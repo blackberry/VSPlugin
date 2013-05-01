@@ -1,0 +1,349 @@
+﻿//* Copyright 2010-2011 Research In Motion Limited.
+//*
+//* Licensed under the Apache License, Version 2.0 (the "License");
+//* you may not use this file except in compliance with the License.
+//* You may obtain a copy of the License at
+//*
+//* http://www.apache.org/licenses/LICENSE-2.0
+//*
+//* Unless required by applicable law or agreed to in writing, software
+//* distributed under the License is distributed on an "AS IS" BASIS,
+//* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//* See the License for the specific language governing permissions and
+//* limitations under the License.
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.ComponentModel;
+using System.Collections;
+using Microsoft.Win32;
+using PkgResources = RIM.VSNDK_Package.Resources;
+using System.Xml;
+using System.Security.Cryptography;
+using System.IO;
+using RIM.VSNDK_Package.Signing.Models;
+using System.Windows.Data;
+
+namespace RIM.VSNDK_Package.Settings.Models
+{
+
+    public class NDKEntryClass
+    {
+        public string NDKName { get; set; }
+        public string HostPath { get; set; }
+        public string TargetPath { get; set; }
+        public NDKEntryClass(string name, string host, string target)
+        {
+            NDKName = name;
+            HostPath = host;
+            TargetPath = target;
+        }
+    }
+
+    class SettingsData : NotifyPropertyChanged
+    {
+        public SettingsData()
+        {
+            string[] filePaths = Directory.GetFiles(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\", "*.xml");
+            IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
+
+            foreach (string file in filePaths)
+            {
+                try 
+                {
+                    XmlDocument xmlDoc = new XmlDocument();
+                    xmlDoc.Load(file);
+                    XmlNodeList name = xmlDoc.GetElementsByTagName("name");
+                    XmlNodeList hostpath = xmlDoc.GetElementsByTagName("host");
+                    XmlNodeList targetpath = xmlDoc.GetElementsByTagName("target");
+
+
+                    NDKEntryClass NDKEntry = new NDKEntryClass(name[0].InnerText, hostpath[0].InnerText, targetpath[0].InnerText);
+                    NDKList.Add(NDKEntry);
+
+                    if (NDKEntry.HostPath == getNDKPath())
+                    {
+                        NDKEntryClass = NDKEntry;
+                    }
+                }
+                catch 
+                {
+                    continue;
+                }
+
+            }
+
+            _ndkEntries = new CollectionView(NDKList);
+        }
+
+        private string _deviceIP;
+        private string _devicePassword;
+        private string _simulatorIP;
+        private string _simulatorPassword;
+        private readonly CollectionView _ndkEntries;
+        private NDKEntryClass _ndkEntry;
+
+        private const string _colDeviceIP = "DeviceIP";
+        private const string _colDevicePW = "DevicePassword";
+        private const string _colSimulatorIP = "SimulatorIP";
+        private const string _colSimulatorPW = "SimulatorPassword";
+        private const string _colNDKEntry = "NDKEntry";
+
+        #region Properties
+
+        public string DeviceIP
+        {
+            get { return _deviceIP; }
+            set { _deviceIP = value; OnPropertyChanged(_colDeviceIP); }
+        }
+
+        public string DevicePassword
+        {
+            get { return _devicePassword; }
+            set { _devicePassword = value; OnPropertyChanged(_colDevicePW); }
+        }
+
+        public string SimulatorIP
+        {
+            get { return _simulatorIP; }
+            set { _simulatorIP = value; OnPropertyChanged(_colSimulatorIP); }
+        }
+
+        public string SimulatorPassword
+        {
+            get { return _simulatorPassword; }
+            set { _simulatorPassword = value; OnPropertyChanged(_colSimulatorPW); }
+        }
+
+        public CollectionView NDKEntries
+        {
+            get { return _ndkEntries; }
+        }
+
+        public NDKEntryClass NDKEntryClass
+        {
+            get { return _ndkEntry; }
+            set
+            {
+                if (_ndkEntry == value) return;
+                _ndkEntry = value;
+                OnPropertyChanged(_colNDKEntry);
+            }
+        }
+
+        #endregion
+
+         /// <summary>
+        /// Set Device Password and IP
+        /// </summary>
+        /// <returns></returns>
+        public void setDeviceInfo()
+        {
+            registerTargetInfo(DevicePassword, DeviceIP, "device");
+        }
+
+        /// <summary>
+        /// Set Simulator Password and IP
+        /// </summary>
+        /// <returns></returns>
+        public void setSimulatorInfo()
+        {
+            registerTargetInfo(SimulatorPassword, SimulatorIP, "simulator");
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public void getDeviceInfo()
+        {
+            RegistryKey rkHKCU = Registry.CurrentUser;
+            RegistryKey rkSettingsPath = null;
+
+            try
+            {
+                rkSettingsPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+
+                object pwd = rkSettingsPath.GetValue("device_password");
+                if (pwd != null)
+                    DevicePassword = Decrypt(pwd.ToString());
+
+                object ip = rkSettingsPath.GetValue("device_IP");
+                if (ip != null)
+                    DeviceIP = ip.ToString();
+            }
+            catch
+            {
+
+            }
+
+            rkSettingsPath.Close();
+            rkHKCU.Close();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public void getSimulatorInfo()
+        {
+            RegistryKey rkHKCU = Registry.CurrentUser;
+            RegistryKey rkSettingsPath = null;
+
+            try
+            {
+                rkSettingsPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+
+                object pwd = rkSettingsPath.GetValue("simulator_password");
+                if (pwd != null)
+                    SimulatorPassword = Decrypt(pwd.ToString());
+                
+                object ip = rkSettingsPath.GetValue("simulator_IP");
+                if (ip != null)
+                    SimulatorIP = ip.ToString();
+            }
+            catch
+            {
+
+            }
+
+            rkSettingsPath.Close();
+            rkHKCU.Close();
+        }
+
+
+        /// <summary>
+        /// Set the password and IP address into the correct registry keys for both simulator and device
+        /// </summary>
+        /// <param name="password">The password to encrypt and store.</param>
+        /// <param name="IP">The IP Address to store.</param>
+        /// <param name="type">The key location device or simulator.</param>
+        private void registerTargetInfo(string password, string IP, string type)
+        {
+            RegistryKey rkHKCU = Registry.CurrentUser;
+            RegistryKey rkTargetInfo = null;
+
+            try
+            {
+                rkTargetInfo = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+                if (password == null)
+                    password = "";
+
+                if (IP == null)
+                    IP = "";
+
+                rkTargetInfo.SetValue(type + "_password", Encrypt(password));
+                rkTargetInfo.SetValue(type + "_IP", IP);
+            }
+            catch
+            {
+
+            }
+            finally
+            {
+                rkTargetInfo.Close();
+                rkHKCU.Close();
+            }
+        }
+
+        /// <summary>
+        /// Set the NDK Path into the register for future reference by the MSBUILD
+        /// </summary>
+        public void setNDKPaths()
+        {
+            RegistryKey rkHKCU = Registry.CurrentUser;
+            RegistryKey rkNDKPath = null;
+
+            try
+            {
+                rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+                rkNDKPath.SetValue("NDKHostPath", _ndkEntry.HostPath);
+                rkNDKPath.SetValue("NDKTargetPath", _ndkEntry.TargetPath);
+            }
+            catch
+            {
+
+            }
+            rkNDKPath.Close();
+            rkHKCU.Close();
+
+        }
+
+        /// <summary>
+        /// Return the NDK Path from the registry
+        /// </summary>
+        /// <returns></returns>
+        private string getNDKPath()
+        {
+            RegistryKey rkHKCU = Registry.CurrentUser;
+            RegistryKey rkNDKPath = null;
+
+            try
+            {
+                rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+                return rkNDKPath.GetValue("NDKHostPath").ToString();
+            }
+            catch
+            {
+
+                return null;
+            }
+            rkNDKPath.Close();
+            rkHKCU.Close();
+        }
+
+        /// <summary>
+        /// Encrypts a given password and returns the encrypted data
+        /// as a base64 string.
+        /// </summary>
+        /// <param name="plainText">An unencrypted string that needs
+        /// to be secured.</param>
+        /// <returns>A base64 encoded string that represents the encrypted
+        /// binary data.
+        /// </returns>
+        /// <remarks>This solution is not really secure as we are
+        /// keeping strings in memory. If runtime protection is essential,
+        /// <see cref="SecureString"/> should be used.</remarks>
+        /// <exception cref="ArgumentNullException">If <paramref name="plainText"/>
+        /// is a null reference.</exception>
+        public string Encrypt(string plainText)
+        {
+            if (plainText == null) throw new ArgumentNullException("plainText");
+
+            //encrypt data
+            var data = Encoding.Unicode.GetBytes(plainText);
+            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.LocalMachine);
+
+            //return as base64 string
+            return Convert.ToBase64String(encrypted);
+        }
+
+        /// <summary>
+        /// Decrypts a given string.
+        /// </summary>
+        /// <param name="cipher">A base64 encoded string that was created
+        /// through the <see cref="Encrypt(string)"/> or
+        /// <see cref="Encrypt(SecureString)"/> extension methods.</param>
+        /// <returns>The decrypted string.</returns>
+        /// <remarks>Keep in mind that the decrypted string remains in memory
+        /// and makes your application vulnerable per se. If runtime protection
+        /// is essential, <see cref="SecureString"/> should be used.</remarks>
+        /// <exception cref="ArgumentNullException">If <paramref name="cipher"/>
+        /// is a null reference.</exception>
+        public string Decrypt(string cipher)
+        {
+            if (cipher == null) throw new ArgumentNullException("cipher");
+
+            //parse base64 string
+            byte[] data = Convert.FromBase64String(cipher);
+
+            //decrypt data
+            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
+
+            return Encoding.Unicode.GetString(decrypted);
+        }
+
+    }
+}

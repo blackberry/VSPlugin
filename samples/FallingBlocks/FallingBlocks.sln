@@ -1,0 +1,45 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FallingBlocks", "FallingBlocks\FallingBlocks.vcxproj", "{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|BlackBerry = Debug|BlackBerry
+		Debug|BlackBerrySimulator = Debug|BlackBerrySimulator
+		Debug|Win32 = Debug|Win32
+		Release|BlackBerry = Release|BlackBerry
+		Release|BlackBerrySimulator = Release|BlackBerrySimulator
+		Release|Win32 = Release|Win32
+		Simulator-Debug|BlackBerry = Simulator-Debug|BlackBerry
+		Simulator-Debug|BlackBerrySimulator = Simulator-Debug|BlackBerrySimulator
+		Simulator-Debug|Win32 = Simulator-Debug|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Debug|BlackBerry.ActiveCfg = Debug|BlackBerry
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Debug|BlackBerry.Build.0 = Debug|BlackBerry
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Debug|BlackBerry.Deploy.0 = Debug|BlackBerry
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Debug|BlackBerrySimulator.ActiveCfg = Debug|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Debug|BlackBerrySimulator.Build.0 = Debug|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Debug|BlackBerrySimulator.Deploy.0 = Debug|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Debug|Win32.ActiveCfg = Debug|Win32
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Debug|Win32.Build.0 = Debug|Win32
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Release|BlackBerry.ActiveCfg = Release|BlackBerry
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Release|BlackBerry.Build.0 = Release|BlackBerry
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Release|BlackBerrySimulator.ActiveCfg = Release|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Release|BlackBerrySimulator.Build.0 = Release|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Release|BlackBerrySimulator.Deploy.0 = Release|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Release|Win32.ActiveCfg = Release|Win32
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Release|Win32.Build.0 = Release|Win32
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Simulator-Debug|BlackBerry.ActiveCfg = Simulator-Debug|BlackBerry
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Simulator-Debug|BlackBerry.Build.0 = Simulator-Debug|BlackBerry
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Simulator-Debug|BlackBerrySimulator.ActiveCfg = Simulator-Debug|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Simulator-Debug|BlackBerrySimulator.Build.0 = Simulator-Debug|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Simulator-Debug|BlackBerrySimulator.Deploy.0 = Simulator-Debug|BlackBerrySimulator
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Simulator-Debug|Win32.ActiveCfg = Simulator-Debug|Win32
+		{90124CDE-5D40-4B1B-ADCD-4DCF309A4FC8}.Simulator-Debug|Win32.Build.0 = Simulator-Debug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
