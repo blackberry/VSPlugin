@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<qnx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.qnx.com/schemas/application/1.0">
+  <id>com.example.FallingBlocks</id>
+  <name>FallingBlocks Test</name>
+  <versionNumber>1.0.0</versionNumber>
+  <buildId>1</buildId>
+  <description>The FallingBlocks application is used for displaying falling blocks. Hello</description>
+  <author>RIM Canada</author>
+  <authorId>gYAAgDthaMCeIcQicW0p4fUkeSM</authorId>
+  <category>core.games</category>
+  <initialWindow>
+    <autoOrients />
+    <aspectRatio />
+    <systemChrome>noneasdasdf</systemChrome>
+    <transparent>true</transparent>
+  </initialWindow>
+  <asset path="icon.png" public="true" entry="" type="">lib/icon.png</asset>
+  <asset path="sample-splashscreen-landscape.png" public="true" entry="" type="Qnx/Elf">sample-splashscreen-landscape.png</asset>
+  <asset path="sample-splashscreen-portrait.png" public="true" entry="" type="">lib/sample-splashscreen-portrait.png</asset>
+  <asset path="LICENSE">LICENSE</asset>
+  <asset path="NOTICE">NOTICE</asset>
+  <configuration id="com.qnx.qcc.configuration.exe.debug.342123362" name="Device-Debug">
+    <platformArchitecture>armle-v7</platformArchitecture>
+    <asset path="Device-Debug/FallingBlocks" entry="true" type="Qnx/Elf">FallingBlocks</asset>
+  </configuration>
+  <configuration id="com.qnx.qcc.configuration.exe.release.1670741476" name="Device-Release">
+    <platformArchitecture>armle-v7</platformArchitecture>
+    <asset path="Device-Release/FallingBlocks" entry="true" type="Qnx/Elf">FallingBlocks</asset>
+  </configuration>
+  <configuration id="com.qnx.qcc.configuration.exe.debug.1135866815" name="Simulator-Debug">
+    <platformArchitecture>x86</platformArchitecture>
+    <asset path="Simulator-Debug/FallingBlocks" entry="true" type="Qnx/Elf">FallingBlocks</asset>
+  </configuration>
+  <permission system="true">run_native</permission>
+  <permission>bbm_connect</permission>
+  <permission>use_camera</permission>
+  <permission>access_pimdomain_calendars</permission>
+  <permission>access_pimdomain_contacts</permission>
+  <permission>bbm_connect</permission>
+  <permission>read_device_identifying_information</permission>
+  <permission>access_location_services</permission>
+  <permission>bbm_connect</permission>
+  <permission>bbm_connect</permission>
+  <icon>
+    <image>icon.png</image>
+  </icon>
+  <env var="LD_LIBRARY_PATH" value="app/native/lib" />
+</qnx>
