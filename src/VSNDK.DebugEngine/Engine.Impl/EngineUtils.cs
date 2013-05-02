@@ -22,23 +22,16 @@ using System.Globalization;
 
 namespace VSNDK.DebugEngine
 {
+    /// <summary>
+    /// Some utilities used in VSNDK debug engine projects.
+    /// </summary>
     public static class EngineUtils
     {
 
-        public static string GetAddressDescription()
-        {
-            return "";
-        }
-
-
-        public static void CheckOk(int hr)
-        {
-            /*if (hr != 0)
-            {
-                throw new ComponentException(hr);
-            }*/
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="hr"> An integer value. </param>
         public static void RequireOk(int hr)
         {
             if (hr != 0)
@@ -47,36 +40,16 @@ namespace VSNDK.DebugEngine
             }
         }
 
-        public static int GetProcessId(IDebugProcess2 process)
-        {
-            AD_PROCESS_ID[] pid = new AD_PROCESS_ID[1];
-            EngineUtils.RequireOk(process.GetPhysicalProcessId(pid));
 
-            if (pid[0].ProcessIdType != (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM)
-            {
-                return 0;
-            }
-
-            return (int) pid[0].dwProcessId;            
-        }
-
-        public static int GetProcessId(IDebugProgram2 program)
-        {
-            IDebugProcess2 process;
-            RequireOk(program.GetProcess(out process));
-
-            return GetProcessId(process);
-        }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"> Exception. </param>
+        /// <returns> VSConstants.E_NOTIMPL. </returns>
         public static int UnexpectedException(Exception e)
         {
-            Debug.Fail("Unexpected exception during Attach");
+            Debug.Fail("Unexpected exception:" + e);
             return VSConstants.E_NOTIMPL;
-        }
-
-        internal static bool IsFlagSet(uint value, int flagValue)
-        {
-            return (value & flagValue) != 0;
         }
     }
 }

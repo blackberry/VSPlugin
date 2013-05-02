@@ -22,12 +22,19 @@ using System.Text;
 
 namespace VSNDK.DebugEngine
 {
-    // This class represents a pending breakpoint which is an abstract representation of a breakpoint before it is bound.
-    // When a user creates a new breakpoint, the pending breakpoint is created and is later bound. The bound breakpoints
-    // become children of the pending breakpoint.
+
+    /// <summary>
+    /// This class represents a peiding breakpoint that is ready to bind to a code location. A pending breakpoint is an abstract 
+    /// representation of a breakpoint before it is bound. When a user creates a new breakpoint, the pending breakpoint is created 
+    /// and is later bound. The bound breakpoints become children of the pending breakpoint.
+    /// 
+    /// It implements IDebugPendingBreakpoint2: (http://msdn.microsoft.com/en-ca/library/bb161807.aspx)
+    /// </summary>
     public class AD7PendingBreakpoint : IDebugPendingBreakpoint2
     {       
-        // The breakpoint request that resulted in this pending breakpoint being created.
+        /// <summary>
+        /// The breakpoint request that resulted in this pending breakpoint being created.
+        /// </summary>
         private IDebugBreakpointRequest2 m_pBPRequest;
         private BP_REQUEST_INFO m_bpRequestInfo; 
         private AD7Engine m_engine;
@@ -45,25 +52,31 @@ namespace VSNDK.DebugEngine
         private bool m_enabled;
         private bool m_deleted;
 
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="pBPRequest"> The breakpoint request used to create this pending breakpoint. </param>
+        /// <param name="engine"> The AD7Engine object that represents the DE. </param>
+        /// <param name="bpManager"> The breakpoint manager. </param>
         public AD7PendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, AD7Engine engine, BreakpointManager bpManager)
         {
             m_pBPRequest = pBPRequest;
             BP_REQUEST_INFO[] requestInfo = new BP_REQUEST_INFO[1];
-            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo));
+            m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_BPLOCATION, requestInfo);
             m_bpRequestInfo = requestInfo[0];
-            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_CONDITION, requestInfo));
+            m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_CONDITION, requestInfo);
             if (requestInfo[0].dwFields != 0)
             {
                 m_bpRequestInfo.bpCondition = requestInfo[0].bpCondition;
                 m_bpRequestInfo.dwFields |= requestInfo[0].dwFields; 
             }
-            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_PASSCOUNT, requestInfo));
+            m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_PASSCOUNT, requestInfo);
             if (requestInfo[0].dwFields != 0)
             {
                 m_bpRequestInfo.bpPassCount = requestInfo[0].bpPassCount;
                 m_bpRequestInfo.dwFields |= requestInfo[0].dwFields;
             }
-//            EngineUtils.CheckOk(m_pBPRequest.GetRequestInfo(enum_BPREQI_FIELDS.BPREQI_ALLFIELDS, requestInfo));
 
             m_engine = engine;
             m_bpManager = bpManager;
@@ -73,43 +86,33 @@ namespace VSNDK.DebugEngine
             m_deleted = false;
         }
 
+
+        /// <summary>
+        /// Determines whether this pending breakpoint can bind to a code location.
+        /// </summary>
+        /// <returns> If successful, returns TRUE; otherwise, returns FALSE. </returns>
         private bool CanBind()
         {
             // The engine only supports these types of breakpoints: 
             // - File and line number.
             // - Function name and offset.
-            if (this.m_deleted || m_engine.m_process == null) 
-            {            
+            if (this.m_deleted || m_engine.m_process == null)
+            {
                 return false;
             }
             else if (m_bpRequestInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE
                 || m_bpRequestInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
-            return true;
-        }
+                return true;
+            }
 
             return false;
         }
 
-        // Get the document context for this pending breakpoint. A document context is a abstract representation of a source file 
-        // location.
-        public AD7DocumentContext GetDocumentContext(uint address)
-        {
-            IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(m_bpRequestInfo.bpLocation.unionmember2));
-            string documentName;
-            EngineUtils.CheckOk(docPosition.GetFileName(out documentName));
 
-            // Get the location in the document that the breakpoint is in.
-            TEXT_POSITION[] startPosition = new TEXT_POSITION[1];
-            TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
-            EngineUtils.CheckOk(docPosition.GetRange(startPosition, endPosition));           
-
-            AD7MemoryAddress codeContext = new AD7MemoryAddress(m_engine, address);
-            
-            return new AD7DocumentContext(documentName, startPosition[0], startPosition[0], codeContext);
-        }
-
-        // Remove all of the bound breakpoints for this pending breakpoint
+        /// <summary>
+        /// Remove all of the bound breakpoints for this pending breakpoint
+        /// </summary>
         public void ClearBoundBreakpoints()
         {
             lock (m_boundBreakpoints)
@@ -121,7 +124,11 @@ namespace VSNDK.DebugEngine
             }
         }
 
-        // Called by bound breakpoints when they are being deleted.
+
+        /// <summary>
+        /// Called by bound breakpoints when they are being deleted.
+        /// </summary>
+        /// <param name="boundBreakpoint"> A bound breakpoint. </param>
         public void OnBoundBreakpointDeleted(AD7BoundBreakpoint boundBreakpoint)
         {
             lock (m_boundBreakpoints)
@@ -132,6 +139,13 @@ namespace VSNDK.DebugEngine
 
         #region IDebugPendingBreakpoint2 Members
 
+
+        /// <summary> GDB works with short path names only, which requires converting the path names to/from long ones. This function 
+        /// returns the short path name for a given long one. </summary>
+        /// <param name="path">Long path name. </param>
+        /// <param name="shortPath">Returns this short path name. </param>
+        /// <param name="shortPathLength"> Lenght of this short path name. </param>
+        /// <returns></returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern int GetShortPathName(
                  [MarshalAs(UnmanagedType.LPTStr)]
@@ -141,10 +155,11 @@ namespace VSNDK.DebugEngine
                  int shortPathLength
                  );
 
+        
         /// <summary>
-        /// Bind a breakpoint
+        /// Bind this breakpoint. (http://msdn.microsoft.com/en-ca/library/bb145901.aspx)
         /// </summary>
-        /// <returns>S_OK if succssful</returns>
+        /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugPendingBreakpoint2.Bind()
         {
             try
@@ -161,7 +176,6 @@ namespace VSNDK.DebugEngine
                         return VSConstants.S_FALSE;
                     }
 
-
                     if (xBBP == null)
                     {
                         return VSConstants.S_FALSE;
@@ -175,35 +189,39 @@ namespace VSNDK.DebugEngine
                     return VSConstants.S_OK;
                 }
                 else
-                {                    
-                    // The breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid expression, etc...
-                    // The sample engine does not support this, but a real world engine will want to send an instance of IDebugBreakpointErrorEvent2 to the
-                    // UI and return a valid instance of IDebugErrorBreakpoint2 from IDebugPendingBreakpoint2::EnumErrorBreakpoints. The debugger will then
-                    // display information about why the breakpoint did not bind to the user.
+                {
+                    // The breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid 
+                    // expression, etc... The VSNDK debug engine does not support this, but a real world engine will want to send an 
+                    // instance of IDebugBreakpointErrorEvent2 to the UI and return a valid instance of IDebugErrorBreakpoint2 from 
+                    // IDebugPendingBreakpoint2::EnumErrorBreakpoints. The debugger will then display information about why the 
+                    // breakpoint did not bind to the user.
                     return VSConstants.S_FALSE;
                 }
             }
-            //catch (ComponentException e)
-            //{
-            //    return e.HResult;
-            //}
             catch (Exception e)
             {
                 return EngineUtils.UnexpectedException(e);
             }
         }
 
-        // Determines whether this pending breakpoint can bind to a code location.
+
+        /// <summary>
+        /// Determines whether this pending breakpoint can bind to a code location. (http://msdn.microsoft.com/en-ca/library/bb146753.aspx)
+        /// </summary>
+        /// <param name="ppErrorEnum"> Returns an IEnumDebugErrorBreakpoints2 object that contains a list of IDebugErrorBreakpoint2 
+        /// objects if there could be errors. </param>
+        /// <returns> If successful, returns S_OK; otherwise, returns S_FALSE </returns>
         int IDebugPendingBreakpoint2.CanBind(out IEnumDebugErrorBreakpoints2 ppErrorEnum)
         {
             ppErrorEnum = null;
 
             if (!CanBind())
             {
-                // Called to determine if a pending breakpoint can be bound. 
-                // The breakpoint may not be bound for many reasons such as an invalid location, an invalid expression, etc...
-                // The sample engine does not support this, but a real world engine will want to return a valid enumeration of IDebugErrorBreakpoint2.
-                // The debugger will then display information about why the breakpoint did not bind to the user.
+                // The breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid 
+                // expression, etc... The VSNDK debug engine does not support this, but a real world engine will want to send an 
+                // instance of IDebugBreakpointErrorEvent2 to the UI and return a valid instance of IDebugErrorBreakpoint2 from 
+                // IDebugPendingBreakpoint2::EnumErrorBreakpoints. The debugger will then display information about why the 
+                // breakpoint did not bind to the user.
                 ppErrorEnum = null;
                 return VSConstants.S_FALSE;
             }
@@ -211,7 +229,11 @@ namespace VSNDK.DebugEngine
             return VSConstants.S_OK;
         }
 
-        // Deletes this pending breakpoint and all breakpoints bound from it.
+
+        /// <summary>
+        /// Deletes this pending breakpoint and all breakpoints bound from it. (http://msdn.microsoft.com/en-ca/library/bb145918.aspx)
+        /// </summary>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugPendingBreakpoint2.Delete()
         {
             lock (m_boundBreakpoints)
@@ -227,7 +249,12 @@ namespace VSNDK.DebugEngine
             return VSConstants.S_OK;
         }
 
-        // Toggles the enabled state of this pending breakpoint.
+
+        /// <summary>
+        /// Toggles the enabled state of this pending breakpoint. (http://msdn.microsoft.com/en-ca/library/bb145046.aspx)
+        /// </summary>
+        /// <param name="fEnable"> Set to nonzero (TRUE) to enable a pending breakpoint, or to zero (FALSE) to disable. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugPendingBreakpoint2.Enable(int fEnable)
         {
             lock (m_boundBreakpoints)
@@ -243,7 +270,12 @@ namespace VSNDK.DebugEngine
             return VSConstants.S_OK;
         }
 
-        // Enumerates all breakpoints bound from this pending breakpoint
+
+        /// <summary>
+        /// Enumerates all breakpoints bound from this pending breakpoint. (http://msdn.microsoft.com/en-ca/library/bb145139.aspx)
+        /// </summary>
+        /// <param name="ppEnum"> Returns an IEnumDebugBoundBreakpoints2 object that enumerates the bound breakpoints. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugPendingBreakpoint2.EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
         {
             lock (m_boundBreakpoints)
@@ -254,25 +286,46 @@ namespace VSNDK.DebugEngine
             return VSConstants.S_OK;
         }
 
-        // Enumerates all error breakpoints that resulted from this pending breakpoint.
+
+        /// <summary>
+        /// Enumerates all error breakpoints that resulted from this pending breakpoint. 
+        /// (http://msdn.microsoft.com/en-ca/library/bb145598.aspx)
+        /// </summary>
+        /// <param name="bpErrorType"> A combination of values from the enum_BP_ERROR_TYPE enumeration that selects the type of errors 
+        /// to enumerate. </param>
+        /// <param name="ppEnum"> Returns an IEnumDebugErrorBreakpoints2 object that contains a list of IDebugErrorBreakpoint2 objects. </param>
+        /// <returns> VSConstants.E_NOTIMPL. </returns>
         int IDebugPendingBreakpoint2.EnumErrorBreakpoints(enum_BP_ERROR_TYPE bpErrorType, out IEnumDebugErrorBreakpoints2 ppEnum)
         {
-            // Called when a pending breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid expression, etc...
-            // The sample engine does not support this, but a real world engine will want to send an instance of IDebugBreakpointErrorEvent2 to the
-            // UI and return a valid enumeration of IDebugErrorBreakpoint2 from IDebugPendingBreakpoint2::EnumErrorBreakpoints. The debugger will then
-            // display information about why the breakpoint did not bind to the user.
+            // Called when a pending breakpoint could not be bound. This may occur for many reasons such as an invalid location, an 
+            // invalid expression, etc... The VSNDK debug engine does not support this, but a real world engine will want to send an 
+            // instance of IDebugBreakpointErrorEvent2 to the UI and return a valid enumeration of IDebugErrorBreakpoint2 from 
+            // IDebugPendingBreakpoint2::EnumErrorBreakpoints. The debugger will then display information about why the breakpoint 
+            // did not bind to the user.
             ppEnum = null;
             return VSConstants.E_NOTIMPL;
         }
 
-        // Gets the breakpoint request that was used to create this pending breakpoint
+
+        /// <summary>
+        /// Gets the breakpoint request that was used to create this pending breakpoint. 
+        /// (http://msdn.microsoft.com/en-ca/library/bb161770.aspx)
+        /// </summary>
+        /// <param name="ppBPRequest"> Returns an IDebugBreakpointRequest2 object representing the breakpoint request that was used to 
+        /// create this pending breakpoint. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugPendingBreakpoint2.GetBreakpointRequest(out IDebugBreakpointRequest2 ppBPRequest)
         {
             ppBPRequest = this.m_pBPRequest;
             return VSConstants.S_OK;
         }
 
-        // Gets the state of this pending breakpoint.
+
+        /// <summary>
+        /// Gets the state of this pending breakpoint. (http://msdn.microsoft.com/en-ca/library/bb162178.aspx)
+        /// </summary>
+        /// <param name="pState"> A PENDING_BP_STATE_INFO structure that is filled in with a description of this pending breakpoint. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugPendingBreakpoint2.GetState(PENDING_BP_STATE_INFO[] pState)
         {
             if (m_deleted)
@@ -291,21 +344,40 @@ namespace VSNDK.DebugEngine
             return VSConstants.S_OK;
         }
 
-        // The sample engine does not support conditions on breakpoints.
+
+        /// <summary>
+        /// Sets or changes the condition associated with the pending breakpoint. (http://msdn.microsoft.com/en-ca/library/bb144977.aspx).
+        /// Not implemented here, but a conditional breakpoint can be set using IDebugBoundBreakpoint2::SetCondition().
+        /// </summary>
+        /// <param name="bpCondition"> A BP_CONDITION structure that specifies the condition to set. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugPendingBreakpoint2.SetCondition(BP_CONDITION bpCondition)
         {
             throw new NotImplementedException();
         }
 
-        // The sample engine does not support pass counts on breakpoints.
+
+        /// <summary>
+        /// Sets or changes the pass count associated with the pending breakpoint. (http://msdn.microsoft.com/en-ca/library/bb145038.aspx).
+        /// Not implemented here, but a pass count associated to a breakpoint can be set/changed using 
+        /// IDebugBoundBreakpoint2::SetPassCount().
+        /// </summary>
+        /// <param name="bpPassCount"> A BP_PASSCOUNT structure that contains the pass count. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugPendingBreakpoint2.SetPassCount(BP_PASSCOUNT bpPassCount)
         {
             throw new NotImplementedException();
         }
 
-        // Toggles the virtualized state of this pending breakpoint. When a pending breakpoint is virtualized, 
-        // the debug engine will attempt to bind it every time new code loads into the program.
-        // The sample engine will does not support this.
+
+        /// <summary>
+        /// Toggles the virtualized state of this pending breakpoint. When a pending breakpoint is virtualized, the debug engine will 
+        /// attempt to bind it every time new code loads into the program. (http://msdn.microsoft.com/en-ca/library/bb146187.aspx)
+        /// The VSNDK debug engine does not support this. Not implemented.
+        /// </summary>
+        /// <param name="fVirtualize"> Set to nonzero (TRUE) to virtualize the pending breakpoint, or to zero (FALSE) to turn off 
+        /// virtualization. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugPendingBreakpoint2.Virtualize(int fVirtualize)
         {
             return VSConstants.S_OK;

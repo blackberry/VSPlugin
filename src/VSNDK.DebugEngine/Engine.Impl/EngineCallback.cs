@@ -21,17 +21,42 @@ using System.Collections.ObjectModel;
 
 namespace VSNDK.DebugEngine
 {
-    public class EngineCallback // : ISampleEngineCallback
+    /// <summary>
+    /// Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
+    /// </summary>
+    public class EngineCallback
     {
+
+        /// <summary>
+        ///  The IDebugEventCallback2 object that receives debugger events. 
+        /// </summary>
         readonly IDebugEventCallback2 m_ad7Callback;
+
+        /// <summary>
+        /// The AD7Engine object that represents the DE.
+        /// </summary>
         readonly AD7Engine m_engine;
 
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="engine"> The AD7Engine object that represents the DE. </param>
+        /// <param name="ad7Callback"> The IDebugEventCallback2 object that receives debugger events. </param>
         public EngineCallback(AD7Engine engine, IDebugEventCallback2 ad7Callback)
         {
             m_ad7Callback = ad7Callback;
             m_engine = engine;
         }
 
+
+        /// <summary>
+        /// Send events to the debugger.
+        /// </summary>
+        /// <param name="eventObject"> Event object to be sent to the debugger. </param>
+        /// <param name="iidEvent"> ID of the event. </param>
+        /// <param name="program"> A program that is running in a process. </param>
+        /// <param name="thread"> A thread running in a program. </param>
         public void Send(IDebugEvent2 eventObject, string iidEvent, IDebugProgram2 program, IDebugThread2 thread)
         {
             uint attributes; 
@@ -57,87 +82,63 @@ namespace VSNDK.DebugEngine
                 EngineUtils.RequireOk(m_ad7Callback.Event(m_engine, null, program, thread, eventObject, ref riidEvent, attributes));
         }
 
+
+        /// <summary>
+        /// Call the method that will send the event to the debugger with all the arguments.
+        /// </summary>
+        /// <param name="eventObject"> Event object to be sent to the debugger. </param>
+        /// <param name="iidEvent"> ID of the event. </param>
+        /// <param name="thread"> A thread running in a program. </param>
         public void Send(IDebugEvent2 eventObject, string iidEvent, IDebugThread2 thread)
         {
             Send(eventObject, iidEvent, m_engine, thread);
         }
 
-        #region ISampleEngineCallback Members
 
+        /// <summary>
+        /// IDebugErrorEvent2 is used to report error messages to the user when something goes wrong in the debug engine.
+        /// The VSNDK debug engine doesn't take advantage of this. Not implemented.
+        /// </summary>
+        /// <param name="hrErr"></param>
         public void OnError(int hrErr)
         {
-            // Debug.Assert(GDBParser.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
-
-            // IDebugErrorEvent2 is used to report error messages to the user when something goes wrong in the debug engine.
-            // The sample engine doesn't take advantage of this.
         }
 
-        //public void OnModuleLoad(DebuggedModule debuggedModule)
+
+        /// <summary>
+        /// The VSNDK debug engine does not support binding breakpoints as modules load since the primary exe is the only module
+        /// symbols are loaded for. A production debugger will need to bind breakpoints when a new module is loaded.
+        /// </summary>
+        /// <param name="debuggedModule"> A module loaded in the debugged process. </param>
         public void OnModuleLoad(AD7Module debuggedModule)
         {
-            // This will get called when the entrypoint breakpoint is fired because the engine sends a mod-load event
-            // for the exe.
-            // if (m_engine.DebuggedProcess != null)
-            // { 
-                // Debug.Assert(GDBParser.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
-            // }
-
             // AD7Module ad7Module = new AD7Module(debuggedModule);
             AD7ModuleLoadEvent eventObject = new AD7ModuleLoadEvent(debuggedModule, true /* this is a module load */);
 
             // debuggedModule.Client = ad7Module;
 
-            // The sample engine does not support binding breakpoints as modules load since the primary exe is the only module
-            // symbols are loaded for. A production debugger will need to bind breakpoints when a new module is loaded.
-
             Send(eventObject, AD7ModuleLoadEvent.IID, null);
         }
 
-        public void OnModuleUnload()
-        {
-            
-        }
 
+        /// <summary>
+        /// Send to the session debug manager (SDM) an event to output a string.
+        /// Not used.
+        /// </summary>
+        /// <param name="outputString"> The output string. </param>
         public void OnOutputString(string outputString)
         {
-            // Debug.Assert(GDBParser.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
-
             AD7OutputDebugStringEvent eventObject = new AD7OutputDebugStringEvent(outputString);
 
             Send(eventObject, AD7OutputDebugStringEvent.IID, null);
         }
 
-        public void OnProcessExit(uint exitCode)
-        {
-            // Debug.Assert(GDBParser.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
 
-            AD7ProgramDestroyEvent eventObject = new AD7ProgramDestroyEvent(exitCode);
-
-            Send(eventObject, AD7ProgramDestroyEvent.IID, null);
-        }
-
-        public void OnThreadExit()
-        {
-
-        }
-        
-        /*public void OnThreadStart(DebuggedThread debuggedThread)
-        {
-            // This will get called when the entrypoint breakpoint is fired because the engine sends a thread start event
-            // for the main thread of the application.
-            //if (m_engine.DebuggedProcess != null)
-            //{
-            //    Debug.Assert(GDBParser.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
-            //}
-
-            // AD7Thread ad7Thread = new AD7Thread(m_engine, debuggedThread);
-            // debuggedThread.Client = ad7Thread;
-            
-            AD7ThreadCreateEvent eventObject = new AD7ThreadCreateEvent();
-            // Send(eventObject, AD7ThreadCreateEvent.IID, ad7Thread);
-            Send(eventObject, AD7ThreadCreateEvent.IID, debuggedThread);
-        }*/
-
+        /// <summary>
+        /// Send an event to SDM with the breakpoint that was hit.
+        /// </summary>
+        /// <param name="thread"> The thread running in a program. </param>
+        /// <param name="clients"> List of bound breakpoints. At this moment, this list has only one element. </param>
         public void OnBreakpoint(AD7Thread thread, IList<IDebugBoundBreakpoint2> clients)
         {
             IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
@@ -149,67 +150,67 @@ namespace VSNDK.DebugEngine
                 i++;
             }
 
-            // An engine that supports more advanced breakpoint features such as hit counts, conditions and filters
-            // should notify each bound breakpoint that it has been hit and evaluate conditions here.
-            // The sample engine does not support these features.
-
             AD7BoundBreakpointsEnum boundBreakpointsEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
             AD7BreakpointEvent eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);            
 
             Send(eventObject, AD7BreakpointEvent.IID, thread);
         }
 
+
+        /// <summary>
+        // Exception events are sent when an exception occurs in the debugged that the debugger was not expecting.
+        // The VSNDK debug engine does not support these. Not implemented.
+        /// </summary>
         public void OnException()
         {
-            // Exception events are sent when an exception occurs in the debuggee that the debugger was not expecting.
-            // The sample engine does not support these.
             throw new Exception("The method or operation is not implemented.");
         }
 
+
+        /// <summary>
+        /// Step complete is sent when a step has finished. Not implemented.
+        /// </summary>
         public void OnStepComplete()
         {
-            // Step complete is sent when a step has finished. The sample engine does not support stepping.
             throw new Exception("The method or operation is not implemented.");
 //            AD7StepCompletedEvent.Send(m_engine);
-            // ??? implement this method...
+            // TODO: implement this method...
         }
 
+
+        /// <summary>
+        /// This will get called when the engine receives the breakpoint event that is created when the user
+        /// hits the pause button in VS.
+        /// </summary>
+        /// <param name="thread"> The thread running in a program. </param>
         public void OnAsyncBreakComplete(AD7Thread thread)
         {
-            // This will get called when the engine receives the breakpoint event that is created when the user
-            // hits the pause button in vs.
-            // Debug.Assert(GDBParser.CurrentThreadId == m_engine.DebuggedProcess.PollThreadId);
-            
             AD7AsyncBreakCompleteEvent eventObject = new AD7AsyncBreakCompleteEvent();
             Send(eventObject, AD7AsyncBreakCompleteEvent.IID, thread);
         }
 
-        public void OnLoadComplete(AD7Thread thread)
-        {            
-            AD7LoadCompleteEvent eventObject = new AD7LoadCompleteEvent();
-            Send(eventObject, AD7LoadCompleteEvent.IID, thread);
-        }
 
-        public void OnProgramDestroy(uint exitCode)
-        {                     
-            AD7ProgramDestroyEvent eventObject = new AD7ProgramDestroyEvent(exitCode);
-            Send(eventObject, AD7ProgramDestroyEvent.IID, null);
-        }
-
-        // Engines notify the debugger about the results of a symbol serach by sending an instance
-        // of IDebugSymbolSearchEvent2
-        //public void OnSymbolSearch(DebuggedModule module, string status, uint dwStatusFlags)
+        /// <summary>
+        /// Engines notify the debugger about the results of a symbol search by sending an instance of IDebugSymbolSearchEvent2.
+        /// Not used.
+        /// </summary>
+        /// <param name="module"></param>
+        /// <param name="status"></param>
+        /// <param name="dwStatusFlags"></param>
         public void OnSymbolSearch(AD7Module module, string status, uint dwStatusFlags)
         {
             string statusString = (dwStatusFlags == 1 ? "Symbols Loaded - " : "No symbols loaded") + status;
 
-            //AD7Module ad7Module = new AD7Module(module);
-            //AD7SymbolSearchEvent eventObject = new AD7SymbolSearchEvent(ad7Module, statusString, dwStatusFlags);
             AD7SymbolSearchEvent eventObject = new AD7SymbolSearchEvent(module, statusString, dwStatusFlags);
             Send(eventObject, AD7SymbolSearchEvent.IID, null);
         }
 
-        // Engines notify the debugger that a breakpoint has bound through the breakpoint bound event.
+
+        /// <summary>
+        /// Engines notify the debugger that a breakpoint has bound through the breakpoint bound event.
+        /// </summary>
+        /// <param name="objBoundBreakpoint"> The bounded breakpoint. </param>
+        /// <param name="address"> 0. </param>
         public void OnBreakpointBound(object objBoundBreakpoint, uint address)
         {
             AD7BoundBreakpoint boundBreakpoint = (AD7BoundBreakpoint)objBoundBreakpoint;
@@ -220,12 +221,15 @@ namespace VSNDK.DebugEngine
             Send(eventObject, AD7BreakpointBoundEvent.IID, null);
         }
 
+
+        /// <summary>
+        /// Send an event to notify the SDM that this thread was created.
+        /// </summary>
+        /// <param name="debuggedThread"> The new thread running in a program. </param>
         public void OnThreadStart(AD7Thread debuggedThread)
         {
             AD7ThreadCreateEvent eventObject = new AD7ThreadCreateEvent();
             Send(eventObject, AD7ThreadCreateEvent.IID, debuggedThread);
         }
-
-        #endregion
     }
 }

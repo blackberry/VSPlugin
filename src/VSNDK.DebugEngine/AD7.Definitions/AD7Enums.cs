@@ -15,8 +15,10 @@
 
 namespace VSNDK.DebugEngine
 {
-    // Flags passed by the debugger to the engine to describe the desired format and execution options for properties 
-    // (locals, arguments, etc...)
+    /// <summary> 
+    /// Flags passed by the debugger to the engine to describe the desired format and execution options for properties 
+    /// (locals, arguments, etc...) 
+    /// </summary>
     public enum DEBUGPROP_INFO_FLAGS
     {
 	    DEBUGPROP_INFO_FULLNAME					= 0x00000001,

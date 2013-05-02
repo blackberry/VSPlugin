@@ -21,22 +21,38 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
 
-// Copied from Cosmos
-
 namespace VSNDK.DebugEngine
 {
-    // this class represents a module loaded in the debuggee process to the debugger. 
+
+    /// <summary>
+    /// This class represents a module loaded in the debuggee process to the debugger. Not implemented, yet.
+    ///
+    /// It implements:
+    ///
+    /// IDebugModule2: This interface represents a module—that is, an executable unit of a program—such as a DLL.
+    /// (http://msdn.microsoft.com/en-ca/library/bb145360.aspx)
+    /// 
+    /// IDebugModule3: This interface represents a module that supports alternate locations of symbols and JustMyCode states.
+    /// (http://msdn.microsoft.com/en-ca/library/bb145893.aspx)
+    /// </summary>
     public class AD7Module : IDebugModule2, IDebugModule3
     {
-        //public readonly DebuggedModule DebuggedModule;
-
-        public AD7Module(/* DebuggedModule debuggedModule */)
+        
+        /// <summary>
+        /// Constructor. Not implemented, yet. 
+        /// </summary>
+        public AD7Module()
         { 
-            //this.DebuggedModule = debuggedModule;
         }
 
-        // Gets the MODULE_INFO that describes this module.
-        // This is how the debugger obtains most of the information about the module.
+
+        /// <summary>
+        /// Gets information about this module. (http://msdn.microsoft.com/en-ca/library/bb161975.aspx)
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags from the MODULE_INFO_FIELDS enumeration that specify which fields of pInfo 
+        /// are to be filled out. </param>
+        /// <param name="infoArray"> A MODULE_INFO structure that is filled in with a description of the module. </param>
+        /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugModule2.GetInfo(enum_MODULE_INFO_FIELDS dwFields, MODULE_INFO[] infoArray)
         {
             try
@@ -45,19 +61,16 @@ namespace VSNDK.DebugEngine
 
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_NAME))
                 {
-                    //info.m_bstrName = System.IO.Path.GetFileName(this.DebuggedModule.Name);
                     info.m_bstrName = "";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_NAME;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_URL))
                 {
-                    //info.m_bstrUrl = this.DebuggedModule.Name;
                     info.m_bstrUrl = "";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_URL;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_LOADADDRESS))
                 {
-                    //info.m_addrLoadAddress = (ulong)this.DebuggedModule.BaseAddress;
                     info.m_addrLoadAddress = 0;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_LOADADDRESS;
                 }
@@ -65,38 +78,28 @@ namespace VSNDK.DebugEngine
                 {
                     // A debugger that actually supports showing the preferred base should crack the PE header and get 
                     // that field. This debugger does not do that, so assume the module loaded where it was suppose to.                   
-                    //info.m_addrPreferredLoadAddress = (ulong)this.DebuggedModule.BaseAddress;
                     info.m_addrPreferredLoadAddress = 0;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_PREFFEREDADDRESS;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_SIZE))
                 {
-                    //info.m_dwSize = this.DebuggedModule.Size;
                     info.m_dwSize = 0;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_SIZE;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_LOADORDER))
                 {
-                    //info.m_dwLoadOrder = this.DebuggedModule.GetLoadOrder();
                     info.m_dwLoadOrder = 0;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_LOADORDER;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_URLSYMBOLLOCATION))
                 {
-                    //if (this.DebuggedModule.SymbolsLoaded)
-                    {
-                        //info.m_bstrUrlSymbolLocation = this.DebuggedModule.SymbolPath;
-                        info.m_bstrUrlSymbolLocation = "";
-                        info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_URLSYMBOLLOCATION;
-                    }
+                    info.m_bstrUrlSymbolLocation = "";
+                    info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_URLSYMBOLLOCATION;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_FLAGS))
                 {
                     info.m_dwModuleFlags = 0;
-                    //if (this.DebuggedModule.SymbolsLoaded)
-                    {
-                        info.m_dwModuleFlags |= (enum_MODULE_FLAGS.MODULE_FLAG_SYMBOLS);
-                    }
+                    info.m_dwModuleFlags |= (enum_MODULE_FLAGS.MODULE_FLAG_SYMBOLS);
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_FLAGS;
                 }
                 if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_VERSION))
@@ -110,15 +113,10 @@ namespace VSNDK.DebugEngine
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_DEBUGMESSAGE;
                 }
 
-
                 infoArray[0] = info;
 
                 return VSConstants.S_OK;
             }
-            //catch (ComponentException e)
-            //{
-            //    return e.HResult;
-            //}
             catch (Exception e)
             {
                 return EngineUtils.UnexpectedException(e);
@@ -127,6 +125,15 @@ namespace VSNDK.DebugEngine
 
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
+        
+
+        /// <summary>
+        /// OBSOLETE. DO NOT USE. Reloads the symbols for this module. (http://msdn.microsoft.com/en-ca/library/bb145113.aspx)
+        /// </summary>
+        /// <param name="urlToSymbols"> The path to the symbol store. </param>
+        /// <param name="debugMessage"> Returns an informational message, such as a status or error message, that is displayed to the 
+        /// right of the module name in the Modules window. </param>
+        /// <returns> VSConstants.E_NOTIMPL. </returns>
         int IDebugModule2.ReloadSymbols_Deprecated(string urlToSymbols, out string debugMessage)
         {
             debugMessage = null;
@@ -134,63 +141,88 @@ namespace VSNDK.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
+
+        /// <summary>
+        /// This method is not presented in IDebugModule3 webpage but the debug engine fails to build without it. It should have the same
+        /// behavior as the above IDebugModule2.ReloadSymbols_Deprecated. (http://msdn.microsoft.com/en-ca/library/bb145893.aspx)
+        /// </summary>
+        /// <param name="pszUrlToSymbols"></param>
+        /// <param name="pbstrDebugMessage"></param>
+        /// <returns> Not implemented. </returns>
         int IDebugModule3.ReloadSymbols_Deprecated(string pszUrlToSymbols, out string pbstrDebugMessage)
         {
             throw new NotImplementedException();
         }
         #endregion
 
-        // IDebugModule3 represents a module that supports alternate locations of symbols and JustMyCode states.
-        // The sample does not support alternate symbol locations or JustMyCode, but it does not display symbol load information 
 
-        // Gets the MODULE_INFO that describes this module.
-        // This is how the debugger obtains most of the information about the module.
+        /// <summary>
+        /// This method is not presented in IDebugModule3 webpage but the debug engine fails to build without it. 
+        /// (http://msdn.microsoft.com/en-ca/library/bb145893.aspx). It should have the same behavior as the above 
+        /// IDebugModule2.GetInfo, i.e., gets information about this module. (http://msdn.microsoft.com/en-ca/library/bb161975.aspx)
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags from the MODULE_INFO_FIELDS enumeration that specify which fields of pInfo 
+        /// are to be filled out. </param>
+        /// <param name="pinfo"> A MODULE_INFO structure that is filled in with a description of the module. </param>
+        /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugModule3.GetInfo(enum_MODULE_INFO_FIELDS dwFields, MODULE_INFO[] pinfo)
         {
             return ((IDebugModule2)this).GetInfo(dwFields, pinfo);
         }
 
-        // Returns a list of paths searched for symbols and the results of searching each path.
+
+        /// <summary>
+        /// Returns a list of paths searched for symbols and the results of searching each path. 
+        /// [http://msdn.microsoft.com/en-ca/library/bb161971(v=vs.100).aspx]
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags from the SYMBOL_SEARCH_INFO_FIELDS enumeration specifying which fields 
+        /// of pInfo are to be filled in. </param>
+        /// <param name="pinfo"> A MODULE_SYMBOL_SEARCH_INFO structure whose members are to be filled in with the specified information. 
+        /// If this is a null value, this method returns E_INVALIDARG. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugModule3.GetSymbolInfo(enum_SYMBOL_SEARCH_INFO_FIELDS dwFields, MODULE_SYMBOL_SEARCH_INFO[] pinfo)
         {
-            // This engine only supports loading symbols at the location specified in the binary's symbol path location in the PE file and
-            // does so only for the primary exe of the debuggee.
-            // Therefore, it only displays if the symbols were loaded or not. If symbols were loaded, that path is added.
             pinfo[0] = new MODULE_SYMBOL_SEARCH_INFO();
             pinfo[0].dwValidFields = 1; // SSIF_VERBOSE_SEARCH_INFO;
 
-            //if (this.DebuggedModule.SymbolsLoaded)
-            {
-                //string symbolPath = "Symbols Loaded - " + this.DebuggedModule.SymbolPath;
-                //pinfo[0].bstrVerboseSearchInfo = symbolPath;
-            }
-            //else
-            {
-                string symbolsNotLoaded = "Symbols not loaded";
-                pinfo[0].bstrVerboseSearchInfo = symbolsNotLoaded;
-            }
+            string symbolsNotLoaded = "Symbols not loaded";
+            pinfo[0].bstrVerboseSearchInfo = symbolsNotLoaded;
             return VSConstants.S_OK;
         }
 
-        // Used to support the JustMyCode features of the debugger.
-        // the sample debug engine does not support JustMyCode and therefore all modules
-        // are considered "My Code"
+
+        /// <summary>
+        /// Retrieves information on whether the module represents user code or not.  Used to support the JustMyCode features of the 
+        /// debugger. [http://msdn.microsoft.com/en-ca/library/bb146644(v=vs.100).aspx]
+        /// The VSNDK debug engine does not support JustMyCode and therefore all modules are considered "My Code"
+        /// </summary>
+        /// <param name="pfUser"> Nonzero (TRUE) if module represents user code, zero (FALSE) if it does not. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugModule3.IsUserCode(out int pfUser)
         {
             pfUser = 1;
             return VSConstants.S_OK;
         }
 
-        // Loads and initializes symbols for the current module when the user explicitly asks for them to load.
-        // The sample engine only supports loading symbols from the location pointed to by the PE file which will load
-        // when the module is loaded.
+
+        /// <summary>
+        /// Loads and initializes symbols for the current module when the user explicitly asks for them to load. Not implemented.
+        /// [http://msdn.microsoft.com/en-ca/library/bb146634(v=vs.100).aspx]
+        /// </summary>
+        /// <returns> Not implemented. </returns>
         int IDebugModule3.LoadSymbols()
         {
             throw new NotImplementedException();
         }
 
-        // Used to support the JustMyCode features of the debugger.
-        // The sample engine does not support JustMyCode so this is not implemented
+
+        /// <summary>
+        /// Specifies whether the module should be considered user code or not. Used to support the JustMyCode features of the debugger.
+        /// [http://msdn.microsoft.com/en-ca/library/bb146327(v=vs.100).aspx]
+        /// The VSNDK debug engine does not support JustMyCode so this is not implemented
+        /// </summary>
+        /// <param name="fIsUserCode"> Nonzero (TRUE) if the module should be considered user code, zero (FALSE) if it should not. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugModule3.SetJustMyCodeState(int fIsUserCode)
         {
             throw new NotImplementedException();

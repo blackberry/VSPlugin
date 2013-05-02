@@ -23,13 +23,35 @@ using System.Runtime.InteropServices;
 
 namespace VSNDK.DebugEngine
 {
-    // This class represents the information that describes a bound breakpoint.
+
+    /// <summary>
+    /// This class represents the information that describes a bound breakpoint. (http://msdn.microsoft.com/en-us/library/bb145894.aspx)
+    /// </summary>
     public class AD7BreakpointResolution : IDebugBreakpointResolution2
     {
+        /// <summary>
+        ///  AD7 Engine. 
+        /// </summary>
         private AD7Engine m_engine;
+
+        /// <summary>
+        /// GDB Address
+        /// </summary>
         private uint m_address;
+
+        /// <summary>
+        /// The document context to the debugger. A document context represents a location within a source file. 
+        /// </summary>
         private AD7DocumentContext m_documentContext;
 
+        
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="engine"> AD7 Engine. </param>
+        /// <param name="address"> GDB Address. </param>
+        /// <param name="documentContext"> The document context to the debugger. A document context represents a location within a 
+        /// source file. </param>
         public AD7BreakpointResolution(AD7Engine engine, uint address, AD7DocumentContext documentContext)
         {
             m_engine = engine;
@@ -39,15 +61,27 @@ namespace VSNDK.DebugEngine
 
         #region IDebugBreakpointResolution2 Members
 
-        // Gets the type of the breakpoint represented by this resolution. 
+        
+        /// <summary>
+        /// Gets the type of the breakpoint represented by this resolution. (http://msdn.microsoft.com/en-us/library/bb145576.aspx)
+        /// </summary>
+        /// <param name="pBPType"> The type of this breakpoint. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType)
         {
-            // The sample engine only supports code breakpoints.
+            // The VSNDK debug engine only supports code breakpoints.
             pBPType[0] = enum_BP_TYPE.BPT_CODE;
             return VSConstants.S_OK;
         }
 
-        // Gets the breakpoint resolution information that describes this breakpoint.
+
+        /// <summary>
+        /// Gets the breakpoint resolution information that describes this breakpoint. 
+        /// (http://msdn.microsoft.com/en-us/library/bb146743.aspx)
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags that determine which fields of the pBPResolutionInfo parameter are to be filled out. </param>
+        /// <param name="pBPResolutionInfo"> The BP_RESOLUTION_INFO structure to be filled in with information about this breakpoint. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugBreakpointResolution2.GetResolutionInfo(enum_BPRESI_FIELDS dwFields, BP_RESOLUTION_INFO[] pBPResolutionInfo)
         {
 	        if ((dwFields & enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION) != 0) 
@@ -78,15 +112,32 @@ namespace VSNDK.DebugEngine
         #endregion
     }
 
+    /// <summary>
+    /// Represents the resolution of a breakpoint error. (http://msdn.microsoft.com/en-us/library/bb161341.aspx)
+    /// </summary>
     class AD7ErrorBreakpointResolution : IDebugErrorBreakpointResolution2
     {
         #region IDebugErrorBreakpointResolution2 Members
 
+        
+        /// <summary>
+        /// Gets the breakpoint type. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145065.aspx)
+        /// </summary>
+        /// <param name="pBPType"> The type of this breakpoint. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugErrorBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType)
         {
             throw new Exception("The method or operation is not implemented.");
         }
 
+
+        /// <summary>
+        /// Gets the breakpoint error resolution information. Not implemented. (http://msdn.microsoft.com/en-us/library/bb161960.aspx)
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags that determine which fields of pErrorResolutionInfo are to be filled out. </param>
+        /// <param name="pErrorResolutionInfo"> The BP_ERROR_RESOLUTION_INFO structure that is filled in with the description of the 
+        /// breakpoint resolution. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugErrorBreakpointResolution2.GetResolutionInfo(enum_BPERESI_FIELDS dwFields, BP_ERROR_RESOLUTION_INFO[] pErrorResolutionInfo)
         {
             if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_BPRESLOCATION) != 0) { }

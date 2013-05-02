@@ -14,7 +14,9 @@
 
 namespace VSNDK.DebugEngine
 {
-    // These are managed definitions of the well-known AD7 HRESULTS. Defined in msdbg.idl.
+    /// <summary> 
+    /// These are managed definitions of the well-known AD7 HRESULTS. Defined in msdbg.idl. 
+    /// </summary>
     static public class AD7_HRESULT
     {
         public const int S_ATTACH_DEFERRED=unchecked((int)0x40004);
