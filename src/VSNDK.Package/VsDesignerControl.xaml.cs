@@ -173,13 +173,10 @@ namespace RIM.VSNDK_Package
                         FileInfo fileInfo2 = new FileInfo(viewModel.Model.Name);
                         FileInfo fileInfo3 = new FileInfo(path);
 
-                        if (fileInfo1.DirectoryName == fileInfo2.DirectoryName)
+                        if (viewModel.AppName == proj.Name)
                         {
-                            if (!File.Exists(System.IO.Path.Combine(fileInfo1.DirectoryName, fileInfo3.Name)))
-                            {
-                                File.Copy(path, System.IO.Path.Combine(fileInfo1.DirectoryName, fileInfo3.Name));
-                                proj.ProjectItems.AddFromFileCopy(System.IO.Path.Combine(fileInfo1.DirectoryName, fileInfo3.Name));
-                            }
+                            proj.ProjectItems.AddFromFile(path);
+                            viewModel.AddLocalAsset(path);
                         }
                     }
                 }

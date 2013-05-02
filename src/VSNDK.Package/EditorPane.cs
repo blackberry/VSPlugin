@@ -63,6 +63,9 @@ namespace RIM.VSNDK_Package
             _service = service;
         }
 
+        /// <summary>
+        /// Event on close of the editor pane
+        /// </summary>
         protected override void OnClose()
         {
             // unhook from Undo related services
@@ -314,12 +317,22 @@ namespace RIM.VSNDK_Package
 
         #region Commands
 
+        /// <summary>
+        /// On create of new window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnQueryNewWindow(object sender, EventArgs e)
         {
             OleMenuCommand command = (OleMenuCommand)sender;
             command.Enabled = true;
         }
 
+        /// <summary>
+        /// Create a new window
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnNewWindow(object sender, EventArgs e)
         {
             NewWindow();
@@ -331,11 +344,19 @@ namespace RIM.VSNDK_Package
             command.Enabled = true;
         }
 
+        /// <summary>
+        /// Event that fires on view of code
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnViewCode(object sender, EventArgs e)
         {
             ViewCode();
         }
 
+        /// <summary>
+        /// Method to create a new windows
+        /// </summary>
         private void NewWindow()
         {
             int hr = VSConstants.S_OK;
@@ -356,6 +377,9 @@ namespace RIM.VSNDK_Package
             }
         }
 
+        /// <summary>
+        /// Method to viewcode
+        /// </summary>
         private void ViewCode()
         {
             Guid XmlTextEditorGuid = new Guid("FA3CD31E-987B-443A-9B81-186104E8DAC1");

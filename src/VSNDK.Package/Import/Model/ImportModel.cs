@@ -31,17 +31,23 @@ using System.Diagnostics;
 
 namespace RIM.VSNDK_Package.Import.Model
 {
-
+    /// <summary>
+    /// DataModel Class for the Import Dialog
+    /// </summary>
     class ImportModel : NotifyPropertyChanged
     {
+        #region Member Variables and Constants
         private const string _colSumaryString = "SummaryString";
         private const string BLACKBERRY = "BlackBerry";
         private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
         
         private IList<String> _summaryList;
         private CollectionView _summaryString;
+        #endregion
 
-
+        /// <summary>
+        /// ImportModel Constructor
+        /// </summary>
         public ImportModel()
         {
             _summaryList = new List<String>();
@@ -51,6 +57,9 @@ namespace RIM.VSNDK_Package.Import.Model
 
         #region Properties
 
+        /// <summary>
+        /// Getter/Setter for the SummaryString Property
+        /// </summary>
         public CollectionView SummaryString
         {
             get { return _summaryString; }
@@ -63,12 +72,24 @@ namespace RIM.VSNDK_Package.Import.Model
 
         #endregion
 
+        /// <summary>
+        /// Helper function to add a summary string to the list
+        /// </summary>
+        /// <param name="entry"></param>
         public void AddSummaryString(string entry)
         {
             _summaryList.Add(entry);
             SummaryString = new CollectionView(_summaryList);
         }
 
+        /// <summary>
+        /// Recursive Function to walk a specified directory tree and add the files into a Visual Studio C project.
+        /// </summary>
+        /// <param name="proj">Destination Project</param>
+        /// <param name="sourceDir">Source Directory to begin walking</param>
+        /// <param name="destinationDir">Destination Directory of new project to copy files to</param>
+        /// <param name="filter">VCFilter object to add files to</param>
+        /// <returns></returns>
         public bool WalkDirectoryTree(Project proj, DirectoryInfo sourceDir, DirectoryInfo destinationDir, VCFilter filter)
         {
             VCFilter localFilter = filter;
@@ -142,7 +163,7 @@ namespace RIM.VSNDK_Package.Import.Model
         }
 
         /// <summary>
-        /// Add File to Project
+        /// Add File to specified project
         /// </summary>
         /// <param name="path"></param>
         private void AddFileToProject(Project proj, string source, string destination, VCFilter filter)
@@ -203,7 +224,7 @@ namespace RIM.VSNDK_Package.Import.Model
         }
 
         /// <summary>
-        /// Add File to Project
+        /// Add Folder to Specified Project
         /// </summary>
         /// <param name="path"></param>
         private VCFilter AddFolderToProject(Project proj, string dirInfo, string newDir, VCFilter filter)

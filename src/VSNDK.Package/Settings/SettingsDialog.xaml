@@ -30,8 +30,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch" Height="28">
                         <Label Content="Device Password:" Width="170" Height="28" />
-                        <PasswordBox Name="tbDevicePassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" RIM_password:PasswordBoxAssistant.BindPassword="true"  RIM_password:PasswordBoxAssistant.BoundPassword="{Binding Path=DevicePassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        </PasswordBox>
+                        <PasswordBox Name="tbDevicePassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" DataContext="{Binding Path=DevicePassword}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
@@ -43,7 +42,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Height="28">
                         <Label Content="Simulator Password:" Width="170" Height="28" />
-                        <PasswordBox Name="tbSimulatorPassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" RIM_password:PasswordBoxAssistant.BindPassword="true"  RIM_password:PasswordBoxAssistant.BoundPassword="{Binding Path=SimulatorPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <PasswordBox Name="tbSimulatorPassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" DataContext="{Binding Path=SimulatorPassword}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

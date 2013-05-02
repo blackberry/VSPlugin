@@ -40,15 +40,25 @@ namespace RIM.VSNDK_Package.Import
     /// </summary>
     public partial class Import : DialogWindow
     {
-        public Import()
-        {
-            InitializeComponent();
-        }
 
         private Project _project;
         private string _sourceDir;
         private string _destDir;
 
+        /// <summary>
+        /// Import Constructor
+        /// </summary>
+        public Import()
+        {
+            InitializeComponent();
+        }
+
+        /// <summary>
+        /// Import Constructor
+        /// </summary>
+        /// <param name="project">Reference to project.</param>
+        /// <param name="sourceDir">Source Directory to import from.</param>
+        /// <param name="destDir">Destination Directory to import to.</param>
         public Import(Project project, string sourceDir, string destDir)
         {
             InitializeComponent();
@@ -58,6 +68,9 @@ namespace RIM.VSNDK_Package.Import
             _destDir = destDir;
         }   
 
+        /// <summary>
+        /// Display the dialog in Model form and start import process.
+        /// </summary>
         public void ShowModel2()
         {
             this.Show();
@@ -78,6 +91,11 @@ namespace RIM.VSNDK_Package.Import
             }
         }
 
+        /// <summary>
+        /// Close the dialog.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
             this.Close();

@@ -27,8 +27,13 @@ using System.Windows.Forms;
 namespace RIM.VSNDK_Package.DebugToken.Model
 {
 
+    /// <summary>
+    /// The DataModel for the DebugToken dialog
+    /// </summary>
     class DebugTokenData : NotifyPropertyChanged
     {
+
+        #region Member Variables and Constants
         private static string _deviceIP;
         private static string _devicePassword;
         private static string _errors;
@@ -52,6 +57,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         private const string _colAuthorID = "AuthorID";
         private const string _colAttachedDevice = "AttachedDevice";
         private const string _colExpiryDate = "ExpiryDate";
+        #endregion
 
         /// <summary>
         /// Company Name Property
@@ -71,7 +77,9 @@ namespace RIM.VSNDK_Package.DebugToken.Model
             set { _tokenExpiryDate = value; OnPropertyChanged(_colExpiryDate); }
         }
 
-        //Contains any errors during the registration
+        /// <summary>
+        /// Contains any errors during the registration
+        /// </summary>
         public string Error
         {
             get { return _errors; }
@@ -345,7 +353,6 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if (!File.Exists(_localRIMFolder  + "DebugToken.bar"))
             {
-                //  _errors = PkgResources.NativSDKNotInstalled;
                 return success;
             }
 
@@ -400,7 +407,6 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if (string.IsNullOrEmpty(_deviceIP))
             {
-              //  _errors = PkgResources.NativSDKNotInstalled;
                 return success;
             }
 
@@ -481,7 +487,6 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if (string.IsNullOrEmpty(_deviceIP))
             {
-                //  _errors = PkgResources.NativSDKNotInstalled;
                 return success;
             }
             else if (!File.Exists(_localRIMFolder + "DebugToken.bar"))
@@ -539,7 +544,6 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if (string.IsNullOrEmpty(_deviceIP))
             {
-                //  _errors = PkgResources.NativSDKNotInstalled;
                 return success;
             }
             else if (string.IsNullOrEmpty(_authorID))
@@ -611,7 +615,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -cskpass {0} -keystore ""{1}"" -storepass {2} -device-id ""{3}"" ""{4}""", _storepass, _certPath, _storepass, _devicePin, _localRIMFolder + "DebugToken.bar");
+            startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -cskpass {0} -keystore ""{1}"" -storepass {2} -deviceid ""{3}"" ""{4}""", _storepass, _certPath, _storepass, _devicePin, _localRIMFolder + "DebugToken.bar");
 
             try
             {

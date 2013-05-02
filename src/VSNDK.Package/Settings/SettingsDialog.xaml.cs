@@ -40,15 +40,20 @@ namespace RIM.VSNDK_Package.Settings
     /// </summary>
     public partial class SettingsDialog : DialogWindow
     {
+        /// <summary>
+        /// Settings Dialog Constructor
+        /// </summary>
         public SettingsDialog()
         {
             InitializeComponent();
             SettingsData data = gridMain.DataContext as SettingsData;
             if (data != null)
-           {
-             //  this.NDKPath.SelectedValue = "test2"; 
+            {
                 data.getSimulatorInfo();
                 data.getDeviceInfo();
+
+                tbDevicePassword.Password = data.DevicePassword;
+                tbSimulatorPassword.Password = data.SimulatorPassword;
             }
         }
 
@@ -62,6 +67,8 @@ namespace RIM.VSNDK_Package.Settings
             SettingsData data = gridMain.DataContext as SettingsData;
             if (data != null)
             {
+                data.DevicePassword = tbDevicePassword.Password;
+                data.SimulatorPassword = tbSimulatorPassword.Password;
                 data.setDeviceInfo();
                 data.setSimulatorInfo();
                 data.setNDKPaths(); 

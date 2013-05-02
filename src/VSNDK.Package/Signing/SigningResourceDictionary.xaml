@@ -1,7 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:data="clr-namespace:RIM.VSNDK_Package.Signing.Models">
-    <data:RIMSiginingAuthorityData x:Key="authData" />
     <data:RegistrationData x:Key="rimSAData" />
     <data:BackupRestoreData x:Key="brData" />
     <Style TargetType="{x:Type Button}">
