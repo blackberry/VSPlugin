@@ -28,10 +28,10 @@ namespace VSNDK.Tasks
 {
     public class BBNativePackager : TrackedVCToolTask
     {
+        #region Member Variable and Constant Declarations
         protected ArrayList switchOrderList;
         private static BarDescriptor.qnx _descriptor = null;
         private string _projDir;
-
         private const string OUTPUT_FILE = "OutputFiles";
         private const string APP_DESCRIPTOR = "ApplicationDescriptorXml";
         private const string TARGET_FORMAT = "TargetFormat";
@@ -43,9 +43,12 @@ namespace VSNDK.Tasks
         private const string SOURCES = "Sources";
         private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
         private const string GET_TARGET_FILE_MAP = "GetTargetFileMap";
-
         private const string WORKSPACE_LOC = "${workspace_loc:/";
+        #endregion
 
+        /// <summary>
+        /// BBNativePackager Constructor
+        /// </summary>
         public BBNativePackager()
             : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
         {
@@ -59,21 +62,38 @@ namespace VSNDK.Tasks
             this.switchOrderList.Add(OUTPUT_FILE);
             this.switchOrderList.Add(APP_DESCRIPTOR);
             this.switchOrderList.Add(TRACKER_LOG_DIRECTORY);
+
+            ApplicationDescriptorXml = "bar-descriptor.xml";
         }
 
         #region overrides
-        //don't use response file for msbuild because it is removed before qcc to run GCC compiler 
+
+
+        /// <summary>
+        /// Return the response file switch.
+        /// Note: Don't use response file for msbuild because it is removed before qcc to run GCC compiler 
+        /// </summary>
+        /// <param name="responseFilePath">Response File Path</param>
+        /// <returns>Response File Switch</returns>
         protected override string GetResponseFileSwitch(string responseFilePath)
         {
             return string.Empty;
         }
 
-        //instead pass the response file to command line commands
+        /// <summary>
+        /// Return the Command Line String.
+        /// Note: pass the response file to command line commands
+        /// </summary>
+        /// <returns>Command Line String</returns>
         protected override string GenerateCommandLineCommands()
         {
             return GenerateResponseFileCommands();
         }
 
+        /// <summary>
+        /// Return the Response File Command String
+        /// </summary>
+        /// <returns></returns>
         protected override string GenerateResponseFileCommands()
         {
             string cmd = base.GenerateResponseFileCommands();
@@ -94,6 +114,11 @@ namespace VSNDK.Tasks
             return cmd;
         }
 
+        /// <summary>
+        /// Helper function to read the assets from the bar-descriptor.xml file and 
+        /// generate the command line listing the resources to be packaged into the bar file.
+        /// </summary>
+        /// <param name="clb">Command Line Builder object</param>
         private void AppendResources(CommandLineBuilder clb)
         {
             ITaskItem[] sources = GetAssetsFile();
@@ -116,6 +141,7 @@ namespace VSNDK.Tasks
         /// <returns></returns>
         private ITaskItem[] GetAssetsFile()
         {
+
             //make sure the _descriptor is loaded
             if (_descriptor == null)
                 _descriptor = BarDescriptor.Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
@@ -165,44 +191,41 @@ namespace VSNDK.Tasks
                     break;
                 }
             }
+            
+            ITaskItem[] items = null;
 
-            if (globalAssets != null && globalAssets.Length > 0)
+
+            int clen = (configAssets == null) ? 0 : configAssets.Length; 
+            int glen = (globalAssets == null) ? 0 : configAssets.Length;
+
+            items = new ITaskItem[glen + clen];
+
+            for (int i = 0; i < glen; i++)
             {
-                ITaskItem[] items = null;
-                if (configAssets != null)
-                {
-                    items = new ITaskItem[globalAssets.Length + configAssets.Length];
-                }
-                else
-                {
-                    items = new ITaskItem[globalAssets.Length];
-                }
-
-                for (int i = 0; i < globalAssets.Length; i++)
-                {
-                    string path = globalAssets[i].path;
-                    path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
-                    string target = globalAssets[i].Value;
-                    items[i] = new TaskItem(path);
-                    items[i].SetMetadata("target", target);
-                }
-
-                if (configAssets != null && configAssets.Length > 0)
-                {
-                    for (int i = 0; i < configAssets.Length; i++)
-                    {
-                        string path = configAssets[i].path;
-                        path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
-                        string target = configAssets[i].Value;
-                        items[i + globalAssets.Length] = new TaskItem(path);
-                        items[i + globalAssets.Length].SetMetadata("target", target);
-                    }
-                }
-                return items;
+                string path = globalAssets[i].path;
+                path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
+                string target = globalAssets[i].Value;
+                items[i] = new TaskItem(path);
+                items[i].SetMetadata("target", target);
             }
-            return null;
+
+           
+            for (int i = 0; i < configAssets.Length; i++)
+            {
+                string path = configAssets[i].path;
+                path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
+                string target = configAssets[i].Value;
+                items[i + glen] = new TaskItem(path);
+                items[i + glen].SetMetadata("target", target);
+            }
+
+            return items;
+
         }
 
+        /// <summary>
+        /// Getter for the SwitchOrderList property
+        /// </summary>
         protected override ArrayList SwitchOrderList
         {
             get
@@ -211,16 +234,25 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the CommandTLogName property
+        /// </summary>
         protected override string CommandTLogName
         {
             get { return "BBNativePackager.command.1.tlog"; }
         }
 
+        /// <summary>
+        /// Getter for the ReadTLogNames property.
+        /// </summary>
         protected override string[] ReadTLogNames
         {
             get { return new string[] { "BBNativePackager.read.1.tlog", "BBNativePackager.*.read.1.tlog" }; }
         }
 
+        /// <summary>
+        /// Getter for the WriteTLogNames property
+        /// </summary>
         protected override string[] WriteTLogNames
         {
             get
@@ -229,6 +261,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the ToolName property
+        /// </summary>
         protected override string ToolName
         {
             get
@@ -240,15 +275,28 @@ namespace VSNDK.Tasks
         #endregion overrides
 
         #region properties
+
+        /// <summary>
+        /// Getter/Setter for Device property
+        /// </summary>
         [Output]
         public virtual string Device { get; set; }
 
+        /// <summary>
+        /// Getter/Setter for Password property
+        /// </summary>
         [Output]
         public virtual string Password { get; set;}
 
+        /// <summary>
+        /// Getter/Setter for BarDeploy property
+        /// </summary>
         [Output]
         public virtual string BarDeploy { get; set; }
 
+        /// <summary>
+        /// Getter/Setter for OutputFile property
+        /// </summary>
         [Required]
         [Output]
         public virtual string OutputFile
@@ -273,7 +321,6 @@ namespace VSNDK.Tasks
 
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
-                    //Separator = ":",
                     DisplayName = "Output bar file name, for example, out.bar",
                     Description = "The -package option specifies the bar file name.",
                     ArgumentRelationList = new ArrayList(),
@@ -286,6 +333,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for ProjectDir property
+        /// </summary>
         [Required]
         public virtual string ProjectDir
         { 
@@ -300,6 +350,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for SolutionDir property
+        /// </summary>
         [Required]
         public virtual string SolutionDir { get; set; }
 
@@ -316,20 +369,27 @@ namespace VSNDK.Tasks
             set
             {
                 base.ActiveToolSwitches.Remove(APP_DESCRIPTOR);
+
+                string _barDescriptorPath = value.Replace("bar-descriptor.xml", "");
+                _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + "bar-descriptor.xml" : _barDescriptorPath + @"\bar-descriptor.xml";
+                _barDescriptorPath = _barDescriptorPath.Trim('\\');
+
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
                     DisplayName = "Application descriptor file name, for example, bar-descriptor.xml",
                     Description = "Application descriptor file name, for example, bar-descriptor.xml, it must follows the out.bar file",
                     ArgumentRelationList = new ArrayList(),
-                    //SwitchValue = " ",
                     Name = APP_DESCRIPTOR,
-                    Value = value
+                    Value = _barDescriptorPath
                 };
                 base.ActiveToolSwitches.Add(APP_DESCRIPTOR, switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for TargetFormat property
+        /// </summary>
         public virtual string TargetFormat
         {
             get
@@ -363,6 +423,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for BuildID property
+        /// </summary>
         public virtual int BuildID
         {
             get
@@ -381,7 +444,6 @@ namespace VSNDK.Tasks
                     DisplayName = "Build Id",
                     Description = "set the build id ( the fourth segment of the version ). Must be a number from 0 to 65535"
                 };
-                //switch2.Parents.AddLast("parent switch");
                 switch2.ArgumentRelationList = new ArrayList();
                 switch2.IsValid = base.ValidateInteger(BUILD_ID, 0, 65535, value);
                 switch2.Name = BUILD_ID;
@@ -392,6 +454,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for BuildIDFile property
+        /// </summary>
         public virtual string BuildIDFile
         {
             get
@@ -419,6 +484,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for DevMode property
+        /// </summary>
         public virtual bool DevMode
         {
             get
@@ -442,6 +510,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for PackageManifestOnly property
+        /// </summary>
         public virtual bool PackageManifestOnly
         {
             get
@@ -465,6 +536,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for GetTargetFileMap property
+        /// </summary>
         public virtual bool GetTargetFileMap
         {
             get
@@ -488,6 +562,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for DebugToken property
+        /// </summary>
         public virtual string DebugToken
         {
             get
@@ -515,6 +592,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for TrackerLogDirectory property.
+        /// </summary>
         public virtual string TrackerLogDirectory
         {
             get
@@ -542,6 +622,9 @@ namespace VSNDK.Tasks
 
         #endregion properties
 
+        /// <summary>
+        /// Getter for the TrackedInputFiles
+        /// </summary>
         protected override Microsoft.Build.Framework.ITaskItem[] TrackedInputFiles
         {
             get
@@ -550,6 +633,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the TrackerIntermediateDirectory
+        /// </summary>
         protected override string TrackerIntermediateDirectory
         {
             get
@@ -562,6 +648,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Seter for the Sources property
+        /// </summary>
         [Required]
         public virtual ITaskItem[] Sources
         {
@@ -588,6 +677,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the Configuration property
+        /// </summary>
         [Required]
         public string Configuration
         {
@@ -595,6 +687,9 @@ namespace VSNDK.Tasks
             set;
         }
 
+        /// <summary>
+        /// Getter/Setter for the Platform property
+        /// </summary>
         [Required]
         public string Platform
         {

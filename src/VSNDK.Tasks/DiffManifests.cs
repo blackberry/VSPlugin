@@ -23,18 +23,25 @@ using Microsoft.Build.Utilities;
 
 namespace VSNDK.Tasks
 {
+    /// <summary>
+    /// MSBuild task to compare the manifest file from the bar file being uploaded against the one already installed on the device.
+    /// </summary>
     public class DiffManifests : Task
     {
+        #region Member Variables and Constants
         private string _localManifestFile;
         private string _targetManifestFile;
         private string _targetFileMap;
-        //private ITaskItem[] _modifiedFiles;
-        //private ITaskItem[] _deletedFiles;
         private ArrayList _modifiedFiles;
         private ArrayList _deletedFiles;
         private int _modifiedFilesCount;
         private int _deletedFilesCount;
+        #endregion
 
+        /// <summary>
+        /// Execute the MSBuild Task.
+        /// </summary>
+        /// <returns></returns>
         public override bool Execute()
         {
             _modifiedFiles = new ArrayList();
@@ -125,7 +132,12 @@ namespace VSNDK.Tasks
             return true;
         }
 
-        // Parse the target file map to add the source path of each modified file as metadata.
+        /// <summary>
+        /// Helper function to parse the target file map to add the source path of each modified file as metadata.
+        /// </summary>
+        /// <param name="sourcePath">Path to the source file</param>
+        /// <param name="targetFileMap">Target file map</param>
+        /// <returns></returns>
         private string getSourcePath(string sourcePath, string[] targetFileMap)
         {
             foreach (string line in targetFileMap)
@@ -140,6 +152,9 @@ namespace VSNDK.Tasks
             return "";
         }
 
+        /// <summary>
+        /// Getter for the ModifiedFiles property.
+        /// </summary>
         [Output]
         public ITaskItem[] ModifiedFiles
         {
@@ -151,6 +166,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the ModifiedFilesCount property
+        /// </summary>
         [Output]
         public int ModifiedFilesCount
         {
@@ -158,6 +176,9 @@ namespace VSNDK.Tasks
             set { _modifiedFilesCount = value; }
         }
 
+        /// <summary>
+        /// Getter for the DeletedFiles property
+        /// </summary>
         [Output]
         public ITaskItem[] DeletedFiles
         {
@@ -169,6 +190,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the DeletedFilesCount property
+        /// </summary>
         [Output]
         public int DeletedFilesCount
         {
@@ -176,6 +200,9 @@ namespace VSNDK.Tasks
             set { _deletedFilesCount = value; }
         }
 
+        /// <summary>
+        /// Setter for the LocalManifestFile property
+        /// </summary>
         [Required]
         public string LocalManifestFile
         {
@@ -185,6 +212,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Setter for the TargetManifestFile property
+        /// </summary>
         [Required]
         public string TargetManifestFile
         {
@@ -194,6 +224,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Setter for the targetFileMap property
+        /// </summary>
         [Required]
         public string targetFileMap
         {

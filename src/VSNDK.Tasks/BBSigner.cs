@@ -27,8 +27,13 @@ using System.Security.Cryptography;
 
 namespace VSNDK.Tasks
 {
+    /// <summary>
+    /// MSBuild Task responsible for the signing of the BlackBerry Bar files 
+    /// for deploy to a secure device not in development mode. 
+    /// </summary>
     public class BBSigner : TrackedVCToolTask
     {
+        #region Member Variables and Constants Declaration
         protected ArrayList switchOrderList;
         private const string REGISTER = "Register";
         private const string KEYSTOREPASSWORD = "KeyStorePassword";
@@ -37,8 +42,11 @@ namespace VSNDK.Tasks
         private const string SOURCES = "Sources";
         private const string OUTPUT_FILE = "OutputFiles";
         private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
+        #endregion
 
-
+        /// <summary>
+        /// BBSigner Constructor Fuction
+        /// </summary>
         public BBSigner()
             : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
         {
@@ -52,19 +60,34 @@ namespace VSNDK.Tasks
             this.switchOrderList.Add(TRACKER_LOG_DIRECTORY);
         }
 
+        
         #region overrides
-        //don't use response file for msbuild because it is removed before qcc to run GCC compiler 
+
+        /// <summary>
+        /// Return the GetResposeFile Switch
+        /// Note: don't use response file for msbuild because it is removed before qcc to run GCC compiler 
+        /// </summary>
+        /// <param name="responseFilePath"></param>
+        /// <returns></returns>
         protected override string GetResponseFileSwitch(string responseFilePath)
         {
             return string.Empty;
         }
 
-        //instead pass the response file to command line commands
+        /// <summary>
+        /// Return the command line argument string
+        /// Note: pass the response file to command line commands
+        /// </summary>
+        /// <returns></returns>
         protected override string GenerateCommandLineCommands()
         {
             return GenerateResponseFileCommands();
         }
 
+        /// <summary>
+        /// Return the Response File Commands string.
+        /// </summary>
+        /// <returns></returns>
         protected override string GenerateResponseFileCommands()
         {
             if (!Register)
@@ -78,6 +101,9 @@ namespace VSNDK.Tasks
             return base.GenerateResponseFileCommands();
         }
 
+        /// <summary>
+        /// Getter for the SwitchOrderList property
+        /// </summary>
         protected override ArrayList SwitchOrderList
         {
             get
@@ -86,11 +112,17 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the CommandTLogName property
+        /// </summary>
         protected override string CommandTLogName
         {
             get { return "BBSigner.command.1.tlog"; }
         }
 
+        /// <summary>
+        /// Getter for the ReadTLogNames property
+        /// </summary>
         protected override string[] ReadTLogNames
         {
             get { return new string[] { "BBSigner.read.1.tlog", "BBSigner.*.read.1.tlog" }; }
@@ -103,6 +135,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the ToolName property
+        /// </summary>
         protected override string ToolName
         {
             get
@@ -110,6 +145,10 @@ namespace VSNDK.Tasks
                 return ToolExe;
             }
         }
+
+        /// <summary>
+        /// Getter for the TrackerIntermediateDirectory property
+        /// </summary>
         protected override string TrackerIntermediateDirectory
         {
             get
@@ -122,6 +161,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the TrackedInputFiles property
+        /// </summary>
         protected override ITaskItem[] TrackedInputFiles
         {
             get { return Sources; }
@@ -131,6 +173,9 @@ namespace VSNDK.Tasks
 
         #region properties
 
+        /// <summary>
+        /// Getter/Setter for the Register property
+        /// </summary>
         [Required]
         public virtual bool Register
         {
@@ -155,6 +200,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the Sources property
+        /// </summary>
         [Required]
         public virtual ITaskItem[] Sources
         {
@@ -181,6 +229,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the CSJFiles property
+        /// </summary>
         public virtual ITaskItem[] CSJFiles
         {
             get
@@ -207,7 +258,9 @@ namespace VSNDK.Tasks
             }
         }
 
-
+        /// <summary>
+        /// Getter/Setter for the KeyStorePassword property
+        /// </summary>
         public virtual string KeyStorePassword
         {
             get
@@ -224,7 +277,6 @@ namespace VSNDK.Tasks
 
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
-                    //Separator = ":",
                     DisplayName = "Keystore password",
                     Description = "The -storepass option specifies the password.",
                     ArgumentRelationList = new ArrayList(),
@@ -232,8 +284,6 @@ namespace VSNDK.Tasks
                     Name = KEYSTOREPASSWORD,
                     Value = Decrypt(value)
                 };
-
-
 
                 base.ActiveToolSwitches.Add(KEYSTOREPASSWORD, switch2);
                 base.AddActiveSwitchToolValue(switch2);
@@ -265,6 +315,9 @@ namespace VSNDK.Tasks
             return Encoding.Unicode.GetString(decrypted);
         }
 
+        /// <summary>
+        /// Getter/Setter for the CSJPin property
+        /// </summary>
         public virtual string CSJPin
         {
             get
@@ -280,7 +333,6 @@ namespace VSNDK.Tasks
                 base.ActiveToolSwitches.Remove(CSJPIN);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
-                    //Separator = ":",
                     DisplayName = "Keystore password",
                     Description = "The -csjpin option specifies the password.",
                     ArgumentRelationList = new ArrayList(),
@@ -293,6 +345,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the OutputFile property
+        /// </summary>
         [Required]
         [Output]
         public virtual string OutputFile
@@ -321,6 +376,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the TrackerLogDirectory property
+        /// </summary>
         public virtual string TrackerLogDirectory
         {
             get

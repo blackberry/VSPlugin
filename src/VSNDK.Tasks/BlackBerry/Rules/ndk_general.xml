@@ -14,7 +14,7 @@
     <DataSource Persistence="ProjectFile" Label="Configuration" />
   </Rule.DataSource>
   <StringProperty Name="OutDir" DisplayName="Output Directory"
-                  Description="Specifies a relative path to the output file directory; can include environment variables."
+                  Description="Specifies a path to the output file directory; can include environment variables. Relative paths are relative to the project directory."
                   Category="General" Default="$(Platform)\$(Configuration)\"
                   Subtype="folder"
                   F1Keyword="VC.Project.VCConfiguration.OutputDirectory">
@@ -23,7 +23,7 @@
     </StringProperty.DataSource>
   </StringProperty>
   <StringProperty Name="IntDir" DisplayName="Intermediate Directory"
-                  Description="Specifies a relative path to the intermediate file directory; can include environment variables."
+                  Description="Specifies a path to the intermediate file directory; can include environment variables. Relative paths are relative to the project directory."
                   Category="General" Default="$(Platform)\$(Configuration)\"
                   Subtype="folder"
                   F1Keyword="VC.Project.VCConfiguration.IntermediateDirectory">

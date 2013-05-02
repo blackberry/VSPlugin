@@ -28,6 +28,7 @@ namespace VSNDK.Tasks
 {
     public class QccLink : VSNDKTasks
     {
+        #region Member Variables and Constants
         private const string ADDITIONAL_DEPENDENCIES = "AdditionalDependencies";
         private const string LINK_ERROR_REPORTING = "LinkErrorReporting";
         private const string ADDITIONAL_LIB_DIR = "AdditionalLibraryDirectories";        
@@ -39,7 +40,11 @@ namespace VSNDK.Tasks
         private const string LINK_LIB_DEP = "LinkLibraryDependencies";
         private const string OUTPUT_FILE = "OutputFile";
         private const string TREAT_LINK_WARNING_AS_ERR = "TreatLinkerWarningAsErrors";
+        #endregion
 
+        /// <summary>
+        /// QccLink Constructor
+        /// </summary>
         public QccLink()
             : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
         {
@@ -58,6 +63,10 @@ namespace VSNDK.Tasks
         }
 
         #region overrides
+
+        /// <summary>
+        /// Getter/Setter for AlwaysAppend property
+        /// </summary>
         protected override string AlwaysAppend
         {
             get
@@ -66,16 +75,25 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for CommandTLogName property
+        /// </summary>
         protected override string CommandTLogName
         {
             get { return "qcc_linker.command.1.tlog"; }
         }
 
+        /// <summary>
+        /// Getter/Setter for ReadTLog
+        /// </summary>
         protected override string[] ReadTLogNames
         {
             get { return new string[] { "qcc_linker.read.1.tlog", "qcc_linker.*.read.1.tlog" }; }
         }
 
+        /// <summary>
+        /// Getter/Setter WriteTLogNames property
+        /// </summary>
         protected override string[] WriteTLogNames
         {
             get
@@ -84,6 +102,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Function to return the Enhanced Security value.
+        /// </summary>
+        /// <returns></returns>
         protected override string GetEnhancedSecuritySwitchValue()
         {
             return "-Wl,-z,relro -Wl,-z,now";
@@ -91,6 +113,10 @@ namespace VSNDK.Tasks
         #endregion
 
         #region properties
+
+        /// <summary>
+        /// Getter/Setter for the AdditionalDependencies property
+        /// </summary>
         public virtual string[] AdditionalDependencies
         {
             get
@@ -118,6 +144,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the AdditionalLibraryDirectories property
+        /// </summary>
         public virtual string[] AdditionalLibraryDirectories
         {
             get
@@ -145,6 +174,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the GenerateMapFile property
+        /// </summary>
         public virtual bool GenerateMapFile
         {
             get
@@ -169,6 +201,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the IgnoreAllDefaultLibraries
+        /// </summary>
         public virtual bool IgnoreAllDefaultLibraries
         {
             get
@@ -192,6 +227,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the IgnoreAllDefaultCppLibraries property
+        /// </summary>
         public virtual bool IgnoreAllDefaultCppLibraries
         {
             get
@@ -215,6 +253,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the LinkIncremental Property
+        /// </summary>
         public virtual bool LinkIncremental
         {
             get
@@ -241,6 +282,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the LinkStatus property
+        /// </summary>
         public virtual bool LinkStatus
         {
             get
@@ -267,6 +311,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the LinkLibraryDependencies
+        /// </summary>
         public virtual bool LinkLibraryDependencies
         {
             get
@@ -289,6 +336,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the OutputFile property
+        /// </summary>
         public virtual string OutputFile
         {
             get
@@ -302,11 +352,9 @@ namespace VSNDK.Tasks
             set
             {
                 base.ActiveToolSwitches.Remove(OUTPUT_FILE);
-                //value = value.Replace(".exe", "");
 
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
-                    //Separator = ":",
                     DisplayName = "Output File",
                     Description = "The -o option overrides the default name and location of the program that the linker creates.",
                     ArgumentRelationList = new ArrayList(),
@@ -319,6 +367,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the TreatLinkerWarningAsErrors property.
+        /// </summary>
         public virtual bool TreatLinkerWarningAsErrors
         {
             get

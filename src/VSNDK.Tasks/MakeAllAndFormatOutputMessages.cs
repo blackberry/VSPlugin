@@ -1,4 +1,18 @@
-﻿using System;
+﻿//* Copyright 2010-2011 Research In Motion Limited.
+//*
+//* Licensed under the Apache License, Version 2.0 (the "License");
+//* you may not use this file except in compliance with the License.
+//* You may obtain a copy of the License at
+//*
+//* http://www.apache.org/licenses/LICENSE-2.0
+//*
+//* Unless required by applicable law or agreed to in writing, software
+//* distributed under the License is distributed on an "AS IS" BASIS,
+//* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//* See the License for the specific language governing permissions and
+//* limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,19 +29,35 @@ using System.Text.RegularExpressions;
 
 namespace VSNDK.Tasks
 {
+    /// <summary>
+    /// Cancelabe MSBuild Task for Running the Make file for the build.
+    /// </summary>
     public class MakeAllAndFormatOutputMessages : ICancelableTask
     {
+        #region Member Variables and Constants
+        private string _projectDir;
+        private string _intDir;
+        private string _outDir;
+
         private static StringBuilder stdOutput = null;
         private static StringBuilder errorOutput = null;
         private IBuildEngine buildEngine;
         private System.Diagnostics.Process proc = null;
+        private ITaskHost hostObject;
+        #endregion
 
+        /// <summary>
+        /// Getter/Setter for the BuildEngine property
+        /// </summary>
         public IBuildEngine BuildEngine
         {
             get { return buildEngine; }
             set { buildEngine = value; }
         }
-        private ITaskHost hostObject;
+
+        /// <summary>
+        /// Getter/Setter for the HostObject property
+        /// </summary>
         public ITaskHost HostObject
         {
             get { return hostObject; }
@@ -42,10 +72,8 @@ namespace VSNDK.Tasks
         {
             try
             {
-                // create the ProcessStartInfo using "cmd" as the program to be run,
-                // and "/c " as the parameters.
-                // Incidentally, /c tells cmd that we want it to execute the command that follows,
-                // and then exit.
+                // create the ProcessStartInfo using "cmd" as the program to be run, and "/c " as the parameters.
+                // Incidentally, /c tells cmd that we want it to execute the command that follows, and then exit.
                 System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("cmd", "/c " + ToolsPath + @"\make all");
 
                 // Set UseShellExecute to false for redirection.
@@ -59,8 +87,8 @@ namespace VSNDK.Tasks
                 errorOutput = new StringBuilder("");
 
                 // Setting the work directory.
-                ExePath = ExePath.Remove(ExePath.LastIndexOf('\\'));
-                procStartInfo.WorkingDirectory = ExePath;
+                string rootedOutDir = (Path.IsPathRooted(OutDir)) ? OutDir : ProjectDir + OutDir;
+                procStartInfo.WorkingDirectory = rootedOutDir;
 
                 // Do not create the black window.
                 procStartInfo.CreateNoWindow = true;
@@ -325,14 +353,15 @@ namespace VSNDK.Tasks
                     tilde = outputText.IndexOf("~", tilde + 1);
                 }
 
-                
-
                 /// Send build output to the Output window and to the ErrorList window
                 if (outputText.IndexOf(": error:") > 0)
                 {
                     string fileName = outputText.Substring(0, outputText.IndexOf(": error:"));
+                    int lineNum = 0;
+
                     int ini = fileName.IndexOf('(') + 1;
                     int end = fileName.IndexOf(')');
+
                     if (fileName.IndexOf(',', ini) > 0)
                     {
                         if (fileName.IndexOf(',', ini) < end)
@@ -340,9 +369,18 @@ namespace VSNDK.Tasks
                             end = fileName.IndexOf(',', ini);
                         }
                     }
-                    end = end - fileName.IndexOf('(') - 1; 
-                    int lineNum = Convert.ToInt16(fileName.Substring(ini, end));
-                    int colNum = 0;// Convert.ToInt16(fileName.Substring(fileName.IndexOf(',') + 1, fileName.IndexOf(')') - fileName.IndexOf(',') - 1));
+                    end = end - fileName.IndexOf('(') - 1;
+
+                    try
+                    {
+                        lineNum = Convert.ToInt16(fileName.Substring(ini, end));
+                    }
+                    catch
+                    {
+                        lineNum = 0;
+                    }
+                    
+                    int colNum = 0;
                     string messageErr = outputText.Substring(outputText.IndexOf(": error:") + 9);
                     fileName = fileName.Substring(0, fileName.IndexOf('('));
                     BuildErrorEventArgs errorEvent = new BuildErrorEventArgs("", "", fileName, lineNum, colNum, 0, 0, messageErr, "", "");
@@ -351,6 +389,8 @@ namespace VSNDK.Tasks
                 else if (outputText.IndexOf(": warning:") > 0)
                 {
                     string fileName = outputText.Substring(0, outputText.IndexOf(": warning:"));
+                    int lineNum = 0;
+
                     int ini = fileName.IndexOf('(') + 1;
                     int end = fileName.IndexOf(')');
                     if (fileName.IndexOf(',', ini) > 0)
@@ -361,7 +401,16 @@ namespace VSNDK.Tasks
                         }
                     }
                     end = end - fileName.IndexOf('(') - 1;
-                    int lineNum = Convert.ToInt16(fileName.Substring(ini, end));
+
+                    try
+                    {
+                        lineNum = Convert.ToInt16(fileName.Substring(ini, end));
+                    }
+                    catch
+                    {
+                        lineNum = 0;
+                    }
+
                     int colNum = 0; 
                     string messageErr = outputText.Substring(outputText.IndexOf(": warning:") + 11);
                     fileName = fileName.Substring(0, fileName.IndexOf('('));
@@ -379,7 +428,14 @@ namespace VSNDK.Tasks
                     if (m.Success)
                     {
                         fileName = outputText.Substring(0, m.Index);
-                        lineNum = Convert.ToInt16(m.Value.Trim(':'));
+                        try
+                        {
+                            lineNum = Convert.ToInt16(m.Value.Trim(':'));
+                        }
+                        catch
+                        {
+                            lineNum = 0;
+                        }
                         message = outputText.Substring(m.Index + m.Length).Trim();
                     }
                     else
@@ -403,6 +459,13 @@ namespace VSNDK.Tasks
             }
         }
 
+
+        /// <summary> GDB works with short path names only, which requires converting the path names to/from long ones. This function 
+        /// returns the long path name for a given short one. </summary>
+        /// <param name="path">Short path name. </param>
+        /// <param name="longPath">Returns this long path name. </param>
+        /// <param name="longPathLength"> Lenght of this long path name. </param>
+        /// <returns></returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern int GetLongPathName(
             [MarshalAs(UnmanagedType.LPTStr)]
@@ -413,11 +476,19 @@ namespace VSNDK.Tasks
             );
 
         [Required]
-        public string ExePath
+        public string ProjectDir
         {
-            get;
-            set;
+            set { _projectDir = value.Replace('\\', '/'); }
+            get { return _projectDir; }
         }
+
+        [Required]
+        public string OutDir
+        {
+            set { _outDir = value.Replace('\\', '/'); }
+            get { return _outDir; }
+        }
+
         [Required]
         public string ToolsPath
         {
@@ -442,6 +513,4 @@ namespace VSNDK.Tasks
             
         }
     }
-
-
 }

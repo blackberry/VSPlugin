@@ -22,11 +22,20 @@ namespace VSNDK.Tasks
 {
     class PackagerCmdBuilder : CommandLineBuilder
     {
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public PackagerCmdBuilder()
             : base(true)
         {
         }
 
+        /// <summary>
+        /// Override of IsQuotingRequired function.  Always return true.
+        /// </summary>
+        /// <param name="parameter"></param>
+        /// <returns></returns>
         protected override bool IsQuotingRequired(string parameter)
         {
             return true;

@@ -27,6 +27,7 @@ namespace VSNDK.Tasks
 {
     public class SSHDelete : TrackedVCToolTask
     {
+        #region Member Variables and Constants
         protected ArrayList switchOrderList;
 
         private const string DEVICE = "Device";
@@ -34,35 +35,56 @@ namespace VSNDK.Tasks
         private const string DELETE_FILES = "DeleteFiles";
         private const string PACKAGE_ID = "PackageId";
         private const string PACKAGE_NAME = "PackageName";
+        #endregion
 
+        /// <summary>
+        /// SSHDelete Constructor
+        /// </summary>
         public SSHDelete()
             : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
         {
             this.switchOrderList = new ArrayList();
             this.switchOrderList.Add(PRIVATE_KEY_PATH);
-            //this.switchOrderList.Add(DEVICE);
         }
 
+        /// <summary>
+        /// Return the Response File Switch string
+        /// </summary>
+        /// <param name="responseFilePath"></param>
+        /// <returns></returns>
         protected override string GetResponseFileSwitch(string responseFilePath)
         {
             return string.Empty;
         }
 
+        /// <summary>
+        /// Return the command line string
+        /// </summary>
+        /// <returns></returns>
         protected override string GenerateCommandLineCommands()
         {
             return GenerateResponseFileCommands();
         }
 
+        /// <summary>
+        /// Getter/Setter for the CommandTLogName property
+        /// </summary>
         protected override string CommandTLogName
         {
             get { return "SSHDelete.command.1.tlog"; }
         }
 
+        /// <summary>
+        /// Getter/Setter for the ReadTLogNames string
+        /// </summary>
         protected override string[] ReadTLogNames
         {
             get { return new string[] { "SSHDelete.read.1.tlog", "SSHDelete.*.read.1.tlog" }; }
         }
 
+        /// <summary>
+        /// Getter/Setter for the WriteTLogNames string
+        /// </summary>
         protected override string[] WriteTLogNames
         {
             get
@@ -71,6 +93,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the TrackedInputFiles string
+        /// </summary>
         protected override Microsoft.Build.Framework.ITaskItem[] TrackedInputFiles
         {
             get
@@ -83,6 +108,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the ToolName property
+        /// </summary>
         protected override string ToolName
         {
             get
@@ -91,6 +119,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the TrackerIntermediateDirectory property
+        /// </summary>
         protected override string TrackerIntermediateDirectory
         {
             get
@@ -99,11 +130,13 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Function to generate the response file commands string
+        /// </summary>
+        /// <returns></returns>
         protected override string GenerateResponseFileCommands()
         {
-            //System.Diagnostics.Debugger.Launch();
             string cmd = base.GenerateResponseFileCommands();
-            //string cmd = "ssh -i \"" + base.ActiveToolSwitches[PRIVATE_KEY_PATH].Value + "\" devuser@" + base.ActiveToolSwitches[DEVICE].Value;
 
             cmd += " -o \"StrictHostKeyChecking no\"";
 
@@ -130,6 +163,9 @@ namespace VSNDK.Tasks
             return cmd;
         }
 
+        /// <summary>
+        /// Getter/Setter for the SwitchOrderList property.
+        /// </summary>
         protected override ArrayList SwitchOrderList
         {
             get
@@ -138,6 +174,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the Device property
+        /// </summary>
         public virtual string Device
         {
             get
@@ -165,6 +204,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PrivateKeyPath property
+        /// </summary>
         public virtual string PrivateKeyPath
         {
             get
@@ -192,6 +234,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PackageId property
+        /// </summary>
         public virtual string PackageId
         {
             get
@@ -219,6 +264,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PackageName property
+        /// </summary>
         public virtual string PackageName
         {
             get
@@ -246,6 +294,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the DeleteFiles property
+        /// </summary>
         public virtual ITaskItem[] DeleteFiles
         {
             get

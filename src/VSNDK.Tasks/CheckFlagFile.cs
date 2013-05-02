@@ -23,15 +23,24 @@ using Microsoft.Build.Utilities;
 
 namespace VSNDK.Tasks
 {
+
+    /// <summary>
+    /// MSBuild Task for reading in the flag file from the start debugging button.
+    /// </summary>
     public class CheckFlagFile : Task
     {
+        #region Member Variables and Constants.
         private string _action;
         private string _flagFile;
         private bool _isFlagSet;
+        #endregion
 
+        /// <summary>
+        /// Execute the MSBuild Task
+        /// </summary>
+        /// <returns></returns>
         public override bool Execute()
         {
-            //System.Diagnostics.Debugger.Launch();
             _isFlagSet = false;
             
             if (String.Equals(_action, "check", StringComparison.OrdinalIgnoreCase)) 
@@ -40,26 +49,27 @@ namespace VSNDK.Tasks
                 {
 				    _isFlagSet = true;				    
 			    }
-                return true;
             } 
             else if (String.Equals(_action, "remove", StringComparison.OrdinalIgnoreCase)) 
             {
                 try
                 {
                     File.Delete(_flagFile);
-                    return true;
+                    _isFlagSet = true;
                 }
                 catch (DirectoryNotFoundException dirNotFound)
                 {
                     Console.WriteLine(dirNotFound.Message);
-                    return false;
+                    _isFlagSet = false;
                 }                
             } 
-            
-            // Unrecognized action
-            return false;
+
+            return _isFlagSet;
         }
 
+        /// <summary>
+        /// Setter for FlagFile property
+        /// </summary>
         [Required]
         public string FlagFile
         {
@@ -69,6 +79,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Setter for Action property
+        /// </summary>
         [Required]
         public string Action
         {
@@ -78,6 +91,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for IsFlagSet property
+        /// </summary>
         [Output]
         public bool IsFlagSet
         {

@@ -23,29 +23,59 @@ using Microsoft.Build.Utilities;
 
 namespace VSNDK.Tasks
 {
+    /// <summary>
+    /// MSBuid Task to retrieve the application info
+    /// </summary>
     public class GetAppInfo : Task
     {
-        private string _barDescriptorPath;
+        #region Member Variables and Constants
+        private string _projectDir;
+        private string _barDescriptorPath = "bar-descriptor.xml";
         private string _appId;
+        #endregion
 
+        /// <summary>
+        /// Execute the MSBuild Task
+        /// </summary>
+        /// <returns></returns>
         public override bool Execute()
         {
-            XmlReader reader = XmlReader.Create(_barDescriptorPath);
+
+            string rootedOutDir = (Path.IsPathRooted(_barDescriptorPath)) ? _barDescriptorPath : _projectDir + _barDescriptorPath;
+
+            XmlReader reader = XmlReader.Create(rootedOutDir);
             reader.ReadToFollowing("id");
             _appId = reader.ReadElementContentAsString();
 
             return true;
         }
 
-        [Required]
+        /// <summary>
+        /// Getter/Setter for the ApplicationDescriptorXml property
+        /// </summary>
         public string ApplicationDescriptorXml
         {
-            set
+            set 
             {
-                _barDescriptorPath = value;
+                _barDescriptorPath = value.Replace("bar-descriptor.xml", "");
+                _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + "bar-descriptor.xml" : _barDescriptorPath + @"\bar-descriptor.xml";
+                _barDescriptorPath = _barDescriptorPath.Trim('\\');
             }
+            get { return _barDescriptorPath; }
         }
 
+        /// <summary>
+        /// Getter/Setter for the ProjectDir property
+        /// </summary>
+        public string ProjectDir
+        {
+            set { _projectDir = value; }
+            get { return _projectDir; }
+        }
+
+        /// <summary>
+        /// Getter/Setter for the AppId property
+        /// </summary>
         [Output]
         public string AppId
         {
