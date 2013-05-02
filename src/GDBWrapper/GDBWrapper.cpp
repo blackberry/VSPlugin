@@ -12,6 +12,7 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+
 // GDBWrapper.cpp : Utility to run GDB in console mode so that CTRL-C works.
 //
 
@@ -34,15 +35,16 @@
 // TODO: Put the following functions in a library that both GDBWrapper
 // and GDBConsole can use
 
-/////////////////////////////////////////////////////////////////////// 
-// DisplayError
-// Displays the error number and corresponding message.
-/////////////////////////////////////////////////////////////////////// 
 using namespace std;
 using namespace System;
 
 char path_log[_MAX_PATH]; // contains the path to the Wrapper output log, needed in logPrint()
 
+
+/// <summary> 
+/// Displays the error number and corresponding message. 
+/// </summary>
+/// <param name="pszAPI"> Error message. </param>
 void DisplayError(LPCTSTR pszAPI)
 {
     LPVOID lpvMessageBuffer;
@@ -60,19 +62,19 @@ void DisplayError(LPCTSTR pszAPI)
         _T("ERROR: API    = %s.\n   error code = %d.\n   message    = %s.\n"),
             pszAPI, GetLastError(), (char *)lpvMessageBuffer);
 
-    /*WriteConsole(GetStdHandle(STD_OUTPUT_HANDLE),szPrintBuffer,
-                    lstrlen(szPrintBuffer),&nCharsWritten,NULL);
-					*/
 	_tprintf(_T("%s\n"), szPrintBuffer);
 
     LocalFree(lpvMessageBuffer);
     ExitProcess(GetLastError());
 }
 
+
+/// <summary> 
+/// Retrieve the system error message for the last-error code. 
+/// </summary>
+/// <param name="lpszFunction"> Error message. </param>
 void ErrorExit(LPTSTR lpszFunction) 
 { 
-    // Retrieve the system error message for the last-error code
-
     LPVOID lpMsgBuf;
     LPVOID lpDisplayBuf;
     DWORD dw = GetLastError(); 
@@ -102,6 +104,11 @@ void ErrorExit(LPTSTR lpszFunction)
     ExitProcess(dw); 
 }
 
+
+/// <summary> 
+/// Generic function to print to a log file. 
+/// </summary>
+/// <param name="buffer"> Message to be printed to a log file. </param>
 void logPrint(TCHAR* buffer) {
 	if (LOG_GDB_RAW_IO) {
 		FILE* file = fopen(path_log, "a");
@@ -113,6 +120,12 @@ void logPrint(TCHAR* buffer) {
 // End region that needs to go into a library
 // *******************************************************************
 
+
+/// <summary> 
+/// CTRL-C handler. 
+/// </summary>
+/// <param name="dwCtrlType"> CTRL type. </param>
+/// <returns> True; False. </returns>
 BOOL WINAPI ctrlHandler(DWORD dwCtrlType)
 {
 	logPrint(_T("ctrlHandler"));
@@ -124,6 +137,13 @@ BOOL WINAPI ctrlHandler(DWORD dwCtrlType)
 	return false;
 }
 
+
+/// <summary> 
+/// Constructor. 
+/// </summary>
+/// <param name="pcGDBCmd"> String with full path and command to initialize GDB/MI. </param>
+/// <param name="eventCtrlC"> Ctrl-C handler; </param>
+/// <param name="eventTerminate"> Terminate handler; </param>
 GDBWrapper::GDBWrapper(TCHAR* pcGDBCmd, HANDLE eventCtrlC, HANDLE eventTerminate) : 
 	m_eventCtrlC(eventCtrlC), m_eventTerminate(eventTerminate), m_isClosed(FALSE)
 {
@@ -147,6 +167,10 @@ GDBWrapper::GDBWrapper(TCHAR* pcGDBCmd, HANDLE eventCtrlC, HANDLE eventTerminate
     prepAndLaunchRedirectedChild();
 }
 
+
+/// <summary> 
+/// Shut down GDB Wrapper: Update variables and terminate GDBWrapper process. 
+/// </summary>
 void GDBWrapper::shutdown() {
 	logPrint(_T("+shutdown"));
 	m_isClosed = TRUE;
@@ -163,6 +187,10 @@ void GDBWrapper::shutdown() {
 	logPrint(_T("-shutdown"));
 }
 
+
+/// <summary> 
+/// Destructor. 
+/// </summary>
 GDBWrapper::~GDBWrapper() {
 	logPrint(_T("+~GDBWrapper"));
 	if (!m_isClosed) {
@@ -171,6 +199,10 @@ GDBWrapper::~GDBWrapper() {
 	logPrint(_T("-~GDBWrapper"));
 }
 
+
+/// <summary> 
+/// Sets up STARTUPINFO structure and launches redirected child. 
+/// </summary>
 void GDBWrapper::prepAndLaunchRedirectedChild(void)
 {
 	LPCTSTR lpApplicationName = NULL;
@@ -213,6 +245,16 @@ void GDBWrapper::prepAndLaunchRedirectedChild(void)
 	if (!CloseHandle(pi.hThread)) DisplayError(_T("CloseHandle"));
 }
 
+
+/// <summary> 
+/// GDBWrapper Main function. 
+/// </summary>
+/// <param name="argc"> Not used. </param>
+/// <param name="argv"> argv[0] -> Full path of the GDBWrapper executable file.
+/// argv[1] -> String with full path and command to initialize GDB/MI
+/// argv[2] -> Ctrl-C handler;
+/// argv[3] -> Terminate handler. </param>
+/// <returns> 0 </returns>
 int _tmain(int argc, _TCHAR* argv[])
 {	
 	TCHAR msg[1024];
@@ -221,19 +263,10 @@ int _tmain(int argc, _TCHAR* argv[])
     WCHAR wszThisFile[MAX_PATH + 1];
     GetModuleFileName(NULL, wszThisFile, MAX_PATH + 1);
 	
-//	WCHAR path_buffer[_MAX_PATH];
-//	WCHAR drive[_MAX_DRIVE];
-//	WCHAR dir[_MAX_DIR];
-//	WCHAR filename[] = L"wrapper";
-//	WCHAR ext[] = L"log";
-
 	String^ tempPath = Environment::GetEnvironmentVariable("APPDATA"); 
 	tempPath += "\\BlackBerry\\wrapper.log";
 	pin_ptr<const wchar_t> path_buffer = PtrToStringChars(tempPath);
 
-//	_wsplitpath(wszThisFile, drive, dir, NULL, NULL);
-//	_wmakepath(path_buffer, drive, dir, filename, ext);
-		
 	int ret = wcstombs ( path_log, path_buffer, _MAX_PATH );
 
 	FILE* file = fopen(path_log, "w"); // just to delete a possible existing file
@@ -244,7 +277,6 @@ int _tmain(int argc, _TCHAR* argv[])
 	HANDLE handles[2];
 	handles[0] = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[2]); // Ctrl-C signal
 	handles[1] = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[3]); // Signal to terminate the wrapper process
-
 
 	_stprintf(msg, _T("args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3]);
 	_tprintf(msg);
