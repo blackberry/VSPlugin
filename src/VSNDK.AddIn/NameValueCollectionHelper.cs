@@ -20,8 +20,17 @@ using System.Collections.Specialized;
 
 namespace VSNDK.AddIn
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public static class NameValueCollectionHelper
     {
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public static string DumpToString(NameValueCollection value)
         {
             var xSB = new StringBuilder();
@@ -32,6 +41,12 @@ namespace VSNDK.AddIn
             return xSB.ToString();
         }
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="target"></param>
+        /// <param name="value"></param>
         public static void LoadFromString(NameValueCollection target, string value)
         {
             if (target.Count > 0)
