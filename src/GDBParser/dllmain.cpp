@@ -18,7 +18,10 @@
 
 #pragma managed(off)
 
-// Use the ATL Registrar to register the engine. 
+
+/// <summary> 
+/// Use the ATL Registrar to register the engine. 
+/// </summary>
 class CGDBParserModule : public CAtlDllModuleT< CGDBParserModule >
 {
 
@@ -28,7 +31,10 @@ CGDBParserModule _GDBParserModule;
 HMODULE _hModThis;
 
 
-// DllRegisterServer - Adds entries to the system registry
+/// <summary> 
+/// Adds entries to the system registry. 
+/// </summary>
+/// <returns> HRESULT </returns>
 STDAPI DllRegisterServer(void)
 {
     // Get this binaries full-path
@@ -53,7 +59,10 @@ STDAPI DllRegisterServer(void)
 }
 
 
-// DllUnregisterServer - Removes entries from the system registry
+/// <summary> 
+/// Removes entries from the system registry. 
+/// </summary>
+/// <returns> HRESULT </returns>
 STDAPI DllUnregisterServer(void)
 {
     // Get this binaries full-path
@@ -77,6 +86,12 @@ STDAPI DllUnregisterServer(void)
 	return hr;
 }
 
+
+/// <summary> </summary>
+/// <param name="hModule"> </param>
+/// <param name="ul_reason_for_call"> </param>
+/// <param name="lpReserved"> </param>
+/// <returns> TRUE. </returns>
 BOOL APIENTRY DllMain( HMODULE hModule,
                        DWORD  ul_reason_for_call,
                        LPVOID lpReserved
