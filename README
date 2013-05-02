@@ -1,0 +1,6 @@
+Please note that the 'bin' and 'lib' folders must be copied to either of the following directories:
+
+C:\Program Files (x86)\Research In Motion\VSPlugin-NDK
+C:\Program Files\Research In Motion\VSPlugin-NDK
+
+This will be done by InstallShield when the installer is available, but for now we have to do it manually.
