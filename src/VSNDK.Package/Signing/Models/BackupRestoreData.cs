@@ -22,21 +22,37 @@ using System.IO.Packaging;
 
 namespace RIM.VSNDK_Package.Signing.Models
 {
+    /// <summary>
+    /// DataModel class for the BackupRestore Dialog
+    /// </summary>
     class BackupRestoreData : NotifyPropertyChanged
     {
+        #region Member Variables and Constants
         private string _info;
 
         private static string p12 = "/author.p12";
         private static string csk = "/barsigner.csk";
         private static string db = "/barsigner.db";
+        #endregion
 
+        /// <summary>
+        /// BackupRestoreData constructor
+        /// </summary>
         public BackupRestoreData()
         {
             _info = PkgResources.BackupRestoreInfo;
         }
 
+        /// <summary>
+        /// Getter for Info property
+        /// </summary>
         public string Info { get { return _info; } }
 
+        /// <summary>
+        /// Function to backup the signing certs at the specified path
+        /// </summary>
+        /// <param name="certPath">Path to the signing keys</param>
+        /// <param name="toZipFile">Path to destination zip file</param>
         public void Backup(string certPath, string toZipFile)
         {
             using (Package pkg = Package.Open(toZipFile, FileMode.Create))
@@ -47,6 +63,12 @@ namespace RIM.VSNDK_Package.Signing.Models
             }
         }
 
+        /// <summary>
+        /// Function to add a file to the zip
+        /// </summary>
+        /// <param name="path">Path to the file</param>
+        /// <param name="file">File name</param>
+        /// <param name="pkg">Package to add file to</param>
         private void AddUriToPackage(string path, string file, Package pkg)
         {
             Uri uri = null;
@@ -59,6 +81,11 @@ namespace RIM.VSNDK_Package.Signing.Models
             }
         }
 
+        /// <summary>
+        /// Function to unzip and restore a set of singing keys
+        /// </summary>
+        /// <param name="fromZipFile"></param>
+        /// <param name="certPath"></param>
         public void Restore(string fromZipFile, string certPath)
         {
 
@@ -76,7 +103,7 @@ namespace RIM.VSNDK_Package.Signing.Models
         }
     
 
-            /// <summary>
+        /// <summary>
         /// Method to create file at the temp folder
         /// </summary>
         /// <param name="rootFolder"></param>
@@ -101,7 +128,6 @@ namespace RIM.VSNDK_Package.Signing.Models
             }
 
             contentFilePath = System.IO.Path.Combine(rootFolder, contentFilePath); 
-            //contentFilePath =  System.IO.Path.Combine(rootFolder, contentFilePath); 
 
             //Check for the folder already exists. If not then create that folder
 
@@ -125,6 +151,11 @@ namespace RIM.VSNDK_Package.Signing.Models
 
         } 
 
+        /// <summary>
+        /// Function to copy a stream from one stream to another
+        /// </summary>
+        /// <param name="source">Source Stream</param>
+        /// <param name="target">Target Stream</param>
         private void CopyStream(Stream source, Stream target)
         {
             const int bufSize = 0x1000;

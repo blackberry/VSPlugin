@@ -18,73 +18,25 @@
             <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Path=Info, Mode=OneWay}"></TextBlock>
             <StackPanel Orientation="Horizontal">
                 <Label Content="RDK CSJ Path:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <TextBox Name="tbRDKCSJPath" 
-                         Validation.ErrorTemplate="{StaticResource validationTemplate}" 
-                         Style="{StaticResource ResourceKey=txtBoxWidth}">
-                    <TextBox.Text>
-                        <Binding Path="RDKCSJPath" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <DataErrorValidationRule />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox.Text>
-                </TextBox>
+                <TextBox Name="tbRDKCSJPath" Style="{StaticResource ResourceKey=txtBoxWidth}" Text="{Binding Path=RDKCSJPath}" />
                 <Button Name="btnRDKBrowse" Content="Browse..." Click="btnBrowse_Click"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="PBDT CSJ Path:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <TextBox Name="tbPBDTCSJPath" Style="{StaticResource ResourceKey=txtBoxWidth}" 
-                         Validation.ErrorTemplate="{StaticResource validationTemplate}" >
-                    <TextBox.Text>
-                        <Binding Path="PBDKCSJPath" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <DataErrorValidationRule />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox.Text>
-                </TextBox>
+                <TextBox Name="tbPBDTCSJPath" Style="{StaticResource ResourceKey=txtBoxWidth}" Text="{Binding Path=PBDKCSJPath}" />
                 <Button Name="btnPBDTBrowse" Content="Browse..." Click="btnBrowse_Click"/>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="CSJ Pin:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <TextBox Name="tbCSJPin" Style="{StaticResource ResourceKey=txtBoxWidth}"
-                    Validation.ErrorTemplate="{StaticResource validationTemplate}" >
-                    <TextBox.Text>
-                        <Binding Path="CSJPin" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <DataErrorValidationRule />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </TextBox.Text>
-                </TextBox>
+                <TextBox Name="tbCSJPin" Style="{StaticResource ResourceKey=txtBoxWidth}" Text="{Binding Path=CSJPin}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="CSK Password:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <PasswordBox Name="tbCSKPassword" pa:PasswordBoxAssistant.BindPassword="True" 
-                             Style="{StaticResource ResourceKey=passwordBoxWidth}"
-                             Validation.ErrorTemplate="{StaticResource validationTemplate}">
-                    <pa:PasswordBoxAssistant.BoundPassword>
-                        <Binding Path="CSJPassword" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <DataErrorValidationRule />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </pa:PasswordBoxAssistant.BoundPassword>
-                </PasswordBox>
+                <PasswordBox Name="tbCSKPassword" Style="{StaticResource ResourceKey=passwordBoxWidth}" DataContext="{Binding Path=CSJPassword}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="Confirm CSK Password:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <PasswordBox Name="tbConfirmCSKPassword" pa:PasswordBoxAssistant.BindPassword="True" 
-                             Style="{StaticResource ResourceKey=passwordBoxWidth}"
-                             Validation.ErrorTemplate="{StaticResource validationTemplate}" >
-                    <pa:PasswordBoxAssistant.BoundPassword>
-                        <Binding Path="CSJConfirmPassword" UpdateSourceTrigger="PropertyChanged">
-                            <Binding.ValidationRules>
-                                <DataErrorValidationRule />
-                            </Binding.ValidationRules>
-                        </Binding>
-                    </pa:PasswordBoxAssistant.BoundPassword>
-                </PasswordBox>
+                <PasswordBox Name="tbConfirmCSKPassword" Style="{StaticResource ResourceKey=passwordBoxWidth}" DataContext="{Binding Path=CSJConfirmPassword}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
             <Button Name="btnOk" IsDefault="True" Click="btnOk_Click" Margin="5" Width="100">OK</Button>

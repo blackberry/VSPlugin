@@ -26,6 +26,9 @@ using System.IO;
 
 namespace RIM.VSNDK_Package.Signing.Models
 {
+    /// <summary>
+    /// Data Model for the Registration Dialog
+    /// </summary>
     class RegistrationData : NotifyPropertyChanged, IDataErrorInfo
     {
         private string _info;
@@ -48,6 +51,9 @@ namespace RIM.VSNDK_Package.Signing.Models
         private static string _ndkTargetPath;
         private static string _ndkHostPath;
 
+        /// <summary>
+        /// Constructor for the RegistrationData Model
+        /// </summary>
         static RegistrationData()
         {
             RegistryKey rkHKCU = Registry.CurrentUser;
@@ -70,6 +76,9 @@ namespace RIM.VSNDK_Package.Signing.Models
             rkHKCU.Close();
         }
 
+        /// <summary>
+        /// Constructor for the RegistrationData Model
+        /// </summary>
         public RegistrationData()
         {
             _info = PkgResources.RegistrationInfo;
@@ -77,31 +86,56 @@ namespace RIM.VSNDK_Package.Signing.Models
         }
 
         #region Properties
+
+        /// <summary>
+        /// Getter/Setter for the Info property.
+        /// </summary>
         public string Info { get { return _info; } }
+
+        /// <summary>
+        /// Getter/Setter for the DeRegInfo property.
+        /// </summary>
         public string DeRegInfo { get { return _deregInfo; } }
+
+        /// <summary>
+        /// Getter/Setter for the RDKCSJPath variable
+        /// </summary>
         public string RDKCSJPath
         {
             get { return _rdkCSJPath; }
             set { _rdkCSJPath = value; OnPropertyChanged(_colRDKCSJPath); }
         }
+
+        /// <summary>
+        /// Getter/Setter for the PBDKCSJPath property
+        /// </summary>
         public string PBDKCSJPath
         {
             get { return _pbdbCSJPath; }
             set { _pbdbCSJPath = value; OnPropertyChanged(_colPBDKCSJPath); }
         }
 
+        /// <summary>
+        /// Getter/Setter for the CSJPin property
+        /// </summary>
         public string CSJPin
         {
             get { return _csjPin; }
             set { _csjPin = value; OnPropertyChanged(_colCSJPin); }
         }
 
+        /// <summary>
+        /// Getter/Setter for the CSJPassword property
+        /// </summary>
         public string CSJPassword
         {
             get { return _csjPassword; }
             set { _csjPassword = value; OnPropertyChanged(_colCSJPW); }
         }
 
+        /// <summary>
+        /// Getter/Setter for the CSJConfirmPassword property
+        /// </summary>
         public string CSJConfirmPassword
         {
             get { return _csjConfirmPassword; }
@@ -109,7 +143,10 @@ namespace RIM.VSNDK_Package.Signing.Models
         }
         #endregion
 
-        //Run the blackberry-signer tool with parameters passed in
+        /// <summary>
+        /// Run the blackberry-signer tool with parameters passed in
+        /// </summary>
+        /// <returns></returns>
         public bool Register()
         {
             if (!ValidateInput())
@@ -157,7 +194,10 @@ namespace RIM.VSNDK_Package.Signing.Models
             return success && string.IsNullOrEmpty(_errors);
         }
 
-        //Run the blackberry-signer tool with parameters passed in
+        /// <summary>
+        /// Run the blackberry-signer tool with parameters passed in
+        /// </summary>
+        /// <returns></returns>
         public bool UnRegister()
         {
             if (string.IsNullOrEmpty(_ndkHostPath))
@@ -270,6 +310,10 @@ namespace RIM.VSNDK_Package.Signing.Models
             return Convert.ToBase64String(encrypted);
         }
 
+        /// <summary>
+        /// Validate the input from the dialog
+        /// </summary>
+        /// <returns></returns>
         private bool ValidateInput()
         {
             string err = this[_colRDKCSJPath];
@@ -290,6 +334,11 @@ namespace RIM.VSNDK_Package.Signing.Models
             return string.IsNullOrEmpty(_errors);
         }
 
+        /// <summary>
+        /// Event Handler for output received from the Register Process
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void p_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
             if (e.Data != null)
@@ -302,6 +351,11 @@ namespace RIM.VSNDK_Package.Signing.Models
             }
         }
 
+        /// <summary>
+        /// Event Handler for the error data received from the Registger Process
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void p_ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
         {
             if (e.Data != null)
@@ -311,17 +365,25 @@ namespace RIM.VSNDK_Package.Signing.Models
             }
         }
 
-        //Contains the output information of the tool
+        /// <summary>
+        /// Getter/Setter for the Message property
+        /// </summary>
         public string Message { get { return _message; } set { _message = value; } }
 
-        //Contains any errors during the registration
+        /// <summary>
+        /// Getter/Setter for the Error property
+        /// </summary>
         public string Error
         {
             get { return _errors; }
             set { _errors = value; }
         }
 
-        //Validation error reported in UI
+        /// <summary>
+        /// Validation error reported in UI
+        /// </summary>
+        /// <param name="columnName"></param>
+        /// <returns></returns>
         public string this[string columnName]
         {
             get 

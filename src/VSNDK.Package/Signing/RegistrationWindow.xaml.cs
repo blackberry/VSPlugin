@@ -34,11 +34,19 @@ namespace RIM.VSNDK_Package
     /// </summary>
     public partial class RegistrationWindow : Window
     {
+        /// <summary>
+        /// RegistrationWindow Constructor
+        /// </summary>
         public RegistrationWindow()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// Register Signing Keys on click of OK Button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
             bool registered = false;
@@ -64,6 +72,11 @@ namespace RIM.VSNDK_Package
             DialogResult = registered;
         }
 
+        /// <summary>
+        /// Open a file browse dialog on click of the browse button.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
         {
             Button btn = sender as Button;
@@ -76,6 +89,10 @@ namespace RIM.VSNDK_Package
                 tbPBDTCSJPath.Text = fn;
         }
 
+        /// <summary>
+        /// Helper function to generate the appropriate browser dialog
+        /// </summary>
+        /// <returns></returns>
         private string BrowserFileName()
         {
             string filename = string.Empty;

@@ -28,7 +28,9 @@ using System.Windows.Data;
 
 namespace RIM.VSNDK_Package.Settings.Models
 {
-
+    /// <summary>
+    /// Class the story a new NDK configuration entry.
+    /// </summary>
     public class NDKEntryClass
     {
         public string NDKName { get; set; }
@@ -42,8 +44,29 @@ namespace RIM.VSNDK_Package.Settings.Models
         }
     }
 
+    /// <summary>
+    /// Data Model Class for the Settings Dialog
+    /// </summary>
     class SettingsData : NotifyPropertyChanged
     {
+        #region Member Variables and Constants
+        private string _deviceIP;
+        private string _devicePassword;
+        private string _simulatorIP;
+        private string _simulatorPassword;
+        private readonly CollectionView _ndkEntries;
+        private NDKEntryClass _ndkEntry;
+
+        private const string _colDeviceIP = "DeviceIP";
+        private const string _colDevicePW = "DevicePassword";
+        private const string _colSimulatorIP = "SimulatorIP";
+        private const string _colSimulatorPW = "SimulatorPassword";
+        private const string _colNDKEntry = "NDKEntry";
+        #endregion
+
+        /// <summary>
+        /// SettingsData Constructor
+        /// </summary>
         public SettingsData()
         {
             string[] filePaths = Directory.GetFiles(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\", "*.xml");
@@ -78,50 +101,55 @@ namespace RIM.VSNDK_Package.Settings.Models
             _ndkEntries = new CollectionView(NDKList);
         }
 
-        private string _deviceIP;
-        private string _devicePassword;
-        private string _simulatorIP;
-        private string _simulatorPassword;
-        private readonly CollectionView _ndkEntries;
-        private NDKEntryClass _ndkEntry;
-
-        private const string _colDeviceIP = "DeviceIP";
-        private const string _colDevicePW = "DevicePassword";
-        private const string _colSimulatorIP = "SimulatorIP";
-        private const string _colSimulatorPW = "SimulatorPassword";
-        private const string _colNDKEntry = "NDKEntry";
-
         #region Properties
 
+        /// <summary>
+        /// Getter/Setter for the DeviceIP property
+        /// </summary>
         public string DeviceIP
         {
             get { return _deviceIP; }
             set { _deviceIP = value; OnPropertyChanged(_colDeviceIP); }
         }
 
+        /// <summary>
+        /// Getter/Setter for the DevicePassword property
+        /// </summary>
         public string DevicePassword
         {
             get { return _devicePassword; }
             set { _devicePassword = value; OnPropertyChanged(_colDevicePW); }
         }
 
+        /// <summary>
+        /// Getter/Setter for the SimulatorIP property
+        /// </summary>
         public string SimulatorIP
         {
             get { return _simulatorIP; }
             set { _simulatorIP = value; OnPropertyChanged(_colSimulatorIP); }
         }
 
+        /// <summary>
+        /// Getter/Setter for the SimulatorPassword property
+        /// </summary>
         public string SimulatorPassword
         {
             get { return _simulatorPassword; }
             set { _simulatorPassword = value; OnPropertyChanged(_colSimulatorPW); }
         }
 
+        /// <summary>
+        /// Getter for the NDKEntries property
+        /// </summary>
         public CollectionView NDKEntries
         {
             get { return _ndkEntries; }
         }
 
+        /// <summary>
+        /// Getter/Setter for the NDKEntryClass property
+        /// </summary>
         public NDKEntryClass NDKEntryClass
         {
             get { return _ndkEntry; }
@@ -154,7 +182,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         }
 
         /// <summary>
-        /// 
+        /// Function to retrieve device info from the registry
         /// </summary>
         /// <returns></returns>
         public void getDeviceInfo()
@@ -184,7 +212,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         }
 
         /// <summary>
-        /// 
+        /// Function to retrieve simulator info from the registry
         /// </summary>
         /// <returns></returns>
         public void getSimulatorInfo()
@@ -261,6 +289,16 @@ namespace RIM.VSNDK_Package.Settings.Models
                 rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
                 rkNDKPath.SetValue("NDKHostPath", _ndkEntry.HostPath);
                 rkNDKPath.SetValue("NDKTargetPath", _ndkEntry.TargetPath);
+
+                string qnx_config = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK";
+
+                System.Environment.SetEnvironmentVariable("QNX_TARGET", _ndkEntry.TargetPath);
+                System.Environment.SetEnvironmentVariable("QNX_HOST", _ndkEntry.HostPath);
+                System.Environment.SetEnvironmentVariable("QNX_CONFIGURATION", qnx_config);
+
+                string ndkpath = string.Format(@"{0}/usr/bin;{1}\bin;{0}/usr/qde/eclipse/jre/bin;", _ndkEntry.HostPath, qnx_config) +
+                    System.Environment.GetEnvironmentVariable("PATH");
+                System.Environment.SetEnvironmentVariable("PATH", ndkpath);
             }
             catch
             {
@@ -282,16 +320,20 @@ namespace RIM.VSNDK_Package.Settings.Models
 
             try
             {
+                string NDKHostPath = "";
                 rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                return rkNDKPath.GetValue("NDKHostPath").ToString();
+                NDKHostPath = rkNDKPath.GetValue("NDKHostPath").ToString();
+                rkNDKPath.Close();
+                rkHKCU.Close();
+                return NDKHostPath;
             }
             catch
             {
-
+                if (rkNDKPath != null)
+                    rkNDKPath.Close();
+                rkHKCU.Close();
                 return null;
             }
-            rkNDKPath.Close();
-            rkHKCU.Close();
         }
 
         /// <summary>

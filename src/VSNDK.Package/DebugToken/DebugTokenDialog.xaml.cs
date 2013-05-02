@@ -37,11 +37,13 @@ namespace RIM.VSNDK_Package.DebugToken
     /// </summary>
     public partial class DebugTokenDialog : DialogWindow
     {
+        #region Member Variables and Constants
         private DebugTokenData deployTokenData;
         public bool IsClosing = false;
+        #endregion
 
         /// <summary>
-        /// Constructor
+        /// DebugTokenDialog Constructor
         /// </summary>
         public DebugTokenDialog()
         {

@@ -22,6 +22,9 @@ using System.Windows.Data;
 
 namespace RIM.VSNDK_Package
 {
+    /// <summary>
+    /// Implementation of the IViewModel interface
+    /// </summary>
     public interface IViewModel
     {
         /// <summary>
@@ -56,9 +59,6 @@ namespace RIM.VSNDK_Package
 
         void CheckPermission(string identifier);
         void UnCheckPermission(string identifier);
-
-    //    string getAuthorID();
-     //   string getAuthor();
         void setAuthorInfo();
 
         void OnSelectChanged(object p);

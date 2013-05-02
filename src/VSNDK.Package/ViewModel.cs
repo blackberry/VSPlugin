@@ -1,4 +1,18 @@
-﻿using System;
+﻿//* Copyright 2010-2011 Research In Motion Limited.
+//*
+//* Licensed under the Apache License, Version 2.0 (the "License");
+//* you may not use this file except in compliance with the License.
+//* You may obtain a copy of the License at
+//*
+//* http://www.apache.org/licenses/LICENSE-2.0
+//*
+//* Unless required by applicable law or agreed to in writing, software
+//* distributed under the License is distributed on an "AS IS" BASIS,
+//* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//* See the License for the specific language governing permissions and
+//* limitations under the License.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -169,12 +183,7 @@ namespace RIM.VSNDK_Package
             }
             catch
             {
-                if (_imageName == "icon.png")
-                {
-                    _imageName = null;
-                    _imagePath = null;
-                    _imageSize = null;
-                }
+
             }
         }
 
@@ -284,7 +293,7 @@ namespace RIM.VSNDK_Package
                 string iconPNG_Path = "";  //added to avoid duplication. That's because I didn't find the template to remove teh ICON.PNG.
                 foreach (string iconImage in _qnxSchema.icon.image)
                 {
-                    ImageItemClass imageItem = new ImageItemClass(iconImage, Path.Combine(_activeProjectDirectory, iconImage));
+                    ImageItemClass imageItem = new ImageItemClass(iconImage, getImagePath(iconImage));
                     if (imageItem.ImageName != null) //added because I didn't find the template to remove teh ICON.PNG.
                         if (imageItem.ImageName == "icon.png")
                         {
@@ -308,7 +317,7 @@ namespace RIM.VSNDK_Package
             {
                 foreach (string splashScreenImage in _qnxSchema.splashScreens.image)
                 {
-                    ImageItemClass imageItem = new ImageItemClass(splashScreenImage, Path.Combine(_activeProjectDirectory, splashScreenImage));
+                    ImageItemClass imageItem = new ImageItemClass(splashScreenImage, getImagePath(splashScreenImage));
                     SplashScreenImageList.Add(imageItem);
                 }
             }
@@ -355,6 +364,21 @@ namespace RIM.VSNDK_Package
             }
 
             _orientationList = new CollectionView(OrientationList);
+        }
+
+        private string getImagePath(string imgName)
+        {
+            string imagePath = "";
+
+            foreach (asset assetItem in _qnxSchema.asset)
+            {
+                if (assetItem.Value == imgName)
+                {
+                    imagePath = assetItem.path; 
+                }
+            }
+
+            return imagePath;
         }
 
         /// <summary>
@@ -764,6 +788,9 @@ namespace RIM.VSNDK_Package
             }
         }
 
+        /// <summary>
+        /// Read the author information from the debug token and update the appropriate boxes.
+        /// </summary>
         public void setAuthorInfo()
         {
             if (!File.Exists(_localRIMFolder + "DebugToken.bar"))
@@ -1198,7 +1225,7 @@ namespace RIM.VSNDK_Package
             _qnxSchema.icon.AddIconImage(iconName);
             DesignerDirty = true;
             IList source = (IList)_iconImageList.SourceCollection;
-              ImageItemClass image = new ImageItemClass(iconName, Path.Combine(_activeProjectDirectory, iconName));
+              ImageItemClass image = new ImageItemClass(iconName, getImagePath(iconName));
             source.Add(image);
             _iconImageList = new CollectionView(source);
 
@@ -1242,7 +1269,7 @@ namespace RIM.VSNDK_Package
             qnxSS.AddSplashScreenImage(splashScreenName);
             DesignerDirty = true;
             IList source = (IList)_splashScreenImageList.SourceCollection;
-            ImageItemClass image = new ImageItemClass(splashScreenName, Path.Combine(_activeProjectDirectory, splashScreenName));
+            ImageItemClass image = new ImageItemClass(splashScreenName, getImagePath(splashScreenName));
             source.Add(image);
             _splashScreenImageList = new CollectionView(source);
 
@@ -1473,15 +1500,6 @@ namespace RIM.VSNDK_Package
             get
             {
                 string error = null;
-                switch (columnName)
-                {
-                    //case "ID":
-                    //    error = this.ValidateId();
-                    //    break;
-                    //case "Description":
-                    //    error = this.ValidateDescription();
-                    //    break;
-                }
                 return error;
             }
         }

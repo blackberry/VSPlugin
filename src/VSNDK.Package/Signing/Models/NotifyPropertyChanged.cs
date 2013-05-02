@@ -20,9 +20,21 @@ using System.ComponentModel;
 
 namespace RIM.VSNDK_Package.Signing.Models
 {
+
+    /// <summary>
+    /// Implimentation of the INotifyPropertyChanged interface
+    /// </summary>
     class NotifyPropertyChanged : INotifyPropertyChanged
     {
+        /// <summary>
+        /// PropertyChanged Event Handler Declaration
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Fire the PropertyChnaged event handler on change of property
+        /// </summary>
+        /// <param name="propName"></param>
         protected void OnPropertyChanged(string propName)
         {
             if (PropertyChanged != null)
