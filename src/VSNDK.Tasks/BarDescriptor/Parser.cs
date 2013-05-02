@@ -25,6 +25,11 @@ namespace VSNDK.Tasks.BarDescriptor
 {
     public class Parser
     {
+        /// <summary>
+        /// Helper function to to deserialize the bar-descriptor.xml file for read.
+        /// </summary>
+        /// <param name="filename">Path to the bar-descriptor.xml file</param>
+        /// <returns>BarDescriptor.qnx object containing the deserialized data from the bar-descriptor.</returns>
         public static  BarDescriptor.qnx Load(string filename)
         {
             if (!string.IsNullOrEmpty(filename))

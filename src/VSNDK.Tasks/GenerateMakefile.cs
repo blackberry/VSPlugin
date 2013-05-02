@@ -24,8 +24,12 @@ using System.Runtime.InteropServices;
 
 namespace VSNDK.Tasks
 {
+    /// <summary>
+    /// MSBuild Task for generating a make file for packaging the bar file. 
+    /// </summary>
     public class GenerateMakefile : Task
     {
+        #region Member Variables and Constants
         private string _projectDir;
         private string _intDir;
         private string _outDir;
@@ -83,7 +87,15 @@ namespace VSNDK.Tasks
             "-include $(II_DEPS)\n" +
             "endif\n" +
             "endif\n\n";
+        #endregion
 
+        /// <summary>
+        /// Interface to unmanaged code for getting the SHortPathName for a given directory.
+        /// </summary>
+        /// <param name="path">Path to be converted</param>
+        /// <param name="shortPath">Returned ShortPathName</param>
+        /// <param name="shortPathLength">Length of the ShortPathName</param>
+        /// <returns></returns>
         [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
         public static extern int GetShortPathName(
                  [MarshalAs(UnmanagedType.LPTStr)]
@@ -93,6 +105,10 @@ namespace VSNDK.Tasks
                  int shortPathLength
                  );
 
+        /// <summary>
+        /// Execute MSBuild Task
+        /// </summary>
+        /// <returns></returns>
         public override bool Execute()
         {
             string targetString = TargetName + TargetExtension;
@@ -130,7 +146,6 @@ namespace VSNDK.Tasks
                     string fullPathShortened = shortPath.ToString();
                     
                     string handleExceptions = compileItem.GetMetadata("GccExceptionHandling");
-                    //string handleExceptions = compileItem.GetMetadata("ExceptionHandling");
 
                     string[] preprocessorDefs = compileItem.GetMetadata("PreprocessorDefinitions").Split(';');
                     string[] preprocessorUndefs = compileItem.GetMetadata("UndefinePreprocessorDefinitions").Split(';');
@@ -347,103 +362,111 @@ namespace VSNDK.Tasks
                 outFile.WriteLine(".PHONY: all clean dependents\n");
             }
 
-            //printAllMetadata();
             return true;
         }
 
-        private void printAllMetadata()
-        {
-            Log.LogMessage("Compile Items:");
-            foreach (ITaskItem taskItem in CompileItems)
-            {
-                Log.LogMessage(taskItem.ToString());
-
-                ICollection c = taskItem.MetadataNames;
-                foreach (string s in c)
-                {
-                    Log.LogMessage(s + " = " + taskItem.GetMetadata(s));
-                }
-            }
-
-            Log.LogMessage("Link Items:");
-            foreach (ITaskItem taskItem in LinkItems)
-            {
-                Log.LogMessage(taskItem.ToString());
-
-                ICollection c = taskItem.MetadataNames;
-                foreach (string s in c)
-                {
-                    Log.LogMessage(s + " = " + taskItem.GetMetadata(s));
-                }
-            }
-        }
-
+        /// <summary>
+        /// Getter/Setter for CompileItems property
+        /// </summary>
         public ITaskItem[] CompileItems
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Getter/Setter for LinkItems
+        /// </summary>
         public ITaskItem[] LinkItems
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Getter/Setter for ProjectDir property
+        /// </summary>
         public string ProjectDir
         {
             set { _projectDir = value.Replace('\\', '/'); }
             get { return _projectDir; }
         }
 
+        /// <summary>
+        /// Getter/Setter for IntDir property
+        /// </summary>
         public string IntDir
         {
             set { _intDir = value.Replace('\\', '/'); }
             get { return _intDir; }
         }
 
+        /// <summary>
+        /// Getter/Setter for OutDir property
+        /// </summary>
         public string OutDir
         {
             set { _outDir = value.Replace('\\', '/'); }
             get { return _outDir; }
         }
 
+        /// <summary>
+        /// Getter/Setter for AdditionalIncludeDirectories property 
+        /// </summary>
         public string[] AdditionalIncludeDirectories
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Getter/Setter for AdditionLibraryDirectories
+        /// </summary>
         public string[] AdditionalLibraryDirectories
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Getter/Setter for TargetName property
+        /// </summary>
         public string TargetName
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Getter/Setter for TargetExtension property
+        /// </summary>
         public string TargetExtension
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Getter/Setter for ConfigurationType property
+        /// </summary>
         public string ConfigurationType
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Getter/Setter for CompilerVersion property
+        /// </summary>
         public string CompilerVersion
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Getter/Setter for Platform property
+        /// </summary>
         public string Platform
         {
             set;

@@ -25,20 +25,33 @@ using Microsoft.Build.Utilities;
 namespace VSNDK.Tasks
 {
     public class WriteDebuggerArgs : Task
-    {        
-        private string _exePath;
+    {
+        #region Member Variables and Constants
+        private string _projectDir;
+        private string _outDir;
+        private string _appName;
+
         private string _device;
         private bool _isSimulator;
 
+        #endregion
+
+        /// <summary>
+        /// Execute MSBuild function
+        /// </summary>
+        /// <returns></returns>
         public override bool Execute()
         {            
             string fileContent = _device;
+
+            // Setting the work directory.
+            string rootedOutDir = (Path.IsPathRooted(OutDir)) ? OutDir + AppName : ProjectDir + OutDir + AppName;
 
             // Escape backslashes
             string pattern = @"\\";
             string replacement = @"\\\\";
             Regex r = new Regex(pattern);
-            string regexResult = r.Replace(_exePath, replacement);
+            string regexResult = r.Replace(rootedOutDir, replacement);
             fileContent += "\r\n" + regexResult;
 
             fileContent += "\r\n" + _isSimulator;
@@ -55,15 +68,39 @@ namespace VSNDK.Tasks
             return true;
         }
 
+        /// <summary>
+        /// Getter/Setter for the ProjectDir property
+        /// </summary>
         [Required]
-        public string ExePath
+        public string ProjectDir
         {
-            set
-            {
-                _exePath = value;
-            }
+            set { _projectDir = value.Replace('\\', '/'); }
+            get { return _projectDir; }
         }
 
+        /// <summary>
+        /// Getter/Setter for the OutDir property
+        /// </summary>
+        [Required]
+        public string OutDir
+        {
+            set { _outDir = value.Replace('\\', '/'); }
+            get { return _outDir; }
+        }
+
+        /// <summary>
+        /// Getter/Setter for the AppName property
+        /// </summary>
+        [Required]
+        public string AppName
+        {
+            set { _appName = value; }
+            get { return _appName; }
+        }
+
+        /// <summary>
+        /// Getter/Setter for the Device property
+        /// </summary>
         [Required]
         public string Device
         {
@@ -73,6 +110,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the isSimulator property
+        /// </summary>
         [Required]
         public bool isSimulator
         {
@@ -81,6 +121,10 @@ namespace VSNDK.Tasks
                 _isSimulator = value;
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for the ToolsPath property
+        /// </summary>
         [Required]
         public string ToolsPath
         {
@@ -88,6 +132,9 @@ namespace VSNDK.Tasks
             set;
         }
 
+        /// <summary>
+        /// Getter/Setter for the PublicKeyPath property
+        /// </summary>
         [Required]
         public string PublicKeyPath
         {
@@ -95,6 +142,9 @@ namespace VSNDK.Tasks
             set;
         }
 
+        /// <summary>
+        /// Getter/Setter for the Password property
+        /// </summary>
         public string Password
         {
             get;

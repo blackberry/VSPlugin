@@ -29,9 +29,9 @@ namespace VSNDK.Tasks
 {
     public class BBDeploy : TrackedVCToolTask
     {
+        #region Member Variable Declaration
         protected ArrayList switchOrderList;
         private string _localManifest;
-
         private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
         private const string GET_FILE = "GetFile";
         private const string GET_FILE_SAVE_AS = "GetFileSaveAs";
@@ -46,9 +46,12 @@ namespace VSNDK.Tasks
         private const string LIST_INSTALLED_APPS = "ListInstalledApps";
         private const string DEBUG_NATIVE = "DebugNative";
         private const string PACKAGE = "Package";
-
         private const string WORKSPACE_LOC = "${workspace_loc:/";
+        #endregion
 
+        /// <summary>
+        /// BBDeploy Constructor
+        /// </summary>
         public BBDeploy()
             : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
         {
@@ -69,16 +72,30 @@ namespace VSNDK.Tasks
         }
 
         #region overrides
+
+        /// <summary>
+        /// Helper function to return Response File Switch
+        /// </summary>
+        /// <param name="responseFilePath">Path to response file.</param>
+        /// <returns>Return response file switch</returns>
         protected override string GetResponseFileSwitch(string responseFilePath)
         {
             return string.Empty;
         }
 
+        /// <summary>
+        /// Helper function to generte the command line argument string.
+        /// </summary>
+        /// <returns>command line argument string</returns>
         protected override string GenerateCommandLineCommands()
         {
             return GenerateResponseFileCommands();
         }
 
+        /// <summary>
+        /// Helper function to generate response file string
+        /// </summary>
+        /// <returns>response file command line string</returns>
         protected override string GenerateResponseFileCommands()
         {
             string cmd = base.GenerateResponseFileCommands();
@@ -91,6 +108,9 @@ namespace VSNDK.Tasks
             return cmd;
         }
 
+        /// <summary>
+        /// Getter for the SwitchOrderList property
+        /// </summary>
         protected override ArrayList SwitchOrderList
         {
             get
@@ -99,16 +119,25 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the CommandTLogName property
+        /// </summary>
         protected override string CommandTLogName
         {
             get { return "BBDeploy.command.1.tlog"; }
         }
 
+        /// <summary>
+        /// Getter for the ReadTLogNames property
+        /// </summary>
         protected override string[] ReadTLogNames
         {
             get { return new string[] { "BBDeploy.read.1.tlog", "BBDeploy.*.read.1.tlog" }; }
         }
 
+        /// <summary>
+        /// Getter for the WriteTLogNames property
+        /// </summary>
         protected override string[] WriteTLogNames
         {
             get
@@ -117,6 +146,9 @@ namespace VSNDK.Tasks
             }
         }
         
+        /// <summary>
+        /// Getter for the TrackedInputFiles property
+        /// </summary>
         protected override Microsoft.Build.Framework.ITaskItem[] TrackedInputFiles
         {
             get
@@ -128,6 +160,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the ToolName property
+        /// </summary>
         protected override string ToolName
         {
             get
@@ -136,9 +171,38 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the TrackerIntermediateDirectory property
+        /// </summary>
+        protected override string TrackerIntermediateDirectory
+        {
+            get
+            {
+                if (this.TrackerLogDirectory != null)
+                {
+                    return this.TrackerLogDirectory;
+                }
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Function to return the full path to the tool.
+        /// </summary>
+        /// <returns></returns>
+        protected override string GenerateFullPathToTool()
+        {
+            return this.ToolName;
+        }
+
         #endregion overrides
 
         #region properties
+
+        /// <summary>
+        /// Getter/Setter for the GetFile property
+        /// Retrieve specified file from default application directory
+        /// </summary>
         public virtual string GetFile
         {
             get
@@ -169,6 +233,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the GetFileSaveAs property
+        /// Retrieve specified file from location.
+        /// </summary>
         public virtual string GetFileSaveAs
         {
             get
@@ -194,6 +262,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PutFile property
+        /// Save given file to default application directory.
+        /// </summary>
         public virtual string PutFile
         {
             get
@@ -222,6 +294,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PutFileSaveAs property
+        /// Save given file to specified location
+        /// </summary>
         public virtual string PutFileSaveAs
         {
             get
@@ -250,6 +326,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the InstallApp property - Switch to cause deploy to install a given application
+        /// </summary>
         public virtual bool InstallApp
         {
             get
@@ -272,6 +351,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the LaunchApp Property - Switch to launch given application.
+        /// </summary>
         public virtual bool LaunchApp
         {
             get
@@ -294,6 +376,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for ListInstalledApps Property.
+        /// Switch for command to retrieve the list of installed apps.
+        /// </summary>
         public virtual bool ListInstalledApps
         {
             get
@@ -316,6 +402,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for DebugNative property
+        /// Switch to cause task to install application in debug configuration.
+        /// </summary>
         public virtual bool DebugNative
         {
             get
@@ -339,6 +429,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for Device property.
+        /// Device property designates the IP of the target device.
+        /// </summary>
         public virtual string Device
         {
             get
@@ -365,6 +459,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for Password property.
+        /// Password property specifies the target device password.
+        /// </summary>
         public virtual string Password
         {
             get
@@ -393,6 +491,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for Package property.
+        /// Package property specified package to be installed/launched on task execution.
+        /// </summary>
         public virtual string Package
         {
             get
@@ -419,6 +521,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for PackageId property
+        /// </summary>
         [Output]
         public virtual string PackageId
         {
@@ -446,6 +551,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for PackageName property
+        /// </summary>
         [Output]
         public virtual string PackageName
         {
@@ -473,7 +581,10 @@ namespace VSNDK.Tasks
             }
         }
 
-        // We need the local manifest in order to determine PackageId and PackageName.
+        /// <summary>
+        /// Getter/Setter for LocalManifestFile property
+        /// We need the local manifest in order to determine PackageId and PackageName.
+        /// </summary>
         public virtual string LocalManifestFile
         {
             get
@@ -504,6 +615,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the TargetManifestFile
+        /// </summary>
         [Output]
         public virtual string TargetManifestFile
         {
@@ -512,6 +626,34 @@ namespace VSNDK.Tasks
                 return null;
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for the TrackerLogDirectory property
+        /// </summary>
+        public virtual string TrackerLogDirectory
+        {
+            get
+            {
+                if (base.IsPropertySet(TRACKER_LOG_DIRECTORY))
+                {
+                    return base.ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
+                }
+                return null;
+            }
+            set
+            {
+                base.ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
+                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Directory)
+                {
+                    DisplayName = "Tracker Log Directory",
+                    Description = "Tracker Log Directory.",
+                    Value = VCToolTask.EnsureTrailingSlash(value)
+                };
+                base.ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
+                base.AddActiveSwitchToolValue(switch2);
+            }
+        }
+
         #endregion
 
         /// <summary>
@@ -537,47 +679,6 @@ namespace VSNDK.Tasks
             byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
 
             return Encoding.Unicode.GetString(decrypted);
-        }
-
-        public virtual string TrackerLogDirectory
-        {
-            get
-            {
-                if (base.IsPropertySet(TRACKER_LOG_DIRECTORY))
-                {
-                    return base.ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
-                }
-                return null;
-            }
-            set
-            {
-                base.ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Directory)
-                {
-                    DisplayName = "Tracker Log Directory",
-                    Description = "Tracker Log Directory.",
-                    Value = VCToolTask.EnsureTrailingSlash(value)
-                };
-                base.ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
-                base.AddActiveSwitchToolValue(switch2);
-            }
-        }
-
-        protected override string TrackerIntermediateDirectory
-        {
-            get
-            {
-                if (this.TrackerLogDirectory != null)
-                {
-                    return this.TrackerLogDirectory;
-                }
-                return string.Empty;
-            }
-        }
-
-        protected override string GenerateFullPathToTool()
-        {
-            return this.ToolName;
         }
     }
 }

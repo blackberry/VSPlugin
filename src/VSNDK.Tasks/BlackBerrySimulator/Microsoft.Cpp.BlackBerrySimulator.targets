@@ -95,14 +95,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       />
 
     <MakeAllAndFormatOutputMessages
-        ExePath ="$(TargetPath)"
+        ProjectDir      ="$(ProjectDir)"
+        OutDir		  ="$(IntDir)"      
         ToolsPath ="$(BuildBarToolPath)"
       >
     </MakeAllAndFormatOutputMessages >
 
-    <!--    <Exec Command="$(QccToolsPath)\make all" WorkingDirectory="$(IntDir)" /> -->
 
-    <Message Text="$(MSBuildProjectFile) -&gt; $(TargetPath)" Importance="High" />
+
 
   </Target>
 
@@ -146,14 +146,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       />
 
     <MakeAllAndFormatOutputMessages
-        ExePath ="$(TargetPath)"
-        ToolsPath ="$(BuildBarToolPath)"
-      >
+        ProjectDir      ="$(ProjectDir)"
+        OutDir		  ="$(IntDir)"      
+        ToolsPath ="$(BuildBarToolPath)">
     </MakeAllAndFormatOutputMessages >
 
-    <!--    <Exec Command="$(QccToolsPath)\make all" WorkingDirectory="$(IntDir)" />
 
-    <FormatOutputMessages /> -->
 
   
 </Target>

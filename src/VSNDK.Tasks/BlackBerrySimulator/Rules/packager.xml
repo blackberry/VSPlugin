@@ -23,8 +23,8 @@ xmlns:sys="clr-namespace:System;assembly=mscorlib">
     DisplayName="bar-debug"></EnumValue>
   </EnumProperty>
   <StringProperty Subtype="file" Name="ApplicationDescriptorXml"
-  DisplayName="Application descriptor file"
-  Description="Specifies a path to the application descriptor file"
+  DisplayName="Application descriptor file (bar-descriptor.xml)"
+  Description="Specifies a path to the application descriptor file (bar-descriptor.xml); can include environment variables. Relative paths are relative to the project directory."
   Category="General" F1Keyword=""></StringProperty>
   <BoolProperty Name="DevMode" DisplayName="Development mode"
   Description="Package in development mode; required to run unsigned applications and access application data remotely"

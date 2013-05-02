@@ -30,6 +30,13 @@ namespace VSNDK.Tasks
     {
         private int _processId;
 
+        /// <summary>
+        /// Execute given command asynchronously.
+        /// </summary>
+        /// <param name="pathToTool">Path of executable to be run.</param>
+        /// <param name="responseFileCommands">Response file commands</param>
+        /// <param name="commandLineCommands">Command Line Arguments</param>
+        /// <returns></returns>
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
             string comm = "/Q /C " + Command + " -password " + Decrypt(Password);
@@ -42,6 +49,12 @@ namespace VSNDK.Tasks
             return 0;
         }
 
+        /// <summary>
+        /// Helper function to create the ProcessStartInfo object for the running process.
+        /// </summary>
+        /// <param name="executable">Path of executable to be run.</param>
+        /// <param name="arguments">Command Line Arguments</param>
+        /// <returns></returns>
         protected virtual ProcessStartInfo GetProcessStartInfo(string executable, string arguments)
         {
             if (arguments.Length > 0x7d00)
@@ -73,12 +86,20 @@ namespace VSNDK.Tasks
             return startInfo;
         }
 
+        /// <summary>
+        /// Getter/Setter for Password Property
+        /// </summary>
         public virtual string Password
         {
             set;
             get;
         }
 
+        /// <summary>
+        /// Helper Function to Decrypt Password
+        /// </summary>
+        /// <param name="cipher"></param>
+        /// <returns></returns>
         public string Decrypt(string cipher)
         {
             if (cipher == null) throw new ArgumentNullException("cipher");

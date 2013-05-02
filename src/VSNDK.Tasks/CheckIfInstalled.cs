@@ -23,29 +23,51 @@ using Microsoft.Build.Utilities;
 
 namespace VSNDK.Tasks
 {
+    /// <summary>
+    /// MSBuild Task to check to see if the application was previously installed.
+    /// </summary>
     public class CheckIfInstalled : Task
     {
+        #region Member Variables and Constants
         private string _listFile;
         private string _appName;
         private bool _isAppInstalled;
+        #endregion
 
+        /// <summary>
+        /// Execute the MSBuild task
+        /// </summary>
+        /// <returns>True on successful execution</returns>
         public override bool Execute()
         {
-            _isAppInstalled = false;
 
-            string[] installedApps = File.ReadAllLines(_listFile);
-            foreach (string app in installedApps)
+            try
             {
-                if (app.Contains(_appName))
+                _isAppInstalled = false;
+
+                string[] installedApps = File.ReadAllLines(_listFile);
+                foreach (string app in installedApps)
                 {
-                    _isAppInstalled = true;
-                    return true;
+                    if (app.Contains(_appName))
+                    {
+                        _isAppInstalled = true;
+                        break;
+                    }
                 }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                return false;
             }
 
-            return true;
+
         }
 
+        /// <summary>
+        /// Setter for the ListFile property
+        /// </summary>
         [Required]
         public string ListFile
         {
@@ -55,6 +77,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Setter for the AppName property
+        /// </summary>
         [Required]
         public string AppName
         {
@@ -64,6 +89,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter for the IsAppInstalled property
+        /// </summary>
         [Output]
         public bool IsAppInstalled
         {

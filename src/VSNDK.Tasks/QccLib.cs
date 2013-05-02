@@ -25,12 +25,17 @@ namespace VSNDK.Tasks
 {
     public class QccLib : VSNDKTasks
     {
+        #region Member Variables and Constants
         private const string ADDITIONAL_DEPENDENCIES = "AdditionalDependencies";
         private const string ADDITIONAL_LIB_DIR = "AdditionalLibraryDirectories";
         private const string OUTPUT_FILE = "OutputFile";
         private const string LINK_STATIC = "LinkStatic";
         private const string TREAT_LIB_WARNING_AS_ERROR = "TreatLibWarningAsErrors";
-        
+        #endregion
+
+        /// <summary>
+        /// QccLib Constructor
+        /// </summary>
         public QccLib()
             : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
         {
@@ -42,6 +47,10 @@ namespace VSNDK.Tasks
         }
 
         #region overrides
+
+        /// <summary>
+        /// Getter/Setter for the AlwaysAppend property
+        /// </summary>
         protected override string AlwaysAppend
         {
             get
@@ -50,16 +59,25 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the CommandTLogName property
+        /// </summary>
         protected override string CommandTLogName
         {
             get { return "qcc_lib.command.1.tlog"; }
         }
 
+        /// <summary>
+        /// Getter/Setter for the ReadTLogNames property
+        /// </summary>
         protected override string[] ReadTLogNames
         {
             get { return new string[] { "qcc_lib.read.1.tlog", "qcc_lib.*.read.1.tlog" }; }
         }
 
+        /// <summary>
+        /// Getter/Setter for the WriteTLogNames
+        /// </summary>
         protected override string[] WriteTLogNames
         {
             get
@@ -68,6 +86,10 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Method return the EnhancedSecuritySwitch
+        /// </summary>
+        /// <returns></returns>
         protected override string GetEnhancedSecuritySwitchValue()
         {
             return string.Empty;
@@ -75,6 +97,9 @@ namespace VSNDK.Tasks
         #endregion overrides
 
         #region properties
+        /// <summary>
+        /// Getter/Setter for the LinkStatic property
+        /// </summary>
         public bool LinkStatic
         {
             get
@@ -98,6 +123,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the AdditionalDependencies property
+        /// </summary>
         public virtual string[] AdditionalDependencies
         {
             get
@@ -125,6 +153,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the AdditionalLibraryDirectories property
+        /// </summary>
         public virtual string[] AdditionalLibraryDirectories
         {
             get
@@ -152,6 +183,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the TreatLibWarningAsErrors property
+        /// </summary>
         public virtual bool TreatLibWarningAsErrors
         {
             get
@@ -175,6 +209,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// GetterSetter for the OutputFile property
+        /// </summary>
         public virtual string OutputFile
         {
             get

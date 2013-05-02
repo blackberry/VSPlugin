@@ -37,8 +37,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(ConfigurationType)' == 'Application'">
-    <LinkCompiled>true</LinkCompiled>
-    <TargetExt>.exe</TargetExt>
+    <LinkCompiled>true</LinkCompiled>    
+    <TargetExt></TargetExt>
     <LibPrefix></LibPrefix>
   </PropertyGroup>
 
@@ -54,20 +54,20 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <TargetPath>$([System.IO.Path]::Combine($(ProjectDir),$(OutDir)$(LibPrefix)$(TargetName)$(TargetExt)))</TargetPath>
     <TargetFileName>$([System.IO.Path]::GetFileName('$(TargetPath)'))</TargetFileName>
     <TargetDir>$([System.IO.Path]::GetDirectoryName('$(TargetPath)'))</TargetDir>
-    <TargetName>$(ProjectName)</TargetName>
+    <TargetName>$(LibPrefix)$(ProjectName)</TargetName>
   </PropertyGroup>
-
 
   <!-- Compiler defaults -->
   <ItemDefinitionGroup>
     <ClCompile>
       <ObjectFileName>$(IntDir)%(FileName).o</ObjectFileName>
       <PreprocessorDefinitions  Condition="'%(ClCompile.PreprocessorDefinitions)'   == ''">$(QccDefines)</PreprocessorDefinitions>
+      <UndefinePreprocessorDefinitions Condition="'%(ClCompile.UndefinePreprocessorDefinitions)'   == ''">WIN32;_WINDOWS</UndefinePreprocessorDefinitions>
       <Warnings                 Condition="'%(ClCompile.Warnings)'                  == ''">NormalWarnings</Warnings>
       <WarningsAsErrors         Condition="'%(ClCompile.WarningsAsErrors)'          == ''">false</WarningsAsErrors>
       <Ansi                     Condition="'%(ClCompile.Ansi)'                      == ''">false</Ansi>
 
-      <GccExceptionHandling     Condition="'%(ClCompile.GccExceptionHandling)'      == ''">false</GccExceptionHandling>
+      <GccExceptionHandling     Condition="'%(ClCompile.GccExceptionHandling)'      == ''">true</GccExceptionHandling>
 
       <RuntimeTypeInfo          Condition="'%(ClCompile.RuntimeTypeInfo)'           == ''">false</RuntimeTypeInfo>
       <ShortEnums               Condition="'%(ClCompile.ShortEnums)'                == ''">false</ShortEnums>
@@ -79,7 +79,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Compiler defaults - Debug builds -->
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Debug'))">
     <ClCompile>
-      <OptimizationLevel        Condition="'%(ClCompile.OptimizationLevel)'         == ''">O0</OptimizationLevel>
+      <OptimizationLevel        Condition="'%(ClCompile.OptimizationLevel)'         == ''">O2</OptimizationLevel>
       <GenerateDebugInformation Condition="'%(ClCompile.GenerateDebugInformation)'  == ''">true</GenerateDebugInformation>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -87,7 +87,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Compiler defaults - Non-debug builds -->
   <ItemDefinitionGroup Condition="$(Configuration.Contains('Release'))">
     <ClCompile>
-      <OptimizationLevel        Condition="'%(ClCompile.OptimizationLevel)'         == ''">O3</OptimizationLevel>
+      <OptimizationLevel        Condition="'%(ClCompile.OptimizationLevel)'         == ''">O2</OptimizationLevel>
       <GenerateDebugInformation Condition="'%(ClCompile.GenerateDebugInformation)'  == ''">false</GenerateDebugInformation>
     </ClCompile>
   </ItemDefinitionGroup>
@@ -122,20 +122,25 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <TrackerLogDirectory         Condition="'%(BuilBar.TrackerLogDirectory)'         == ''">$(IntDir)</TrackerLogDirectory>
       <MinimalRebuildFromTracking  Condition="'%(BuildBar.MinimalRebuildFromTracking)'  == ''">true</MinimalRebuildFromTracking>
       <OutputFile   Condition="'%(BuildBar.OutputFile)' == ''">$(OutDir)$(TargetName).bar</OutputFile>
-      <ApplicationDescriptorXml  Condition="'%(BuildBar.ApplicationDescriptorXml)' == ''">bar-descriptor.xml</ApplicationDescriptorXml>
-      <!-- TargetFormat Condition="'%(BuildBar.TargetFormat)' == ''">bar-debug</TargetFormat -->
+      <PackageManifestOnly Condition="Exists('%(BuildBar.OutputFile)')">true</PackageManifestOnly>
+      <PackageManifestOnly Condition="!Exists('%(BuildBar.OutputFile)')">false</PackageManifestOnly>
       <TargetFormat Condition="$(Configuration.Contains('Debug'))">bar-debug</TargetFormat>
       <TargetFormat Condition="$(Configuration.Contains('Release'))">bar</TargetFormat>
       <DevMode Condition="$(Configuration.Contains('Debug'))">true</DevMode>
       <DevMode Condition="$(Configuration.Contains('Release'))">false</DevMode>
       <BarDeploy Condition="'%(BuildBar.BarDeploy)' == ''">None</BarDeploy>
-      <Device Condition="'%(BuildBar.Device)' == ''">169.254.0.1</Device>
       <Deployment Condition="'%(BuildBar.Deployment)' == ''">Install</Deployment>
       <Register Condition="'%(BuildBar.Register)' == ''">false</Register>
       <BuildID Condition="'%(BuildBar.BuildID)' == ''">1</BuildID>
     </BuildBar>
   </ItemDefinitionGroup>
 
-  <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter\*.props" Condition="Exists('$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter')" />
+  <PropertyGroup>
+    <Device Condition="'$(Device)' == ''">169.254.0.1</Device>
+    <DevicePassword Condition="'$(DevicePassword)' == ''"></DevicePassword>
+    <ApplicationDescriptorXml  Condition="'$(ApplicationDescriptorXml)' == ''">bar-descriptor.xml</ApplicationDescriptorXml>
+    <AppDataPath>$(AppData)</AppDataPath>
+  </PropertyGroup>
 
+  <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter\*.props" Condition="Exists('$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter')" />
 </Project>
