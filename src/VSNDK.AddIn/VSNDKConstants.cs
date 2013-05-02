@@ -19,7 +19,9 @@ using System.Text;
 
 namespace VSNDK.AddIn
 {
-    //Command IDs exposed by VisualStudio
+    /// <summary> 
+    /// Command IDs exposed by VisualStudio. 
+    /// </summary>
     public static class CommandConstants
     {
         public const int cmdidAddSolutionSCC = 21016;
