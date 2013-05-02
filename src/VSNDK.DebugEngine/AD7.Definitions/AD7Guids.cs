@@ -18,8 +18,10 @@ using System.Text;
 
 namespace VSNDK.DebugEngine
 {
-    // These are well-known guids in AD7. Most of these are used to specify filters in what the debugger UI is requesting.
-    // For instance, guidFilterLocals can be passed to IDebugStackFrame2::EnumProperties to specify only locals are requested.
+    /// <summary> 
+    /// These are well-known guids in AD7. Most of these are used to specify filters in what the debugger UI is requesting.
+    /// For instance, guidFilterLocals can be passed to IDebugStackFrame2::EnumProperties to specify only locals are requested.  
+    /// </summary>
     static class AD7Guids
     {
         static private Guid _guidFilterRegisters = new Guid("223ae797-bd09-4f28-8241-2763bdc5f713");

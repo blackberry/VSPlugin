@@ -23,27 +23,60 @@ using System.Diagnostics;
 
 namespace VSNDK.DebugEngine
 {
-
+    /// <summary>
+    /// This class contains all information about a variable / expression.
+    /// </summary>
     public class VariableInfo
     {
-//        private static ArrayList __variables;
 
+        /// <summary>
+        /// Variable's name or expression.
+        /// </summary>
         public string _name;
-        public string _exp;
+
+        /// <summary>
+        /// Variable's data type.
+        /// </summary>
         public string _type;
+
+        /// <summary>
+        /// Variable's value or the result of an expression.
+        /// </summary>
         public string _value;
+
+        /// <summary>
+        /// Variable's name to be used by GDB.
+        /// </summary>
         public string _GDBName;
+
+        /// <summary>
+        /// List of variable's children.
+        /// </summary>
         public ArrayList _children;
 
+
+        /// <summary>
+        /// Evaluate an expression / Get the value of a variable. This method basically send a "-data-evaluate-expression" command to GDB
+        /// and evaluate the result.
+        /// </summary>
+        /// <param name="name"> The expression/variable to be evaluated. </param>
+        /// <param name="result"> The result of the expression/ value of variable. </param>
+        /// <param name="GDBName"> The GDB Name of the variable. </param>
+        /// <returns> A boolean value indicating if the expression evaluation was successful  or not. </returns>
         public static bool evaluateExpression(string name, ref string result, string GDBName)
         {
             if (name[name.Length - 1] == '.')
                 name = name.Remove(name.Length - 1);
+
+            // Waits for the parsed response for the GDB/MI command that evaluates "name" as an expression.
+            // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Data-Manipulation.html)
             result = GDBParser.parseCommand("-data-evaluate-expression \"" + name + "\"", 2);
-            if (result.Substring(0, 2) == "61")
+            if (result.Substring(0, 2) == "61") // If result starts with 61, it means that there is an error.
             {
-                if (GDBName != null)
+                if (GDBName != null) // Maybe that error was caused because GDB didn't accept the VS name. Use the GDBName if there is one.
                 {
+                    // Gets the parsed response for the GDB/MI command that evaluates "GDBName" as an expression.
+                    // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Data-Manipulation.html)
                     string result2 = GDBParser.parseCommand("-data-evaluate-expression \"" + GDBName + "\"", 2);
                     if (result2.Substring(0, 2) == "60")
                         result = result2;
@@ -52,7 +85,7 @@ namespace VSNDK.DebugEngine
 
             bool valid = true;
 
-            if (result.Substring(0, 2) == "61")
+            if (result.Substring(0, 2) == "61") // If result starts with 61, it means that there is an error. So, expression is not valid.
                 valid = false;
 
             result = result.Substring(3);
@@ -89,6 +122,14 @@ namespace VSNDK.DebugEngine
             return valid;
         }
 
+
+        /// <summary>
+        /// Gets the information about a variable/expression.
+        /// </summary>
+        /// <param name="name"> Variable name / expression. </param>
+        /// <param name="m_eventDispatcher"> The event dispatcher. </param>
+        /// <param name="m_frame"> Current stack frame. </param>
+        /// <returns> Return the VariableInfo object. </returns>
         public static VariableInfo get(string name, EventDispatcher m_eventDispatcher, AD7StackFrame m_frame)
         {
             VariableInfo vi = null;
@@ -142,7 +183,7 @@ namespace VSNDK.DebugEngine
                         foreach (VariableInfo var in m_frame._locals)
                         {
                             if (var._name == search)
-                            {
+                            { // if the "search" expression is a local variable, it doesn't need to create a VariableInfo object for that.
                                 vi = var;
                                 break;
                             }
@@ -154,7 +195,7 @@ namespace VSNDK.DebugEngine
                         if (m_frame._arguments != null)
                         {
                             foreach (VariableInfo var in m_frame._arguments)
-                            {
+                            { // if the "search" expression is an argument, it doesn't need to create a VariableInfo object for that.
                                 if (var._name == search)
                                 {
                                     vi = var;
@@ -233,13 +274,23 @@ namespace VSNDK.DebugEngine
             else
             {
                 if (!valid)
-                    vi = new VariableInfo(search, "", result);
+                    vi = new VariableInfo(search, "", result, null);
                 else
                 {
                     string aux_exp = search.Replace(" ", "");
                     string datatype;
+
+                    // Sending 2 GDB commands to get the data type of "aux_exp" because it is not known, at this moment, if "aux_exp"
+                    // is an expression, a primitive or a compound variable.
+
+                    // Gets the parsed response for the GDB command that returns the data type of "aux_exp".
+                    // (http://sourceware.org/gdb/onlinedocs/gdb/Symbols.html)
                     string firstDatatype = GDBParser.parseCommand("whatis " + aux_exp, 3);
+
+                    // Gets the parsed response for the GDB command that returns a detailed description of the type.
+                    // (http://sourceware.org/gdb/onlinedocs/gdb/Symbols.html)
                     string baseDatatype = GDBParser.parseCommand("ptype " + aux_exp, 4);
+
                     if ((baseDatatype[baseDatatype.Length - 1] == '{') && (baseDatatype[baseDatatype.Length - 2] == ' '))
                         baseDatatype = baseDatatype.Remove(baseDatatype.Length - 2);
                     if (baseDatatype.Length < firstDatatype.Length)
@@ -261,7 +312,7 @@ namespace VSNDK.DebugEngine
                     if (datatype[datatype.Length - 1] == '*')
                         if (result == "0x0")
                         {
-                            vi = new VariableInfo(search, firstDatatype, result);
+                            vi = new VariableInfo(search, firstDatatype, result, null);
                         }
                         else
                         {
@@ -273,71 +324,63 @@ namespace VSNDK.DebugEngine
                     }
                     else
                     {
-                        vi = new VariableInfo(search, firstDatatype, result);
+                        vi = new VariableInfo(search, firstDatatype, result, null);
                     }
                 }
             }
             return vi;
         }
 
+
+        /// <summary>
+        /// Call the right VariableInfo constructor for locals and arguments.
+        /// </summary>
+        /// <param name="name"> The name of the variable. </param>
+        /// <param name="type"> The data type of the variable. </param>
+        /// <param name="value"> The value of the variable. </param>
+        /// <param name="dispatcher"> The event dispatcher. </param>
+        /// <returns> Return the VariableInfo created object. </returns>
         public static VariableInfo create(string name, string type, string value, EventDispatcher dispatcher)
         {
             VariableInfo newVar = new VariableInfo(name, type, "", value, dispatcher, null, null);
             return newVar;
         }
 
+
         /// <summary>
-        /// Constructor for Variable Info Object
+        /// Constructor for Variable Info Object without inquiring for the variable's children.
         /// </summary>
-        /// <param name="name">The name of the variable</param>
-        /// <param name="exp"></param>
-        /// <param name="type">The data type of the variable</param>
-        /// <param name="value">The value of the variable</param>
-        /// <param name="GDBName">The GDB Name of the variable</param>
-        public VariableInfo(string name, string exp, string type, string value, string GDBName)
+        /// <param name="name"> The name of the variable. </param>
+        /// <param name="type"> The data type of the variable. </param>
+        /// <param name="value"> The value of the variable. </param>
+        /// <param name="GDBName"> The GDB Name of the variable. </param>
+        public VariableInfo(string name, string type, string value, string GDBName)
         {
             _name = name;
-            _exp = name;
             _type = type;
             _value = value;
             _children = null;
             _GDBName = GDBName;
         }
 
-        /// <summary>
-        /// Constructor for Variable Info Object
-        /// </summary>
-        /// <param name="name">The name of the variable</param>
-        /// <param name="type">The data type of the variable</param>
-        /// <param name="value">The value of the variable</param>
-        public VariableInfo(string name, string type, string value)
-        {
-            _name = name;
-            _exp = null;
-            _type = type;
-            _value = value;
-            _children = null;
-            _GDBName = null;
-        }
 
         /// <summary>
-        /// Constructor for Variable Info Object
+        /// Constructor for Variable Info Object inquiring for the variable's children
         /// </summary>
-        /// <param name="name">The name of the variable</param>
-        /// <param name="type">The data type of the variable</param>
-        /// <param name="baseType">The base type of the variable.</param>
-        /// <param name="value">The value of the variable</param>
-        /// <param name="dispatcher">The event dispatcher</param>
-        /// <param name="GDBNames">The GDBNames of the children</param>
-        /// <param name="VSNames">The VS Names of the children</param>
-        /// <param name="level">The currrent evaluation level</param>
+        /// <param name="name"> The name of the variable. </param>
+        /// <param name="type"> The data type of the variable. </param>
+        /// <param name="baseType"> The base type of the variable. </param>
+        /// <param name="value"> The value of the variable. </param>
+        /// <param name="dispatcher"> The event dispatcher. </param>
+        /// <param name="GDBNames"> The names of the variables used by GDB. </param>
+        /// <param name="VSNames"> The Names of the variables used by VS. </param>
         public VariableInfo(string name, string type, string baseType, string value, EventDispatcher dispatcher, ArrayList GDBNames, ArrayList VSNames)
         {
-            /// numChildren - The result of the createvar returns ERROR or a number 0-n where n is the number of children of the variable.
+            /// numChildren - The result of the createvar returns ERROR or a number from 0 to "n" where "n" is the number of children 
+            /// of the variable.
             string numChildren = ""; 
             
             _name = name;
-            _exp = null;
             _type = type;
             _value = value;
             _children = null;
@@ -356,7 +399,11 @@ namespace VSNDK.DebugEngine
             {
                 // This is an array, struct, union, or pointer.
                 // Create a variable object so we can list this variable's children.
-                bool hasVsNdK_ = false;
+
+                /// Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
+                /// name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
+                /// same index position. This bool variable just indicate if this prefix is used or not.
+                bool hasVsNdK_ = false; 
 
                 numChildren = dispatcher.createVar(_name, ref hasVsNdK_);
 
@@ -369,7 +416,7 @@ namespace VSNDK.DebugEngine
 
                 try // Catch non-numerical data
                 {
-                    if (Convert.ToInt32(numChildren) > 0) // If the variable has children evaluate
+                    if (Convert.ToInt32(numChildren) > 0) // If the variable has children, evaluate them.
                     {
                         _children = new ArrayList();
                         if (type.Contains("struct"))
@@ -392,7 +439,6 @@ namespace VSNDK.DebugEngine
 
                 }
 
-
                 dispatcher.deleteVar(_name, hasVsNdK_);
             }
 
@@ -400,6 +446,17 @@ namespace VSNDK.DebugEngine
                 evaluateExpression(name, ref _value, null);
         }
 
+
+        /// <summary>
+        /// Gets the list of children for a given variable.
+        /// </summary>
+        /// <param name="dispatcher"> The event dispatcher. </param>
+        /// <param name="parentType"> The variable's parent data type. "*" means it is a pointer; "struct[]" means it is an array of
+        /// structures; "struct" means it is a structure; and "[]" means it is an array. </param>
+        /// <param name="GDBNames"> The names of the variables used by GDB. </param>
+        /// <param name="VSNames"> The Names of the variables used by VS. </param>
+        /// <param name="hasVsNdK_"> Indicate if the variable name uses or not the prefix "VsNdK_". </param>
+        /// <param name="GDBName"> The GDB Name of the variable. </param>
         public void listChildren(EventDispatcher dispatcher, string parentType, ArrayList GDBNames, ArrayList VSNames, bool hasVsNdK_, string GDBName)
         {
             string childListResponse;
@@ -428,11 +485,9 @@ namespace VSNDK.DebugEngine
                 string[] childList = childListResponse.Split('#');
                 foreach (string childString in childList)
                 {
-                    //                    bool complex = false;
                     string name = null;
                     string type = null;
                     string value = null;
-                    string exp = null;
                     int numChildren = 0;
                     bool valid = true;
 
@@ -443,19 +498,24 @@ namespace VSNDK.DebugEngine
 
                     name = childProperties[0];
 
-                    if (name.Contains("::"))
+                    if (name.Contains("::")) // discard this GDB expression.
                     {
                         continue;
                     }
 
                     GDBName = name;
-//                    string old = name;
 
                     int end = name.Length;
                     if (name[end - 1] == '"')
                         end--;
-                    if (((name.Length > 8) && (name.Substring(end - 8, 8) == ".private")) || ((name.Length > 7) && (name.Substring(end - 7, 7) == ".public")) || ((name.Length > 10) && (name.Substring(end - 10, 10) == ".protected")) || ((name.Length > 9) && (name.Substring(end - 9, 9) == ".private.")) || ((name.Length > 8) && (name.Substring(end - 8, 8) == ".public.")) || ((name.Length > 11) && (name.Substring(end - 11, 11) == ".protected.")))
+                    if (((name.Length > 8) && (name.Substring(end - 8, 8) == ".private")) || 
+                        ((name.Length > 7) && (name.Substring(end - 7, 7) == ".public")) || 
+                        ((name.Length > 10) && (name.Substring(end - 10, 10) == ".protected")) || 
+                        ((name.Length > 9) && (name.Substring(end - 9, 9) == ".private.")) || 
+                        ((name.Length > 8) && (name.Substring(end - 8, 8) == ".public.")) || 
+                        ((name.Length > 11) && (name.Substring(end - 11, 11) == ".protected.")))
                     {
+                        // GDB is using an intermediate representation for the variable. Inquire GDB again using this intermediate name.
                         int index = VSNames.IndexOf(_name);
                         if (index != -1)
                             GDBNames[index] = GDBName;
@@ -512,12 +572,13 @@ namespace VSNDK.DebugEngine
                         numChildren = Convert.ToInt32(childProperties[1]);
 
                     value = childProperties[2];
-                    if ((value == "") || (value.Contains("{...}")) || ((value.Length >= 2) && (value[0] == '[') && (value[value.Length - 1] == ']')))
+                    if ((value == "") || (value.Contains("{...}")) || 
+                        ((value.Length >= 2) && (value[0] == '[') && (value[value.Length - 1] == ']')))
                         valid = evaluateExpression(name, ref value, GDBName);
 
                     type = childProperties[3];
                                         
-                    VariableInfo child = new VariableInfo(name, exp, type, value, GDBName);
+                    VariableInfo child = new VariableInfo(name, type, value, GDBName);
 
                     if ((valid) && (numChildren > 0 && value != "0x0"))
                     {
@@ -529,44 +590,65 @@ namespace VSNDK.DebugEngine
                         VSNames.RemoveAt(index);
                         GDBNames.RemoveAt(index);
                     }
-                    _children.Add(child);
-                    //                    }
+                    _children.Add(child); // If VS knows that there are children, it will inquiries again if those children data 
+                                          // were not filled.
                 }
             }
-            else
-            {
-                // ??? What to do in case of error???
-            }
-        }
-
-        public void addChild(VariableInfo child)
-        {
-            if (_children == null)
-                _children = new ArrayList();
-
-            _children.Add(child);
         }
     }
 
+
     /// <summary>
     /// Represents a logical stack frame on the thread stack. 
-    /// Also implements the IDebugExpressionContext interface, which allows expression evaluation and watch windows.
+    /// 
+    /// It implements:
+    /// 
+    /// IDebugStackFrame2: Represents a single stack frame in a call stack in a particular thread.
+    /// (http://msdn.microsoft.com/en-us/library/bb161683.aspx)
+    /// 
+    /// IDebugExpressionContext: Represents a context for expression evaluation, which allows expression evaluation and watch windows.
+    /// (http://msdn.microsoft.com/en-ca/library/bb146178.aspx)
     /// </summary>
     public class AD7StackFrame : IDebugStackFrame2, IDebugExpressionContext2
     {
-//        private static ArrayList __stackFrames;
+        /// <summary>
+        /// The class that manages debug events for the debug engine.
+        /// </summary>
         public static EventDispatcher m_dispatcher;
 
+        /// <summary>
+        /// The AD7Engine object that represents the DE.
+        /// </summary>
         public readonly AD7Engine m_engine;
+        
+        /// <summary>
+        /// Represents the thread for this stack frame.
+        /// </summary>
         public readonly AD7Thread m_thread = null;
 
+        /// <summary>
+        ///  The short path file name that contains the source code of this stack frame. 
+        /// </summary>
         private string m_documentName = "";
+        
+        /// <summary>
+        /// The function name associated to this stack frame.
+        /// </summary>
         public string m_functionName = "";
-        private string m_addressString = "";
+        
+        /// <summary>
+        /// Represents the current position (line number) in m_documentName.
+        /// </summary>
         private uint m_lineNum = 0;
+        
+        /// <summary>
+        /// Boolean value that indicates if this stack frame has an associated source code to present.
+        /// </summary>
         private bool m_hasSource = false;
-        private uint m_numParameters = 0;
-        private uint m_numLocals = 0;
+        
+        /// <summary>
+        /// The current context's address. 
+        /// </summary>
         private uint m_address = 0;
         
         /// <summary>
@@ -574,9 +656,26 @@ namespace VSNDK.DebugEngine
         /// </summary>
         private string[] m_variableFilter = { "__func__" };
 
+        /// <summary>
+        /// Contains the locals variables to this stack frame.
+        /// </summary>
         public ArrayList _locals;
+        
+        /// <summary>
+        /// Contains the parameters used to call the method/function that originated this stack frame.
+        /// </summary>
         public ArrayList _arguments;
 
+
+        /// <summary>
+        /// Search the __stackframes cache for the internal representation of the stack frame associated to the GDB frameInfo 
+        /// information. If successful, returns the stack frame; otherwise, creates a new one and return it.
+        /// </summary>
+        /// <param name="engine"> The AD7Engine object that represents the DE. </param>
+        /// <param name="thread"> Represents the thread for this stack frame. </param>
+        /// <param name="frameInfo">  Array of strings with the information provided by GDB about this stack frame. </param>
+        /// <param name="created"> Boolean value that indicates if a new object for this stack frame was created or not. </param>
+        /// <returns> Returns the created/found stack frame. </returns>
         public static AD7StackFrame create(AD7Engine engine, AD7Thread thread, string[] frameInfo, ref bool created)
         {
             created = false;
@@ -586,7 +685,7 @@ namespace VSNDK.DebugEngine
                 {
                     if (frame.m_documentName != null && frame.m_functionName != null)
                     {
-                        if (frame.m_documentName == frameInfo[3] && frame.m_functionName == frameInfo[2])// && frame.m_addressString == frameInfo[1]) // frameInfo[2] = func, frameInfo[3] = file
+                        if (frame.m_documentName == frameInfo[3] && frame.m_functionName == frameInfo[2]) // frameInfo[2] = func, frameInfo[3] = file
                             return frame;
                     }
                 }
@@ -603,6 +702,13 @@ namespace VSNDK.DebugEngine
             return newFrame;
         }
 
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="engine"> The AD7Engine object that represents the DE. </param>
+        /// <param name="thread"> Represents the thread for this stack frame. </param>
+        /// <param name="frameInfo"> Array of strings with the information provided by GDB about this stack frame. </param>
         public AD7StackFrame(AD7Engine engine, AD7Thread thread, string[] frameInfo)
         {
             m_engine = engine;
@@ -611,7 +717,6 @@ namespace VSNDK.DebugEngine
 
             uint level = Convert.ToUInt32(frameInfo[0]);
             string address = frameInfo[1];
-            m_addressString = address;
             m_functionName = frameInfo[2];
             m_documentName = frameInfo[3];
             try
@@ -676,11 +781,16 @@ namespace VSNDK.DebugEngine
 
         #region Non-interface methods
 
-        // Construct a FRAMEINFO for this stack frame with the requested information.
+
+        /// <summary>
+        /// Construct a FRAMEINFO for this stack frame with the requested information.
+        /// </summary>
+        /// <param name="dwFieldSpec"> A combination of flags from the FRAMEINFO_FLAGS enumeration that specifies which fields of the 
+        /// frameInfo parameter are to be filled in. </param>
+        /// <param name="frameInfo"> A FRAMEINFO structure that is filled in with the description of the stack frame. </param>
         public void SetFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, out FRAMEINFO frameInfo)
         {
             frameInfo = new FRAMEINFO();
-//            AD7Module module = m_engine.m_module;
 
             // The debugger is asking for the formatted name of the function which is displayed in the callstack window.
             // There are several optional parts to this name including the module, argument types and values, and line numbers.
@@ -694,7 +804,6 @@ namespace VSNDK.DebugEngine
                     
                     if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_MODULE) != 0)
                     {
-                    // Do we support modules?  Would this just be the name of the program?
 //                        frameInfo.m_bstrFuncName = System.IO.Path.GetFileName(module.Name) + "!";
                     }
                     
@@ -702,7 +811,6 @@ namespace VSNDK.DebugEngine
                     if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_RETURNTYPE) != 0)
                     {
                         // Adds the return type to the m_bstrFuncName field.
-                        // TODO: Can we determine the value of this field?
                         //frameInfo.m_bstrFuncName += _returnType;
                     }
 
@@ -886,8 +994,6 @@ namespace VSNDK.DebugEngine
                 // TODO:
                 // Initialize/use the m_addrMin and m_addrMax (stack range) fields.
 
-                //frameInfo.m_addrMin = m_threadContext.ebp;
-                //frameInfo.m_addrMax = m_threadContext.ebp;
                 frameInfo.m_addrMin = 0;
                 frameInfo.m_addrMax = 0;
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_STACKRANGE;
@@ -926,7 +1032,14 @@ namespace VSNDK.DebugEngine
 
         }
 
-        // Construct an instance of IEnumDebugPropertyInfo2 for the combined locals and parameters.
+
+        /// <summary>
+        /// Construct an instance of IEnumDebugPropertyInfo2 for the combined locals and parameters.
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
+        /// the enumObject are to be filled in.</param>
+        /// <param name="elementsReturned"> Returns the number of elements in the enumeration. </param>
+        /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
         private void CreateLocalsPlusArgsProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = 0;
@@ -969,7 +1082,14 @@ namespace VSNDK.DebugEngine
             enumObject = new AD7PropertyInfoEnum(propInfo);
         }
 
-        // Construct an instance of IEnumDebugPropertyInfo2 for the locals collection only.
+
+        /// <summary>
+        /// Construct an instance of IEnumDebugPropertyInfo2 for the locals collection only.
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
+        /// the enumObject are to be filled in.</param>
+        /// <param name="elementsReturned"> Returns the number of elements in the enumeration. </param>
+        /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
         private void CreateLocalProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = (uint)_locals.Count;
@@ -986,7 +1106,14 @@ namespace VSNDK.DebugEngine
             enumObject = new AD7PropertyInfoEnum(propInfo);
         }
 
-        // Construct an instance of IEnumDebugPropertyInfo2 for the parameters collection only.
+
+        /// <summary>
+        /// Construct an instance of IEnumDebugPropertyInfo2 for the parameters collection only.
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
+        /// the enumObject are to be filled in.</param>
+        /// <param name="elementsReturned"> Returns the number of elements in the enumeration. </param>
+        /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
         private void CreateParameterProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = (uint)_arguments.Count;
@@ -1007,9 +1134,22 @@ namespace VSNDK.DebugEngine
 
         #region IDebugStackFrame2 Members
 
-        // Creates an enumerator for properties associated with the stack frame, such as local variables.
-        // The sample engine only supports returning locals and parameters. Other possible values include
-        // class fields (this pointer), registers, exceptions...
+
+        /// <summary>
+        /// Creates an enumerator for properties associated with the stack frame, such as local variables.
+        /// (http://msdn.microsoft.com/en-us/library/bb145607.aspx).
+        /// </summary>
+        /// <param name="dwFields"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
+        /// the enumerated DEBUG_PROPERTY_INFO structures are to be filled in. </param>
+        /// <param name="nRadix"> The radix to be used in formatting any numerical information. </param>
+        /// <param name="guidFilter"> A GUID of a filter used to select which DEBUG_PROPERTY_INFO structures are to be enumerated, 
+        /// such as guidFilterLocals. </param>
+        /// <param name="dwTimeout"> Maximum time, in milliseconds, to wait before returning from this method. Use INFINITE to wait 
+        /// indefinitely. </param>
+        /// <param name="elementsReturned"> Returns the number of properties enumerated. This is the same as calling the 
+        /// IEnumDebugPropertyInfo2::GetCount method. </param>
+        /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
+        /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugStackFrame2.EnumProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, uint nRadix, ref Guid guidFilter, uint dwTimeout, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = 0;
@@ -1045,7 +1185,13 @@ namespace VSNDK.DebugEngine
             }
         }
 
-        // Gets the code context for this stack frame. The code context represents the current instruction pointer in this stack frame.
+
+        /// <summary>
+        /// Gets the code context for this stack frame. The code context represents the current instruction pointer in this stack frame.
+        /// (http://msdn.microsoft.com/en-us/library/bb147046.aspx)
+        /// </summary>
+        /// <param name="memoryAddress"> Returns an IDebugCodeContext2 object that represents the current instruction pointer in this stack frame. </param>
+        /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugStackFrame2.GetCodeContext(out IDebugCodeContext2 memoryAddress)
         {
             memoryAddress = null;
@@ -1060,16 +1206,28 @@ namespace VSNDK.DebugEngine
             }
         }
 
-        // Gets a description of the properties of a stack frame.
-        // Calling the IDebugProperty2::EnumChildren method with appropriate filters can retrieve the local variables, method parameters, registers, and "this" 
-        // pointer associated with the stack frame. The debugger calls EnumProperties to obtain these values in the sample.
+
+        /// <summary>
+        /// Gets a description of the properties associated with a stack frame.
+        /// Calling the IDebugProperty2::EnumChildren method with appropriate filters can retrieve the local variables, method parameters, registers, and "this" 
+        /// pointer associated with the stack frame. The debugger calls EnumProperties to obtain these values. Not implemented.
+        /// (http://msdn.microsoft.com/en-us/library/bb144920.aspx)
+        /// </summary>
+        /// <param name="property"> Returns an IDebugProperty2 object that describes the properties of this stack frame. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugStackFrame2.GetDebugProperty(out IDebugProperty2 property)
         {
             throw new NotImplementedException();
         }
 
-        // Gets the document context for this stack frame. The debugger will call this when the current stack frame is changed
-        // and will use it to open the correct source document for this stack frame.
+
+        /// <summary>
+        /// Gets the document context for this stack frame. The debugger will call this when the current stack frame is changed and 
+        /// will use it to open the correct source document for this stack frame. (http://msdn.microsoft.com/en-us/library/bb146338.aspx)
+        /// </summary>
+        /// <param name="docContext"> Returns an IDebugDocumentContext2 object that represents the current position in a source 
+        /// document. </param>
+        /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 docContext)
         {
             this.m_engine.cleanEvaluatedThreads();
@@ -1099,17 +1257,31 @@ namespace VSNDK.DebugEngine
             return VSConstants.S_FALSE;
         }
 
-        // Gets an evaluation context for expression evaluation within the current context of a stack frame and thread.
-        // Generally, an expression evaluation context can be thought of as a scope for performing expression evaluation. 
-        // Call the IDebugExpressionContext2::ParseText method to parse an expression and then call the resulting IDebugExpression2::EvaluateSync 
-        // or IDebugExpression2::EvaluateAsync methods to evaluate the parsed expression.
+
+        /// <summary>
+        /// Gets an evaluation context for expression evaluation within the current context of a stack frame and thread.
+        /// Generally, an expression evaluation context can be thought of as a scope for performing expression evaluation. 
+        /// Call the IDebugExpressionContext2::ParseText method to parse an expression and then call the resulting 
+        /// IDebugExpression2::EvaluateSync or IDebugExpression2::EvaluateAsync methods to evaluate the parsed expression.
+        /// (http://msdn.microsoft.com/en-us/library/bb161269.aspx)
+        /// </summary>
+        /// <param name="ppExprCxt"> Returns an IDebugExpressionContext2 object that represents a context for expression evaluation. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugStackFrame2.GetExpressionContext(out IDebugExpressionContext2 ppExprCxt)
         {
             ppExprCxt = (IDebugExpressionContext2)this;
             return VSConstants.S_OK;
         }
 
-        // Gets a description of the stack frame.
+
+        /// <summary>
+        /// Gets a description of the stack frame. (http://msdn.microsoft.com/en-us/library/bb145146.aspx)
+        /// </summary>
+        /// <param name="dwFieldSpec"> A combination of flags from the FRAMEINFO_FLAGS enumeration that specifies which fields of the 
+        /// pFrameInfo parameter are to be filled in. </param>
+        /// <param name="nRadix"> The radix to be used in formatting any numerical information. </param>
+        /// <param name="pFrameInfo"> A FRAMEINFO structure that is filled in with the description of the stack frame. </param>
+        /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugStackFrame2.GetInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, FRAMEINFO[] pFrameInfo)
         {
             try
@@ -1129,7 +1301,9 @@ namespace VSNDK.DebugEngine
 
                 if (this.m_thread._id != this.m_engine.currentThread()._id)
                     this.m_engine.eDispatcher.selectThread(this.m_thread._id);
-                
+
+                // Waits for the parsed response for the GDB/MI command that changes the selected frame.
+                // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
                 GDBParser.parseCommand("-stack-select-frame " + frame, 5);
 
                 if (this.m_thread._id != this.m_engine.currentThread()._id)
@@ -1139,24 +1313,24 @@ namespace VSNDK.DebugEngine
                 
                 return VSConstants.S_OK;
             }
-            /*catch (ComponentException e)
-            {
-                return e.HResult;
-            }*/
             catch (Exception e)
             {
                 return EngineUtils.UnexpectedException(e);
             }
         }
 
-        // Gets the language associated with this stack frame. 
-        // In this sample, all the supported stack frames are C++
+
+        /// <summary>
+        /// Gets the language associated with this stack frame. (http://msdn.microsoft.com/en-us/library/bb145096.aspx)
+        /// </summary>
+        /// <param name="pbstrLanguage"> Returns the name of the language that implements the method associated with this stack frame. </param>
+        /// <param name="pguidLanguage"> Returns the GUID of the language. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugStackFrame2.GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage)
         {
             if (m_documentName.EndsWith(".c"))
             {
                 pbstrLanguage = "C";
-                // TODO: Add GUID for AD7Guids.guidLanguageC;
                 pguidLanguage = AD7Guids.guidLanguageCpp;
             }
             else if (m_documentName.EndsWith(".cpp") || m_documentName.EndsWith(".c++"))
@@ -1168,8 +1342,13 @@ namespace VSNDK.DebugEngine
             return VSConstants.S_OK;
         }
 
-        // Gets the name of the stack frame.
-        // The name of a stack frame is typically the name of the method being executed.
+
+        /// <summary>
+        /// Gets the name of the stack frame. The name of a stack frame is typically the name of the method being executed.
+        /// Not implemented. (http://msdn.microsoft.com/en-us/library/bb145002.aspx)
+        /// </summary>
+        /// <param name="name"> Returns the name of the stack frame. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugStackFrame2.GetName(out string name)
         {
             name = null;
@@ -1177,7 +1356,14 @@ namespace VSNDK.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-        // Gets a machine-dependent representation of the range of physical addresses associated with a stack frame.
+
+        /// <summary>
+        /// Gets a machine-dependent representation of the range of physical addresses associated with a stack frame.
+        /// Not implemented. (http://msdn.microsoft.com/en-us/library/bb145597.aspx)
+        /// </summary>
+        /// <param name="addrMin"> Returns the lowest physical address associated with this stack frame. </param>
+        /// <param name="addrMax"> Returns the highest physical address associated with this stack frame. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugStackFrame2.GetPhysicalStackRange(out ulong addrMin, out ulong addrMax)
         {
             addrMin = 0;
@@ -1186,7 +1372,12 @@ namespace VSNDK.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-        // Gets the thread associated with a stack frame.
+
+        /// <summary>
+        /// Gets the thread associated with a stack frame. (http://msdn.microsoft.com/en-us/library/bb161776.aspx)
+        /// </summary>
+        /// <param name="thread"> Returns an IDebugThread2 object that represents the thread. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugStackFrame2.GetThread(out IDebugThread2 thread)
         {
             thread = m_thread;
@@ -1197,17 +1388,34 @@ namespace VSNDK.DebugEngine
 
         #region IDebugExpressionContext2 Members
 
-        // Retrieves the name of the evaluation context. 
-        // The name is the description of this evaluation context. It is typically something that can be parsed by an expression evaluator 
-        // that refers to this exact evaluation context. For example, in C++ the name is as follows: 
-        // "{ function-name, source-file-name, module-file-name }"
+
+        /// <summary>
+        /// Retrieves the name of the evaluation context. The name is the description of this evaluation context. It is typically 
+        /// something that can be parsed by an expression evaluator that refers to this exact evaluation context. For example, in 
+        /// C++ the name is as follows:  "{ function-name, source-file-name, module-file-name }"
+        /// Not implemented. (http://msdn.microsoft.com/en-ca/library/bb161724.aspx)
+        /// </summary>
+        /// <param name="pbstrName"> Returns the name of the evaluation context. </param>
+        /// <returns> Not implemented. </returns>
         int IDebugExpressionContext2.GetName(out string pbstrName)
         {
             throw new NotImplementedException();
         }
 
-        // Parses a text-based expression for evaluation.
-        // The engine sample only supports locals and parameters so the only task here is to check the names in those collections.
+
+        /// <summary>
+        /// Parses a text-based expression for evaluation. (http://msdn.microsoft.com/en-ca/library/bb162304.aspx).
+        /// GDB will parse and evaluate the expression, returning the result or an error in the expression. So, the only task for this
+        /// method is to create the IDebugExpression2 object that will be sent indirectly to the methods responsible for the evaluation.
+        /// </summary>
+        /// <param name="pszCode"> The expression to be parsed. </param>
+        /// <param name="dwFlags"> A combination of flags from the PARSEFLAGS enumeration that controls parsing. </param>
+        /// <param name="nRadix"> The radix to be used in parsing any numerical information in pszCode. </param>
+        /// <param name="ppExpr"> Returns the IDebugExpression2 object that represents the parsed expression, which is ready for 
+        /// binding and evaluation. </param>
+        /// <param name="pbstrError"> Returns the error message if the expression contains an error. </param>
+        /// <param name="pichError"> Returns the character index of the error in pszCode if the expression contains an error. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugExpressionContext2.ParseText(string pszCode,
                                                 enum_PARSEFLAGS dwFlags, 
                                                 uint nRadix, 
@@ -1215,22 +1423,10 @@ namespace VSNDK.DebugEngine
                                                 out string pbstrError, 
                                                 out uint pichError)
         {
-//            pbstrError = "";
-//            pichError = 0;
-//            ppExpr = null;
-
-//            return VSConstants.E_NOTIMPL;            
-            
             pbstrError = "";
             pichError = 0;
             ppExpr = null;
 
-            // Parse here, if needed: verify if it is a valid expression, and store the parsed results into VariableInfo, or create another object.
-            // if not: send a GDB command to evaluate the expression pszCode. It should return the result or an error message.
-            // This object is indirectly sent to IDebugExpression2.EvaluateAsync
-            // if pszCode is a variable, it must be found in Locals.
-
-//            VariableInfo vi = new VariableInfo(pszCode,"","");
             ppExpr = new AD7Expression(pszCode, this, m_engine.eDispatcher);
             return VSConstants.S_OK;
         }

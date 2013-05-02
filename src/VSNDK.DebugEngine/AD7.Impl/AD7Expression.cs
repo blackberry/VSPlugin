@@ -23,17 +23,36 @@ using System.Threading;
 
 namespace VSNDK.DebugEngine
 {
-    // This class represents a succesfully parsed expression to the debugger. 
-    // It is returned as a result of a successful call to IDebugExpressionContext2.ParseText
-    // It allows the debugger to obtain the values of an expression in the debuggee. 
-    // For the purposes of this sample, this means obtaining the values of locals and parameters from a stack frame.
+    /// <summary>
+    /// This class represents a parsed expression ready for binding and evaluating. 
+    /// It is returned as a result of a successful call to IDebugExpressionContext2.ParseText
+    /// It allows the debugger to obtain the values of an expression in the debuggee. 
+    /// (http://msdn.microsoft.com/en-ca/library/bb162308.aspx)
+    /// </summary>
     public class AD7Expression : IDebugExpression2
     {
-        //private VariableInformation m_var;
+        /// <summary>
+        ///  The expression to be evaluated. 
+        /// </summary>
         private string exp;
+
+        /// <summary>
+        /// The class that manages debug events for the debug engine.
+        /// </summary>
         private EventDispatcher m_eventDispatcher;
+
+        /// <summary>
+        /// Current stack frame.
+        /// </summary>
         private AD7StackFrame m_frame;
 
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="exp"> The expression to be evaluated. </param>
+        /// <param name="frame"> Current stack frame. </param>
+        /// <param name="dispatcher"> Represents the class that manages debug events for the debug engine. </param>
         public AD7Expression(string exp, AD7StackFrame frame, EventDispatcher dispatcher)
         {
             this.exp = exp;
@@ -43,12 +62,21 @@ namespace VSNDK.DebugEngine
 
         #region IDebugExpression2 Members
 
-        // This method cancels asynchronous expression evaluation as started by a call to the IDebugExpression2::EvaluateAsync method.
+
+        /// <summary>
+        /// This method cancels asynchronous expression evaluation as started by a call to the IDebugExpression2::EvaluateAsync method.
+        /// Not implemented yet because it was not needed till now. (http://msdn.microsoft.com/en-ca/library/bb145924.aspx)
+        /// </summary>
+        /// <returns> Not implemented. </returns>
         int IDebugExpression2.Abort()
         {
             throw new NotImplementedException();
         }
 
+
+        /// <summary>
+        /// Thread responsible for evaluating expressions asynchronously.
+        /// </summary>
         public void evaluatingAsync()
         {
             VariableInfo vi = VariableInfo.get(exp, m_eventDispatcher, m_frame);
@@ -57,14 +85,17 @@ namespace VSNDK.DebugEngine
             m_frame.m_engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, ppResult), AD7ExpressionEvaluationCompleteEvent.IID, m_frame.m_engine, m_frame.m_thread);
         }
 
-        // This method evaluates the expression asynchronously.
-        // This method should return immediately after it has started the expression evaluation. 
-        // When the expression is successfully evaluated, an IDebugExpressionEvaluationCompleteEvent2 
-        // must be sent to the IDebugEventCallback2 event callback
-        //
-        // This is primarily used for the immediate window which this engine does not currently support.
+        
+        /// <summary>
+        /// This method evaluates the expression asynchronously.
+        /// This is primarily used for the immediate window. (http://msdn.microsoft.com/en-ca/library/bb146752.aspx)
+        /// </summary>
+        /// <param name="dwFlags"> A combination of flags from the EVALFLAGS enumeration that control expression evaluation. </param>
+        /// <param name="pExprCallback"> This parameter is always a null value. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback)
         {
+            // Creating a thread to evaluate the expression asynchronously.
             Thread m_processingThread;
             m_processingThread = new Thread(evaluatingAsync);
             m_processingThread.Start();            
@@ -72,7 +103,16 @@ namespace VSNDK.DebugEngine
             return VSConstants.S_OK;
         }
 
-        // This method evaluates the expression synchronously.
+
+        /// <summary>
+        /// This method evaluates the expression synchronously. (http://msdn.microsoft.com/en-ca/library/bb146982.aspx)
+        /// </summary>
+        /// <param name="dwFlags"> A combination of flags from the EVALFLAGS enumeration that control expression evaluation. </param>
+        /// <param name="dwTimeout"> Maximum time, in milliseconds, to wait before returning from this method. Use INFINITE to wait 
+        /// indefinitely. </param>
+        /// <param name="pExprCallback"> This parameter is always a null value. </param>
+        /// <param name="ppResult"> Returns the IDebugProperty2 object that contains the result of the expression evaluation. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult)
         {
             VariableInfo vi = VariableInfo.get(exp, m_eventDispatcher, m_frame);
