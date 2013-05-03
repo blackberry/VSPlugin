@@ -24,7 +24,7 @@ namespace RIM.VSNDK_Package.Signing.Models
     /// <summary>
     /// Implimentation of the INotifyPropertyChanged interface
     /// </summary>
-    class NotifyPropertyChanged : INotifyPropertyChanged
+    public class NotifyPropertyChanged : INotifyPropertyChanged
     {
         /// <summary>
         /// PropertyChanged Event Handler Declaration
