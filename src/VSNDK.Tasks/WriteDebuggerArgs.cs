@@ -27,46 +27,17 @@ namespace VSNDK.Tasks
     public class WriteDebuggerArgs : Task
     {
         #region Member Variables and Constants
+
         private string _projectDir;
         private string _outDir;
         private string _appName;
-
         private string _device;
         private bool _isSimulator;
+        private string _appData;
 
         #endregion
 
-        /// <summary>
-        /// Execute MSBuild function
-        /// </summary>
-        /// <returns></returns>
-        public override bool Execute()
-        {            
-            string fileContent = _device;
-
-            // Setting the work directory.
-            string rootedOutDir = (Path.IsPathRooted(OutDir)) ? OutDir + AppName : ProjectDir + OutDir + AppName;
-
-            // Escape backslashes
-            string pattern = @"\\";
-            string replacement = @"\\\\";
-            Regex r = new Regex(pattern);
-            string regexResult = r.Replace(rootedOutDir, replacement);
-            fileContent += "\r\n" + regexResult;
-
-            fileContent += "\r\n" + _isSimulator;
-            fileContent += "\r\n" + ToolsPath;
-            fileContent += "\r\n" + PublicKeyPath;
-            fileContent += "\r\n" + Password; // Encrypted
-
-            string appData = Environment.GetEnvironmentVariable("AppData");
-            System.IO.StreamWriter file = new System.IO.StreamWriter(appData + @"\BlackBerry\vsndk-args-file.txt");            
-            
-            file.WriteLine(fileContent);
-            file.Close();
-
-            return true;
-        }
+        #region Public Propeties
 
         /// <summary>
         /// Getter/Setter for the ProjectDir property
@@ -76,6 +47,16 @@ namespace VSNDK.Tasks
         {
             set { _projectDir = value.Replace('\\', '/'); }
             get { return _projectDir; }
+        }
+
+        /// <summary>
+        /// Getter/Setter for the _appData property
+        /// </summary>
+        [Required]
+        public string AppData
+        {
+            set { _appData = value; }
+            get { return _appData; }
         }
 
         /// <summary>
@@ -105,7 +86,7 @@ namespace VSNDK.Tasks
         public string Device
         {
             set
-            { 
+            {
                 _device = value;
             }
         }
@@ -150,5 +131,44 @@ namespace VSNDK.Tasks
             get;
             set;
         }
+
+        #endregion
+
+        /// <summary>
+        /// Execute MSBuild function
+        /// </summary>
+        /// <returns></returns>
+        public override bool Execute()
+        {
+            /// Initialize Variables
+            bool result;
+
+            try
+            {
+                // Setting the work directory.
+                string rootedOutDir = (Path.IsPathRooted(OutDir)) ? OutDir + AppName : ProjectDir + OutDir + AppName;
+
+                AppData = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\vsndk-args-file.txt";
+
+                System.IO.StreamWriter file = new System.IO.StreamWriter(AppData);
+
+                file.WriteLine(_device);
+                file.WriteLine(rootedOutDir.Replace(@"\\", @"\\\\"));
+                file.WriteLine(_isSimulator);
+                file.WriteLine(ToolsPath);
+                file.WriteLine(PublicKeyPath);
+                file.WriteLine(Password); 
+                file.Close();
+
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                result = false;
+            }
+            return result;
+        }
+
+
     }
 }
