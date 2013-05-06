@@ -1740,6 +1740,7 @@ namespace VSNDK.DebugEngine
 
                         case '5':  
                         // Exited-signaled. Ex: 55;SIGSEGV;Segmentation fault
+                        // or Aborted. Ex: 55;SIGABRT;Aborted
                             ini = 3;
                             end = ev.IndexOf(';', ini);
                             m_signalName = ev.Substring(ini, (end - ini));
@@ -1760,6 +1761,12 @@ namespace VSNDK.DebugEngine
                             if (m_signalMeaning == "Segmentation fault")
                             {
                                 MessageBox.Show("Segmentation Fault: Closing debugger.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                m_eventDispatcher.endDebugSession(0);
+                            }
+
+                            if (m_signalMeaning == "Aborted")
+                            {
+                                MessageBox.Show("Program aborted: Closing debugger.", "Program Aborted", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 m_eventDispatcher.endDebugSession(0);
                             }
 
