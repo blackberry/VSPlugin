@@ -35,6 +35,7 @@ namespace VSNDK.Tasks
     public class MakeAllAndFormatOutputMessages : ICancelableTask
     {
         #region Member Variables and Constants
+
         private string _projectDir;
         private string _intDir;
         private string _outDir;
@@ -44,6 +45,9 @@ namespace VSNDK.Tasks
         private IBuildEngine buildEngine;
         private System.Diagnostics.Process proc = null;
         private ITaskHost hostObject;
+
+        private string _numProcessors;
+
         #endregion
 
         /// <summary>
@@ -65,16 +69,33 @@ namespace VSNDK.Tasks
         }
 
         /// <summary>
+        /// Getter/Setter for the number of processors property.
+        /// </summary>
+        public string numProcessors
+        {
+            get 
+            {
+                _numProcessors = Environment.ProcessorCount.ToString();
+                return _numProcessors; 
+            }
+            set { _numProcessors = value; }
+        }
+
+        /// <summary>
         /// Perform Task Execution 
         /// </summary>
         /// <returns>Return true on successful task completion</returns>
         public bool Execute()
         {
+            string pCommand = "";
+            string pArgs = "";
+
             try
             {
-                // create the ProcessStartInfo using "cmd" as the program to be run, and "/c " as the parameters.
-                // Incidentally, /c tells cmd that we want it to execute the command that follows, and then exit.
-                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo("cmd", "/c " + ToolsPath + @"\make all");
+                pCommand = "cmd";
+                pArgs = "/c " + ToolsPath + @"\make -j" + numProcessors + " all";
+ 
+                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo(pCommand, pArgs);
 
                 // Set UseShellExecute to false for redirection.
                 procStartInfo.UseShellExecute = false;
