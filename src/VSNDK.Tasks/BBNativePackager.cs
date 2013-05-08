@@ -195,8 +195,8 @@ namespace VSNDK.Tasks
             ITaskItem[] items = null;
 
 
-            int clen = (configAssets == null) ? 0 : configAssets.Length; 
-            int glen = (globalAssets == null) ? 0 : configAssets.Length;
+            int clen = (configAssets == null) ? 0 : configAssets.Length;
+            int glen = (globalAssets == null) ? 0 : globalAssets.Length;
 
             items = new ITaskItem[glen + clen];
 
