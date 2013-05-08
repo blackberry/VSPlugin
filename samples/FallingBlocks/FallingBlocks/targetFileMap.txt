@@ -1,2 +1,0 @@
-target_map:native/FallingBlocks=C:\Users\dburgess\vsplugin-ndk\samples\FallingBlocks\FallingBlocks\Device-Debug\FallingBlocks
-target_map:native/bar-descriptor.xml=C:\Users\dburgess\vsplugin-ndk\samples\FallingBlocks\FallingBlocks\bar-descriptor.xml
