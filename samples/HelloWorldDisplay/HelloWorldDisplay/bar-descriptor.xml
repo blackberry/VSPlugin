@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<qnx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.qnx.com/schemas/application/1.0">
+  <id>com.example.HelloWorldDisplay</id>
+  <name>HelloWorldDisplay</name>
+  <versionNumber>1.0.0</versionNumber>
+  <buildId>1</buildId>
+  <description>The HelloWorldDisplay application</description>
+  <author>RIM Canada</author>
+  <authorId>gYAAgDthaMCeIcQicW0p4fUkeSM</authorId>
+  <category>core.games</category>
+  <initialWindow>
+    <autoOrients />
+    <aspectRatio />
+    <systemChrome>none</systemChrome>
+    <transparent>false</transparent>
+  </initialWindow>
+  <asset path="icon.png" public="true">icon.png</asset>
+  <asset path="HelloWorld_smaller_bubble.png">HelloWorld_smaller_bubble.png</asset>
+  <configuration name="Device-Debug">
+    <platformArchitecture>armle-v7</platformArchitecture>
+    <asset path="Device-Debug\HelloWorldDisplay" entry="true" type="Qnx/Elf">HelloWorldDisplay</asset>
+  </configuration>
+  <configuration name="Device-Release">
+    <platformArchitecture>armle-v7</platformArchitecture>
+  </configuration>
+  <configuration name="Simulator-Debug">
+    <platformArchitecture>x86</platformArchitecture>
+  </configuration>
+  <permission system="true">run_native</permission>
+  <icon>
+    <image>icon.png</image>
+  </icon>
+  <env var="LD_LIBRARY_PATH" value="app/native/lib" />
+</qnx>
