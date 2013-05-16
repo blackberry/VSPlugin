@@ -3,6 +3,7 @@
                     xmlns:data="clr-namespace:RIM.VSNDK_Package.Signing.Models">
     <data:RegistrationData x:Key="rimSAData" />
     <data:BackupRestoreData x:Key="brData" />
+    <data:RIMSiginingAuthorityData x:Key="authData" />
     <Style TargetType="{x:Type Button}">
         <Setter Property="Margin" Value="2,1,1,1" />
         <Setter Property="FontSize" Value="12" />

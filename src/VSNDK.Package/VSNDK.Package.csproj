@@ -163,6 +163,7 @@
     <Compile Include="Signing\Models\BackupRestoreData.cs" />
     <Compile Include="Signing\Models\NotifyPropertyChanged.cs" />
     <Compile Include="Signing\Models\RegistrationData.cs" />
+    <Compile Include="Signing\Models\RIMSiginingAuthorityData.cs" />
     <Compile Include="Signing\RegistrationWindow.xaml.cs">
       <DependentUpon>RegistrationWindow.xaml</DependentUpon>
     </Compile>
