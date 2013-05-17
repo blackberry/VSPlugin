@@ -32,8 +32,10 @@ namespace VSNDK.DebugEngine
     /// This interface is implemented by a custom port supplier to manage programs as a group. An IDebugProcess2 contains one or more 
     /// IDebugProgram2 interfaces.
     /// </summary>
-    public class AD7Process : IDebugProcess2
+    public class AD7Process : IDebugProcess2, IDebugProcessEx2
     {
+        IDebugSession2 session;
+        
         /// <summary>
         /// The name of the process. Not used till now. Has no value assigned to it.
         /// </summary>
@@ -47,7 +49,12 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Process GUID.
         /// </summary>
-        public Guid _processID = Guid.NewGuid();
+        public Guid _processGUID = Guid.NewGuid();
+
+        /// <summary>
+        /// Process ID.
+        /// </summary>
+        public string _processID;
 
         /// <summary>
         /// The server on which this process is running. Not used till now. Has no value assigned to it.
@@ -63,7 +70,8 @@ namespace VSNDK.DebugEngine
         /// A program that is running in this process. It should be an array of programs, as a process "is a container for 
         /// a set of programs" but, at this moment, the VSNDK supports only one program at a time.
         /// </summary>
-        internal IDebugProgram2 m_program = null;
+        public IDebugProgram2 m_program = null;
+        List<IDebugProgram2> programs_ = new List<IDebugProgram2>();
 
         /// <summary>
         /// Constructor.
@@ -75,6 +83,20 @@ namespace VSNDK.DebugEngine
             _engine = aEngine;
             _port = aPort;
             m_program = aEngine.m_program;
+        }
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="aPort"> The IDebugPort2 object that represents the port on which the process was launched. </param>
+        /// <param name="ID"> The process ID. </param>
+        /// <param name="name"> The process name. </param>
+        public AD7Process(IDebugPort2 aPort, string ID, string name)
+        {
+            _port = aPort;
+            _processID = ID;
+            _name = name;
         }
 
 
@@ -139,7 +161,20 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumPrograms(out IEnumDebugPrograms2 ppEnum)
         {
-            ppEnum = null;
+            if (programs_.Count == 0)
+            {
+                AD7ProgramNodeAttach pn = new AD7ProgramNodeAttach(_processGUID, _processID, "", Guid.NewGuid());
+                programs_.Add((IDebugProgram2)pn);
+            }
+            IDebugProgram2[] p = new IDebugProgram2[programs_.Count()];
+            int i = 0;
+            foreach (var prog in programs_)
+            {
+                p[i] = prog;
+                i++;
+            }
+            ppEnum = new AD7ProgramEnum(p);
+//            ppEnum = null;
             return VSConstants.S_OK;
         }
 
@@ -180,7 +215,51 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetInfo(enum_PROCESS_INFO_FIELDS Fields, PROCESS_INFO[] pProcessInfo)
         {
-            return VSConstants.S_OK;
+            try
+            {
+                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_FILE_NAME) != 0)
+                {
+                    pProcessInfo[0].bstrFileName = this._name;
+                    pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_FILE_NAME;
+                }
+                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_BASE_NAME) != 0)
+                {
+                    pProcessInfo[0].bstrBaseName = this._name.Substring(_name.LastIndexOf('/') + 1);
+                    pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_BASE_NAME;
+                }
+                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_TITLE) != 0)
+                {
+                    pProcessInfo[0].bstrTitle = this._name;
+                    pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_TITLE;
+                }
+                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_PROCESS_ID) != 0)
+                {
+                    pProcessInfo[0].ProcessId.dwProcessId = Convert.ToUInt32(this._processID);
+                    pProcessInfo[0].ProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
+                    pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_PROCESS_ID;
+                }
+                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_SESSION_ID) != 0)
+                {
+//                    pProcessInfo[0].dwSessionId = 0;
+                    pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_SESSION_ID;
+                }
+                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_ATTACHED_SESSION_NAME) != 0)
+                {
+//                    pProcessInfo[0].bstrAttachedSessionName = null;
+                    pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_ATTACHED_SESSION_NAME;
+                }
+                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_CREATION_TIME) != 0)
+                {
+//                    pProcessInfo[0].CreationTime = null;
+                    pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_CREATION_TIME;
+                }
+
+                return VSConstants.S_OK;
+            }
+            catch (Exception e)
+            {
+                return EngineUtils.UnexpectedException(e);
+            }
         }
 
 
@@ -198,7 +277,7 @@ namespace VSNDK.DebugEngine
         }
 
 
-        public readonly Guid PhysID = Guid.NewGuid();
+//        public readonly Guid PhysID = Guid.NewGuid();
         /// <summary>
         /// Gets the system process identifier. (http://msdn.microsoft.com/en-us/library/bb146648.aspx)
         /// </summary>
@@ -206,8 +285,18 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId)
         {
-            pProcessId[0].guidProcessId = PhysID;
-            pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+//            pProcessId[0].guidProcessId = PhysID;
+//            pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+            if (_engine == null)
+            {
+                pProcessId[0].dwProcessId = Convert.ToUInt32(_processID);
+                pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
+            }
+            else
+            {
+                pProcessId[0].guidProcessId = _processGUID;
+                pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+            }
 
             return VSConstants.S_OK;
         }
@@ -232,7 +321,7 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetProcessId(out Guid pguidProcessId)
         {
-            pguidProcessId = _processID;
+            pguidProcessId = _processGUID;
             return VSConstants.S_OK;
         }
 
@@ -258,5 +347,44 @@ namespace VSNDK.DebugEngine
         {
             return VSConstants.S_OK;
         }
+
+
+        #region IDebugProcessEx2 Members
+
+        /// <summary>
+        /// . ()
+        /// </summary>
+        /// <returns>  </returns>
+        public int Attach(IDebugSession2 pSession)
+        {
+            session = pSession;
+            return VSConstants.S_OK;
+        }
+
+
+        /// <summary>
+        /// . ()
+        /// </summary>
+        /// <returns>  </returns>
+        public int Detach(IDebugSession2 pSession)
+        {
+            session = pSession;
+            return VSConstants.S_OK;
+        }
+
+
+        /// <summary>
+        /// . ()
+        /// </summary>
+        /// <returns>  </returns>
+        public int AddImplicitProgramNodes(ref Guid guidLaunchingEngine, Guid[] rgguidSpecificEngines, uint celtSpecificEngines)
+        {
+            int i = 2;
+            return VSConstants.S_OK;
+        }
+
+
+        #endregion
+        
     }
 }

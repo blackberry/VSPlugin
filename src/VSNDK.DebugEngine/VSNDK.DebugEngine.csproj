@@ -34,6 +34,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -64,9 +65,12 @@
     <Compile Include="AD7.Impl\AD7MemoryAddress.cs" />
     <Compile Include="AD7.Impl\AD7Module.cs" />
     <Compile Include="AD7.Impl\AD7PendingBreakpoint.cs" />
+    <Compile Include="AD7.Impl\AD7Port.cs" />
+    <Compile Include="AD7.Impl\AD7PortRequest.cs" />
     <Compile Include="AD7.Impl\AD7PortSupplier.cs" />
     <Compile Include="AD7.Impl\AD7Process.cs" />
     <Compile Include="AD7.Impl\AD7ProgramNode.cs" />
+    <Compile Include="AD7.Impl\AD7ProgramNodeAttach.cs" />
     <Compile Include="AD7.Impl\AD7ProgramProvider.cs" />
     <Compile Include="AD7.Impl\AD7Property.cs" />
     <Compile Include="AD7.Impl\AD7StackFrame.cs" />

@@ -183,6 +183,8 @@ namespace VSNDK.DebugEngine
         {
             m_breakpointManager = new BreakpointManager(this);            
             m_state = DE_STATE.DESIGN_MODE;
+            AD7PortSupplier ps = new AD7PortSupplier();
+            
         }
 
 
@@ -534,9 +536,10 @@ namespace VSNDK.DebugEngine
                 {
                     process = m_process = new AD7Process(this, port);
                     m_eventDispatcher = new EventDispatcher(this);
-                    m_programGUID = m_process._processID;
+                    m_programGUID = m_process._processGUID;
                     m_module = new AD7Module();
-                    m_progNode = new AD7ProgramNode(m_process.PhysID, pid, exePath, new Guid(AD7Engine.Id));
+//                    m_progNode = new AD7ProgramNode(m_process.PhysID, pid, exePath, new Guid(AD7Engine.Id));
+                    m_progNode = new AD7ProgramNode(m_process._processGUID, pid, exePath, new Guid(AD7Engine.Id));
                     AddThreadsToProgram();
 
                     AD7EngineCreateEvent.Send(this);
@@ -909,7 +912,7 @@ namespace VSNDK.DebugEngine
             if (m_programGUID != null)
                 guidProgramId = m_programGUID;
             else
-                guidProgramId = m_process._processID;
+                guidProgramId = m_process._processGUID;
 
             return VSConstants.S_OK;
         }

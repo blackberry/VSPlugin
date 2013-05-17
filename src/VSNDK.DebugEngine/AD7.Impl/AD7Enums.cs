@@ -152,6 +152,70 @@ namespace VSNDK.DebugEngine
     #endregion Base Class
 
 
+
+
+    /// <summary>
+    /// . ()
+    /// </summary>
+    class AD7ProcessEnum : AD7Enum<IDebugProcess2, IEnumDebugProcesses2>, IEnumDebugProcesses2
+    {
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="data"> Array of IDebugProcess2 elements. </param>
+        public AD7ProcessEnum(IDebugProcess2[] data)
+            : base(data)
+        {
+        }
+
+
+        /// <summary>
+        /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb147027.aspx)
+        /// </summary>
+        /// <param name="celt"> The number of elements to retrieve. Also specifies the maximum size of the rgelt array. </param>
+        /// <param name="rgelt"> Array of IDebugProcess2 elements to be filled in. </param>
+        /// <param name="celtFetched"> Returns the number of elements actually returned in rgelt. </param>
+        /// <returns> If successful, returns S_OK. If not, returns S_FALSE. </returns>
+        public int Next(uint celt, IDebugProcess2[] rgelt, ref uint celtFetched)
+        {
+            return Next(celt, rgelt, out celtFetched);
+        }
+    }
+
+
+    /// <summary>
+    /// . ()
+    /// </summary>
+    class AD7PortEnum : AD7Enum<IDebugPort2, IEnumDebugPorts2>, IEnumDebugPorts2
+    {
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="data"> Array of IDebugProcess2 elements. </param>
+        public AD7PortEnum(IDebugPort2[] data)
+            : base(data)
+        {
+        }
+
+
+        /// <summary>
+        /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb147027.aspx)
+        /// </summary>
+        /// <param name="celt"> The number of elements to retrieve. Also specifies the maximum size of the rgelt array. </param>
+        /// <param name="rgelt"> Array of IDebugProcess2 elements to be filled in. </param>
+        /// <param name="celtFetched"> Returns the number of elements actually returned in rgelt. </param>
+        /// <returns> If successful, returns S_OK. If not, returns S_FALSE. </returns>
+        public int Next(uint celt, IDebugPort2[] rgelt, ref uint celtFetched)
+        {
+            return Next(celt, rgelt, out celtFetched);
+        }
+    }
+
+
+    
+    
     /// <summary>
     /// This class enumerates the programs running in the current debug session. (http://msdn.microsoft.com/en-ca/library/bb146727.aspx)
     /// </summary>

@@ -167,6 +167,120 @@ namespace VSNDK.DebugEngine
 
 
     /// <summary>
+    /// .
+    /// ()
+    /// </summary>
+    class DebugProgramCreateEvent : IDebugEvent2, IDebugProgramCreateEvent2
+    {
+        private Guid IID = new Guid("2B8035B6-E78A-4A8E-B5F8-FEEF4E4ADF07");
+        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_IMMEDIATE;
+
+        public Guid getGuid()
+        {
+            return IID;
+        }
+
+        /// <summary>
+        /// . ()
+        /// </summary>
+        /// <param name="eventAttributes"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
+        /// <returns> VSConstants.S_OK. </returns>
+        int IDebugEvent2.GetAttributes(out uint eventAttributes)
+        {
+            eventAttributes = Attributes;
+            return VSConstants.S_OK;
+        }
+    }
+    /// <summary>
+    /// .
+    /// ()
+    /// </summary>
+    class DebugProgramDestroyEvent : IDebugEvent2, IDebugProgramDestroyEvent2
+    {
+        private Guid IID = new Guid("8F50A082-6AAC-4440-B13B-EE0007156656");
+        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_IMMEDIATE;
+
+        public Guid getGuid()
+        {
+            return IID;
+        }
+
+        /// <summary>
+        /// . ()
+        /// </summary>
+        /// <param name="eventAttributes"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
+        /// <returns> VSConstants.S_OK. </returns>
+        int IDebugEvent2.GetAttributes(out uint eventAttributes)
+        {
+            eventAttributes = Attributes;
+            return VSConstants.S_OK;
+        }
+        /// <summary>
+        /// Gets the program's exit code. (http://msdn.microsoft.com/en-ca/library/bb146724.aspx)
+        /// </summary>
+        /// <param name="exitCode"> Returns the program's exit code. </param>
+        /// <returns> VSConstants.S_OK. </returns>
+        int IDebugProgramDestroyEvent2.GetExitCode(out uint exitCode)
+        {
+            exitCode = 0;
+            return VSConstants.S_OK;
+        }
+    }
+    /// <summary>
+    /// .
+    /// ()
+    /// </summary>
+    class DebugProcessCreateEvent : IDebugEvent2, IDebugProcessCreateEvent2
+    {
+        private Guid IID = new Guid("9020DEE3-362D-4FF2-8CA9-8F6791F0EC85");
+        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_IMMEDIATE;
+
+        public Guid getGuid()
+        {
+            return IID;
+        }
+
+        /// <summary>
+        /// . ()
+        /// </summary>
+        /// <param name="eventAttributes"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
+        /// <returns> VSConstants.S_OK. </returns>
+        int IDebugEvent2.GetAttributes(out uint eventAttributes)
+        {
+            eventAttributes = Attributes;
+            return VSConstants.S_OK;
+        }
+    }
+    /// <summary>
+    /// .
+    /// ()
+    /// </summary>
+    class DebugProcessDestroyEvent : IDebugEvent2, IDebugProcessDestroyEvent2
+    {
+        private Guid IID = new Guid("29DAA0AC-C718-4F93-A11E-6D15681476C7");
+        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_IMMEDIATE;
+
+        public Guid getGuid()
+        {
+            return IID;
+        }
+
+        /// <summary>
+        /// . ()
+        /// </summary>
+        /// <param name="eventAttributes"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
+        /// <returns> VSConstants.S_OK. </returns>
+        int IDebugEvent2.GetAttributes(out uint eventAttributes)
+        {
+            eventAttributes = Attributes;
+            return VSConstants.S_OK;
+        }
+    }
+
+
+
+
+    /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a program is attached to.
     /// (http://msdn.microsoft.com/en-ca/library/bb161345.aspx)
     /// </summary>
