@@ -139,6 +139,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       Platform        ="$(Platform)"
       AdditionalIncludeDirectories ="$(IncludePath)"
       AdditionalLibraryDirectories ="$(LibraryPath)"
+      ExcludeDirectories ="$(ExcludePath)"
       ConfigurationType ="$(ConfigurationType)"
       />
 
