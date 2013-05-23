@@ -183,8 +183,6 @@ namespace VSNDK.DebugEngine
         {
             m_breakpointManager = new BreakpointManager(this);            
             m_state = DE_STATE.DESIGN_MODE;
-            AD7PortSupplier ps = new AD7PortSupplier();
-            
         }
 
 
@@ -224,10 +222,73 @@ namespace VSNDK.DebugEngine
                 EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out m_programGUID));
 
                 m_program = rgpPrograms[0];
+
+                // It is NULL when the user attached the debugger to a running process (by using Attach to Process UI). When that 
+                // happens, some objects must be instantiated, as well as GDB must be launched. Those ones are instantiated/launched
+                // by LaunchSuspended and ResumeProcess methods when debugging an open project.
+                if (this.m_engineCallback == null) 
+                {
+                    VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning = true;
+                    m_engineCallback = new EngineCallback(this, ad7Callback);
+
+                    AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
+                    m_process = pnt.m_process;
+                    AD7Port port = pnt.m_process._portAttach;
+                    string publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
+                    string progName = pnt.m_programName.Substring(pnt.m_programName.LastIndexOf('/') + 1);
+
+                    string exePath = "";
+                    string processesPaths = "";
+                    System.IO.StreamReader readProcessesPathsFile = null;
+                    // Read the file ProcessesPath.txt to try to get the file location of the executable file.
+                    try
+                    {
+                        readProcessesPathsFile = new System.IO.StreamReader(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
+                        processesPaths = readProcessesPathsFile.ReadToEnd();
+                        readProcessesPathsFile.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        processesPaths = "";
+                    }
+
+                    int begin = processesPaths.IndexOf(progName + ":>");
+
+                    if (begin != -1)
+                    {
+                        begin += progName.Length + 2;
+                        int end = processesPaths.IndexOf("\r\n", begin);
+                        if (port.m_isSimulator)
+                        {
+                            exePath = processesPaths.Substring(begin, end - begin) + "Simulator\\" + progName;
+                        }
+                        else
+                        {
+                            exePath = processesPaths.Substring(begin, end - begin) + "Device-Debug\\" + progName;
+                        }
+                    }
+                    else
+                        exePath = "CannotAttachToRunningProcess";
+
+                    exePath = exePath.Replace("\\", "\\\\\\\\");
+
+                    if (GDBParser.LaunchProcess(pnt.m_programID, exePath, port.m_IP, port.m_isSimulator, port.m_toolsPath, publicKeyPath, port.m_password))
+                    {
+                        m_eventDispatcher = new EventDispatcher(this);
+                        m_module = new AD7Module();
+                        m_progNode = new AD7ProgramNode(m_process._processGUID, m_process._processID, exePath, new Guid(AD7Engine.Id));
+                        AddThreadsToProgram();
+                    }
+                    else
+                    {
+                        GDBParser.exitGDB();
+                        VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning = false;
+                        return VSConstants.E_FAIL;
+                    }
+                }
                 AD7EngineCreateEvent.Send(this);
                 AD7ProgramCreateEvent.Send(this);
                 AD7ModuleLoadEvent.Send(this, m_module, true);
-
                 AD7LoadCompleteEvent.Send(this, currentThread());
 
                 // If the reason for attaching is ATTACH_REASON_LAUNCH, the DE needs to send the IDebugEntryPointEvent2 event.
@@ -858,18 +919,17 @@ namespace VSNDK.DebugEngine
 
 
         /// <summary>
-        /// Gets the name and GUID of the debug engine (DE) running this program. Not implemented. 
-        /// (http://msdn.microsoft.com/en-us/library/bb145854.aspx)
+        /// Gets the name and GUID of the debug engine running this program. (http://msdn.microsoft.com/en-us/library/bb145854.aspx)
         /// </summary>
         /// <param name="engineName"> Returns the name of the DE running this program. </param>
         /// <param name="engineGuid"> Returns the GUID of the DE running this program. </param>
-        /// <returns> VSConstants.E_NOTIMPL. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         public int GetEngineInfo(out string engineName, out Guid engineGuid)
         {
-            engineName = "";
-            engineGuid = new Guid();
+            engineName = "VSNDK Debug Engine";
+            engineGuid = new Guid(AD7Engine.Id);
 
-            return VSConstants.E_NOTIMPL;
+            return VSConstants.S_OK;
         }
 
 
@@ -1387,7 +1447,7 @@ namespace VSNDK.DebugEngine
 
         /// <summary> TODO: Verify if this method is called or not by VS.
         /// Continues running this program from a stopped state. Any previous execution state (such as a step) is cleared, and the 
-        /// program starts executing again. Not implemented. (http://msdn.microsoft.com/en-us/library/bb162315.aspx)
+        /// program starts executing again. (http://msdn.microsoft.com/en-us/library/bb162315.aspx)
         /// </summary>
         /// <returns> VSConstants.S_OK. </returns>
         public int Execute()

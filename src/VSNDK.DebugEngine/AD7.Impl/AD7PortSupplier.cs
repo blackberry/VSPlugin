@@ -28,19 +28,45 @@ using Microsoft.VisualStudio.Shell;
 namespace VSNDK.DebugEngine
 {
     /// <summary>
-    /// This interface supplies ports to the session debug manager (SDM). (http://msdn.microsoft.com/en-ca/library/bb145819.aspx)
-    /// It is not implemented yet, but it seems to be needed to enable updating the list of processes in the "attach to process" 
-    /// user interface.
+    /// This class supplies ports to the Session Debug Manager (SDM).
+    /// 
+    /// It implements:
+    /// 
+    /// - IDebugPortSupplier2 - This interface supplies ports to the session debug manager (SDM). (http://msdn.microsoft.com/en-ca/library/bb145819.aspx)
+    /// - IDebugPortSupplierDescription2 - Enables the Visual Studio UI to display text inside the Transport Information section of 
+    ///   the Attach to Process dialog box. (http://msdn.microsoft.com/en-us/library/bb458056.aspx)
+    /// 
+    /// It is needed to enable updating the list of processes in the "attach to process" user interface.
     /// </summary>
     [ComVisible(true)]
     [Guid("BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6")]
-    public class AD7PortSupplier : IDebugPortSupplier3, IDebugPortSupplierDescription2
+    public class AD7PortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2
     {
+
+        /// <summary>
+        /// The name of the port supplier.
+        /// </summary>
         private string m_name;
+
+        /// <summary>
+        /// The description for the port supplier.
+        /// </summary>
         private string m_description;
+
+        /// <summary>
+        /// The NDK host path.
+        /// </summary>
         private string m_toolsPath = "";
+
+        /// <summary>
+        /// List of ports for this port supplier.
+        /// </summary>
         Dictionary<Guid, AD7Port> m_ports = new Dictionary<Guid, AD7Port>();
 
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public AD7PortSupplier()
         {
             m_name = "BlackBerry";
@@ -116,12 +142,18 @@ namespace VSNDK.DebugEngine
             }
         }
 
-        AD7Port CreatePort(AD7PortRequest rq)
+
+        /// <summary>
+        /// Creates an AD7Port.
+        /// </summary>
+        /// <param name="port_request"> Port request. </param>
+        /// <returns> Returns an AD7Port. </returns>
+        AD7Port CreatePort(AD7PortRequest port_request)
         {
             string portname;
             Guid guid;
             bool isSimulator = false;
-            rq.GetPortName(out portname);
+            port_request.GetPortName(out portname);
             string password = portname.Substring(portname.IndexOf('-') + 1);
             portname = portname.Remove(portname.IndexOf('-'));
             if (portname.Substring(0, 6) == "Device")
@@ -132,32 +164,32 @@ namespace VSNDK.DebugEngine
                 isSimulator = true;
             }
 
-            return new AD7Port(this, rq, guid, portname, password, isSimulator, m_toolsPath);
+            return new AD7Port(this, port_request, guid, portname, password, isSimulator, m_toolsPath);
         }
+
 
         #region Implementation of IDebugPortSupplier2
         
         /// <summary>
-        /// Adds a port. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb161980.aspx)
+        /// Adds a port. (http://msdn.microsoft.com/en-ca/library/bb161980.aspx)
         /// </summary>
         /// <param name="pRequest"> An IDebugPortRequest2 object that describes the port to be added. </param>
         /// <param name="ppPort"> Returns an IDebugPort2 object that represents the port. </param>
-        /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         public int AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
         {
-            AD7PortRequest pr = (AD7PortRequest)pRequest;
-            var port = CreatePort(pr);
-            m_ports.Add(port.Guid, port);
+            AD7PortRequest port_request = (AD7PortRequest)pRequest;
+            var port = CreatePort(port_request);
+            m_ports.Add(port.m_guid, port);
             ppPort = port;
             return VSConstants.S_OK; 
         }
 
 
         /// <summary>
-        /// Verifies that a port supplier can add new ports. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb145880.aspx)
+        /// Verifies that a port supplier can add new ports. (http://msdn.microsoft.com/en-ca/library/bb145880.aspx)
         /// </summary>
-        /// <returns> Not implemented. It should returns S_OK if the port can be added, or S_FALSE to indicate no ports can be added 
-        /// to this port supplier. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         public int CanAddPort()
         {
             return VSConstants.S_OK;
@@ -165,11 +197,10 @@ namespace VSNDK.DebugEngine
 
 
         /// <summary>
-        /// Retrieves a list of all the ports supplied by a port supplier. Not implemented. 
-        /// (http://msdn.microsoft.com/en-ca/library/bb146984.aspx)
+        /// Retrieves a list of all the ports supplied by a port supplier. (http://msdn.microsoft.com/en-ca/library/bb146984.aspx)
         /// </summary>
         /// <param name="ppEnum"> Returns an IEnumDebugPorts2 object containing a list of ports supplied. </param>
-        /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         public int EnumPorts(out IEnumDebugPorts2 ppEnum)
         {
             AD7Port[] ports = new AD7Port[m_ports.Count()];
@@ -185,11 +216,11 @@ namespace VSNDK.DebugEngine
 
 
         /// <summary>
-        /// Gets a port from a port supplier. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb161812.aspx)
+        /// Gets a port from a port supplier. (http://msdn.microsoft.com/en-ca/library/bb161812.aspx)
         /// </summary>
         /// <param name="guidPort"> Globally unique identifier (GUID) of the port. </param>
         /// <param name="ppPort"> Returns an IDebugPort2 object that represents the port. </param>
-        /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         public int GetPort(ref Guid guidPort, out IDebugPort2 ppPort)
         {
             ppPort = m_ports[guidPort];
@@ -198,10 +229,10 @@ namespace VSNDK.DebugEngine
 
 
         /// <summary>
-        /// Gets the port supplier identifier. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb146617.aspx)
+        /// Gets the port supplier identifier. (http://msdn.microsoft.com/en-ca/library/bb146617.aspx)
         /// </summary>
         /// <param name="pguidPortSupplier"> Returns the GUID of the port supplier. </param>
-        /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         public int GetPortSupplierId(out Guid pguidPortSupplier)
         {
             pguidPortSupplier = this.GetType().GUID;
@@ -210,10 +241,10 @@ namespace VSNDK.DebugEngine
 
 
         /// <summary>
-        /// Gets the port supplier name. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb162136.aspx)
+        /// Gets the port supplier name. (http://msdn.microsoft.com/en-ca/library/bb162136.aspx)
         /// </summary>
         /// <param name="pbstrName"> Returns the name of the port supplier. </param>
-        /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         public int GetPortSupplierName(out string pbstrName)
         {
             pbstrName = m_name;
@@ -233,22 +264,15 @@ namespace VSNDK.DebugEngine
 
         #endregion
 
-        #region Implementation of IDebugPortSupplier3
-
-        public int CanPersistPorts()
-        {
-            return VSConstants.S_OK;
-        }
-
-        public int EnumPersistedPorts(BSTR_ARRAY PortNames, out IEnumDebugPorts2 ppEnum)
-        {
-            throw new NotImplementedException();
-        }
-
-        #endregion
 
         #region Implementation of IDebugPortSupplierDescription2
 
+        /// <summary>
+        /// Retrieves the description for the port supplier. (http://msdn.microsoft.com/en-us/library/bb457978.aspx)
+        /// </summary>
+        /// <param name="pdwFlags"> Metadata flags for the description. </param>
+        /// <param name="pbstrText"> Description of the port supplier. </param>
+        /// <returns> VSConstants.S_OK. </returns>
         public int GetDescription(enum_PORT_SUPPLIER_DESCRIPTION_FLAGS[] pdwFlags, out string pbstrText)
         {
             pbstrText = m_description;

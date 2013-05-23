@@ -149,15 +149,15 @@ void GDBParser::setNDKVars(bool isSimulator) {
 	String^ ndkHostPath = (String^)Registry::GetValue(keyPath, "NDKHostPath", "");
 	String^ ndkTargetPath = (String^)Registry::GetValue(keyPath, "NDKTargetPath", "");
 			
-//	if (isSimulator) {		
+	if (isSimulator) {		
 		m_pcGDBCmd = ndkHostPath + "\\usr\\bin\\ntox86-gdb.exe --interpreter=mi2";
 		m_libPaths[0] = ndkTargetPath + "\\x86\\lib";
 		m_libPaths[1] = ndkTargetPath + "\\x86\\usr\\lib";
-//	} else {		
-//		m_pcGDBCmd = ndkHostPath + "\\usr\\bin\\ntoarm-gdb.exe --interpreter=mi2";
-//		m_libPaths[0] = ndkTargetPath + "\\armle-v7\\lib";
-//		m_libPaths[1] = ndkTargetPath + "\\armle-v7\\usr\\lib";
-//	}
+	} else {		
+		m_pcGDBCmd = ndkHostPath + "\\usr\\bin\\ntoarm-gdb.exe --interpreter=mi2";
+		m_libPaths[0] = ndkTargetPath + "\\armle-v7\\lib";
+		m_libPaths[1] = ndkTargetPath + "\\armle-v7\\usr\\lib";
+	}
 
     // Escape backslashes for strings that will be sent to GDB
     String^ pattern = "\\\\"; // one backslash
@@ -220,15 +220,14 @@ void GDBParser::BlackBerryConnect(String^ IPAddrStr, String^ toolsPath, String^ 
 
 
 /// <summary>
-/// Just start GDB without any process to debug
+/// Execute GDB only to get the list of running processes in the Device/Simulator
 /// </summary>
 /// <param name="IP"> Device/Simulator IP. </param>
 /// <param name="password"> Device/simulator password. </param>
 /// <param name="isSimulator"> TRUE when using the Simulator, FALSE when using the Device. </param>
 /// <param name="toolsPath"> NDK full path. </param>
 /// <param name="publicKeyPath"> Public key full path. </param>
-/// <returns> True -> succeeded;
-/// False -> failed. </returns>
+/// <returns> A string with the list of running processes. </returns>
 String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimulator, String^ toolsPath, String^ publicKeyPath)
 {
 	string response;
@@ -334,7 +333,11 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 	CAutoPtr <char> apDevice = convertToAutoPtrFromString(IPAddrStr);
 
 	// Get binary file path	
-	CAutoPtr <char> apBinaryFile = convertToAutoPtrFromString(exeStr);
+	CAutoPtr <char> apBinaryFile;
+	if (exeStr == "CannotAttachToRunningProcess")
+		apBinaryFile = convertToAutoPtrFromString("");
+	else
+		apBinaryFile = convertToAutoPtrFromString(exeStr);
 
 	// Set NDK Variables
 	setNDKVars(isSimulator);	
