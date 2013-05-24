@@ -89,6 +89,128 @@ namespace VSNDK.Tasks
             "endif\n\n";
         #endregion
 
+        #region properties
+
+        /// <summary>
+        /// Getter/Setter for CompileItems property
+        /// </summary>
+        public ITaskItem[] CompileItems
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// Getter/Setter for LinkItems
+        /// </summary>
+        public ITaskItem[] LinkItems
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// Getter/Setter for ProjectDir property
+        /// </summary>
+        public string ProjectDir
+        {
+            set { _projectDir = value.Replace('\\', '/'); }
+            get { return _projectDir; }
+        }
+
+        /// <summary>
+        /// Getter/Setter for IntDir property
+        /// </summary>
+        public string IntDir
+        {
+            set { _intDir = value.Replace('\\', '/'); }
+            get { return _intDir; }
+        }
+
+        /// <summary>
+        /// Getter/Setter for OutDir property
+        /// </summary>
+        public string OutDir
+        {
+            set { _outDir = value.Replace('\\', '/'); }
+            get { return _outDir; }
+        }
+
+        /// <summary>
+        /// Getter/Setter for AdditionalIncludeDirectories property 
+        /// </summary>
+        public string[] AdditionalIncludeDirectories
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// Getter/Setter for AdditionLibraryDirectories
+        /// </summary>
+        public string[] AdditionalLibraryDirectories
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// Getter/Setter for ExcludeDirectories
+        /// </summary>
+        public string[] ExcludeDirectories
+        {
+            set;
+            get;
+        }
+
+
+        /// <summary>
+        /// Getter/Setter for TargetName property
+        /// </summary>
+        public string TargetName
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// Getter/Setter for TargetExtension property
+        /// </summary>
+        public string TargetExtension
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// Getter/Setter for ConfigurationType property
+        /// </summary>
+        public string ConfigurationType
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// Getter/Setter for CompilerVersion property
+        /// </summary>
+        public string CompilerVersion
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
+        /// Getter/Setter for Platform property
+        /// </summary>
+        public string Platform
+        {
+            set;
+            get;
+        }
+
+        #endregion
+
         /// <summary>
         /// Interface to unmanaged code for getting the SHortPathName for a given directory.
         /// </summary>
@@ -123,7 +245,7 @@ namespace VSNDK.Tasks
             using (StreamWriter outFile = new StreamWriter(IntDir + "makefile"))
             {
                 outFile.Write(INITIAL_DEFINITIONS);
-
+          //      System.Diagnostics.Debugger.Launch();
                 foreach (ITaskItem compileItem in CompileItems)
                 {
                     // Get the metadata we need from this compile item.
@@ -140,6 +262,13 @@ namespace VSNDK.Tasks
                     string enhancedSecurity = compileItem.GetMetadata("EnhancedSecurity");
                     string additionalOptions = compileItem.GetMetadata("AdditionalOptions");
                     string fullPath = compileItem.GetMetadata("FullPath").Replace('\\', '/');
+
+                    /// if CompileItem is in the ExcludedPath then continue.
+                    if (isExcludedPath(fullPath))
+                    {
+
+                        continue;
+                    }
 
                     StringBuilder shortPath = new StringBuilder(1024);
                     GetShortPathName(fullPath, shortPath, shortPath.Capacity);
@@ -366,111 +495,24 @@ namespace VSNDK.Tasks
         }
 
         /// <summary>
-        /// Getter/Setter for CompileItems property
+        /// Check to see if path is in the excluded list
         /// </summary>
-        public ITaskItem[] CompileItems
+        /// <param name="path"></param>
+        /// <returns></returns>
+        private bool isExcludedPath(string path)
         {
-            set;
-            get;
-        }
-
-        /// <summary>
-        /// Getter/Setter for LinkItems
-        /// </summary>
-        public ITaskItem[] LinkItems
-        {
-            set;
-            get;
-        }
-
-        /// <summary>
-        /// Getter/Setter for ProjectDir property
-        /// </summary>
-        public string ProjectDir
-        {
-            set { _projectDir = value.Replace('\\', '/'); }
-            get { return _projectDir; }
-        }
-
-        /// <summary>
-        /// Getter/Setter for IntDir property
-        /// </summary>
-        public string IntDir
-        {
-            set { _intDir = value.Replace('\\', '/'); }
-            get { return _intDir; }
-        }
-
-        /// <summary>
-        /// Getter/Setter for OutDir property
-        /// </summary>
-        public string OutDir
-        {
-            set { _outDir = value.Replace('\\', '/'); }
-            get { return _outDir; }
-        }
-
-        /// <summary>
-        /// Getter/Setter for AdditionalIncludeDirectories property 
-        /// </summary>
-        public string[] AdditionalIncludeDirectories
-        {
-            set;
-            get;
-        }
-
-        /// <summary>
-        /// Getter/Setter for AdditionLibraryDirectories
-        /// </summary>
-        public string[] AdditionalLibraryDirectories
-        {
-            set;
-            get;
-        }
-
-        /// <summary>
-        /// Getter/Setter for TargetName property
-        /// </summary>
-        public string TargetName
-        {
-            set;
-            get;
-        }
-
-        /// <summary>
-        /// Getter/Setter for TargetExtension property
-        /// </summary>
-        public string TargetExtension
-        {
-            set;
-            get;
-        }
-
-        /// <summary>
-        /// Getter/Setter for ConfigurationType property
-        /// </summary>
-        public string ConfigurationType
-        {
-            set;
-            get;
-        }
-
-        /// <summary>
-        /// Getter/Setter for CompilerVersion property
-        /// </summary>
-        public string CompilerVersion
-        {
-            set;
-            get;
-        }
-
-        /// <summary>
-        /// Getter/Setter for Platform property
-        /// </summary>
-        public string Platform
-        {
-            set;
-            get;
+            foreach (string exDir in ExcludeDirectories)
+            {
+                if (Path.GetFullPath(path).Contains(Path.GetFullPath(exDir)))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+            return false;
         }
     }
 }
