@@ -167,6 +167,67 @@ namespace VSNDK.DebugEngine
 
 
     /// <summary>
+    /// This interface is sent when a process is launched. (http://msdn.microsoft.com/en-ca/library/bb161755.aspx)
+    /// </summary>
+    class AD7ProcessCreateEvent : IDebugEvent2, IDebugProcessCreateEvent2
+    {
+        private Guid IID = new Guid("9020DEE3-362D-4FF2-8CA9-8F6791F0EC85");
+        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_IMMEDIATE;
+
+        /// <summary>
+        /// Gets the GUID of this event. 
+        /// </summary>
+        /// <returns> Returns the GUID of this event. </returns>
+        public Guid getGuid()
+        {
+            return IID;
+        }
+
+        /// <summary>
+        /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
+        /// </summary>
+        /// <param name="eventAttributes"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
+        /// <returns> VSConstants.S_OK. </returns>
+        int IDebugEvent2.GetAttributes(out uint eventAttributes)
+        {
+            eventAttributes = Attributes;
+            return VSConstants.S_OK;
+        }
+    }
+
+
+    /// <summary>
+    /// This interface is sent when a process is terminated, exits atypically, or is detached from.
+    /// (http://msdn.microsoft.com/en-us/library/bb145152.aspx)
+    /// </summary>
+    class AD7ProcessDestroyEvent : IDebugEvent2, IDebugProcessDestroyEvent2
+    {
+        private Guid IID = new Guid("29DAA0AC-C718-4F93-A11E-6D15681476C7");
+        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_IMMEDIATE;
+
+        /// <summary>
+        /// Gets the GUID of this event. 
+        /// </summary>
+        /// <returns> Returns the GUID of this event. </returns>
+        public Guid getGuid()
+        {
+            return IID;
+        }
+
+        /// <summary>
+        /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
+        /// </summary>
+        /// <param name="eventAttributes"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
+        /// <returns> VSConstants.S_OK. </returns>
+        int IDebugEvent2.GetAttributes(out uint eventAttributes)
+        {
+            eventAttributes = Attributes;
+            return VSConstants.S_OK;
+        }
+    }
+
+
+    /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a program is attached to.
     /// (http://msdn.microsoft.com/en-ca/library/bb161345.aspx)
     /// </summary>

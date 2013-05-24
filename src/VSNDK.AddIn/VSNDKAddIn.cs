@@ -358,11 +358,14 @@ namespace VSNDK.AddIn
         {
             bool bbPlatform = false;
             DTE dte = _applicationObject as DTE;
-            SolutionContexts scCollection = dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts;
-            foreach (SolutionContext sc in scCollection)
+            if (dte.Solution.SolutionBuild.ActiveConfiguration != null)
             {
-                if (sc.PlatformName == "BlackBerry" || sc.PlatformName == "BlackBerrySimulator")
-                    bbPlatform = true;
+                SolutionContexts scCollection = dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts;
+                foreach (SolutionContext sc in scCollection)
+                {
+                    if (sc.PlatformName == "BlackBerry" || sc.PlatformName == "BlackBerrySimulator")
+                        bbPlatform = true;
+                }
             }
 
             Debug.WriteLine("Before Start Debug");
@@ -565,6 +568,54 @@ namespace VSNDK.AddIn
                     CaptureCollection cc = g.Captures;
                     Capture c = cc[0];
                     pidString = c.ToString();
+
+                    // Store proccess name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
+                    // source code for a running process.
+                    // First read the file.
+                    string processesPaths = "";
+                    System.IO.StreamReader readProcessesPathsFile = null;
+                    try
+                    {
+                        readProcessesPathsFile = new System.IO.StreamReader(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
+                        processesPaths = readProcessesPathsFile.ReadToEnd();
+                        readProcessesPathsFile.Close();
+                    }
+                    catch (Exception e)
+                    {
+                        processesPaths = "";
+                    }
+
+                    // Updating the contents.
+                    int begin = outputText.IndexOf("Project: ") + 9;
+                    int end = outputText.IndexOf(", Configuration:", begin);
+                    string processName = outputText.Substring(begin, end - begin);
+                    begin = processesPaths.IndexOf(processName + ":>");
+
+                    string currentPath = dte.ActiveDocument.Path;
+
+                    if (begin != -1)
+                    {
+                        begin += processName.Length + 2;
+                        end = processesPaths.IndexOf("\r\n", begin);
+                        processesPaths = processesPaths.Substring(0, begin) + currentPath + processesPaths.Substring(end);
+                    }
+                    else
+                    {
+                        processesPaths = processesPaths + processName + ":>" + currentPath + "\r\n";
+                    }
+
+                    // Writing contents to file.
+                    System.IO.StreamWriter writeProcessesPathsFile = null;
+                    try
+                    {
+                        writeProcessesPathsFile = new System.IO.StreamWriter(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt", false);
+                        writeProcessesPathsFile.Write(processesPaths);
+                        writeProcessesPathsFile.Close();
+                    }
+                    catch (Exception e)
+                    {
+                    }
+
                     return true;
                 }
                 else

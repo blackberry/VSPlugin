@@ -219,6 +219,86 @@ void GDBParser::BlackBerryConnect(String^ IPAddrStr, String^ toolsPath, String^ 
 }
 
 
+/// <summary>
+/// Execute GDB only to get the list of running processes in the Device/Simulator
+/// </summary>
+/// <param name="IP"> Device/Simulator IP. </param>
+/// <param name="password"> Device/simulator password. </param>
+/// <param name="isSimulator"> TRUE when using the Simulator, FALSE when using the Device. </param>
+/// <param name="toolsPath"> NDK full path. </param>
+/// <param name="publicKeyPath"> Public key full path. </param>
+/// <returns> A string with the list of running processes. </returns>
+String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimulator, String^ toolsPath, String^ publicKeyPath)
+{
+	string response;
+	string parsed;
+    m_BBConnectProcess = NULL;
+	char pcCmd[256];
+	
+	// Run BlackBerryConnect
+    BlackBerryConnect(IP, toolsPath, publicKeyPath, password);
+
+	// Get device (IP address)	
+	CAutoPtr <char> ip = convertToAutoPtrFromString(IP);
+
+	// Set NDK Variables
+	setNDKVars(isSimulator);	
+	
+	// Convert GDB command to wchar_t* since GDBWrapper.exe requires a Unicode argument
+	pin_ptr<const wchar_t> pkwcGDBCmd = PtrToStringChars(m_pcGDBCmd);
+    const size_t newsizew = (wcslen(pkwcGDBCmd) + 1) * sizeof(wchar_t);
+    wchar_t* pwcGDBCmd = new wchar_t[newsizew];
+    wcscpy_s(pwcGDBCmd, newsizew, pkwcGDBCmd);
+	CAutoPtr <wchar_t> apGDBCmd;
+	apGDBCmd.Attach(pwcGDBCmd);
+
+	// Get GDB Console
+	GDBConsole::setGDBPath(apGDBCmd);	
+	GDBConsole* console = GDBConsole::getInstance();	
+
+	// Convert library paths
+	CAutoPtr <char> libPaths[NUM_LIB_PATHS];
+	for (int i = 0; i < NUM_LIB_PATHS; i++) {
+		libPaths[i] = convertToAutoPtrFromString(m_libPaths[i]);
+	}
+	
+	/// Send intialization commands to GDB
+	response = console->waitForPrompt(true);
+	if ((response == "") || (response[0] == '!')) //found an error
+	{
+		// ??? load output console window with the parsed message.
+		response = "";
+	}
+
+	if (response != "")
+	{
+		sprintf(pcCmd, "1-target-select qnx %s:8000\r\n", ip);
+		console->sendCommand(pcCmd);
+		response = console->waitForPrompt(true);
+		if ((response == "") || (response[0] == '!')) //found an error
+		{
+			// ??? load output console window with the parsed message.
+			response = "";
+		}
+
+		if (response != "")
+		{
+			sprintf(pcCmd, "info pidlist\r\n");
+			console->sendCommand(pcCmd);
+			response = console->waitForPrompt(true);
+			if ((response == "") || (response[0] == '!')) //found an error
+			{
+				// ??? load output console window with the parsed message.
+				response = "";
+			}
+		}
+	}
+	exitGDB();
+	String ^systemString = gcnew String(response.c_str());
+	return systemString;
+}
+
+
 /// <summary> 
 /// Launch the GDB Debug Process. 
 /// </summary>
@@ -253,7 +333,11 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 	CAutoPtr <char> apDevice = convertToAutoPtrFromString(IPAddrStr);
 
 	// Get binary file path	
-	CAutoPtr <char> apBinaryFile = convertToAutoPtrFromString(exeStr);
+	CAutoPtr <char> apBinaryFile;
+	if (exeStr == "CannotAttachToRunningProcess")
+		apBinaryFile = convertToAutoPtrFromString("");
+	else
+		apBinaryFile = convertToAutoPtrFromString(exeStr);
 
 	// Set NDK Variables
 	setNDKVars(isSimulator);	

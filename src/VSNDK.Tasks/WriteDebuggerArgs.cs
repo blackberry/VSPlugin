@@ -52,7 +52,7 @@ namespace VSNDK.Tasks
         /// <summary>
         /// Getter/Setter for the _appData property
         /// </summary>
-        [Required]
+//        [Required]
         public string AppData
         {
             set { _appData = value; }

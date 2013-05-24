@@ -25,7 +25,7 @@ namespace VSNDK.Tasks.Test
     [TestFixture]
     class WriteDebuggerArgsTestClass
     {
-        private WriteDebuggerArgs target;
+/*        private WriteDebuggerArgs target;
 
         [SetUp]
         public void setup()
@@ -76,6 +76,6 @@ namespace VSNDK.Tasks.Test
 
             /// Verify test case
             Assert. IsTrue(result);
-        }
+        }*/
     }
 }
