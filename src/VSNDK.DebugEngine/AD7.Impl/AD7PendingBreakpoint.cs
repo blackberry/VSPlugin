@@ -176,7 +176,7 @@ namespace VSNDK.DebugEngine
                         return VSConstants.S_FALSE;
                     }
 
-                    if (xBBP == null)
+                    if ((xBBP == null) || (xBBP.GDB_ID == 0))
                     {
                         return VSConstants.S_FALSE;
                     }

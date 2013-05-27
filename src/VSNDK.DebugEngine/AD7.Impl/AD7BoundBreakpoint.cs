@@ -201,7 +201,8 @@ namespace VSNDK.DebugEngine
                 m_remoteID = m_engine.BPMgr.RemoteAdd(this);
             }
 
-            if ((m_remoteID == 0) && (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false))
+//            if ((m_remoteID == 0) && (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false))
+            if (m_remoteID == 0)
             {
                 return;
             }

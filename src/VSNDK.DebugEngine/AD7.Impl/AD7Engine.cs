@@ -26,6 +26,7 @@ using VSNDK.AddIn;
 using NameValueCollection = System.Collections.Specialized.NameValueCollection;
 using NameValueCollectionHelper = VSNDK.AddIn.NameValueCollectionHelper;
 using System.Collections;
+using System.Windows.Forms;
 
 namespace VSNDK.DebugEngine
 {
@@ -268,12 +269,18 @@ namespace VSNDK.DebugEngine
                         }
                     }
                     else
+                    {
                         exePath = "CannotAttachToRunningProcess";
+                    }
 
                     exePath = exePath.Replace("\\", "\\\\\\\\");
 
                     if (GDBParser.LaunchProcess(pnt.m_programID, exePath, port.m_IP, port.m_isSimulator, port.m_toolsPath, publicKeyPath, port.m_password))
                     {
+                        if (exePath == "CannotAttachToRunningProcess")
+                        {
+                            MessageBox.Show(progName + " is attached to the debugger. However, to be able to debug your application, you must build and deploy it from this computer first.", "No executable file with symbols found.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
                         m_eventDispatcher = new EventDispatcher(this);
                         m_module = new AD7Module();
                         m_progNode = new AD7ProgramNode(m_process._processGUID, m_process._processID, exePath, new Guid(AD7Engine.Id));

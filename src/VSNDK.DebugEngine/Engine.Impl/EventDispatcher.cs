@@ -294,8 +294,9 @@ namespace VSNDK.DebugEngine
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
                 response = GDBParser.parseCommand(command, 6);
 
-                if ((response.Length < 2) && (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false))
+                if (((response.Length < 2) && (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false)) || (response == "Function not found!"))
                 {
+                    resumeFromInterrupt();
                     return false;
                 }
 
