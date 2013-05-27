@@ -501,15 +501,18 @@ namespace VSNDK.Tasks
         /// <returns></returns>
         private bool isExcludedPath(string path)
         {
-            foreach (string exDir in ExcludeDirectories)
+            if (ExcludeDirectories != null)
             {
-                if (Path.GetFullPath(path).Contains(Path.GetFullPath(exDir)))
+                foreach (string exDir in ExcludeDirectories)
                 {
-                    return true;
-                }
-                else
-                {
-                    return false;
+                    if (Path.GetFullPath(path).Contains(Path.GetFullPath(exDir)))
+                    {
+                        return true;
+                    }
+/*                    else
+                    {
+                        return false;
+                    }*/
                 }
             }
             return false;

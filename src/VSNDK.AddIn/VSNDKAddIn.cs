@@ -59,6 +59,7 @@ namespace VSNDK.AddIn
         public int amountOfProjects = 0;
         public bool hitPlay = false; // used to know if user has clicked in the play button
         public bool isDeploying = false;
+        private string targetDir = ""; // used to store the target directory in ProcessesPath.txt file, that will be used later in "attach to process"
 
         private const string BLACKBERRY = "BlackBerry";
         private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
@@ -412,6 +413,7 @@ namespace VSNDK.AddIn
                             if (p1.UniqueName == startupProject)
                             {
                                 buildThese.Add(p1.FullName);
+                                targetDir = p1.FullName.Remove(p1.FullName.LastIndexOf('\\') + 1);
                                 break;
                             }
                         }
@@ -586,12 +588,15 @@ namespace VSNDK.AddIn
                     }
 
                     // Updating the contents.
-                    int begin = outputText.IndexOf("Project: ") + 9;
+                    int begin = outputText.IndexOf("Deploy started: Project: ") + 25;
+                    if (begin == -1)
+                        begin = outputText.IndexOf("Project: ") + 9;
                     int end = outputText.IndexOf(", Configuration:", begin);
                     string processName = outputText.Substring(begin, end - begin);
                     begin = processesPaths.IndexOf(processName + ":>");
 
-                    string currentPath = dte.ActiveDocument.Path;
+//                    string currentPath = dte.ActiveDocument.Path;
+                    string currentPath = targetDir;
 
                     if (begin != -1)
                     {

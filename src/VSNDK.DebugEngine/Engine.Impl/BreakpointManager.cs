@@ -102,9 +102,6 @@ namespace VSNDK.DebugEngine
         /// <returns> Breakpoint ID Number. </returns>
         public int RemoteAdd(AD7BoundBreakpoint aBBP)
         {
-
-            m_activeBPs.Add(aBBP);
-
             // Call GDB to set a breakpoint based on filename and line no. in aBBP                                                           
             uint GDB_ID = 0;
             uint GDB_LinePos = 0;
@@ -123,6 +120,8 @@ namespace VSNDK.DebugEngine
 
             if (ret)
             {
+                m_activeBPs.Add(aBBP);
+
                 aBBP.GDB_ID = GDB_ID;
                 aBBP.GDB_FileName = GDB_Filename;
                 aBBP.GDB_LinePos = GDB_LinePos;
