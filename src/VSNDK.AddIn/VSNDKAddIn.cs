@@ -249,20 +249,31 @@ namespace VSNDK.AddIn
                     IVCCollection cfgs = vcProj.Configurations;
 
                     bool isBlackBerry = false;
+                    bool isApplication = true;
                     foreach (VCConfiguration cfg in cfgs)
                     {
                         if (cfg.ConfigurationType != ConfigurationTypes.typeApplication)
-                            return;
+                        {
+                            isApplication = false;
+                            break;
+                        }
 
                         if (cfg.Platform.Name == BLACKBERRY || cfg.Platform.Name == BLACKBERRYSIMULATOR)
+                        {
                             isBlackBerry = true;
+                            break;
+                        }
                     }
+
+                    if (!isApplication)
+                        continue;
 
                     if (!isBlackBerry)
                         continue;
                     
                     ProjectItem baritem = proj.ProjectItems.Item(BAR_DESCRIPTOR);
-                    if (baritem == null && !File.Exists(vcProj.ProjectDirectory + BAR_DESCRIPTOR))
+                    string n = proj.Name;
+                    if (baritem == null)
                     {
                         tokenProcessor = new TokenProcessor();
                         Debug.WriteLine("Add bar descriptor file to the project");
@@ -270,7 +281,10 @@ namespace VSNDK.AddIn
                         templatePath += BAR_DESCRIPTOR_PATH + BAR_DESCRIPTOR;
                         tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", proj.Name);
                         string destination = System.IO.Path.GetFileName(templatePath);
-                        destination = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(proj.FullName), destination);
+
+                        string folder = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(proj.FullName), proj.Name + "_barDescriptor");
+                        System.IO.Directory.CreateDirectory(folder);
+                        destination = System.IO.Path.Combine(folder, destination);
                         tokenProcessor.UntokenFile(templatePath, destination);
                         ProjectItem projectitem = proj.ProjectItems.AddFromFile(destination);
                     }
