@@ -30,6 +30,7 @@ namespace VSNDK.Tasks
     {
         #region Member Variables and Constants
         private string _projectDir;
+        private string _appName;
         private string _barDescriptorPath = "bar-descriptor.xml";
         private string _appId;
         #endregion
@@ -40,9 +41,7 @@ namespace VSNDK.Tasks
         /// <returns></returns>
         public override bool Execute()
         {
-
             string rootedOutDir = (Path.IsPathRooted(_barDescriptorPath)) ? _barDescriptorPath : _projectDir + _barDescriptorPath;
-
             XmlReader reader = XmlReader.Create(rootedOutDir);
             reader.ReadToFollowing("id");
             _appId = reader.ReadElementContentAsString();
@@ -58,10 +57,18 @@ namespace VSNDK.Tasks
             set 
             {
                 _barDescriptorPath = value.Replace("bar-descriptor.xml", "");
-                _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + "bar-descriptor.xml" : _barDescriptorPath + @"\bar-descriptor.xml";
+
+                if ((_appName != null) && (!_barDescriptorPath.Contains(_appName + "_barDescriptor")))
+                    _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + _appName + "_barDescriptor\\bar-descriptor.xml" : _barDescriptorPath + "\\" + _appName + "_barDescriptor\\bar-descriptor.xml";
+                else
+                    _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + "bar-descriptor.xml" : _barDescriptorPath + @"\bar-descriptor.xml";
+
                 _barDescriptorPath = _barDescriptorPath.Trim('\\');
             }
-            get { return _barDescriptorPath; }
+            get 
+            {
+                return _barDescriptorPath; 
+            }
         }
 
         /// <summary>
@@ -69,8 +76,39 @@ namespace VSNDK.Tasks
         /// </summary>
         public string ProjectDir
         {
-            set { _projectDir = value; }
-            get { return _projectDir; }
+            set 
+            {
+                _projectDir = value;
+            }
+            get 
+            { 
+                return _projectDir; 
+            }
+        }
+
+        /// <summary>
+        /// Getter/Setter for the AppName property
+        /// </summary>
+        public string AppName
+        {
+            set
+            {
+                _appName = value;
+                if (!_barDescriptorPath.Contains(_appName + "_barDescriptor"))
+                {
+                    int pos = _barDescriptorPath.LastIndexOf('\\') + 1;
+                    int pos2 = _barDescriptorPath.LastIndexOf('/') + 1;
+                    if (pos == 0) // if the '\\' char was not found.
+                        pos = pos2;
+                    if (pos < pos2)
+                        pos = pos2;
+                    _barDescriptorPath = _barDescriptorPath.Substring(0, pos) + _appName + "_barDescriptor\\" + _barDescriptorPath.Substring(pos);
+                }
+            }
+            get
+            {
+                return _appName;
+            }
         }
 
         /// <summary>

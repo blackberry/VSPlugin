@@ -32,6 +32,8 @@ namespace VSNDK.Tasks
         protected ArrayList switchOrderList;
         private static BarDescriptor.qnx _descriptor = null;
         private string _projDir;
+        private string _appName;
+        private string _barDescriptorPath;
         private const string OUTPUT_FILE = "OutputFiles";
         private const string APP_DESCRIPTOR = "ApplicationDescriptorXml";
         private const string TARGET_FORMAT = "TargetFormat";
@@ -144,7 +146,9 @@ namespace VSNDK.Tasks
 
             //make sure the _descriptor is loaded
             if (_descriptor == null)
+            {
                 _descriptor = BarDescriptor.Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
+            }
             BarDescriptor.asset[] globalAssets = _descriptor.assets;
             BarDescriptor.asset[] configAssets = null;
 
@@ -351,6 +355,46 @@ namespace VSNDK.Tasks
         }
 
         /// <summary>
+        /// Getter/Setter for AppName property
+        /// </summary>
+        [Required]
+        public virtual string AppName
+        {
+            get
+            {
+                return _appName;
+            }
+            set
+            {
+                _appName = value;
+                if ((_barDescriptorPath != null) && (!_barDescriptorPath.Contains(_appName + "_barDescriptor")))
+                {
+                    int pos = _barDescriptorPath.LastIndexOf('\\') + 1;
+                    int pos2 = _barDescriptorPath.LastIndexOf('/') + 1;
+                    if (pos == 0) // if the '\\' char was not found.
+                        pos = pos2;
+                    if (pos < pos2)
+                        pos = pos2;
+                    _barDescriptorPath = _barDescriptorPath.Substring(0, pos) + _appName + "_barDescriptor\\" + _barDescriptorPath.Substring(pos);
+
+                    base.ActiveToolSwitches.Remove(APP_DESCRIPTOR);
+
+                    ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                    {
+                        DisplayName = "Application descriptor file name, for example, bar-descriptor.xml",
+                        Description = "Application descriptor file name, for example, bar-descriptor.xml, it must follows the out.bar file",
+                        ArgumentRelationList = new ArrayList(),
+                        Name = APP_DESCRIPTOR,
+                        Value = _barDescriptorPath
+                    };
+                    base.ActiveToolSwitches.Add(APP_DESCRIPTOR, switch2);
+                    base.AddActiveSwitchToolValue(switch2);
+                }
+
+            }
+        }
+
+        /// <summary>
         /// Getter/Setter for SolutionDir property
         /// </summary>
         [Required]
@@ -368,22 +412,30 @@ namespace VSNDK.Tasks
             }
             set
             {
-                base.ActiveToolSwitches.Remove(APP_DESCRIPTOR);
+                _barDescriptorPath = value.Replace("bar-descriptor.xml", "");
 
-                string _barDescriptorPath = value.Replace("bar-descriptor.xml", "");
-                _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + "bar-descriptor.xml" : _barDescriptorPath + @"\bar-descriptor.xml";
+                if ((_appName != null) && (!_barDescriptorPath.Contains(_appName + "_barDescriptor")))
+                    _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + _appName + "_barDescriptor\\bar-descriptor.xml" : _barDescriptorPath + "\\" + _appName + "_barDescriptor\\bar-descriptor.xml";
+                else
+                    _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + "bar-descriptor.xml" : _barDescriptorPath + @"\bar-descriptor.xml";
+
                 _barDescriptorPath = _barDescriptorPath.Trim('\\');
 
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                if (_appName != null) // means that the full bar-descriptor path is correct
                 {
-                    DisplayName = "Application descriptor file name, for example, bar-descriptor.xml",
-                    Description = "Application descriptor file name, for example, bar-descriptor.xml, it must follows the out.bar file",
-                    ArgumentRelationList = new ArrayList(),
-                    Name = APP_DESCRIPTOR,
-                    Value = _barDescriptorPath
-                };
-                base.ActiveToolSwitches.Add(APP_DESCRIPTOR, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                    base.ActiveToolSwitches.Remove(APP_DESCRIPTOR);
+
+                    ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                    {
+                        DisplayName = "Application descriptor file name, for example, bar-descriptor.xml",
+                        Description = "Application descriptor file name, for example, bar-descriptor.xml, it must follows the out.bar file",
+                        ArgumentRelationList = new ArrayList(),
+                        Name = APP_DESCRIPTOR,
+                        Value = _barDescriptorPath
+                    };
+                    base.ActiveToolSwitches.Add(APP_DESCRIPTOR, switch2);
+                    base.AddActiveSwitchToolValue(switch2);
+                }
             }
         }
 

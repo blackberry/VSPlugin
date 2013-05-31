@@ -172,7 +172,7 @@ namespace RIM.VSNDK_Package
             set { _imageSize = value; }
         }
 
-        public ImageItemClass(string imageName, string imagePath)
+        public ImageItemClass(string imageName, string imagePath, string activeProjectDirectory)
         {
             _imageName = imageName;
             _imagePath = imagePath;
@@ -183,7 +183,14 @@ namespace RIM.VSNDK_Package
             }
             catch
             {
-
+                try
+                {
+                    System.Drawing.Image objImage = System.Drawing.Image.FromFile(activeProjectDirectory + "\\" + imagePath);
+                    _imageSize = objImage.Width.ToString() + "X" + objImage.Height.ToString();
+                }
+                catch
+                {
+                }
             }
         }
 
@@ -293,7 +300,7 @@ namespace RIM.VSNDK_Package
                 string iconPNG_Path = "";  //added to avoid duplication. That's because I didn't find the template to remove teh ICON.PNG.
                 foreach (string iconImage in _qnxSchema.icon.image)
                 {
-                    ImageItemClass imageItem = new ImageItemClass(iconImage, getImagePath(iconImage));
+                    ImageItemClass imageItem = new ImageItemClass(iconImage, getImagePath(iconImage), _activeProjectDirectory);
                     if (imageItem.ImageName != null) //added because I didn't find the template to remove teh ICON.PNG.
                         if (imageItem.ImageName == "icon.png")
                         {
@@ -317,7 +324,7 @@ namespace RIM.VSNDK_Package
             {
                 foreach (string splashScreenImage in _qnxSchema.splashScreens.image)
                 {
-                    ImageItemClass imageItem = new ImageItemClass(splashScreenImage, getImagePath(splashScreenImage));
+                    ImageItemClass imageItem = new ImageItemClass(splashScreenImage, getImagePath(splashScreenImage), _activeProjectDirectory);
                     SplashScreenImageList.Add(imageItem);
                 }
             }
@@ -1225,7 +1232,7 @@ namespace RIM.VSNDK_Package
             _qnxSchema.icon.AddIconImage(iconName);
             DesignerDirty = true;
             IList source = (IList)_iconImageList.SourceCollection;
-              ImageItemClass image = new ImageItemClass(iconName, getImagePath(iconName));
+              ImageItemClass image = new ImageItemClass(iconName, getImagePath(iconName), _activeProjectDirectory);
             source.Add(image);
             _iconImageList = new CollectionView(source);
 
@@ -1269,7 +1276,7 @@ namespace RIM.VSNDK_Package
             qnxSS.AddSplashScreenImage(splashScreenName);
             DesignerDirty = true;
             IList source = (IList)_splashScreenImageList.SourceCollection;
-            ImageItemClass image = new ImageItemClass(splashScreenName, getImagePath(splashScreenName));
+            ImageItemClass image = new ImageItemClass(splashScreenName, getImagePath(splashScreenName), _activeProjectDirectory);
             source.Add(image);
             _splashScreenImageList = new CollectionView(source);
 
