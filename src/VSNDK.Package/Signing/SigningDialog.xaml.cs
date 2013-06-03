@@ -52,13 +52,13 @@ namespace RIM.VSNDK_Package.Signing
         /// <param name="registered"></param>
         private void UpdateUI(bool registered)
         {
-     //       RIMSiginingAuthorityData data = gbRIMSigningAuthority.DataContext as RIMSiginingAuthorityData;
-      //      if (data != null)
-      //      {
-             //   data.Registered = registered;
+            RIMSiginingAuthorityData data = gbRIMSigningAuthority.DataContext as RIMSiginingAuthorityData;
+            if (data != null)
+            {
+                data.Registered = registered;
                 btnRegister.IsEnabled = !registered;
                 btnUnregister.IsEnabled = registered;
-       //     }
+            }
         }
 
         /// <summary>
