@@ -55,6 +55,10 @@ namespace RIM.VSNDK_Package
             {
                 data.CSJPassword = this.tbCSKPassword.Password;
                 data.CSJConfirmPassword = this.tbConfirmCSKPassword.Password;
+                if (string.IsNullOrEmpty(data.RDKCSJPath))
+                    data.RDKCSJPath = this.tbRDKCSJPath.Text;
+                if (string.IsNullOrEmpty(data.PBDKCSJPath))
+                    data.PBDKCSJPath = this.tbPBDTCSJPath.Text;
                 registered = data.Register();
                 if (!registered)
                 {
