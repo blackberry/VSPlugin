@@ -71,7 +71,10 @@ namespace VSNDK.DebugEngine
         {
             m_name = "BlackBerry";
             m_description = "The BlackBerry transport lets you select a process that is running in a BlackBerry Device/Simulator";
+        }
 
+        private void verifyAndAddPorts()
+        {
             RegistryKey rkHKCU = Registry.CurrentUser;
             RegistryKey rkPluginRegKey = null;
             string DeviceIP = "";
@@ -203,13 +206,24 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumPorts(out IEnumDebugPorts2 ppEnum)
         {
+            m_ports.Clear();
+            verifyAndAddPorts();
             AD7Port[] ports = new AD7Port[m_ports.Count()];
-            int i = 0;
-            foreach (var p in m_ports)
+
+            if (m_ports.Count() > 0)
             {
-                ports[i] = p.Value;
-                i++;
+                int i = 0;
+                foreach (var p in m_ports)
+                {
+                    ports[i] = p.Value;
+                    i++;
+                }
             }
+            else
+            {
+                MessageBox.Show("Missing Device/Simulator infomration. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+
             ppEnum = new AD7PortEnum(ports);
             return VSConstants.S_OK;
         }
