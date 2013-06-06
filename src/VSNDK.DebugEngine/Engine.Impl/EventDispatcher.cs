@@ -269,13 +269,16 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Code to set the breakpoint in GDB and then confirm and set in Visual Studio
         /// </summary>
-        /// <param name="command"> Initial command to set the breakpoint in GDB. </param>
+        /// <param name="command"> Initial command to set the breakpoint in GDB, with the entire path when setting
+        /// a breakpoint in a given line number. </param>
+        /// <param name="command2"> Initial command to set the breakpoint in GDB, with only the file name when setting
+        /// a breakpoint in a given line number, or "" when setting a breakpoint in a function. </param>
         /// <param name="GDB_ID"> Returns the breakpoint ID in GDB. </param>
         /// <param name="GDB_line"> Returns the breakpoint Line Number. </param>
         /// <param name="GDB_filename"> Returns the breakpoint File Name. </param>
         /// <param name="GDB_address"> Returns the Breakpoint Address. </param>
         /// <returns> If successful, returns true; otherwise, returns false. </returns>
-        private bool setBreakpointImpl(string command, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
+        private bool setBreakpointImpl(string command, string command2, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
         {
             string response;
             string bpointAddress;
@@ -294,12 +297,16 @@ namespace VSNDK.DebugEngine
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
                 response = GDBParser.parseCommand(command, 6);
 
+                if ((command2 != "") && ((response.Contains("<PENDING>"))))
+                {
+                    response = GDBParser.parseCommand(command2, 6);
+                }
+
                 if (((response.Length < 2) && (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false)) || (response == "Function not found!"))
                 {
                     resumeFromInterrupt();
                     return false;
                 }
-
 
                 HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
                 hBreakpoints.handle(response);
@@ -349,7 +356,11 @@ namespace VSNDK.DebugEngine
         public bool setBreakpoint(string filename, uint line, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
         {
             string cmd = @"-break-insert --thread-group i1 -f " + filename + ":" + line;
-            return setBreakpointImpl(cmd, out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
+            int i = filename.LastIndexOf('\\');
+            if ((i != -1) && (i + 1 < filename.Length))
+                filename = filename.Substring(i + 1);
+            string cmd2 = @"-break-insert --thread-group i1 -f " + filename + ":" + line;
+            return setBreakpointImpl(cmd, cmd2, out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
         }
 
         /// <summary>
@@ -364,7 +375,7 @@ namespace VSNDK.DebugEngine
         public bool setBreakpoint(string func, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
         {
             string cmd = @"-break-insert " + func;
-            return setBreakpointImpl(cmd, out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
+            return setBreakpointImpl(cmd, "", out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
         }
 
         /// <summary>

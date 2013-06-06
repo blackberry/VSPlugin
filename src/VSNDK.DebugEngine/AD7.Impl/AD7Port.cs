@@ -145,17 +145,19 @@ namespace VSNDK.DebugEngine
                 while (ind < tempListOfProcesses.Length - 1)
                 {
                     string process = tempListOfProcesses[ind];
-                    if (!process.Contains("/0"))
+                    int pos = process.LastIndexOf('/');
+                    if (pos == -1)
                     {
                         ind++;
                         continue;
                     }
+                    process = process.Remove(pos).Substring(2);
                     for (ind = ind + 1; ind < tempListOfProcesses.Length - 1; ind++) // ignore the duplicates
                     {
-                        if (tempListOfProcesses[ind] != process)
+                        int pos2 = tempListOfProcesses[ind].LastIndexOf('/');
+                        if ((pos2 <= 2) || (tempListOfProcesses[ind].Substring(2, pos2 - 2) != process))
                             break;
                     }
-                    process = process.Remove(process.IndexOf("/0")).Substring(2);
                     AD7Process proc = new AD7Process(this, process.Substring(process.IndexOf("- ") + 2), process.Remove(process.IndexOf(" ")));
                     m_processes.Add(proc);
                     AD7ProcessCreateEvent ev = new AD7ProcessCreateEvent();
