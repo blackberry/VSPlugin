@@ -241,28 +241,47 @@ namespace VSNDK.AddIn
             {
                 DTE dte = _applicationObject as DTE;
                 Projects projs = dte.Solution.Projects;
+
+                List<Project> projList = new List<Project>();
                 foreach (Project proj in projs)
                 {
+                    projList.Add(proj);
+                }
+
+                while (projList.Count > 0)
+                {
+                    Project proj = projList.ElementAt(0);
+                    projList.RemoveAt(0);
+
                     VCProject vcProj = proj.Object as VCProject;
                     if (vcProj == null)
-                        return;
+                    {
+                        foreach (ProjectItem projItem in proj.ProjectItems)
+                        {
+                            if(projItem.SubProject != null)
+                                projList.Add(projItem.SubProject);
+                        }
+                        continue;
+                    }
+
                     IVCCollection cfgs = vcProj.Configurations;
 
                     bool isBlackBerry = false;
-                    bool isApplication = true;
+                    bool isApplication = false;
                     foreach (VCConfiguration cfg in cfgs)
                     {
-                        if (cfg.ConfigurationType != ConfigurationTypes.typeApplication)
+                        if (cfg.ConfigurationType == ConfigurationTypes.typeApplication)
                         {
-                            isApplication = false;
-                            break;
+                            isApplication = true;
                         }
 
                         if (cfg.Platform.Name == BLACKBERRY || cfg.Platform.Name == BLACKBERRYSIMULATOR)
                         {
                             isBlackBerry = true;
-                            break;
                         }
+
+                        if ((isApplication) && (isBlackBerry))
+                            break;
                     }
 
                     if (!isApplication)
