@@ -83,7 +83,7 @@ namespace VSNDK.DebugEngine
             if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB) != 0)
             {
                 // We don't support writing of values displayed in the debugger, so mark them all as read-only.
-                propertyInfo.dwAttrib = (enum_DBG_ATTRIB_FLAGS)DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
+//                propertyInfo.dwAttrib = (enum_DBG_ATTRIB_FLAGS)DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
 
                 if (_variableInfo._children != null)
                 {
@@ -324,7 +324,7 @@ namespace VSNDK.DebugEngine
         /// <returns> Not implemented. </returns>
         public int SetValueAsReference(IDebugReference2[] rgpArgs, uint dwArgCount, IDebugReference2 pValue, uint dwTimeout)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return 22;
         }
 
 
@@ -342,7 +342,7 @@ namespace VSNDK.DebugEngine
         /// <returns> Not implemented. </returns>
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return 33;
         }
 
         #endregion

@@ -117,6 +117,7 @@ namespace VSNDK.DebugEngine
         {
             VariableInfo vi = VariableInfo.get(exp, m_eventDispatcher, m_frame);
             ppResult = new AD7Property(vi);
+            m_frame._lastEvaluatedExpression = vi;
             return VSConstants.S_OK;
         }
 

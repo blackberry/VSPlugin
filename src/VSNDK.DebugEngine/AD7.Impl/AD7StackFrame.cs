@@ -668,6 +668,12 @@ namespace VSNDK.DebugEngine
 
 
         /// <summary>
+        /// 
+        /// </summary>
+        public VariableInfo _lastEvaluatedExpression;
+
+
+        /// <summary>
         /// Search the __stackframes cache for the internal representation of the stack frame associated to the GDB frameInfo 
         /// information. If successful, returns the stack frame; otherwise, creates a new one and return it.
         /// </summary>
@@ -1217,7 +1223,8 @@ namespace VSNDK.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugStackFrame2.GetDebugProperty(out IDebugProperty2 property)
         {
-            throw new NotImplementedException();
+            property = new AD7Property(_lastEvaluatedExpression);
+            return VSConstants.S_OK;
         }
 
 
