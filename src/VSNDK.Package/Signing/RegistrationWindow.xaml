@@ -28,7 +28,7 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="CSJ Pin:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <TextBox Name="tbCSJPin" Style="{StaticResource ResourceKey=txtBoxWidth}" Text="{Binding Path=CSJPin}" />
+                <PasswordBox Name="tbCSJPin" Style="{StaticResource ResourceKey=passwordBoxWidth}" DataContext="{Binding Path=CSJPin}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="CSK Password:" Style="{StaticResource ResourceKey=labelWidth}"/>

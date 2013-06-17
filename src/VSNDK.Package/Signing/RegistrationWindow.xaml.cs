@@ -26,6 +26,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using RIM.VSNDK_Package.Signing.Models;
 using PkgResources = RIM.VSNDK_Package.Resources;
+using System.IO;
 
 namespace RIM.VSNDK_Package
 {
@@ -53,6 +54,7 @@ namespace RIM.VSNDK_Package
             RegistrationData data = gridMain.DataContext as RegistrationData;
             if (data != null)
             {
+                data.CSJPin = this.tbCSJPin.Password;
                 data.CSJPassword = this.tbCSKPassword.Password;
                 data.CSJConfirmPassword = this.tbConfirmCSKPassword.Password;
                 if (string.IsNullOrEmpty(data.RDKCSJPath))
@@ -65,6 +67,9 @@ namespace RIM.VSNDK_Package
                     MessageBox.Show(data.Error, PkgResources.Errors);
                     data.Error = null;
                     e.Handled = true;
+                    string certPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\author.p12";
+                    if (File.Exists(certPath))
+                        File.Delete(certPath);
                     return;
                 }
                 else if (!string.IsNullOrEmpty(data.Message))
