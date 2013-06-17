@@ -1046,7 +1046,7 @@ namespace VSNDK.DebugEngine
         /// the enumObject are to be filled in.</param>
         /// <param name="elementsReturned"> Returns the number of elements in the enumeration. </param>
         /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
-        private void CreateLocalsPlusArgsProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
+        public void CreateLocalsPlusArgsProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = 0;
             int localsLength = 0;
@@ -1215,15 +1215,13 @@ namespace VSNDK.DebugEngine
 
         /// <summary>
         /// Gets a description of the properties associated with a stack frame.
-        /// Calling the IDebugProperty2::EnumChildren method with appropriate filters can retrieve the local variables, method parameters, registers, and "this" 
-        /// pointer associated with the stack frame. The debugger calls EnumProperties to obtain these values. Not implemented.
         /// (http://msdn.microsoft.com/en-us/library/bb144920.aspx)
         /// </summary>
         /// <param name="property"> Returns an IDebugProperty2 object that describes the properties of this stack frame. </param>
-        /// <returns> Not implemented. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         int IDebugStackFrame2.GetDebugProperty(out IDebugProperty2 property)
         {
-            property = new AD7Property(_lastEvaluatedExpression);
+            property = new AD7Property(this);
             return VSConstants.S_OK;
         }
 
