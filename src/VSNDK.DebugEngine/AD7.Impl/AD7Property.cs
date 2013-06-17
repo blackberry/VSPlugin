@@ -37,6 +37,21 @@ namespace VSNDK.DebugEngine
 
 
         /// <summary>
+        /// Object that contains all information about a stack frame.
+        /// </summary>
+        private AD7StackFrame _stackFrame;
+
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="vi"> Contains all information about a variable / expression. </param>
+        public AD7Property(AD7StackFrame vi)
+        {
+            _stackFrame = vi;
+        }
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="vi"> Contains all information about a variable / expression. </param>
@@ -55,50 +70,50 @@ namespace VSNDK.DebugEngine
         {
             DEBUG_PROPERTY_INFO propertyInfo = new DEBUG_PROPERTY_INFO();
 
-            string name = _variableInfo._name;
-            if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME) != 0)
+            if (_variableInfo != null)
             {
-                propertyInfo.bstrFullName = name;
-                propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME));
-            }
-
-            if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME) != 0)
-            {
-                propertyInfo.bstrName = name;
-                propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME));
-            }
-
-            if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE) != 0)
-            {
-                propertyInfo.bstrType = _variableInfo._type;
-                propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE));
-            }
-
-            if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE) != 0)
-            {
-                propertyInfo.bstrValue = _variableInfo._value;
-                propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE));
-            }
-
-            if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB) != 0)
-            {
-                // We don't support writing of values displayed in the debugger, so mark them all as read-only.
-                propertyInfo.dwAttrib = (enum_DBG_ATTRIB_FLAGS)DBG_ATTRIB_FLAGS.DBG_ATTRIB_VALUE_READONLY;
-
-                if (_variableInfo._children != null)
+                string name = _variableInfo._name;
+                if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME) != 0)
                 {
-                    propertyInfo.dwAttrib |= (enum_DBG_ATTRIB_FLAGS)DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
+                    propertyInfo.bstrFullName = name;
+                    propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_FULLNAME));
                 }
-            }
 
-            // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
-            // then set the pProperty field so the debugger can call back when the chilren are enumerated.
-            if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0 || _variableInfo._children != null) 
-            {
-                propertyInfo.pProperty = (IDebugProperty2)this;
-                propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP));
-            }
+                if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME) != 0)
+                {
+                    propertyInfo.bstrName = name;
+                    propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_NAME));
+                }
 
+                if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE) != 0)
+                {
+                    propertyInfo.bstrType = _variableInfo._type;
+                    propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_TYPE));
+                }
+
+                if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE) != 0)
+                {
+                    propertyInfo.bstrValue = _variableInfo._value;
+                    propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_VALUE));
+                }
+
+                if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_ATTRIB) != 0)
+                {
+                    if (_variableInfo._children != null)
+                    {
+                        propertyInfo.dwAttrib |= (enum_DBG_ATTRIB_FLAGS)DBG_ATTRIB_FLAGS.DBG_ATTRIB_OBJ_IS_EXPANDABLE;
+                    }
+                }
+
+                // If the debugger has asked for the property, or the property has children (meaning it is a pointer in the sample)
+                // then set the pProperty field so the debugger can call back when the chilren are enumerated.
+                if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0 || _variableInfo._children != null)
+                {
+                    propertyInfo.pProperty = (IDebugProperty2)this;
+                    propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP));
+                }
+
+            }
             return propertyInfo;
         }
 
@@ -128,64 +143,73 @@ namespace VSNDK.DebugEngine
         {
             ppEnum = null;
 
-            if (_variableInfo._children != null)
+            if (_variableInfo != null)
             {
-                if (_variableInfo._children.Count == 0)
+                if (_variableInfo._children != null)
                 {
-                    // This is an array, struct, union, or pointer.
-                    // Create a variable object so we can list this variable's children.
-
-                    /// Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
-                    /// name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
-                    /// same index position. This bool variable just indicate if this prefix is used or not.
-                    bool hasVsNdK_ = false;
-
-                    string numChildren = AD7StackFrame.m_dispatcher.createVar(_variableInfo._name, ref hasVsNdK_);
-
-                    ArrayList GDBNames = new ArrayList();
-                    ArrayList VSNames = new ArrayList();
-
-                    if (hasVsNdK_)
+                    if (_variableInfo._children.Count == 0)
                     {
-                        _variableInfo._GDBName = "VsNdK_" + _variableInfo._name;
-                        GDBNames.Add("VsNdK_" + _variableInfo._name);
-                        VSNames.Add(_variableInfo._name);
-                    }
+                        // This is an array, struct, union, or pointer.
+                        // Create a variable object so we can list this variable's children.
 
-                    try // Catch non-numerical data
-                    {
-                        if (Convert.ToInt32(numChildren) > 0) // If the variable has children evaluate
+                        /// Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
+                        /// name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
+                        /// same index position. This bool variable just indicate if this prefix is used or not.
+                        bool hasVsNdK_ = false;
+
+                        string numChildren = AD7StackFrame.m_dispatcher.createVar(_variableInfo._name, ref hasVsNdK_);
+
+                        ArrayList GDBNames = new ArrayList();
+                        ArrayList VSNames = new ArrayList();
+
+                        if (hasVsNdK_)
                         {
-                            if (_variableInfo._type.Contains("struct"))
-                                if (_variableInfo._type[_variableInfo._type.Length - 1] == '*')
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
-                                else if (_variableInfo._type.Contains("["))
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct[]", GDBNames, VSNames, hasVsNdK_, null);
-                                else
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct", GDBNames, VSNames, hasVsNdK_, null);
-                            else if (_variableInfo._type.Contains("["))
-                                _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "[]", GDBNames, VSNames, hasVsNdK_, null);
-                            else if (_variableInfo._type.Contains("*"))
-                                _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
-                            else
-                                _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "", GDBNames, VSNames, hasVsNdK_, null);
-
+                            _variableInfo._GDBName = "VsNdK_" + _variableInfo._name;
+                            GDBNames.Add("VsNdK_" + _variableInfo._name);
+                            VSNames.Add(_variableInfo._name);
                         }
+
+                        try // Catch non-numerical data
+                        {
+                            if (Convert.ToInt32(numChildren) > 0) // If the variable has children evaluate
+                            {
+                                if (_variableInfo._type.Contains("struct"))
+                                    if (_variableInfo._type[_variableInfo._type.Length - 1] == '*')
+                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
+                                    else if (_variableInfo._type.Contains("["))
+                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct[]", GDBNames, VSNames, hasVsNdK_, null);
+                                    else
+                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct", GDBNames, VSNames, hasVsNdK_, null);
+                                else if (_variableInfo._type.Contains("["))
+                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "[]", GDBNames, VSNames, hasVsNdK_, null);
+                                else if (_variableInfo._type.Contains("*"))
+                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
+                                else
+                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "", GDBNames, VSNames, hasVsNdK_, null);
+
+                            }
+                        }
+                        catch (FormatException e)
+                        {
+                        }
+                        AD7StackFrame.m_dispatcher.deleteVar(_variableInfo._name, hasVsNdK_);
                     }
-                    catch (FormatException e)
+                    DEBUG_PROPERTY_INFO[] properties = new DEBUG_PROPERTY_INFO[_variableInfo._children.Count];
+                    int i = 0;
+                    foreach (VariableInfo child in _variableInfo._children)
                     {
+                        VariableInfo.evaluateExpression(child._name, ref child._value, child._GDBName);
+                        properties[i] = new AD7Property(child).ConstructDebugPropertyInfo(dwFields);
+                        i++;
                     }
-                    AD7StackFrame.m_dispatcher.deleteVar(_variableInfo._name, hasVsNdK_);
+                    ppEnum = new AD7PropertyEnum(properties);
+                    return VSConstants.S_OK;
                 }
-                DEBUG_PROPERTY_INFO[] properties = new DEBUG_PROPERTY_INFO[_variableInfo._children.Count];
-                int i = 0;
-                foreach (VariableInfo child in _variableInfo._children)
-                {
-                    VariableInfo.evaluateExpression(child._name, ref child._value, child._GDBName);
-                    properties[i] = new AD7Property(child).ConstructDebugPropertyInfo(dwFields);
-                    i++;
-                }
-                ppEnum = new AD7PropertyEnum(properties);
+            }
+            else if (_stackFrame != null)
+            {
+                uint elementsReturned = 0;
+                _stackFrame.CreateLocalsPlusArgsProperties(dwFields, out elementsReturned, out ppEnum);
                 return VSConstants.S_OK;
             }
 
@@ -280,6 +304,7 @@ namespace VSNDK.DebugEngine
             pPropertyInfo[0] = new DEBUG_PROPERTY_INFO();
             rgpArgs = null;
             pPropertyInfo[0] = ConstructDebugPropertyInfo(dwFields);
+
             return VSConstants.S_OK;
         }
 
@@ -331,18 +356,19 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Sets the value of a property from a given string. (http://msdn.microsoft.com/en-ca/library/bb160956.aspx)
         /// The debugger will call this when the user tries to edit the property's values in one of the debugger windows.
-        /// As the sample has set the read-only flag on its properties, this should not be called.
-        /// Not implemented. 
         /// </summary>
         /// <param name="pszValue"> A string containing the value to be set. </param>
         /// <param name="dwRadix"> A radix to be used in interpreting any numerical information. This can be 0 to attempt to determine 
         /// the radix automatically. </param>
         /// <param name="dwTimeout"> Specifies the maximum time, in milliseconds, to wait before returning from this method. Use 
         /// INFINITE to wait indefinitely. </param>
-        /// <returns> Not implemented. </returns>
+        /// <returns> VSConstants.S_OK. </returns>
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout)
         {
-            throw new Exception("The method or operation is not implemented.");
+            string result = "";
+            VariableInfo.evaluateExpression(this._variableInfo._name + "=" + pszValue, ref result, null);
+
+            return VSConstants.S_OK;
         }
 
         #endregion
