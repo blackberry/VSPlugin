@@ -179,7 +179,8 @@ namespace RIM.VSNDK_Package.Signing.Models
                 p.WaitForExit();
                 if (p.ExitCode != 0)
                     success = false;
-                success = true;
+                else
+                    success = true;
                 p.Close();
             }
             catch (Exception e)
