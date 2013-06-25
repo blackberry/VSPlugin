@@ -1077,7 +1077,34 @@ namespace RIM.VSNDK_Package
 
             FileInfo fileInfo = new FileInfo(assetPath);
             newAsset.Value = fileInfo.Name;
-            newAsset.path = assetPath.Replace(_activeProjectDirectory + "\\", "");
+
+            string activeDir = _activeProjectDirectory;
+            string back = "";
+
+            // generating the relative path for the asset.
+            do
+            {
+                if (assetPath.Contains(activeDir + "\\"))
+                {
+                    newAsset.path = back + assetPath.Replace(activeDir + "\\", "");
+                    break;
+                }
+                else
+                {
+                    int pos = activeDir.LastIndexOf('\\', activeDir.Length - 1);
+                    if (pos < 0)
+                    { // file is located in a different driver. Copy the entire assetPath.
+                        newAsset.path = assetPath;
+                        break;
+                    }
+                    else
+                    {
+                        back += "..\\";
+                        activeDir = activeDir.Remove(pos);
+                    }
+                }
+            }
+            while (true);
 
             if (_config.Name == "All Configurations")   
                 _qnxSchema.AddLocalAsset(newAsset);
