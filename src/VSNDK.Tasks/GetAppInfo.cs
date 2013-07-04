@@ -31,7 +31,7 @@ namespace VSNDK.Tasks
         #region Member Variables and Constants
         private string _projectDir;
         private string _appName;
-        private string _barDescriptorPath = "bar-descriptor.xml";
+        private string _barDescriptorPath = "";
         private string _appId;
         #endregion
 
@@ -56,14 +56,7 @@ namespace VSNDK.Tasks
         {
             set 
             {
-                _barDescriptorPath = value.Replace("bar-descriptor.xml", "");
-
-                if ((_appName != null) && (!_barDescriptorPath.Contains(_appName + "_barDescriptor")))
-                    _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + _appName + "_barDescriptor\\bar-descriptor.xml" : _barDescriptorPath + "\\" + _appName + "_barDescriptor\\bar-descriptor.xml";
-                else
-                    _barDescriptorPath = _barDescriptorPath.EndsWith(@"\") ? _barDescriptorPath + "bar-descriptor.xml" : _barDescriptorPath + @"\bar-descriptor.xml";
-
-                _barDescriptorPath = _barDescriptorPath.Trim('\\');
+                _barDescriptorPath = value;
             }
             get 
             {
@@ -94,15 +87,20 @@ namespace VSNDK.Tasks
             set
             {
                 _appName = value;
-                if (!_barDescriptorPath.Contains(_appName + "_barDescriptor"))
+
+                if (_barDescriptorPath == "")
                 {
-                    int pos = _barDescriptorPath.LastIndexOf('\\') + 1;
-                    int pos2 = _barDescriptorPath.LastIndexOf('/') + 1;
-                    if (pos == 0) // if the '\\' char was not found.
-                        pos = pos2;
-                    if (pos < pos2)
-                        pos = pos2;
-                    _barDescriptorPath = _barDescriptorPath.Substring(0, pos) + _appName + "_barDescriptor\\" + _barDescriptorPath.Substring(pos);
+                    // Default location of bar-descriptor file, if not specified in the Properties Configurations.
+                    _barDescriptorPath = "BlackBerry-" + _appName + "\\bar-descriptor.xml";
+                    if (!File.Exists(_barDescriptorPath))
+                    {
+                        // Just to support the default locations of bar-descriptor from previous versions of the plug-in.
+                        _barDescriptorPath = _appName + "_barDescriptor\\bar-descriptor.xml";
+                        if (!File.Exists(_barDescriptorPath))
+                        {
+                            _barDescriptorPath = "bar-descriptor.xml";
+                        }
+                    }
                 }
             }
             get

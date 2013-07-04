@@ -75,9 +75,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <!-- Get app's ID from bar descriptor. -->
     <GetAppInfo
         ProjectDir="$(ProjectDir)"
+        ApplicationDescriptorXml ="%(BuildBar.ApplicationDescriptorXml)"
         AppName = "$(ProjectName)"
         Condition="%(BuildBar.DevMode) == 'true'"
-        ApplicationDescriptorXml ="%(BuildBar.ApplicationDescriptorXml)"
       >
       <Output TaskParameter="AppId" PropertyName="AppId" />
     </GetAppInfo>
@@ -110,8 +110,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Sources                        ="@(BuildBar)"
         Platform                       ="$(Platform)"
         Configuration                  ="$(Configuration)"
-        AppName                        = "$(ProjectName)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
+        AppName                        = "$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
@@ -183,9 +183,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <!-- Get app's ID from bar descriptor. -->
     <GetAppInfo
         ProjectDir="$(ProjectDir)"
+        ApplicationDescriptorXml ="%(BuildBar.ApplicationDescriptorXml)"
         AppName = "$(ProjectName)"
         Condition="%(BuildBar.DevMode) == 'true'"
-        ApplicationDescriptorXml ="%(BuildBar.ApplicationDescriptorXml)"
       >
       <Output TaskParameter="AppId" PropertyName="AppId" />
     </GetAppInfo>
@@ -258,8 +258,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Sources                        ="@(BuildBar)"
         Platform                       ="$(Platform)"
         Configuration                  ="$(Configuration)"
-        AppName                        = "$(ProjectName)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
+        AppName                        = "$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"

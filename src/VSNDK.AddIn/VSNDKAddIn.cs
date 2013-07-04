@@ -301,7 +301,20 @@ namespace VSNDK.AddIn
                         tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", proj.Name);
                         string destination = System.IO.Path.GetFileName(templatePath);
 
+                        // Remove directory used in previous versions of this plug-in.
                         string folder = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(proj.FullName), proj.Name + "_barDescriptor");
+                        if (Directory.Exists(folder))
+                        {
+                            try
+                            {
+                                Directory.Delete(folder);
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+
+                        folder = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(proj.FullName), "BlackBerry-" + proj.Name);
                         System.IO.Directory.CreateDirectory(folder);
                         destination = System.IO.Path.Combine(folder, destination);
                         tokenProcessor.UntokenFile(templatePath, destination);
