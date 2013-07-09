@@ -98,6 +98,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         ProjectDir      ="$(ProjectDir)"
         OutDir		  ="$(IntDir)"      
         ToolsPath ="$(BuildBarToolPath)"
+        CompileItems    ="@(ClCompile)"
       >
     </MakeAllAndFormatOutputMessages >
 
@@ -148,7 +149,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <MakeAllAndFormatOutputMessages
         ProjectDir      ="$(ProjectDir)"
         OutDir		  ="$(IntDir)"      
-        ToolsPath ="$(BuildBarToolPath)">
+        ToolsPath ="$(BuildBarToolPath)"
+        CompileItems    ="@(ClCompile)">
     </MakeAllAndFormatOutputMessages >
 
 

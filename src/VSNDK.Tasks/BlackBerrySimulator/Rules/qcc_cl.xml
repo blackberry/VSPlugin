@@ -21,6 +21,10 @@
                       Description="Specifies one or more directories to add to the include path; separate with semi-colons if more than one.     (-I[path])" 
                       Category="General" Switch="I" F1Keyword="VC.Project.VCCLCompilerTool.AdditionalIncludeDirectories">
   </StringListProperty>
+  <BoolProperty Name="MultiProcess" DisplayName="Multi-Processor Compilation"
+            Description="Use the maximum number of processors during compilation."
+            Category="General" Switch="j">
+  </BoolProperty>
   <BoolProperty Name="Ansi" DisplayName="Compile strict ANSI code" 
                 Description="When you use the -ansi option, qcc compiles strict ANSI code. Use this option when you're creating an application that must conform to the ANSI standard."
                 Category="General" Switch="ansi">

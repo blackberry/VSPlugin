@@ -69,6 +69,15 @@ namespace VSNDK.Tasks
         }
 
         /// <summary>
+        /// Getter/Setter for CompileItems property
+        /// </summary>
+        public ITaskItem[] CompileItems
+        {
+            set;
+            get;
+        }
+
+        /// <summary>
         /// Getter/Setter for the number of processors property.
         /// </summary>
         public string numProcessors
@@ -89,12 +98,22 @@ namespace VSNDK.Tasks
         {
             string pCommand = "";
             string pArgs = "";
+            bool mprocess = false;
 
             try
             {
+                foreach (ITaskItem compileItem in CompileItems)
+                {
+                    // Get the metadata we need from this compile item.
+                    mprocess = (compileItem.GetMetadata("MultiProcess") == "true");
+                }
+
                 pCommand = "cmd";
-                pArgs = "/c " + ToolsPath + @"\make -j" + numProcessors + " all";
- 
+                if (mprocess)
+                    pArgs = "/c " + ToolsPath + @"\make -j" + numProcessors + " all";
+                else
+                    pArgs = "/c " + ToolsPath + @"\make all";
+
                 System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo(pCommand, pArgs);
 
                 // Set UseShellExecute to false for redirection.
