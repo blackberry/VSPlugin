@@ -272,6 +272,10 @@ String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimula
 
 	if (response != "")
 	{
+//		sprintf(pcCmd, "set debug nto-debug 2\r\n");
+//		console->sendCommand(pcCmd);
+//		response = console->waitForPrompt(true);
+
 		sprintf(pcCmd, "1-target-select qnx %s:8000\r\n", ip);
 		console->sendCommand(pcCmd);
 		response = console->waitForPrompt(true);
@@ -381,6 +385,10 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 		// TODO: load output console window with the response.
 		return false;
 	}
+
+//	sprintf(pcCmd, "set debug nto-debug 2\r\n");
+//	console->sendCommand(pcCmd);
+//	response = console->waitForPrompt(true);
 
 	sprintf(pcCmd, "1-gdb-set breakpoint pending on\r\n");
 	console->sendCommand(pcCmd);
