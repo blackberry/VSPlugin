@@ -221,7 +221,7 @@ namespace VSNDK.DebugEngine
             }
             else
             {
-                MessageBox.Show("Missing Device/Simulator infomration. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
             ppEnum = new AD7PortEnum(ports);
