@@ -333,17 +333,14 @@ namespace VSNDK.DebugEngine
                 if (EventDispatcher.m_GDBRunMode == true)
                 {
                     HandleProcessExecution.m_mre.Reset();
-                    do
-                    {
-                        hitBreakAll = m_running.WaitOne();
+                    hitBreakAll = m_running.WaitOne();
 
-                        // Sends the GDB command that interrupts the background execution of the target.
-                        // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                        GDBParser.addGDBCommand(@"-exec-interrupt");
+                    // Sends the GDB command that interrupts the background execution of the target.
+                    // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
+                    GDBParser.addGDBCommand(@"-exec-interrupt");
 
-                        // Ensure the process is interrupted before returning                
-                        signalReceived = HandleProcessExecution.m_mre.WaitOne(1000);
-                    } while ((!signalReceived) && (VSNDKAddIn.isDebugEngineRunning));
+                    // Ensure the process is interrupted before returning                
+                    signalReceived = HandleProcessExecution.m_mre.WaitOne(1000);
 
                     m_running.Set();
 
@@ -823,7 +820,7 @@ namespace VSNDK.DebugEngine
                     AD7ThreadDestroyEvent.Send(this, 0, t);
                 }
                 this.m_threads = null;
-                this.m_threads = new AD7Thread[listThreads.Length]; 
+                this.m_threads = new AD7Thread[listThreads.Length];
                 this.m_threads = listThreads;
                 this._currentThreadIndex = currentThread;
                 foreach (AD7Thread t in this.m_threads)
@@ -1251,24 +1248,19 @@ namespace VSNDK.DebugEngine
         /// </summary>
         public void UpdateListOfThreads()
         {
-            AD7Thread[] listThreads = null;
-
-            // Get the current list of threads and store them into a temporary variable listThreads.
-            int currentThread = GetListOfThreads(out listThreads);
-
-            if ((currentThread == -1) || (listThreads == null))
-                return;
-
             foreach (AD7Thread t in this.m_threads)
             {
                 // Send events to VS to destroy its current debugged threads.
                 AD7ThreadDestroyEvent.Send(this, 0, t);
             }
-            this.m_threads = null;
 
-            this.m_threads = new AD7Thread[listThreads.Length];
-            this.m_threads = listThreads;
-            this._currentThreadIndex = currentThread;
+            this.m_threads = null;
+            // Get the current list of threads and store them into a temporary variable listThreads.
+            this._currentThreadIndex = GetListOfThreads(out this.m_threads);
+
+            if ((this._currentThreadIndex == -1) || (this.m_threads == null))
+                return;
+
             // Send events to VS to add this list of debugged threads.
             foreach (AD7Thread t in this.m_threads)
             {
