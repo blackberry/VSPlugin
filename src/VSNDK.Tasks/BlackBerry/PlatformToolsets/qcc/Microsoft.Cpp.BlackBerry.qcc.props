@@ -31,8 +31,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <PropertyGroup>
     <PlatformToolsetVersion>qcc2.0</PlatformToolsetVersion>
     <QccToolsPath>$(QNX_HOST)\usr\bin</QccToolsPath>
-    <AdvancedToolsPath Condition="Exists('C:\Program Files (x86)\BlackBerry\VSPlugin-NDK')">C:\Program Files (x86)\BlackBerry\VSPlugin-NDK\bin</AdvancedToolsPath>
-    <AdvancedToolsPath Condition="$(AdvancedToolsPath) == ''">C:\Program Files\BlackBerry\VSPlugin-NDK\bin</AdvancedToolsPath>
     <QccCompiler>qcc.exe</QccCompiler>
     <QccLinker>qcc.exe</QccLinker>
     <QccLibrarian>qcc.exe</QccLibrarian>
@@ -44,7 +42,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <SSHToolPath>$(QccToolsPath)</SSHToolPath>
     <SSHKeygenToolExe>$(QccToolsPath)\ssh-keygen.exe</SSHKeygenToolExe>
     <ConnectToolExe>$(QccToolsPath)\blackberry-connect.bat</ConnectToolExe>
-    <OptimizedDeployToolPath>$(AdvancedToolsPath)</OptimizedDeployToolPath>
 
     <VCInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
     <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
