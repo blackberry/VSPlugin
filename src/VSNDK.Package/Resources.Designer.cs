@@ -99,9 +99,9 @@ namespace RIM.VSNDK_Package {
         /// <summary>
         ///   Looks up a localized string similar to You have to provide the Pin.
         /// </summary>
-        internal static string CSJPinMissing {
+        internal static string AuthorMissing {
             get {
-                return ResourceManager.GetString("CSJPinMissing", resourceCulture);
+                return ResourceManager.GetString("AuthorMissing", resourceCulture);
             }
         }
         

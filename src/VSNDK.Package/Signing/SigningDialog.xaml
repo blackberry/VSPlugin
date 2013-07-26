@@ -14,13 +14,15 @@
     
     <Grid Height="356">
         <GroupBox Header="BlackBerry Signing Authority" Name="gbRIMSigningAuthority" DataContext="{StaticResource authData}" Margin="12,12,12,223">
-            <StackPanel Orientation="Vertical" HorizontalAlignment="Left" Width="123" Height="89">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center" Width="107">
-                    <Label Content="Registered:" />
-                    <TextBlock Name="tbRegistered" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=Registered}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="255" Height="95">
+                <StackPanel Width="111">
+                    <StackPanel Orientation="Horizontal" Width="101">
+                        <Label Content="Registered:" />
+                        <TextBlock Name="tbRegistered" HorizontalAlignment="Left" VerticalAlignment="Center" Text="{Binding Path=Registered}" />
+                    </StackPanel>
+                    <Button Content="Register" Name="btnRegister" Click="btnRegister_Click" Width="105" HorizontalAlignment="Left" />
+                    <Button Content="Unregister" Name="btnUnregister" Click="btnUnregister_Click" Width="105" HorizontalAlignment="Left" />
                 </StackPanel>
-                <Button Content="Register" Name="btnRegister" Click="btnRegister_Click" Width="97" HorizontalAlignment="Left" />
-                <Button Content="Unregister" Name="btnUnregister" Click="btnUnregister_Click" Width="98" HorizontalAlignment="Left" />
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Backup and Restore" Name="gbBackupRestore" DataContext="{StaticResource brData}" Margin="12,133,12,92">

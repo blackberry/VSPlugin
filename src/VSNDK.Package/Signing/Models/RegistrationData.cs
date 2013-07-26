@@ -33,20 +33,14 @@ namespace RIM.VSNDK_Package.Signing.Models
     {
         private string _info;
         private string _deregInfo;
-        private string _rdkCSJPath;
-        private string _pbdbCSJPath;
         private string _csjPassword;
-        private string _csjConfirmPassword;
-        private string _csjPin;
+        private string _author;
 
         private string _errors;
         private string _message;
 
-        private const string _colRDKCSJPath = "RDKCSJPath";
-        private const string _colPBDKCSJPath = "PBDKCSJPath";
-        private const string _colCSJPin = "CSJPin";
+        private const string _colAuthor = "Author name";
         private const string _colCSJPW = "CSJPassword";
-        private const string _colCSJCPW = "CSJConfirmPassword";
 
         private static string _ndkTargetPath;
         private static string _ndkHostPath;
@@ -98,30 +92,12 @@ namespace RIM.VSNDK_Package.Signing.Models
         public string DeRegInfo { get { return _deregInfo; } }
 
         /// <summary>
-        /// Getter/Setter for the RDKCSJPath variable
+        /// Getter/Setter for the Author property
         /// </summary>
-        public string RDKCSJPath
+        public string Author
         {
-            get { return _rdkCSJPath; }
-            set { _rdkCSJPath = value; OnPropertyChanged(_colRDKCSJPath); }
-        }
-
-        /// <summary>
-        /// Getter/Setter for the PBDKCSJPath property
-        /// </summary>
-        public string PBDKCSJPath
-        {
-            get { return _pbdbCSJPath; }
-            set { _pbdbCSJPath = value; OnPropertyChanged(_colPBDKCSJPath); }
-        }
-
-        /// <summary>
-        /// Getter/Setter for the CSJPin property
-        /// </summary>
-        public string CSJPin
-        {
-            get { return _csjPin; }
-            set { _csjPin = value; OnPropertyChanged(_colCSJPin); }
+            get { return _author; }
+            set { _author = value; OnPropertyChanged(_colAuthor); }
         }
 
         /// <summary>
@@ -133,14 +109,6 @@ namespace RIM.VSNDK_Package.Signing.Models
             set { _csjPassword = value; OnPropertyChanged(_colCSJPW); }
         }
 
-        /// <summary>
-        /// Getter/Setter for the CSJConfirmPassword property
-        /// </summary>
-        public string CSJConfirmPassword
-        {
-            get { return _csjConfirmPassword; }
-            set { _csjConfirmPassword = value; OnPropertyChanged(_colCSJCPW); }
-        }
         #endregion
 
         /// <summary>
@@ -168,8 +136,8 @@ namespace RIM.VSNDK_Package.Signing.Models
 
             //run register tool
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format("/C blackberry-signer.bat -register -storepass {0} -csjpin {1} {2} {3}",
-                _csjPassword, _csjPin, "\"" + _rdkCSJPath + "\"", "\"" + _pbdbCSJPath + "\"");
+            startInfo.Arguments = string.Format("/C blackberry-keytool -genkeypair -storepass {0} -author {1}",
+                _csjPassword, "\"" + _author + "\"");
 
             try
             {
@@ -230,11 +198,13 @@ namespace RIM.VSNDK_Package.Signing.Models
                     success = false;
                 p.Close();
 
-                FileInfo fi = new FileInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +  @"\Research In Motion\author.p12");
+                FileInfo fi_p12 = new FileInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +  @"\Research In Motion\author.p12");
+                FileInfo fi_csk = new FileInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\bbidtoken.csk");
 
                 try
                 {
-                    fi.Delete();
+                    fi_p12.Delete();
+                    fi_csk.Delete();
                 }
                 catch (System.IO.IOException e)
                 {
@@ -317,19 +287,10 @@ namespace RIM.VSNDK_Package.Signing.Models
         /// <returns></returns>
         private bool ValidateInput()
         {
-            string err = this[_colRDKCSJPath];
-            if ( !string.IsNullOrEmpty(err))
-                _errors += err + "\n";
-            err = this[_colPBDKCSJPath];
-            if ( !string.IsNullOrEmpty(err))
-                _errors += err + "\n";
-            err = this[_colCSJPin];
+            string err = this[_colAuthor];
             if (!string.IsNullOrEmpty(err))
                 _errors += err + "\n";
             err = this[_colCSJPW];
-            if (!string.IsNullOrEmpty(err))
-               _errors += err + "\n";
-            err = this[_colCSJCPW];
             if (!string.IsNullOrEmpty(err))
                _errors += err + "\n";
             return string.IsNullOrEmpty(_errors);
@@ -392,23 +353,13 @@ namespace RIM.VSNDK_Package.Signing.Models
                 string error = string.Empty;
                 switch ( columnName )
                 {
-                    case _colRDKCSJPath:
-                        if (string.IsNullOrEmpty(this._rdkCSJPath))
-                            error = PkgResources.RDKCSJFileMissing;
-                        break;
-                    case _colCSJPin:
-                        if ( string.IsNullOrEmpty(_csjPin) )
-                            error = PkgResources.CSJPinMissing;
+                    case _colAuthor:
+                        if ( string.IsNullOrEmpty(_author) )
+                            error = PkgResources.AuthorMissing;
                         break;
                     case _colCSJPW:
                         if (string.IsNullOrEmpty(_csjPassword) || _csjPassword.Length < 6)
                             error = PkgResources.CSJPasswordMissing;
-                        break;
-                    case _colCSJCPW:
-                        if (string.IsNullOrEmpty(_csjConfirmPassword))
-                            error = PkgResources.CSJConfirmPasswordMissing;
-                        else if (_csjPassword != _csjConfirmPassword)
-                            error = PkgResources.PasswordNotmatch;
                         break;
                     default:
                         break;
