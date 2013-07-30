@@ -141,16 +141,24 @@ namespace VSNDK.DebugEngine
             {
                 if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
                 {
-                    MessageBox.Show("Please, verify if your Device/Simulator is connected.", "Device/Simulator not connected.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Please, verify if your Device/Simulator is connected.", "Verify:", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
-                else if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
+                else 
+                if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
                 {
                     string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
+                    string caption = "";
                     if (txt.IndexOf("The requested address is not valid in its context.") != -1)
+                    {
                         txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
+                        caption = "Invalid IP";
+                    }
                     else
+                    {
                         txt += "\n\nPlease, verify if the device/simulator is connected.";
-                    MessageBox.Show(txt, "Invalid IP", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        caption = "Connection failed";
+                    }
+                    MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 response = "";
             }
