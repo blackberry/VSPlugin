@@ -542,9 +542,70 @@ BOOL GDBConsole::isMoreOutputAvailable () {
 
 
 /// <summary> 
+/// Waits and returns the output received from GDB, with a timeout. In case it finishes because of a timeout while waiting for a
+/// GDB response, be aware that this GDB response must be available in a later time and you must be able to handle it.
+/// </summary>
+/// <param name="seconds"> Timeout. </param>
+/// <returns> Returns output received from GDB or "" if there is no GDB output. </returns>
+string GDBConsole::waitForPromptWithTimeout(int seconds) {
+	char lpBuffer [1024];
+	int nCharsRead = 0;
+	int rc = 0;
+	BOOL isPromptReady = FALSE;
+	const char* promptString = "(gdb) \r\n";
+	const char* lpTmp;
+	clock_t start, current;
+
+	start = clock();
+
+	string message = "";
+
+	do {
+
+		current = clock();
+		if ((message == "") && (((current - start) / CLOCKS_PER_SEC ) > seconds))
+		{
+			message = "TIMEOUT!"; 
+			break;
+		}
+
+		memset(lpBuffer, 0, sizeof(lpBuffer));
+
+		if (isClosed()) {
+			break;
+		}
+
+		if (isMoreOutputAvailable())
+		{
+			rc = readOutput(lpBuffer, sizeof(lpBuffer) - 1, &nCharsRead);
+			if (rc) {
+				// Terminate the buffer.
+
+				lpBuffer[nCharsRead] = '\0';
+			
+				message += lpBuffer;
+
+				if (nCharsRead >= strlen(promptString)) {
+					lpTmp = lpBuffer + nCharsRead - strlen(promptString);
+					if (!strcmp(lpTmp, promptString)) {
+						isPromptReady = TRUE;
+					}
+				}
+			} else {
+				DisplayError(_T("waitForPrompt: readOutput got error"));
+				message += "\n\nwaitForPrompt: readOutput got error\n\n";
+				break;
+			}
+		}
+	} while (!isPromptReady && !isClosed());	
+
+	return message;
+}
+
+
+/// <summary> 
 /// Returns the output received from GDB. 
 /// </summary>
-/// <param name="console"> Instance of GDB debugger. </param>
 /// <param name="sync"> If TRUE, this method waits for the entire GDB output, i.e., until the GDB prompt is ready. It is TRUE when 
 /// initializing GDB. If FALSE, that is the default behavior, returns the current GDB output or "" if there is no GDB output. </param>
 /// <returns> Returns output received from GDB or "" if there is no GDB output. </returns>

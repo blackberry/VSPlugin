@@ -227,8 +227,9 @@ void GDBParser::BlackBerryConnect(String^ IPAddrStr, String^ toolsPath, String^ 
 /// <param name="isSimulator"> TRUE when using the Simulator, FALSE when using the Device. </param>
 /// <param name="toolsPath"> NDK full path. </param>
 /// <param name="publicKeyPath"> Public key full path. </param>
+/// <param name="timeout"> How many seconds to wait for connecting to the device. </param>
 /// <returns> A string with the list of running processes. </returns>
-String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimulator, String^ toolsPath, String^ publicKeyPath)
+String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimulator, String^ toolsPath, String^ publicKeyPath, int timeout)
 {
 	string response;
 	string parsed;
@@ -278,14 +279,14 @@ String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimula
 
 		sprintf(pcCmd, "1-target-select qnx %s:8000\r\n", ip);
 		console->sendCommand(pcCmd);
-		response = console->waitForPrompt(true);
+		response = console->waitForPromptWithTimeout(timeout);
 		if ((response == "") || (response[0] == '!')) //found an error
 		{
 			// ??? load output console window with the parsed message.
 			response = "";
 		}
 
-		if (response != "")
+		if ((response != "") && (response != "TIMEOUT!") && (response.find("1^error,msg=",0) == -1)) //there is no error from previous response
 		{
 			sprintf(pcCmd, "info pidlist\r\n");
 			console->sendCommand(pcCmd);

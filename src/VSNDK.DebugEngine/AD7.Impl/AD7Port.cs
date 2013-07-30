@@ -21,6 +21,7 @@ using System.Runtime.InteropServices.ComTypes;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using VSNDK.Parser;
+using System.Windows.Forms;
 
 namespace VSNDK.DebugEngine
 {
@@ -134,9 +135,26 @@ namespace VSNDK.DebugEngine
 
             string publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
 
-            string response = GDBParser.GetPIDsThroughGDB(m_IP, m_password, m_isSimulator, m_toolsPath, publicKeyPath);
+            string response = GDBParser.GetPIDsThroughGDB(m_IP, m_password, m_isSimulator, m_toolsPath, publicKeyPath, 7);
 
-            if (response.Contains("^done"))
+            if ((response == "") || (response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
+            {
+                if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
+                {
+                    MessageBox.Show("Please, verify if your Device/Simulator is connected.", "Device/Simulator not connected.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
+                {
+                    string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
+                    if (txt.IndexOf("The requested address is not valid in its context.") != -1)
+                        txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
+                    else
+                        txt += "\n\nPlease, verify if the device/simulator is connected.";
+                    MessageBox.Show(txt, "Invalid IP", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                response = "";
+            }
+            else if (response.Contains("^done"))
             {
                 response = response.Remove(response.IndexOf("^done"));
                 string[] tempListOfProcesses = response.Split('\n');
@@ -191,7 +209,7 @@ namespace VSNDK.DebugEngine
 
 
         #region Implementation of IDebugPort2
-                
+
         /// <summary>
         /// Returns the port name. (http://msdn.microsoft.com/en-us/library/bb145890.aspx)
         /// </summary>

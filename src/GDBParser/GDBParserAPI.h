@@ -26,7 +26,7 @@ BEGIN_NAMESPACE
 public ref class GDBParser abstract sealed
 {
 public:	
-	static String^ GetPIDsThroughGDB(String^, String^, bool, String^, String^);
+	static String^ GetPIDsThroughGDB(String^, String^, bool, String^, String^, int);
 	static bool LaunchProcess(String^, String^, String^, bool, String^, String^, String^);	
     static void BlackBerryConnect(String^, String^, String^, String^);
 

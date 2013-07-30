@@ -69,6 +69,7 @@ public:
 	static void setGDBPath(const TCHAR*);
 	static void shutdown();
 	string waitForPrompt(bool);
+	string waitForPromptWithTimeout(int);
 };
 
 void DisplayError(LPCTSTR);
