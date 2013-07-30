@@ -285,14 +285,14 @@ String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimula
 			// ??? load output console window with the parsed message.
 			response = "";
 		}
-        if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
-        {
+		if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
+		{
 			int resp = MessageBox(NULL, L"It might take up to one minute to get a response from GDB if the device is not connected.\n\nDo you want to continue (yes) or abort (no)?", L"Attempting to connect to device/simulator.", MB_YESNO + MB_ICONWARNING + MB_DEFBUTTON2);
 			if (resp == IDYES)
 			{
 				response = console->waitForPrompt(true);
 			}
-        }
+		}
 
 		if ((response != "") && (response != "TIMEOUT!") && (response.find("1^error,msg=",0) == -1)) //there is no error from previous response
 		{
