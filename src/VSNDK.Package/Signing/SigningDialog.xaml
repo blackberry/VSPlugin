@@ -14,7 +14,7 @@
     
     <Grid Height="356">
         <GroupBox Header="BlackBerry Signing Authority" Name="gbRIMSigningAuthority" DataContext="{StaticResource authData}" Margin="12,12,12,223">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="255" Height="95">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" Width="645" Height="95">
                 <StackPanel Width="111">
                     <StackPanel Orientation="Horizontal" Width="101">
                         <Label Content="Registered:" />
@@ -23,6 +23,7 @@
                     <Button Content="Register" Name="btnRegister" Click="btnRegister_Click" Width="105" HorizontalAlignment="Left" />
                     <Button Content="Unregister" Name="btnUnregister" Click="btnUnregister_Click" Width="105" HorizontalAlignment="Left" />
                 </StackPanel>
+                <TextBlock TextWrapping="WrapWithOverflow" Text="You must register with BlackBerry in order to sign applications and create debug tokens for your device. For additional information see: http://www.blackberry.com/go/codesigning/" Width="518" Height="73"></TextBlock>
             </StackPanel>
         </GroupBox>
         <GroupBox Header="Backup and Restore" Name="gbBackupRestore" DataContext="{StaticResource brData}" Margin="12,133,12,92">

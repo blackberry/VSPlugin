@@ -673,6 +673,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
+//            startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat –bbidtoken {0} -cskpass {1} -keystore ""{2}"" -storepass {3} -deviceid ""{4}"" ""{5}""", LocalFolder + "bbidtoken.csk", KeyStorePassword, CertPath, KeyStorePassword, DevicePIN, LocalFolder + "DebugToken.bar");
             startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -cskpass {0} -keystore ""{1}"" -storepass {2} -deviceid ""{3}"" ""{4}""", KeyStorePassword, CertPath, KeyStorePassword, DevicePIN, LocalFolder + "DebugToken.bar");
 
             try
