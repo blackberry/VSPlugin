@@ -34,17 +34,39 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public string TargetName { get; set; }
         public string TargetDescription { get; set; }
         public string TargetVersion { get; set; }
-        public string IsInstalled { get; set; }
-        public string IsAvailable { get; set; }
+        public string LatestVersion { get; set; }
+        public bool IsInstalled { get; set; }
+        public bool IsUpdate { get; set; }
         public bool IsBeta { get; set; }
+
+        public string InstalledVisibility 
+        { 
+            get { return IsInstalled ? "visible" : "collapsed"; }
+        }
+
+        public string AvailableVisibility 
+        { 
+            get { return IsInstalled ? "collapsed" : "visible"; }  
+        }
+
+        public string UpdateVisibility 
+        { 
+            get { return IsUpdate ? "visible" : "collapsed"; }
+        }
+
+        public string NoUpdateVisibility 
+        { 
+            get { return IsUpdate ? "collapsed" : "visible"; }  
+        }
 
         public APITargetClass(string name, string description, string version)
         {
             TargetName = name;
             TargetDescription = description;
             TargetVersion = version;
-            IsInstalled = "visible";
-            IsAvailable = "visible";
+            LatestVersion = version;
+            IsInstalled = true;
+            IsUpdate = false;
             IsBeta = false;
         }
     }
@@ -59,9 +81,11 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         private bool isAvailable = false;
         private CollectionView _apiTargets;
         private APITargetClass _apiTarget;
+        private string _errors;
 
-        public IList<APITargetClass> tempAPITargetList;
+        public  List<APITargetClass> tempAPITargetList;
         private List<string> installedAPIList;
+        private List<string> installedRuntimeList;
 
         private const string _colAPITarget = "APITarget";
 
@@ -74,6 +98,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         public UpdateManagerData()
         {
+            getInstalledRuntimeTargetList();    
             RefreshScreen();
         }
 
@@ -94,6 +119,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             get { return _apiTargets; }
             set { _apiTargets = value; }
+        }
+
+        /// <summary>
+        /// Errors property
+        /// </summary>
+        public String Errors
+        {
+            get { return _errors; }
+            set { _errors = value; }
         }
 
         /// <summary>
@@ -194,7 +228,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C C:\bbndk\sdkinstall --list");
+            startInfo.Arguments = string.Format(@"/C C:\bbndk\eclipsec --list");
 
             try
             {
@@ -223,6 +257,35 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             }
 
             return success;
+
+        }
+
+        /// <summary>
+        /// Retrieve a list of the installed runtimes on the PC.
+        /// </summary>
+        /// <returns></returns>
+        public bool getInstalledRuntimeTargetList()
+        {
+            bool success = false;
+
+            installedRuntimeList = new List<string>();
+
+            string[] directories = Directory.GetDirectories(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk");
+
+            foreach (string directory in directories)
+            {
+                if (directory.Contains("runtime_"))
+                {
+                    installedRuntimeList.Add(directory.Substring(directory.IndexOf("runtime_") + 8));
+                    success = true;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            return success;    
 
         }
 
@@ -337,6 +400,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             string name = "";
             string description = "";
             string version = "";
+            APITargetClass api = null;
 
             if (e.Data != null)
             {
@@ -354,18 +418,35 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                         name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
                         description = "Device Support Unknown.";
 
-                        APITargetClass api = new APITargetClass(name, description, version);
+                        api = tempAPITargetList.Find(i => i.TargetName == name);
 
-                        if (IsAPIInstalled(version, name))
+                        if (api == null)
                         {
-                            api.IsInstalled = "visible";
-                            api.IsAvailable = "collapsed";
+                            api = new APITargetClass(name, description, version);
                         }
                         else
                         {
-                            api.IsInstalled = "collapsed";
-                            api.IsAvailable = "visible";
+                            if (api.IsInstalled)
+                            {
+                                api.IsUpdate = true;
+                                api.LatestVersion = version;
+                            }
+                            else
+                            {
+                                api.TargetVersion = version;
+                                api.LatestVersion = version;
+                            }
                         }
+
+                        if (IsAPIInstalled(api.TargetVersion, api.TargetName))
+                        {
+                            api.IsInstalled = true;
+                        }
+                        else
+                        {
+                            api.IsInstalled = false;
+                        }  
+
 
                         api.IsBeta = name.Contains("Beta");
 

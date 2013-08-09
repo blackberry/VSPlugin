@@ -24,6 +24,7 @@
                                 <TextBlock Text="{Binding Path=TargetDescription}" FontStyle="Italic" />
                             </StackPanel>
                             <Button Content="Uninstall" Height="23" HorizontalAlignment="Right" Click="Uninstall_Click"></Button>
+                            <Button Content="Update" Height="23" HorizontalAlignment="Right"></Button>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -34,7 +35,7 @@
             <ListBox ItemsSource="{Binding Path=APITargets}" Name="lbAvailable">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel Orientation="Horizontal" Width="500" Visibility="{Binding Path=IsAvailable}">
+                        <StackPanel Orientation="Horizontal" Width="500">
                             <StackPanel Orientation="Vertical" Width="400">
                                 <TextBlock FontWeight="Bold" Text="{Binding Path=TargetName}" />
                                 <TextBlock FontStyle="Italic" Text="{Binding Path=TargetDescription}" />

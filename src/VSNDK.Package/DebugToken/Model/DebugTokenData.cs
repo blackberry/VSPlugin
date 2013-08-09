@@ -45,6 +45,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         private static string _ndkTargetPath;
         private static string _ndkHostPath;
         private static string _certPath;
+        private static string _deviceosversion = "";
         private static string _storepass;
         private static string _localFolder;
         private static bool _alreadyRegistered = false;
@@ -105,6 +106,15 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         {
             get { return _deviceIP; }
             set { _deviceIP = value; }
+        }
+
+        /// <summary>
+        /// Device OS Version
+        /// </summary>
+        public string DeviceOSVersion
+        {
+            get { return _deviceosversion; }
+            set { _deviceosversion = value; }
         }
 
         /// <summary>
@@ -290,7 +300,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                     KeyStorePassword = Decrypt(KeyStorePassword);
                 }
 
-                if (getDevicePin())
+                if (getDeviceInfo())
                 {
                     if (getDebugTokenInfo())
                     {
@@ -456,10 +466,10 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         }
         
         /// <summary>
-        /// Get the device PIN of the connected device
+        /// Get the device Info of the connected device
         /// </summary>
         /// <returns>True if successful</returns>
-        public bool getDevicePin()
+        public bool getDeviceInfo()
         {
             bool success = false;
 
@@ -496,7 +506,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                 {
                     success = true;
                 }
-                
+
                 p.Close();
             }
             catch (Exception e)
@@ -727,6 +737,8 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                     _tmpTokenExpiryDate = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
                 else if (e.Data.Contains("[n]debug_token_author::"))
                     _tokenAuthor = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
+                else if (e.Data.Contains("scmbundle::"))
+                    _deviceosversion = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
             }
         }
 
