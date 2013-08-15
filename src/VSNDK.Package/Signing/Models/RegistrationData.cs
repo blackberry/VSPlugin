@@ -136,8 +136,18 @@ namespace RIM.VSNDK_Package.Signing.Models
 
             //run register tool
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format("/C blackberry-keytool -genkeypair -storepass {0} -author {1}",
-                _csjPassword, "\"" + _author + "\"");
+            if (SigningDialog.ndk10_2_orNewer)
+            {
+                startInfo.Arguments = string.Format("/C blackberry-keytool -genkeypair -storepass {0} -author {1}",
+                    _csjPassword, "\"" + _author + "\"");
+            }
+            else if (SigningDialog.useNewSigningMethodology)
+            {
+                startInfo.Arguments = string.Format("/C {0}blackberry-keytool -genkeypair -storepass {1} -author {2}",
+                    SigningDialog.latestNDK_Hostpath, _csjPassword, "\"" + _author + "\"");
+            }
+            else
+                return false;
 
             try
             {

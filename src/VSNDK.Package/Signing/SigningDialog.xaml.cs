@@ -27,6 +27,8 @@ using System.Windows.Shapes;
 using RIM.VSNDK_Package.Signing.Models;
 using System.IO;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.Win32;
+using System.Xml;
 
 namespace RIM.VSNDK_Package.Signing
 {
@@ -38,6 +40,122 @@ namespace RIM.VSNDK_Package.Signing
         public string certPath;
         public string bbidtokenPath;
         private RIMSiginingAuthorityData data;
+
+        public static bool ndk10_2_orNewer = true;
+        public static bool useNewSigningMethodology = true;
+        public static string latestNDK_Hostpath = "";
+
+        public static void updateNDKHostpath()
+        {
+            RegistryKey rkHKCU = Registry.CurrentUser;
+            RegistryKey rkNDKPath = null;
+            try
+            {
+                rkNDKPath = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+                string ndkHostPath = rkNDKPath.GetValue("NDKHostPath").ToString();
+                if (ndkHostPath.Contains("host_10_0") || ndkHostPath.Contains("host_10_1") || ndkHostPath.Contains("bbndk-2.1.0") || ndkHostPath.Contains("host/"))
+                    ndk10_2_orNewer = false;
+            }
+            catch
+            {
+            }
+            rkNDKPath.Close();
+            rkHKCU.Close();
+
+            if (!ndk10_2_orNewer)
+            {
+                string[] filePaths = Directory.GetFiles(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\", "*.xml");
+                int latestV1, latestV2, latestV3, latestV4;
+                latestV1 = latestV2 = latestV3 = latestV4 = 0;
+
+                foreach (string file in filePaths)
+                {
+                    try
+                    {
+                        int p1, p2, v1, v2, v3, v4;
+                        v1 = v2 = v3 = v4 = 0;
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.Load(file);
+                        string hostpath = xmlDoc.GetElementsByTagName("host")[0].InnerText;
+
+                        if (hostpath == latestNDK_Hostpath)
+                            continue;
+
+                        try
+                        {
+                            p1 = hostpath.IndexOf('_') + 1;
+                            p2 = hostpath.IndexOf('_', p1);
+                            v1 = Convert.ToInt32(hostpath.Substring(p1, p2 - p1));
+
+                            p1 = p2 + 1;
+                            p2 = hostpath.IndexOf('_', p1);
+                            v2 = Convert.ToInt32(hostpath.Substring(p1, p2 - p1));
+
+                            p1 = p2 + 1;
+                            p2 = hostpath.IndexOf('_', p1);
+                            v3 = Convert.ToInt32(hostpath.Substring(p1, p2 - p1));
+
+                            p1 = p2 + 1;
+                            p2 = hostpath.IndexOf('/', p1);
+                            v4 = Convert.ToInt32(hostpath.Substring(p1, p2 - p1));
+                        }
+                        catch
+                        {
+                        }
+
+                        bool latest = false;
+
+                        if (v1 > latestV1)
+                        {
+                            latest = true;
+                        }
+                        else if (v1 == latestV1)
+                        {
+                            if (v2 > latestV2)
+                            {
+                                latest = true;
+                            }
+                            else if (v2 == latestV2)
+                            {
+                                if (v3 > latestV3)
+                                {
+                                    latest = true;
+                                }
+                                else if (v3 == latestV3)
+                                {
+                                    if (v4 > latestV4)
+                                    {
+                                        latest = true;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (latest)
+                        {
+                            latestNDK_Hostpath = hostpath;
+                            latestV1 = v1;
+                            latestV2 = v2;
+                            latestV3 = v3;
+                            latestV4 = v4;
+                        }
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                }
+                if ((latestV1 >= 10) && (latestV2 >= 2))
+                {
+                    latestNDK_Hostpath = latestNDK_Hostpath + "/usr/bin/";
+                    useNewSigningMethodology = true;
+                }
+                else
+                    useNewSigningMethodology = false;
+
+            }
+        }
 
         public SigningDialog()
         {
@@ -75,8 +193,16 @@ namespace RIM.VSNDK_Package.Signing
         /// <param name="e"></param>
         private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
-            Browser wb = new Browser(this);
-            wb.Show();
+            updateNDKHostpath();
+            if ((ndk10_2_orNewer) || (useNewSigningMethodology))
+            {
+                Browser wb = new Browser(this);
+                wb.Show();
+            }
+            else
+            {
+                MessageBox.Show("You have to download the NDK 10.2 or higher to be able to sign and register your app.", "Missing NDK 10.2", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         /// <summary>

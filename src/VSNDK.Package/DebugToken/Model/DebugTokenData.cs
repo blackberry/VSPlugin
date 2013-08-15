@@ -673,7 +673,25 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -storepass {0} -deviceid ""{1}"" ""{2}""", KeyStorePassword, DevicePIN, LocalFolder + "DebugToken.bar");
+
+            SigningDialog.updateNDKHostpath();
+
+            if (SigningDialog.ndk10_2_orNewer)
+            {
+                startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -storepass {0} -deviceid ""{1}"" ""{2}""", 
+                    KeyStorePassword, DevicePIN, LocalFolder + "DebugToken.bar");
+            }
+            else if (SigningDialog.useNewSigningMethodology)
+            {
+                startInfo.Arguments = string.Format(@"/C {0}blackberry-debugtokenrequest.bat -storepass {1} -deviceid ""{2}"" ""{3}""",
+                    SigningDialog.latestNDK_Hostpath, KeyStorePassword, DevicePIN, LocalFolder + "DebugToken.bar");
+            }
+            else
+            {
+                MessageBox.Show("You have to download the NDK 10.2 or higher to be able to sign and register your app.", "Missing NDK 10.2", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
 
             try
             {
