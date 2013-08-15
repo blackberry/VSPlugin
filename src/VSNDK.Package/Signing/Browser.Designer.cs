@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+
 namespace RIM.VSNDK_Package.Signing
 {
     partial class Browser
@@ -35,15 +36,7 @@ namespace RIM.VSNDK_Package.Signing
         /// </summary>
         private void InitializeComponent()
         {
-            //Trust all certificates
-//            System.Net.ServicePointManager.ServerCertificateValidationCallback =
-//                ((sender, certificate, chain, sslPolicyErrors) => true);
-
-            // trust sender
-//            System.Net.ServicePointManager.ServerCertificateValidationCallback
-//                            = ((sender, cert, chain, errors) => cert.Subject.Contains("https://bdsc01cnc.rim.net:8443/bdsc/Developer/csk.html"));
-
-            // validate cert by calling a function
+            // validate certificate by calling a function
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(ValidateRemoteCertificate);
 
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
@@ -58,7 +51,7 @@ namespace RIM.VSNDK_Package.Signing
             this.webBrowser1.Size = new System.Drawing.Size(1024, 768);
             this.webBrowser1.TabIndex = 0;
             this.webBrowser1.TabStop = false;
-            this.webBrowser1.Url = new System.Uri("https://bdsc01cnc.rim.net:8443/bdsc/Developer/csk.html", System.UriKind.Absolute);
+            this.webBrowser1.Url = new System.Uri("https://developer.blackberry.com/codesigning/", System.UriKind.Absolute);
             this.webBrowser1.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser1_Navigating);
             // 
             // Browser
@@ -76,36 +69,82 @@ namespace RIM.VSNDK_Package.Signing
 
         private System.Windows.Forms.WebBrowser webBrowser1;
 
+        /// <summary>
+        /// Method that handles the Navigating event.
+        /// </summary>
+        /// <param name="sender"> Contains the WebBrowser1 data. </param>
+        /// <param name="e"></param>
         public void webBrowser1_Navigating(object sender, WebBrowserNavigatingEventArgs e)
         {
-            if (e.Url.Segments[e.Url.Segments.Length - 1].EndsWith(".pg"))
+            if (e.Url.Segments[e.Url.Segments.Length - 1].EndsWith("csk.pg"))
             {
-                e.Cancel = true;
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(e.Url);
+                request.Referer = ((WebBrowser)sender).Url.ToString();
+                request.CookieContainer = new CookieContainer();
+                string cookie_txt = webBrowser1.Document.Cookie;
+                string[] cookies = cookie_txt.Split(';');
 
-                WebClient client = new WebClient();
+                try
+                {
+                    // Copying cookies from WebBrowser to the HttpWebRequest.
+                    foreach (string cookie in cookies)
+                    {
+                        string[] details = cookie.Split('=');
+                        if (details.Length == 2)
+                        {
+                            details[1] = details[1].Replace(",", "%2C");
+                            request.CookieContainer.Add(e.Url, new Cookie(details[0].Trim(), details[1].Trim()));
+                        }
+                    }
 
-                client.DownloadFileCompleted += new AsyncCompletedEventHandler(client_DownloadFileCompleted);
-                client.DownloadFileAsync(e.Url, signingDialog.bbidtokenPath);
+                    request.KeepAlive = true;
+                    
+                    // Getting the response
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+                    // Creating a StreamReader
+                    System.IO.Stream stream = response.GetResponseStream();
+                    System.Text.Encoding ec = System.Text.Encoding.GetEncoding("utf-8");
+                    System.IO.StreamReader reader = new System.IO.StreamReader(stream, ec);
+
+                    // Creating the bbidtoken.csk file
+                    File.WriteAllText(signingDialog.bbidtokenPath, reader.ReadToEnd());
+
+                    reader.Close();
+                    response.Close();
+
+                    this.Close();
+                }
+                catch (Exception e1)
+                {
+                    Console.WriteLine("ERROR: Exception reading from webpage " + e.Url + "\n");
+                }
+
+                if (File.Exists(signingDialog.bbidtokenPath))
+                {
+                    RegistrationWindow win = new RegistrationWindow();
+                    bool? res = win.ShowDialog();
+                }
+                signingDialog.UpdateUI(File.Exists(signingDialog.certPath));
+
             }
         }
 
-        void client_DownloadFileCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            this.Close();
-
-            if (File.Exists(signingDialog.bbidtokenPath))
-            {
-                RegistrationWindow win = new RegistrationWindow();
-                bool? res = win.ShowDialog();
-            }
-            signingDialog.UpdateUI(File.Exists(signingDialog.certPath));
-        }
-
-        // callback used to validate the certificate in an SSL conversation
+        /// <summary>
+        /// Callback used to validate the certificate in an SSL conversation
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="cert"></param>
+        /// <param name="chain"></param>
+        /// <param name="policyErrors"></param>
+        /// <returns></returns>
         private static bool ValidateRemoteCertificate(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors policyErrors)
         {
+            // This code must be included in InitializeComponent() method:
+            // ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(ValidateRemoteCertificate);
+
             bool result = false;
-            if ((cert.Subject.Contains("=RIM,")) || (cert.Subject.Contains("=Research in Motion Limited,")))
+            if (cert.Subject.Contains(".blackberry.com"))
             {
                 result = true;
             }

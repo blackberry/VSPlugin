@@ -54,7 +54,7 @@ namespace RIM.VSNDK_Package
             RegistrationData data = gridMain.DataContext as RegistrationData;
             if (data != null)
             {
-                data.Author = this.tbAuthor.ToString();
+                data.Author = this.tbAuthor.Text;
                 data.CSJPassword = this.tbCSKPassword.Password;
                 registered = data.Register();
                 if (!registered)
