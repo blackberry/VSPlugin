@@ -1,0 +1,4 @@
+instructions.configure = \
+org.eclipse.equinox.p2.touchpoint.eclipse.setJvm(jvm:features/com.qnx.tools.jre.win32_1.6.0.43/jre/bin/);
+instructions.unconfigure = \
+org.eclipse.equinox.p2.touchpoint.eclipse.setJvm(jvm:null);
