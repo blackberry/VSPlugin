@@ -81,36 +81,40 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         public void RefreshScreen()
         {
-            string[] filePaths = Directory.GetFiles(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\", "*.xml");
-            IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
-
-            foreach (string file in filePaths)
+            if (Directory.Exists(updateManager.bbndkPathConst + @"\..\qconfig\"))
             {
-                try
+                string[] filePaths = Directory.GetFiles(updateManager.bbndkPathConst + @"\..\qconfig\", "*.xml");
+
+                IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
+
+                foreach (string file in filePaths)
                 {
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.Load(file);
-                    string name = xmlDoc.GetElementsByTagName("name")[0].InnerText;
-                    string apiName = getAPIName(name.Substring(name.LastIndexOf(' ') + 1));
-                    string hostpath = xmlDoc.GetElementsByTagName("host")[0].InnerText;
-                    string targetpath = xmlDoc.GetElementsByTagName("target")[0].InnerText;
-
-                    NDKEntryClass NDKEntry = new NDKEntryClass(apiName != "" ? apiName : name, hostpath, targetpath);
-                    NDKList.Add(NDKEntry);
-
-                    if (NDKEntry.HostPath == getNDKPath())
+                    try
                     {
-                        NDKEntryClass = NDKEntry;
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.Load(file);
+                        string name = xmlDoc.GetElementsByTagName("name")[0].InnerText;
+                        string apiName = getAPIName(name.Substring(name.LastIndexOf(' ') + 1));
+                        string hostpath = xmlDoc.GetElementsByTagName("host")[0].InnerText;
+                        string targetpath = xmlDoc.GetElementsByTagName("target")[0].InnerText;
+
+                        NDKEntryClass NDKEntry = new NDKEntryClass(apiName != "" ? apiName : name, hostpath, targetpath);
+                        NDKList.Add(NDKEntry);
+
+                        if (NDKEntry.HostPath == getNDKPath())
+                        {
+                            NDKEntryClass = NDKEntry;
+                        }
                     }
-                }
-                catch
-                {
-                    continue;
+                    catch
+                    {
+                        continue;
+                    }
+
                 }
 
+                NDKEntries = new CollectionView(NDKList);
             }
-           
-            NDKEntries = new CollectionView(NDKList);
         }
 
         /// <summary>

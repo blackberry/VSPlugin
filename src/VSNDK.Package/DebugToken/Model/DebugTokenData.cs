@@ -178,6 +178,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         {
             get
             {
+              
                 if (DevicePIN != "Not Attached")
                 {
                     return DevicePIN.Substring(0, 2) + DevicePIN.Substring(2, 8).ToUpper();

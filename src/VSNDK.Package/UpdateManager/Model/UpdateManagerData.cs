@@ -22,6 +22,7 @@ using RIM.VSNDK_Package.Settings;
 using System.IO;
 using System.Xml;
 using System.Linq;
+using System.Windows;
 
 namespace RIM.VSNDK_Package.UpdateManager.Model
 {
@@ -65,7 +66,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             TargetDescription = description;
             TargetVersion = version;
             LatestVersion = version;
-            IsInstalled = true;
+            IsInstalled = false;
             IsUpdate = false;
             IsBeta = false;
         }
@@ -76,18 +77,30 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
     /// </summary>
     class UpdateManagerData : INotifyPropertyChanged
     {
+        #region Constants
+
+        private const string _colAPITarget = "APITarget";
+        private const string _colAPITargets = "APITargets";
+        private const string _colStatus = "Status";
+        private const string _colIsInstalling = "IsInstalling";
+
+        #endregion
+
         #region Member Variables
 
         private bool isAvailable = false;
+        private bool isInstalling = true;
         private CollectionView _apiTargets;
         private APITargetClass _apiTarget;
         private string _errors;
+        public string bbndkPathConst = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk_vs";
+        private string _status = "";
 
         public  List<APITargetClass> tempAPITargetList;
         private List<string> installedAPIList;
         private List<string> installedRuntimeList;
 
-        private const string _colAPITarget = "APITarget";
+        
 
         #endregion
 
@@ -98,6 +111,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         public UpdateManagerData()
         {
+            Status = "";
             getInstalledRuntimeTargetList();    
             RefreshScreen();
         }
@@ -106,6 +120,144 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             GetInstalledAPIList();
             GetAvailableAPIList();
+        }
+
+        /// <summary>
+        /// Install Specified API
+        /// </summary>
+        /// <param name="version">version of API to install</param>
+        /// <returns>true if successful</returns>
+        public bool InstallAPI(string version)
+        {
+            bool success = false;
+
+            Status = "Installing API Level";
+
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
+            p.EnableRaisingEvents = true;
+            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
+            p.Exited += new EventHandler(p_Exited);
+
+            /// Get Device PIN
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0}", version);
+
+            try
+            {
+                isAvailable = false;
+                IsInstalling = false;
+                p.Start();
+                p.BeginErrorReadLine();
+                p.BeginOutputReadLine();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                success = false;
+            }
+
+            return success;
+        }
+
+        /// <summary>
+        /// Uninstall Specified API
+        /// </summary>
+        /// <param name="version">version of API to uninstall</param>
+        /// <returns>true if successful</returns>
+        public bool UninstallAPI(string version)
+        {
+            bool success = false;
+
+            Status = "Uninstalling API Level";
+
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
+            p.EnableRaisingEvents = true;
+            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
+            p.Exited += new EventHandler(p_Exited);
+
+            /// Get Device PIN
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --uninstall {0}", version);
+
+            try
+            {
+                isAvailable = false;
+                IsInstalling = false;
+                p.Start();
+                p.BeginErrorReadLine();
+                p.BeginOutputReadLine();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                success = false;
+            }
+
+            return success;
+        }
+
+        /// <summary>
+        /// Retrieve a list of the installed runtimes on the PC.
+        /// </summary>
+        /// <returns></returns>
+        public bool getInstalledRuntimeTargetList()
+        {
+            bool success = false;
+
+            installedRuntimeList = new List<string>();
+
+            string[] directories = Directory.GetDirectories(bbndkPathConst);
+
+            foreach (string directory in directories)
+            {
+                if (directory.Contains("runtime_"))
+                {
+                    installedRuntimeList.Add(directory.Substring(directory.IndexOf("runtime_") + 8));
+                    success = true;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            return success;
+
+        }
+
+        /// <summary>
+        /// Update API Level from Server
+        /// </summary>
+        /// <param name="vesion"></param>
+        /// <returns></returns>
+        public bool UpdateAPI(string oldversion, string newversion)
+        {
+            bool success = false;
+
+            Status = "Updating API";
+
+            if (!((oldversion.StartsWith("10.1")) || (oldversion.StartsWith("10.0"))))
+            {
+                UninstallAPI(oldversion);
+            }
+
+            InstallAPI(newversion);
+
+            return success;
         }
 
         #endregion
@@ -118,7 +270,11 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public CollectionView APITargets
         {
             get { return _apiTargets; }
-            set { _apiTargets = value; }
+            set 
+            { 
+                _apiTargets = value;
+                OnPropertyChanged(_colAPITargets);
+            }
         }
 
         /// <summary>
@@ -131,6 +287,32 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         }
 
         /// <summary>
+        /// Status property
+        /// </summary>
+        public String Status
+        {
+            get { return _status; }
+            set 
+            { 
+                _status = value;
+                OnPropertyChanged(_colStatus);
+            }
+        }
+
+        /// <summary>
+        /// Is Installing property
+        /// </summary>
+        public bool IsInstalling
+        {
+            get { return isInstalling; }
+            set
+            {
+                isInstalling = value;
+                OnPropertyChanged(_colIsInstalling);
+            }
+        }
+
+        /// <summary>
         /// Getter/Setter for the NDKEntryClass property
         /// </summary>
         public APITargetClass APITarget
@@ -138,7 +320,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             get { return _apiTarget; }
             set
             {
-                if (_apiTarget == value) return;
                 _apiTarget = value;
                 OnPropertyChanged(_colAPITarget);
             }
@@ -158,18 +339,11 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             bool success = false;
 
-            if (installedAPIList.Contains(name))
+            string result = installedAPIList.FirstOrDefault(s => s.Contains(version));
+
+            if (result != null)
             {
                 success = true;
-            }
-            else
-            {
-                string result = installedAPIList.FirstOrDefault(s => s.Contains(version));
-
-                if (result != null)
-                {
-                    success = true;
-                }
             }
 
             return success;
@@ -183,26 +357,34 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             bool success = false;
 
-            string[] filePaths = Directory.GetFiles(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\", "*.xml");
-            installedAPIList = new List<string>();
-
-            foreach (string file in filePaths)
+            try
             {
-                try
-                {
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.Load(file);
-                    XmlNodeList name = xmlDoc.GetElementsByTagName("name");
+                installedAPIList = new List<string>();
 
-                    installedAPIList.Add(name.Item(0).InnerText);
-
-                    success = true;
-                }
-                catch
+                string[] filePaths = Directory.GetFiles(bbndkPathConst + @"\..\qconfig\", "*.xml");
+                foreach (string file in filePaths)
                 {
-                    success = false;
-                    break;
+                    try
+                    {
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.Load(file);
+                        XmlNodeList name = xmlDoc.GetElementsByTagName("name");
+                        XmlNodeList version = xmlDoc.GetElementsByTagName("version");
+
+                        installedAPIList.Add(name.Item(0).InnerText + " - " + version.Item(0).InnerText);
+
+                        success = true;
+                    }
+                    catch
+                    {
+                        success = false;
+                        break;
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                success = false;
             }
 
             return success;
@@ -228,7 +410,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C C:\bbndk\eclipsec --list");
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list");
 
             try
             {
@@ -260,134 +442,11 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
         }
 
-        /// <summary>
-        /// Retrieve a list of the installed runtimes on the PC.
-        /// </summary>
-        /// <returns></returns>
-        public bool getInstalledRuntimeTargetList()
+        private void p_Exited(object sender, System.EventArgs e)
         {
-            bool success = false;
-
-            installedRuntimeList = new List<string>();
-
-            string[] directories = Directory.GetDirectories(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk");
-
-            foreach (string directory in directories)
-            {
-                if (directory.Contains("runtime_"))
-                {
-                    installedRuntimeList.Add(directory.Substring(directory.IndexOf("runtime_") + 8));
-                    success = true;
-                }
-                else
-                {
-                    continue;
-                }
-            }
-
-            return success;    
-
-        }
-
-        /// <summary>
-        /// Install Specified API
-        /// </summary>
-        /// <param name="version">version of API to install</param>
-        /// <returns>true if successful</returns>
-        public bool InstallAPI(string version)
-        {
-            bool success = false;
-
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
-
-
-            /// Get Device PIN
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C C:\bbndk\sdkinstall --install {0}", version);
-
-            try
-            {
-                isAvailable = false;
-                p.Start();
-                p.BeginErrorReadLine();
-                p.BeginOutputReadLine();
-                p.WaitForExit();
-                if (p.ExitCode != 0)
-                {
-                    success = false;
-                }
-                else
-                {
-                    success = true;
-
-                }
-                p.Close();
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                success = false;
-            }
-
-            return success;
-        }
-
-        /// <summary>
-        /// Uninstall Specified API
-        /// </summary>
-        /// <param name="version">version of API to uninstall</param>
-        /// <returns>true if successful</returns>
-        public bool UninstallAPI(string version)
-        {
-            bool success = false;
-
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
-
-
-            /// Get Device PIN
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C C:\bbndk\sdkinstall --uninstall {0}", version);
-
-            try
-            {
-                isAvailable = false;
-                p.Start();
-                p.BeginErrorReadLine();
-                p.BeginOutputReadLine();
-                p.WaitForExit();
-                if (p.ExitCode != 0)
-                {
-                    success = false;
-                }
-                else
-                {
-                    success = true;
-                }
-                p.Close();
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                success = false;
-            }
-
-            return success;
+            Status = "Complete";
+            IsInstalling = true;
+            RefreshScreen();
         }
 
         /// <summary>
@@ -406,51 +465,57 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             {
                 System.Diagnostics.Debug.WriteLine(e.Data);
 
-                if (e.Data.Contains("Available SDKs:"))
+                if (!IsInstalling)
                 {
-                    isAvailable = true;
+                    Status = e.Data;
                 }
                 else
                 {
-                    if (isAvailable)
+                    if (e.Data.Contains("Available SDKs:"))
                     {
-                        version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
-                        name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
-                        description = "Device Support Unknown.";
-
-                        api = tempAPITargetList.Find(i => i.TargetName == name);
-
-                        if (api == null)
+                        isAvailable = true;
+                    }
+                    else
+                    {
+                        if (isAvailable)
                         {
-                            api = new APITargetClass(name, description, version);
-                        }
-                        else
-                        {
-                            if (api.IsInstalled)
+                            version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
+                            name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
+                            description = "Device Support Unknown.";
+
+                            api = tempAPITargetList.Find(i => i.TargetName == name);
+
+                            if (api == null)
                             {
-                                api.IsUpdate = true;
-                                api.LatestVersion = version;
+                                api = new APITargetClass(name, description, version);
+                                tempAPITargetList.Add(api);
                             }
                             else
                             {
-                                api.TargetVersion = version;
-                                api.LatestVersion = version;
+                                if (api.IsInstalled)
+                                {
+                                    api.IsUpdate = true;
+                                    api.LatestVersion = version;
+                                }
+                                else
+                                {
+                                    api.TargetVersion = version;
+                                    api.LatestVersion = version;
+                                }
                             }
+
+                            if (IsAPIInstalled(api.TargetVersion, api.TargetName))
+                            {
+                                api.IsInstalled = true;
+                            }
+                            else
+                            {
+                                api.IsInstalled = false;
+                            }
+
+                            api.IsBeta = name.Contains("Beta");
+
                         }
-
-                        if (IsAPIInstalled(api.TargetVersion, api.TargetName))
-                        {
-                            api.IsInstalled = true;
-                        }
-                        else
-                        {
-                            api.IsInstalled = false;
-                        }  
-
-
-                        api.IsBeta = name.Contains("Beta");
-
-                        tempAPITargetList.Add(api);
                     }
                 }
             }
@@ -466,6 +531,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             if (e.Data != null)
             {
                 System.Diagnostics.Debug.WriteLine(e.Data);
+
+                MessageBox.Show(e.Data);
             }
         }
 

@@ -48,21 +48,7 @@ namespace RIM.VSNDK_Package.UpdateManager
             UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
             if (data != null)
             {
-                if (MessageBox.Show("Please Note that this operation can take up to a few minutes to complete.", "Information", MessageBoxButton.OKCancel, MessageBoxImage.Information, MessageBoxResult.OK) == MessageBoxResult.Cancel)
-                {
-                    return;
-                }
-
-                Cursor = Cursors.Wait;
-                data.InstallAPI(((APITargetClass)lbAPITargets.SelectedItem).TargetVersion);
-                data.RefreshScreen();
-
-                lbAPITargets.ItemsSource = null;
-                lbAPITargets.ItemsSource = data.APITargets;
-                lbAvailable.ItemsSource = null;
-                lbAvailable.ItemsSource = data.APITargets;
-
-                Cursor = Cursors.Hand;
+                data.InstallAPI(((APITargetClass)APITargets.SelectedItem).TargetVersion);
             }
         }
 
@@ -76,21 +62,21 @@ namespace RIM.VSNDK_Package.UpdateManager
             UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
             if (data != null)
             {
-                if (MessageBox.Show("Please Note that this operation can take up to a few minutes to complete.", "Information", MessageBoxButton.OKCancel, MessageBoxImage.Information, MessageBoxResult.OK) == MessageBoxResult.Cancel)
-                {
-                    return;
-                }
-
-                Cursor = Cursors.Wait;
                 data.UninstallAPI(((APITargetClass)lbAvailable.SelectedItem).TargetVersion);
-                data.RefreshScreen();
+            }
+        }
 
-                lbAPITargets.ItemsSource = null;
-                lbAPITargets.ItemsSource = data.APITargets;
-                lbAvailable.ItemsSource = null;
-                lbAvailable.ItemsSource = data.APITargets;
-
-                Cursor = Cursors.Hand;
+        /// <summary>
+        /// Update 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
+            if (data != null)
+            {
+                data.UpdateAPI(((APITargetClass)lbAvailable.SelectedItem).TargetVersion, ((APITargetClass)lbAvailable.SelectedItem).LatestVersion);
             }
         }
     }
