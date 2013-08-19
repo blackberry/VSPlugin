@@ -79,7 +79,7 @@ namespace RIM.VSNDK_Package.Signing
         private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
             Browser wb = new Browser(this);
-            wb.Show();
+            wb.ShowDialog();
         }
 
         /// <summary>

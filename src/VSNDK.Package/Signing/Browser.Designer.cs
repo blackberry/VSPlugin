@@ -49,8 +49,6 @@ namespace RIM.VSNDK_Package.Signing
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
             this.webBrowser1.Size = new System.Drawing.Size(1024, 768);
-            this.webBrowser1.TabIndex = 0;
-            this.webBrowser1.TabStop = false;
             this.webBrowser1.Url = new System.Uri("https://developer.blackberry.com/codesigning/", System.UriKind.Absolute);
             this.webBrowser1.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser1_Navigating);
             // 
@@ -141,6 +139,7 @@ namespace RIM.VSNDK_Package.Signing
         private static bool ValidateRemoteCertificate(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors policyErrors)
         {
             // This code must be included in InitializeComponent() method:
+            // validate certificate by calling a function
             // ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(ValidateRemoteCertificate);
 
             bool result = false;
