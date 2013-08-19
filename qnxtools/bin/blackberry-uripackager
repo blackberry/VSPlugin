@@ -1,0 +1,5 @@
+#!/bin/sh
+here=$(dirname "$0")
+LIB="$here/../lib"
+java -Djava.awt.headless=true -Xmx512M -cp "$LIB/EccpressoAll.jar:$LIB/EccpressoJDK15ECC.jar:$LIB/TrustpointAll.jar:$LIB/TrustpointJDK15.jar:$LIB/TrustpointProviders.jar:$LIB/BarSigner.jar:$LIB/BarPackager.jar:$LIB/KeyTool.jar:$LIB/BarDeploy.jar:$LIB/BarAir.jar" \
+  com.qnx.bbt.uripackager.BarUriPackager "$@"

@@ -112,13 +112,13 @@ namespace RIM.VSNDK_Package.Signing
 
                     reader.Close();
                     response.Close();
-
-                    this.Close();
                 }
                 catch (Exception e1)
                 {
-                    Console.WriteLine("ERROR: Exception reading from webpage " + e.Url + "\n");
+                    MessageBox.Show("Server error, please, try to register again.", "Server Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+
+                this.Close();
 
                 if (File.Exists(signingDialog.bbidtokenPath))
                 {

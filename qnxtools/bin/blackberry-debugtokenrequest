@@ -1,0 +1,4 @@
+#!/bin/sh
+BIN=$(dirname "$0")
+LIB="$BIN/../lib"
+java -Djava.awt.headless=true -Xmx512M -cp "$LIB/EccpressoJDK15ECC.jar:$LIB/EccpressoAll.jar:$LIB/TrustpointAll.jar:$LIB/TrustpointJDK15.jar:$LIB/TrustpointProviders.jar:$LIB/BarSigner.jar:$LIB/BarPackager.jar:$LIB/KeyTool.jar:$LIB/DebugTokenRequest.jar" net.rim.device.codesigning.debugtoken.DebugTokenRequest "$@"
