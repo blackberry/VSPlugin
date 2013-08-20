@@ -4,7 +4,7 @@
         Title="Registration Window" mc:Ignorable="d" xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:pa="clr-namespace:RIM.VSNDK_Package.Signing.Models"
-        d:DesignHeight="312" d:DesignWidth="536" SizeToContent="WidthAndHeight" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+        d:DesignHeight="190" d:DesignWidth="536" SizeToContent="WidthAndHeight" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -13,30 +13,16 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Name="gridMain" Height="270" Width="511" DataContext="{StaticResource rimSAData}">
+    <Grid Name="gridMain" Height="156" Width="511" DataContext="{StaticResource rimSAData}">
         <StackPanel Orientation="Vertical">
             <TextBlock TextWrapping="WrapWithOverflow" Text="{Binding Path=Info, Mode=OneWay}"></TextBlock>
             <StackPanel Orientation="Horizontal">
-                <Label Content="RDK CSJ Path:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <TextBox Name="tbRDKCSJPath" Style="{StaticResource ResourceKey=txtBoxWidth}" Text="{Binding Path=RDKCSJPath}" />
-                <Button Name="btnRDKBrowse" Content="Browse..." Click="btnBrowse_Click"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="PBDT CSJ Path:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <TextBox Name="tbPBDTCSJPath" Style="{StaticResource ResourceKey=txtBoxWidth}" Text="{Binding Path=PBDKCSJPath}" />
-                <Button Name="btnPBDTBrowse" Content="Browse..." Click="btnBrowse_Click"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="CSJ Pin:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <PasswordBox Name="tbCSJPin" Style="{StaticResource ResourceKey=passwordBoxWidth}" DataContext="{Binding Path=CSJPin}" />
+                <Label Content="Author name:" Style="{StaticResource ResourceKey=labelWidth}"/>
+                <TextBox Name="tbAuthor" Width="300" Text="{Binding Path=Author}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="CSK Password:" Style="{StaticResource ResourceKey=labelWidth}"/>
                 <PasswordBox Name="tbCSKPassword" Style="{StaticResource ResourceKey=passwordBoxWidth}" DataContext="{Binding Path=CSJPassword}" />
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="Confirm CSK Password:" Style="{StaticResource ResourceKey=labelWidth}"/>
-                <PasswordBox Name="tbConfirmCSKPassword" Style="{StaticResource ResourceKey=passwordBoxWidth}" DataContext="{Binding Path=CSJConfirmPassword}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
             <Button Name="btnOk" IsDefault="True" Click="btnOk_Click" Margin="5" Width="100">OK</Button>

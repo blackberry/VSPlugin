@@ -31,8 +31,7 @@ namespace RIM.VSNDK_Package.Signing.Models
         private string _info;
 
         private static string p12 = "/author.p12";
-        private static string csk = "/barsigner.csk";
-        private static string db = "/barsigner.db";
+        private static string csk = "/bbidtoken.csk";
         #endregion
 
         /// <summary>
@@ -59,7 +58,6 @@ namespace RIM.VSNDK_Package.Signing.Models
             {
                 AddUriToPackage(certPath, p12, pkg);
                 AddUriToPackage(certPath, csk, pkg);
-                AddUriToPackage(certPath, db, pkg);
             }
         }
 

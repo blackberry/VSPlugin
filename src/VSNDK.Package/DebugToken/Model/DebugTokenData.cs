@@ -673,7 +673,10 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -cskpass {0} -keystore ""{1}"" -storepass {2} -deviceid ""{3}"" ""{4}""", KeyStorePassword, CertPath, KeyStorePassword, DevicePIN, LocalFolder + "DebugToken.bar");
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
+            startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -storepass {0} -deviceid ""{1}"" ""{2}""",
+                KeyStorePassword, DevicePIN, LocalFolder + "DebugToken.bar");
+
 
             try
             {

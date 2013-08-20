@@ -27,6 +27,8 @@ using System.Windows.Shapes;
 using RIM.VSNDK_Package.Signing.Models;
 using System.IO;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.Win32;
+using System.Xml;
 
 namespace RIM.VSNDK_Package.Signing
 {
@@ -35,42 +37,49 @@ namespace RIM.VSNDK_Package.Signing
     /// </summary>
     public partial class SigningDialog : DialogWindow
     {
-        private string certPath;
+        public string certPath;
+        public string bbidtokenPath;
+        private RIMSiginingAuthorityData data;
+
 
         public SigningDialog()
         {
             InitializeComponent();
 
-            certPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +  @"\Research In Motion\author.p12";
+            string folder = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            certPath = folder +  @"\Research In Motion\author.p12";
+            bbidtokenPath = folder + @"\Research In Motion\bbidtoken.csk";
+            data = gbRIMSigningAuthority.DataContext as RIMSiginingAuthorityData;
             UpdateUI(File.Exists(certPath));
-
         }
+
 
         /// <summary>
         /// Private method to update the screen UI
         /// </summary>
         /// <param name="registered"></param>
-        private void UpdateUI(bool registered)
+        public void UpdateUI(bool registered)
         {
-            RIMSiginingAuthorityData data = gbRIMSigningAuthority.DataContext as RIMSiginingAuthorityData;
             if (data != null)
             {
                 data.Registered = registered;
-                btnRegister.IsEnabled = !registered;
+
                 btnUnregister.IsEnabled = registered;
+                btnRegister.IsEnabled = !registered;
+                btnBackup.IsEnabled = registered;
             }
         }
 
         /// <summary>
-        /// Show the Regisration Dialog
+        /// Open BlackBerry Signing in the default browser and start a thread that will move the downloaded 
+        /// bbidtoken.csk file to the right folder. Then, it is presented the Regisration Dialog.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
-            RegistrationWindow win = new RegistrationWindow();
-            bool? res = win.ShowDialog();
-            UpdateUI(File.Exists(certPath));
+            Browser wb = new Browser(this);
+            wb.ShowDialog();
         }
 
         /// <summary>
@@ -126,6 +135,5 @@ namespace RIM.VSNDK_Package.Signing
                 UpdateUI(File.Exists(certPath));
             }
         }
-
     }
 }
