@@ -79,6 +79,13 @@ md "%drive%bbndk_vs"
 xcopy "%thisDir%bbndk_vs" "%drive%bbndk_vs" /e /i /y
 
 REM     //********************************************************************************************
+REM     // Copy QNX Tools
+REM     **********************************************************************************************
+echo xcopy "%thisDir%qnxtools" "%ProgRoot%\BlackBerry\VSPlugin-NDK\qnxtools" /e /i /y
+md "%ProgRoot%\BlackBerry\VSPlugin-NDK\qnxtools"
+xcopy "%thisDir%qnxtools" "%ProgRoot%\BlackBerry\VSPlugin-NDK\qnxtools" /e /i /y
+
+REM     //********************************************************************************************
 REM     // Register clases
 REM     **********************************************************************************************
 echo registering setup

@@ -29,16 +29,16 @@ del "%AllUsers%\Microsoft\MSEnvShared\Addins\VSNDK.AddIn.dll"
 REM     //********************************************************************************************
 REM     // Remove GDBParser and DebugEngine Files
 REM     **********************************************************************************************
-echo Deleting  "%ProgRoot%\Research In Motion\VSPlugin-NDK\GDBParser.dll"
-del "%ProgRoot%\Research In Motion\VSPlugin-NDK\GDBParser.dll" 
-echo Deleting "%ProgRoot%\Research In Motion\VSPlugin-NDK\GDBWrapper.exe"
-del  "%ProgRoot%\Research In Motion\VSPlugin-NDK\GDBWrapper.exe" 
-echo Deleting "%ProgRoot%\Research In Motion\VSPlugin-NDK\Instructions.txt"
-del "%ProgRoot%\Research In Motion\VSPlugin-NDK\Instructions.txt" 
-echo Deleting "%ProgRoot%\Research In Motion\VSPlugin-NDK\VSNDK.DebugEngine.dll"
-del "%ProgRoot%\Research In Motion\VSPlugin-NDK\VSNDK.DebugEngine.dll" 
-echo Remove Directory "%ProgRoot%\Research In Motion\VSPlugin-NDK"
-rd "%ProgRoot%\Research In Motion\VSPlugin-NDK"
+echo Deleting  "%ProgRoot%\BlackBerry\VSPlugin-NDK\GDBParser.dll"
+del "%ProgRoot%\BlackBerry\VSPlugin-NDK\GDBParser.dll" 
+echo Deleting "%ProgRoot%\BlackBerry\VSPlugin-NDK\GDBWrapper.exe"
+del  "%ProgRoot%\BlackBerry\VSPlugin-NDK\GDBWrapper.exe" 
+echo Deleting "%ProgRoot%\BlackBerry\VSPlugin-NDK\Instructions.txt"
+del "%ProgRoot%\BlackBerry\VSPlugin-NDK\Instructions.txt" 
+echo Deleting "%ProgRoot%\BlackBerry\VSPlugin-NDK\VSNDK.DebugEngine.dll"
+del "%ProgRoot%\BlackBerry\VSPlugin-NDK\VSNDK.DebugEngine.dll" 
+echo Remove Directory "%ProgRoot%\BlackBerry\VSPlugin-NDK"
+rd "%ProgRoot%\BlackBerry\VSPlugin-NDK"
 
 REM     //********************************************************************************************
 REM     // Remove Package Files
@@ -72,10 +72,16 @@ echo Delete BlackBerry VCWizards directory
 rd "%ProgRoot%\Microsoft Visual Studio 10.0\VC\VCWizards\CodeWiz\BlackBerry" /s /q 
 
 REM     //********************************************************************************************
-REM     // Remove Template Files
+REM     // Remove command line tools
 REM     **********************************************************************************************
 echo Delete %drive%bbndk_vs directory
 rd "%drive%bbndk_vs" /s /q
+
+REM     //********************************************************************************************
+REM     // Remove qnx tools
+REM     **********************************************************************************************
+echo Delete "%ProgRoot%\BlackBerry\VSPlugin-NDK\qnxtools" directory
+rd "%ProgRoot%\BlackBerry\VSPlugin-NDK\qnxtools" /s /q
 
 REM     //********************************************************************************************
 REM     // Register clases
