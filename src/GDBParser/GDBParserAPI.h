@@ -45,6 +45,7 @@ private:
 	static array<String^>^ m_libPaths = gcnew array<String^>(NUM_LIB_PATHS);
     static bool s_running = true;
     static HANDLE m_BBConnectProcess;
+	static String^ m_remotePath;
 };
 
 END_NAMESPACE
