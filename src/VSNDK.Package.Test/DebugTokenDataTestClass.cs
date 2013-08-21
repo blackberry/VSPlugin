@@ -130,7 +130,7 @@ namespace VSNDK.Package.Test
         {
             /// Initialize Test Case
             DebugTokenObject.DeviceIP = "";
-            bool result = DebugTokenObject.getDevicePin();
+            bool result = DebugTokenObject.getDeviceInfo();
 
             /// Verify Test Case
             Assert.IsFalse(result);
@@ -143,7 +143,7 @@ namespace VSNDK.Package.Test
         public void getDevicePin_Success_Test()
         {
             /// Initialize Test Case
-            bool result = DebugTokenObject.getDevicePin();
+            bool result = DebugTokenObject.getDeviceInfo();
 
             /// Verify Test Case
             Assert.IsTrue(result);
@@ -157,7 +157,7 @@ namespace VSNDK.Package.Test
         {
             /// Initialize Test Case
             DebugTokenObject.DevicePassword = "error";
-            bool result = DebugTokenObject.getDevicePin();
+            bool result = DebugTokenObject.getDeviceInfo();
 
             /// Verify Test Case
             Assert.IsFalse(result);
@@ -171,7 +171,7 @@ namespace VSNDK.Package.Test
         {
             /// Initialize Test Case
             DebugTokenObject.DeviceIP = "1.1.1.1";
-            bool result = DebugTokenObject.getDevicePin();
+            bool result = DebugTokenObject.getDeviceInfo();
 
             /// Verify Test Case
             Assert.IsFalse(result);
