@@ -78,5 +78,29 @@ namespace RIM.VSNDK_Package.Settings
             DialogResult = true; ;
 
         }
+
+        /// <summary>
+        /// Open App Target Dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void button1_Click(object sender, RoutedEventArgs e)
+        {
+            SettingsData data = gridMain.DataContext as SettingsData;
+            if (data != null)
+            {
+                this.Cursor = System.Windows.Input.Cursors.Wait;
+                UpdateManager.UpdateManager win = new UpdateManager.UpdateManager();
+                this.Cursor = System.Windows.Input.Cursors.Hand;
+
+                bool? res = win.ShowDialog();
+
+                data.RefreshScreen();
+                NDKEntry.ItemsSource = null;
+                NDKEntry.ItemsSource = data.NDKEntries;
+            }
+
+
+        }
     }
 }

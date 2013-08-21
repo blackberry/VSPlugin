@@ -54,8 +54,13 @@ namespace RIM.VSNDK_Package
             RegistrationData data = gridMain.DataContext as RegistrationData;
             if (data != null)
             {
-                data.Author = this.tbAuthor.Text;
+                data.CSJPin = this.tbCSJPin.Password;
                 data.CSJPassword = this.tbCSKPassword.Password;
+                data.CSJConfirmPassword = this.tbConfirmCSKPassword.Password;
+                if (string.IsNullOrEmpty(data.RDKCSJPath))
+                    data.RDKCSJPath = this.tbRDKCSJPath.Text;
+                if (string.IsNullOrEmpty(data.PBDKCSJPath))
+                    data.PBDKCSJPath = this.tbPBDTCSJPath.Text;
                 registered = data.Register();
                 if (!registered)
                 {
@@ -74,6 +79,41 @@ namespace RIM.VSNDK_Package
                 }
             }
             DialogResult = registered;
+        }
+
+        /// <summary>
+        /// Open a file browse dialog on click of the browse button.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = sender as Button;
+            string fn = BrowserFileName();
+            if (btn.Name == this.btnRDKBrowse.Name)
+            {
+                tbRDKCSJPath.Text = fn;
+            }
+            else
+                tbPBDTCSJPath.Text = fn;
+        }
+
+        /// <summary>
+        /// Helper function to generate the appropriate browser dialog
+        /// </summary>
+        /// <returns></returns>
+        private string BrowserFileName()
+        {
+            string filename = string.Empty;
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+            dlg.DefaultExt = ".csj"; // Default file extension
+            dlg.Filter = "CSJ files (.csj)|*.csj"; // Filter files by extension
+            bool? result = dlg.ShowDialog();
+            if (result == true)
+            {
+                filename = dlg.FileName;
+            }
+            return filename;
         }
     }
 }

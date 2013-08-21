@@ -25,6 +25,7 @@ using System.Security.Cryptography;
 using System.IO;
 using RIM.VSNDK_Package.Signing.Models;
 using System.Windows.Data;
+using RIM.VSNDK_Package.UpdateManager.Model;
 
 namespace RIM.VSNDK_Package.Settings.Models
 {
@@ -53,8 +54,9 @@ namespace RIM.VSNDK_Package.Settings.Models
         private string _deviceIP;
         private string _devicePassword;
         private string _simulatorIP;
+        private UpdateManagerData updateManager;
         private string _simulatorPassword;
-        private readonly CollectionView _ndkEntries;
+        private CollectionView _ndkEntries;
         private NDKEntryClass _ndkEntry;
 
         private const string _colDeviceIP = "DeviceIP";
@@ -69,36 +71,72 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         public SettingsData()
         {
-            string[] filePaths = Directory.GetFiles(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\", "*.xml");
-            IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
+            updateManager = new UpdateManagerData();
 
-            foreach (string file in filePaths)
+            RefreshScreen();
+        }
+
+        /// <summary>
+        /// Refresh the screen
+        /// </summary>
+        public void RefreshScreen()
+        {
+            if (Directory.Exists(updateManager.bbndkPathConst + @"\..\qconfig\"))
             {
-                try 
+                string[] filePaths = Directory.GetFiles(updateManager.bbndkPathConst + @"\..\qconfig\", "*.xml");
+
+                IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
+
+                foreach (string file in filePaths)
                 {
-                    XmlDocument xmlDoc = new XmlDocument();
-                    xmlDoc.Load(file);
-                    XmlNodeList name = xmlDoc.GetElementsByTagName("name");
-                    XmlNodeList hostpath = xmlDoc.GetElementsByTagName("host");
-                    XmlNodeList targetpath = xmlDoc.GetElementsByTagName("target");
-
-
-                    NDKEntryClass NDKEntry = new NDKEntryClass(name[0].InnerText, hostpath[0].InnerText, targetpath[0].InnerText);
-                    NDKList.Add(NDKEntry);
-
-                    if (NDKEntry.HostPath == getNDKPath())
+                    try
                     {
-                        NDKEntryClass = NDKEntry;
+                        XmlDocument xmlDoc = new XmlDocument();
+                        xmlDoc.Load(file);
+                        string name = xmlDoc.GetElementsByTagName("name")[0].InnerText;
+                        string apiName = getAPIName(name.Substring(name.LastIndexOf(' ') + 1));
+                        string hostpath = xmlDoc.GetElementsByTagName("host")[0].InnerText;
+                        string targetpath = xmlDoc.GetElementsByTagName("target")[0].InnerText;
+
+                        NDKEntryClass NDKEntry = new NDKEntryClass(apiName != "" ? apiName : name, hostpath, targetpath);
+                        NDKList.Add(NDKEntry);
+
+                        if (NDKEntry.HostPath == getNDKPath())
+                        {
+                            NDKEntryClass = NDKEntry;
+                        }
                     }
-                }
-                catch 
-                {
-                    continue;
+                    catch
+                    {
+                        continue;
+                    }
+
                 }
 
+                NDKEntries = new CollectionView(NDKList);
+            }
+        }
+
+        /// <summary>
+        /// return API Name
+        /// </summary>
+        /// <param name="version">version to match</param>
+        /// <returns></returns>
+        public string getAPIName(string version)
+        {
+            string result = "";
+
+            foreach (APITargetClass target in updateManager.tempAPITargetList)
+            {
+                if (target.TargetVersion  == version)
+                {
+                    result = target.TargetName;
+                    break;
+                }
             }
 
-            _ndkEntries = new CollectionView(NDKList);
+            return result;
+
         }
 
         #region Properties
@@ -145,6 +183,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         public CollectionView NDKEntries
         {
             get { return _ndkEntries; }
+            set { _ndkEntries = value; }
         }
 
         /// <summary>

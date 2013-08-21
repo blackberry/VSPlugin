@@ -14,11 +14,12 @@
 
     <Grid Name="gridMain" VerticalAlignment="Top" DataContext="{StaticResource settingsData}"  Width="608" xmlns:RIM_password="clr-namespace:RIM.VSNDK_Package.Signing.Models">
         <StackPanel Orientation="Vertical" Name="MainPanel" VerticalAlignment="Top" Height="299">
-            <GroupBox Header="BlackBerry NDK Settings" Name="gbBlackBerryNDKSettings" VerticalAlignment="Stretch" Height="55" Margin="5,5,5,5">
+            <GroupBox Header="BlackBerry API Levels" Name="gbBlackBerryNDKSettings" VerticalAlignment="Stretch" Height="55" Margin="5,5,5,5">
                 <StackPanel Orientation="Vertical" Height="33" Width="528">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                        <Label Content="NDK Path:" Width="83" Height="28" />
-                        <ComboBox Height="23" Name="NDKEntry" Width="437" ItemsSource="{Binding Path=NDKEntries}" DisplayMemberPath="NDKName" SelectedValuePath="NDKName" SelectedItem="{Binding Path=NDKEntryClass}" />
+                        <Label Content="API Level:" Width="83" Height="28" />
+                        <ComboBox Height="23" Name="NDKEntry" Width="340" ItemsSource="{Binding Path=NDKEntries}" DisplayMemberPath="NDKName" SelectedValuePath="NDKName" SelectedItem="{Binding Path=NDKEntryClass}" />
+                        <Button Margin="10,0,0,0" Content="Get More.." Height="23" Name="button1" Width="85" Click="button1_Click" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
