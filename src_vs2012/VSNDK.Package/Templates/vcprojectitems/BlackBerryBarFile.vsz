@@ -1,0 +1,6 @@
+VSWIZARD 7.0
+Wizard=VsWizard.VsWizardEngine.10.0
+Param="WIZARD_NAME = BarDescriptor"
+Param="RELATIVE_PATH = VCWizards\CodeWiz\BlackBerry"
+Param="WIZARD_UI = FALSE"
+Param="WIZARD_ID = 44"

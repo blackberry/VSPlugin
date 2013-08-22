@@ -1,0 +1,1 @@
+C:\Users\dburgess\VSPlugin\src_vs2012\VSNDK.Package.Test\obj\Release\VSNDK.Package.Test.csprojResolveAssemblyReference.cache

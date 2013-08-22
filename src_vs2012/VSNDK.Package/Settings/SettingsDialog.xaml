@@ -1,0 +1,57 @@
+﻿<ui:DialogWindow x:Class="RIM.VSNDK_Package.Settings.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
+        Title="Settings" Height="334" Width="627">
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SettingsDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Name="gridMain" VerticalAlignment="Top" DataContext="{StaticResource settingsData}"  Width="608" xmlns:RIM_password="clr-namespace:RIM.VSNDK_Package.Signing.Models">
+        <StackPanel Orientation="Vertical" Name="MainPanel" VerticalAlignment="Top" Height="299">
+            <GroupBox Header="BlackBerry API Levels" Name="gbBlackBerryNDKSettings" VerticalAlignment="Stretch" Height="55" Margin="5,5,5,5">
+                <StackPanel Orientation="Vertical" Height="33" Width="528">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                        <Label Content="API Level:" Width="83" Height="28" />
+                        <ComboBox Height="23" Name="NDKEntry" Width="340" ItemsSource="{Binding Path=NDKEntries}" DisplayMemberPath="NDKName" SelectedValuePath="NDKName" SelectedItem="{Binding Path=NDKEntryClass}" />
+                        <Button Margin="10,0,0,0" Content="Get More.." Height="23" Name="button1" Width="85" Click="button1_Click" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="BlackBerry Device Target" Name="gbBlackBerryDeviceTarget" Height="83" Margin="5,5,5,5">
+                <StackPanel Orientation="Vertical" Height="61" Width="528">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
+                        <Label Content="IP Address:" Width="170" Height="28" />
+                        <TextBox Name="tbIPAddress1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" Text="{Binding Path=DeviceIP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch" Height="28">
+                        <Label Content="Device Password:" Width="170" Height="28" />
+                        <PasswordBox Name="tbDevicePassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" DataContext="{Binding Path=DevicePassword}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="BlackBerry Simulator Target" Name="gbBlackBerrySimulatorTarget" VerticalAlignment="Stretch" Height="83" Margin="5,5,5,5">
+                <StackPanel Orientation="Vertical" Height="60" Width="528">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Height="28">
+                        <Label Content="IP Address:" Width="170" Height="28" />
+                        <TextBox Name="tbIPAddress2" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" Text="{Binding Path=SimulatorIP, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Height="28">
+                        <Label Content="Simulator Password:" Width="170" Height="28" />
+                        <PasswordBox Name="tbSimulatorPassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" DataContext="{Binding Path=SimulatorPassword}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
+            <StackPanel Orientation="Horizontal" Width="532" Height="38" FlowDirection="RightToLeft" Margin="5">
+                <Button Content="Cancel" Name="btnCancel" Height="25" Width="70" Margin="2" IsCancel="True" />
+                <Button Content="OK" Name="btnOK" Height="25" Width="70" Margin="2" IsDefault="True" Click="btnOK_Click" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</ui:DialogWindow>
+

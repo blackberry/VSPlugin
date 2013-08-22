@@ -1,0 +1,191 @@
+﻿<!--
+***********************************************************************************************
+Modified based on Microsoft.Cpp.Win32.targets
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+This file defines the steps/targets required to build Visual C++ projects
+specifically on x86 platforms.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(VCTargetsPath)Platforms\BlackBerry\ImportBefore\*.targets" Condition="Exists('$(VCTargetsPath)Platforms\BlackBerry\ImportBefore')" />
+  <Import Project="$(VCTargetsPath)Microsoft.CppCommon.targets" />
+
+  <UsingTask TaskName="QccCompiler" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="QccLink" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="QccLib" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="GenerateMakeFile" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="MakeAllAndFormatOutputMessages" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="VCMessage" AssemblyName="Microsoft.Build.CppTasks.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+
+  <PropertyGroup>
+    <!-- Enable incremental build by enable file tracking in tasks-->
+    <TrackFileAccess Condition="'$(TrackFileAccess)' == ''">true</TrackFileAccess>
+  </PropertyGroup>
+
+  <!-- *******************************************************************************************
+        CLCompile
+       ******************************************************************************************* -->
+  <Target Name="ClCompile" Condition="'@(ClCompile)' != ''" DependsOnTargets="SelectClCompile">
+    <ItemGroup>
+      <ClCompile>
+        <CompileAs                    Condition="'%(ClCompile.CompileAs)' == 'Default' and '%(ClCompile.Extension)' == '.c'">CompileAsC</CompileAs>
+        <CompileAs                    Condition="'%(ClCompile.CompileAs)' == 'Default' and '%(ClCompile.Extension)' != '.c'">CompileAsCpp</CompileAs>
+        <MinimalRebuildFromTracking   Condition="'$(BuildType)' != 'Build' or '$(ForceRebuild)' == 'true'">false</MinimalRebuildFromTracking>
+      </ClCompile>
+    </ItemGroup>
+
+    <WriteLinesToFile File="CompileRan" Lines="true" Overwrite="true" />
+    
+    <PropertyGroup>
+      <CLToolArchitecture Condition="'$(CLToolArchitecture)' == ''">$(DefaultToolArchitecture)</CLToolArchitecture>
+    </PropertyGroup>
+
+    <SetEnv Name   ="QNX_HOST"
+            Value  ="$(QNX_HOST)"
+            Prefix ="false" >
+      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_HOST"/>
+    </SetEnv>
+    <SetEnv Name   ="QNX_TARGET"
+            Value  ="$(QNX_TARGET)"
+            Prefix ="false" >
+      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_TARGET"/>
+    </SetEnv>
+    <SetEnv Name   ="QCC_CONF_PATH"
+            Value  ="$(QCC_CONF_PATH)"
+            Prefix ="false" >
+      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QCC_CONF_PATH"/>
+    </SetEnv>
+  </Target>
+
+  <!-- *******************************************************************************************
+        Lib
+       ******************************************************************************************* -->
+  <Target Name="Lib"
+          Condition="'@(Lib)' != ''">
+    <ItemGroup>
+      <Lib>
+        <MinimalRebuildFromTracking Condition="'$(BuildType)' != 'Build' or '$(ForceRebuild)' == 'true'">false</MinimalRebuildFromTracking>
+      </Lib>
+    </ItemGroup>
+
+    <PropertyGroup>
+      <LibToolArchitecture Condition="'$(LibToolArchitecture)' == ''">$(DefaultToolArchitecture)</LibToolArchitecture>
+    </PropertyGroup>
+    
+    <GenerateMakefile
+      TargetName      ="$(TargetName)"
+      TargetExtension ="$(TargetExt)"
+      CompileItems    ="@(ClCompile)"
+      LinkItems		  ="@(Lib)"
+      ProjectDir      ="$(ProjectDir)"
+      IntDir		  ="$(IntDir)"
+      OutDir		  ="$(OutDir)"
+      CompilerVersion ="$(CompilerVersion)"
+      Platform        ="$(Platform)"
+      AdditionalIncludeDirectories ="$(IncludePath)"
+      AdditionalLibraryDirectories ="$(LibraryPath)"
+      ConfigurationType ="$(ConfigurationType)"
+      />
+    
+    <MakeAllAndFormatOutputMessages
+        ProjectDir      ="$(ProjectDir)"
+        OutDir		  ="$(IntDir)"      
+        ToolsPath ="$(BuildBarToolPath)"
+        CompileItems    ="@(ClCompile)"
+      >
+    </MakeAllAndFormatOutputMessages >
+    
+  </Target>
+
+  <!-- *******************************************************************************************
+        Link
+       ******************************************************************************************* -->
+  <Target Name="Link" Condition="'@(Link)' != ''" >
+    <PropertyGroup>
+      <Link_MinimalRebuildFromTracking Condition="'@(Link->AnyHaveMetadataValue('MinimalRebuildFromTracking', 'false'))' == 'true'">false</Link_MinimalRebuildFromTracking>
+      <Link_MinimalRebuildFromTracking Condition="'$(BuildType)' != 'Build' or '$(ForceRebuild)' == 'true'" >false</Link_MinimalRebuildFromTracking>
+      <Link_MinimalRebuildFromTracking Condition="'$(Link_MinimalRebuildFromTracking)' == ''">true</Link_MinimalRebuildFromTracking>
+      <LinkToolArchitecture Condition="'$(LinkToolArchitecture)' == ''">$(DefaultToolArchitecture)</LinkToolArchitecture>
+      <LinkYieldDuringToolExecution Condition="'$(LinkYieldDuringToolExecution)' == '' and '%(Link.LinkTimeCodeGeneration)' == 'UseLinkTimeCodeGeneration'">true</LinkYieldDuringToolExecution>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Link>
+        <ProfileGuidedDatabase Condition="'%(Link.LinkTimeCodeGeneration)' != 'PGOptimization' and
+                                          '%(Link.LinkTimeCodeGeneration)' != 'PGUpdate' and
+                                          '%(Link.LinkTimeCodeGeneration)' != 'PGInstrument'"></ProfileGuidedDatabase>
+        <CompileAs             Condition="'%(Link.CompileAs)' == 'Default' and '%(ClCompile.Extension)' == '.c'">CompileAsC</CompileAs>
+        <CompileAs             Condition="'%(Link.CompileAs)' == 'Default' and '%(ClCompile.Extension)' != '.c'">CompileAsCpp</CompileAs>
+      </Link>
+    </ItemGroup>
+
+    <Message Condition="'$(LinkSkippedExecution)' == 'false'" Text="$(MSBuildProjectFile) -&gt; $(TargetPath)" Importance="High" />
+
+    <GenerateMakefile
+      TargetName      ="$(TargetName)"
+      TargetExtension ="$(TargetExt)"
+      CompileItems    ="@(ClCompile)"
+      LinkItems		  ="@(Link)"
+      ProjectDir      ="$(ProjectDir)"
+      IntDir		  ="$(IntDir)"
+      OutDir		  ="$(OutDir)"
+      CompilerVersion ="$(CompilerVersion)"
+      Platform        ="$(Platform)"
+      AdditionalIncludeDirectories ="$(IncludePath)"
+      AdditionalLibraryDirectories ="$(LibraryPath)"
+      ExcludeDirectories ="$(ExcludePath)"
+      ConfigurationType ="$(ConfigurationType)"
+      />
+
+    <MakeAllAndFormatOutputMessages
+        ProjectDir      ="$(ProjectDir)"
+        OutDir		  ="$(IntDir)"      
+        ToolsPath ="$(BuildBarToolPath)"
+        CompileItems    ="@(ClCompile)">
+    </MakeAllAndFormatOutputMessages >
+  
+</Target>
+
+  <PropertyGroup>
+    <CleanDependsOn>
+      $(CleanDependsOn);
+      MakeClean;
+    </CleanDependsOn>
+  </PropertyGroup>
+  
+  <Target Name="MakeClean">
+    <Exec Command="$(QccToolsPath)\make clean" WorkingDirectory="$(IntDir)" Condition="Exists('$(IntDir)makefile')" />
+    <Message Text="Nothing to clean. $(IntDir)makefile does not exist." Condition="!Exists('$(IntDir)makefile')" />
+  </Target>
+
+  <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets"
+          Condition="(exists('$(VCTargetsPath)\Platforms\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets'))" />
+
+  <PropertyGroup>
+    <PrepareForBuildDependsOn>PlatformPrepareForBuild;$(PrepareForBuildDependsOn)</PrepareForBuildDependsOn>
+    <PrepareForBuildDependsOn Condition="'$(ConfigurationType)'=='Application'">PlatformPrepareForBuild;$(PrepareForBuildDependsOn)</PrepareForBuildDependsOn>
+  </PropertyGroup>
+
+  <!-- Override the Microsoft.CppBuild.targets stuff -->
+  <Import Project="$(VCTargetsPath)Platforms\BlackBerry\Microsoft.CppBuild.BlackBerry.targets" />
+
+  <!-- *******************************************************************************************
+        PlatformPrepareForBuild target
+       ******************************************************************************************* -->
+  <Target Name="PlatformPrepareForBuild" DependsOnTargets="$(PlatformPrepareForBuildDependsOn)">
+    <!-- Error out if the project references a missing platform toolset -->
+    <VCMessage Code="MSB8008" Type="Error" Arguments="$(PlatformToolset)"
+          Condition="!(exists('$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).targets'))"/>
+  </Target>
+
+  <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).targets"
+          Condition="(exists('$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).targets'))" />
+  <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter\*.targets" Condition="Exists('$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter')" />
+</Project>

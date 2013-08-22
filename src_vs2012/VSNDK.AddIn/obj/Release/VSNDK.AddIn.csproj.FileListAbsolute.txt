@@ -1,0 +1,12 @@
+C:\Users\dburgess\buildresults\vs2012\VSNDK.AddIn.AddIn
+C:\Users\dburgess\buildresults\vs2012\VSNDK.AddIn.dll
+C:\Users\dburgess\buildresults\vs2012\VSNDK.AddIn.pdb
+C:\Users\dburgess\buildresults\vs2012\VSNDK.AddIn.xml
+C:\Users\dburgess\VSPlugin\src_vs2012\VSNDK.AddIn\obj\Release\VSNDK.AddIn.csprojResolveAssemblyReference.cache
+C:\Users\dburgess\VSPlugin\src_vs2012\VSNDK.AddIn\obj\Release\VSNDK.AddIn.csproj.ResolveComReference.cache
+C:\Users\dburgess\VSPlugin\src_vs2012\VSNDK.AddIn\obj\Release\VSNDK.AddIn.dll
+C:\Users\dburgess\VSPlugin\src_vs2012\VSNDK.AddIn\obj\Release\VSNDK.AddIn.pdb
+C:\Users\dburgess\buildresults\VS2010\VSNDK.AddIn.AddIn
+C:\Users\dburgess\buildresults\VS2010\VSNDK.AddIn.dll
+C:\Users\dburgess\buildresults\VS2010\VSNDK.AddIn.pdb
+C:\Users\dburgess\buildresults\VS2010\VSNDK.AddIn.xml

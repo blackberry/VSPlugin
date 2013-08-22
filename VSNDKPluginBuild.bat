@@ -1,33 +1,35 @@
 echo off
 
-REM     //********************************************************************************************
-REM     // Batch Constants 
-REM     // thisDir = working directory of current batch file.
-REM     // dotNetFrameworkPath = path to the DotNet Framework libraries
-REM     // buildLog = build results log file.
-REM     // solutionPath = path to MDS.NET solution.
-REM     **********************************************************************************************
-Set thisDir=%~dp0
-Set buildresults="%thisDir%\..\buildresults"
-Set buildLog=%thisDir%\..\VDNDKPlugin_results.log
-Set dotNetFrameworkPath="C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\MsBuild.exe"
-Set solutionPath="%thisDir%\src\VSNDK.sln"
-Set regAsmPath=C:\WINDOWS\Microsoft.NET\Framework\v2.0.50727
+REM ********************************************************************************************
+REM Declare Constants
+REM ********************************************************************************************
+set thisDir=%~dp0
+set buildresults="%thisDir%\..\buildresults"
+set dotNetFrameworkPath="C:\WINDOWS\Microsoft.NET\Framework\v4.0.30319\MsBuild.exe"
+set solutionPath2010="%thisDir%\src\VSNDK.sln"
+set solutionPath2012="%thisDir%\src_vs2012\VSNDK.sln"
 
-REM     //********************************************************************************************
-REM     // Clean up old bin folder
-REM     **********************************************************************************************
+REM ********************************************************************************************
+REM Clean up old bin folder
+REM ********************************************************************************************
 echo Removing previous code
 if not exist "%buildresults%" goto build
   echo Remove Build Results
   RMDIR /Q "%buildresults%" /S
 :build  
 
-REM     //********************************************************************************************
-REM     // Build the .NET Solution 2008 and register files in GAC
-REM     **********************************************************************************************
+REM ********************************************************************************************
+REM Build VS2010
+REM ********************************************************************************************
 echo Building Solution for VS2010
-%dotNetFrameworkPath% %solutionPath% /property:Configuration=Release /target:Clean;Build /p:OutputPath="%buildresults%" > %buildLog%
+%dotNetFrameworkPath% %solutionPath2010% /property:Configuration=Release /target:Clean;Build /p:OutputPath="%buildresults%\VS2010" > %buildresult%\VS2010_buildlog.txt
+echo Build Success
+
+REM ********************************************************************************************
+REM Build VS2010
+REM ********************************************************************************************
+echo Building Solution for VS2012
+%dotNetFrameworkPath% %solutionPath2012% /property:Configuration=Release /target:Clean;Build /p:OutputPath="%buildresults%\VS2012" > %buildresult%\VS2012_buildlog.txt
 echo Build Success
 
 

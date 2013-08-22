@@ -1,0 +1,7 @@
+C:\Users\dburgess\buildresults\vs2012\GDBParser.UnitTests.dll
+C:\Users\dburgess\buildresults\vs2012\GDBParser.UnitTests.pdb
+C:\Users\dburgess\VSPlugin\src_vs2012\GDBParser.UnitTests\obj\Release\GDBParser_UnitTests.csprojResolveAssemblyReference.cache
+C:\Users\dburgess\VSPlugin\src_vs2012\GDBParser.UnitTests\obj\Release\GDBParser.UnitTests.dll
+C:\Users\dburgess\VSPlugin\src_vs2012\GDBParser.UnitTests\obj\Release\GDBParser.UnitTests.pdb
+C:\Users\dburgess\buildresults\VS2010\GDBParser.UnitTests.dll
+C:\Users\dburgess\buildresults\VS2010\GDBParser.UnitTests.pdb

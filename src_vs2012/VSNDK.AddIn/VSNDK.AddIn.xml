@@ -1,0 +1,550 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>VSNDK.AddIn</name>
+    </assembly>
+    <members>
+        <member name="T:VSNDK.AddIn.Connect">
+            <summary> 
+            The object for implementing an Add-in. 
+            </summary>
+            1. Disable the IntelliSense Error Reporting property
+            2. ...
+            To register the addin, copy the VSNDK.AddIn.dll and VSNDK.Addin.AddIn files to 
+            the one of the folders specified by "Add-In File path" in Add-In Security option page.
+            <seealso class='IDTExtensibility2' />
+        </member>
+        <member name="M:VSNDK.AddIn.Connect.#ctor">
+            <summary> 
+            Implements the constructor for the Add-in object. Place your initialization code within this method. 
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.Connect.OnConnection(System.Object,Extensibility.ext_ConnectMode,System.Object,System.Array@)">
+            <summary>
+            Implements the OnConnection method of the IDTExtensibility2 interface. Receives notification that the Add-in is being loaded. 
+            </summary>
+            <param term='application'>Root object of the host application. </param>
+            <param term='connectMode'>Describes how the Add-in is being loaded. </param>
+            <param term='addInInst'>Object representing this Add-in. </param>
+            <seealso class='IDTExtensibility2' />
+        </member>
+        <member name="M:VSNDK.AddIn.Connect.OnDisconnection(Extensibility.ext_DisconnectMode,System.Array@)">
+            <summary>
+            Implements the OnDisconnection method of the IDTExtensibility2 interface. Receives notification that the Add-in is 
+            being unloaded. 
+            </summary>
+            <param term='disconnectMode'>Describes how the Add-in is being unloaded. </param>
+            <param term='custom'>Array of parameters that are host application specific. </param>
+            <seealso class='IDTExtensibility2' />
+        </member>
+        <member name="M:VSNDK.AddIn.Connect.OnAddInsUpdate(System.Array@)">
+            <summary>
+            Implements the OnAddInsUpdate method of the IDTExtensibility2 interface. Receives notification when the collection 
+            of Add-ins has changed. 
+            </summary>
+            <param term='custom'>Array of parameters that are host application specific. </param>
+            <seealso class='IDTExtensibility2' />		
+        </member>
+        <member name="M:VSNDK.AddIn.Connect.OnStartupComplete(System.Array@)">
+            <summary>
+            Implements the OnStartupComplete method of the IDTExtensibility2 interface. Receives notification that the host 
+            application has completed loading. 
+            </summary>
+            <param term='custom'>Array of parameters that are host application specific. </param>
+            <seealso class='IDTExtensibility2' />
+        </member>
+        <member name="M:VSNDK.AddIn.Connect.OnBeginShutdown(System.Array@)">
+            <summary>
+            Implements the OnBeginShutdown method of the IDTExtensibility2 interface. Receives notification that the host 
+            application is being unloaded. 
+            </summary>
+            <param term='custom'>Array of parameters that are host application specific. </param>
+            <seealso class='IDTExtensibility2' />
+        </member>
+        <member name="T:VSNDK.AddIn.NameValueCollectionHelper">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.NameValueCollectionHelper.DumpToString(System.Collections.Specialized.NameValueCollection)">
+            <summary>
+            
+            </summary>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:VSNDK.AddIn.NameValueCollectionHelper.LoadFromString(System.Collections.Specialized.NameValueCollection,System.String)">
+            <summary>
+            
+            </summary>
+            <param name="target"></param>
+            <param name="value"></param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.NativeMethods.GetAbsolutePath(System.String)">
+            <devdoc>
+            This method takes a file URL and converts it to an absolute path.  The trick here is that
+            if there is a '#' in the path, everything after this is treated as a fragment.  So
+            we need to append the fragment to the end of the path.
+            </devdoc>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.NativeMethods.IsSamePath(System.String,System.String)">
+            <devdoc>
+            Please use this "approved" method to compare file names.
+            </devdoc>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.NativeMethods.SetParent(System.IntPtr,System.IntPtr)">
+            <summary>
+            Changes the parent window of the specified child window.
+            </summary>
+            <param name="hWnd">Handle to the child window.</param>
+            <param name="hWndParent">Handle to the new parent window. If this parameter is NULL, the desktop window becomes the new parent window.</param>
+            <returns>A handle to the previous parent window indicates success. NULL indicates failure.</returns>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.NativeMethods.GetBinaryType(System.String,System.UInt32@)">
+            <summary>
+            Indicates whether the file type is binary or not
+            </summary>
+            <param name="lpApplicationName">Full path to the file to check</param>
+            <param name="lpBinaryType">If file isbianry the bitness of the app is indicated by lpBinaryType value.</param>
+            <returns>True if the file is binary false otherwise</returns>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.NativeMethods.OLECMDTEXT">
+            <devdoc>
+            Helper class for setting the text parameters to OLECMDTEXT structures.
+            </devdoc>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.NativeMethods.OLECMDTEXT.OLECMDTEXTF">
+            <summary>
+            Flags for the OLE command text
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.NativeMethods.OLECMDTEXT.OLECMDTEXTF.OLECMDTEXTF_NONE">
+            <summary>No flag</summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.NativeMethods.OLECMDTEXT.OLECMDTEXTF.OLECMDTEXTF_NAME">
+            <summary>The name of the command is required.</summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.NativeMethods.OLECMDTEXT.OLECMDTEXTF.OLECMDTEXTF_STATUS">
+            <summary>A description of the status is required.</summary>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.NativeMethods.tagOLECMDF">
+            <devdoc>
+            OLECMDF enums for IOleCommandTarget
+            </devdoc>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.NativeMethods.IMethodXML.SetXML(System.String)">
+            <!-- Failed to insert some or all of included XML --><include file="doc\NativeMethods.uex" path="docs/doc[@for=&quot;IMethodXML.SetXML&quot;]/*"/>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.NativeMethods.ICodeClassBase">
+            --------------------------------------------------------------------------
+             ICodeClassBase:
+            --------------------------------------------------------------------------
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.NativeMethods.VSTASKBITMAP">
+            <summary>
+            Specifies options for a bitmap image associated with a task item.
+            </summary>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.NativeMethods.ExtendedSpecialFolder">
+            <summary>
+            Defines the values that are not supported by the System.Environment.SpecialFolder enumeration
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.NativeMethods.ExtendedSpecialFolder.CommonStartup">
+            <summary>
+            Identical to CSIDL_COMMON_STARTUP
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.NativeMethods.ExtendedSpecialFolder.Windows">
+            <summary>
+            Identical to CSIDL_WINDOWS 
+            </summary>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.TokenReplaceType">
+            <summary>
+            Replacement type
+            </summary>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.TokenProcessor">
+            <summary>
+            Contain a number of functions that handle token replacement
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.#ctor">
+            <summary>
+            Constructor
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.Reset">
+            <summary>
+            Reset list of TokenReplacer entries
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.AddReplace(System.String,System.String)">
+            <summary>
+            Add a replacement type entry
+            </summary>
+            <param name="token">token to replace</param>
+            <param name="replacement">replacement string</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.AddReplaceBetween(System.String,System.String,System.String,System.String)">
+            <summary>
+            Add replace between entry
+            </summary>
+            <param name="tokenStart">Start token</param>
+            <param name="tokenEnd">End token</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.AddDelete(System.String)">
+            <summary>
+            Add a deletion entry
+            </summary>
+            <param name="tokenToDelete">Token to delete</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.UntokenFile(System.String,System.String)">
+            <summary>
+            For all known token, replace token with correct value
+            </summary>
+            <param name="source">File of the source file</param>
+            <param name="destination">File of the destination file</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.ReplaceTokens(System.String@,Microsoft.VisualStudio.Project.ReplacePairToken)">
+            <summary>
+            Replaces the tokens in a buffer with the replacement string
+            </summary>
+            <param name="buffer">Buffer to update</param>
+            <param name="tokenToReplace">replacement data</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.DeleteTokens(System.String@,Microsoft.VisualStudio.Project.DeleteToken)">
+            <summary>
+            Deletes the token from the buffer
+            </summary>
+            <param name="buffer">Buffer to update</param>
+            <param name="tokenToDelete">token to delete</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.ReplaceBetweenTokens(System.String@,Microsoft.VisualStudio.Project.ReplaceBetweenPairToken)">
+            <summary>
+            Replaces the token from the buffer between the provided tokens
+            </summary>
+            <param name="buffer">Buffer to update</param>
+            <param name="rpBetweenToken">replacement token</param>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.GuidToForm1(System.Guid)">
+            <summary>
+            Generates a string representation of a guid with the following format:
+            0x01020304, 0x0506, 0x0708, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F, 0x10
+            </summary>
+            <param name="value">Guid to be generated</param>
+            <returns>The guid as string</returns>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.IsValidIdentifierChar(System.Char)">
+            <summary>
+            This function will accept a subset of the characters that can create an
+            identifier name: there are other unicode char that can be inside the name, but
+            this function will not allow. By now it can work this way, but when and if the
+            VSIP package will handle also languages different from english, this function
+            must be changed.
+            </summary>
+            <param name="c">Character to validate</param>
+            <returns>true if successful false otherwise</returns>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.TokenProcessor.IsValidIdentifierStartChar(System.Char)">
+            <summary>
+            Verifies if the start character is valid
+            </summary>
+            <param name="c">Start character</param>
+            <returns>true if successful false otherwise</returns>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.ReplacePairToken">
+            <summary>
+             Storage classes for replacement tokens
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.ReplacePairToken.token">
+            <summary>
+            token string
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.ReplacePairToken.replacement">
+            <summary>
+            Replacement string
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.ReplacePairToken.#ctor(System.String,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="token">replaceable token</param>
+            <param name="replacement">replacement string</param>
+        </member>
+        <member name="P:Microsoft.VisualStudio.Project.ReplacePairToken.Token">
+            <summary>
+            Token that needs to be replaced
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.Project.ReplacePairToken.Replacement">
+            <summary>
+            String to replace the token with
+            </summary>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.DeleteToken">
+            <summary>
+            Storage classes for token to be deleted
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.DeleteToken.token">
+            <summary>
+            String to delete
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.DeleteToken.#ctor(System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="token">Deletable token.</param>
+        </member>
+        <member name="P:Microsoft.VisualStudio.Project.DeleteToken.StringToDelete">
+            <summary>
+            Token marking the end of the block to delete
+            </summary>
+        </member>
+        <member name="T:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken">
+            <summary>
+            Storage classes for string to be deleted between tokens to be deleted 
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.tokenStart">
+            <summary>
+            Token start
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.tokenEnd">
+            <summary>
+            End token
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.replacement">
+            <summary>
+            Replacement string
+            </summary>
+        </member>
+        <member name="F:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.tokenidentifier">
+            <summary>
+            Token identifier string
+            </summary>
+        </member>
+        <member name="M:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.#ctor(System.String,System.String,System.String,System.String)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="blockStart">Start token</param>
+            <param name="blockEnd">End Token</param>
+            <param name="replacement">Replacement string.</param>
+        </member>
+        <member name="P:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.TokenStart">
+            <summary>
+            Token marking the begining of the block to delete
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.TokenEnd">
+            <summary>
+            Token marking the end of the block to delete
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.TokenReplacement">
+            <summary>
+            Token marking the end of the block to delete
+            </summary>
+        </member>
+        <member name="P:Microsoft.VisualStudio.Project.ReplaceBetweenPairToken.TokenIdentifier">
+            <summary>
+            Token Identifier
+            </summary>
+        </member>
+        <member name="T:VSNDK.AddIn.VSNDKAddIn">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.Connect(EnvDTE80.DTE2,EnvDTE.AddIn)">
+            <summary> 
+            Run initialization code on first connection of the AddIn. 
+            </summary>
+            <param name="appObj"> Application Object. </param>
+            <param name="addin"> Add In Object. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.Disconnect">
+            <summary> 
+            Terminate the AddIn. 
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.CheckSolutionPlatformCommand">
+            <summary> 
+            Solution Platform command is shown in the Standard toolbar by default with Visual C++ settings. Add the 
+            command if not in the Standard toolbar. 
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.DisableIntelliSenseErrorReport(System.Boolean)">
+            <summary> 
+            Set the DisableErrorReporting property value. 
+            </summary>
+            <param name="disable"> The property value to set. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.cmdNewPlatform_beforeExec(System.String,System.Int32,System.Object,System.Object,System.Boolean@)">
+            <summary> 
+            New Platform Before Execution Event Handler. 
+            </summary>
+            <param name="Guid">Command GUID. </param>
+            <param name="ID">Command ID. </param>
+            <param name="CustomIn">Custom IN Object. </param>
+            <param name="CustomOut">Custom OUT Object. </param>
+            <param name="CancelDefault">Cancel the default execution of the command. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.cmdNewPlatform_afterExec(System.String,System.Int32,System.Object,System.Object)">
+            <summary> 
+            New Platform After Execution Event Handler. 
+            </summary>
+            <param name="Guid">Command GUID. </param>
+            <param name="ID">Command ID. </param>
+            <param name="CustomIn">Custom IN Object. </param>
+            <param name="CustomOut">Custom OUT Object. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.cmdNewFunctionBreakpoint_beforeExec(System.String,System.Int32,System.Object,System.Object,System.Boolean@)">
+            <summary> 
+            New Function Breakpoint Before Execution Event Handler. 
+            </summary>
+            <param name="Guid">Command GUID. </param>
+            <param name="ID">Command ID. </param>
+            <param name="CustomIn">Custom IN Object. </param>
+            <param name="CustomOut">Custom OUT Object. </param>
+            <param name="CancelDefault">Cancel the default execution of the command. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.cmdNewFunctionBreakpoint_afterExec(System.String,System.Int32,System.Object,System.Object)">
+            <summary> 
+            New Function Breakpoint After Execution Event Handler. 
+            </summary>
+            <param name="Guid">Command GUID. </param>
+            <param name="ID">Command ID. </param>
+            <param name="CustomIn">Custom IN Object. </param>
+            <param name="CustomOut">Custom OUT Object. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.AddBarDescriptor">
+            <summary> 
+            Add Bar Descriptor to each project. 
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.AddBlackBerryConfigurations(EnvDTE.Project)">
+            <summary> 
+            Add BlackBerry configurations to the project. 
+            </summary>
+            <param name="proj"> Represents a project in the integrated development environment. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.startNoDebugCommandEvents_AfterExecute(System.String,System.Int32,System.Object,System.Object)">
+            <summary> 
+            New Start No Debug Command Events After Execution Event Handler. 
+            </summary>
+            <param name="Guid"> Command GUID. </param>
+            <param name="ID"> Command ID. </param>
+            <param name="CustomIn"> Custom IN Object. </param>
+            <param name="CustomOut"> Custom OUT Object. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.startNoDebugCommandEvents_BeforeExecute(System.String,System.Int32,System.Object,System.Object,System.Boolean@)">
+            <summary> 
+            New Start No Debug Command Events Before Execution Event Handler. 
+            </summary>
+            <param name="Guid"> Command GUID. </param>
+            <param name="ID"> Command ID. </param>
+            <param name="CustomIn"> Custom IN Object. </param>
+            <param name="CustomOut"> Custom OUT Object. </param>
+            <param name="CancelDefault"> Cancel the default execution of the command. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.startDebugCommandEvents_AfterExecute(System.String,System.Int32,System.Object,System.Object)">
+            <summary> 
+            New Start Debug Command Events After Execution Event Handler. 
+            </summary>
+            <param name="Guid">Command GUID. </param>
+            <param name="ID">Command ID. </param>
+            <param name="CustomIn">Custom IN Object. </param>
+            <param name="CustomOut">Custom OUT Object. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.startDebugCommandEvents_BeforeExecute(System.String,System.Int32,System.Object,System.Object,System.Boolean@)">
+            <summary> 
+            New Start Debug Command Events Before Execution Event Handler. Call the method responsible for building the app. 
+            </summary>
+            <param name="Guid"> Command GUID. </param>
+            <param name="ID"> Command ID. </param>
+            <param name="CustomIn"> Custom IN Object. </param>
+            <param name="CustomOut"> Custom OUT Object. </param>
+            <param name="CancelDefault"> Cancel the default execution of the command. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.BuildBar">
+            <summary> 
+            Identify the projects to be build and start the build process. 
+            </summary>
+            <returns> TRUE if successful, FALSE if not. </returns>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.OnBuildBegin(EnvDTE.vsBuildScope,EnvDTE.vsBuildAction)">
+            <summary> 
+            This event is fired only when user wants to build, rebuild or clean the project. 
+            </summary>
+            <param name="Scope"> Represents the scope of the build. </param>
+            <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.OnBuildDone(EnvDTE.vsBuildScope,EnvDTE.vsBuildAction)">
+            <summary> 
+            This event is fired only when the build/rebuild/clean process ends. 
+            </summary>
+            <param name="Scope"> Represents the scope of the build. </param>
+            <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.Built">
+            <summary> 
+            Verify if the build process was successful. If so, start deploying the app. 
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.Deployed">
+            <summary> 
+            Get the process ID and launch an executable using the VSNDK debug engine. 
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.getPID(EnvDTE80.DTE2,System.String@)">
+            <summary> 
+            Get the PID of the launched native app by parsing text from the output window. 
+            </summary>
+            <param name="dte"> Application Object. </param>
+            <param name="pidString"> Returns the Process ID as a string. </param>
+            <returns> TRUE if successful, False if not. </returns>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.LaunchDebugTarget(System.String)">
+            <summary> 
+            Launch an executable using the VSNDK debug engine. 
+            </summary>
+            <param name="pidString"> Process ID in string format. </param>
+            <returns> TRUE if successful, False if not. </returns>
+        </member>
+        <member name="T:VSNDK.AddIn.VSNDKCommandEvents">
+            <summary> 
+            Responsible for customization of VSShell command events for VSNDK. 
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKCommandEvents.#ctor(EnvDTE80.DTE2)">
+            <summary>
+            
+            </summary>
+            <param name="dte"> Application Object. </param>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKCommandEvents.RegisterCommand(System.String,System.Int32,EnvDTE._dispCommandEvents_AfterExecuteEventHandler,EnvDTE._dispCommandEvents_BeforeExecuteEventHandler)">
+            <summary>
+            
+            </summary>
+            <param name="guid"></param>
+            <param name="cmdId"></param>
+            <param name="afterHandler"></param>
+            <param name="beforeHandler"></param>
+        </member>
+        <member name="T:VSNDK.AddIn.CommandConstants">
+            <summary> 
+            Command IDs exposed by VisualStudio. 
+            </summary>
+        </member>
+    </members>
+</doc>
