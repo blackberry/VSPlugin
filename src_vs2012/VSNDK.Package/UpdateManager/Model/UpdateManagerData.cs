@@ -21,7 +21,6 @@ using System.Windows.Data;
 using RIM.VSNDK_Package.Settings;
 using System.IO;
 using System.Xml;
-using System.Linq;
 using System.Windows;
 
 namespace RIM.VSNDK_Package.UpdateManager.Model
