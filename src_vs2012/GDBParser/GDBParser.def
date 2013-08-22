@@ -1,0 +1,5 @@
+LIBRARY	"GDBParser"
+
+EXPORTS
+DllRegisterServer	PRIVATE
+DllUnregisterServer	PRIVATE
