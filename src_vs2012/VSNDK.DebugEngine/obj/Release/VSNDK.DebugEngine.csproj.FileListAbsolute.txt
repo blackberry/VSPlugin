@@ -1,9 +1,0 @@
-C:\Users\dburgess\buildresults\vs2012\VSNDK.AddIn.AddIn
-C:\Users\dburgess\buildresults\vs2012\VSNDK.DebugEngine.dll
-C:\Users\dburgess\buildresults\vs2012\VSNDK.DebugEngine.pdb
-C:\Users\dburgess\VSPlugin\src_vs2012\VSNDK.DebugEngine\obj\Release\VSNDK.DebugEngine.csprojResolveAssemblyReference.cache
-C:\Users\dburgess\VSPlugin\src_vs2012\VSNDK.DebugEngine\obj\Release\VSNDK.DebugEngine.dll
-C:\Users\dburgess\VSPlugin\src_vs2012\VSNDK.DebugEngine\obj\Release\VSNDK.DebugEngine.pdb
-C:\Users\dburgess\buildresults\VS2010\VSNDK.AddIn.AddIn
-C:\Users\dburgess\buildresults\VS2010\VSNDK.DebugEngine.dll
-C:\Users\dburgess\buildresults\VS2010\VSNDK.DebugEngine.pdb

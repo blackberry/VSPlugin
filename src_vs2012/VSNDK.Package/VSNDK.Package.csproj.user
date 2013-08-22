@@ -8,7 +8,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <StartAction>Program</StartAction>
     <StartProgram>C:\Program Files %28x86%29\Microsoft Visual Studio 11.0\Common7\IDE\devenv.exe</StartProgram>
-    <StartArguments>
-    </StartArguments>
+    <StartArguments>/rootsuffix Exp</StartArguments>
   </PropertyGroup>
 </Project>

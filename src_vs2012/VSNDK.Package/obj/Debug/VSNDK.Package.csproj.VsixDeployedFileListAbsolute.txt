@@ -1,5 +1,0 @@
-C:\Users\dburgess\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Research In Motion Ltd\VSNDK.Package\1.0.31\\VSNDK.Package.dll
-C:\Users\dburgess\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Research In Motion Ltd\VSNDK.Package\1.0.31\\VSNDK.Package.pkgdef
-C:\Users\dburgess\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Research In Motion Ltd\VSNDK.Package\1.0.31\\extension.vsixmanifest
-C:\Users\dburgess\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Research In Motion Ltd\VSNDK.Package\1.0.31\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\\bar-descriptor.xml
-C:\Users\dburgess\AppData\Local\Microsoft\VisualStudio\11.0Exp\Extensions\Research In Motion Ltd\VSNDK.Package\1.0.31\\VSNDK.Package.pdb
