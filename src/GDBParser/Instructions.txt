@@ -7,7 +7,7 @@ upload:->:??^done;#File uploaded!;
 -target-attach:->:??^done;{#state="stopped"\;processID=";0;??pid=";@@";#"\;thread-ID=";??thread-created,id=";@@";0;#"\;$EOL$80\;";(??~";?<?~;@@$EOL$;):$EOL$;#"!80;};
 -file-exec-and-symbols:->:??^done;#File and symbols loaded.;
 -gdb-set:->:??^done;{#done;};
-set:->:#NOT CREATED!
+set:->:??^done;{#done;};
 -exec-arguments:->:??^done;#Arguments loaded.;
 -exec-run:->:??^running;{0;#40\;;??thread-created,id=";@@";0;??pid=";#\;;@@";0;#$EOL$;(??~";#80\;";?<?~;@@$EOL$;#"!80;):$EOL$;(??&";#80\;";?<?&;@@$EOL$;#"!80;):$EOL$;};
 -exec-continue:->:??^running;{#41\;;??thread-id="all;{#0;}{??thread-id=";@@";};0;#$EOL$;(??~";#80\;";?<?~;@@$EOL$;#"!80;):$EOL$;(??&";#80\;";?<?&;@@$EOL$;#"!80;):$EOL$;};

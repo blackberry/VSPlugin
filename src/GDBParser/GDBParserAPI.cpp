@@ -148,6 +148,7 @@ void GDBParser::setNDKVars(bool isSimulator) {
 	String^ keyPath = "HKEY_CURRENT_USER\\Software\\BlackBerry\\BlackBerryVSPlugin";
 	String^ ndkHostPath = (String^)Registry::GetValue(keyPath, "NDKHostPath", "");
 	String^ ndkTargetPath = (String^)Registry::GetValue(keyPath, "NDKTargetPath", "");
+	m_remotePath = (String^)Registry::GetValue(keyPath, "NDKRemotePath", "");
 			
 	if (isSimulator) {		
 		m_pcGDBCmd = ndkHostPath + "\\usr\\bin\\ntox86-gdb.exe --interpreter=mi2";
@@ -429,7 +430,21 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 		return false;
 	}
 	
-	sprintf(pcCmd, "6-target-attach %d\r\n", pid);
+	if (m_remotePath != "")
+	{
+		CAutoPtr <char> apPath = convertToAutoPtrFromString(m_remotePath);
+		sprintf(pcCmd, "6set solib-search-path %s\r\n", apPath);		
+		console->sendCommand(pcCmd);
+		response = console->waitForPrompt(true);
+		parsed = parseGDB(response, parsingInstructions[8]);
+		if ((parsed == "") || (parsed[0] == '!')) //found an error
+		{
+			// TODO: load output console window with the response.
+			return false;
+		}
+	}
+	
+	sprintf(pcCmd, "7-target-attach %d\r\n", pid);
 	console->sendCommand(pcCmd);
 	response = console->waitForPrompt(true);
 	parsed = parseGDB(response, parsingInstructions[6]);
