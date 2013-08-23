@@ -87,7 +87,8 @@ namespace RIM.VSNDK_Package.Signing
                 win.ResizeMode = System.Windows.ResizeMode.NoResize;
                 bool? res = win.ShowDialog();
             }
-            UpdateUI(File.Exists(certPath));        }
+            UpdateUI(File.Exists(certPath));
+        }
 
         /// <summary>
         /// Unregister your signing keys.

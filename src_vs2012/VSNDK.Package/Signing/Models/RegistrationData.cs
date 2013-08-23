@@ -261,7 +261,8 @@ namespace RIM.VSNDK_Package.Signing.Models
             if (!string.IsNullOrEmpty(err))
                 _errors += err + "\n";
             if (this.Author.ToUpper() == "BLACKBERRY")
-                _errors += "BlackBerry is a reserved word and can not be used as \"author name\".\n"; err = this[_colCSJPW];
+                _errors += "BlackBerry is a reserved word and can not be used as \"author name\".\n"; 
+            err = this[_colCSJPW];
             if (!string.IsNullOrEmpty(err))
                _errors += err + "\n";
             return string.IsNullOrEmpty(_errors);
