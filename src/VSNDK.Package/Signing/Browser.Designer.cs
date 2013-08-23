@@ -46,9 +46,11 @@ namespace RIM.VSNDK_Package.Signing
             // 
             this.webBrowser1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.webBrowser1.Location = new System.Drawing.Point(0, 0);
-            this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
+            this.webBrowser1.MaximumSize = new System.Drawing.Size(1280, 768);
+            this.webBrowser1.MinimumSize = new System.Drawing.Size(1280, 768);
             this.webBrowser1.Name = "webBrowser1";
-            this.webBrowser1.Size = new System.Drawing.Size(1024, 768);
+            this.webBrowser1.Size = new System.Drawing.Size(1280, 768);
+            this.webBrowser1.TabIndex = 0;
             this.webBrowser1.Url = new System.Uri("https://developer.blackberry.com/codesigning/", System.UriKind.Absolute);
             this.webBrowser1.Navigating += new System.Windows.Forms.WebBrowserNavigatingEventHandler(this.webBrowser1_Navigating);
             // 
@@ -56,11 +58,15 @@ namespace RIM.VSNDK_Package.Signing
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1024, 768);
+            this.ClientSize = new System.Drawing.Size(1280, 768);
             this.Controls.Add(this.webBrowser1);
             this.Name = "Browser";
             this.Text = "Sign in to create and download your BlackBerry ID token";
             this.ResumeLayout(false);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MinimizeBox = false;
+            this.MaximizeBox = false;
+
         }
 
         #endregion
@@ -117,14 +123,6 @@ namespace RIM.VSNDK_Package.Signing
                 }
 
                 this.Close();
-
-                if (File.Exists(signingDialog.bbidtokenPath))
-                {
-                    RegistrationWindow win = new RegistrationWindow();
-                    bool? res = win.ShowDialog();
-                }
-                signingDialog.UpdateUI(File.Exists(signingDialog.certPath));
-
             }
         }
 

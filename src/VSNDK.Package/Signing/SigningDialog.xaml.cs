@@ -80,6 +80,14 @@ namespace RIM.VSNDK_Package.Signing
         {
             Browser wb = new Browser(this);
             wb.ShowDialog();
+
+            if (File.Exists(bbidtokenPath))
+            {
+                RegistrationWindow win = new RegistrationWindow();
+                win.ResizeMode = System.Windows.ResizeMode.NoResize;
+                bool? res = win.ShowDialog();
+            }
+            UpdateUI(File.Exists(certPath));
         }
 
         /// <summary>
