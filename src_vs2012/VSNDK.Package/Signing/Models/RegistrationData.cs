@@ -42,32 +42,11 @@ namespace RIM.VSNDK_Package.Signing.Models
         private const string _colAuthor = "Author name";
         private const string _colCSJPW = "CSJPassword";
 
-        private static string _ndkTargetPath;
-        private static string _ndkHostPath;
-
         /// <summary>
         /// Constructor for the RegistrationData Model
         /// </summary>
         static RegistrationData()
         {
-            RegistryKey rkHKCU = Registry.CurrentUser;
-            RegistryKey rkNDKPath = null;
-
-            try
-            {
-
-                rkNDKPath = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                _ndkHostPath = rkNDKPath.GetValue("NDKHostPath").ToString();
-                _ndkTargetPath = rkNDKPath.GetValue("NDKTargetPath").ToString();
-            }
-            catch
-            {
-                _ndkHostPath = null;
-                _ndkTargetPath = null;
-            }
-
-            rkNDKPath.Close();
-            rkHKCU.Close();
         }
 
         /// <summary>
@@ -119,11 +98,7 @@ namespace RIM.VSNDK_Package.Signing.Models
         {
             if (!ValidateInput())
                 return false;
-            if (string.IsNullOrEmpty(_ndkHostPath))
-            {
-                _errors = PkgResources.NativSDKNotInstalled;
-                return false;
-            }
+
             bool success = false;
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
@@ -169,11 +144,6 @@ namespace RIM.VSNDK_Package.Signing.Models
         /// <returns></returns>
         public bool UnRegister()
         {
-            if (string.IsNullOrEmpty(_ndkHostPath))
-            {
-                _errors = PkgResources.NativSDKNotInstalled;
-                return false;
-            }
             bool success = false;
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
@@ -290,7 +260,8 @@ namespace RIM.VSNDK_Package.Signing.Models
             string err = this[_colAuthor];
             if (!string.IsNullOrEmpty(err))
                 _errors += err + "\n";
-            err = this[_colCSJPW];
+            if (this.Author.ToUpper() == "BLACKBERRY")
+                _errors += "BlackBerry is a reserved word and can not be used as \"author name\".\n"; err = this[_colCSJPW];
             if (!string.IsNullOrEmpty(err))
                _errors += err + "\n";
             return string.IsNullOrEmpty(_errors);

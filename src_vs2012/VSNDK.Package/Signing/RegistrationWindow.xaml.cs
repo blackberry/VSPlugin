@@ -27,6 +27,7 @@ using System.Windows.Shapes;
 using RIM.VSNDK_Package.Signing.Models;
 using PkgResources = RIM.VSNDK_Package.Resources;
 using System.IO;
+using System.ComponentModel;
 
 namespace RIM.VSNDK_Package
 {
@@ -75,5 +76,21 @@ namespace RIM.VSNDK_Package
             }
             DialogResult = registered;
         }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            if (!File.Exists(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\author.p12"))
+            {
+                FileInfo fi_csk = new FileInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\bbidtoken.csk");
+
+                try
+                {
+                    fi_csk.Delete();
+                }
+                catch (System.IO.IOException ex)
+                {
+                }
+            }
+        }    
     }
 }

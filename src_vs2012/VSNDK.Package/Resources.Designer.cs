@@ -97,7 +97,7 @@ namespace RIM.VSNDK_Package {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You have to specify a password and it must be at least 6 characters long.
+        ///   Looks up a localized string similar to You have to specify a BlackBerry ID token password and it must be at least 6 characters long.
         /// </summary>
         internal static string CSJPasswordMissing {
             get {
@@ -187,7 +187,7 @@ namespace RIM.VSNDK_Package {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please, enter the &quot;Author Name&quot; and the password used to create the BlackBerry ID token..
+        ///   Looks up a localized string similar to Please, enter the &quot;Author Name&quot; and the password that was used to create the BlackBerry ID token..
         /// </summary>
         internal static string RegistrationInfo {
             get {
@@ -214,7 +214,7 @@ namespace RIM.VSNDK_Package {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please note that by unregistering your signing keys you are also removing them from the RIM signing server.  These keys will no longer be usable on this or any other machine.  You will need to request new signing keys to sign applications in the future.  For more information see:http://www.blackberry.com/go/codesigning/.
+        ///   Looks up a localized string similar to Do you want to unregister and remove the BlackBerry ID Token file?.
         /// </summary>
         internal static string UnRegistrationInfo {
             get {
