@@ -33,7 +33,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void Close_Click(object sender, RoutedEventArgs e)
         {
             DialogResult = true;
         }
@@ -46,9 +46,17 @@ namespace RIM.VSNDK_Package.UpdateManager
         private void Install_Click(object sender, RoutedEventArgs e)
         {
             UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
+
             if (data != null)
             {
-                data.InstallAPI(((APITargetClass)APITargets.SelectedItem).TargetVersion);
+                if (!data.IsInstalling)
+                {
+                    MessageBox.Show("Visual Studio is currently already installing an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                }
+                else
+                {
+                    data.InstallAPI(((APITargetClass)APITargets.SelectedItem).TargetVersion);
+                }
             }
         }
 
@@ -62,7 +70,14 @@ namespace RIM.VSNDK_Package.UpdateManager
             UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
             if (data != null)
             {
-                data.UninstallAPI(((APITargetClass)lbAvailable.SelectedItem).TargetVersion);
+                if (!data.IsInstalling)
+                {
+                    MessageBox.Show("Visual Studio is currently already installing an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                }
+                else
+                {
+                    data.UninstallAPI(((APITargetClass)lbAvailable.SelectedItem).TargetVersion);
+                }
             }
         }
 
@@ -71,12 +86,20 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void Update_Click(object sender, RoutedEventArgs e)
         {
             UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
             if (data != null)
             {
-                data.UpdateAPI(((APITargetClass)lbAvailable.SelectedItem).TargetVersion, ((APITargetClass)lbAvailable.SelectedItem).LatestVersion);
+                if (!data.IsInstalling)
+                {
+                    MessageBox.Show("Visual Studio is currently already installing an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                }
+                else
+                {
+                    data.UpdateAPI(((APITargetClass)lbAvailable.SelectedItem).TargetVersion, ((APITargetClass)lbAvailable.SelectedItem).LatestVersion);
+                }
+
             }
         }
     }
