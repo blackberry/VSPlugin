@@ -56,6 +56,7 @@ namespace RIM.VSNDK_Package.Signing
                 }
                 else if (!string.IsNullOrEmpty(data.Message))
                 {
+                    data.Message = data.Message.Replace("CSK", "BB ID Token");
                     MessageBox.Show(data.Message, PkgResources.Info);
                     data.Message = null;
                 }

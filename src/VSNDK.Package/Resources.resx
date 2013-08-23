@@ -124,7 +124,7 @@
     <value>You have to specify a confirm password</value>
   </data>
   <data name="CSJPasswordMissing" xml:space="preserve">
-    <value>You have to specify a password and it must be at least 6 characters long</value>
+    <value>You have to specify BlackBerry ID token password and it must be at least 6 characters long</value>
   </data>
   <data name="CSJPinMissing" xml:space="preserve">
     <value>You have to provide the Pin</value>
@@ -154,10 +154,10 @@
     <value>It is important that you back up your signing keys. If you should lose your signing keys, or forget your password, you will be required to re-register with BlackBerry. After re-registering, new versions of your applications will appear as new applications, and will not have access to shared data from previous versions. Exporting your signing keys will also allow you to import them to multiple computers allow you to sign from any of them.</value>
   </data>
   <data name="RegistrationInfo" xml:space="preserve">
-    <value>Please, enter the "Author Name" and the password used to create the BlackBerry ID token.</value>
+    <value>Please, enter the "Author Name" and the password that was used to create the BlackBerry ID token.</value>
   </data>
   <data name="UnRegistrationInfo" xml:space="preserve">
-    <value>Please note that by unregistering your signing keys you are also removing them from the RIM signing server.  These keys will no longer be usable on this or any other machine.  You will need to request new signing keys to sign applications in the future.  For more information see:http://www.blackberry.com/go/codesigning/</value>
+    <value>Do you want to unregister and remove the BlackBerry ID Token file?</value>
   </data>
   <data name="ErrorMessageBoxTitle" xml:space="preserve">
     <value>bar-descriptor Designer</value>

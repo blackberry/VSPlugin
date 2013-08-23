@@ -21,7 +21,7 @@
                 <TextBox Name="tbAuthor" Width="300" Text="{Binding Path=Author}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label Content="CSK Password:" Style="{StaticResource ResourceKey=labelWidth}"/>
+                <Label Content="BB ID Token Password:" Style="{StaticResource ResourceKey=labelWidth}"/>
                 <PasswordBox Name="tbCSKPassword" Style="{StaticResource ResourceKey=passwordBoxWidth}" DataContext="{Binding Path=CSJPassword}" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
