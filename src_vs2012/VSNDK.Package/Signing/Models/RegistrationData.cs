@@ -195,16 +195,6 @@ namespace RIM.VSNDK_Package.Signing.Models
         }
 
         /// <summary>
-        /// Reset password to user input
-        /// </summary>
-        /// <returns></returns>
-        public void resetPassword()
-        {
-            setCSKPassword(CSJPassword);
-            Message = "Password successfully reset.";
-        }
-
-        /// <summary>
         /// Set CSK Password into the registry.
         /// </summary>
         private void setCSKPassword(string password)

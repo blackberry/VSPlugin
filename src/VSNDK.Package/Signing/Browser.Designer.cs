@@ -119,7 +119,7 @@ namespace RIM.VSNDK_Package.Signing
                 }
                 catch (Exception e1)
                 {
-                    MessageBox.Show("Server error, please, try to register again.", "Server Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("Server error, please, try again later.", "Server Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
 
                 this.Close();

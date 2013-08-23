@@ -195,16 +195,6 @@ namespace RIM.VSNDK_Package.Signing.Models
         }
 
         /// <summary>
-        /// Reset password to user input
-        /// </summary>
-        /// <returns></returns>
-        public void resetPassword()
-        {
-            setCSKPassword(CSJPassword);
-            Message = "Password successfully reset.";
-        }
-
-        /// <summary>
         /// Set CSK Password into the registry.
         /// </summary>
         private void setCSKPassword(string password)
@@ -264,7 +254,7 @@ namespace RIM.VSNDK_Package.Signing.Models
                 _errors += "BlackBerry is a reserved word and can not be used as \"author name\".\n";
             err = this[_colCSJPW];
             if (!string.IsNullOrEmpty(err))
-               _errors += err + "\n";
+                _errors += err + "\n";
             return string.IsNullOrEmpty(_errors);
         }
 

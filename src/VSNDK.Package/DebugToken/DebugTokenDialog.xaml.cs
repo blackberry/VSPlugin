@@ -55,6 +55,8 @@ namespace RIM.VSNDK_Package.DebugToken
             {
                 btnAdd.IsEnabled = false;
                 btnRefresh.IsEnabled = false;
+                IsClosing = true;
+                this.Close();
                 return;
             }
             deployTokenData = gridMain.DataContext as DebugTokenData;
