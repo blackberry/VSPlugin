@@ -202,6 +202,12 @@
     <Resource Include="Resources\RunBackgrounded.bmp" />
     <Resource Include="Resources\SharedFiles.bmp" />
     <Resource Include="Resources\TextMessages.bmp" />
+    <Resource Include="Resources\Gamepad.bmp" />
+    <Resource Include="Resources\MyContactInfo.bmp" />
+    <Resource Include="Resources\Phone.bmp" />
+    <Resource Include="Resources\PhoneControl.bmp" />
+    <Resource Include="Resources\Push.bmp" />
+    <Resource Include="Resources\CaptureScreen.bmp" />
     <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
