@@ -55,7 +55,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    data.InstallAPI(((APITargetClass)APITargets.SelectedItem).TargetVersion);
+                    data.InstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion);
                 }
             }
         }
@@ -76,7 +76,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    data.UninstallAPI(((APITargetClass)lbAvailable.SelectedItem).TargetVersion);
+                    data.UninstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion);
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    data.UpdateAPI(((APITargetClass)lbAvailable.SelectedItem).TargetVersion, ((APITargetClass)lbAvailable.SelectedItem).LatestVersion);
+                    data.UpdateAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, ((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).LatestVersion);
                 }
 
             }
