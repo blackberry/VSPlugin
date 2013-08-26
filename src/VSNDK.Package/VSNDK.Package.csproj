@@ -173,9 +173,6 @@
     <Compile Include="Signing\RegistrationWindow.xaml.cs">
       <DependentUpon>RegistrationWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Signing\ResetPasswordWindow.xaml.cs">
-      <DependentUpon>ResetPasswordWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Signing\SigningDialog.xaml.cs">
       <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
@@ -315,10 +312,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Signing\RegistrationWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Signing\ResetPasswordWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
