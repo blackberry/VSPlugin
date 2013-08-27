@@ -33,6 +33,7 @@ using System.Collections;
 using System.IO;
 using System.Windows.Data;
 using System.Collections.ObjectModel;
+using RIM.VSNDK_Package.Settings.Models;
 using EnvDTE;
 
 namespace RIM.VSNDK_Package
@@ -405,45 +406,143 @@ namespace RIM.VSNDK_Package
             }
         }
 
+        /// <summary>
+        /// Given the permission ID return the appropriate Icon
+        /// </summary>
+        /// <param name="ID"></param>
+        /// <returns></returns>
+        private string getPermissionIcon(string ID)
+        {
+            string retVal = "";
+
+            switch (ID)
+            {
+                case "bbm_connect":
+                    retVal = "/VSNDK.Package;component/Resources/BlackBerryMessager.bmp";
+                    break;
+                case "access_pimdomain_calendars":
+                    retVal = "/VSNDK.Package;component/Resources/Calendar.bmp";
+                    break;
+                case "use_camera":
+                    retVal = "/VSNDK.Package;component/Resources/Camera.bmp";
+                    break;
+                case "access_pimdomain_contacts":
+                    retVal = "/VSNDK.Package;component/Resources/Contacts.bmp";
+                    break;
+                case "read_device_identifying_information":
+                    retVal = "/VSNDK.Package;component/Resources/DeviceIdentifyingInfo.bmp";
+                    break;
+                case "access_pimdomain_messages":
+                    retVal = "/VSNDK.Package;component/Resources/EmailPINMessages.bmp";
+                    break;
+                case "access_internet":
+                    retVal = "/VSNDK.Package;component/Resources/Internet.bmp";
+                    break;
+                case "read_geolocation":
+                    retVal = "/VSNDK.Package;component/Resources/GPSLocation.bmp";
+                    break;
+                case "access_location_services":
+                    retVal = "/VSNDK.Package;component/Resources/Location.bmp";
+                    break;
+                case "record_audio":
+                    retVal = "/VSNDK.Package;component/Resources/Mircrophone.bmp";
+                    break;
+                case "access_pimdomain_notebooks":
+                    retVal = "/VSNDK.Package;component/Resources/Notebooks.bmp";
+                    break;
+                case "post_notification":
+                    retVal = "/VSNDK.Package;component/Resources/PostNotifications.bmp";
+                    break;
+                case "run_when_backgrounded":
+                    retVal = "/VSNDK.Package;component/Resources/RunBackgrounded.bmp";
+                    break;
+                case "access_shared":
+                    retVal = "/VSNDK.Package;component/Resources/SharedFiles.bmp";
+                    break;
+                case "access_sms_mms":
+                    retVal = "/VSNDK.Package;component/Resources/TextMessages.bmp";
+                    break;
+                case "read_personally_identifiable_information":
+                    retVal = "/VSNDK.Package;component/Resources/MyContactInfo.bmp";
+                    break;
+                case "access_phone":
+                    retVal = "/VSNDK.Package;component/Resources/Phone.bmp";
+                    break;
+                case "control_phone":
+                    retVal = "/VSNDK.Package;component/Resources/PhoneControl.bmp";
+                    break;
+                case "_sys_use_consumer_push":
+                    retVal = "/VSNDK.Package;component/Resources/Push.bmp";
+                    break;
+                case "use_camera_desktop":
+                    retVal = "/VSNDK.Package;component/Resources/CaptureScreen.bmp";
+                    break;
+                case "use_gamepad":
+                    retVal = "/VSNDK.Package;component/Resources/Gamepad.bmp";
+                    break;
+            }
+
+            return retVal;
+        }
+
         private void LoadPermissions()
         {
+            SettingsData settingsData = new SettingsData();
+
+            XmlDocument xmlDoc = new XmlDocument();
+            xmlDoc.Load(settingsData.TargetPath + @"\..\blackberry-sdk-descriptor.xml");
+            XmlNodeList pList = xmlDoc.GetElementsByTagName("permission");
+
             IList<PermissionItemClass> PermissionList = new List<PermissionItemClass>();
-            PermissionItemClass permissionItem = new PermissionItemClass(isPermissionChecked("bbm_connect"), "BlackBerry Messenger", "bbm_connect", "/VSNDK.Package;component/Resources/BlackBerryMessager.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_calendars"), "Calendar", "access_pimdomain_calendars", "/VSNDK.Package;component/Resources/Calendar.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("use_camera"), "Camera", "use_camera", "/VSNDK.Package;component/Resources/Camera.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_contacts"), "Contacts", "access_pimdomain_contacts", "/VSNDK.Package;component/Resources/Contacts.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("read_device_identifying_information"), "Device Identifying Information", "read_device_identifying_information", "/VSNDK.Package;component/Resources/DeviceIdentifyingInfo.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_messages"), "Email and PIN Message", "access_pimdomain_messages", "/VSNDK.Package;component/Resources/EmailPINMessages.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_internet"), "Internet", "access_internet", "/VSNDK.Package;component/Resources/Internet.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("read_geolocation"), "GPS Location", "read_geolocation", "/VSNDK.Package;component/Resources/GPSLocation.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_location_services"), "Location", "access_location_services", "/VSNDK.Package;component/Resources/Location.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("record_audio"), "Microphone", "record_audio", "/VSNDK.Package;component/Resources/Mircrophone.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_notebooks"), "Notebooks", "access_pimdomain_notebooks", "/VSNDK.Package;component/Resources/Notebooks.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("post_notification"), "Post Notifications", "post_notification", "/VSNDK.Package;component/Resources/PostNotifications.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("run_when_backgrounded"), "Run When Backgrounded", "run_when_backgrounded", "/VSNDK.Package;component/Resources/RunBackgrounded.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_shared"), "Shared Files", "access_shared", "/VSNDK.Package;component/Resources/SharedFiles.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_sms_mms"), "Text Messages", "access_sms_mms", "/VSNDK.Package;component/Resources/TextMessages.bmp");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("_sys_use_consumer_push"), "Consumer Push", "_sys_use_consumer_push", "");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("narrow_landscape_exit"), "Narrow Swipe Up", "narrow_landscape_exit", "");
-            PermissionList.Add(permissionItem);
-            permissionItem = new PermissionItemClass(isPermissionChecked("access_phone"), "Phone", "access_phone", "");
-            PermissionList.Add(permissionItem);
+
+            if (pList.Count == 0) // Old Listing Method
+            {
+                PermissionItemClass permissionItem = new PermissionItemClass(isPermissionChecked("bbm_connect"), "BlackBerry Messenger", "bbm_connect", getPermissionIcon("bbm_connect"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_calendars"), "Calendar", "access_pimdomain_calendars", getPermissionIcon("access_pimdomain_calendars"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("use_camera"), "Camera", "use_camera", getPermissionIcon("use_camera"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_contacts"), "Contacts", "access_pimdomain_contacts", getPermissionIcon("access_pimdomain_contacts"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("read_device_identifying_information"), "Device Identifying Information", "read_device_identifying_information", getPermissionIcon("read_device_identifying_information"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_messages"), "Email and PIN Message", "access_pimdomain_messages", getPermissionIcon("access_pimdomain_messages"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_internet"), "Internet", "access_internet", getPermissionIcon("access_internet"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("read_geolocation"), "GPS Location", "read_geolocation", getPermissionIcon("read_geolocation"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_location_services"), "Location", "access_location_services", getPermissionIcon("access_location_services"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("record_audio"), "Microphone", "record_audio", getPermissionIcon("record_audio"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_notebooks"), "Notebooks", "access_pimdomain_notebooks", getPermissionIcon("access_pimdomain_notebooks"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("post_notification"), "Post Notifications", "post_notification", getPermissionIcon("post_notification"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("run_when_backgrounded"), "Run When Backgrounded", "run_when_backgrounded", getPermissionIcon("run_when_backgrounded"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_shared"), "Shared Files", "access_shared", getPermissionIcon("access_shared"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_sms_mms"), "Text Messages", "access_sms_mms", getPermissionIcon("access_sms_mms"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("_sys_use_consumer_push"), "Consumer Push", "_sys_use_consumer_push", getPermissionIcon("_sys_use_consumer_push"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("narrow_landscape_exit"), "Narrow Swipe Up", "narrow_landscape_exit", getPermissionIcon("narrow_landscape_exit"));
+                PermissionList.Add(permissionItem);
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_phone"), "Phone", "access_phone", getPermissionIcon("access_phone"));
+                PermissionList.Add(permissionItem);
+            }
+            else
+            {
+                foreach (XmlNode p in pList)
+                {
+                    PermissionItemClass permissionItem = new PermissionItemClass(isPermissionChecked(p["id"].InnerText), p["name"].InnerText, p["id"].InnerText, getPermissionIcon(p["id"].InnerText));
+                    PermissionList.Add(permissionItem);
+                }
+            }
+
             _permissionList = new CollectionView(PermissionList);
         }
 

@@ -59,6 +59,9 @@ namespace RIM.VSNDK_Package.Settings.Models
         private CollectionView _ndkEntries;
         private NDKEntryClass _ndkEntry;
 
+        private string _targetPath;
+        private string _hostPath;
+
         private const string _colDeviceIP = "DeviceIP";
         private const string _colDevicePW = "DevicePassword";
         private const string _colSimulatorIP = "SimulatorIP";
@@ -87,6 +90,8 @@ namespace RIM.VSNDK_Package.Settings.Models
 
                 IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
 
+                getNDKPath();
+
                 foreach (string file in filePaths)
                 {
                     try
@@ -101,7 +106,7 @@ namespace RIM.VSNDK_Package.Settings.Models
                         NDKEntryClass NDKEntry = new NDKEntryClass(apiName != "" ? apiName : name, hostpath, targetpath);
                         NDKList.Add(NDKEntry);
 
-                        if (NDKEntry.HostPath == getNDKPath())
+                        if (NDKEntry.HostPath == HostPath)
                         {
                             NDKEntryClass = NDKEntry;
                         }
@@ -148,6 +153,24 @@ namespace RIM.VSNDK_Package.Settings.Models
         {
             get { return _deviceIP; }
             set { _deviceIP = value; OnPropertyChanged(_colDeviceIP); }
+        }
+
+        /// <summary>
+        /// Getter Setter for the TargetPath
+        /// </summary>
+        public string TargetPath
+        {
+            get { return _targetPath; }
+            set { _targetPath = value; }
+        }
+
+        /// <summary>
+        /// Getter Setter for the HostPath
+        /// </summary>
+        public string HostPath
+        {
+            get { return _hostPath; }
+            set { _hostPath = value; }
         }
 
         /// <summary>
@@ -352,8 +375,10 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// Return the NDK Path from the registry
         /// </summary>
         /// <returns></returns>
-        private string getNDKPath()
+        public bool getNDKPath()
         {
+            bool success = false;
+
             RegistryKey rkHKCU = Registry.CurrentUser;
             RegistryKey rkNDKPath = null;
 
@@ -361,18 +386,21 @@ namespace RIM.VSNDK_Package.Settings.Models
             {
                 string NDKHostPath = "";
                 rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                NDKHostPath = rkNDKPath.GetValue("NDKHostPath").ToString();
+                HostPath = rkNDKPath.GetValue("NDKHostPath").ToString();
+                TargetPath = rkNDKPath.GetValue("NDKTargetPath").ToString();
                 rkNDKPath.Close();
                 rkHKCU.Close();
-                return NDKHostPath;
+                success = true;
             }
             catch
             {
                 if (rkNDKPath != null)
                     rkNDKPath.Close();
                 rkHKCU.Close();
-                return null;
+                success = false;
             }
+
+            return success;
         }
 
         /// <summary>
