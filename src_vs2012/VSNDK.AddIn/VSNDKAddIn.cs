@@ -59,7 +59,8 @@ namespace VSNDK.AddIn
         public int amountOfProjects = 0;
         public bool hitPlay = false; // used to know if user has clicked in the play button
         public bool isDeploying = false;
-        private string targetDir = ""; // used to store the target directory in ProcessesPath.txt file, that will be used later in "attach to process"
+        private List<string[]> targetDir = null; // used to store the target directory in ProcessesPath.txt file, that will be used later in "attach to process"
+        private bool isSimulator;
 
         private const string BLACKBERRY = "BlackBerry";
         private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
@@ -411,7 +412,13 @@ namespace VSNDK.AddIn
                 foreach (SolutionContext sc in scCollection)
                 {
                     if (sc.PlatformName == "BlackBerry" || sc.PlatformName == "BlackBerrySimulator")
+                    {
                         bbPlatform = true;
+                        if (sc.PlatformName == "BlackBerrySimulator")
+                            isSimulator = true;
+                        else
+                            isSimulator = false;
+                    }
                 }
             }
 
@@ -451,6 +458,7 @@ namespace VSNDK.AddIn
                 {
                     Solution2 soln = (Solution2)_applicationObject.Solution;
                     List<String> buildThese = new List<String>();
+                    targetDir = new List<string[]>();
 
                     foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
                     {
@@ -459,7 +467,27 @@ namespace VSNDK.AddIn
                             if (p1.UniqueName == startupProject)
                             {
                                 buildThese.Add(p1.FullName);
-                                targetDir = p1.FullName.Remove(p1.FullName.LastIndexOf('\\') + 1);
+
+                                ConfigurationManager config = p1.ConfigurationManager;
+                                Configuration active = config.ActiveConfiguration;
+                                foreach (Property prop in active.Properties)
+                                {
+                                    try
+                                    {
+                                        if (prop.Name == "OutputPath")
+                                        {
+                                            string[] path = new string[2];
+                                            path[0] = p1.Name + "_" + isSimulator.ToString();
+                                            path[1] = prop.Value.ToString();
+                                            targetDir.Add(path);
+                                            break;
+                                        }
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+
                                 break;
                             }
                         }
@@ -638,11 +666,20 @@ namespace VSNDK.AddIn
                     if (begin == -1)
                         begin = outputText.IndexOf("Project: ") + 9;
                     int end = outputText.IndexOf(", Configuration:", begin);
-                    string processName = outputText.Substring(begin, end - begin);
+                    string processName = outputText.Substring(begin, end - begin) + "_" + isSimulator.ToString();
                     begin = processesPaths.IndexOf(processName + ":>");
 
 //                    string currentPath = dte.ActiveDocument.Path;
-                    string currentPath = targetDir;
+                    string currentPath = "";
+
+                    foreach (string[] paths in targetDir)
+                    {
+                        if (paths[0] == processName)
+                        {
+                            currentPath = paths[1];
+                            break;
+                        }
+                    }
 
                     if (begin != -1)
                     {

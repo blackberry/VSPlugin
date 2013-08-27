@@ -253,20 +253,15 @@ namespace VSNDK.DebugEngine
                         processesPaths = "";
                     }
 
-                    int begin = processesPaths.IndexOf(progName + ":>");
+                    string searchProgName = progName + "_" + port.m_isSimulator;
+                    int begin = processesPaths.IndexOf(searchProgName + ":>");
 
                     if (begin != -1)
                     {
-                        begin += progName.Length + 2;
+                        begin += searchProgName.Length + 2;
                         int end = processesPaths.IndexOf("\r\n", begin);
-                        if (port.m_isSimulator)
-                        {
-                            exePath = processesPaths.Substring(begin, end - begin) + "Simulator\\" + progName;
-                        }
-                        else
-                        {
-                            exePath = processesPaths.Substring(begin, end - begin) + "Device-Debug\\" + progName;
-                        }
+
+                        exePath = processesPaths.Substring(begin, end - begin) + progName;
                     }
                     else
                     {
