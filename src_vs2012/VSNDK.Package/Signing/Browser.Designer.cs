@@ -63,9 +63,7 @@ namespace RIM.VSNDK_Package.Signing
             this.Name = "Browser";
             this.Text = "Sign in to create and download your BlackBerry ID token";
             this.ResumeLayout(false);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MinimizeBox = false;
-            this.MaximizeBox = false;
 
         }
 
