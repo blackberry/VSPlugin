@@ -137,11 +137,11 @@ namespace VSNDK.DebugEngine
 
             string response = GDBParser.GetPIDsThroughGDB(m_IP, m_password, m_isSimulator, m_toolsPath, publicKeyPath, 7);
 
-            if ((response == "") || (response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
+            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
             {
                 if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
                 {
-                    MessageBox.Show("Please, verify if your Device/Simulator is connected.", "Verify:", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Please, verify if your Device/Simulator is connected and try again later.", "Device/Simulator not connected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 else 
                 if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
