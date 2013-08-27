@@ -74,8 +74,6 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         public SettingsData()
         {
-            updateManager = new UpdateManagerData();
-
             RefreshScreen();
         }
 
@@ -84,13 +82,17 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         public void RefreshScreen()
         {
-            if (Directory.Exists(updateManager.bbndkPathConst + @"\..\qconfig\"))
+            string[] dirPaths = new string[2];
+            dirPaths[0] = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + @"bbndk_vs\..\qconfig\";
+            dirPaths[1] = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
+
+            IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
+
+            getNDKPath();
+
+            for (int i = 0; i < 2; i++)
             {
-                string[] filePaths = Directory.GetFiles(updateManager.bbndkPathConst + @"\..\qconfig\", "*.xml");
-
-                IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
-
-                getNDKPath();
+                string[] filePaths = Directory.GetFiles(dirPaths[i], "*.xml");
 
                 foreach (string file in filePaths)
                 {
@@ -99,27 +101,26 @@ namespace RIM.VSNDK_Package.Settings.Models
                         XmlDocument xmlDoc = new XmlDocument();
                         xmlDoc.Load(file);
                         string name = xmlDoc.GetElementsByTagName("name")[0].InnerText;
-                        string apiName = getAPIName(name.Substring(name.LastIndexOf(' ') + 1));
+                        //   string apiName = getAPIName(name.Substring(name.LastIndexOf(' ') + 1));
                         string hostpath = xmlDoc.GetElementsByTagName("host")[0].InnerText;
                         string targetpath = xmlDoc.GetElementsByTagName("target")[0].InnerText;
-
-                        NDKEntryClass NDKEntry = new NDKEntryClass(apiName != "" ? apiName : name, hostpath, targetpath);
+                        NDKEntryClass NDKEntry = new NDKEntryClass(name, hostpath, targetpath);
                         NDKList.Add(NDKEntry);
 
                         if (NDKEntry.HostPath == HostPath)
                         {
                             NDKEntryClass = NDKEntry;
                         }
+
                     }
                     catch
                     {
-                        continue;
+                        break;
                     }
-
                 }
-
-                NDKEntries = new CollectionView(NDKList);
             }
+
+            NDKEntries = new CollectionView(NDKList);
         }
 
         /// <summary>

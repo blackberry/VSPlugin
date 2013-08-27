@@ -113,9 +113,21 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public UpdateManagerData()
         {
             Status = "";
-            getInstalledRuntimeTargetList();
+         //   getInstalledRuntimeTargetList();
             RefreshScreen();
         }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        /// <param name="Refresh">Force Refresh</param>
+        public UpdateManagerData(bool Refresh)
+        {
+            Status = "";
+            //   getInstalledRuntimeTargetList();
+            if (Refresh) RefreshScreen();
+        }
+
 
         public void RefreshScreen()
         {
