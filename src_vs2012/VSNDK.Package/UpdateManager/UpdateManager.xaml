@@ -15,8 +15,8 @@
 
     <Grid Name="gridMain" DataContext="{StaticResource updateManagerData}" Height="400">
         <GroupBox Header="Installed" Height="165" HorizontalAlignment="Left" Margin="12,12,0,0" Name="groupBox1" VerticalAlignment="Top" Width="574">
-            <ListBox Name="APITargets" ItemsSource="{Binding Path=APITargets}">
-                <ListBox.ItemTemplate>
+            <ItemsControl Name="APITargets" ItemsSource="{Binding Path=APITargets}">
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Width="500" Visibility="{Binding Path=InstalledVisibility}">
                             <StackPanel Orientation="Vertical" Width="400">
@@ -27,13 +27,13 @@
                             <Button Content="Update" Height="23" HorizontalAlignment="Right" Visibility="{Binding Path=UpdateVisibility}" Click="Update_Click" />
                         </StackPanel>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </GroupBox>
         <Button Content="Close" Height="23" HorizontalAlignment="Left" Margin="504,365,0,0" Name="Close" VerticalAlignment="Top" Width="75" Click="Close_Click" IsEnabled="{Binding Path=IsInstalling}" />
         <GroupBox Header="Available" Height="165" HorizontalAlignment="Left" Margin="11,194,0,0" Name="groupBox2" VerticalAlignment="Top" Width="574">
-            <ListBox ItemsSource="{Binding Path=APITargets}" Name="lbAvailable">
-                <ListBox.ItemTemplate>
+            <ItemsControl ItemsSource="{Binding Path=APITargets}" Name="lbAvailable">
+                <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal" Width="500" Visibility="{Binding Path=AvailableVisibility}">
                             <StackPanel Orientation="Vertical" Width="400">
@@ -43,8 +43,8 @@
                             <Button Content="Install" Height="23" HorizontalAlignment="Right" Click="Install_Click" />
                         </StackPanel>
                     </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </GroupBox>
         <Label Name="Status" Height="28" HorizontalAlignment="Left" Margin="40,366,0,0" VerticalAlignment="Top" Width="226" Content="{Binding Path=Status}" />
     </Grid>
