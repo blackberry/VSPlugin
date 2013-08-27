@@ -31,6 +31,7 @@ using System.Xml;
 using System.Windows.Forms;
 using PkgResources = RIM.VSNDK_Package.Resources;
 using RIM.VSNDK_Package.Settings.Models;
+using System.Net;
 
 namespace RIM.VSNDK_Package.Settings
 {
@@ -84,22 +85,32 @@ namespace RIM.VSNDK_Package.Settings
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, RoutedEventArgs e)
+        private void Update_Click(object sender, RoutedEventArgs e)
         {
-            SettingsData data = gridMain.DataContext as SettingsData;
-            if (data != null)
+            this.Cursor = System.Windows.Input.Cursors.Wait;
+
+            try
             {
-                this.Cursor = System.Windows.Input.Cursors.Wait;
-                UpdateManager.UpdateManager win = new UpdateManager.UpdateManager();
-                this.Cursor = System.Windows.Input.Cursors.Hand;
+                System.Net.WebRequest.Create("http://downloads.blackberry.com").GetResponse();
 
-                bool? res = win.ShowDialog();
+                SettingsData data = gridMain.DataContext as SettingsData;
+                if (data != null)
+                {
+                    UpdateManager.UpdateManager win = new UpdateManager.UpdateManager();
 
-                data.RefreshScreen();
-                NDKEntry.ItemsSource = null;
-                NDKEntry.ItemsSource = data.NDKEntries;
+                    bool? res = win.ShowDialog();
+
+                    data.RefreshScreen();
+                    NDKEntry.ItemsSource = null;
+                    NDKEntry.ItemsSource = data.NDKEntries;
+                }
+            }
+            catch (WebException)
+            {
+                System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
             }
 
+            this.Cursor = System.Windows.Input.Cursors.Hand;
 
         }
     }
