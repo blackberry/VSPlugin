@@ -148,6 +148,7 @@ void GDBParser::setNDKVars(bool isSimulator) {
 	String^ keyPath = "HKEY_CURRENT_USER\\Software\\BlackBerry\\BlackBerryVSPlugin";
 	String^ ndkHostPath = (String^)Registry::GetValue(keyPath, "NDKHostPath", "");
 	String^ ndkTargetPath = (String^)Registry::GetValue(keyPath, "NDKTargetPath", "");
+	m_remotePath = (String^)Registry::GetValue(keyPath, "NDKRemotePath", "");
 			
 	if (isSimulator) {		
 		m_pcGDBCmd = ndkHostPath + "\\usr\\bin\\ntox86-gdb.exe --interpreter=mi2";
@@ -285,14 +286,6 @@ String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimula
 			// ??? load output console window with the parsed message.
 			response = "";
 		}
-		if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
-		{
-			int resp = MessageBox(NULL, L"It might take up to one minute to get a response from GDB if the device is not connected.\n\nDo you want to continue (yes) or abort (no)?", L"Attempting to connect to device/simulator.", MB_YESNO + MB_ICONWARNING + MB_DEFBUTTON2);
-			if (resp == IDYES)
-			{
-				response = console->waitForPrompt(true);
-			}
-		}
 
 		if ((response != "") && (response != "TIMEOUT!") && (response.find("1^error,msg=",0) == -1)) //there is no error from previous response
 		{
@@ -429,7 +422,21 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 		return false;
 	}
 	
-	sprintf(pcCmd, "6-target-attach %d\r\n", pid);
+	if (m_remotePath != "")
+	{
+	  CAutoPtr <char> apPath = convertToAutoPtrFromString(m_remotePath);
+	  sprintf(pcCmd, "6set solib-search-path %s\r\n", apPath);    
+	  console->sendCommand(pcCmd);
+	  response = console->waitForPrompt(true);
+	  parsed = parseGDB(response, parsingInstructions[8]);
+	  if ((parsed == "") || (parsed[0] == '!')) //found an error
+	  {
+		// TODO: load output console window with the response.
+		return false;
+	  }
+	}
+  
+	sprintf(pcCmd, "7-target-attach %d\r\n", pid);
 	console->sendCommand(pcCmd);
 	response = console->waitForPrompt(true);
 	parsed = parseGDB(response, parsingInstructions[6]);

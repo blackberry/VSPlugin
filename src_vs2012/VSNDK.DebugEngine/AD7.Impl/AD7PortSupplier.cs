@@ -24,6 +24,7 @@ using System.Windows.Forms;
 using System.Security.Cryptography;
 using System.Runtime.InteropServices.ComTypes;
 using Microsoft.VisualStudio.Shell;
+using VSNDK.Parser;
 
 namespace VSNDK.DebugEngine
 {
@@ -75,6 +76,9 @@ namespace VSNDK.DebugEngine
 
         private void verifyAndAddPorts()
         {
+            if (GDBParser.s_running == true) // Returning because VS can debug only one app at a time.
+                return;
+
             RegistryKey rkHKCU = Registry.CurrentUser;
             RegistryKey rkPluginRegKey = null;
             string DeviceIP = "";
@@ -221,7 +225,10 @@ namespace VSNDK.DebugEngine
             }
             else
             {
-                MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                if (GDBParser.s_running == true)
+                    MessageBox.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                else
+                    MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
 
             ppEnum = new AD7PortEnum(ports);

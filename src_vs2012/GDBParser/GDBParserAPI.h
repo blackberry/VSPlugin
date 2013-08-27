@@ -36,6 +36,8 @@ public:
 	static bool is_Input_Buffer_Empty();
     static void exitGDB();
 
+    static bool s_running = false;
+
 private:
 	static void setNDKVars(bool);
 
@@ -43,8 +45,8 @@ private:
 	static String^ m_pcGDBCmd;
 	static const int NUM_LIB_PATHS = 2;
 	static array<String^>^ m_libPaths = gcnew array<String^>(NUM_LIB_PATHS);
-    static bool s_running = true;
     static HANDLE m_BBConnectProcess;
+	static String^ m_remotePath;
 };
 
 END_NAMESPACE
