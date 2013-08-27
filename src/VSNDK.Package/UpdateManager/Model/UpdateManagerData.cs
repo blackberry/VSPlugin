@@ -36,28 +36,28 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public string TargetDescription { get; set; }
         public string TargetVersion { get; set; }
         public string LatestVersion { get; set; }
-        public bool IsInstalled { get; set; }
+        public int IsInstalled { get; set; }
         public bool IsUpdate { get; set; }
         public bool IsBeta { get; set; }
 
-        public string InstalledVisibility 
-        { 
-            get { return IsInstalled ? "visible" : "collapsed"; }
+        public string InstalledVisibility
+        {
+            get { return IsInstalled > 0 ? "visible" : "collapsed"; }
         }
 
-        public string AvailableVisibility 
-        { 
-            get { return IsInstalled ? "collapsed" : "visible"; }  
+        public string AvailableVisibility
+        {
+            get { return IsInstalled == 0 ? "visible" : "collapsed"; }
         }
 
-        public string UpdateVisibility 
-        { 
+        public string UpdateVisibility
+        {
             get { return IsUpdate ? "visible" : "collapsed"; }
         }
 
-        public string NoUpdateVisibility 
-        { 
-            get { return IsUpdate ? "collapsed" : "visible"; }  
+        public string NoUpdateVisibility
+        {
+            get { return IsUpdate ? "collapsed" : "visible"; }
         }
 
         public APITargetClass(string name, string description, string version)
@@ -66,7 +66,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             TargetDescription = description;
             TargetVersion = version;
             LatestVersion = version;
-            IsInstalled = false;
+            IsInstalled = 0;
             IsUpdate = false;
             IsBeta = false;
         }
@@ -96,11 +96,12 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public string bbndkPathConst = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk_vs";
         private string _status = "";
 
-        public  List<APITargetClass> tempAPITargetList;
+        public List<APITargetClass> tempAPITargetList;
         private List<string> installedAPIList;
+        private List<string> installedNDKList;
         private List<string> installedRuntimeList;
 
-        
+
 
         #endregion
 
@@ -112,7 +113,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public UpdateManagerData()
         {
             Status = "";
-            getInstalledRuntimeTargetList();    
+            getInstalledRuntimeTargetList();
             RefreshScreen();
         }
 
@@ -270,8 +271,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public CollectionView APITargets
         {
             get { return _apiTargets; }
-            set 
-            { 
+            set
+            {
                 _apiTargets = value;
                 OnPropertyChanged(_colAPITargets);
             }
@@ -292,8 +293,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public String Status
         {
             get { return _status; }
-            set 
-            { 
+            set
+            {
                 _status = value;
                 OnPropertyChanged(_colStatus);
             }
@@ -335,15 +336,22 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <param name="version">Check version number</param>
         /// <param name="name">Check API name</param>
         /// <returns>true if installed</returns>
-        private bool IsAPIInstalled(string version, string name)
+        private int IsAPIInstalled(string version, string name)
         {
-            bool success = false;
+            int success = 0;
 
             string result = installedAPIList.FirstOrDefault(s => s.Contains(version));
 
             if (result != null)
             {
-                success = true;
+                success = 1;
+            }
+
+            result = installedNDKList.FirstOrDefault(s => s.Contains(version));
+
+            if (result != null)
+            {
+                success = 2;
             }
 
             return success;
@@ -360,25 +368,41 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             try
             {
                 installedAPIList = new List<string>();
+                installedNDKList = new List<string>();
 
-                string[] filePaths = Directory.GetFiles(bbndkPathConst + @"\..\qconfig\", "*.xml");
-                foreach (string file in filePaths)
+                string[] dirPaths = new string[2];
+                dirPaths[0] = bbndkPathConst + @"\..\qconfig\";
+                dirPaths[1] = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
+
+                for (int i = 0; i <= 2; i++)
                 {
-                    try
+                    string[] filePaths = Directory.GetFiles(dirPaths[i], "*.xml");
+                    foreach (string file in filePaths)
                     {
-                        XmlDocument xmlDoc = new XmlDocument();
-                        xmlDoc.Load(file);
-                        XmlNodeList name = xmlDoc.GetElementsByTagName("name");
-                        XmlNodeList version = xmlDoc.GetElementsByTagName("version");
+                        try
+                        {
+                            XmlDocument xmlDoc = new XmlDocument();
+                            xmlDoc.Load(file);
+                            XmlNodeList name = xmlDoc.GetElementsByTagName("name");
+                            XmlNodeList version = xmlDoc.GetElementsByTagName("version");
 
-                        installedAPIList.Add(name.Item(0).InnerText + " - " + version.Item(0).InnerText);
+                            if (i == 0)
+                            {
+                                installedAPIList.Add(name.Item(0).InnerText + " - " + version.Item(0).InnerText);
+                            }
+                            else
+                            {
+                                installedNDKList.Add(name.Item(0).InnerText);
+                            }
 
-                        success = true;
-                    }
-                    catch
-                    {
-                        success = false;
-                        break;
+
+                            success = true;
+                        }
+                        catch
+                        {
+                            success = false;
+                            break;
+                        }
                     }
                 }
             }
@@ -492,26 +516,24 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                             }
                             else
                             {
-                                if (api.IsInstalled)
+                                switch (api.IsInstalled)
                                 {
-                                    api.IsUpdate = true;
-                                    api.LatestVersion = version;
-                                }
-                                else
-                                {
-                                    api.TargetVersion = version;
-                                    api.LatestVersion = version;
+                                    case 0:
+                                        api.TargetVersion = version;
+                                        api.LatestVersion = version;
+                                        break;
+                                    case 1:
+                                        api.IsUpdate = true;
+                                        api.LatestVersion = version;
+                                        break;
+                                    case 2:
+                                        api.TargetVersion = version;
+                                        api.LatestVersion = "NDK";
+                                        break;
                                 }
                             }
 
-                            if (IsAPIInstalled(api.TargetVersion, api.TargetName))
-                            {
-                                api.IsInstalled = true;
-                            }
-                            else
-                            {
-                                api.IsInstalled = false;
-                            }
+                            api.IsInstalled = IsAPIInstalled(api.TargetVersion, api.TargetName);
 
                             api.IsBeta = name.Contains("Beta");
 
