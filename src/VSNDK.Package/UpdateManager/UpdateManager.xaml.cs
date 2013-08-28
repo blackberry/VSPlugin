@@ -69,7 +69,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    data.InstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion);
+                    data.InstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false);
                 }
             }
         }

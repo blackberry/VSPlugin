@@ -19,10 +19,12 @@ using System.Text;
 using System.ComponentModel;
 using System.Windows.Data;
 using RIM.VSNDK_Package.Settings;
+using RIM.VSNDK_Package.DebugToken;
 using System.IO;
 using System.Xml;
 using System.Linq;
 using System.Windows;
+using RIM.VSNDK_Package.DebugToken.Model;
 
 namespace RIM.VSNDK_Package.UpdateManager.Model
 {
@@ -113,7 +115,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public UpdateManagerData()
         {
             Status = "";
-         //   getInstalledRuntimeTargetList();
+            validateDeviceVersion();
             RefreshScreen();
         }
 
@@ -124,7 +126,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public UpdateManagerData(bool Refresh)
         {
             Status = "";
-            //   getInstalledRuntimeTargetList();
             if (Refresh) RefreshScreen();
         }
 
@@ -133,6 +134,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             GetInstalledAPIList();
             GetAvailableAPIList();
+            getInstalledRuntimeTargetList();
         }
 
         /// <summary>
@@ -140,7 +142,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         /// <param name="version">version of API to install</param>
         /// <returns>true if successful</returns>
-        public bool InstallAPI(string version)
+        public bool InstallAPI(string version, bool isRuntime)
         {
             bool success = false;
 
@@ -159,7 +161,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0}", version);
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0} {1}", version, isRuntime ? "--runtime" : "");
 
             try
             {
@@ -224,6 +226,83 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         }
 
         /// <summary>
+        /// Validate to make sure device matches the API Level chosen.
+        /// </summary>
+        /// <returns></returns>
+        public bool validateDeviceVersion()
+        {
+            bool retVal = false;
+            string baseVersion = "10.2.0.0";
+
+            RefreshScreen();
+
+            DebugTokenData dtokenData = new DebugTokenData();
+            if (dtokenData.getDeviceInfo())
+            {
+                if (IsAPIInstalled(dtokenData.DeviceOSVersion, "") > 0)
+                {
+                    retVal = true;
+                }
+                else
+                {
+                    if (baseVersion.CompareTo(dtokenData.DeviceOSVersion) > 0)
+                    {
+                        if (MessageBox.Show("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", "Update Manager", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                        {
+                            InstallAPI(dtokenData.DeviceOSVersion, false);
+                            retVal = true;
+                        }
+                        else
+                        {
+                            retVal = false;
+                        }
+                    }
+                    else
+                    {
+                        if (IsRuntimeInstalled(dtokenData.DeviceOSVersion))
+                        {
+                            retVal = true;
+                        }
+                        else
+                        {
+                            if (IsAPIInstalled(dtokenData.DeviceOSVersion.Substring(0, dtokenData.DeviceOSVersion.LastIndexOf('.')), "") > 0)
+                            {
+                                if (MessageBox.Show("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", "Update Manager", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                                {
+                                    InstallAPI(GetAPILevel(dtokenData.DeviceOSVersion.Substring(0, dtokenData.DeviceOSVersion.LastIndexOf('.'))), false);
+                                    InstallAPI(dtokenData.DeviceOSVersion, true);
+                                    retVal = true;
+                                }
+                                else
+                                {
+                                    retVal = false;
+                                }
+                            }
+                            else
+                            {
+                                if (MessageBox.Show("The Runtime Libraries for the operating system version of the attached deice are not currently installed.  Would you like to install them now?", "Update Manager", MessageBoxButton.YesNo, MessageBoxImage.Question, MessageBoxResult.Yes) == MessageBoxResult.Yes)
+                                {
+                                    InstallAPI(dtokenData.DeviceOSVersion, true);
+                                    retVal = true;
+                                }
+                                else
+                                {
+                                    retVal = false;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                retVal = true;
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
         /// Retrieve a list of the installed runtimes on the PC.
         /// </summary>
         /// <returns></returns>
@@ -239,7 +318,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             {
                 if (directory.Contains("runtime_"))
                 {
-                    installedRuntimeList.Add(directory.Substring(directory.IndexOf("runtime_") + 8));
+                    installedRuntimeList.Add(directory.Substring(directory.IndexOf("runtime_") + 8).Replace('_', '.'));
                     success = true;
                 }
                 else
@@ -268,7 +347,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 UninstallAPI(oldversion);
             }
 
-            InstallAPI(newversion);
+            InstallAPI(newversion, false);
 
             return success;
         }
@@ -352,6 +431,10 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             int success = 0;
 
+            /// Check for 2.1 version
+            if (version.StartsWith("2.1.0"))
+                version = "2.1.0";
+
             string result = installedAPIList.FirstOrDefault(s => s.Contains(version));
 
             if (result != null)
@@ -364,6 +447,26 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             if (result != null)
             {
                 success = 2;
+            }
+
+            return success;
+        }
+
+        /// <summary>
+        /// Check to see if Runtime is installed
+        /// </summary>
+        /// <param name="version">Check version number</param>
+        /// <param name="name">Check API name</param>
+        /// <returns>true if installed</returns>
+        private bool IsRuntimeInstalled(string version)
+        {
+            bool success = false;
+
+            string result = installedRuntimeList.FirstOrDefault(s => s.Contains(version));
+
+            if (result != null)
+            {
+                success = true;
             }
 
             return success;
@@ -424,6 +527,20 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             }
 
             return success;
+        }
+
+        /// <summary>
+        /// Given a runtime version get the associated API Level version.
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        private string GetAPILevel(string version)
+        {
+            string retVal = "";
+
+            retVal = tempAPITargetList.FindLast(i => i.TargetVersion.Contains(version)).TargetVersion;
+
+            return retVal;
         }
 
         /// <summary>
