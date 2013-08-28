@@ -254,43 +254,38 @@ namespace VSNDK.AddIn
                     Project proj = projList.ElementAt(0);
                     projList.RemoveAt(0);
 
-                    VCProject vcProj = proj.Object as VCProject;
-                    if (vcProj == null)
+                    Configuration config;
+                    Property prop;
+                    try
                     {
-                        foreach (ProjectItem projItem in proj.ProjectItems)
+                        config = proj.ConfigurationManager.ActiveConfiguration;
+                        prop = config.Properties.Item("ConfigurationType");
+                    }
+                    catch
+                    {
+                        config = null;
+                        prop = null;
+                    }
+
+                    if (prop == null)
+                    {
+                        if (proj.ProjectItems != null)
                         {
-                            if(projItem.SubProject != null)
-                                projList.Add(projItem.SubProject);
+                            foreach (ProjectItem projItem in proj.ProjectItems)
+                            {
+                                if (projItem.SubProject != null)
+                                    projList.Add(projItem.SubProject);
+                            }
                         }
                         continue;
                     }
 
-                    IVCCollection cfgs = vcProj.Configurations;
-
-                    bool isBlackBerry = false;
-                    bool isApplication = false;
-                    foreach (VCConfiguration cfg in cfgs)
-                    {
-                        if (cfg.ConfigurationType == ConfigurationTypes.typeApplication)
-                        {
-                            isApplication = true;
-                        }
-
-                        if (cfg.Platform.Name == BLACKBERRY || cfg.Platform.Name == BLACKBERRYSIMULATOR)
-                        {
-                            isBlackBerry = true;
-                        }
-
-                        if ((isApplication) && (isBlackBerry))
-                            break;
-                    }
-
-                    if (!isApplication)
+                    if (Convert.ToInt16(prop.Value) != Convert.ToInt16(ConfigurationTypes.typeApplication))
                         continue;
 
-                    if (!isBlackBerry)
+                    if (config.PlatformName != BLACKBERRY && config.PlatformName != BLACKBERRYSIMULATOR)
                         continue;
-                    
+
                     ProjectItem baritem = proj.ProjectItems.Item(BAR_DESCRIPTOR);
                     string n = proj.Name;
                     if (baritem == null)
