@@ -153,6 +153,7 @@
       <DependentUpon>Import.xaml</DependentUpon>
     </Compile>
     <Compile Include="IViewModel.cs" />
+    <Compile Include="NameValueCollectionHelper.cs" />
     <Compile Include="Settings\Model\SettingsData.cs" />
     <Compile Include="Settings\SettingsDialog.xaml.cs">
       <DependentUpon>SettingsDialog.xaml</DependentUpon>
@@ -177,6 +178,9 @@
       <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="UpdateManager\UpdateManagerDialog.xaml.cs">
+      <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UpdateManager\Model\UpdateManagerData.cs" />
     <Compile Include="UpdateManager\UpdateManager.xaml.cs">
       <DependentUpon>UpdateManager.xaml</DependentUpon>
@@ -186,6 +190,8 @@
       <DependentUpon>VsDesignerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="VSMacroRecorder.cs" />
+    <Compile Include="VSNDKCommandEvents.cs" />
+    <Compile Include="VSNDKConstants.cs" />
     <Compile Include="XmlEditorDesignerViewRegistration.cs" />
     <Resource Include="Resources\BlackBerryMessager.bmp" />
     <Resource Include="Resources\Calendar.bmp" />
@@ -208,6 +214,7 @@
     <Resource Include="Resources\PhoneControl.bmp" />
     <Resource Include="Resources\Push.bmp" />
     <Resource Include="Resources\CaptureScreen.bmp" />
+    <Resource Include="Resources\info.png" />
     <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -328,6 +335,10 @@
     <Page Include="Signing\SigningResourceDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UpdateManager\UpdateManagerDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UpdateManager\UpdateManager.xaml">
       <SubType>Designer</SubType>

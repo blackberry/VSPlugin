@@ -33,6 +33,7 @@ using PkgResources = RIM.VSNDK_Package.Resources;
 using RIM.VSNDK_Package.Settings.Models;
 using System.Net;
 using System.Net.Sockets;
+using RIM.VSNDK_Package.UpdateManager.Model;
 
 namespace RIM.VSNDK_Package.Settings
 {
@@ -98,10 +99,9 @@ namespace RIM.VSNDK_Package.Settings
                 if (data != null)
                 {
                     UpdateManager.UpdateManager win = new UpdateManager.UpdateManager();
-
                     bool? res = win.ShowDialog();
 
-                    data.RefreshScreen();
+                   // data.RefreshScreen();
                     NDKEntry.ItemsSource = null;
                     NDKEntry.ItemsSource = data.NDKEntries;
                 }
