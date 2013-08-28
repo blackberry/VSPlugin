@@ -101,7 +101,6 @@ namespace RIM.VSNDK_Package.Settings.Models
                         XmlDocument xmlDoc = new XmlDocument();
                         xmlDoc.Load(file);
                         string name = xmlDoc.GetElementsByTagName("name")[0].InnerText;
-                        //   string apiName = getAPIName(name.Substring(name.LastIndexOf(' ') + 1));
                         string hostpath = xmlDoc.GetElementsByTagName("host")[0].InnerText;
                         string targetpath = xmlDoc.GetElementsByTagName("target")[0].InnerText;
                         NDKEntryClass NDKEntry = new NDKEntryClass(name, hostpath, targetpath);
@@ -385,6 +384,7 @@ namespace RIM.VSNDK_Package.Settings.Models
 
             try
             {
+                string NDKHostPath = "";
                 rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
                 HostPath = rkNDKPath.GetValue("NDKHostPath").ToString();
                 TargetPath = rkNDKPath.GetValue("NDKTargetPath").ToString();

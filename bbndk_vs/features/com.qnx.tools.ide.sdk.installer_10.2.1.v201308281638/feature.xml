@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feature
+      id="com.qnx.tools.ide.sdk.installer"
+      label="BlackBerry Native SDK Installer"
+      version="10.2.1.v201308281638"
+      provider-name="QNX">
+
+   <description url="http://www.example.com/description">
+      [Enter Feature Description here.]
+   </description>
+
+   <copyright url="http://www.example.com/copyright">
+      [Enter Copyright Description here.]
+   </copyright>
+
+   <license url="http://www.example.com/license">
+      [Enter License Description here.]
+   </license>
+
+   <includes
+         id="com.qnx.tools.jre.linux"
+         version="1.6.0.43"
+         os="linux"/>
+
+   <includes
+         id="com.qnx.tools.jre.win32"
+         version="1.6.0.43"
+         os="win32"/>
+
+   <includes
+         id="org.eclipse.equinox.p2.core.feature"
+         version="1.1.0.v20121211-153934-8297FndFWmE7h7Bpz-vcqkxyKz0"/>
+
+   <requires>
+      <import feature="org.eclipse.rcp"/>
+   </requires>
+
+   <plugin
+         id="com.qnx.tools.ide.sdk.manager.core"
+         download-size="118"
+         install-size="255"
+         version="1.0.0.v201308281638"
+         unpack="false"/>
+
+   <plugin
+         id="org.eclipse.equinox.p2.transport.ecf"
+         download-size="41"
+         install-size="86"
+         version="1.0.100.v20120913-155635"
+         unpack="false"/>
+
+</feature>
