@@ -64,10 +64,6 @@ rd "%buildresults%\BlackBerrySimulator" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\P
 REM     //********************************************************************************************
 REM     // Remove Template Files
 REM     **********************************************************************************************
-echo Delete BlackBerry vcprojectitems directory
-rd "%ProgRoot%\Microsoft Visual Studio 10.0\VC\vcprojectitems\BlackBerry" /s /q
-del "%ProgRoot%\Microsoft Visual Studio 10.0\VC\vcprojectitems\BlackBerryBarFile.vsz"
-del "%ProgRoot%\Microsoft Visual Studio 10.0\VC\vcprojectitems\VCBlackBerry.vsdir"
 echo Delete BlackBerry VCWizards directory
 rd "%ProgRoot%\Microsoft Visual Studio 10.0\VC\VCWizards\CodeWiz\BlackBerry" /s /q 
 
