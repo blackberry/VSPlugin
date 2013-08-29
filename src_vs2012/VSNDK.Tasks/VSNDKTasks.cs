@@ -276,7 +276,7 @@ namespace VSNDK.Tasks
                 switch2.SwitchValue = base.ReadSwitchMap(WARING_LEVEL, switchMap, value);
                 switch2.Name = WARING_LEVEL;
                 switch2.Value = value;
-                switch2.MultiValues = true;
+                switch2.MultipleValues = true;
                 base.ActiveToolSwitches.Add(WARING_LEVEL, switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }
@@ -362,7 +362,7 @@ namespace VSNDK.Tasks
                 switch2.SwitchValue = base.ReadSwitchMap("ExceptionHandling", switchMap, value);
                 switch2.Name = "ExceptionHandling";
                 switch2.Value = value;
-                switch2.MultiValues = true;
+                switch2.MultipleValues = true;
                 base.ActiveToolSwitches.Add("ExceptionHandling", switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }
@@ -395,7 +395,7 @@ namespace VSNDK.Tasks
                 switch2.SwitchValue = base.ReadSwitchMap(OPTIMIZATION, switchMap, value);
                 switch2.Name = OPTIMIZATION;
                 switch2.Value = value;
-                switch2.MultiValues = true;
+                switch2.MultipleValues = true;
                 base.ActiveToolSwitches.Add(OPTIMIZATION, switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }
@@ -466,7 +466,7 @@ namespace VSNDK.Tasks
                 switch2.SwitchValue = base.ReadSwitchMap("TargetMachine", switchMap, value);
                 switch2.Name = "TargetMachine";
                 switch2.Value = value;
-                switch2.MultiValues = true;
+                switch2.MultipleValues = true;
                 base.ActiveToolSwitches.Add("TargetMachine", switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }
@@ -498,7 +498,7 @@ namespace VSNDK.Tasks
                 switch2.SwitchValue = base.ReadSwitchMap(COMPILE_AS, switchMap, value);
                 switch2.Name = COMPILE_AS;
                 switch2.Value = value;
-                switch2.MultiValues = true;
+                switch2.MultipleValues = true;
                 base.ActiveToolSwitches.Add(COMPILE_AS, switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }

@@ -12,6 +12,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GDBWrapper", "GDBWrapper\GDBWrapper.vcxproj", "{9A560339-44DB-413F-868C-403962C2CF01}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VSNDK.DebugEngine", "VSNDK.DebugEngine\VSNDK.DebugEngine.csproj", "{59A7B188-E307-4495-A3AF-4ED76B086A87}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D4644752-F6B1-47EE-A0FB-1197355A525E} = {D4644752-F6B1-47EE-A0FB-1197355A525E}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GDBParser_UnitTests", "GDBParser.UnitTests\GDBParser_UnitTests.csproj", "{6451DFCD-1CCD-4796-A832-A45FB95D994F}"
 EndProject
