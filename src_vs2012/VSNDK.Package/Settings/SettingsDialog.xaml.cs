@@ -32,6 +32,7 @@ using System.Windows.Forms;
 using PkgResources = RIM.VSNDK_Package.Resources;
 using RIM.VSNDK_Package.Settings.Models;
 using System.Net;
+using System.Net.Sockets;
 
 namespace RIM.VSNDK_Package.Settings
 {
@@ -91,7 +92,7 @@ namespace RIM.VSNDK_Package.Settings
 
             try
             {
-                System.Net.WebRequest.Create("http://downloads.blackberry.com").GetResponse();
+                System.Net.IPHostEntry ipHostEntry = System.Net.Dns.GetHostEntry("downloads.blackberry.com");
 
                 SettingsData data = gridMain.DataContext as SettingsData;
                 if (data != null)
@@ -105,7 +106,7 @@ namespace RIM.VSNDK_Package.Settings
                     NDKEntry.ItemsSource = data.NDKEntries;
                 }
             }
-            catch (WebException)
+            catch (SocketException)
             {
                 System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
             }
