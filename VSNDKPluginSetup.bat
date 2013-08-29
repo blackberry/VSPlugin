@@ -66,8 +66,6 @@ copy "%buildresults%\VSNDK.Tasks.dll" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\Pla
 REM     //********************************************************************************************
 REM     // Copy Template Files
 REM     **********************************************************************************************
-echo Copy BlackBerry vcprojectitems directory
-xcopy "%buildresults%\Templates\vcprojectitems" "%ProgRoot%\Microsoft Visual Studio 10.0\VC\vcprojectitems" /e /i /y
 echo Copy BlackBerry VCWizards directory
 xcopy "%buildresults%\Templates\VCWizards" "%ProgRoot%\Microsoft Visual Studio 10.0\VC\VCWizards\CodeWiz" /e /i /y
 
