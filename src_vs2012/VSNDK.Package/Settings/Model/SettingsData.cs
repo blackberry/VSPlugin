@@ -92,6 +92,9 @@ namespace RIM.VSNDK_Package.Settings.Models
 
             for (int i = 0; i < 2; i++)
             {
+                if (!Directory.Exists(dirPaths[i]))
+                    continue;
+
                 string[] filePaths = Directory.GetFiles(dirPaths[i], "*.xml");
 
                 foreach (string file in filePaths)

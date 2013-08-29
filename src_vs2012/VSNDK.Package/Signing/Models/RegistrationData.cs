@@ -156,6 +156,7 @@ namespace RIM.VSNDK_Package.Signing.Models
 
             //run register tool
             startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
             startInfo.Arguments = string.Format("/C blackberry-signer.bat -cskdelete");
 
             try

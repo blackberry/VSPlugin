@@ -438,6 +438,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
             startInfo.Arguments = string.Format(@"/C blackberry-airpackager.bat -listManifest ""{0}""", LocalFolder + "DebugToken.bar");
 
             try
@@ -489,9 +490,9 @@ namespace RIM.VSNDK_Package.DebugToken.Model
             p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
             p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
 
-
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\"; 
             startInfo.Arguments = string.Format("/C blackberry-deploy.bat -listDeviceInfo {0} -password {1}", DeviceIP, DevicePassword);
 
             try
@@ -575,6 +576,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
             startInfo.Arguments = string.Format(@"/C blackberry-deploy.bat -installDebugToken ""{0}"" -device {1} -password {2}", LocalFolder + "DebugToken.bar", DeviceIP, DevicePassword);
 
             try
@@ -632,6 +634,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
             startInfo.Arguments = string.Format(@"/C blackberry-deploy.bat -uninstallApp -device {0} -password {1} -package-id {2}", DeviceIP, DevicePassword, _authorID);
 
             try

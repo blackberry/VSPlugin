@@ -141,7 +141,7 @@ namespace VSNDK.DebugEngine
             {
                 if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
                 {
-                    MessageBox.Show("Please, verify if your Device/Simulator is connected and try again later.", "Device/Simulator not connected", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Please, verify if the Device/Simulator IP in \"BlackBerry -> Settings\" menu is correct and check if it is connected.", "Device/Simulator not connected or not configured properly", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 else 
                 if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."

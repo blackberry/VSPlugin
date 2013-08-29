@@ -22,7 +22,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using VSNDK.Parser;
 using System.Collections.Specialized;
 using Microsoft.VisualStudio.Shell.Interop;
-using VSNDK.AddIn;
+//using VSNDK.AddIn;
 using System.Windows.Forms;
 
 
