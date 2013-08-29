@@ -74,10 +74,10 @@ namespace VSNDK.DebugEngine
             m_description = "The BlackBerry transport lets you select a process that is running in a BlackBerry Device/Simulator";
         }
 
-        private void verifyAndAddPorts()
+        private int verifyAndAddPorts()
         {
             if (GDBParser.s_running == true) // Returning because VS can debug only one app at a time.
-                return;
+                return 0;
 
             RegistryKey rkHKCU = Registry.CurrentUser;
             RegistryKey rkPluginRegKey = null;
@@ -90,6 +90,10 @@ namespace VSNDK.DebugEngine
             {
                 rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
                 m_toolsPath = rkPluginRegKey.GetValue("NDKHostPath").ToString() + "/usr/bin";
+
+                if ((m_toolsPath == null) || (m_toolsPath == ""))
+                    return -1;
+
                 DeviceIP = rkPluginRegKey.GetValue("device_IP").ToString();
                 if ((DeviceIP != "") && (DeviceIP != null))
                 {
@@ -147,6 +151,7 @@ namespace VSNDK.DebugEngine
                 IDebugPort2 p;
                 AddPort(new AD7PortRequest("Simulator: " + SimulatorIP + "-" + SimulatorPassword), out p);
             }
+            return 1;
         }
 
 
@@ -211,7 +216,7 @@ namespace VSNDK.DebugEngine
         public int EnumPorts(out IEnumDebugPorts2 ppEnum)
         {
             m_ports.Clear();
-            verifyAndAddPorts();
+            int success = verifyAndAddPorts();
             AD7Port[] ports = new AD7Port[m_ports.Count()];
 
             if (m_ports.Count() > 0)
@@ -225,8 +230,10 @@ namespace VSNDK.DebugEngine
             }
             else
             {
-                if (GDBParser.s_running == true)
+                if (success == 0)
                     MessageBox.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                else if (success == -1)
+                    MessageBox.Show("You need an API Level to be able to attach to a running process in a BlackBerry device.\n\nPlease, use \"BlackBerry -> Settings -> Get more\" to download one.", "Missing NDK", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 else
                     MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }

@@ -156,6 +156,7 @@ namespace RIM.VSNDK_Package.Signing.Models
 
             //run register tool
             startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
             startInfo.Arguments = string.Format("/C blackberry-signer.bat -cskdelete");
 
             try
@@ -250,7 +251,7 @@ namespace RIM.VSNDK_Package.Signing.Models
             string err = this[_colAuthor];
             if (!string.IsNullOrEmpty(err))
                 _errors += err + "\n";
-            if (this.Author.ToUpper() == "BLACKBERRY")
+            if (this.Author.Trim().ToUpper() == "BLACKBERRY")
                 _errors += "BlackBerry is a reserved word and can not be used as \"author name\".\n";
             err = this[_colCSJPW];
             if (!string.IsNullOrEmpty(err))
