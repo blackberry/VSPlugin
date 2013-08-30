@@ -80,6 +80,7 @@ namespace RIM.VSNDK_Package.Signing
         {
             if (e.Url.Segments[e.Url.Segments.Length - 1].EndsWith("csk.pg"))
             {
+                this.Cursor = Cursors.WaitCursor;
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(e.Url);
                 request.Referer = ((WebBrowser)sender).Url.ToString();
                 request.CookieContainer = new CookieContainer();
@@ -119,7 +120,7 @@ namespace RIM.VSNDK_Package.Signing
                 {
                     MessageBox.Show("Server error, please, try again later.", "Server Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
+                this.Cursor = Cursors.Arrow;
                 this.Close();
             }
         }

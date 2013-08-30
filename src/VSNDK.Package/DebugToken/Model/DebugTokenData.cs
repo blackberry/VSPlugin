@@ -58,6 +58,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         private const string _colAuthorID = "AuthorID";
         private const string _colAttachedDevice = "AttachedDevice";
         private const string _colExpiryDate = "ExpiryDate";
+        public static bool restart = false;
 
         #endregion
 
@@ -309,7 +310,6 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                         isRegistered();
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -324,7 +324,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// <summary>
         /// Add current device to device list.
         /// </summary>
-        public bool addDevice()
+        public bool addDevice(DebugTokenDialog parent)
         {
             if (DevicePIN == "Not Attached")
             {
@@ -340,14 +340,16 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if (createDebugToken()) uploadDebugToken();
 
-            while ((_errors.Contains("invalid password")) || (_errors.Contains("password is not valid")) || (_errors.Contains("invalid store password")))
+            if ((_errors.Contains("invalid password")) || (_errors.Contains("password is not valid")) || (_errors.Contains("invalid store password")))
             {
                 MessageBox.Show("The specified password is invalid.\n\nPlease, enter the same one that you used to generate your BB ID Token.\n\nIf you don't remember it, you might close the next window, unregister and register again using BlackBerry -> Signing menu.",_errors, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                if (!resetPassword())
-                    return false;
-
-                if (createDebugToken()) uploadDebugToken();
+                parent.Close();
+                if (resetPassword())
+                {
+                    restart = true;
+                }
+                return false;
             }
 
             if (_errors.Contains("Cannot connect:"))
@@ -370,7 +372,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// <summary>
         /// Refresh current device to device list.
         /// </summary>
-        public bool refreshDevice()
+        public bool refreshDevice(DebugTokenDialog parent)
         {
             if (DevicePIN == "Not Attached")
             {
@@ -386,14 +388,16 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if (createDebugToken()) uploadDebugToken();
 
-            while ((_errors.Contains("invalid password")) || (_errors.Contains("password is not valid")) || (_errors.Contains("invalid store password")))
+            if ((_errors.Contains("invalid password")) || (_errors.Contains("password is not valid")) || (_errors.Contains("invalid store password")))
             {
-                MessageBox.Show("The specified password is invalid. Please, enter the same one that you used to generate your BB ID Token.\nIf you don't remember, you might close this window, unregister and register again.", _errors);
+                MessageBox.Show("The specified password is invalid.\n\nPlease, enter the same one that you used to generate your BB ID Token.\n\nIf you don't remember it, you might close the next window, unregister and register again using BlackBerry -> Signing menu.",_errors, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                if (!resetPassword())
-                    return false;
-
-                if (createDebugToken()) uploadDebugToken();
+                parent.Close();
+                if (resetPassword())
+                {
+                    restart = true;
+                }
+                return false;
             }
 
             if (_errors.Contains("Cannot connect:"))

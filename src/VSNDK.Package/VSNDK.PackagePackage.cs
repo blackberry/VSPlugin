@@ -70,7 +70,6 @@ namespace RIM.VSNDK_Package
     {
         private EnvDTE.DTE _dte;
 
-
         /// <summary>
         /// Default constructor of the package.
         /// Inside this method you can place any initialization code that does not require 
@@ -116,11 +115,18 @@ namespace RIM.VSNDK_Package
         /// </summary>
         private void ShowDebugTokenWindow(object sender, EventArgs e)
         {
-            // Create the dialog instance without Help support.
-            var DebugTokenDialog = new DebugToken.DebugTokenDialog();
-            // Show the dialog.
-            if (!DebugTokenDialog.IsClosing)
-                DebugTokenDialog.ShowModal();
+            do
+            {
+                // Create the dialog instance without Help support.
+                var DebugTokenDialog = new DebugToken.DebugTokenDialog();
+
+                DebugToken.Model.DebugTokenData.restart = false;
+
+                // Show the dialog.
+                if (!DebugTokenDialog.IsClosing)
+                    DebugTokenDialog.ShowModal();
+
+            } while (DebugToken.Model.DebugTokenData.restart);
         }
 
         private void MenuItemCallback(object sender, EventArgs e)
