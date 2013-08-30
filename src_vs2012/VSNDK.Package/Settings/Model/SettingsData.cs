@@ -74,6 +74,8 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         public SettingsData()
         {
+            getDeviceInfo();
+            getSimulatorInfo();
             RefreshScreen();
         }
 

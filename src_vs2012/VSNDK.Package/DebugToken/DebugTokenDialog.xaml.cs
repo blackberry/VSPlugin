@@ -87,7 +87,7 @@ namespace RIM.VSNDK_Package.DebugToken
             {
                 this.Cursor = Cursors.Wait;
 
-                if (!(deployTokenData.addDevice()))
+                if (!(deployTokenData.addDevice(this)))
                 {
                     deployTokenData.Error = "";
                     e.Handled = true;
@@ -104,8 +104,8 @@ namespace RIM.VSNDK_Package.DebugToken
             {
                 this.Cursor = Cursors.Arrow;
             }
-            
         }
+
 
         /// <summary>
         /// Refresh debug token to device and registration file.
@@ -116,7 +116,7 @@ namespace RIM.VSNDK_Package.DebugToken
         {
             this.Cursor = Cursors.Wait;
 
-            if (!(deployTokenData.refreshDevice()))
+            if (!(deployTokenData.refreshDevice(this)))
             {
                 deployTokenData.Error = "";
                 e.Handled = true;
