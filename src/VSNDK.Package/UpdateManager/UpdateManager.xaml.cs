@@ -37,10 +37,25 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <summary>
         /// Constructor
         /// </summary>
-        public UpdateManager()
+        private UpdateManager()
         {
             InitializeComponent();
         }
+
+        public static void create()
+        {
+            if (!GlobalFunctions.isOnline())
+            {
+                System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+
+            }
+            else
+            {
+                UpdateManager win = new UpdateManager();
+                bool? res = win.ShowDialog();
+            }
+        }
+
 
         /// <summary>
         /// Close button
@@ -69,7 +84,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    data.InstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion);
+                    data.InstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false, false);
                 }
             }
         }

@@ -26,7 +26,12 @@ namespace RIM.VSNDK_Package
         public const string guidVSNDK_PackageEditorFactoryString = "9e985c5e-5b53-4cb1-bcd0-40a56f18eb4d";
         public const string guidVsTemplateDesignerEditorFactoryString = "6bf3ea12-98bb-41e2-ba01-8662f713d293";
 
+        public const string guidVSStd97String = "{5efc7975-14bc-11cf-9b2b-00aa00573819}";
+        public const string guidVSStd2KString = "{1496A755-94DE-11D0-8C3F-00C04FC2AAE2}";
+        public const string guidVSDebugGroup = "{C9DD4A59-47FB-11D2-83E7-00C04F9902C1}"; 
+
         public static readonly Guid guidVSNDK_PackageCmdSet = new Guid(guidVSNDK_PackageCmdSetString);
         public static readonly Guid guidVSNDK_PackageEditorFactory = new Guid(guidVsTemplateDesignerEditorFactoryString);
+        public static readonly Guid guidTest = new Guid(guidVSStd2KString);
     };
 }

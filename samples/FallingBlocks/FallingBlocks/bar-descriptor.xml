@@ -5,8 +5,8 @@
   <versionNumber>1.0.0</versionNumber>
   <buildId>1</buildId>
   <description>The FallingBlocks application is used for displaying falling blocks.</description>
-  <author>Gustavo</author>
-  <authorId>gYAAgKsAa4ytTJRUjwbx4M6dwqY</authorId>
+  <author>David Burgess</author>
+  <authorId>gYAAgITWetvsq61EuszuYEkcRZU</authorId>
   <category>core.games</category>
   <initialWindow>
     <autoOrients />

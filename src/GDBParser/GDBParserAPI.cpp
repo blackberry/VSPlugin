@@ -424,8 +424,9 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 	
 	if (m_remotePath != "")
 	{
+		m_remotePath = m_remotePath + "\\lib;" + m_remotePath + "\\usr\\lib;" + m_remotePath + "\\usr\\lib\\qt4";
 		CAutoPtr <char> apPath = convertToAutoPtrFromString(m_remotePath);
-		sprintf(pcCmd, "6set solib-search-path %s\r\n", apPath);		
+		sprintf(pcCmd, "6set solib-search-path %s\r\n", apPath );		
 		console->sendCommand(pcCmd);
 		response = console->waitForPrompt(true);
 		parsed = parseGDB(response, parsingInstructions[8]);
