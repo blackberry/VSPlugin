@@ -88,6 +88,7 @@ namespace RIM.VSNDK_Package
         private int _amountOfProjects = 0;
         private bool _isDeploying = false;
         private OutputWindowPane _owP;
+        private string bbndkPathConst = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk_vs";
 
         #endregion
 
@@ -198,13 +199,12 @@ namespace RIM.VSNDK_Package
                     }
                 }
 
-                string qnx_config = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK";
+                string qnx_config = bbndkPathConst + @"\features\com.qnx.tools.jre.win32_1.6.0.43\jre\bin";
 
                 System.Environment.SetEnvironmentVariable("QNX_TARGET", qnx_target);
                 System.Environment.SetEnvironmentVariable("QNX_HOST", qnx_host);
-                System.Environment.SetEnvironmentVariable("QNX_CONFIGURATION", qnx_config);
 
-                string ndkpath = string.Format(@"{0}/usr/bin;{1}\bin;{0}/usr/qde/eclipse/jre/bin;", qnx_host, qnx_config) +
+                string ndkpath = string.Format(@"{0}/usr/bin;{1}", qnx_host, qnx_config) +
                     System.Environment.GetEnvironmentVariable("PATH");
                 System.Environment.SetEnvironmentVariable("PATH", ndkpath);
 
