@@ -1,0 +1,23 @@
+﻿<Window x:Class="RIM.VSNDK_Package.UpdateManager.UpdateManagerDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
+        xmlns:pa="clr-namespace:RIM.VSNDK_Package.UpdateManager.Model"                 
+        Title="Update Manager" Height="188" Width="613" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Topmost="False">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="UpdateManagerDictionary.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <Grid Name="gridMain" DataContext="{StaticResource updateManagerData}" Height="154">
+        <Button Content="Close" Height="23" HorizontalAlignment="Left" Margin="496,123,0,0" Name="No" VerticalAlignment="Top" Width="75" Click="Close_Click"  IsEnabled="{Binding Path=IsInstalling}" />
+        <Label Name="Status" Height="28" HorizontalAlignment="Left" Margin="50,83,0,0" VerticalAlignment="Top" Width="529" Content="{Binding Path=Status}" />
+        <TextBlock Height="55" HorizontalAlignment="Left" Margin="50,22,0,0" Name="lblMessage" VerticalAlignment="Top" Width="529" TextWrapping="Wrap" />
+        <Button Content="Install" Height="23" HorizontalAlignment="Left" Margin="415,123,0,0" Name="Yes" VerticalAlignment="Top" Width="75" IsDefault="True" Click="Install_Click" />
+        <Image Height="32" HorizontalAlignment="Left" Margin="12,22,0,0" Name="image1" Stretch="Fill" VerticalAlignment="Top" Width="32" Source="/VSNDK.Package;component/Resources/info.png" />
+    </Grid>
+</Window>
