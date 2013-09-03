@@ -15,14 +15,17 @@ Copyright (C) Microsoft Corporation. All rights reserved.
           Condition="Exists('$(VCTargetsPath)Platforms\BlackBerrySimulator\PlatformToolsets\qcc\ImportBefore')" />
 
   <PropertyGroup>
-    <NativeSDKDir Condition="'$(NativeSDKDir)' == ''">$(Registry:HKEY_CURRENT_USER\SOFTWARE\Research In Motion\BlackBerryVSPlugin@NDKPath)</NativeSDKDir>
-    <QNX_TARGET Condition="'$(QNX_TARGET)' == ''">$(NativeSDKDir)\target\qnx6</QNX_TARGET>
-    <QNX_HOST Condition="'$(QNX_HOST)' == ''">$(NativeSDKDir)\host\win32\x86</QNX_HOST>
+    <QNX_TARGET>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@NDKTargetPath)</QNX_TARGET>
+    <QNX_HOST>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@NDKHostPath)</QNX_HOST>
+    <from_file>$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
     <QCC_CONF_PATH Condition="'$(QCC_CONF_PATH)' == ''">$(QNX_HOST)\etc\qcc\gcc</QCC_CONF_PATH>
     <CPUVARDIR>x86</CPUVARDIR>
-    <CompilerVersion>4.6.3</CompilerVersion>
+    <CompilerVersion>$(from_file)</CompilerVersion>
     <CompilerTarget>gcc_ntox86</CompilerTarget>
     <QccLibPath>$(QNX_TARGET)\$(CPUVARDIR)\lib</QccLibPath>
+    <AppDataPath>$(AppData)</AppDataPath>
+    <SSHPublicKeyPath>$(AppDataPath)/BlackBerry/bbt_id_rsa.pub</SSHPublicKeyPath>
+    <SSHPrivateKeyPath>$(AppDataPath)/BlackBerry/bbt_id_rsa</SSHPrivateKeyPath>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -32,8 +35,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <QccLinker>qcc.exe</QccLinker>
     <QccLibrarian>qcc.exe</QccLibrarian>
     <BuildBarToolExe>blackberry-nativepackager.bat</BuildBarToolExe>
+    <SignerBarToolExe>$(MSBuildProgramFiles32)\BlackBerry\VSPlugin-NDK\qnxtools\bin\blackberry-signer.bat</SignerBarToolExe>
     <DeployToolExe>blackberry-deploy.bat</DeployToolExe>
     <BuildBarToolPath>$(QccToolsPath)</BuildBarToolPath>
+    <DeployToolPath>$(QccToolsPath)</DeployToolPath>
+    <BuildBarToolPath>$(QccToolsPath)</BuildBarToolPath>
+    <SSHToolExe>ssh.exe</SSHToolExe>
+    <SSHToolPath>$(QccToolsPath)</SSHToolPath>
+    <SSHKeygenToolExe>$(QccToolsPath)\ssh-keygen.exe</SSHKeygenToolExe>
+    <ConnectToolExe>$(QccToolsPath)\blackberry-connect.bat</ConnectToolExe>
 
     <VCInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
     <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
