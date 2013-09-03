@@ -28,7 +28,6 @@ using System.IO;
 using System.Collections.Generic;
 using EnvDTE;
 using System.Windows.Forms;
-using VSNDK.Package;
 using EnvDTE80;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
