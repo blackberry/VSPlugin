@@ -80,7 +80,7 @@ namespace RIM.VSNDK_Package.UpdateManager
             {
                 if (!data.IsInstalling)
                 {
-                    MessageBox.Show("Visual Studio is currently already installing an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    MessageBox.Show("Visual Studio is currently already installing/uninstalling an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
                 }
                 else
                 {
@@ -101,7 +101,7 @@ namespace RIM.VSNDK_Package.UpdateManager
             {
                 if (!data.IsInstalling)
                 {
-                    MessageBox.Show("Visual Studio is currently already un-installing an API Level. Please wait until completion before proceeding.", "Update Manager", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    MessageBox.Show("Visual Studio is currently already installing/uninstalling an API Level. Please wait until completion before proceeding.", "Update Manager", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
                 }
                 else
                 {
@@ -129,7 +129,7 @@ namespace RIM.VSNDK_Package.UpdateManager
             {
                 if (!data.IsInstalling)
                 {
-                    MessageBox.Show("Visual Studio is currently already installing an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                    MessageBox.Show("Visual Studio is currently already installing/uninstalling an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
                 }
                 else
                 {
