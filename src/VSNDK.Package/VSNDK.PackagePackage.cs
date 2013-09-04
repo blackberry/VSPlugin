@@ -304,7 +304,7 @@ namespace RIM.VSNDK_Package
             _owP.TextDocument.Selection.SelectAll();
             outputText = _owP.TextDocument.Selection.Text;
 
-            if ((outputText == "") || (System.Text.RegularExpressions.Regex.IsMatch(outputText, ">Build succeeded.\r\n")))
+            if ((outputText == "") || (System.Text.RegularExpressions.Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
             {
                 // Write file to flag the deploy task that it should use the -debugNative option
                 string fileContent = "Use -debugNative.\r\n";
