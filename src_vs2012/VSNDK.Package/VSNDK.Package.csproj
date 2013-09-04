@@ -231,6 +231,7 @@
     <Resource Include="Resources\Phone.bmp" />
     <Resource Include="Resources\PhoneControl.bmp" />
     <Resource Include="Resources\Push.bmp" />
+    <Resource Include="Resources\info.png" />
     <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

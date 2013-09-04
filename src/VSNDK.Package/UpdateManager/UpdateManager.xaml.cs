@@ -139,5 +139,22 @@ namespace RIM.VSNDK_Package.UpdateManager
 
             }
         }
+
+        /// <summary>
+        /// Prevent the user from closing
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
+            if (data != null)
+            {
+                if (!data.IsInstalling)
+                {
+                    e.Cancel = true;
+                }
+            }
+        }
     }
 }
