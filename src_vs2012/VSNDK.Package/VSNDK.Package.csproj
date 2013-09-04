@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>RIM.VSNDK_Package</RootNamespace>
     <AssemblyName>VSNDK.Package</AssemblyName>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
@@ -157,6 +157,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="bar-descriptor.cs" />
+    <Compile Include="ControlDebugEngine.cs" />
     <Compile Include="DebugToken\DebugTokenDialog.xaml.cs">
       <DependentUpon>DebugTokenDialog.xaml</DependentUpon>
     </Compile>
@@ -411,12 +412,6 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\VSNDK.AddIn\VSNDK.AddIn.csproj">
-      <Project>{d4644752-f6b1-47ee-a0fb-1197355a525e}</Project>
-      <Name>VSNDK.AddIn</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

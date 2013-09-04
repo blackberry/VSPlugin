@@ -116,7 +116,7 @@ namespace VSNDK.DebugEngine
             GDBParser.exitGDB();
 
             // Notify the AddIn that this debug session has ended.
-            VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning = false;
+            VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = false;
         }
 
 
@@ -289,7 +289,7 @@ namespace VSNDK.DebugEngine
             GDB_address = "";
             GDB_line = 0;
 
-            if (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == true)
+            if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning == true)
             {
                 prepareToModifyBreakpoint();
 
@@ -302,7 +302,7 @@ namespace VSNDK.DebugEngine
                     response = GDBParser.parseCommand(command2, 6);
                 }
 
-                if (((response.Length < 2) && (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false)) || (response == "Function not found!"))
+                if (((response.Length < 2) && (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning == false)) || (response == "Function not found!"))
                 {
                     resumeFromInterrupt();
                     return false;
