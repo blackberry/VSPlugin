@@ -100,9 +100,9 @@
       <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
       <Name>GDBParser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VSNDK.AddIn\VSNDK.AddIn.csproj">
-      <Project>{D4644752-F6B1-47EE-A0FB-1197355A525E}</Project>
-      <Name>VSNDK.AddIn</Name>
+    <ProjectReference Include="..\VSNDK.Package\VSNDK.Package.csproj">
+      <Project>{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}</Project>
+      <Name>VSNDK.Package</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

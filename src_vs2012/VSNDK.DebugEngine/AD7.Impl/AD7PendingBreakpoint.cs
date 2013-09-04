@@ -171,7 +171,7 @@ namespace VSNDK.DebugEngine
                     // Visual Studio returns a start position that is one less than it actually is
                     xBBP = new AD7BoundBreakpoint(m_engine, m_bpRequestInfo, this);
 
-                    if (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false)
+                    if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning == false)
                     {
                         return VSConstants.S_FALSE;
                     }

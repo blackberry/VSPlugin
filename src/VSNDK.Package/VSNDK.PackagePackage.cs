@@ -35,7 +35,6 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using RIM.VSNDK_Package.UpdateManager.Model;
-using VSNDK.AddIn;
 
 namespace RIM.VSNDK_Package
 {
@@ -80,9 +79,8 @@ namespace RIM.VSNDK_Package
         #region private member variables
 
         private EnvDTE.DTE _dte;
-        private VSNDK.AddIn.VSNDKCommandEvents _commandEvents;
+        private VSNDKCommandEvents _commandEvents;
         private bool _isSimulator;
-//        private static bool _isDebugEngineRunning = false;
         private BuildEvents _buildEvents;
         private List<string[]> _targetDir = null;
         private bool _hitPlay = false;
@@ -123,8 +121,8 @@ namespace RIM.VSNDK_Package
 
             SetNDKPath();
 
-            _commandEvents = new VSNDK.AddIn.VSNDKCommandEvents((DTE2)_dte);
-            _commandEvents.RegisterCommand(GuidList.guidVSStd97String, VSNDK.AddIn.CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            _commandEvents = new VSNDKCommandEvents((DTE2)_dte);
+            _commandEvents.RegisterCommand(GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += new _dispBuildEvents_OnBuildBeginEventHandler(this.OnBuildBegin);
@@ -397,7 +395,7 @@ namespace RIM.VSNDK_Package
                 nvc.Add("Password", Encoding.Unicode.GetString(decrypted));
             }
 
-            info.bstrArg = VSNDK.AddIn.NameValueCollectionHelper.DumpToString(nvc);
+            info.bstrArg = NameValueCollectionHelper.DumpToString(nvc);
             argsFile.Close();
 
             info.bstrRemoteMachine = null; // debug locally
@@ -578,8 +576,8 @@ namespace RIM.VSNDK_Package
             }
 
             Debug.WriteLine("Before Start Debug");
-            
-            if (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning || !bbPlatform)
+
+            if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning || !bbPlatform)
             {
                 // Disable the override of F5 (this allows the debugged process to continue execution)
                 CancelDefault = false;
