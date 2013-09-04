@@ -17,7 +17,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <PropertyGroup>
     <QNX_TARGET>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@NDKTargetPath)</QNX_TARGET>
     <QNX_HOST>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@NDKHostPath)</QNX_HOST>
-    <from_file>$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
+    <from_file Condition="'$(QNX_HOST)' != ''">$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
     <QCC_CONF_PATH Condition="'$(QCC_CONF_PATH)' == ''">$(QNX_HOST)\etc\qcc\gcc</QCC_CONF_PATH>
     <CPUVARDIR>x86</CPUVARDIR>
     <CompilerVersion>$(from_file)</CompilerVersion>

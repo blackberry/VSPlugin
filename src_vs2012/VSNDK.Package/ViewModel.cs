@@ -485,17 +485,26 @@ namespace RIM.VSNDK_Package
             return retVal;
         }
 
+        /// <summary>
+        /// Load the permissions list
+        /// </summary>
         private void LoadPermissions()
         {
             SettingsData settingsData = new SettingsData();
+            bool oldListMethod = true;
+            XmlNodeList pList = null;
 
-            XmlDocument xmlDoc = new XmlDocument();
-            xmlDoc.Load(settingsData.TargetPath + @"\..\blackberry-sdk-descriptor.xml");
-            XmlNodeList pList = xmlDoc.GetElementsByTagName("permission");
+            if (settingsData.TargetPath != "")
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(settingsData.TargetPath + @"\..\blackberry-sdk-descriptor.xml");
+                pList = xmlDoc.GetElementsByTagName("permission");
+                oldListMethod = false;
+            }
 
             IList<PermissionItemClass> PermissionList = new List<PermissionItemClass>();
 
-            if (pList.Count == 0) // Old Listing Method
+            if (oldListMethod) // Old Listing Method
             {
                 PermissionItemClass permissionItem = new PermissionItemClass(isPermissionChecked("bbm_connect"), "BlackBerry Messenger", "bbm_connect", getPermissionIcon("bbm_connect"));
                 PermissionList.Add(permissionItem);
