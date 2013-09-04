@@ -141,6 +141,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="bar-descriptor.cs" />
+    <Compile Include="ControlDebugEngine.cs" />
     <Compile Include="DebugToken\DebugTokenDialog.xaml.cs">
       <DependentUpon>DebugTokenDialog.xaml</DependentUpon>
     </Compile>

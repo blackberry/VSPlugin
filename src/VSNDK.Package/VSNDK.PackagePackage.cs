@@ -35,7 +35,6 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using RIM.VSNDK_Package.UpdateManager.Model;
-using VSNDK.AddIn;
 
 namespace RIM.VSNDK_Package
 {
@@ -82,7 +81,6 @@ namespace RIM.VSNDK_Package
         private EnvDTE.DTE _dte;
         private VSNDK.AddIn.VSNDKCommandEvents _commandEvents;
         private bool _isSimulator;
-//        private static bool _isDebugEngineRunning = false;
         private BuildEvents _buildEvents;
         private List<string[]> _targetDir = null;
         private bool _hitPlay = false;
@@ -578,8 +576,8 @@ namespace RIM.VSNDK_Package
             }
 
             Debug.WriteLine("Before Start Debug");
-            
-            if (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning || !bbPlatform)
+
+            if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning || !bbPlatform)
             {
                 // Disable the override of F5 (this allows the debugged process to continue execution)
                 CancelDefault = false;

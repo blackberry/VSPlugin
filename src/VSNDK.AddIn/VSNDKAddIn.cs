@@ -63,7 +63,7 @@ namespace VSNDK.AddIn
         private const string BAR_DESCRIPTOR = "bar-descriptor.xml";
         private const string BAR_DESCRIPTOR_PATH = @"\..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033\";
         
-        public static bool isDebugEngineRunning = false;
+//        public static bool isDebugEngineRunning = false;
 
         public VSNDKAddIn()
         {

@@ -21,10 +21,11 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
 using VSNDK.Parser;
-using VSNDK.AddIn;
+//using VSNDK.AddIn;
+using VSNDK.Package;
 
 using NameValueCollection = System.Collections.Specialized.NameValueCollection;
-using NameValueCollectionHelper = VSNDK.AddIn.NameValueCollectionHelper;
+using NameValueCollectionHelper = VSNDK.Package.NameValueCollectionHelper;
 using System.Collections;
 using System.Windows.Forms;
 
@@ -229,7 +230,7 @@ namespace VSNDK.DebugEngine
                 // by LaunchSuspended and ResumeProcess methods when debugging an open project.
                 if (this.m_engineCallback == null) 
                 {
-                    VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning = true;
+                    VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = true;
                     m_engineCallback = new EngineCallback(this, ad7Callback);
 
                     AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
@@ -284,7 +285,7 @@ namespace VSNDK.DebugEngine
                     else
                     {
                         GDBParser.exitGDB();
-                        VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning = false;
+                        VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = false;
                         return VSConstants.E_FAIL;
                     }
                 }
@@ -339,7 +340,7 @@ namespace VSNDK.DebugEngine
 
                     m_running.Set();
 
-                    if (VSNDKAddIn.isDebugEngineRunning)
+                    if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning)
                         HandleProcessExecution.m_mre.Reset();
                 }
             }
@@ -572,8 +573,8 @@ namespace VSNDK.DebugEngine
             process = null;
 
             try
-            {                
-                VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning = true;
+            {
+                VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = true;
                 m_engineCallback = new EngineCallback(this, ad7Callback);
 
                 // Read arguments back from the args string
@@ -609,7 +610,7 @@ namespace VSNDK.DebugEngine
                 else
                 {
                     GDBParser.exitGDB();
-                    VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning = false;
+                    VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = false;
                     return VSConstants.E_FAIL;
                 }
             }
