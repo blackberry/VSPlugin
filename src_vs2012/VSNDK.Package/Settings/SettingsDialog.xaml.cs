@@ -97,7 +97,7 @@ namespace RIM.VSNDK_Package.Settings
                 UpdateManager.UpdateManager.create();
                 
 
-                // data.RefreshScreen();
+                data.RefreshScreen();
                 NDKEntry.ItemsSource = null;
                 NDKEntry.ItemsSource = data.NDKEntries;
             }
