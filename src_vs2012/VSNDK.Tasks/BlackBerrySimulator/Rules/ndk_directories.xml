@@ -25,4 +25,8 @@
                       Description="Path to use when searching for library files while building a VC++ project.  Corresponds to environment variable LIB."
                       F1Keyword="VC.Project.VCDirectories.LibraryPath"
                       Category="VC++" Separator=";" Subtype="folder" />
+  <StringListProperty Name="ExcludePath" DisplayName="Exclude Directories"
+                  Description="Path to skip when searching for scan dependencies."
+                  F1Keyword="VC.Project.VCDirectories.ExcludePath"
+                  Category="VC++" Separator=";" Subtype="folder" />  
 </Rule>

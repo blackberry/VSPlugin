@@ -73,6 +73,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <ExecutablePath Condition="'$(ExecutablePath)' == ''">$(QNX_HOST)\usr\bin;$(PATH);</ExecutablePath>
     <IncludePath Condition="'$(IncludePath)' == ''">$(QNX_TARGET)\usr\include;$(QNX_TARGET)\usr\include\freetype2;$(QNX_TARGET)\..\target-override\usr\include;</IncludePath>
     <LibraryPath Condition="'$(LibraryPath)' == ''">$(QccLibPath);$(QNX_TARGET)\..\target-override\$(CPUVARDIR)\lib;$(QNX_TARGET)\..\target-override\$(CPUVARDIR)\usr\lib;</LibraryPath>
+    <ExcludePath Condition="'$(ExcludePath)' == ''"></ExcludePath>
     <NativeExecutablePath Condition="'$(NativeExecutablePath)' == ''">$(ExecutablePath)</NativeExecutablePath>
   </PropertyGroup>
 
