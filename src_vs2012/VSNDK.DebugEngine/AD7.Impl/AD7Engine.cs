@@ -782,9 +782,7 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumModules(out IEnumDebugModules2 ppEnum)
         {
-            // Setting ppEnum to null because we are not adding/working with this feature now. It was causing an error
-            // when opening Threads Window and ppEnum = new AD7ModuleEnum(new[] { m_module }).
-            ppEnum = null;
+            ppEnum = new AD7ModuleEnum(new[] { m_module });
             return VSConstants.S_OK;            
         }
 
