@@ -325,7 +325,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                                         UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", GetAPILevel(dtokenData.DeviceOSVersion.Substring(0, dtokenData.DeviceOSVersion.LastIndexOf('.'))), false, false);
                                         if (umd.ShowDialog() == true)
                                         {
-                                            umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached deice are not currently installed.  Would you like to install them now?", dtokenData.DeviceOSVersion, true, false);
+                                            umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", dtokenData.DeviceOSVersion, true, false);
                                             if (umd.ShowDialog() == true)
                                             {
                                                 retVal = true;
