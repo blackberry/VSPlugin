@@ -173,28 +173,36 @@ namespace RIM.VSNDK_Package
             set { _imageSize = value; }
         }
 
+        /// <summary>
+        /// Class to store the splashscreen and icon images data.
+        /// </summary>
+        /// <param name="imageName"></param>
+        /// <param name="imagePath"></param>
+        /// <param name="activeProjectDirectory"></param>
         public ImageItemClass(string imageName, string imagePath, string activeProjectDirectory)
         {
             _imageName = imageName;
             _imagePath = imagePath;
+
+            if (!File.Exists(_imagePath))
+            {
+                if (File.Exists(activeProjectDirectory + "\\" + _imagePath))
+                {
+                    _imagePath = activeProjectDirectory + "\\" + _imagePath;
+
+                }
+            }
+
             try
             {
-                System.Drawing.Image objImage = System.Drawing.Image.FromFile(imagePath);
+                System.Drawing.Image objImage = System.Drawing.Image.FromFile(_imagePath);
                 _imageSize = objImage.Width.ToString() + "X" + objImage.Height.ToString();
             }
             catch
             {
-                try
-                {
-                    System.Drawing.Image objImage = System.Drawing.Image.FromFile(activeProjectDirectory + "\\" + imagePath);
-                    _imageSize = objImage.Width.ToString() + "X" + objImage.Height.ToString();
-                }
-                catch
-                {
-                }
+
             }
         }
-
     }
 
     /// <summary>

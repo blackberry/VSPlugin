@@ -76,7 +76,7 @@
                                         <DataGrid Name="grdIcon" Width="265" Height="100" ItemsSource="{Binding Path=IconImageList}" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="True" IsReadOnly="True">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Image Name" Width="150" Binding="{Binding Path=ImageName}"/>
-                                                <DataGridTextColumn Header="Image Size" Width="60" Binding="{Binding Path=ImageSize}"/>
+                                                <DataGridTextColumn Header="Image Size" Width="70" Binding="{Binding Path=ImageSize}"/>
                                                 <DataGridTemplateColumn Width="20">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
@@ -96,7 +96,7 @@
                                         <DataGrid Name="grdSplashScreen" Width="265" Height="100" ItemsSource="{Binding Path=SplashScreenImageList}" GridLinesVisibility="None" IsSynchronizedWithCurrentItem="True" IsReadOnly="True" IsManipulationEnabled="False">
                                             <DataGrid.Columns>
                                                 <DataGridTextColumn Header="Image Name" Width="150" Binding="{Binding Path=ImageName}" />
-                                                <DataGridTextColumn Header="Image Size" Width="60" Binding="{Binding Path=ImageSize}" />
+                                                <DataGridTextColumn Header="Image Size" Width="70" Binding="{Binding Path=ImageSize}" />
                                                 <DataGridTemplateColumn Width="20">
                                                     <DataGridTemplateColumn.CellTemplate>
                                                         <DataTemplate>
