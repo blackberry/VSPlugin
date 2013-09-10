@@ -24,7 +24,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <UsingTask TaskName="GetAppInfo"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   <UsingTask TaskName="CheckIfInstalled"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   <UsingTask TaskName="VCMessage" AssemblyName="Microsoft.Build.CppTasks.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <UsingTask TaskName="CheckFlagFile"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="RemoveFlagFile"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   <UsingTask TaskName="WriteDebuggerArgs"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   
   <PropertyGroup  Condition="$(Configuration.Contains('Release'))">
@@ -223,8 +223,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <CallTarget Targets="OptimizedDeploy" Condition="$(IsAppInstalled) == 'true'" />
 
     <!-- Remove the -debugNative flag if it was set. -->
-    <CheckFlagFile
-        Action="remove"
+    <RemoveFlagFile
         FlagFile="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
       />
   </Target>
@@ -234,14 +233,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <BuildBar Include="@(None)" />
     </ItemGroup>
 
-    <CheckFlagFile
-        Condition="%(BuildBar.DevMode) == 'true'"
-        Action="check"
-        FlagFile="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
-      >
-      <Output TaskParameter="IsFlagSet" PropertyName="IsDebugging" />
-    </CheckFlagFile>
-    
     <BBDeploy
         ToolExe           ="$(DeployToolExe)"
         ToolPath          ="$(BuildBarToolPath)"
@@ -250,7 +241,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Package           ="$(ProjectDir)%(BuildBar.OutputFile)"
         InstallApp        ="true"
         LaunchApp         ="true"
-        DebugNative       ="$(IsDebugging)"
+        FlagFile          ="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
+        DebugNative       ="false"
       />
   </Target>
   
@@ -365,14 +357,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         DeleteFiles     ="@(DeletedFiles)"
       />
 
-    <CheckFlagFile
-        Condition="%(BuildBar.DevMode) == 'true' AND !$(AppDescriptorChanged)"
-        Action="check"
-        FlagFile="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
-      >
-      <Output TaskParameter="IsFlagSet" PropertyName="IsDebugging" />
-    </CheckFlagFile>
-
     <!-- Launch the app without installing it. -->
     <BBDeploy Condition="!$(AppDescriptorChanged)"
         ToolExe           ="$(DeployToolExe)"
@@ -382,7 +366,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@device_IP)"
         Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@device_password)"
         LaunchApp         ="true"
-        DebugNative       ="$(IsDebugging)"
+        FlagFile          ="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
+        DebugNative       ="false"
       />
     
     <!-- Delete temporary files used by the optimized build process. -->

@@ -81,7 +81,7 @@
     <Compile Include="BBDeploy.cs" />
     <Compile Include="BBNativePackager.cs" />
     <Compile Include="BBSigner.cs" />
-    <Compile Include="CheckFlagFile.cs" />
+    <Compile Include="RemoveFlagFile.cs" />
     <Compile Include="MakeAllAndFormatOutputMessages.cs" />
     <Compile Include="WriteDebuggerArgs.cs" />
     <Compile Include="CheckIfInstalled.cs" />
