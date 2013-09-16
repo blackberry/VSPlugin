@@ -27,6 +27,7 @@ using System.Windows.Shapes;
 using RIM.VSNDK_Package.UpdateManager.Model;
 using Microsoft.VisualStudio.PlatformUI;
 using System.Net.Sockets;
+using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.UpdateManager
 {
@@ -39,11 +40,12 @@ namespace RIM.VSNDK_Package.UpdateManager
         private bool _isRuntime = false;
         private bool _isSimulator = false;
         private bool _installed = false;
+        private UpdateManagerData data = null;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public UpdateManagerDialog()
+        public UpdateManagerDialog(Package pkg)
         {
             if (!GlobalFunctions.isOnline())
             {
@@ -52,12 +54,15 @@ namespace RIM.VSNDK_Package.UpdateManager
             }
 
             InitializeComponent();
+
+            data = new UpdateManagerData(pkg);
+            gridMain.DataContext = data;  
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public UpdateManagerDialog(string message, string version, bool isRuntime, bool isSimulator)
+        public UpdateManagerDialog(Package pkg, string message, string version, bool isRuntime, bool isSimulator)
         {
             if (!GlobalFunctions.isOnline())
             {
@@ -66,6 +71,9 @@ namespace RIM.VSNDK_Package.UpdateManager
             }
 
             InitializeComponent();
+
+            data = new UpdateManagerData(pkg);
+            gridMain.DataContext = data;  
 
             _version = version;
             _isRuntime = isRuntime;
@@ -92,19 +100,16 @@ namespace RIM.VSNDK_Package.UpdateManager
         private void Install_Click(object sender, RoutedEventArgs e)
         {
             ((Button)sender).IsEnabled = false;
-            UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
 
-            if (data != null)
+            if (!data.IsInstalling)
             {
-                if (!data.IsInstalling)
-                {
-                    MessageBox.Show("Visual Studio is currently already installing an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
-                }
-                else
-                {
-                    data.InstallAPI(_version, _isRuntime, _isSimulator);
-                }
+                MessageBox.Show("Visual Studio is currently already installing an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
+            else
+            {
+                data.InstallAPI(_version, _isRuntime, _isSimulator);
+            }
+
             _installed = true;
         }
 
@@ -115,13 +120,9 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
-            if (data != null)
+            if (!data.IsInstalling)
             {
-                if (!data.IsInstalling)
-                {
-                    e.Cancel = true;
-                }
+                e.Cancel = true;
             }
         }
     }

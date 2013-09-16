@@ -26,76 +26,13 @@ using System.Linq;
 using System.Windows;
 using RIM.VSNDK_Package.DebugToken.Model;
 using Microsoft.Win32;
+using Microsoft.VisualStudio.Shell;
+using System.Security.Cryptography;
 
 namespace RIM.VSNDK_Package.UpdateManager.Model
 {
 
-    /// <summary>
-    /// Class to store API Targets
-    /// </summary>
-    public class APITargetClass
-    {
-        public string TargetName { get; set; }
-        public string TargetDescription { get; set; }
-        public string TargetVersion { get; set; }
-        public string LatestVersion { get; set; }
-        public int IsInstalled { get; set; }
-        public bool IsUpdate { get; set; }
-        public bool IsBeta { get; set; }
-
-        public string InstalledVisibility
-        {
-            get { return IsInstalled > 0 ? "visible" : "collapsed"; }
-        }
-
-        public string AvailableVisibility
-        {
-            get { return IsInstalled == 0 ? "visible" : "collapsed"; }
-        }
-
-        public string UpdateVisibility
-        {
-            get { return IsUpdate ? "visible" : "collapsed"; }
-        }
-
-        public string NoUpdateVisibility
-        {
-            get { return IsUpdate ? "collapsed" : "visible"; }
-        }
-
-        public APITargetClass(string name, string description, string version)
-        {
-            TargetName = name;
-            TargetDescription = description;
-            TargetVersion = version;
-            LatestVersion = version;
-            IsInstalled = 0;
-            IsUpdate = false;
-            IsBeta = false;
-        }
-    }
-
-    /// <summary>
-    /// Class to store Installed APIs
-    /// </summary>
-    public class APIClass
-    {
-        public string Name { get; set; }
-        public string HostName { get; set; }
-        public string TargetName { get; set; }
-        public string Version { get; set; }
-
-        public APIClass(string name, string hostName, string targetName, string version)
-        {
-            Name = name;
-            Version = version;
-            HostName = hostName;
-            TargetName = targetName;
-        }
-    }
-
-
-    /// <summary>
+     /// <summary>
     /// Data Model for the Update Manager Dialog
     /// </summary>
     class UpdateManagerData : INotifyPropertyChanged
@@ -104,6 +41,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
         private const string _colAPITarget = "APITarget";
         private const string _colAPITargets = "APITargets";
+        private const string _colSimulator = "Simulator";
+        private const string _colSimulators = "Simulators";
         private const string _colStatus = "Status";
         private const string _colIsInstalling = "IsInstalling";
 
@@ -116,19 +55,22 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         private bool _isRuntime = false;
         private bool _isSimulator = false;
         private CollectionView _apiTargets;
+        private CollectionView _simulators;
+        private CollectionView _simulators2;
         private APITargetClass _apiTarget;
+        private SimulatorsClass _simulator;
         private string _errors;
         public string bbndkPathConst = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk_vs";
         private string _status = "";
         private string _error = "";
+        private Package _pkg;
+        private string DeviceIP;
+        private string DevicePassword;
 
-
-        public List<APITargetClass> tempAPITargetList;
         private List<APIClass> installedAPIList;
         private List<APIClass> installedNDKList;
         private List<string> installedRuntimeList;
-        private List<string> installedSimulatorList;
-
+        private string _deviceosversion;
 
         #endregion
 
@@ -137,20 +79,25 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <summary>
         /// Constructor
         /// </summary>
-        public UpdateManagerData()
+        public UpdateManagerData(Package pkg)
         {
             Status = "";
-            RefreshScreen();
+            _pkg = pkg;
+
+            installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
+            installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
+            APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
+            Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
+            
         }
 
         /// <summary>
-        /// Constructor
+        /// Function to filter the sublist of simulators
         /// </summary>
-        /// <param name="Refresh">Force Refresh</param>
-        public UpdateManagerData(bool Refresh)
+        /// <param name="apiLevel"></param>
+        public void FilterSubList(string apiLevel)
         {
-            Status = "";
-            if (Refresh) RefreshScreen();
+            Simulators2 = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList.FindAll(i => i.APILevel.Contains(apiLevel)));
         }
 
         /// <summary>
@@ -158,8 +105,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         public void RefreshScreen()
         {
-            GetInstalledAPIList();
-            GetAvailableAPIList();
+            ((VSNDK_PackagePackage)_pkg).GetInstalledAPIList();
+            ((VSNDK_PackagePackage)_pkg).GetAvailableAPIList();
+            ((VSNDK_PackagePackage)_pkg).GetInstalledSimulatorList();
+            ((VSNDK_PackagePackage)_pkg).GetSimulatorList();
+
+            installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
+            installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
+            APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
+            Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
         }
 
         /// <summary>
@@ -215,10 +169,11 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         /// <param name="version">version of API to uninstall</param>
         /// <returns>true if successful</returns>
-        public bool UninstallAPI(string version)
+        public bool UninstallAPI(string version, bool isSimulator)
         {
             bool success = false;
             _error = "";
+            _isSimulator = isSimulator;
 
             Status = "Uninstalling API Level";
 
@@ -235,7 +190,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --uninstall {0}", version);
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --uninstall {0} {1}", version, isSimulator ? "--simulator" : "");
 
             try
             {
@@ -255,94 +210,125 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         }
 
         /// <summary>
+        /// Function to retrieve device info from the registry
+        /// </summary>
+        /// <returns></returns>
+        public void getDeviceSimInfo(bool isSim)
+        {
+            RegistryKey rkHKCU = Registry.CurrentUser;
+            RegistryKey rkSettingsPath = null;
+            object pwd = null;
+            object ip = null;
+
+            try
+            {
+                rkSettingsPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+
+                if (isSim)
+                {
+                    pwd = rkSettingsPath.GetValue("simulator_password");
+                    ip = rkSettingsPath.GetValue("simulator_IP");
+                }
+                else
+                {
+                    pwd = rkSettingsPath.GetValue("device_password");
+                    ip = rkSettingsPath.GetValue("device_IP");
+                }
+
+                
+                if (pwd != null)
+                    DevicePassword = Decrypt(pwd.ToString());
+
+                if (ip != null)
+                    DeviceIP = ip.ToString();
+            }
+            catch
+            {
+
+            }
+
+            rkSettingsPath.Close();
+            rkHKCU.Close();
+        }
+
+    
+        /// <summary>
+        /// Decrypts a given string.
+        /// </summary>
+        /// <param name="cipher">A base64 encoded string that was created
+        /// through the <see cref="Encrypt(string)"/> or
+        /// <see cref="Encrypt(SecureString)"/> extension methods.</param>
+        /// <returns>The decrypted string.</returns>
+        /// <remarks>Keep in mind that the decrypted string remains in memory
+        /// and makes your application vulnerable per se. If runtime protection
+        /// is essential, <see cref="SecureString"/> should be used.</remarks>
+        /// <exception cref="ArgumentNullException">If <paramref name="cipher"/>
+        /// is a null reference.</exception>
+        public string Decrypt(string cipher)
+        {
+            if (cipher == null) throw new ArgumentNullException("cipher");
+
+            //parse base64 string
+            byte[] data = Convert.FromBase64String(cipher);
+
+            //decrypt data
+            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
+
+            return Encoding.Unicode.GetString(decrypted);
+        }
+
+
+        /// <summary>
         /// Validate to make sure device matches the API Level chosen.
         /// </summary>
         /// <returns></returns>
-        public bool validateDeviceVersion(bool isSimulator)
+        public bool validateDeviceVersion(bool isSim)
         {
             bool retVal = false;
             string baseVersion = "10.2.0.0";
 
-            if (isSimulator)
-            {
-                string currentAPIVersion = getCurrentAPIVersion();
-                if (IsSimulatorInstalled(currentAPIVersion))
-                {
-                    retVal = true;
-                }
-                else
-                {
+            DebugTokenData dtokenData = new DebugTokenData();
 
-                    UpdateManagerDialog umd = new UpdateManagerDialog("The Simulator for your selected API Level is not currently installed.  Would you like to install it now?", currentAPIVersion, false, true);
+            getDeviceSimInfo(isSim);
 
-                    if (umd.ShowDialog() == true)
+            if (getDeviceInfo())
+            { //** Device Info retrieved - validate API's 
+                if (getCurrentAPIVersion() != _deviceosversion)
+                { //** Currently selected API version is different from attached device OS version.  
+                   // GetInstalledAPIList();
+                    if (((VSNDK_PackagePackage)_pkg).IsAPIInstalled(_deviceosversion, "") > 0)
                     {
-                        retVal = false; //In this case return false to cancel build so that the user can start the newly installed simulator after install.
+                        retVal = true;
                     }
                     else
                     {
-                        retVal = false;
-                    }
-                }
-            }
-            else
-            {
-                DebugTokenData dtokenData = new DebugTokenData();
-                if (dtokenData.getDeviceInfo())
-                {
-                    if (getCurrentAPIVersion() != dtokenData.DeviceOSVersion)
-                    {
-                        GetInstalledAPIList();
-                        if (IsAPIInstalled(dtokenData.DeviceOSVersion, "") > 0)
+                        if (baseVersion.CompareTo(_deviceosversion) > 0)
                         {
-                            retVal = true;
-                        }
-                        else
-                        {
-                            if (baseVersion.CompareTo(dtokenData.DeviceOSVersion) > 0)
-                            {
-                                UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", dtokenData.DeviceOSVersion, false, false);
+                            UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", _deviceosversion, false, false);
 
-                                if (umd.ShowDialog() == true)
-                                {
-                                    retVal = true;
-                                }
-                                else
-                                {
-                                    retVal = false;
-                                }
+                            if (umd.ShowDialog() == true)
+                            {
+                                retVal = true;
                             }
                             else
                             {
-                                if (IsRuntimeInstalled(dtokenData.DeviceOSVersion))
+                                retVal = false;
+                            }
+                        }
+                        else
+                        {
+                            if (IsRuntimeInstalled(_deviceosversion))
+                            {
+                                retVal = true;
+                            }
+                            else
+                            {
+                                if (((VSNDK_PackagePackage)_pkg).IsAPIInstalled(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')), "") == 0)
                                 {
-                                    retVal = true;
-                                }
-                                else
-                                {
-                                    if (IsAPIInstalled(dtokenData.DeviceOSVersion.Substring(0, dtokenData.DeviceOSVersion.LastIndexOf('.')), "") == 0)
+                                    UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.'))), false, false);
+                                    if (umd.ShowDialog() == true)
                                     {
-                                        UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", GetAPILevel(dtokenData.DeviceOSVersion.Substring(0, dtokenData.DeviceOSVersion.LastIndexOf('.'))), false, false);
-                                        if (umd.ShowDialog() == true)
-                                        {
-                                            umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", dtokenData.DeviceOSVersion, true, false);
-                                            if (umd.ShowDialog() == true)
-                                            {
-                                                retVal = true;
-                                            }
-                                            else
-                                            {
-                                                retVal = false;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            retVal = false;
-                                        }
-                                    }
-                                    else
-                                    {
-                                        UpdateManagerDialog umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached deice are not currently installed.  Would you like to install them now?", dtokenData.DeviceOSVersion, true, false);
+                                        umd = new UpdateManagerDialog(_pkg, "The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
                                         if (umd.ShowDialog() == true)
                                         {
                                             retVal = true;
@@ -352,13 +338,25 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                                             retVal = false;
                                         }
                                     }
+                                    else
+                                    {
+                                        retVal = false;
+                                    }
+                                }
+                                else
+                                {
+                                    UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The Runtime Libraries for the operating system version of the attached deice are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
+                                    if (umd.ShowDialog() == true)
+                                    {
+                                        retVal = true;
+                                    }
+                                    else
+                                    {
+                                        retVal = false;
+                                    }
                                 }
                             }
                         }
-                    }
-                    else
-                    {
-                        retVal = true;
                     }
                 }
                 else
@@ -366,8 +364,94 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                     retVal = true;
                 }
             }
+            else
+            { //** Device Info Not Connected : Return true so that the normal process runs. No device connected will be caught by build process.
+                retVal = true;
+            }
 
             return retVal;
+        }
+
+        /// <summary>
+        /// Get the device Info of the connected device
+        /// </summary>
+        /// <returns>True if successful</returns>
+        public bool getDeviceInfo()
+        {
+            bool success = false;
+
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
+            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(DeviceInfoDataReceived);
+
+            /// Get Device PIN
+            startInfo.FileName = "cmd.exe";
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
+            startInfo.Arguments = string.Format("/C blackberry-deploy.bat -listDeviceInfo {0} {1}", DeviceIP, DevicePassword == "" ? "" : "-password " + DevicePassword);
+
+            try
+            {
+                p.Start();
+                p.BeginErrorReadLine();
+                p.BeginOutputReadLine();
+                p.WaitForExit();
+                if (p.ExitCode != 0)
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                }
+
+                p.Close();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                success = false;
+            }
+
+            return success;
+
+        }
+
+        /// <summary>
+        /// On Data Received event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DeviceInfoDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                if (e.Data.Contains("Error:"))
+                    _errors += e.Data + "\n";
+                else if (e.Data.Contains("scmbundle::"))
+                    _deviceosversion = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
+            }
+        }        /// <summary>
+        /// On Data Received event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void p_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Data);
+                if (e.Data.Contains("Error:"))
+                    _errors += e.Data + "\n";
+                else if (e.Data.Contains("scmbundle::"))
+                    _deviceosversion = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
+            }
         }
 
         /// <summary>
@@ -399,34 +483,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
         }
 
-        /// <summary>
-        /// Retrieve a list of the installed runtimes on the PC.
-        /// </summary>
-        /// <returns></returns>
-        public bool getInstalledSimulatorList()
-        {
-            bool success = false;
-
-            installedSimulatorList = new List<string>();
-
-            string[] directories = Directory.GetDirectories(bbndkPathConst);
-
-            foreach (string directory in directories)
-            {
-                if (directory.Contains("simulator_"))
-                {
-                    installedSimulatorList.Add(directory.Substring(directory.IndexOf("simulator_") + 8).Replace('_', '.'));
-                    success = true;
-                }
-                else
-                {
-                    continue;
-                }
-            }
-
-            return success;
-
-        }
 
         /// <summary>
         /// Update API Level from Server
@@ -441,7 +497,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             if (!((oldversion.StartsWith("10.1")) || (oldversion.StartsWith("10.0"))))
             {
-                UninstallAPI(oldversion);
+                UninstallAPI(oldversion, false);
             }
 
             InstallAPI(newversion, false, false);
@@ -454,7 +510,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         #region Public Properties
 
         /// <summary>
-        /// Getter for the NDKEntries property
+        /// Getter for the APITargets property
         /// </summary>
         public CollectionView APITargets
         {
@@ -463,6 +519,32 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             {
                 _apiTargets = value;
                 OnPropertyChanged(_colAPITargets);
+            }
+        }
+
+        /// <summary>
+        /// Getter for the Simulators property
+        /// </summary>
+        public CollectionView Simulators
+        {
+            get { return _simulators; }
+            set
+            {
+                _simulators = value;
+                OnPropertyChanged(_colSimulators);
+            }
+        }
+
+        /// <summary>
+        /// Getter for the Simulators property
+        /// </summary>
+        public CollectionView Simulators2
+        {
+            get { return _simulators2; }
+            set
+            {
+                _simulators2 = value;
+                OnPropertyChanged(_colSimulators);
             }
         }
 
@@ -502,7 +584,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         }
 
         /// <summary>
-        /// Getter/Setter for the NDKEntryClass property
+        /// Getter/Setter for the APITarget property
         /// </summary>
         public APITargetClass APITarget
         {
@@ -511,6 +593,19 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             {
                 _apiTarget = value;
                 OnPropertyChanged(_colAPITarget);
+            }
+        }
+
+        /// <summary>
+        /// Getter/Setter for the Simulator property
+        /// </summary>
+        public SimulatorsClass Simulator
+        {
+            get { return _simulator; }
+            set
+            {
+                _simulator = value;
+                OnPropertyChanged(_colSimulator);
             }
         }
 
@@ -586,70 +681,9 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         }
 
         /// <summary>
-        /// Check to see if API is installed
+        /// Return the Current API Version from the registry
         /// </summary>
-        /// <param name="version">Check version number</param>
-        /// <param name="name">Check API name</param>
-        /// <returns>true if installed</returns>
-        private int IsAPIInstalled(string version, string name)
-        {
-            int success = 0;
-
-            /// Check for 2.1 version
-            if (version.StartsWith("2.1.0"))
-                version = "2.1.0";
-
-            if (installedAPIList != null)
-            {
-                APIClass result = installedAPIList.Find(i => i.Version.Contains(version));
-
-                if (result != null)
-                {
-                    success = 1;
-                }
-            }
-
-            if (installedNDKList != null)
-            {
-                APIClass result = installedNDKList.Find(i => i.Version.Contains(version));
-
-                if (result != null)
-                {
-                    success = 2;
-                }
-            }
-
-            return success;
-        }
-
-        /// <summary>
-        /// Check to see if Simulator is installed
-        /// </summary>
-        /// <param name="version">Check version number</param>
-        /// <returns>true if installed</returns>
-        private bool IsSimulatorInstalled(string version)
-        {
-            bool success = false;
-
-            getInstalledSimulatorList();
-
-            if (installedSimulatorList != null)
-            {
-                string result = installedSimulatorList.FirstOrDefault(s => s.Contains(version));
-
-                if (result != null)
-                {
-                    success = true;
-                }
-            }
-
-            return success;
-        }
-
-        /// <summary>
-        /// Return the NDK Path from the registry
-        /// </summary>
-        /// <returns></returns>
+        /// <returns>Currently selected API Version.</returns>
         public string getCurrentAPIVersion()
         {
             string retVal = "";
@@ -704,67 +738,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             return success;
         }
 
-        /// <summary>
-        /// Get list of installed APIs
-        /// </summary>
-        /// <returns></returns>
-        private bool GetInstalledAPIList()
-        {
-            bool success = false;
-
-            try
-            {
-                installedAPIList = new List<APIClass>();
-                installedNDKList = new List<APIClass>();
-
-                string[] dirPaths = new string[2];
-                dirPaths[0] = bbndkPathConst + @"\..\qconfig\";
-                dirPaths[1] = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
-
-                for (int i = 0; i < 2; i++)
-                {
-                    string[] filePaths = Directory.GetFiles(dirPaths[i], "*.xml");
-                    foreach (string file in filePaths)
-                    {
-                        try
-                        {
-                            XmlDocument xmlDoc = new XmlDocument();
-                            xmlDoc.Load(file);
-                            XmlNodeList name = xmlDoc.GetElementsByTagName("name");
-                            XmlNodeList version = xmlDoc.GetElementsByTagName("version");
-                            XmlNodeList hostpath = xmlDoc.GetElementsByTagName("host");
-                            XmlNodeList targetpath = xmlDoc.GetElementsByTagName("target");
-
-                            if (i == 0)
-                            {
-                                APIClass aclass = new APIClass(name.Item(0).InnerText, hostpath.Item(0).InnerText, targetpath.Item(0).InnerText, version.Item(0).InnerText);
-                                installedAPIList.Add(aclass);
-                            }
-                            else
-                            {
-                                APIClass aclass = new APIClass(name.Item(0).InnerText, hostpath.Item(0).InnerText, targetpath.Item(0).InnerText, version.Item(0) == null ? "2.1.0" : version.Item(0).InnerText);
-                                installedNDKList.Add(aclass);
-                            }
-
-
-                            success = true;
-                        }
-                        catch
-                        {
-                            success = false;
-                            break;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                success = false;
-            }
-
-            return success;
-        }
-
+  
         /// <summary>
         /// Given a runtime version get the associated API Level version.
         /// </summary>
@@ -774,71 +748,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             string retVal = "";
 
-            GetAvailableAPIList();
-
-            if (tempAPITargetList != null)
+            if (((VSNDK_PackagePackage)_pkg).APITargetList != null)
             {
-                retVal = tempAPITargetList.FindLast(i => i.TargetVersion.Contains(version)).TargetVersion;
+                retVal = ((VSNDK_PackagePackage)_pkg).APITargetList.FindLast(i => i.TargetVersion.Contains(version)).TargetVersion;
             }
 
             return retVal;
         }
 
-        /// <summary>
-        /// Retrieve list of API's from 
-        /// </summary>
-        /// <returns></returns>
-        private bool GetAvailableAPIList()
-        {
-            bool success = false;
-
-            _error = "";
-
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDataReceived);
-
-
-            /// Get Device PIN
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list");
-
-            try
-            {
-                tempAPITargetList = new List<APITargetClass>();
-
-                p.Start();
-                p.BeginErrorReadLine();
-                p.BeginOutputReadLine();
-                p.WaitForExit();
-                if (p.ExitCode != 0)
-                {
-                    success = false;
-                }
-                else
-                {
-                    APITargets = new CollectionView(tempAPITargetList);
-                    success = true;
-                }
-                p.Close();
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                success = false;
-            }
-
-            return success;
-
-        }
-
-        /// <summary>
+           /// <summary>
         /// Event that handles the return of a process.
         /// </summary>
         /// <param name="sender"></param>
@@ -861,6 +779,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             {
                 Status = "Complete";
                 IsInstalling = true;
+
                 RefreshScreen();
 
                 if (installVersion != "")
@@ -915,67 +834,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             }
         }
 
-        /// <summary>
-        /// On Data Received event handler
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void APIListDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
-        {
-            string name = "";
-            string description = "";
-            string version = "";
-            APITargetClass api = null;
-
-            if (e.Data != null)
-            {
-                if ((e.Data.ToLower().Contains("error")) || (_error != ""))
-                {
-                    _error = _error + e.Data;
-                }
-                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")))
-                {
-                    // Do Nothing
-                }
-                else
-                {
-                    version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
-                    name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
-                    description = "Device Support Unknown.";
-
-                    api = tempAPITargetList.Find(i => i.TargetName == name);
-
-                    if (api == null)
-                    {
-                        api = new APITargetClass(name, description, version);
-                        tempAPITargetList.Add(api);
-                    }
-                    else
-                    {
-                        switch (api.IsInstalled)
-                        {
-                            case 0:
-                                api.TargetVersion = version;
-                                api.LatestVersion = version;
-                                break;
-                            case 1:
-                                api.IsUpdate = true;
-                                api.LatestVersion = version;
-                                break;
-                            case 2:
-                                api.TargetVersion = version;
-                                api.LatestVersion = "NDK";
-                                break;
-                        }
-                    }
-
-                    api.IsInstalled = IsAPIInstalled(api.TargetVersion, api.TargetName);
-
-                    api.IsBeta = name.Contains("Beta");
-
-                }
-            }
-        }
+  
 
         #endregion
 

@@ -26,8 +26,10 @@ using Microsoft.VisualStudio.Shell;
 using System.Xml;
 using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using EnvDTE;
 using System.Windows.Forms;
+using VSNDK.Package;
 using EnvDTE80;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
@@ -37,6 +39,127 @@ using RIM.VSNDK_Package.UpdateManager.Model;
 
 namespace RIM.VSNDK_Package
 {
+    /// <summary>
+    /// Class to store Installed APIs
+    /// </summary>
+    public class APIClass
+    {
+        public string Name { get; set; }
+        public string HostName { get; set; }
+        public string TargetName { get; set; }
+        public string Version { get; set; }
+
+        public APIClass(string name, string hostName, string targetName, string version)
+        {
+            Name = name;
+            Version = version;
+            HostName = hostName;
+            TargetName = targetName;
+        }
+    }
+    /// <summary>
+    /// Class to store Simulators
+    /// </summary>
+    public class SimulatorsClass
+    {
+        public string APILevel { get; set; }
+        public string TargetVersion { get; set; }
+        public bool LatestVersion { get; set; }
+        public bool IsInstalled { get; set; }
+
+        public string TargetVersionText
+        {
+            get { return LatestVersion ? "Latest Version " + TargetVersion : TargetVersion; } 
+        }
+
+        public string InstalledVersionText
+        {
+            get { return "BlackBerry Native SDK Simulator (" + TargetVersion + ")"; }
+        }
+        
+        public string LabelAPIVersion
+        {
+            get { return LatestVersion ? "visible" : "collapsed"; }
+        }
+
+        public string SubAPIVersion
+        {
+            get { return LatestVersion ? "collapsed" : "visible"; }
+        }
+
+        public string LabelAPIVersionText
+        {
+            get 
+            {
+                return "Simulator for BlackBerry Native SDK " + APILevel;
+            }
+        }
+
+        public string AvailableVisibility
+        {
+            get { return IsInstalled ? "visible" : "collapsed"; }
+        }
+
+        public string InstalledVisibility
+        {
+            get { return IsInstalled ? "collapsed" : "visible"; }
+        }
+
+        public SimulatorsClass(string version, string apilevel, bool latest)
+        {
+            TargetVersion = version;
+            LatestVersion = latest;
+            APILevel = apilevel;
+            IsInstalled = false;
+        }
+    }
+
+    /// <summary>
+    /// Class to store API Targets
+    /// </summary>
+    public class APITargetClass
+    {
+        public string TargetName { get; set; }
+        public string TargetDescription { get; set; }
+        public string TargetVersion { get; set; }
+        public string LatestVersion { get; set; }
+        public int IsInstalled { get; set; }
+        public bool IsUpdate { get; set; }
+        public bool IsBeta { get; set; }
+
+        public string InstalledVisibility
+        {
+            get { return IsInstalled > 0 ? "visible" : "collapsed"; }
+        }
+
+        public string AvailableVisibility
+        {
+            get { return IsInstalled == 0 ? "visible" : "collapsed"; }
+        }
+
+        public string UpdateVisibility
+        {
+            get { return IsUpdate ? "visible" : "collapsed"; }
+        }
+
+        public string NoUpdateVisibility
+        {
+            get { return IsUpdate ? "collapsed" : "visible"; }
+        }
+
+        public APITargetClass(string name, string description, string version)
+        {
+            TargetName = name;
+            TargetDescription = description;
+            TargetVersion = version;
+            LatestVersion = version;
+            IsInstalled = 0;
+            IsUpdate = false;
+            IsBeta = false;
+        }
+    }
+
+
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
     ///
@@ -84,9 +207,15 @@ namespace RIM.VSNDK_Package
         private List<string[]> _targetDir = null;
         private bool _hitPlay = false;
         private int _amountOfProjects = 0;
+        private string _error = "";
         private bool _isDeploying = false;
         private OutputWindowPane _owP;
         private string bbndkPathConst = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk_vs";
+        private List<APIClass> _installedAPIList;
+        private List<APIClass> _installedNDKList;
+        private List<SimulatorsClass> _simulatorList;
+        private List<APITargetClass> _tempAPITargetList;
+        private List<string> installedSimulatorList;
 
         #endregion
 
@@ -119,6 +248,10 @@ namespace RIM.VSNDK_Package
             _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
             SetNDKPath();
+            GetInstalledAPIList();
+            GetAvailableAPIList();
+            GetInstalledSimulatorList();
+            GetSimulatorList();
 
             _commandEvents = new VSNDKCommandEvents((DTE2)_dte);
             _commandEvents.RegisterCommand(GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
@@ -154,6 +287,54 @@ namespace RIM.VSNDK_Package
             }
 
         }
+        #endregion
+
+        #region public methods
+
+        /// <summary>
+        /// Public property for the list of installed API's 
+        /// </summary>
+        public List<APIClass> InstalledAPIList
+        {
+            get
+            {
+                return _installedAPIList;
+            }
+        }
+
+        /// <summary>
+        /// Public property for the list of installed NDK's 
+        /// </summary>
+        public List<APIClass> InstalledNDKList
+        {
+            get
+            {
+                return _installedNDKList;
+            }
+        }
+
+        /// <summary>
+        /// Public property for the list of installed NDK's 
+        /// </summary>
+        public List<APITargetClass> APITargetList
+        {
+            get
+            {
+                return _tempAPITargetList;
+            }
+        }
+
+        /// <summary>
+        /// Public property for the list of installed NDK's 
+        /// </summary>
+        public List<SimulatorsClass> SimulatorList
+        {
+            get
+            {
+                return _simulatorList;
+            }
+        }
+
         #endregion
 
         #region private methods
@@ -430,6 +611,110 @@ namespace RIM.VSNDK_Package
             return false;
         }
 
+        /// <summary>
+        /// Get list of installed APIs
+        /// </summary>
+        /// <returns></returns>
+        public void GetInstalledAPIList()
+        {
+            try
+            {
+                _installedAPIList = new List<APIClass>();
+                _installedNDKList = new List<APIClass>();
+
+                string[] dirPaths = new string[2];
+                dirPaths[0] = bbndkPathConst + @"\..\qconfig\";
+                dirPaths[1] = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
+
+                for (int i = 0; i < 2; i++)
+                {
+                    string[] filePaths = Directory.GetFiles(dirPaths[i], "*.xml");
+                    foreach (string file in filePaths)
+                    {
+                        try
+                        {
+                            XmlDocument xmlDoc = new XmlDocument();
+                            xmlDoc.Load(file);
+                            XmlNodeList name = xmlDoc.GetElementsByTagName("name");
+                            XmlNodeList version = xmlDoc.GetElementsByTagName("version");
+                            XmlNodeList hostpath = xmlDoc.GetElementsByTagName("host");
+                            XmlNodeList targetpath = xmlDoc.GetElementsByTagName("target");
+
+                            if (i == 0)
+                            {
+                                APIClass aclass = new APIClass(name.Item(0).InnerText, hostpath.Item(0).InnerText, targetpath.Item(0).InnerText, version.Item(0).InnerText);
+                                _installedAPIList.Add(aclass);
+                            }
+                            else
+                            {
+                                APIClass aclass = new APIClass(name.Item(0).InnerText, hostpath.Item(0).InnerText, targetpath.Item(0).InnerText, version.Item(0) == null ? "2.1.0" : version.Item(0).InnerText);
+                                _installedNDKList.Add(aclass);
+                            }
+                        }
+                        catch
+                        {
+                            break;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        /// <summary>
+        /// Retrieve a list of the installed runtimes on the PC.
+        /// </summary>
+        /// <returns></returns>
+        public bool GetInstalledSimulatorList()
+        {
+            bool success = false;
+
+            installedSimulatorList = new List<string>();
+
+            string[] directories = Directory.GetFiles(bbndkPathConst, "*.vmxf", SearchOption.AllDirectories);
+
+            foreach (string directory in directories)
+            {
+                if (directory.Contains("simulator_"))
+                {
+                    installedSimulatorList.Add(directory.Substring(0, directory.LastIndexOf("\\")).Substring(directory.IndexOf("simulator_") + 10).Replace('_', '.'));
+                    success = true;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            return success;
+
+        }
+
+        /// <summary>
+        /// Check to see if Simulator is installed
+        /// </summary>
+        /// <param name="version">Check version number</param>
+        /// <returns>true if installed</returns>
+        private bool IsSimulatorInstalled(string version)
+        {
+            bool success = false;
+
+            if (installedSimulatorList != null)
+            {
+                string result = installedSimulatorList.FirstOrDefault(s => s.Contains(version));
+
+                if (result != null)
+                {
+                    success = true;
+                }
+            }
+
+            return success;
+        }
+
         /// <summary> 
         /// Get the PID of the launched native app by parsing text from the output window. 
         /// </summary>
@@ -529,6 +814,284 @@ namespace RIM.VSNDK_Package
         }
 
 
+
+        #endregion
+
+        #region Get Simulator List command
+
+        /// <summary>
+        /// Retrieve list of Available Simulators
+        /// </summary>
+        /// <returns></returns>
+        public bool GetSimulatorList()
+        {
+            bool success = false;
+
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
+            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(SimulatorListDataReceived);
+
+
+            /// Get Device PIN
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list-all --simulator");
+
+            try
+            {
+                _simulatorList = new List<SimulatorsClass>();
+
+                p.Start();
+                p.BeginErrorReadLine();
+                p.BeginOutputReadLine();
+                p.WaitForExit(); 
+                if (p.ExitCode != 0)
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                }
+                p.Close();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                success = false;
+            }
+
+            return success;
+
+        }
+
+        /// <summary>
+        /// On Data Received event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SimulatorListDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            string apilevel = "";
+            string version = "";
+
+            SimulatorsClass sim = null;
+
+            if (e.Data != null)
+            {
+                if ((e.Data.ToLower().Contains("error")) || (_error != ""))
+                {
+                    _error = _error + e.Data;
+                }
+                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")))
+                {
+                    // Do Nothing
+                }
+                else
+                {
+                    version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
+                    apilevel = version.Split('.')[0] + "." + version.Split('.')[1]; 
+
+                    sim = _simulatorList.Find(i => i.APILevel  == apilevel);
+
+                    if (sim == null)
+                    {
+                        sim = new SimulatorsClass(version, apilevel, true);
+                        sim.IsInstalled = IsSimulatorInstalled(version);
+                        _simulatorList.Add(sim);
+                    }
+                    else
+                    {
+                        //sim not the latest... mark it as false
+                        sim.LatestVersion = false;
+
+                        //create new sim
+                        SimulatorsClass sim2 = new SimulatorsClass(version, apilevel, true);
+                        sim2.IsInstalled = IsSimulatorInstalled(version);
+
+                        // insert before found sim.
+                        _simulatorList.Insert(_simulatorList.IndexOf(sim), sim2);
+                    }
+                }
+            }
+        }
+
+
+        #endregion
+
+        #region Get Available API List command
+
+        /// <summary>
+        /// Retrieve list of API's from 
+        /// </summary>
+        /// <returns></returns>
+        public bool GetAvailableAPIList()
+        {
+            bool success = false;
+
+            System.Diagnostics.Process p = new System.Diagnostics.Process();
+            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+            startInfo.UseShellExecute = false;
+            startInfo.CreateNoWindow = true;
+            startInfo.RedirectStandardError = true;
+            startInfo.RedirectStandardOutput = true;
+            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
+            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDataReceived);
+
+
+            /// Get Device PIN
+            startInfo.FileName = "cmd.exe";
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list");
+
+            try
+            {
+                _tempAPITargetList = new List<APITargetClass>();
+
+                p.Start();
+                p.BeginErrorReadLine();
+                p.BeginOutputReadLine();
+                p.WaitForExit();
+                if (p.ExitCode != 0)
+                {
+                    success = false;
+                }
+                else
+                {
+                    success = true;
+                }
+                p.Close();
+            }
+            catch (Exception e)
+            {
+                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                System.Diagnostics.Debug.WriteLine(e.Message);
+                success = false;
+            }
+
+            return success;
+
+        }
+
+        /// <summary>
+        /// On Data Received event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void APIListDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            string name = "";
+            string description = "";
+            string version = "";
+            string error = "";
+            APITargetClass api = null;
+
+            if (e.Data != null)
+            {
+                if ((e.Data.ToLower().Contains("error")) || (_error != ""))
+                {
+                    _error = _error + e.Data;
+                }
+                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")))
+                {
+                    // Do Nothing
+                }
+                else
+                {
+                    version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
+                    name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
+                    description = "Device Support Unknown.";
+
+                    api = _tempAPITargetList.Find(i => i.TargetName == name);
+
+                    if (api == null)
+                    {
+                        api = new APITargetClass(name, description, version);
+                        _tempAPITargetList.Add(api);
+                    }
+                    else
+                    {
+                        switch (api.IsInstalled)
+                        {
+                            case 0:
+                                api.TargetVersion = version;
+                                api.LatestVersion = version;
+                                break;
+                            case 1:
+                                api.IsUpdate = true;
+                                api.LatestVersion = version;
+                                break;
+                            case 2:
+                                api.TargetVersion = version;
+                                api.LatestVersion = "NDK";
+                                break;
+                        }
+                    }
+
+                    api.IsInstalled = IsAPIInstalled(api.TargetVersion, api.TargetName);
+
+                    api.IsBeta = name.Contains("Beta");
+
+                }
+            }
+        }
+
+        /// <summary>
+        /// On Error received event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            if (e.Data != null)
+            {
+                System.Diagnostics.Debug.WriteLine(e.Data);
+
+                MessageBox.Show(e.Data);
+            }
+        }
+
+        /// <summary>
+        /// Check to see if API is installed
+        /// </summary>
+        /// <param name="version">Check version number</param>
+        /// <param name="name">Check API name</param>
+        /// <returns>true if installed</returns>
+        public int IsAPIInstalled(string version, string name)
+        {
+            int success = 0;
+
+            /// Check for 2.1 version
+            if (version.StartsWith("2.1.0"))
+                version = "2.1.0";
+
+            if (_installedAPIList != null)
+            {
+                APIClass result = _installedAPIList.Find(i => i.Version.Contains(version));
+
+                if (result != null)
+                {
+                    success = 1;
+                }
+            }
+
+            if (_installedNDKList != null)
+            {
+                APIClass result = _installedNDKList.Find(i => i.Version.Contains(version));
+
+                if (result != null)
+                {
+                    success = 2;
+                }
+            }
+
+            return success;
+        }
+
         #endregion
 
         #region Event Handlers
@@ -593,7 +1156,7 @@ namespace RIM.VSNDK_Package
                 _owP.Activate();
 
                 
-                UpdateManagerData upData = new UpdateManagerData(false);
+                UpdateManagerData upData = new UpdateManagerData(this);
 
                 if (!upData.validateDeviceVersion(_isSimulator))
                 {
@@ -669,9 +1232,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         private void ShowSettingsWindow(object sender, EventArgs e)
         {
-            // Create the dialog instance without Help support.
-            var SettingsDialog = new Settings.SettingsDialog();
-            // Show the dialog.
+            var SettingsDialog = new Settings.SettingsDialog(this);
             var m = SettingsDialog.ShowModal();
         }
 

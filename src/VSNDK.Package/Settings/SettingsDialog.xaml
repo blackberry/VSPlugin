@@ -12,7 +12,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Name="gridMain" VerticalAlignment="Top" DataContext="{StaticResource settingsData}"  Width="608" xmlns:RIM_password="clr-namespace:RIM.VSNDK_Package.Signing.Models">
+    <Grid Name="gridMain" VerticalAlignment="Top" Width="608" xmlns:RIM_password="clr-namespace:RIM.VSNDK_Package.Signing.Models">
         <StackPanel Orientation="Vertical" Name="MainPanel" VerticalAlignment="Top" Height="299">
             <GroupBox Header="BlackBerry API Levels" Name="gbBlackBerryNDKSettings" VerticalAlignment="Stretch" Height="55" Margin="5,5,5,5">
                 <StackPanel Orientation="Vertical" Height="33" Width="528">

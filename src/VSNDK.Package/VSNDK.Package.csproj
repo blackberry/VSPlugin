@@ -180,6 +180,9 @@
       <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="NativeMethods.cs" />
+    <Compile Include="UpdateManager\SimulatorManager.xaml.cs">
+      <DependentUpon>SimulatorManager.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UpdateManager\UpdateManagerDialog.xaml.cs">
       <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
     </Compile>
@@ -328,6 +331,10 @@
     <Page Include="Signing\SigningResourceDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UpdateManager\SimulatorManager.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="UpdateManager\UpdateManagerDialog.xaml">
       <Generator>MSBuild:Compile</Generator>
