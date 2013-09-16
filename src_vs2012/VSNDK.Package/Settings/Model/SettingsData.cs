@@ -26,6 +26,7 @@ using System.IO;
 using RIM.VSNDK_Package.Signing.Models;
 using System.Windows.Data;
 using RIM.VSNDK_Package.UpdateManager.Model;
+using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.Settings.Models
 {
@@ -53,6 +54,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         #region Member Variables and Constants
         private string _deviceIP;
         private string _devicePassword;
+        private Package _pkg;
         private string _simulatorIP;
         private UpdateManagerData updateManager;
         private string _simulatorPassword;
@@ -72,12 +74,15 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// <summary>
         /// SettingsData Constructor
         /// </summary>
-        public SettingsData()
+        public SettingsData(Package pkg)
         {
+            _pkg = pkg;
+
             getDeviceInfo();
             getSimulatorInfo();
             RefreshScreen();
         }
+
 
         /// <summary>
         /// Refresh the screen
@@ -136,9 +141,9 @@ namespace RIM.VSNDK_Package.Settings.Models
         {
             string result = "";
 
-            foreach (APITargetClass target in updateManager.tempAPITargetList)
+            foreach (APITargetClass target in ((VSNDK_PackagePackage)_pkg).APITargetList)
             {
-                if (target.TargetVersion  == version)
+                if (target.TargetVersion == version)
                 {
                     result = target.TargetName;
                     break;

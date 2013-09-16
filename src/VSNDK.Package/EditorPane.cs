@@ -156,7 +156,7 @@ namespace RIM.VSNDK_Package
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
-            _vsDesignerControl = new VsDesignerControl(_service, new ViewModel(_store, _model, this, _textBuffer));
+            _vsDesignerControl = new VsDesignerControl(_service, new ViewModel(_thisPackage, _store, _model, this, _textBuffer));
             base.Content = _vsDesignerControl;
 
             RegisterIndependentView(true);

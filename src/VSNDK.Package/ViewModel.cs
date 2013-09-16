@@ -227,6 +227,7 @@ namespace RIM.VSNDK_Package
         private PermissionItemClass _permission;
         private DTE _dte;
         private string _activeProjectDirectory;
+        private Package _pkg;
 
         long _dirtyTime;
         LanguageService _xmlLanguageService;
@@ -251,8 +252,9 @@ namespace RIM.VSNDK_Package
         /// <param name="xmlModel"></param>
         /// <param name="provider"></param>
         /// <param name="buffer"></param>
-        public ViewModel(XmlStore xmlStore, XmlModel xmlModel, IServiceProvider provider, IVsTextLines buffer)
+        public ViewModel(Package pkg, XmlStore xmlStore, XmlModel xmlModel, IServiceProvider provider, IVsTextLines buffer)
         {
+            _pkg = pkg;
             /// Initialize Asset Type List
             IList<AssetTypeItemClass> AssetTypeListItem = new List<AssetTypeItemClass>();
             AssetTypeItemClass assetType = new AssetTypeItemClass("Other");
@@ -498,7 +500,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         private void LoadPermissions()
         {
-            SettingsData settingsData = new SettingsData();
+            SettingsData settingsData = new SettingsData(_pkg);
             bool oldListMethod = true;
             XmlNodeList pList = null;
 

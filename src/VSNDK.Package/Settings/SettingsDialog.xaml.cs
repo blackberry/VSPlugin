@@ -34,6 +34,7 @@ using RIM.VSNDK_Package.Settings.Models;
 using System.Net;
 using System.Net.Sockets;
 using RIM.VSNDK_Package.UpdateManager.Model;
+using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.Settings
 {
@@ -43,21 +44,26 @@ namespace RIM.VSNDK_Package.Settings
     /// </summary>
     public partial class SettingsDialog : DialogWindow
     {
+        private Package _pkg;
+        private SettingsData _data;
+
         /// <summary>
         /// Settings Dialog Constructor
         /// </summary>
-        public SettingsDialog()
+        public SettingsDialog(Package pkg)
         {
-            InitializeComponent();
-            SettingsData data = gridMain.DataContext as SettingsData;
-            if (data != null)
-            {
-                data.getSimulatorInfo();
-                data.getDeviceInfo();
+            /// Save internal variables
+            _pkg = pkg;
 
-                tbDevicePassword.Password = data.DevicePassword;
-                tbSimulatorPassword.Password = data.SimulatorPassword;
-            }
+            InitializeComponent();
+
+            _data = new SettingsData(_pkg);
+            gridMain.DataContext = _data;
+
+            _data.getSimulatorInfo();
+            _data.getDeviceInfo();
+            tbDevicePassword.Password = _data.DevicePassword;
+            tbSimulatorPassword.Password = _data.SimulatorPassword;
         }
 
         /// <summary>
@@ -67,16 +73,11 @@ namespace RIM.VSNDK_Package.Settings
         /// <param name="e"></param>
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
-            SettingsData data = gridMain.DataContext as SettingsData;
-            if (data != null)
-            {
-                data.DevicePassword = tbDevicePassword.Password;
-                data.SimulatorPassword = tbSimulatorPassword.Password;
-                data.setDeviceInfo();
-                data.setSimulatorInfo();
-                data.setNDKPaths(); 
-            }
-
+            _data.DevicePassword = tbDevicePassword.Password;
+            _data.SimulatorPassword = tbSimulatorPassword.Password;
+            _data.setDeviceInfo();
+            _data.setSimulatorInfo();
+            _data.setNDKPaths(); 
 
             DialogResult = true; ;
 
@@ -91,16 +92,11 @@ namespace RIM.VSNDK_Package.Settings
         {
             this.Cursor = System.Windows.Input.Cursors.Wait;
 
-            SettingsData data = gridMain.DataContext as SettingsData;
-            if (data != null)
-            {
-                UpdateManager.UpdateManager.create();
-                
+            UpdateManager.UpdateManager.create(_pkg);
 
-                data.RefreshScreen();
-                NDKEntry.ItemsSource = null;
-                NDKEntry.ItemsSource = data.NDKEntries;
-            }
+            _data.RefreshScreen();
+            NDKEntry.ItemsSource = null;
+            NDKEntry.ItemsSource = _data.NDKEntries;
 
             this.Cursor = System.Windows.Input.Cursors.Hand;
 

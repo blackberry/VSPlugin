@@ -26,6 +26,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using RIM.VSNDK_Package.UpdateManager.Model;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.UpdateManager
 {
@@ -34,15 +35,23 @@ namespace RIM.VSNDK_Package.UpdateManager
     /// </summary>
     public partial class UpdateManager : Window
     {
+        Package _pkg;
+
         /// <summary>
         /// Constructor
         /// </summary>
-        private UpdateManager()
+        private UpdateManager(Package pkg)
         {
+            //Save package reference
+            _pkg = pkg;
+
             InitializeComponent();
+
+            UpdateManagerData data = new UpdateManagerData(pkg);
+            gridMain.DataContext = data;  
         }
 
-        public static void create()
+        public static void create(Package pkg)
         {
             if (!GlobalFunctions.isOnline())
             {
@@ -51,7 +60,7 @@ namespace RIM.VSNDK_Package.UpdateManager
             }
             else
             {
-                UpdateManager win = new UpdateManager();
+                UpdateManager win = new UpdateManager(pkg);
                 bool? res = win.ShowDialog();
             }
         }
@@ -111,7 +120,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                     }
                     else
                     {
-                        data.UninstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion);
+                        data.UninstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false);
                     }
                 }
             }
@@ -140,9 +149,8 @@ namespace RIM.VSNDK_Package.UpdateManager
             }
         }
 
-
         /// <summary>
-        /// Prevent the user from closing the window
+        /// Prevent the user from closing
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -156,6 +164,12 @@ namespace RIM.VSNDK_Package.UpdateManager
                     e.Cancel = true;
                 }
             }
+        }
+
+        private void Simulators_Click(object sender, RoutedEventArgs e)
+        {
+            SimulatorManager sm = new SimulatorManager(_pkg);
+            sm.ShowDialog();
         }
     }
 }

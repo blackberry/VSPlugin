@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
         xmlns:pa="clr-namespace:RIM.VSNDK_Package.UpdateManager.Model"                 
-        Title="Update Manager" Height="188" Width="613" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Topmost="False" Closing="Window_Closing">
+        Title="API Levels" Height="188" Width="613" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Topmost="False" Closing="Window_Closing">
 
     <Window.Resources>
         <ResourceDictionary>
@@ -13,7 +13,7 @@
         </ResourceDictionary>
     </Window.Resources>
 
-    <Grid Name="gridMain" DataContext="{StaticResource updateManagerData}" Height="154">
+    <Grid Name="gridMain" Height="154">
         <Button Content="Close" Height="23" HorizontalAlignment="Left" Margin="496,123,0,0" Name="No" VerticalAlignment="Top" Width="75" Click="Close_Click"  IsEnabled="{Binding Path=IsInstalling}" />
         <Label Name="Status" Height="28" HorizontalAlignment="Left" Margin="50,83,0,0" VerticalAlignment="Top" Width="529" Content="{Binding Path=Status}" />
         <TextBlock Height="55" HorizontalAlignment="Left" Margin="50,22,0,0" Name="lblMessage" VerticalAlignment="Top" Width="529" TextWrapping="Wrap" />

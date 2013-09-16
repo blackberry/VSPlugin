@@ -1,12 +1,12 @@
 #version=1
 com.google.guava,13.0.0,plugins/com.google.guava_13.0.0/,4,false
 com.ibm.icu,4.4.2.v20110823,plugins/com.ibm.icu_4.4.2.v20110823.jar,4,false
-com.qnx.tools.ide.bugreport,5.0.0.v201308281638,plugins/com.qnx.tools.ide.bugreport_5.0.0.v201308281638.jar,4,false
-com.qnx.tools.ide.core,5.1.0.v201308281638,plugins/com.qnx.tools.ide.core_5.1.0.v201308281638.jar,4,false
-com.qnx.tools.ide.sdk.manager.core,1.0.0.v201308281638,plugins/com.qnx.tools.ide.sdk.manager.core_1.0.0.v201308281638.jar,4,false
-com.qnx.tools.ide.utils,5.0.0.v201308281638,plugins/com.qnx.tools.ide.utils_5.0.0.v201308281638.jar,4,false
-com.qnx.tools.license,4.7.0.v201308281638,plugins/com.qnx.tools.license_4.7.0.v201308281638.jar,4,false
-com.qnx.tools.utils,5.0.0.v201308281638,plugins/com.qnx.tools.utils_5.0.0.v201308281638.jar,4,false
+com.qnx.tools.ide.bugreport,5.0.0.v201309101638,plugins/com.qnx.tools.ide.bugreport_5.0.0.v201309101638.jar,4,false
+com.qnx.tools.ide.core,5.1.0.v201309101638,plugins/com.qnx.tools.ide.core_5.1.0.v201309101638.jar,4,false
+com.qnx.tools.ide.sdk.manager.core,1.0.0.v201309101638,plugins/com.qnx.tools.ide.sdk.manager.core_1.0.0.v201309101638.jar,4,false
+com.qnx.tools.ide.utils,5.0.0.v201309101638,plugins/com.qnx.tools.ide.utils_5.0.0.v201309101638.jar,4,false
+com.qnx.tools.license,4.7.0.v201309101638,plugins/com.qnx.tools.license_4.7.0.v201309101638.jar,4,false
+com.qnx.tools.utils,5.0.0.v201309101638,plugins/com.qnx.tools.utils_5.0.0.v201309101638.jar,4,false
 javax.annotation,1.0.0.v20101115-0725,plugins/javax.annotation_1.0.0.v20101115-0725.jar,4,false
 javax.inject,1.0.0.v20091030,plugins/javax.inject_1.0.0.v20091030.jar,4,false
 javax.xml,1.3.4.v201005080400,plugins/javax.xml_1.3.4.v201005080400.jar,4,false
@@ -20,7 +20,7 @@ org.apache.commons.logging,1.0.4.v201101211617,plugins/org.apache.commons.loggin
 org.apache.felix.gogo.command,0.8.0.v201108120515,plugins/org.apache.felix.gogo.command_0.8.0.v201108120515.jar,4,false
 org.apache.felix.gogo.runtime,0.8.0.v201108120515,plugins/org.apache.felix.gogo.runtime_0.8.0.v201108120515.jar,4,false
 org.apache.felix.gogo.shell,0.8.0.v201110170705,plugins/org.apache.felix.gogo.shell_0.8.0.v201110170705.jar,4,false
-org.eclipse.cdt.core,5.4.1.v201308232002,plugins/org.eclipse.cdt.core_5.4.1.v201308232002.jar,4,false
+org.eclipse.cdt.core,5.4.1.v201309092047,plugins/org.eclipse.cdt.core_5.4.1.v201309092047.jar,4,false
 org.eclipse.compare,3.5.301.v20130125-135424,plugins/org.eclipse.compare_3.5.301.v20130125-135424.jar,4,false
 org.eclipse.compare.core,3.5.200.v20120522-1148,plugins/org.eclipse.compare.core_3.5.200.v20120522-1148.jar,4,false
 org.eclipse.core.commands,3.6.2.v20130123-162658,plugins/org.eclipse.core.commands_3.6.2.v20130123-162658.jar,4,false
