@@ -47,6 +47,8 @@ namespace VSNDK.Tasks
         private const string DEBUG_NATIVE = "DebugNative";
         private const string PACKAGE = "Package";
         private const string WORKSPACE_LOC = "${workspace_loc:/";
+        private string _flagFile;
+
         #endregion
 
         /// <summary>
@@ -403,6 +405,17 @@ namespace VSNDK.Tasks
         }
 
         /// <summary>
+        /// Setter for FlagFile property
+        /// </summary>
+        public string FlagFile
+        {
+            set
+            {
+                _flagFile = value;
+            }
+        }
+
+        /// <summary>
         /// Getter/Setter for DebugNative property
         /// Switch to cause task to install application in debug configuration.
         /// </summary>
@@ -415,6 +428,9 @@ namespace VSNDK.Tasks
 
             set
             {
+                if (File.Exists(_flagFile))
+                    value = true;
+
                 base.ActiveToolSwitches.Remove(DEBUG_NATIVE);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {

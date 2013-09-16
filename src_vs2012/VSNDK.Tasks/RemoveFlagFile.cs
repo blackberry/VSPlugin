@@ -27,12 +27,10 @@ namespace VSNDK.Tasks
     /// <summary>
     /// MSBuild Task for reading in the flag file from the start debugging button.
     /// </summary>
-    public class CheckFlagFile : Task
+    public class RemoveFlagFile : Task
     {
         #region Member Variables and Constants.
-        private string _action;
         private string _flagFile;
-        private bool _isFlagSet;
         #endregion
 
         /// <summary>
@@ -41,30 +39,18 @@ namespace VSNDK.Tasks
         /// <returns></returns>
         public override bool Execute()
         {
-            _isFlagSet = false;
-            
-            if (String.Equals(_action, "check", StringComparison.OrdinalIgnoreCase)) 
-            {            
-			    if (File.Exists(_flagFile))
-                {
-				    _isFlagSet = true;				    
-			    }
-            } 
-            else if (String.Equals(_action, "remove", StringComparison.OrdinalIgnoreCase)) 
+            bool removed;
+            try
             {
-                try
-                {
-                    File.Delete(_flagFile);
-                    _isFlagSet = true;
-                }
-                catch (DirectoryNotFoundException dirNotFound)
-                {
-                    Console.WriteLine(dirNotFound.Message);
-                    _isFlagSet = false;
-                }                
-            } 
-
-            return _isFlagSet;
+                File.Delete(_flagFile);
+                removed = true;
+            }
+            catch (DirectoryNotFoundException dirNotFound)
+            {
+                Console.WriteLine(dirNotFound.Message);
+                removed = false;
+            }
+            return removed;
         }
 
         /// <summary>
@@ -76,30 +62,6 @@ namespace VSNDK.Tasks
             set
             {
                 _flagFile = value;
-            }
-        }
-
-        /// <summary>
-        /// Setter for Action property
-        /// </summary>
-        [Required]
-        public string Action
-        {
-            set
-            {
-                _action = value;
-            }
-        }
-
-        /// <summary>
-        /// Getter for IsFlagSet property
-        /// </summary>
-        [Output]
-        public bool IsFlagSet
-        {
-            get
-            {
-                return _isFlagSet;
             }
         }
     }
