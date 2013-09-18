@@ -222,7 +222,9 @@ namespace VSNDK.DebugEngine
             AD7MemoryAddress codeContext = new AD7MemoryAddress(m_engine, xAddress);
             AD7DocumentContext documentContext = new AD7DocumentContext(m_GDB_filename, tpos, tpos, codeContext);
 
-            m_breakpointResolution = new AD7BreakpointResolution(m_engine, xAddress, documentContext); 
+            m_breakpointResolution = new AD7BreakpointResolution(m_engine, xAddress, documentContext);
+
+            m_engine.Callback.OnBreakpointBound(this, 0);
         }
 
 

@@ -126,7 +126,6 @@ namespace VSNDK.DebugEngine
                 aBBP.GDB_FileName = GDB_Filename;
                 aBBP.GDB_LinePos = GDB_LinePos;
                 aBBP.GDB_Address = GDB_address;
-                m_engine.Callback.OnBreakpointBound(aBBP, 0);
             }
             return (int)GDB_ID;
         }
