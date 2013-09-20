@@ -35,39 +35,19 @@ namespace RIM.VSNDK_Package.Signing
     /// <summary>
     /// Interaction logic for SigningDialog.xaml
     /// </summary>
-    public partial class SigningDialog : DialogWindow
+    public partial class SigningDialog : Window
     {
+        private SigningData signingData = null;
+
         public string certPath;
         public string bbidtokenPath;
-        private RIMSiginingAuthorityData data;
-
 
         public SigningDialog()
         {
             InitializeComponent();
 
-            string folder = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            certPath = folder +  @"\Research In Motion\author.p12";
-            bbidtokenPath = folder + @"\Research In Motion\bbidtoken.csk";
-            data = gbRIMSigningAuthority.DataContext as RIMSiginingAuthorityData;
-            UpdateUI(File.Exists(certPath));
-        }
-
-
-        /// <summary>
-        /// Private method to update the screen UI
-        /// </summary>
-        /// <param name="registered"></param>
-        public void UpdateUI(bool registered)
-        {
-            if (data != null)
-            {
-                data.Registered = registered;
-
-                btnUnregister.IsEnabled = registered;
-                btnRegister.IsEnabled = !registered;
-                btnBackup.IsEnabled = registered;
-            }
+            signingData = new SigningData();
+            gridMain.DataContext = signingData; 
         }
 
         /// <summary>
@@ -87,7 +67,8 @@ namespace RIM.VSNDK_Package.Signing
                 win.ResizeMode = System.Windows.ResizeMode.NoResize;
                 bool? res = win.ShowDialog();
             }
-            UpdateUI(File.Exists(certPath));
+
+            signingData.RefreshScreen();
         }
 
         /// <summary>
@@ -99,7 +80,8 @@ namespace RIM.VSNDK_Package.Signing
         {
             DeRegisterWindow win = new DeRegisterWindow();
             bool? res = win.ShowDialog();
-            UpdateUI(File.Exists(certPath));    
+
+            signingData.RefreshScreen();    
         }
 
         /// <summary>
@@ -109,8 +91,9 @@ namespace RIM.VSNDK_Package.Signing
         /// <param name="e"></param>
         private void btnBackup_Click(object sender, RoutedEventArgs e)
         {
-            BackupRestoreData brData = gbBackupRestore.DataContext as BackupRestoreData;
             string zipfile = string.Empty;
+            
+            ///Create Dialog
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.FileName = "signingkey";
             dlg.DefaultExt = ".zip"; // Default file extension
@@ -119,7 +102,7 @@ namespace RIM.VSNDK_Package.Signing
             if (result == true)
             {
                 zipfile = dlg.FileName;
-                brData.Backup(System.IO.Path.GetDirectoryName(certPath), zipfile);
+                signingData.Backup(System.IO.Path.GetDirectoryName(certPath), zipfile);
             }
         }
 
@@ -130,7 +113,6 @@ namespace RIM.VSNDK_Package.Signing
         /// <param name="e"></param>
         private void btnRestore_Click(object sender, RoutedEventArgs e)
         {
-            BackupRestoreData brData = gbBackupRestore.DataContext as BackupRestoreData;
             string zipfile = string.Empty;
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".zip"; // Default file extension
@@ -139,8 +121,8 @@ namespace RIM.VSNDK_Package.Signing
             if (result == true)
             {
                 zipfile = dlg.FileName;
-                brData.Restore(zipfile, System.IO.Path.GetDirectoryName(certPath));
-                UpdateUI(File.Exists(certPath));
+                signingData.Restore(zipfile, System.IO.Path.GetDirectoryName(certPath));
+                signingData.RefreshScreen(); 
             }
         }
     }

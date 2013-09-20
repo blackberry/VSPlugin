@@ -1222,7 +1222,7 @@ namespace RIM.VSNDK_Package
             // Create the dialog instance without Help support.
             var SigningToolDialog = new Signing.SigningDialog();
             // Show the dialog.
-            var m = SigningToolDialog.ShowModal();
+            var m = SigningToolDialog.ShowDialog();
         }
 
         /// <summary>
