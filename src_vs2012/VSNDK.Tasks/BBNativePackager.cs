@@ -192,6 +192,11 @@ namespace VSNDK.Tasks
                     configAssets = config.asset;
                     break;
                 }
+                else if (Configuration == "Release" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Release")
+                {
+                    configAssets = config.asset;
+                    break;
+                }
             }
             
             ITaskItem[] items = null;
@@ -211,14 +216,17 @@ namespace VSNDK.Tasks
                 items[i].SetMetadata("target", target);
             }
 
-           
-            for (int i = 0; i < configAssets.Length; i++)
+
+            if (configAssets != null)
             {
-                string path = configAssets[i].path;
-                path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
-                string target = configAssets[i].Value;
-                items[i + glen] = new TaskItem(path);
-                items[i + glen].SetMetadata("target", target);
+                for (int i = 0; i < configAssets.Length; i++)
+                {
+                    string path = configAssets[i].path;
+                    path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
+                    string target = configAssets[i].Value;
+                    items[i + glen] = new TaskItem(path);
+                    items[i + glen].SetMetadata("target", target);
+                }
             }
 
             return items;
