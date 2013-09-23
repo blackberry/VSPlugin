@@ -216,6 +216,7 @@ namespace RIM.VSNDK_Package
         private List<SimulatorsClass> _simulatorList;
         private List<APITargetClass> _tempAPITargetList;
         private List<string> installedSimulatorList;
+        private bool isDebugConfiguration = true;
 
         #endregion
 
@@ -430,6 +431,7 @@ namespace RIM.VSNDK_Package
 
                                 ConfigurationManager config = p1.ConfigurationManager;
                                 Configuration active = config.ActiveConfiguration;
+
                                 foreach (Property prop in active.Properties)
                                 {
                                     try
@@ -484,15 +486,17 @@ namespace RIM.VSNDK_Package
 
             if ((outputText == "") || (System.Text.RegularExpressions.Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
             {
-                // Write file to flag the deploy task that it should use the -debugNative option
-                string fileContent = "Use -debugNative.\r\n";
-                string appData = Environment.GetEnvironmentVariable("AppData");
-                System.IO.StreamWriter file = new System.IO.StreamWriter(appData + @"\BlackBerry\vsndk-debugNative.txt");
-                file.WriteLine(fileContent);
-                file.Close();
+                if (isDebugConfiguration)
+                {
+                    // Write file to flag the deploy task that it should use the -debugNative option
+                    string fileContent = "Use -debugNative.\r\n";
+                    string appData = Environment.GetEnvironmentVariable("AppData");
+                    System.IO.StreamWriter file = new System.IO.StreamWriter(appData + @"\BlackBerry\vsndk-debugNative.txt");
+                    file.WriteLine(fileContent);
+                    file.Close();
 
-                _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
-
+                    _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+                }
 
                 foreach (String startupProject in (Array)_dte.Solution.SolutionBuild.StartupProjects)
                 {
@@ -814,6 +818,32 @@ namespace RIM.VSNDK_Package
         }
 
 
+        /// <summary>
+        /// Verify if the app configuration is Debug.
+        /// </summary>
+        /// <returns> True if Debug configuration; False otherwise. </returns>
+        private bool checkDebugConfiguration()
+        {
+            Solution2 soln = (Solution2)_dte.Solution;
+            foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
+            {
+                foreach (Project p1 in soln.Projects)
+                {
+                    if (p1.UniqueName == startupProject)
+                    {
+                        ConfigurationManager config = p1.ConfigurationManager;
+                        Configuration active = config.ActiveConfiguration;
+
+                        if (active.ConfigurationName.ToUpper() == "DEBUG")
+                            return (true);
+                        else
+                            return (false);
+                    }
+                }
+            }
+            return (false);
+        }
+
 
         #endregion
 
@@ -1102,6 +1132,8 @@ namespace RIM.VSNDK_Package
             bool bbPlatform = false;
             if (_dte.Solution.SolutionBuild.ActiveConfiguration != null)
             {
+                isDebugConfiguration = checkDebugConfiguration();
+
                 SolutionContexts scCollection = _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts;
                 foreach (SolutionContext sc in scCollection)
                 {
@@ -1134,12 +1166,20 @@ namespace RIM.VSNDK_Package
                 _owP = ow.OutputWindowPanes.Item("Build");
                 _owP.Activate();
 
-                
-                UpdateManagerData upData = new UpdateManagerData(this);
 
-                if (!upData.validateDeviceVersion(_isSimulator))
+                if (isDebugConfiguration)
                 {
-                    CancelDefault = true;
+                    UpdateManagerData upData = new UpdateManagerData(this);
+
+                    if (!upData.validateDeviceVersion(_isSimulator))
+                    {
+                        CancelDefault = true;
+                    }
+                    else
+                    {
+                        BuildBar();
+                        CancelDefault = true;
+                    }
                 }
                 else
                 {
@@ -1148,6 +1188,7 @@ namespace RIM.VSNDK_Package
                 }
             }
         }
+
 
         /// <summary> 
         /// This event is fired only when the build/rebuild/clean process ends. 
