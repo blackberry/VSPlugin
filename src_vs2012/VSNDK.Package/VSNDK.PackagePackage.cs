@@ -823,51 +823,40 @@ namespace RIM.VSNDK_Package
         /// Retrieve list of Available Simulators
         /// </summary>
         /// <returns></returns>
-        public bool GetSimulatorList()
+        public void GetSimulatorList()
         {
-            bool success = false;
-
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(SimulatorListDataReceived);
-
-
-            /// Get Device PIN
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list-all --simulator");
-
-            try
+            if (GlobalFunctions.isOnline())
             {
-                _simulatorList = new List<SimulatorsClass>();
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                startInfo.UseShellExecute = false;
+                startInfo.CreateNoWindow = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.RedirectStandardOutput = true;
+                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
+                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(SimulatorListDataReceived);
 
-                p.Start();
-                p.BeginErrorReadLine();
-                p.BeginOutputReadLine();
-                p.WaitForExit(); 
-                if (p.ExitCode != 0)
+
+                /// Get Device PIN
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list-all --simulator");
+
+                try
                 {
-                    success = false;
+                    _simulatorList = new List<SimulatorsClass>();
+
+                    p.Start();
+                    p.BeginErrorReadLine();
+                    p.BeginOutputReadLine();
+                    p.WaitForExit();
+                    p.Close();
                 }
-                else
+                catch (Exception e)
                 {
-                    success = true;
+                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                    System.Diagnostics.Debug.WriteLine(e.Message);
                 }
-                p.Close();
             }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                success = false;
-            }
-
-            return success;
-
         }
 
         /// <summary>
@@ -930,50 +919,40 @@ namespace RIM.VSNDK_Package
         /// Retrieve list of API's from 
         /// </summary>
         /// <returns></returns>
-        public bool GetAvailableAPIList()
+        public void GetAvailableAPIList()
         {
-            bool success = false;
-
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDataReceived);
-
-
-            /// Get Device PIN
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list");
-
-            try
+            if (GlobalFunctions.isOnline())
             {
-                _tempAPITargetList = new List<APITargetClass>();
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                startInfo.UseShellExecute = false;
+                startInfo.CreateNoWindow = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.RedirectStandardOutput = true;
+                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
+                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDataReceived);
 
-                p.Start();
-                p.BeginErrorReadLine();
-                p.BeginOutputReadLine();
-                p.WaitForExit();
-                if (p.ExitCode != 0)
-                {
-                    success = false;
-                }
-                else
-                {
-                    success = true;
-                }
-                p.Close();
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                success = false;
-            }
 
-            return success;
+                /// Get Device PIN
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list");
+
+                try
+                {
+                    _tempAPITargetList = new List<APITargetClass>();
+
+                    p.Start();
+                    p.BeginErrorReadLine();
+                    p.BeginOutputReadLine();
+                    p.WaitForExit();
+                    p.Close();
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+                }
+            }
 
         }
 
