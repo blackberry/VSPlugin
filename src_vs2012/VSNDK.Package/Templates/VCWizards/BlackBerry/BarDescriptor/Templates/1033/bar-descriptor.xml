@@ -52,6 +52,10 @@
     <platformArchitecture>x86</platformArchitecture>
     <asset path="Simulator-Debug/[!output PROJECT_NAME]" entry="true" type="Qnx/Elf">[!output PROJECT_NAME]</asset>
   </configuration>
+  <configuration id="com.qnx.qcc.configuration.exe.release.1324337687" name="Simulator-Release">
+    <platformArchitecture>armle-v7</platformArchitecture>
+    <asset path="Simulator-Release/[!output PROJECT_NAME]" entry="true" type="Qnx/Elf">[!output PROJECT_NAME]</asset>
+  </configuration>
 
   <!--  The icon for the application, which should be 86x86. -->
   <icon>
