@@ -345,7 +345,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                                 }
                                 else
                                 {
-                                    UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The Runtime Libraries for the operating system version of the attached deice are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
+                                    UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
                                     if (umd.ShowDialog() == true)
                                     {
                                         retVal = true;
