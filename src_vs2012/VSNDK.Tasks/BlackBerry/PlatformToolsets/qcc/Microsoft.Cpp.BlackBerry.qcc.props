@@ -28,6 +28,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <SSHPrivateKeyPath>$(AppDataPath)/BlackBerry/bbt_id_rsa</SSHPrivateKeyPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Platform)'=='BlackBerry'">
+    <DebuggerFlavor>VSNDKDebugEngine</DebuggerFlavor>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <PlatformToolsetVersion>qcc2.0</PlatformToolsetVersion>
     <QccToolsPath>$(QNX_HOST)\usr\bin</QccToolsPath>

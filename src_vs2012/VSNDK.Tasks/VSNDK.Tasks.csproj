@@ -171,6 +171,12 @@
     <Content Include="BarDescriptor\Schema\bar-descriptor.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="BlackBerrySimulator\Rules\debugger_ndk.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="BlackBerry\Rules\debugger_ndk.xml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="BlackBerry\Rules\ndk_general_ps.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
