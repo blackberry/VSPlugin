@@ -52,6 +52,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Redefine the Target Macros-->
   <PropertyGroup>
     <TargetPath>$([System.IO.Path]::Combine($(ProjectDir),$(OutDir)$(LibPrefix)$(TargetName)$(TargetExt)))</TargetPath>
+    <TargetPath>$(TargetPath.TrimEnd('\'))</TargetPath>
     <TargetFileName>$([System.IO.Path]::GetFileName('$(TargetPath)'))</TargetFileName>
     <TargetDir>$([System.IO.Path]::GetDirectoryName('$(TargetPath)'))</TargetDir>
     <TargetName>$(LibPrefix)$(ProjectName)</TargetName>
@@ -95,7 +96,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Linker defaults -->
   <ItemDefinitionGroup>
     <Link>
-      <OutputFile>$(LocalDebuggerCommand)</OutputFile>
+      <OutputFile Condition="'%(Link.OutputFile)' == '' and '$(TargetPath)' == ''">$(OutDir)$(LibPrefix)$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile Condition="'%(Link.OutputFile)' == '' and '$(TargetPath)' != ''">$(TargetPath)</OutputFile>
       <AdditionalLibraryDirectories Condition="'%(Link.AdditionalLibraryDirectories)' == ''"></AdditionalLibraryDirectories>
       <AdditionalDependencies     Condition="'%(Link.AdditionalDependencies)'       == ''"></AdditionalDependencies>
       <IgnoreAllDefaultLibraries  Condition="'%(Link.IgnoreAllDefaultLibraries)'    == ''">false</IgnoreAllDefaultLibraries>
@@ -110,7 +112,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Librarian defaults -->
   <ItemDefinitionGroup>
     <Lib>
-      <OutputFile                 Condition="'%(Lib.OutputFile)'                    == ''">$(LocalDebuggerCommand)</OutputFile>
+      <OutputFile                 Condition="'%(Lib.OutputFile)'                    == ''">$(OutDir)$(LibPrefix)$(TargetName)$(TargetExt)</OutputFile>
       <LinkStatic Condition="'%(Lib.LinkStatic)' == ''">false</LinkStatic>
     </Lib>
   </ItemDefinitionGroup>
