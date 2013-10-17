@@ -216,6 +216,7 @@ namespace RIM.VSNDK_Package
         private List<SimulatorsClass> _simulatorList;
         private List<APITargetClass> _tempAPITargetList;
         private List<string> installedSimulatorList;
+        private bool isDebugConfiguration = true;
 
         #endregion
 
@@ -430,6 +431,7 @@ namespace RIM.VSNDK_Package
 
                                 ConfigurationManager config = p1.ConfigurationManager;
                                 Configuration active = config.ActiveConfiguration;
+
                                 foreach (Property prop in active.Properties)
                                 {
                                     try
@@ -484,15 +486,17 @@ namespace RIM.VSNDK_Package
 
             if ((outputText == "") || (System.Text.RegularExpressions.Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
             {
-                // Write file to flag the deploy task that it should use the -debugNative option
-                string fileContent = "Use -debugNative.\r\n";
-                string appData = Environment.GetEnvironmentVariable("AppData");
-                System.IO.StreamWriter file = new System.IO.StreamWriter(appData + @"\BlackBerry\vsndk-debugNative.txt");
-                file.WriteLine(fileContent);
-                file.Close();
+                if (isDebugConfiguration)
+                {
+                    // Write file to flag the deploy task that it should use the -debugNative option
+                    string fileContent = "Use -debugNative.\r\n";
+                    string appData = Environment.GetEnvironmentVariable("AppData");
+                    System.IO.StreamWriter file = new System.IO.StreamWriter(appData + @"\BlackBerry\vsndk-debugNative.txt");
+                    file.WriteLine(fileContent);
+                    file.Close();
 
-                _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
-
+                    _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+                }
 
                 foreach (String startupProject in (Array)_dte.Solution.SolutionBuild.StartupProjects)
                 {
@@ -814,6 +818,32 @@ namespace RIM.VSNDK_Package
         }
 
 
+        /// <summary>
+        /// Verify if the app configuration is Debug.
+        /// </summary>
+        /// <returns> True if Debug configuration; False otherwise. </returns>
+        private bool checkDebugConfiguration()
+        {
+            Solution2 soln = (Solution2)_dte.Solution;
+            foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
+            {
+                foreach (Project p1 in soln.Projects)
+                {
+                    if (p1.UniqueName == startupProject)
+                    {
+                        ConfigurationManager config = p1.ConfigurationManager;
+                        Configuration active = config.ActiveConfiguration;
+
+                        if (active.ConfigurationName.ToUpper() == "DEBUG")
+                            return (true);
+                        else
+                            return (false);
+                    }
+                }
+            }
+            return (false);
+        }
+
 
         #endregion
 
@@ -823,51 +853,40 @@ namespace RIM.VSNDK_Package
         /// Retrieve list of Available Simulators
         /// </summary>
         /// <returns></returns>
-        public bool GetSimulatorList()
+        public void GetSimulatorList()
         {
-            bool success = false;
-
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(SimulatorListDataReceived);
-
-
-            /// Get Device PIN
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list-all --simulator");
-
-            try
+            if (GlobalFunctions.isOnline())
             {
-                _simulatorList = new List<SimulatorsClass>();
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                startInfo.UseShellExecute = false;
+                startInfo.CreateNoWindow = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.RedirectStandardOutput = true;
+                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
+                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(SimulatorListDataReceived);
 
-                p.Start();
-                p.BeginErrorReadLine();
-                p.BeginOutputReadLine();
-                p.WaitForExit(); 
-                if (p.ExitCode != 0)
+
+                /// Get Device PIN
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list-all --simulator");
+
+                try
                 {
-                    success = false;
+                    _simulatorList = new List<SimulatorsClass>();
+
+                    p.Start();
+                    p.BeginErrorReadLine();
+                    p.BeginOutputReadLine();
+                    p.WaitForExit();
+                    p.Close();
                 }
-                else
+                catch (Exception e)
                 {
-                    success = true;
+                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                    System.Diagnostics.Debug.WriteLine(e.Message);
                 }
-                p.Close();
             }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                success = false;
-            }
-
-            return success;
-
         }
 
         /// <summary>
@@ -930,50 +949,40 @@ namespace RIM.VSNDK_Package
         /// Retrieve list of API's from 
         /// </summary>
         /// <returns></returns>
-        public bool GetAvailableAPIList()
+        public void GetAvailableAPIList()
         {
-            bool success = false;
-
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDataReceived);
-
-
-            /// Get Device PIN
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list");
-
-            try
+            if (GlobalFunctions.isOnline())
             {
-                _tempAPITargetList = new List<APITargetClass>();
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                startInfo.UseShellExecute = false;
+                startInfo.CreateNoWindow = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.RedirectStandardOutput = true;
+                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
+                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDataReceived);
 
-                p.Start();
-                p.BeginErrorReadLine();
-                p.BeginOutputReadLine();
-                p.WaitForExit();
-                if (p.ExitCode != 0)
-                {
-                    success = false;
-                }
-                else
-                {
-                    success = true;
-                }
-                p.Close();
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-                success = false;
-            }
 
-            return success;
+                /// Get Device PIN
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --list");
+
+                try
+                {
+                    _tempAPITargetList = new List<APITargetClass>();
+
+                    p.Start();
+                    p.BeginErrorReadLine();
+                    p.BeginOutputReadLine();
+                    p.WaitForExit();
+                    p.Close();
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+                }
+            }
 
         }
 
@@ -1123,6 +1132,8 @@ namespace RIM.VSNDK_Package
             bool bbPlatform = false;
             if (_dte.Solution.SolutionBuild.ActiveConfiguration != null)
             {
+                isDebugConfiguration = checkDebugConfiguration();
+
                 SolutionContexts scCollection = _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts;
                 foreach (SolutionContext sc in scCollection)
                 {
@@ -1155,12 +1166,20 @@ namespace RIM.VSNDK_Package
                 _owP = ow.OutputWindowPanes.Item("Build");
                 _owP.Activate();
 
-                
-                UpdateManagerData upData = new UpdateManagerData(this);
 
-                if (!upData.validateDeviceVersion(_isSimulator))
+                if (isDebugConfiguration)
                 {
-                    CancelDefault = true;
+                    UpdateManagerData upData = new UpdateManagerData(this);
+
+                    if (!upData.validateDeviceVersion(_isSimulator))
+                    {
+                        CancelDefault = true;
+                    }
+                    else
+                    {
+                        BuildBar();
+                        CancelDefault = true;
+                    }
                 }
                 else
                 {
@@ -1169,6 +1188,7 @@ namespace RIM.VSNDK_Package
                 }
             }
         }
+
 
         /// <summary> 
         /// This event is fired only when the build/rebuild/clean process ends. 

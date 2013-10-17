@@ -37,7 +37,7 @@ show:->:#NOT CREATED!
 -var-create:->:??^done;{??numchild=";@@";}{#ERROR;};
 -var-delete:->:??^done;{#DONE;}{#ERROR;};
 -var-list-children:->:??^done;{#71\;;(??name=;{??";@@";};~"\};#\;;??numchild=;{??";@@";};#\;;??value=;{??";@@";};#\;;??type=;{??";@@";};);}{#ERROR;};
--data-evaluate-expression:->:??^done;{??=;#60\;;@@$EOL$;}{??^error;{??-data-evaluate-expression: Usage: -data-evaluate-expression expression;{#61\;Error in expression.;}{??A syntax error in expression, near `'.;{#61;A syntax error at the end of the expression.;}{??=;#61\;;@@$EOL$;};};};};
+-data-evaluate-expression:->:??^done;{??=;#60\;;@@$EOL$;}{??^error;{??-data-evaluate-expression: Usage: -data-evaluate-expression expression;{#61\;Error in expression.;}{??A syntax error in expression, near `'.;{#61\;A syntax error at the end of the expression.;}{??=;#61\;;@@$EOL$;};};};};
 ptype:->:??type = ;{@@\\n";}{# ;};
 whatis:->:??type = ;{@@\\n";}{# ;};
 -exec-interrupt:->:??^done;{??signal-received;{??signal-meaning="Killed";{#47;}{#44\;;??addr=";@@";#\;;??func=";@@";0;??file=;{#\;;??";@@";#\;;??line=";@@";};};};};#\;;??thread-id=;{??";@@";};

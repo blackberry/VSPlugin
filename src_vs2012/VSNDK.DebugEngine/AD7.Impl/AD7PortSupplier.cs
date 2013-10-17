@@ -89,10 +89,12 @@ namespace VSNDK.DebugEngine
             try
             {
                 rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                m_toolsPath = rkPluginRegKey.GetValue("NDKHostPath").ToString() + "/usr/bin";
+                m_toolsPath = rkPluginRegKey.GetValue("NDKHostPath").ToString();
 
                 if ((m_toolsPath == null) || (m_toolsPath == ""))
                     return -1;
+
+                m_toolsPath += "/usr/bin";
 
                 DeviceIP = rkPluginRegKey.GetValue("device_IP").ToString();
                 if ((DeviceIP != "") && (DeviceIP != null))
@@ -233,7 +235,7 @@ namespace VSNDK.DebugEngine
                 if (success == 0)
                     MessageBox.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 else if (success == -1)
-                    MessageBox.Show("You need an API Level to be able to attach to a running process in a BlackBerry device.\n\nPlease, use \"BlackBerry -> Settings -> Get more\" to download one.", "Missing NDK", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("You must select an API Level to be able to attach to a running process.\n\nPlease, use \"BlackBerry -> Settings -> Get more\" to download one.", "Missing NDK", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 else
                     MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }

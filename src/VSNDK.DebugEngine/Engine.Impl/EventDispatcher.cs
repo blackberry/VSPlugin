@@ -1105,15 +1105,6 @@ namespace VSNDK.DebugEngine
                     end = ev.IndexOf(';', ini);
                     m_func = ev.Substring(ini, end - ini);
 
-                    if (m_func == "??")
-                    {
-                        EventDispatcher.m_unknownCode = true;
-                    }
-                    else
-                    {
-                        EventDispatcher.m_unknownCode = false;
-                    }
-
                     ini = end + 1;
                     end = ev.IndexOf(';', ini);
                     m_filename = ev.Substring(ini, end - ini);
@@ -1445,6 +1436,7 @@ namespace VSNDK.DebugEngine
                                     // Thread ID
                                     ini = end + 1;
                                     m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    EventDispatcher.m_unknownCode = true;
                                     break;
                                 case 4:
                                     // Filename and line number
@@ -1714,6 +1706,7 @@ namespace VSNDK.DebugEngine
                                     // Thread ID
                                     ini = end + 1;
                                     m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    EventDispatcher.m_unknownCode = true;
                                     break;
                                 case 5:
                                     //  Filename, line number and thread ID
