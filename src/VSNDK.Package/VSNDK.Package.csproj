@@ -169,10 +169,6 @@
     <Compile Include="Signing\DeRegisterWindow.xaml.cs">
       <DependentUpon>DeRegisterWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Signing\Models\BackupRestoreData.cs" />
-    <Compile Include="Signing\Models\NotifyPropertyChanged.cs" />
-    <Compile Include="Signing\Models\RegistrationData.cs" />
-    <Compile Include="Signing\Models\RIMSiginingAuthorityData.cs" />
     <Compile Include="Signing\Models\SigningData.cs" />
     <Compile Include="Signing\RegistrationWindow.xaml.cs">
       <DependentUpon>RegistrationWindow.xaml</DependentUpon>
@@ -326,10 +322,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Signing\SigningDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Signing\SigningResourceDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

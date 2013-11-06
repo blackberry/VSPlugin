@@ -39,9 +39,6 @@ namespace RIM.VSNDK_Package.Signing
     {
         private SigningData signingData = null;
 
-        public string certPath;
-        public string bbidtokenPath;
-
         public SigningDialog()
         {
             InitializeComponent();
@@ -61,7 +58,7 @@ namespace RIM.VSNDK_Package.Signing
             Browser wb = new Browser(this);
             wb.ShowDialog();
 
-            if (File.Exists(bbidtokenPath))
+            if (!signingData.Registered)
             {
                 RegistrationWindow win = new RegistrationWindow();
                 win.ResizeMode = System.Windows.ResizeMode.NoResize;
@@ -102,7 +99,7 @@ namespace RIM.VSNDK_Package.Signing
             if (result == true)
             {
                 zipfile = dlg.FileName;
-                signingData.Backup(System.IO.Path.GetDirectoryName(certPath), zipfile);
+                signingData.Backup(zipfile);
             }
         }
 
@@ -121,7 +118,7 @@ namespace RIM.VSNDK_Package.Signing
             if (result == true)
             {
                 zipfile = dlg.FileName;
-                signingData.Restore(zipfile, System.IO.Path.GetDirectoryName(certPath));
+                signingData.Restore(zipfile);
                 signingData.RefreshScreen(); 
             }
         }

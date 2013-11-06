@@ -23,7 +23,6 @@ using PkgResources = RIM.VSNDK_Package.Resources;
 using System.Xml;
 using System.Security.Cryptography;
 using System.IO;
-using RIM.VSNDK_Package.Signing.Models;
 using System.Windows.Data;
 using EnvDTE;
 using Microsoft.VisualStudio.VCProjectEngine;
@@ -34,7 +33,7 @@ namespace RIM.VSNDK_Package.Import.Model
     /// <summary>
     /// DataModel Class for the Import Dialog
     /// </summary>
-    class ImportModel : NotifyPropertyChanged
+    class ImportModel : INotifyPropertyChanged
     {
         #region Member Variables and Constants
         private const string _colSumaryString = "SummaryString";
@@ -275,6 +274,23 @@ namespace RIM.VSNDK_Package.Import.Model
             }
         }
 
+        #region INotifyPropertyChanged Implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Fire the PropertyChnaged event handler on change of property
+        /// </summary>
+        /// <param name="propName"></param>
+        protected void OnPropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
+
+        #endregion
 
     }
 }
