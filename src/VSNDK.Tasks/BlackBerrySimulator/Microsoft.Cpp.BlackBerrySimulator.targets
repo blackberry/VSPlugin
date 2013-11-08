@@ -17,9 +17,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <Import Project="$(VCTargetsPath)Platforms\BlackBerrySimulator\ImportBefore\*.targets" Condition="Exists('$(VCTargetsPath)Platforms\BlackBerrySimulator\ImportBefore')" />
   <Import Project="$(VCTargetsPath)Microsoft.CppCommon.targets" />
 
-  <UsingTask TaskName="QccCompiler" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerrySimulator\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="QccLink" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerrySimulator\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="QccLib" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerrySimulator\VSNDK.Tasks.dll" />
   <UsingTask TaskName="GenerateMakeFile" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerrySimulator\VSNDK.Tasks.dll" />
   <UsingTask TaskName="MakeAllAndFormatOutputMessages" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerrySimulator\VSNDK.Tasks.dll" />
   <UsingTask TaskName="VCMessage" AssemblyName="Microsoft.Build.CppTasks.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
