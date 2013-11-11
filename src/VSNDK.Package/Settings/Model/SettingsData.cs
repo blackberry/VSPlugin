@@ -19,13 +19,9 @@ using System.Text;
 using System.ComponentModel;
 using System.Collections;
 using Microsoft.Win32;
-//using PkgResources = RIM.VSNDK_Package.Resources;
 using System.Xml;
-//using System.Security.Cryptography;
 using System.IO;
-//using RIM.VSNDK_Package.Signing.Models;
 using System.Windows.Data;
-//using RIM.VSNDK_Package.UpdateManager.Model;
 using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.Settings.Models
@@ -56,7 +52,6 @@ namespace RIM.VSNDK_Package.Settings.Models
         private string _devicePassword;
         private Package _pkg;
         private string _simulatorIP;
-   //     private UpdateManagerData updateManager;
         private string _simulatorPassword;
         private CollectionView _ndkEntries;
         private NDKEntryClass _ndkEntry;
@@ -74,10 +69,8 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// <summary>
         /// SettingsData Constructor
         /// </summary>
-        public SettingsData(Package pkg)
+        public SettingsData()
         {
-            _pkg = pkg; 
-
             getDeviceInfo();
             getSimulatorInfo();
             RefreshScreen();
@@ -140,7 +133,9 @@ namespace RIM.VSNDK_Package.Settings.Models
         {
             string result = "";
 
-            foreach (APITargetClass target in ((VSNDK_PackagePackage)_pkg).APITargetList)
+            APITargetListSingleton ap = APITargetListSingleton.Instance;
+           
+            foreach (APITargetClass target in ap._tempAPITargetList)
             {
                 if (target.TargetVersion  == version)
                 {
@@ -267,7 +262,7 @@ namespace RIM.VSNDK_Package.Settings.Models
 
                 object pwd = rkSettingsPath.GetValue("device_password");
                 if (pwd != null)
-                    DevicePassword = Decrypt(pwd.ToString());
+                    DevicePassword = GlobalFunctions.Decrypt(pwd.ToString());
 
                 object ip = rkSettingsPath.GetValue("device_IP");
                 if (ip != null)
@@ -297,7 +292,7 @@ namespace RIM.VSNDK_Package.Settings.Models
 
                 object pwd = rkSettingsPath.GetValue("simulator_password");
                 if (pwd != null)
-                    SimulatorPassword = Decrypt(pwd.ToString());
+                    SimulatorPassword = GlobalFunctions.Decrypt(pwd.ToString());
                 
                 object ip = rkSettingsPath.GetValue("simulator_IP");
                 if (ip != null)

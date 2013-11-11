@@ -35,23 +35,20 @@ namespace RIM.VSNDK_Package.UpdateManager
     /// </summary>
     public partial class UpdateManager : Window
     {
-        Package _pkg;
 
         /// <summary>
         /// Constructor
         /// </summary>
-        private UpdateManager(Package pkg)
+        private UpdateManager()
         {
-            //Save package reference
-            _pkg = pkg;
 
             InitializeComponent();
 
-            UpdateManagerData data = new UpdateManagerData(pkg);
+            UpdateManagerData data = new UpdateManagerData();
             gridMain.DataContext = data;  
         }
 
-        public static void create(Package pkg)
+        public static void create()
         {
             if (!GlobalFunctions.isOnline())
             {
@@ -60,7 +57,7 @@ namespace RIM.VSNDK_Package.UpdateManager
             }
             else
             {
-                UpdateManager win = new UpdateManager(pkg);
+                UpdateManager win = new UpdateManager();
                 bool? res = win.ShowDialog();
             }
         }
@@ -168,7 +165,7 @@ namespace RIM.VSNDK_Package.UpdateManager
 
         private void Simulators_Click(object sender, RoutedEventArgs e)
         {
-            SimulatorManager sm = new SimulatorManager(_pkg);
+            SimulatorManager sm = new SimulatorManager();
             sm.ShowDialog();
         }
     }

@@ -63,7 +63,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public string bbndkPathConst = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk_vs";
         private string _status = "";
         private string _error = "";
-        private Package _pkg;
         private string DeviceIP;
         private string DevicePassword;
 
@@ -79,15 +78,14 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <summary>
         /// Constructor
         /// </summary>
-        public UpdateManagerData(Package pkg)
+        public UpdateManagerData()
         {
             Status = "";
-            _pkg = pkg;
 
-            installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
-            installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
-            APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
-            Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
+            installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
+            installedNDKList = InstalledNDKListSingleton.Instance._installedNDKList;
+            APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
+            Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
             
         }
 
@@ -97,7 +95,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <param name="apiLevel"></param>
         public void FilterSubList(string apiLevel)
         {
-            Simulators2 = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList.FindAll(i => i.APILevel.Contains(apiLevel)));
+            Simulators2 = new CollectionView(SimulatorListSingleton.Instance._simulatorList.FindAll(i => i.APILevel.Contains(apiLevel)));
         }
 
         /// <summary>
@@ -105,15 +103,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         public void RefreshScreen()
         {
-            ((VSNDK_PackagePackage)_pkg).GetInstalledAPIList();
-            ((VSNDK_PackagePackage)_pkg).GetAvailableAPIList();
-            ((VSNDK_PackagePackage)_pkg).GetInstalledSimulatorList();
-            ((VSNDK_PackagePackage)_pkg).GetSimulatorList();
+           // ((VSNDK_PackagePackage)_pkg).GetInstalledAPIList();
+           //// ((VSNDK_PackagePackage)_pkg).GetAvailableAPIList();
+           // ((VSNDK_PackagePackage)_pkg).GetInstalledSimulatorList();
+           // ((VSNDK_PackagePackage)_pkg).GetSimulatorList();
 
-            installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
-            installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
-            APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
-            Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
+           // installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
+           // installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
+           // APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
+           // Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
         }
 
         /// <summary>
@@ -277,6 +275,43 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             return Encoding.Unicode.GetString(decrypted);
         }
 
+        /// <summary>
+        /// Check to see if API is installed
+        /// </summary>
+        /// <param name="version">Check version number</param>
+        /// <param name="name">Check API name</param>
+        /// <returns>true if installed</returns>
+        private int IsAPIInstalled(string version, string name)
+        {
+            int success = 0;
+
+            /// Check for 2.1 version
+            if (version.StartsWith("2.1.0"))
+                version = "2.1.0";
+
+            if (InstalledAPIListSingleton.Instance._installedAPIList != null)
+            {
+                APIClass result = InstalledAPIListSingleton.Instance._installedAPIList.Find(i => i.Version.Contains(version));
+
+                if (result != null)
+                {
+                    success = 1;
+                }
+            }
+
+            if (InstalledNDKListSingleton.Instance._installedNDKList != null)
+            {
+                APIClass result = InstalledNDKListSingleton.Instance._installedNDKList.Find(i => i.Version.Contains(version));
+
+                if (result != null)
+                {
+                    success = 2;
+                }
+            }
+
+            return success;
+        }
+
 
         /// <summary>
         /// Validate to make sure device matches the API Level chosen.
@@ -296,7 +331,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 if (getCurrentAPIVersion() != _deviceosversion)
                 { //** Currently selected API version is different from attached device OS version.  
                    // GetInstalledAPIList();
-                    if (((VSNDK_PackagePackage)_pkg).IsAPIInstalled(_deviceosversion, "") > 0)
+                    if (IsAPIInstalled(_deviceosversion, "") > 0)
                     {
                         retVal = true;
                     }
@@ -304,7 +339,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                     {
                         if (baseVersion.CompareTo(_deviceosversion) > 0)
                         {
-                            UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", _deviceosversion, false, false);
+                            UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", _deviceosversion, false, false);
 
                             if (umd.ShowDialog() == true)
                             {
@@ -323,12 +358,12 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                             }
                             else
                             {
-                                if (((VSNDK_PackagePackage)_pkg).IsAPIInstalled(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')), "") == 0)
+                                if (IsAPIInstalled(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')), "") == 0)
                                 {
-                                    UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.'))), false, false);
+                                    UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.'))), false, false);
                                     if (umd.ShowDialog() == true)
                                     {
-                                        umd = new UpdateManagerDialog(_pkg, "The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
+                                        umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
                                         if (umd.ShowDialog() == true)
                                         {
                                             retVal = true;
@@ -345,7 +380,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                                 }
                                 else
                                 {
-                                    UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
+                                    UpdateManagerDialog umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
                                     if (umd.ShowDialog() == true)
                                     {
                                         retVal = true;
@@ -748,9 +783,9 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             string retVal = "";
 
-            if (((VSNDK_PackagePackage)_pkg).APITargetList != null)
+            if (APITargetListSingleton.Instance._tempAPITargetList != null)
             {
-                retVal = ((VSNDK_PackagePackage)_pkg).APITargetList.FindLast(i => i.TargetVersion.Contains(version)).TargetVersion;
+                retVal = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.TargetVersion.Contains(version)).TargetVersion;
             }
 
             return retVal;

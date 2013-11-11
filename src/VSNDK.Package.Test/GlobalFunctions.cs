@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Security.Cryptography;
-using System.IO;
 
-namespace RIM.VSNDK_Package
+namespace VSNDK.Package.Test
 {
     static class GlobalFunctions
     {
@@ -26,8 +25,6 @@ namespace RIM.VSNDK_Package
                 return false;
             }
         }
-
-        public static string bbndkPathConst = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk_vs";
 
         /// <summary>
         /// Encrypts a given password and returns the encrypted data
