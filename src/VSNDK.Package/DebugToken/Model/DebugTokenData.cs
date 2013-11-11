@@ -23,6 +23,7 @@ using System.IO;
 using System.Windows.Data;
 using RIM.VSNDK_Package.Signing;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace RIM.VSNDK_Package.DebugToken.Model
 {
@@ -30,7 +31,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
     /// <summary>
     /// The DataModel for the DebugToken dialog
     /// </summary>
-    public class DebugTokenData : NotifyPropertyChanged
+    public class DebugTokenData : INotifyPropertyChanged
     {
 
         #region Member Variables and Constants
@@ -213,7 +214,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
             win.ResizeMode = System.Windows.ResizeMode.NoResize;
             bool? res = win.ShowDialog();
             if (res == true)
-                KeyStorePassword = win.tbCSKPassword.Password;
+                KeyStorePassword = win.tbPassword.Password;
 
             return res == true;
         }
@@ -826,6 +827,24 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             return Encoding.Unicode.GetString(decrypted);
         }
+
+        #region INotifyPropertyChanged Implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Fire the PropertyChnaged event handler on change of property
+        /// </summary>
+        /// <param name="propName"></param>
+        protected void OnPropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
+
+        #endregion
 
     }
 }

@@ -33,35 +33,44 @@ namespace RIM.VSNDK_Package.Signing
     /// <summary>
     /// Interaction logic for DeRegisterWindow.xaml
     /// </summary>
-    public partial class DeRegisterWindow : DialogWindow
+    public partial class DeRegisterWindow : Window
     {
+
+        private SigningData signingData = null;
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public DeRegisterWindow()
         {
             InitializeComponent();
+
+            signingData = new SigningData();
+            gridMain.DataContext = signingData; 
         }
 
+        /// <summary>
+        /// Event fired on OK button click
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
-            bool registered = false;
-            RegistrationData data = gridMain.DataContext as RegistrationData;
-            if (data != null)
+            if (!signingData.UnRegister())
             {
-                registered = data.UnRegister();
-                if (!registered)
-                {
-                    MessageBox.Show(data.Error, PkgResources.Errors);
-                    data.Error = null;
-                    e.Handled = true;
-                    return;
-                }
-                else if (!string.IsNullOrEmpty(data.Message))
-                {
-                    data.Message = data.Message.Replace("CSK", "BB ID Token");
-                    MessageBox.Show(data.Message, PkgResources.Info);
-                    data.Message = null;
-                }
+                MessageBox.Show(signingData.Errors, "Registration Window", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
+                signingData.Errors = null;
+                e.Handled = true;
+                return;
             }
-            DialogResult = registered;
+            else if (!string.IsNullOrEmpty(signingData.Messages))
+            {
+                signingData.Messages = signingData.Messages.Replace("CSK", "BB ID Token");
+                MessageBox.Show(signingData.Messages, "Registration Window", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                signingData.Messages = null;
+            }
+
+            DialogResult = true;
         }
 
     }

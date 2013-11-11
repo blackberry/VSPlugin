@@ -5,11 +5,15 @@ using System;
 using System.IO;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
+using RIM.VSNDK_Package.Signing.Models;
 
 namespace RIM.VSNDK_Package.Signing
 {
     partial class Browser
     {
+
+        private SigningData signingData = null;
+
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -36,6 +40,8 @@ namespace RIM.VSNDK_Package.Signing
         /// </summary>
         private void InitializeComponent()
         {
+            signingData = new SigningData();
+
             // validate certificate by calling a function
             ServicePointManager.ServerCertificateValidationCallback += new RemoteCertificateValidationCallback(ValidateRemoteCertificate);
 
@@ -111,14 +117,14 @@ namespace RIM.VSNDK_Package.Signing
                     System.IO.StreamReader reader = new System.IO.StreamReader(stream, ec);
 
                     // Creating the bbidtoken.csk file
-                    File.WriteAllText(signingDialog.bbidtokenPath, reader.ReadToEnd());
+                    File.WriteAllText(signingData.bbidtokenPath, reader.ReadToEnd());
 
                     reader.Close();
                     response.Close();
                 }
                 catch (Exception e1)
                 {
-                    MessageBox.Show("Server error, please, try again later.", "Server Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("An error occurred while downloading your signing key. " + e1.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 this.Cursor = Cursors.Arrow;
                 this.Close();
