@@ -7,7 +7,7 @@ using System.IO;
 
 namespace RIM.VSNDK_Package
 {
-    static class GlobalFunctions
+    public static class GlobalFunctions
     {
         /// <summary>
         /// function to check if user is online.  

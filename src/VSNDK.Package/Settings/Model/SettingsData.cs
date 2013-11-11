@@ -54,7 +54,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         private string _simulatorIP;
         private string _simulatorPassword;
         private CollectionView _ndkEntries;
-        private NDKEntryClass _ndkEntry;
+        private NDKEntryClass _ndkEntry = new NDKEntryClass("", "", "");
 
         private string _targetPath;
         private string _hostPath;
@@ -81,13 +81,14 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         public void RefreshScreen()
         {
+            /// Get the NDK Path data
+            getNDKPath();
+
+            /// Refresh the NDK List
             string[] dirPaths = new string[2];
             dirPaths[0] = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + @"bbndk_vs\..\qconfig\";
             dirPaths[1] = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
-
             IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
-
-            getNDKPath();
 
             for (int i = 0; i < 2; i++)
             {
@@ -388,7 +389,6 @@ namespace RIM.VSNDK_Package.Settings.Models
 
             try
             {
-                string NDKHostPath = "";
                 rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
                 HostPath = rkNDKPath.GetValue("NDKHostPath").ToString();
                 TargetPath = rkNDKPath.GetValue("NDKTargetPath").ToString();
