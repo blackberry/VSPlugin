@@ -286,8 +286,10 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             bool retVal = false;
             string baseVersion = "10.2.0.0";
+            DebugTokenData dtokenData;
 
-            DebugTokenData dtokenData = new DebugTokenData();
+            if (!isSim)
+                dtokenData = new DebugTokenData();
 
             getDeviceSimInfo(isSim);
 
