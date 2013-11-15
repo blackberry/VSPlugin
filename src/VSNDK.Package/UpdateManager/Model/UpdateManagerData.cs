@@ -365,8 +365,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 }
             }
             else
-            { //** Device Info Not Connected : Return true so that the normal process runs. No device connected will be caught by build process.
-                retVal = true;
+            {
+                retVal = false;
             }
 
             return retVal;
