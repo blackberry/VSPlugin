@@ -21,8 +21,8 @@ namespace VSNDK.Package.Test
         /// <summary>
         /// Setup for testing
         /// </summary>
-        [SetUp]
-        public void Setup()
+        [TestFixtureSetUp]
+        public void TFSetup()
         {
             /// Create Object
             settingsDataObject = new SettingsData();
@@ -519,6 +519,37 @@ namespace VSNDK.Package.Test
             Assert.IsTrue(settingsDataObject.NDKEntryClass.NDKName == "BlackBerry Native SDK 10.2", "BlackBerry Native SDK 10.2");
 
             RemoveXmlFiles();
+        }
+
+        /// <summary>
+        /// Test the setting of the NDK Paths
+        /// </summary>
+        [TestCase]
+        public void TC_setNDKPaths()
+        {
+            // Initialize Test
+            string targetPath = ((NDKEntryClass)settingsDataObject.NDKEntries.GetItemAt(0)).TargetPath;
+            string hostPath = ((NDKEntryClass)settingsDataObject.NDKEntries.GetItemAt(0)).HostPath;
+            string qnx_config = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK";
+
+            settingsDataObject.NDKEntryClass = (NDKEntryClass)settingsDataObject.NDKEntries.GetItemAt(0);
+
+            RegistryKey regKeyCurrentUser = Registry.CurrentUser;
+            RegistryKey regKey = regKeyCurrentUser.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+            regKey.SetValue("NDKTargetPath", "");
+            regKey.SetValue("NDKHostPath", "");
+
+            // Run Test
+            settingsDataObject.setNDKPaths();
+
+            // Validate Test
+            Assert.IsTrue(regKey.GetValue("NDKHostPath").ToString() == hostPath, "Host path does not match expected result");
+            Assert.IsTrue(regKey.GetValue("NDKTargetPath").ToString() == targetPath, "Target path does not match expected result");
+            Assert.IsTrue(System.Environment.GetEnvironmentVariable("QNX_TARGET") == targetPath, "QNX_TARGET system variable is not match expected result");
+            Assert.IsTrue(System.Environment.GetEnvironmentVariable("QNX_HOST") == hostPath, "QNX_HOST system variable is not match expected result");
+            Assert.IsTrue(System.Environment.GetEnvironmentVariable("QNX_CONFIGURATION") == qnx_config, "QNX_CONFIGURATION system variable is not match expected result");
+            Assert.IsTrue(System.Environment.GetEnvironmentVariable("PATH").Contains(hostPath), "Path system variable does not contain host path");
+            Assert.IsTrue(System.Environment.GetEnvironmentVariable("PATH").Contains(qnx_config), "Path system variable does not contain config path");
         }
 
         /// <summary>

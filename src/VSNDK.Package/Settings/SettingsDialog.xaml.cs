@@ -74,6 +74,7 @@ namespace RIM.VSNDK_Package.Settings
             _data.SimulatorPassword = tbSimulatorPassword.Password;
             _data.setDeviceInfo();
             _data.setSimulatorInfo();
+            _data.NDKEntryClass = (NDKEntryClass)NDKEntry.SelectedItem;
             _data.setNDKPaths(); 
 
             DialogResult = true; ;
@@ -89,7 +90,7 @@ namespace RIM.VSNDK_Package.Settings
         {
             this.Cursor = System.Windows.Input.Cursors.Wait;
 
-            UpdateManager.UpdateManager.create();
+            UpdateManager.UpdateManager updateManager = UpdateManager.UpdateManager.create();
 
             _data.RefreshScreen();
             NDKEntry.ItemsSource = null;

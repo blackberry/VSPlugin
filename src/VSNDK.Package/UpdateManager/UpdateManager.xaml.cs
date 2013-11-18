@@ -48,17 +48,16 @@ namespace RIM.VSNDK_Package.UpdateManager
             gridMain.DataContext = data;  
         }
 
-        public static void create()
+        public static UpdateManager create()
         {
             if (!GlobalFunctions.isOnline())
             {
                 System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
-
+                return null;
             }
             else
             {
-                UpdateManager win = new UpdateManager();
-                bool? res = win.ShowDialog();
+                return new UpdateManager();
             }
         }
 
