@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using RIM.VSNDK_Package.Signing.Models;
+using RIM.VSNDK_Package;
 using System.IO;
 using Microsoft.Win32;
 
