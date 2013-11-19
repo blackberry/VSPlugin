@@ -54,7 +54,7 @@ STDAPI DllRegisterServer(void)
         {NULL, NULL}
     };
 
-    HRESULT hr = _GDBParserModule.UpdateRegistryFromResourceS(IDR_GDBPARSER, true, rgMap);
+    HRESULT hr = _GDBParserModule.UpdateRegistryFromResource(IDR_GDBPARSER, true, rgMap);
 	return hr;
 }
 
@@ -82,7 +82,7 @@ STDAPI DllUnregisterServer(void)
         {NULL, NULL}
     };
 
-    HRESULT hr = _GDBParserModule.UpdateRegistryFromResourceS(IDR_GDBPARSER, false, rgMap);
+    HRESULT hr = _GDBParserModule.UpdateRegistryFromResource(IDR_GDBPARSER, false, rgMap);
 	return hr;
 }
 

@@ -1,0 +1,86 @@
+﻿<!--
+***********************************************************************************************
+Modified based on Microsoft.Cpp.Win32.v100.props
+
+WARNING:  DO NOT MODIFY this file unless you are knowledgeable about MSBuild and have
+          created a backup copy.  Incorrect changes to this file will make it
+          impossible to load or build your projects from the command-line or the IDE.
+
+Copyright (C) Microsoft Corporation. All rights reserved.
+***********************************************************************************************
+-->
+
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(VCTargetsPath)Platforms\BlackBerrySimulator\PlatformToolsets\qcc\ImportBefore\*.props" 
+          Condition="Exists('$(VCTargetsPath)Platforms\BlackBerrySimulator\PlatformToolsets\qcc\ImportBefore')" />
+
+  <PropertyGroup>
+    <QNX_TARGET>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@NDKTargetPath)</QNX_TARGET>
+    <QNX_HOST>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@NDKHostPath)</QNX_HOST>
+    <from_file Condition="'$(QNX_HOST)' != ''">$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
+    <QCC_CONF_PATH Condition="'$(QCC_CONF_PATH)' == ''">$(QNX_HOST)\etc\qcc\gcc</QCC_CONF_PATH>
+    <CPUVARDIR>x86</CPUVARDIR>
+    <CompilerVersion>$(from_file)</CompilerVersion>
+    <CompilerTarget>gcc_ntox86</CompilerTarget>
+    <QccLibPath>$(QNX_TARGET)\$(CPUVARDIR)\lib</QccLibPath>
+    <AppDataPath>$(AppData)</AppDataPath>
+    <SSHPublicKeyPath>$(AppDataPath)/BlackBerry/bbt_id_rsa.pub</SSHPublicKeyPath>
+    <SSHPrivateKeyPath>$(AppDataPath)/BlackBerry/bbt_id_rsa</SSHPrivateKeyPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)'=='BlackBerrySimulator'">
+    <DebuggerFlavor>VSNDKDebugEngine</DebuggerFlavor>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <PlatformToolsetVersion>qcc2.0</PlatformToolsetVersion>
+    <QccToolsPath>$(QNX_HOST)\usr\bin</QccToolsPath>
+    <QccCompiler>qcc.exe</QccCompiler>
+    <QccLinker>qcc.exe</QccLinker>
+    <QccLibrarian>qcc.exe</QccLibrarian>
+    <BuildBarToolExe>blackberry-nativepackager.bat</BuildBarToolExe>
+    <SignerBarToolExe>$(MSBuildProgramFiles32)\BlackBerry\VSPlugin-NDK\qnxtools\bin\blackberry-signer.bat</SignerBarToolExe>
+    <DeployToolExe>blackberry-deploy.bat</DeployToolExe>
+    <BuildBarToolPath>$(QccToolsPath)</BuildBarToolPath>
+    <DeployToolPath>$(QccToolsPath)</DeployToolPath>
+    <BuildBarToolPath>$(QccToolsPath)</BuildBarToolPath>
+    <SSHToolExe>ssh.exe</SSHToolExe>
+    <SSHToolPath>$(QccToolsPath)</SSHToolPath>
+    <SSHKeygenToolExe>$(QccToolsPath)\ssh-keygen.exe</SSHKeygenToolExe>
+    <ConnectToolExe>$(QccToolsPath)\blackberry-connect.bat</ConnectToolExe>
+
+    <VCInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
+    <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
+    <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\10.0\Setup\VC@ProductDir)</VCInstallDir>
+    <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VCExpress\10.0\Setup\VC@ProductDir)</VCInstallDir>
+
+    <VSInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS@ProductDir)</VSInstallDir>
+    <VSInstallDir Condition="'$(VSInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\Setup\VS@ProductDir)</VSInstallDir>
+    <VSInstallDir Condition="'$(VSInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\11.0\Setup\VS@ProductDir)</VSInstallDir>
+    <VSInstallDir Condition="'$(VSInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VCExpress\11.0\Setup\VS@ProductDir)</VSInstallDir>
+
+    <WindowsSdkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A@InstallationFolder)</WindowsSdkDir>
+    <WindowsSdkDir Condition="'$(WindowsSdkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v7.0A@InstallationFolder)</WindowsSdkDir>
+
+    <WindowsSdkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v8.0A@InstallationFolder)</WindowsSdkDir>
+    <WindowsSdkDir Condition="'$(WindowsSdkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v8.0A@InstallationFolder)</WindowsSdkDir>
+
+    <FrameworkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework@InstallRoot)</FrameworkDir>
+    <FrameworkDir Condition="'$(FrameworkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\.NETFramework@InstallRoot)</FrameworkDir>
+
+    <FrameworkSdkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A@InstallationFolder)</FrameworkSdkDir>
+    <FrameworkSdkDir Condition="'$(FrameworkSdkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v7.0A@InstallationFolder)</FrameworkSdkDir>
+
+    <FrameworkSdkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v8.0A@InstallationFolder)</FrameworkSdkDir>
+    <FrameworkSdkDir Condition="'$(FrameworkSdkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v8.0A@InstallationFolder)</FrameworkSdkDir>
+
+    <ExecutablePath Condition="'$(ExecutablePath)' == ''">$(QNX_HOST)\usr\bin;$(PATH);</ExecutablePath>
+    <IncludePath Condition="'$(IncludePath)' == ''">$(QNX_TARGET)\usr\include;$(QNX_TARGET)\usr\include\freetype2;$(QNX_TARGET)\..\target-override\usr\include;</IncludePath>
+    <LibraryPath Condition="'$(LibraryPath)' == ''">$(QccLibPath);$(QNX_TARGET)\..\target-override\$(CPUVARDIR)\lib;$(QNX_TARGET)\..\target-override\$(CPUVARDIR)\usr\lib;</LibraryPath>
+    <ExcludePath Condition="'$(ExcludePath)' == ''"></ExcludePath>
+    <NativeExecutablePath Condition="'$(NativeExecutablePath)' == ''">$(ExecutablePath)</NativeExecutablePath>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)Platforms\BlackBerrySimulator\PlatformToolsets\qcc\ImportAfter\*.props" 
+          Condition="Exists('$(VCTargetsPath)Platforms\BlackBerrySimulator\PlatformToolsets\qcc\ImportAfter')" />
+</Project>
