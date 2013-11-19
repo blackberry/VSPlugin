@@ -35,7 +35,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
      /// <summary>
     /// Data Model for the Update Manager Dialog
     /// </summary>
-    class UpdateManagerData : INotifyPropertyChanged
+    public class UpdateManagerData : INotifyPropertyChanged
     {
         #region Constants
 
@@ -103,15 +103,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         public void RefreshScreen()
         {
-           // ((VSNDK_PackagePackage)_pkg).GetInstalledAPIList();
-           //// ((VSNDK_PackagePackage)_pkg).GetAvailableAPIList();
-           // ((VSNDK_PackagePackage)_pkg).GetInstalledSimulatorList();
-           // ((VSNDK_PackagePackage)_pkg).GetSimulatorList();
+            //((VSNDK_PackagePackage)_pkg).GetInstalledAPIList();
+            //// ((VSNDK_PackagePackage)_pkg).GetAvailableAPIList();
+            //((VSNDK_PackagePackage)_pkg).GetInstalledSimulatorList();
+            //((VSNDK_PackagePackage)_pkg).GetSimulatorList();
 
-           // installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
-           // installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
-           // APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
-           // Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
+            //installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
+            //installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
+            //APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
+            //Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
         }
 
         /// <summary>
@@ -235,7 +235,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
                 
                 if (pwd != null)
-                    DevicePassword = Decrypt(pwd.ToString());
+                    DevicePassword = GlobalFunctions.Decrypt(pwd.ToString());
 
                 if (ip != null)
                     DeviceIP = ip.ToString();
@@ -247,32 +247,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             rkSettingsPath.Close();
             rkHKCU.Close();
-        }
-
-    
-        /// <summary>
-        /// Decrypts a given string.
-        /// </summary>
-        /// <param name="cipher">A base64 encoded string that was created
-        /// through the <see cref="Encrypt(string)"/> or
-        /// <see cref="Encrypt(SecureString)"/> extension methods.</param>
-        /// <returns>The decrypted string.</returns>
-        /// <remarks>Keep in mind that the decrypted string remains in memory
-        /// and makes your application vulnerable per se. If runtime protection
-        /// is essential, <see cref="SecureString"/> should be used.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="cipher"/>
-        /// is a null reference.</exception>
-        public string Decrypt(string cipher)
-        {
-            if (cipher == null) throw new ArgumentNullException("cipher");
-
-            //parse base64 string
-            byte[] data = Convert.FromBase64String(cipher);
-
-            //decrypt data
-            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-
-            return Encoding.Unicode.GetString(decrypted);
         }
 
         /// <summary>
@@ -332,7 +306,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             { //** Device Info retrieved - validate API's 
                 if (getCurrentAPIVersion() != _deviceosversion)
                 { //** Currently selected API version is different from attached device OS version.  
-                   // GetInstalledAPIList();
                     if (IsAPIInstalled(_deviceosversion, "") > 0)
                     {
                         retVal = true;
@@ -402,8 +375,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 }
             }
             else
-            { //** Device Info Not Connected : Return true so that the normal process runs. No device connected will be caught by build process.
-                retVal = true;
+            {
+                retVal = false;
             }
 
             return retVal;
@@ -495,7 +468,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// Retrieve a list of the installed runtimes on the PC.
         /// </summary>
         /// <returns></returns>
-        public bool getInstalledRuntimeTargetList()
+        private bool getInstalledRuntimeTargetList()
         {
             bool success = false;
 
@@ -756,7 +729,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <param name="version">Check version number</param>
         /// <param name="name">Check API name</param>
         /// <returns>true if installed</returns>
-        private bool IsRuntimeInstalled(string version)
+        public bool IsRuntimeInstalled(string version)
         {
             bool success = false;
 
@@ -781,13 +754,18 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         /// <param name="version"></param>
         /// <returns></returns>
-        private string GetAPILevel(string version)
+        public string GetAPILevel(string version)
         {
             string retVal = "";
 
             if (APITargetListSingleton.Instance._tempAPITargetList != null)
             {
-                retVal = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.TargetVersion.Contains(version)).TargetVersion;
+                APITargetClass apiLevel = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.TargetVersion.Contains(version)); 
+
+                if (apiLevel != null)
+                {
+                    retVal = apiLevel.TargetVersion;
+                }
             }
 
             return retVal;
@@ -819,19 +797,19 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
                 RefreshScreen();
 
-                if (installVersion != "")
+                //if (installVersion != "")
+                //{
+                //    SetSelectedAPI(installVersion);
+
+                if (_isRuntime)
                 {
-                    SetSelectedAPI(installVersion);
-
-                    if (_isRuntime)
-                    {
-                        SetRuntime(installVersion);
-                        _isRuntime = false;
-                    }
-
-                    installVersion = "";
-
+                    SetRuntime(installVersion);
+                    _isRuntime = false;
                 }
+
+                //    installVersion = "";
+
+                //}
             }
         }
 

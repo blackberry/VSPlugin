@@ -229,7 +229,10 @@ namespace RIM.VSNDK_Package
 
             }
         }
+
+
     }
+
 
     /// <summary>
     /// Class to retrieve Installed API List
@@ -384,12 +387,14 @@ namespace RIM.VSNDK_Package
                     version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
                     name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
                     description = "Device Support Unknown.";
+                    
 
                     api = _tempAPITargetList.Find(i => i.TargetName == name);
 
                     if (api == null)
                     {
                         api = new APITargetClass(name, description, version);
+                        api.IsInstalled = IsAPIInstalled(version, "");
                         _tempAPITargetList.Add(api);
                     }
                     else
@@ -415,6 +420,43 @@ namespace RIM.VSNDK_Package
 
                 }
             }
+        }
+
+        /// <summary>
+        /// Check to see if API is installed
+        /// </summary>
+        /// <param name="version">Check version number</param>
+        /// <param name="name">Check API name</param>
+        /// <returns>true if installed</returns>
+        private int IsAPIInstalled(string version, string name)
+        {
+            int success = 0;
+
+            /// Check for 2.1 version
+            if (version.StartsWith("2.1.0"))
+                version = "2.1.0";
+
+            if (InstalledAPIListSingleton.Instance._installedAPIList != null)
+            {
+                APIClass result = InstalledAPIListSingleton.Instance._installedAPIList.Find(i => i.Version.Contains(version));
+
+                if (result != null)
+                {
+                    success = 1;
+                }
+            }
+
+            if (InstalledNDKListSingleton.Instance._installedNDKList != null)
+            {
+                APIClass result = InstalledNDKListSingleton.Instance._installedNDKList.Find(i => i.Version.Contains(version));
+
+                if (result != null)
+                {
+                    success = 2;
+                }
+            }
+
+            return success;
         }
 
         /// <summary>
@@ -462,7 +504,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         private SimulatorListSingleton()
         {
-           // GetInstalledNDKList();
+            GetSimulatorList();
         }
 
         /// <summary>
@@ -566,7 +608,7 @@ namespace RIM.VSNDK_Package
                     if (sim == null)
                     {
                         sim = new SimulatorsClass(version, apilevel, true);
-  //                      sim.IsInstalled = IsSimulatorInstalled(version);
+                        sim.IsInstalled = IsSimulatorInstalled(version);
                         _simulatorList.Add(sim);
                     }
                     else
@@ -576,7 +618,7 @@ namespace RIM.VSNDK_Package
 
                         //create new sim
                         SimulatorsClass sim2 = new SimulatorsClass(version, apilevel, true);
-          //              sim2.IsInstalled = IsSimulatorInstalled(version);
+                        sim2.IsInstalled = IsSimulatorInstalled(version);
 
                         // insert before found sim.
                         _simulatorList.Insert(_simulatorList.IndexOf(sim), sim2);
@@ -584,6 +626,30 @@ namespace RIM.VSNDK_Package
                 }
             }
         }
+
+
+        /// <summary>
+        /// Check to see if Simulator is installed
+        /// </summary>
+        /// <param name="version">Check version number</param>
+        /// <returns>true if installed</returns>
+        private bool IsSimulatorInstalled(string version)
+        {
+            bool success = false;
+
+            if (InstalledSimulatorListSingleton.Instance.installedSimulatorList != null)
+            {
+                string result = InstalledSimulatorListSingleton.Instance.installedSimulatorList.FirstOrDefault(s => s.Contains(version));
+
+                if (result != null)
+                {
+                    success = true;
+                }
+            }
+
+            return success;
+        }
+
     }
 
     /// <summary>
@@ -1051,28 +1117,6 @@ namespace RIM.VSNDK_Package
 
             return false;
         }
-
-        ///// <summary>
-        ///// Check to see if Simulator is installed
-        ///// </summary>
-        ///// <param name="version">Check version number</param>
-        ///// <returns>true if installed</returns>
-        //private bool IsSimulatorInstalled(string version)
-        //{
-        //    bool success = false;
-
-        //    if (installedSimulatorList != null)
-        //    {
-        //        string result = installedSimulatorList.FirstOrDefault(s => s.Contains(version));
-
-        //        if (result != null)
-        //        {
-        //            success = true;
-        //        }
-        //    }
-
-        //    return success;
-        //}
 
         /// <summary> 
         /// Get the PID of the launched native app by parsing text from the output window. 
