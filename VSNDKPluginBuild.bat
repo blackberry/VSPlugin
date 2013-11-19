@@ -12,6 +12,11 @@ set DebugEngine2012="%thisDir%\src_vs2012\VSNDK.DebugEngine\VSNDK.DebugEngine.cs
 set GDWrapper2012="%thisDir%\src_vs2012\GDBWrapper\GDBWrapper.vcxproj"
 set VSPackage2012="%thisDir%\src_vs2012\VSNDK.Package\VSNDK.Package.csproj"
 set VSTasks2012="%thisDir%\src_vs2012\VSNDK.Tasks\VSNDK.Tasks.csproj"
+set AddIn2013="%thisDir%\src_vs2013\VSNDK.AddIn\VSNDK.AddIn.csproj"
+set DebugEngine2013="%thisDir%\src_vs2013\VSNDK.DebugEngine\VSNDK.DebugEngine.csproj"
+set GDWrapper2013="%thisDir%\src_vs2013\GDBWrapper\GDBWrapper.vcxproj"
+set VSPackage2013="%thisDir%\src_vs2013\VSNDK.Package\VSNDK.Package.csproj"
+set VSTasks2013="%thisDir%\src_vs2013\VSNDK.Tasks\VSNDK.Tasks.csproj"
 
 REM ********************************************************************************************
 REM Clean up old bin folder
@@ -30,7 +35,7 @@ echo Building Solution for VS2010
 echo Build Success
 
 REM ********************************************************************************************
-REM Build VS2010
+REM Build VS2012
 REM ********************************************************************************************
 echo Building Solution for VS2012
 %dotNetFrameworkPath% %AddIn2012% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=11.0 /p:OutputPath="%buildresults%\VS2012" > %buildresult%\VS2012_buildlog.txt
@@ -38,5 +43,16 @@ echo Building Solution for VS2012
 %dotNetFrameworkPath% %GDWrapper2012% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=11.0 /p:OutputPath="%buildresults%\VS2012" > %buildresult%\VS2012_buildlog.txt
 %dotNetFrameworkPath% %VSPackage2012% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=11.0 /p:OutputPath="%buildresults%\VS2012" > %buildresult%\VS2012_buildlog.txt
 %dotNetFrameworkPath% %VSTasks2012% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=11.0 /p:OutputPath="%buildresults%\VS2012" > %buildresult%\VS2012_buildlog.txt
+echo Build Success
+
+REM ********************************************************************************************
+REM Build VS2013
+REM ********************************************************************************************
+echo Building Solution for VS2013
+%dotNetFrameworkPath% %AddIn2013% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=12.0 /p:OutputPath="%buildresults%\VS2013" > %buildresult%\VS2013_buildlog.txt
+%dotNetFrameworkPath% %DebugEngine2013% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=12.0 /p:OutputPath="%buildresults%\VS2013" > %buildresult%\VS2013_buildlog.txt
+%dotNetFrameworkPath% %GDWrapper2013% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=12.0 /p:OutputPath="%buildresults%\VS2013" > %buildresult%\VS2013_buildlog.txt
+%dotNetFrameworkPath% %VSPackage2013% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=12.0 /p:OutputPath="%buildresults%\VS2013" > %buildresult%\VS2013_buildlog.txt
+%dotNetFrameworkPath% %VSTasks2013% /property:Configuration=Release /target:Clean;Build /p:VisualStudioVersion=12.0 /p:OutputPath="%buildresults%\VS2013" > %buildresult%\VS2013_buildlog.txt
 echo Build Success
 
