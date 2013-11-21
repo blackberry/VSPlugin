@@ -882,11 +882,41 @@ namespace RIM.VSNDK_Package
                     p.BeginOutputReadLine();
                     p.WaitForExit();
                     p.Close();
+                    if (_error != "")
+                    {
+                        System.Diagnostics.Debug.WriteLine(_error);
+                        int begin = _error.IndexOf("java.io.IOException: ");
+                        if (begin != -1)
+                        {
+                            begin += 20;
+                            int end = _error.IndexOf("\n", begin);
+                            MessageBox.Show(_error.Substring(begin, end - begin) + "\n\nSee the Debug Output window for details.", "Could not load the simulator's list.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                            MessageBox.Show(_error + "See the Debug Output window for details.", "Could not load the simulator's list.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        _error = "";
+                    }
                 }
                 catch (Exception e)
                 {
                     System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
                     System.Diagnostics.Debug.WriteLine(e.Message);
+                    if (_error != "")
+                    {
+                        System.Diagnostics.Debug.WriteLine(_error);
+                        int begin = _error.IndexOf("java.io.IOException: ");
+                        if (begin != -1)
+                        {
+                            begin += 20;
+                            int end = _error.IndexOf("\n", begin);
+                            MessageBox.Show(_error.Substring(begin, end - begin) + "\n\nSee the Debug Output window for details.", "Could not load the simulator's list.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                            MessageBox.Show(_error + "See the Debug Output window for details.", "Could not load the simulator's list.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        _error = "";
+                    }
                 }
             }
         }
@@ -978,11 +1008,41 @@ namespace RIM.VSNDK_Package
                     p.BeginOutputReadLine();
                     p.WaitForExit();
                     p.Close();
+                    if (_error != "")
+                    {
+                        System.Diagnostics.Debug.WriteLine(_error);
+                        int begin = _error.IndexOf("java.io.IOException: ");
+                        if (begin != -1)
+                        {
+                            begin += 20;
+                            int end = _error.IndexOf("\n", begin);
+                            MessageBox.Show(_error.Substring(begin, end - begin) + "\n\nSee the Debug Output window for details.", "Could not load the list of available APIs.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                            MessageBox.Show(_error + "See the Debug Output window for details.", "Could not load the list of available APIs.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        _error = "";
+                    }
                 }
                 catch (Exception e)
                 {
                     System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
                     System.Diagnostics.Debug.WriteLine(e.Message);
+                    if (_error != "")
+                    {
+                        System.Diagnostics.Debug.WriteLine(_error);
+                        int begin = _error.IndexOf("java.io.IOException: ");
+                        if (begin != -1)
+                        {
+                            begin += 20;
+                            int end = _error.IndexOf("\n", begin);
+                            MessageBox.Show(_error.Substring(begin, end - begin) + "\n\nSee the Debug Output window for details.", "Could not load the list of available APIs.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        else
+                            MessageBox.Show(_error + "See the Debug Output window for details.", "Could not load the list of available APIs.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                        _error = "";
+                    }
                 }
             }
 
@@ -1061,8 +1121,8 @@ namespace RIM.VSNDK_Package
             if (e.Data != null)
             {
                 System.Diagnostics.Debug.WriteLine(e.Data);
-
-                MessageBox.Show(e.Data);
+                _error += e.Data + "\n"; 
+//                MessageBox.Show(e.Data);
             }
         }
 

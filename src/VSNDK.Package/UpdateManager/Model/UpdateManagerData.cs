@@ -59,7 +59,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         private CollectionView _simulators2;
         private APITargetClass _apiTarget;
         private SimulatorsClass _simulator;
-        private string _errors;
+        private string _errors = "";
         public string bbndkPathConst = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + "bbndk_vs";
         private string _status = "";
         private string _error = "";
@@ -327,13 +327,22 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                             {
                                 if (((VSNDK_PackagePackage)_pkg).IsAPIInstalled(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')), "") == 0)
                                 {
-                                    UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.'))), false, false);
-                                    if (umd.ShowDialog() == true)
+                                    string apiLevel = GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')));
+
+                                    if (apiLevel != "")
                                     {
-                                        umd = new UpdateManagerDialog(_pkg, "The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
+                                        UpdateManagerDialog umd = new UpdateManagerDialog(_pkg, "The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", apiLevel, false, false);
                                         if (umd.ShowDialog() == true)
                                         {
-                                            retVal = true;
+                                            umd = new UpdateManagerDialog(_pkg, "The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
+                                            if (umd.ShowDialog() == true)
+                                            {
+                                                retVal = true;
+                                            }
+                                            else
+                                            {
+                                                retVal = false;
+                                            }
                                         }
                                         else
                                         {
@@ -341,9 +350,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                                         }
                                     }
                                     else
-                                    {
-                                        retVal = false;
-                                    }
+                                        System.Diagnostics.Debug.WriteLine("API level not supported at this moment. Aborting...");
                                 }
                                 else
                                 {
@@ -412,12 +419,40 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 }
 
                 p.Close();
+                if (_errors != "")
+                {
+                    int begin = _errors.IndexOf("java.io.IOException: ");
+                    if (begin != -1)
+                    {
+                        begin += 20;
+                        int end = _errors.IndexOf("\n", begin);
+                        MessageBox.Show(_errors.Substring(begin, end - begin) + "\n\nSee the Debug Output window for details.", "Could not get the device Info of the connected device.", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                        MessageBox.Show(_errors + "See the Debug Output window for details.", "Could not get the device Info of the connected device.", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    _errors = "";
+                }
             }
             catch (Exception e)
             {
                 System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
                 System.Diagnostics.Debug.WriteLine(e.Message);
                 success = false;
+                if (_errors != "")
+                {
+                    int begin = _errors.IndexOf("java.io.IOException: ");
+                    if (begin != -1)
+                    {
+                        begin += 20;
+                        int end = _errors.IndexOf("\n", begin);
+                        MessageBox.Show(_errors.Substring(begin, end - begin) + "\n\nSee the Debug Output window for details.", "Could not get the device Info of the connected device.", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                        MessageBox.Show(_errors + "See the Debug Output window for details.", "Could not get the device Info of the connected device.", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    _errors = "";
+                }
             }
 
             return success;
@@ -752,7 +787,14 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             if (((VSNDK_PackagePackage)_pkg).APITargetList != null)
             {
-                retVal = ((VSNDK_PackagePackage)_pkg).APITargetList.FindLast(i => i.TargetVersion.Contains(version)).TargetVersion;
+                try
+                {
+                    retVal = ((VSNDK_PackagePackage)_pkg).APITargetList.FindLast(i => i.TargetVersion.Contains(version)).TargetVersion;
+                }
+                catch
+                {
+                    retVal = "";
+                }
             }
 
             return retVal;
@@ -812,7 +854,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
                 if ((e.Data.ToLower().Contains("error")) || (_error != ""))
                 {
-                    _error = _error + e.Data;
+                    _error = _error + e.Data + "\n";
                 }
                 else
                 {
@@ -831,8 +873,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             if (e.Data != null)
             {
                 System.Diagnostics.Debug.WriteLine(e.Data);
-
-                MessageBox.Show(e.Data);
+                _errors += e.Data + "\n";
+//                MessageBox.Show(e.Data);
             }
         }
 
