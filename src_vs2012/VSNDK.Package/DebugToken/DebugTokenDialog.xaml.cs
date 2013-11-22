@@ -47,19 +47,21 @@ namespace RIM.VSNDK_Package.DebugToken
         /// </summary>
         public DebugTokenDialog()
         {
-            DebugTokenData._initializedCorrectly = true;
+            deployTokenData = new DebugTokenData();
+
+         //   DebugTokenData._initializedCorrectly = true;
 
             InitializeComponent();
 
-            if (DebugTokenData._initializedCorrectly == false)
-            {
-                btnAdd.IsEnabled = false;
-                btnRefresh.IsEnabled = false;
-                IsClosing = true;
-                this.Close();
-                return;
-            }
-            deployTokenData = gridMain.DataContext as DebugTokenData;
+            //if (debugTokenData._initializedCorrectly == false)
+            //{
+            //    btnAdd.IsEnabled = false;
+            //    btnRefresh.IsEnabled = false;
+            //    IsClosing = true;
+            //    this.Close();
+            //    return;
+            //}
+            gridMain.DataContext = deployTokenData;
 
             if (deployTokenData.Error != "")
             {

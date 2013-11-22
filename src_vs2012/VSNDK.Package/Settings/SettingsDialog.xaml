@@ -3,14 +3,6 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
         Title="Settings" Height="334" Width="627">
-    
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="SettingsDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
 
     <Grid Name="gridMain" VerticalAlignment="Top" Width="608" xmlns:RIM_password="clr-namespace:RIM.VSNDK_Package.Signing.Models">
         <StackPanel Orientation="Vertical" Name="MainPanel" VerticalAlignment="Top" Height="299">

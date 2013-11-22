@@ -40,11 +40,11 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <summary>
         /// Constructor
         /// </summary>
-        public SimulatorManager(Package pkg)
+        public SimulatorManager()
         {
             InitializeComponent();
 
-            umData = new UpdateManagerData(pkg);
+            umData = new UpdateManagerData();
             gridMain.DataContext = umData;  
         }
 
