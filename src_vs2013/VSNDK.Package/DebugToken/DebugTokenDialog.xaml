@@ -5,15 +5,7 @@
         xmlns:pa="clr-namespace:RIM.VSNDK_Package.DebugToken.Model"                 
         Title="Debug Tokens" Height="198" Width="620" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="DebugTokenDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-
-    <Grid Name="gridMain" Height="229"  DataContext="{StaticResource debugTokenData}" Width="591">
+    <Grid Name="gridMain" Height="229"  Width="591">
         <StackPanel Orientation="Vertical" Margin="12,0,12,72">
             <GroupBox Header="Debug Token Information" Name="gbDebugTokenSetup" Margin="12,0,12,0" Height="126">
                 <StackPanel Name="pnlScreenLayout" Orientation="Horizontal">

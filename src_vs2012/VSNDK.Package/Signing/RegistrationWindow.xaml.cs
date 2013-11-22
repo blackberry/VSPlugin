@@ -25,72 +25,62 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using RIM.VSNDK_Package.Signing.Models;
-using PkgResources = RIM.VSNDK_Package.Resources;
 using System.IO;
 using System.ComponentModel;
 
-namespace RIM.VSNDK_Package
+namespace RIM.VSNDK_Package.Signing
 {
     /// <summary>
     /// Interaction logic for RegistrationWindow.xaml
     /// </summary>
     public partial class RegistrationWindow : Window
     {
+        private SigningData signingData = null;
+
         /// <summary>
         /// RegistrationWindow Constructor
         /// </summary>
         public RegistrationWindow()
         {
             InitializeComponent();
+
+            signingData = new SigningData();
+            gridMain.DataContext = signingData; 
         }
 
         /// <summary>
-        /// Register Signing Keys on click of OK Button
+        /// Perform actions on the OK button click
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
-            bool registered = false;
-            RegistrationData data = gridMain.DataContext as RegistrationData;
-            if (data != null)
+            if (!signingData.Register(tbAuthor.Text, tbPassword.Password))
             {
-                data.Author = this.tbAuthor.Text;
-                data.CSJPassword = this.tbCSKPassword.Password;
-                registered = data.Register();
-                if (!registered)
-                {
-                    MessageBox.Show(data.Error, PkgResources.Errors);
-                    data.Error = null;
-                    e.Handled = true;
-                    string certPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\author.p12";
-                    if (File.Exists(certPath))
-                        File.Delete(certPath);
-                    return;
-                }
-                else if (!string.IsNullOrEmpty(data.Message))
-                {
-                    MessageBox.Show(data.Message, PkgResources.Info);
-                    data.Message = null;
-                }
+                MessageBox.Show(signingData.Errors, "Registration Window", MessageBoxButton.OK, MessageBoxImage.Exclamation, MessageBoxResult.OK);
+                signingData.Errors = null;
+                e.Handled = true;
+                return;
             }
-            DialogResult = registered;
+            else if (!string.IsNullOrEmpty(signingData.Messages))
+            {
+                signingData.Messages = signingData.Messages.Replace("CSK", "BB ID Token");
+                MessageBox.Show(signingData.Messages, "Registration Window", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
+                signingData.Messages = null;
+            }
+
+            signingData.Register("", "");
+            
+            DialogResult = true;
         }
 
+        /// <summary>
+        /// Perform actions on close of dialog.
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnClosing(CancelEventArgs e)
         {
-            if (!File.Exists(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\author.p12"))
-            {
-                FileInfo fi_csk = new FileInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\bbidtoken.csk");
-
-                try
-                {
-                    fi_csk.Delete();
-                }
-                catch (System.IO.IOException ex)
-                {
-                }
-            }
-        }    
+            signingData.CleanUp();
+        }
     }
 }
