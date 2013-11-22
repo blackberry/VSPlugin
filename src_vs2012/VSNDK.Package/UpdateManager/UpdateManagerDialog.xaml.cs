@@ -45,7 +45,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <summary>
         /// Constructor
         /// </summary>
-        public UpdateManagerDialog(Package pkg)
+        public UpdateManagerDialog()
         {
             if (!GlobalFunctions.isOnline())
             {
@@ -55,14 +55,14 @@ namespace RIM.VSNDK_Package.UpdateManager
 
             InitializeComponent();
 
-            data = new UpdateManagerData(pkg);
+            data = new UpdateManagerData();
             gridMain.DataContext = data;  
         }
 
         /// <summary>
         /// Constructor
         /// </summary>
-        public UpdateManagerDialog(Package pkg, string message, string version, bool isRuntime, bool isSimulator)
+        public UpdateManagerDialog(string message, string version, bool isRuntime, bool isSimulator)
         {
             if (!GlobalFunctions.isOnline())
             {
@@ -72,7 +72,7 @@ namespace RIM.VSNDK_Package.UpdateManager
 
             InitializeComponent();
 
-            data = new UpdateManagerData(pkg);
+            data = new UpdateManagerData();
             gridMain.DataContext = data;  
 
             _version = version;

@@ -44,20 +44,17 @@ namespace RIM.VSNDK_Package.Settings
     /// </summary>
     public partial class SettingsDialog : DialogWindow
     {
-        private Package _pkg;
         private SettingsData _data;
 
         /// <summary>
         /// Settings Dialog Constructor
         /// </summary>
-        public SettingsDialog(Package pkg)
+        public SettingsDialog()
         {
-            /// Save internal variables
-            _pkg = pkg;
 
             InitializeComponent();
 
-            _data = new SettingsData(_pkg);
+            _data = new SettingsData();
             gridMain.DataContext = _data;
 
             _data.getSimulatorInfo();
@@ -77,6 +74,7 @@ namespace RIM.VSNDK_Package.Settings
             _data.SimulatorPassword = tbSimulatorPassword.Password;
             _data.setDeviceInfo();
             _data.setSimulatorInfo();
+            _data.NDKEntryClass = (NDKEntryClass)NDKEntry.SelectedItem;
             _data.setNDKPaths(); 
 
             DialogResult = true; ;
@@ -92,7 +90,7 @@ namespace RIM.VSNDK_Package.Settings
         {
             this.Cursor = System.Windows.Input.Cursors.Wait;
 
-            UpdateManager.UpdateManager.create(_pkg);
+            UpdateManager.UpdateManager updateManager = UpdateManager.UpdateManager.create();
 
             _data.RefreshScreen();
             NDKEntry.ItemsSource = null;

@@ -23,6 +23,7 @@ using System.IO;
 using System.Windows.Data;
 using RIM.VSNDK_Package.Signing;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace RIM.VSNDK_Package.DebugToken.Model
 {
@@ -30,7 +31,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
     /// <summary>
     /// The DataModel for the DebugToken dialog
     /// </summary>
-    public class DebugTokenData : NotifyPropertyChanged
+    public class DebugTokenData : INotifyPropertyChanged
     {
 
         #region Member Variables and Constants
@@ -210,10 +211,10 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         {
             _errors = "";
             RegistrationWindow win = new RegistrationWindow();
-            win.ResizeMode = System.Windows.ResizeMode.NoResize; 
+            win.ResizeMode = System.Windows.ResizeMode.NoResize;
             bool? res = win.ShowDialog();
             if (res == true)
-                KeyStorePassword = win.tbCSKPassword.Password;
+                KeyStorePassword = win.tbPassword.Password;
 
             return res == true;
         }
@@ -342,7 +343,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if ((_errors.Contains("invalid password")) || (_errors.Contains("password is not valid")) || (_errors.Contains("invalid store password")))
             {
-                MessageBox.Show("The specified password is invalid.\n\nPlease, enter the same one that you used to generate your BB ID Token.\n\nIf you don't remember it, you might close the next window, unregister and register again using BlackBerry -> Signing menu.", _errors, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The specified password is invalid.\n\nPlease, enter the same one that you used to generate your BB ID Token.\n\nIf you don't remember it, you might close the next window, unregister and register again using BlackBerry -> Signing menu.",_errors, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 parent.Close();
                 if (resetPassword())
@@ -390,7 +391,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if ((_errors.Contains("invalid password")) || (_errors.Contains("password is not valid")) || (_errors.Contains("invalid store password")))
             {
-                MessageBox.Show("The specified password is invalid.\n\nPlease, enter the same one that you used to generate your BB ID Token.\n\nIf you don't remember it, you might close the next window, unregister and register again using BlackBerry -> Signing menu.", _errors, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("The specified password is invalid.\n\nPlease, enter the same one that you used to generate your BB ID Token.\n\nIf you don't remember it, you might close the next window, unregister and register again using BlackBerry -> Signing menu.",_errors, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                 parent.Close();
                 if (resetPassword())
@@ -496,7 +497,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\"; 
             startInfo.Arguments = string.Format("/C blackberry-deploy.bat -listDeviceInfo {0} -password {1}", DeviceIP, DevicePassword);
 
             try
@@ -826,6 +827,24 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             return Encoding.Unicode.GetString(decrypted);
         }
+
+        #region INotifyPropertyChanged Implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Fire the PropertyChnaged event handler on change of property
+        /// </summary>
+        /// <param name="propName"></param>
+        protected void OnPropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
+
+        #endregion
 
     }
 }

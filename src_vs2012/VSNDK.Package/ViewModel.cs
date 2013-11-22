@@ -500,7 +500,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         private void LoadPermissions()
         {
-            SettingsData settingsData = new SettingsData(_pkg);
+            SettingsData settingsData = new SettingsData();
             bool oldListMethod = true;
             XmlNodeList pList = null;
 

@@ -19,13 +19,9 @@ using System.Text;
 using System.ComponentModel;
 using System.Collections;
 using Microsoft.Win32;
-using PkgResources = RIM.VSNDK_Package.Resources;
 using System.Xml;
-using System.Security.Cryptography;
 using System.IO;
-using RIM.VSNDK_Package.Signing.Models;
 using System.Windows.Data;
-using RIM.VSNDK_Package.UpdateManager.Model;
 using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.Settings.Models
@@ -49,17 +45,16 @@ namespace RIM.VSNDK_Package.Settings.Models
     /// <summary>
     /// Data Model Class for the Settings Dialog
     /// </summary>
-    class SettingsData : NotifyPropertyChanged
+    public class SettingsData : INotifyPropertyChanged
     {
         #region Member Variables and Constants
         private string _deviceIP;
         private string _devicePassword;
         private Package _pkg;
         private string _simulatorIP;
-        private UpdateManagerData updateManager;
         private string _simulatorPassword;
         private CollectionView _ndkEntries;
-        private NDKEntryClass _ndkEntry;
+        private NDKEntryClass _ndkEntry = new NDKEntryClass("", "", "");
 
         private string _targetPath;
         private string _hostPath;
@@ -74,28 +69,26 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// <summary>
         /// SettingsData Constructor
         /// </summary>
-        public SettingsData(Package pkg)
+        public SettingsData()
         {
-            _pkg = pkg;
-
             getDeviceInfo();
             getSimulatorInfo();
             RefreshScreen();
         }
-
 
         /// <summary>
         /// Refresh the screen
         /// </summary>
         public void RefreshScreen()
         {
+            /// Get the NDK Path data
+            getNDKPath();
+
+            /// Refresh the NDK List
             string[] dirPaths = new string[2];
             dirPaths[0] = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + @"bbndk_vs\..\qconfig\";
             dirPaths[1] = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
-
             IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
-
-            getNDKPath();
 
             for (int i = 0; i < 2; i++)
             {
@@ -141,9 +134,11 @@ namespace RIM.VSNDK_Package.Settings.Models
         {
             string result = "";
 
-            foreach (APITargetClass target in ((VSNDK_PackagePackage)_pkg).APITargetList)
+            APITargetListSingleton ap = APITargetListSingleton.Instance;
+           
+            foreach (APITargetClass target in ap._tempAPITargetList)
             {
-                if (target.TargetVersion == version)
+                if (target.TargetVersion  == version)
                 {
                     result = target.TargetName;
                     break;
@@ -268,7 +263,7 @@ namespace RIM.VSNDK_Package.Settings.Models
 
                 object pwd = rkSettingsPath.GetValue("device_password");
                 if (pwd != null)
-                    DevicePassword = Decrypt(pwd.ToString());
+                    DevicePassword = GlobalFunctions.Decrypt(pwd.ToString());
 
                 object ip = rkSettingsPath.GetValue("device_IP");
                 if (ip != null)
@@ -298,7 +293,7 @@ namespace RIM.VSNDK_Package.Settings.Models
 
                 object pwd = rkSettingsPath.GetValue("simulator_password");
                 if (pwd != null)
-                    SimulatorPassword = Decrypt(pwd.ToString());
+                    SimulatorPassword = GlobalFunctions.Decrypt(pwd.ToString());
                 
                 object ip = rkSettingsPath.GetValue("simulator_IP");
                 if (ip != null)
@@ -334,7 +329,7 @@ namespace RIM.VSNDK_Package.Settings.Models
                 if (IP == null)
                     IP = "";
 
-                rkTargetInfo.SetValue(type + "_password", Encrypt(password));
+                rkTargetInfo.SetValue(type + "_password", GlobalFunctions.Encrypt(password));
                 rkTargetInfo.SetValue(type + "_IP", IP);
             }
             catch
@@ -394,7 +389,6 @@ namespace RIM.VSNDK_Package.Settings.Models
 
             try
             {
-                string NDKHostPath = "";
                 rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
                 HostPath = rkNDKPath.GetValue("NDKHostPath").ToString();
                 TargetPath = rkNDKPath.GetValue("NDKTargetPath").ToString();
@@ -413,56 +407,25 @@ namespace RIM.VSNDK_Package.Settings.Models
             return success;
         }
 
-        /// <summary>
-        /// Encrypts a given password and returns the encrypted data
-        /// as a base64 string.
-        /// </summary>
-        /// <param name="plainText">An unencrypted string that needs
-        /// to be secured.</param>
-        /// <returns>A base64 encoded string that represents the encrypted
-        /// binary data.
-        /// </returns>
-        /// <remarks>This solution is not really secure as we are
-        /// keeping strings in memory. If runtime protection is essential,
-        /// <see cref="SecureString"/> should be used.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="plainText"/>
-        /// is a null reference.</exception>
-        public string Encrypt(string plainText)
-        {
-            if (plainText == null) throw new ArgumentNullException("plainText");
+        #region INotifyPropertyChanged Implementation
 
-            //encrypt data
-            var data = Encoding.Unicode.GetBytes(plainText);
-            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.LocalMachine);
-
-            //return as base64 string
-            return Convert.ToBase64String(encrypted);
-        }
+        public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>
-        /// Decrypts a given string.
+        /// Fire the PropertyChnaged event handler on change of property
         /// </summary>
-        /// <param name="cipher">A base64 encoded string that was created
-        /// through the <see cref="Encrypt(string)"/> or
-        /// <see cref="Encrypt(SecureString)"/> extension methods.</param>
-        /// <returns>The decrypted string.</returns>
-        /// <remarks>Keep in mind that the decrypted string remains in memory
-        /// and makes your application vulnerable per se. If runtime protection
-        /// is essential, <see cref="SecureString"/> should be used.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="cipher"/>
-        /// is a null reference.</exception>
-        public string Decrypt(string cipher)
+        /// <param name="propName"></param>
+        protected void OnPropertyChanged(string propName)
         {
-            if (cipher == null) throw new ArgumentNullException("cipher");
-
-            //parse base64 string
-            byte[] data = Convert.FromBase64String(cipher);
-
-            //decrypt data
-            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-
-            return Encoding.Unicode.GetString(decrypted);
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
         }
+
+        #endregion
 
     }
+
+
 }
