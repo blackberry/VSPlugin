@@ -51,7 +51,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
         #region Member Variables
 
-        private bool isInstalling = true;
+        private bool isInstalling = false;
         private string installVersion = "";
         private bool _isRuntime = false;
         private bool _isSimulator = false;
@@ -153,7 +153,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             try
             {
-                IsInstalling = false;
+                IsInstalling = true;
                 p.Start();
                 p.BeginErrorReadLine();
                 p.BeginOutputReadLine();
@@ -240,7 +240,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             try
             {
-                IsInstalling = false;
+                IsInstalling = true;
                 p.Start();
                 p.BeginErrorReadLine();
                 p.BeginOutputReadLine();
@@ -867,7 +867,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             if (_error != "")
             {
                 Status = "Error";
-                IsInstalling = false;
 
                 MessageBox.Show(_error, "Update Manager", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
 
@@ -877,7 +876,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             else
             {
                 Status = "Complete";
-                IsInstalling = true;
 
                 RefreshScreen();
 
@@ -895,6 +893,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 }
                 installed = true;
             }
+            IsInstalling = false;
         }
 
         /// <summary>
