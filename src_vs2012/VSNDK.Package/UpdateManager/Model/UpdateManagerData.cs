@@ -28,6 +28,7 @@ using RIM.VSNDK_Package.DebugToken.Model;
 using Microsoft.Win32;
 using Microsoft.VisualStudio.Shell;
 using System.Security.Cryptography;
+using System.Management;
 
 namespace RIM.VSNDK_Package.UpdateManager.Model
 {
@@ -66,6 +67,9 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         private Package _pkg;
         private string DeviceIP;
         private string DevicePassword;
+        public bool isConfiguring = false;
+        public bool installed = false;
+        public List<int> installProcessID = new List<int>();
 
         private List<APIClass> installedAPIList;
         private List<APIClass> installedNDKList;
@@ -153,6 +157,20 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 p.Start();
                 p.BeginErrorReadLine();
                 p.BeginOutputReadLine();
+                int parentProcessID = p.Id;
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process WHERE ParentProcessId=" + parentProcessID);
+                ManagementObjectCollection collection = searcher.Get();
+                foreach (ManagementObject item in collection)
+                {
+                    try
+                    {
+                        installProcessID.Add(Convert.ToInt32(item["ProcessId"].ToString()));
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+
             }
             catch (Exception e)
             {
@@ -162,6 +180,34 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             }
             
             return success;
+        }
+
+        /// <summary>
+        /// Wait till the API installation ends. This method is called only when the installation process has finished downloading all 
+        /// the needed files and it is just finishing the configuration. This process is supposed to take less than one minute.
+        /// </summary>
+        public void waitTerminateInstallation()
+        {
+            if (installProcessID.Count == 1)
+            {
+                foreach (int pid in installProcessID)
+                {
+                    var p = System.Diagnostics.Process.GetProcessById(pid);
+                    p.WaitForExit();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Cancel the API installation.
+        /// </summary>
+        public void cancelInstallation()
+        {
+            foreach (int pid in installProcessID)
+            {
+                var p = System.Diagnostics.Process.GetProcessById(pid);
+                p.Kill();
+            }
         }
 
         /// <summary>
@@ -595,6 +641,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         }
 
         /// <summary>
+        /// Error property
+        /// </summary>
+        public String Error
+        {
+            get { return _error; }
+            set { _error = value; }
+        }
+
+        /// <summary>
         /// Status property
         /// </summary>
         public String Status
@@ -807,12 +862,12 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <param name="e"></param>
         private void p_Exited(object sender, System.EventArgs e)
         {
-
+            isConfiguring = false;
 
             if (_error != "")
             {
                 Status = "Error";
-                IsInstalling = true;
+                IsInstalling = false;
 
                 MessageBox.Show(_error, "Update Manager", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
 
@@ -837,8 +892,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                     }
 
                     installVersion = "";
-
                 }
+                installed = true;
             }
         }
 
@@ -858,6 +913,10 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 }
                 else
                 {
+                    if ((!isConfiguring) && (e.Data.Contains("Configuring")))
+                    {
+                        isConfiguring = true;
+                    }
                     Status = e.Data;
                 }
             }

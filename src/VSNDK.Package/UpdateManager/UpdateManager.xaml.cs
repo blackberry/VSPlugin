@@ -159,7 +159,7 @@ namespace RIM.VSNDK_Package.UpdateManager
             UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
             if (data != null)
             {
-                if (!data.IsInstalling)
+                if (data.IsInstalling)
                 {
                     e.Cancel = true;
                 }

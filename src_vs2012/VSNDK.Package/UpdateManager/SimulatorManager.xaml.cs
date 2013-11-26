@@ -99,7 +99,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!umData.IsInstalling)
+            if (umData.IsInstalling)
             {
                 e.Cancel = true;
             }
