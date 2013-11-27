@@ -1247,6 +1247,7 @@ namespace RIM.VSNDK_Package
         #endregion
 
 
+
         #region Event Handlers
 
         /// <summary> 
