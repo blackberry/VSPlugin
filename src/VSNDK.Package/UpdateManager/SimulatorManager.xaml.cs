@@ -65,7 +65,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Install_Click(object sender, RoutedEventArgs e)
         {
-            if (!umData.IsInstalling)
+            if (umData.IsInstalling)
             {
                 MessageBox.Show("Visual Studio is currently already installing/uninstalling a Simulator. Please wait until completion before proceeding.", "Simulators", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
@@ -82,7 +82,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Uninstall_Click(object sender, RoutedEventArgs e)
         {
-            if (!umData.IsInstalling)
+            if (umData.IsInstalling)
             {
                 MessageBox.Show("Visual Studio is currently already installing/uninstalling a Simulator. Please wait until completion before proceeding.", "Simulators", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
@@ -99,7 +99,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!umData.IsInstalling)
+            if (umData.IsInstalling)
             {
                 e.Cancel = true;
             }
