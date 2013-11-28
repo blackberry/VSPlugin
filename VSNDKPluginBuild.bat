@@ -30,9 +30,9 @@ if not exist "%buildresults%" goto build
 REM ********************************************************************************************
 REM Build VS2010
 REM ********************************************************************************************
-echo Building Solution for VS2010
-%dotNetFrameworkPath% %solutionPath2010% /property:Configuration=Release /target:Clean;Build /p:OutputPath="%buildresults%\VS2010" > %buildresult%\VS2010_buildlog.txt
-echo Build Success
+REM echo Building Solution for VS2010
+REM %dotNetFrameworkPath% %solutionPath2010% /property:Configuration=Release /target:Clean;Build /p:OutputPath="%buildresults%\VS2010" > %buildresult%\VS2010_buildlog.txt
+REM echo Build Success
 
 REM ********************************************************************************************
 REM Build VS2012
