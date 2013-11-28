@@ -1372,12 +1372,12 @@ namespace RIM.VSNDK_Package
             }
         }
 
-        public void AddIcon(string iconName)
+        public void AddIcon(FileInfo icon)
         {
-            _qnxSchema.icon.AddIconImage(iconName);
+            _qnxSchema.icon.AddIconImage(icon.Name);
             DesignerDirty = true;
             IList source = (IList)_iconImageList.SourceCollection;
-              ImageItemClass image = new ImageItemClass(iconName, getImagePath(iconName), _activeProjectDirectory);
+              ImageItemClass image = new ImageItemClass(icon.Name, icon.ToString(), _activeProjectDirectory);
             source.Add(image);
             _iconImageList = new CollectionView(source);
 
@@ -1404,7 +1404,7 @@ namespace RIM.VSNDK_Package
             }
         }
 
-        public void AddSplashScreen(string splashScreenName)
+        public void AddSplashScreen(FileInfo splashScreen)
         {
             qnxSplashScreens qnxSS;
 
@@ -1418,10 +1418,10 @@ namespace RIM.VSNDK_Package
                 qnxSS = _qnxSchema.splashScreens;
             }
 
-            qnxSS.AddSplashScreenImage(splashScreenName);
+            qnxSS.AddSplashScreenImage(splashScreen.Name);
             DesignerDirty = true;
             IList source = (IList)_splashScreenImageList.SourceCollection;
-            ImageItemClass image = new ImageItemClass(splashScreenName, getImagePath(splashScreenName), _activeProjectDirectory);
+            ImageItemClass image = new ImageItemClass(splashScreen.Name, splashScreen.ToString(), _activeProjectDirectory);
             source.Add(image);
             _splashScreenImageList = new CollectionView(source);
 

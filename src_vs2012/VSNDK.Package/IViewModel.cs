@@ -19,6 +19,7 @@ using System.Text;
 using Microsoft.VisualStudio.XmlEditor;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.IO;
 
 namespace RIM.VSNDK_Package
 {
@@ -47,9 +48,9 @@ namespace RIM.VSNDK_Package
         event EventHandler ViewModelChanged;
 
         void DoIdle();
-        void AddIcon(string iconName);
+        void AddIcon(FileInfo icon);
         void DeleteIcon(object iconName);
-        void AddSplashScreen(string iconName);
+        void AddSplashScreen(FileInfo iconName);
         void DeleteSplashScreen(object iconName);
         void AddLocalAsset(string newAsset);
         void DeleteLocalAsset(object removeAsset);
