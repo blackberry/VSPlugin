@@ -149,7 +149,7 @@ namespace RIM.VSNDK_Package
                 if (viewModel != null)
                 {
                     FileInfo fileInfo = new FileInfo(filename);
-                    viewModel.AddIcon(fileInfo.Name);
+                    viewModel.AddIcon(fileInfo);
                 }
             }
         }
@@ -217,7 +217,7 @@ namespace RIM.VSNDK_Package
                 if (viewModel != null)
                 {
                     FileInfo fileInfo = new FileInfo(filename);
-                    viewModel.AddSplashScreen(fileInfo.Name);
+                    viewModel.AddSplashScreen(fileInfo);
                 }
             }
 
