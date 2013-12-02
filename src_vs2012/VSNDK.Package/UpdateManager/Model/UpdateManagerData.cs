@@ -404,7 +404,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                                         }
                                     }
                                     else
-                                        System.Diagnostics.Debug.WriteLine("API level not supported at this moment. Aborting...");
+                                        MessageBox.Show("API level not supported at this moment.\n\nAborting...", "API level not supported", MessageBoxButton.OK, MessageBoxImage.Error);
                                 }
                                 else
                                 {

@@ -35,6 +35,7 @@ namespace RIM.VSNDK_Package.UpdateManager
     /// </summary>
     public partial class UpdateManager : Window
     {
+        private UpdateManagerData data = null;
 
         /// <summary>
         /// Constructor
@@ -44,7 +45,7 @@ namespace RIM.VSNDK_Package.UpdateManager
 
             InitializeComponent();
 
-            UpdateManagerData data = new UpdateManagerData();
+            data = new UpdateManagerData();
 
             gridMain.DataContext = data;
             this.Close.IsEnabled = true;
@@ -72,7 +73,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            DialogResult = data.installed;
         }
 
         /// <summary>
@@ -92,6 +93,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
+                    this.Simulators.IsEnabled = false;
                     data.InstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false, false);
                 }
             }
@@ -119,6 +121,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                     }
                     else
                     {
+                        this.Simulators.IsEnabled = false;
                         data.UninstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false);
                     }
                 }
@@ -141,7 +144,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-
+                    this.Simulators.IsEnabled = false;
                     data.UpdateAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, ((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).LatestVersion);
                 }
 
@@ -155,12 +158,32 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            UpdateManagerData data = gridMain.DataContext as UpdateManagerData;
-            if (data != null)
+            if ((!data.installed) && (data.IsInstalling))
             {
-                if (data.IsInstalling)
+                if (data.isConfiguring)
                 {
-                    e.Cancel = true;
+                    data.waitTerminateInstallation();
+                }
+                else
+                {
+                    var result = MessageBox.Show("Are you sure that you want to cancel the installation?", "Cancel installation?", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.No)
+                    {
+                        e.Cancel = true;
+                    }
+                    else
+                    {
+                        if (data.isConfiguring)
+                        {
+                            data.waitTerminateInstallation();
+                        }
+                        else
+                        {
+                            data.cancelInstallation();
+                            data.installed = false;
+                            data.Error = "Download cancelled by the user. You must be able to debug only after completing the download.";
+                        }
+                    }
                 }
             }
         }
