@@ -301,7 +301,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <param name="version">Check version number</param>
         /// <param name="name">Check API name</param>
         /// <returns>true if installed</returns>
-        private int IsAPIInstalled(string version, string name)
+        private int IsAPIInstalled(string version, string name, bool allowSubstringVersion)
         {
             int success = 0;
 
@@ -309,23 +309,34 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             if (version.StartsWith("2.1.0"))
                 version = "2.1.0";
 
-            if (InstalledAPIListSingleton.Instance._installedAPIList != null)
+            while ((success == 0) && (version.Contains('.')))
             {
-                APIClass result = InstalledAPIListSingleton.Instance._installedAPIList.Find(i => i.Version.Contains(version));
-
-                if (result != null)
+                if (InstalledAPIListSingleton.Instance._installedAPIList != null)
                 {
-                    success = 1;
+                    APIClass result = InstalledAPIListSingleton.Instance._installedAPIList.Find(i => i.Version.Contains(version));
+
+                    if (result != null)
+                    {
+                        success = 1;
+                    }
                 }
-            }
 
-            if (InstalledNDKListSingleton.Instance._installedNDKList != null)
-            {
-                APIClass result = InstalledNDKListSingleton.Instance._installedNDKList.Find(i => i.Version.Contains(version));
-
-                if (result != null)
+                if (InstalledNDKListSingleton.Instance._installedNDKList != null)
                 {
-                    success = 2;
+                    APIClass result = InstalledNDKListSingleton.Instance._installedNDKList.Find(i => i.Version.Contains(version));
+
+                    if (result != null)
+                    {
+                        success = 2;
+                    }
+                }
+
+                if (!allowSubstringVersion)
+                    break;
+
+                if (success == 0)
+                {
+                    version = version.Substring(0, version.LastIndexOf('.'));
                 }
             }
 
@@ -352,7 +363,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             { //** Device Info retrieved - validate API's 
                 if (getCurrentAPIVersion() != _deviceosversion)
                 { //** Currently selected API version is different from attached device OS version.  
-                    if (IsAPIInstalled(_deviceosversion, "") > 0)
+                    if (IsAPIInstalled(_deviceosversion, "", false) > 0)
                     {
                         retVal = true;
                     }
@@ -379,13 +390,13 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                             }
                             else
                             {
-                                if (IsAPIInstalled(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')), "") == 0)
+                                if (IsAPIInstalled(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')), "", true) == 0)
                                 {
                                     string apiLevel = GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')));
 
                                     if (apiLevel != "")
                                     {
-                                        UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.'))), false, false);
+                                        UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", apiLevel, false, false);
                                         if (umd.ShowDialog() == true)
                                         {
                                             umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
@@ -404,7 +415,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                                         }
                                     }
                                     else
-                                        System.Diagnostics.Debug.WriteLine("API level not supported at this moment. Aborting...");
+                                        MessageBox.Show("API level not supported at this moment.\n\nAborting...", "API level not supported", MessageBoxButton.OK, MessageBoxImage.Error);
                                 }
                                 else
                                 {
@@ -848,13 +859,21 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             string retVal = "";
 
-            if (APITargetListSingleton.Instance._tempAPITargetList != null)
+            while ((retVal == "") && (version.Contains('.')))
             {
-                APITargetClass apiLevel = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.TargetVersion.Contains(version)); 
-
-                if (apiLevel != null)
+                if (APITargetListSingleton.Instance._tempAPITargetList != null)
                 {
-                    retVal = apiLevel.TargetVersion;
+                    APITargetClass apiLevel = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.TargetVersion.Contains(version));
+
+                    if (apiLevel != null)
+                    {
+                        retVal = apiLevel.TargetVersion;
+                    }
+                }
+
+                if (retVal == "")
+                {
+                    version = version.Substring(0, version.LastIndexOf('.'));
                 }
             }
 
