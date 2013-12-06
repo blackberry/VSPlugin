@@ -125,5 +125,6 @@ namespace RIM.VSNDK_Package.UpdateManager
                 e.Cancel = true;
             }
         }
+
     }
 }
