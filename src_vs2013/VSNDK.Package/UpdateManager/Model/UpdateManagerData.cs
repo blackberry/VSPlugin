@@ -126,7 +126,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             _isSimulator = isSimulator;
             _error = "";
 
-            installVersion = version;
+            if (version == "default")
+            {
+                installVersion = GetDefaultLevel();
+            }
+            else
+            {
+                installVersion = version;
+            }
+            
 
             Status = "Installing API Level";
 
@@ -143,7 +151,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0} {1} {2}", version, isRuntime ? "--runtime" : "", isSimulator ? "--simulator" : "");
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0} {1} {2}", installVersion, isRuntime ? "--runtime" : "", isSimulator ? "--simulator" : "");
 
             try
             {
@@ -761,6 +769,28 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             if (APITargetListSingleton.Instance._tempAPITargetList != null)
             {
                 APITargetClass apiLevel = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.TargetVersion.Contains(version)); 
+
+                if (apiLevel != null)
+                {
+                    retVal = apiLevel.TargetVersion;
+                }
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Given a runtime version get the associated API Level version.
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public string GetDefaultLevel()
+        {
+            string retVal = "";
+
+            if (APITargetListSingleton.Instance._tempAPITargetList != null)
+            {
+                APITargetClass apiLevel = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.IsDefault.Contains("True"));
 
                 if (apiLevel != null)
                 {

@@ -107,7 +107,7 @@ namespace RIM.VSNDK_Package.UpdateManager
             }
             else
             {
-                data.InstallAPI(_version, _isRuntime, _isSimulator);
+                    data.InstallAPI(_version, _isRuntime, _isSimulator);
             }
 
             _installed = true;
@@ -124,6 +124,12 @@ namespace RIM.VSNDK_Package.UpdateManager
             {
                 e.Cancel = true;
             }
+        }
+
+        private void RadioButton_Loaded(object sender, RoutedEventArgs e)
+        {
+            int i = 0;
+            i = i + 1;
         }
     }
 }
