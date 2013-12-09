@@ -103,7 +103,7 @@
     </ClCompile>
     <Link>
       <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>psapi.lib;$(ProgramFiles)\Microsoft Visual Studio 12.0\DIA SDK\lib\diaguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>psapi.lib;$(VSInstallDir_120)\Microsoft Visual Studio 12.0\DIA SDK\lib\diaguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>GDBParser.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
