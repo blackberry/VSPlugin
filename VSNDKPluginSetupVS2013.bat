@@ -56,12 +56,12 @@ REM     //**********************************************************************
 REM     // Copy MSBuild Files
 REM     **********************************************************************************************
 echo Copy BlackBerry MSBuild directory
-xcopy "%buildresults%\BlackBerry" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms\BlackBerry" /e /i /y
-copy "%buildresults%\VSNDK.Tasks.dll" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms\BlackBerry\VSNDK.Tasks.dll"
+xcopy "%buildresults%\BlackBerry" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\V120\Platforms\BlackBerry" /e /i /y
+copy "%buildresults%\VSNDK.Tasks.dll" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\V120\Platforms\BlackBerry\VSNDK.Tasks.dll"
 echo Copy GDBWrapper.exe
 echo Copy BlackBerrySimulator MSBuild directory
-xcopy "%buildresults%\BlackBerrySimulator" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms\BlackBerrySimulator" /e /i /y
-copy "%buildresults%\VSNDK.Tasks.dll" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms\BlackBerrySimulator\VSNDK.Tasks.dll"
+xcopy "%buildresults%\BlackBerrySimulator" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\V120\Platforms\BlackBerrySimulator" /e /i /y
+copy "%buildresults%\VSNDK.Tasks.dll" "%ProgRoot%\MSBuild\Microsoft.Cpp\v4.0\V120\Platforms\BlackBerrySimulator\VSNDK.Tasks.dll"
 
 REM     //********************************************************************************************
 REM     // Copy Template Files
