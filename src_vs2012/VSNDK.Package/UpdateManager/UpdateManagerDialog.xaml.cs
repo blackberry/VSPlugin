@@ -39,6 +39,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         private string _version = "";
         private bool _isRuntime = false;
         private bool _isSimulator = false;
+        private bool _installed = false;
         private UpdateManagerData data = null;
 
         /// <summary>
@@ -88,7 +89,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = data.installed;
+            DialogResult = _installed;
         }
 
         /// <summary>
@@ -98,10 +99,9 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Install_Click(object sender, RoutedEventArgs e)
         {
-            this.Yes.IsEnabled = false;
-            this.No.IsEnabled = true;
+            ((Button)sender).IsEnabled = false;
 
-            if (data.IsInstalling)
+            if (!data.IsInstalling)
             {
                 MessageBox.Show("Visual Studio is currently already installing an API Level. Please wait until completion before proceeding.", "", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
@@ -109,6 +109,8 @@ namespace RIM.VSNDK_Package.UpdateManager
             {
                 data.InstallAPI(_version, _isRuntime, _isSimulator);
             }
+
+            _installed = true;
         }
 
         /// <summary>
@@ -118,34 +120,11 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if ((!this.Yes.IsEnabled) && (!data.installed))
+            if (!data.IsInstalling)
             {
-                if (data.isConfiguring)
-                {
-                    data.waitTerminateInstallation();
-                }
-                else
-                {
-                    var result = MessageBox.Show("Are you sure that you want to cancel the installation?", "Cancel installation?", MessageBoxButton.YesNo, MessageBoxImage.Question);
-                    if (result == MessageBoxResult.No)
-                    {
-                        e.Cancel = true;
-                    }
-                    else
-                    {
-                        if (data.isConfiguring)
-                        {
-                            data.waitTerminateInstallation();
-                        }
-                        else
-                        {
-                            data.cancelInstallation();
-                            data.installed = false;
-                            data.Error = "Download cancelled by the user. You must be able to debug only after completing the download.";
-                        }
-                    }
-                }
+                e.Cancel = true;
             }
         }
+
     }
 }
