@@ -107,15 +107,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         public void RefreshScreen()
         {
-            //((VSNDK_PackagePackage)_pkg).GetInstalledAPIList();
-            //// ((VSNDK_PackagePackage)_pkg).GetAvailableAPIList();
-            //((VSNDK_PackagePackage)_pkg).GetInstalledSimulatorList();
-            //((VSNDK_PackagePackage)_pkg).GetSimulatorList();
-
-            //installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
-            //installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
-            //APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
-            //Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
+            installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
         }
 
         /// <summary>
@@ -130,7 +122,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             _isSimulator = isSimulator;
             _error = "";
 
-            installVersion = version;
+            if (version == "default")
+            {
+                installVersion = GetDefaultLevel();
+            }
+            else
+            {
+                installVersion = version;
+            }
+            
 
             Status = "Installing API Level";
 
@@ -147,7 +147,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0} {1} {2}", version, isRuntime ? "--runtime" : "", isSimulator ? "--simulator" : "");
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0} {1} {2}", installVersion, isRuntime ? "--runtime" : "", isSimulator ? "--simulator" : "");
 
             try
             {
@@ -755,9 +755,19 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public void SetSelectedAPI(string version)
         {
 
+            /// Set default version
+            if (version == "default")
+            {
+                installVersion = GetDefaultLevel();
+            }
+            else
+            {
+                installVersion = version;
+            }
+            
             if (installedAPIList != null)
             {
-                APIClass result = installedAPIList.Find(i => i.Version.Contains(version));
+                APIClass result = installedAPIList.Find(i => i.Version.Contains(installVersion));
 
                 if (result != null)
                 {
@@ -880,6 +890,28 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             return retVal;
         }
 
+        /// <summary>
+        /// Given a runtime version get the associated API Level version.
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public string GetDefaultLevel()
+        {
+            string retVal = "";
+
+            if (APITargetListSingleton.Instance._tempAPITargetList != null)
+            {
+                APITargetClass apiLevel = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.IsDefault.Contains("True"));
+
+                if (apiLevel != null)
+                {
+                    retVal = apiLevel.TargetVersion;
+                }
+            }
+
+            return retVal;
+        }
+
            /// <summary>
         /// Event that handles the return of a process.
         /// </summary>
@@ -903,21 +935,18 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 Status = "Complete";
 
                 RefreshScreen();
-
-                //if (installVersion != "")
-                //{
-                //    SetSelectedAPI(installVersion);
+  
 
                 if (_isRuntime)
                 {
                     SetRuntime(installVersion);
                     _isRuntime = false;
                 }
+                else if ((!_isRuntime) && (!_isSimulator))
+                {
+                    SetSelectedAPI(installVersion);
+                }
 
-                //    installVersion = "";
-
-                    installVersion = "";
-                installed = true;
             }
           //  IsInstalling = false;
         }

@@ -147,5 +147,6 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
             }
         }
+
     }
 }

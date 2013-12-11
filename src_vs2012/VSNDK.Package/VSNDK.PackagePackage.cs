@@ -63,13 +63,26 @@ namespace RIM.VSNDK_Package
     /// </summary>
     public class APITargetClass
     {
+        private string DefaultVersion = "10.2.0.1155";
+
         public string TargetName { get; set; }
         public string TargetDescription { get; set; }
         public string TargetVersion { get; set; }
         public string LatestVersion { get; set; }
         public int IsInstalled { get; set; }
         public bool IsUpdate { get; set; }
-        public bool IsBeta { get; set; }
+
+        public string IsDefault
+        {
+            get { return TargetVersion == DefaultVersion ? "True" : "False"; }
+            set 
+            {
+                if (value == "True")
+                    DefaultVersion = TargetVersion;
+                else
+                    DefaultVersion = "";
+            }
+        }
 
         public string InstalledVisibility
         {
@@ -89,7 +102,7 @@ namespace RIM.VSNDK_Package
         public string NoUpdateVisibility
         {
             get { return IsUpdate ? "collapsed" : "visible"; }
-        }
+        } 
 
         public APITargetClass(string name, string description, string version)
         {
@@ -99,7 +112,6 @@ namespace RIM.VSNDK_Package
             LatestVersion = version;
             IsInstalled = 0;
             IsUpdate = false;
-            IsBeta = false;
         }
     }
 
@@ -173,7 +185,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         private InstalledAPIListSingleton()
         {
-            GetInstalledAPIList();
+
         }
 
         /// <summary>
@@ -187,6 +199,9 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new InstalledAPIListSingleton();
                 }
+
+                _instance.GetInstalledAPIList();
+                
                 return _instance;
             }
         }
@@ -378,7 +393,7 @@ namespace RIM.VSNDK_Package
                 {
                     _error = _error + e.Data;
                 }
-                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")))
+                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")) || (e.Data.Contains("Beta")))
                 {
                     // Do Nothing
                 }
@@ -415,8 +430,6 @@ namespace RIM.VSNDK_Package
                                 break;
                         }
                     }
-
-                    api.IsBeta = name.Contains("Beta");
 
                 }
             }
@@ -746,7 +759,7 @@ namespace RIM.VSNDK_Package
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
-    [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
+    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackagePkgString)]
     public sealed class VSNDK_PackagePackage : Package
     {
@@ -793,15 +806,22 @@ namespace RIM.VSNDK_Package
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             base.RegisterEditorFactory(new EditorFactory(this));
 
-            _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
-            SetNDKPath();
 
             APITargetListSingleton api = APITargetListSingleton.Instance;
             InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
             InstalledNDKListSingleton ndkList = InstalledNDKListSingleton.Instance;
             SimulatorListSingleton simList = SimulatorListSingleton.Instance;
             InstalledSimulatorListSingleton installedSimList = InstalledSimulatorListSingleton.Instance;
+
+            if (apiList._installedAPIList.Count == 0)
+            { 
+                UpdateManager.UpdateManagerDialog ud = new UpdateManager.UpdateManagerDialog("Please choose your default API Level to be used by the Visual Studio Plug-in.", "default", false, false);
+                ud.ShowDialog();
+            }
+
+            _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+            SetNDKPath();
 
             _commandEvents = new VSNDKCommandEvents((DTE2)_dte);
             _commandEvents.RegisterCommand(GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
@@ -1245,7 +1265,6 @@ namespace RIM.VSNDK_Package
 
 
         #endregion
-
 
 
         #region Event Handlers
