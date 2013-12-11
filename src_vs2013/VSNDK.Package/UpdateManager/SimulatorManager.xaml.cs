@@ -45,7 +45,8 @@ namespace RIM.VSNDK_Package.UpdateManager
             InitializeComponent();
 
             umData = new UpdateManagerData();
-            gridMain.DataContext = umData;  
+            gridMain.DataContext = umData;
+            this.Close.IsEnabled = true;
         }
 
         /// <summary>
@@ -55,7 +56,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = true;
+            DialogResult = umData.installed;
         }
 
         /// <summary>
@@ -65,7 +66,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Install_Click(object sender, RoutedEventArgs e)
         {
-            if (!umData.IsInstalling)
+            if (umData.IsInstalling)
             {
                 MessageBox.Show("Visual Studio is currently already installing/uninstalling a Simulator. Please wait until completion before proceeding.", "Simulators", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
@@ -82,7 +83,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Uninstall_Click(object sender, RoutedEventArgs e)
         {
-            if (!umData.IsInstalling)
+            if (umData.IsInstalling)
             {
                 MessageBox.Show("Visual Studio is currently already installing/uninstalling a Simulator. Please wait until completion before proceeding.", "Simulators", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
             }
@@ -99,9 +100,32 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (!umData.IsInstalling)
+            if ((!umData.installed) && (umData.IsInstalling))
             {
-                e.Cancel = true;
+                if (umData.isConfiguring)
+                {
+                    umData.waitTerminateInstallation();
+                }
+                else
+                {
+                    var result = MessageBox.Show("Are you sure that you want to cancel the installation?", "Cancel installation?", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (result == MessageBoxResult.No)
+                    {
+                        e.Cancel = true;
+                    }
+                    else
+                    {
+                        if (umData.isConfiguring)
+                        {
+                            umData.waitTerminateInstallation();
+                        }
+                        else
+                        {
+                            umData.cancelInstallation();
+                            umData.installed = false;
+                        }
+                    }
+                }
             }
         }
 
