@@ -6,7 +6,7 @@ REM     // thisDir = working directory of current batch file.
 REM     // buildresults = Directory containing the build results.
 REM     **********************************************************************************************
 set thisDir=%~dp0
-set buildresults=%thisDir%..\buildresults\VS2010
+set buildresults=%thisDir%..\buildresults\VS2012
 set ProgRoot=%ProgramFiles(x86)%
 set AllUsers=%ALLUSERSPROFILE%
 set AppData=%APPDATA%
@@ -87,7 +87,7 @@ REM     //**********************************************************************
 REM     // Register clases
 REM     **********************************************************************************************
 echo registering setup
-REGEDIT.EXE /S "thisDir"VSNDKPluginSetup.reg
+REGEDIT.EXE /S "thisDir"VSNDKPluginSetup2012.reg
 
 
 
