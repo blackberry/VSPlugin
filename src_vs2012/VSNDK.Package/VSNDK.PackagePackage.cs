@@ -813,13 +813,14 @@ namespace RIM.VSNDK_Package
             SimulatorListSingleton simList = SimulatorListSingleton.Instance;
             InstalledSimulatorListSingleton installedSimList = InstalledSimulatorListSingleton.Instance;
 
-            if (apiList._installedAPIList.Count == 0)
-            { 
+            _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+            if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
+            {
                 UpdateManager.UpdateManagerDialog ud = new UpdateManager.UpdateManagerDialog("Please choose your default API Level to be used by the Visual Studio Plug-in.", "default", false, false);
                 ud.ShowDialog();
             }
 
-            _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
 
             SetNDKPath();
 
@@ -862,6 +863,32 @@ namespace RIM.VSNDK_Package
         #endregion
 
         #region private methods
+
+        /// <summary>
+        /// Check to see if current solution is configured with a BlackBerry Configuration.
+        /// </summary>
+        /// <param name="dte"></param>
+        /// <returns></returns>
+        private bool IsBlackBerrySolution(EnvDTE.DTE dte)
+        {
+            bool res = false;
+
+            if (dte.Solution.FullName != "")
+            {
+                string fileText = System.IO.File.ReadAllText(dte.Solution.FullName);
+
+                if (fileText.Contains("Debug|BlackBerry"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return res;
+        }
 
         /// <summary>
         /// Set the NDK path into the registry if not already set.
@@ -1385,6 +1412,13 @@ namespace RIM.VSNDK_Package
         /// <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
         public void OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
         {
+            InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
+            if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
+            {
+                UpdateManager.UpdateManagerDialog ud = new UpdateManager.UpdateManagerDialog("Please choose your default API Level to be used by the Visual Studio Plug-in.", "default", false, false);
+                ud.ShowDialog();
+            }
+
             if ((Action == vsBuildAction.vsBuildActionBuild) || (Action == vsBuildAction.vsBuildActionRebuildAll))
             {
                 if ((_hitPlay == false) && (_isDeploying == false)) // means that the "play" building and deploying process was cancelled before, so we have to disable the 
