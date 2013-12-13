@@ -935,7 +935,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 Status = "Complete";
 
                 RefreshScreen();
-  
+
+                installed = true;
 
                 if (_isRuntime)
                 {
