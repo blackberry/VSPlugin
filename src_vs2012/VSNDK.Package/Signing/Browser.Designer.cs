@@ -116,7 +116,11 @@ namespace RIM.VSNDK_Package.Signing
                     System.Text.Encoding ec = System.Text.Encoding.GetEncoding("utf-8");
                     System.IO.StreamReader reader = new System.IO.StreamReader(stream, ec);
 
-                    // Creating the bbidtoken.csk file
+                    // Save the CSK file.. create directory if necessary.
+                    if (!Directory.Exists(signingData.bbidtokenPath))
+                    {
+                        Directory.CreateDirectory(signingData.bbidtokenPath);
+                    }
                     File.WriteAllText(signingData.bbidtokenPath, reader.ReadToEnd());
 
                     reader.Close();
