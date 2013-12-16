@@ -123,6 +123,7 @@ namespace RIM.VSNDK_Package.UpdateManager
                         {
                             umData.cancelInstallation();
                             umData.installed = false;
+                            umData.Error = "Download cancelled by the user. You must be able to debug only after completing the download.";
                         }
                     }
                 }
