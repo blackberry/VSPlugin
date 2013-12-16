@@ -1451,7 +1451,7 @@ namespace RIM.VSNDK_Package
         private void ShowSettingsWindow(object sender, EventArgs e)
         {
             var SettingsDialog = new Settings.SettingsDialog();
-            var m = SettingsDialog.ShowModal();
+            var m = SettingsDialog.ShowDialog();
         }
 
         /// <summary>
@@ -1465,7 +1465,7 @@ namespace RIM.VSNDK_Package
             var DebugTokenDialog = new DebugToken.DebugTokenDialog();
             // Show the dialog.
             if (!DebugTokenDialog.IsClosing)
-                DebugTokenDialog.ShowModal();
+                DebugTokenDialog.Show();
         }
 
         private void MenuItemCallback(object sender, EventArgs e)

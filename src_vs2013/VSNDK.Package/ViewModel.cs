@@ -924,7 +924,7 @@ namespace RIM.VSNDK_Package
                 var DebugTokenDialog = new DebugToken.DebugTokenDialog();
                 // Show the dialog.
                 if (!DebugTokenDialog.IsClosing)
-                    DebugTokenDialog.ShowModal();
+                    DebugTokenDialog.Show();
             }
 
             System.Diagnostics.Process p = new System.Diagnostics.Process();

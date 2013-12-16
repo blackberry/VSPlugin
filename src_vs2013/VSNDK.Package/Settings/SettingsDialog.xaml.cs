@@ -42,7 +42,7 @@ namespace RIM.VSNDK_Package.Settings
     /// <summary>
     /// Interaction logic for Settings.xaml
     /// </summary>
-    public partial class SettingsDialog : DialogWindow
+    public partial class SettingsDialog : Window
     {
         private SettingsData _data;
 
