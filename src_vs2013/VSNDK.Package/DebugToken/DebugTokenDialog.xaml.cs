@@ -35,10 +35,11 @@ namespace RIM.VSNDK_Package.DebugToken
     /// <summary>
     /// Interaction logic for DebugTokenDialog.xaml
     /// </summary>
-    public partial class DebugTokenDialog : DialogWindow
+    public partial class DebugTokenDialog : Window
     {
         #region Member Variables and Constants
         private DebugTokenData deployTokenData;
+        private bool isRegistering = false;
         public bool IsClosing = false;
         #endregion
 
@@ -89,21 +90,28 @@ namespace RIM.VSNDK_Package.DebugToken
             {
                 this.Cursor = Cursors.Wait;
 
-                if (!(deployTokenData.addDevice(this)))
+
+                if (!isRegistering)
                 {
-                    deployTokenData.Error = "";
-                    e.Handled = true;
-                    btnAdd.IsEnabled = false;
-                    btnRefresh.IsEnabled = false;
-                }
-                else
-                {
-                    btnAdd.IsEnabled = false;
-                    btnRefresh.IsEnabled = true;
+                    isRegistering = true;
+
+                    if (!(deployTokenData.addDevice(this)))
+                    {
+                        deployTokenData.Error = "";
+                        e.Handled = true;
+                        btnAdd.IsEnabled = false;
+                        btnRefresh.IsEnabled = false;
+                    }
+                    else
+                    {
+                        btnAdd.IsEnabled = false;
+                        btnRefresh.IsEnabled = true;
+                    }
                 }
             }
             finally
             {
+                isRegistering = false;
                 this.Cursor = Cursors.Arrow;
             }
         }
@@ -117,21 +125,29 @@ namespace RIM.VSNDK_Package.DebugToken
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
             this.Cursor = Cursors.Wait;
+            
 
-            if (!(deployTokenData.refreshDevice(this)))
+            if (!isRegistering)
             {
-                deployTokenData.Error = "";
-                e.Handled = true;
-                btnAdd.IsEnabled = false;
-                btnRefresh.IsEnabled = false;
-            }
-            else
-            {
-                btnAdd.IsEnabled = false;
-                btnRefresh.IsEnabled = true;
+                isRegistering = true;
+
+                if (!(deployTokenData.refreshDevice(this)))
+                {
+                    deployTokenData.Error = "";
+                    e.Handled = true;
+                    btnAdd.IsEnabled = false;
+                    btnRefresh.IsEnabled = false;
+                }
+                else
+                {
+                    btnAdd.IsEnabled = false;
+                    btnRefresh.IsEnabled = true;
+                }
             }
 
+            isRegistering = false;
             this.Cursor = Cursors.Arrow;
+
         }
 
     }
