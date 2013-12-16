@@ -185,7 +185,15 @@ namespace RIM.VSNDK_Package
         /// </summary>
         private InstalledAPIListSingleton()
         {
+            GetInstalledAPIList();
+        }
 
+        /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetInstalledAPIList();
         }
 
         /// <summary>
@@ -199,8 +207,6 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new InstalledAPIListSingleton();
                 }
-
-                _instance.GetInstalledAPIList();
                 
                 return _instance;
             }
@@ -265,6 +271,16 @@ namespace RIM.VSNDK_Package
             GetInstalledNDKList();
         }
 
+
+        /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetInstalledNDKList();
+        }
+
+   
         /// <summary>
         /// Public property to retrieve the singleton instance
         /// </summary>
@@ -276,6 +292,8 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new InstalledNDKListSingleton();
                 }
+
+
                 return _instance;
             }
         }
@@ -331,7 +349,16 @@ namespace RIM.VSNDK_Package
 
         private APITargetListSingleton()
         {
-            GetAvailableAPIList();
+            GetAvailableAPIList(); 
+        }
+
+
+        /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetAvailableAPIList();
         }
 
         /// <summary>
@@ -498,6 +525,7 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new APITargetListSingleton();
                 }
+
                 return _instance;
             }
         }
@@ -521,6 +549,15 @@ namespace RIM.VSNDK_Package
         }
 
         /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetSimulatorList();
+        }
+
+
+        /// <summary>
         /// Public property to retrieve the singleton instance
         /// </summary>
         public static SimulatorListSingleton Instance
@@ -531,6 +568,7 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new SimulatorListSingleton();
                 }
+
                 return _instance;
             }
         }

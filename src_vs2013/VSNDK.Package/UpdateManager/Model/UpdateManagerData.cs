@@ -90,7 +90,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             installedNDKList = InstalledNDKListSingleton.Instance._installedNDKList;
             APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
             Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
-            
         }
 
         /// <summary>
@@ -107,7 +106,21 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         public void RefreshScreen()
         {
+            InstalledAPIListSingleton.Instance.RefreshData();
             installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
+            //InstalledNDKListSingleton.Instance.RefreshData();
+            //installedNDKList = InstalledNDKListSingleton.Instance._installedNDKList;
+            //APITargetListSingleton.Instance.RefreshData();
+            //APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
+        }
+
+        /// <summary>
+        /// Refresh all the lists
+        /// </summary>
+        public void RefreshSimulatorScreen()
+        {
+            SimulatorListSingleton.Instance.RefreshData();
+            Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
         }
 
         /// <summary>
@@ -943,8 +956,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             {
                 Status = "Complete";
 
-                RefreshScreen();
-
                 installed = true;
 
                 if (_isRuntime)
@@ -952,13 +963,17 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                     SetRuntime(installVersion);
                     _isRuntime = false;
                 }
-                else if ((!_isRuntime) && (!_isSimulator))
+                else if (_isSimulator)
                 {
+                    RefreshSimulatorScreen();
+                }
+                else 
+                {
+                    RefreshScreen();
                     SetSelectedAPI(installVersion);
                 }
 
             }
-          //  IsInstalling = false;
         }
 
         /// <summary>
