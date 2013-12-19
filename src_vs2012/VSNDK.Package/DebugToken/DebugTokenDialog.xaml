@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
         xmlns:pa="clr-namespace:RIM.VSNDK_Package.DebugToken.Model"                 
-        Title="Debug Tokens" Height="198" Width="620" ShowInTaskbar="False" WindowStartupLocation="CenterOwner">
+        Title="Debug Tokens" Height="198" Width="620" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="NoResize">
 
     <Grid Name="gridMain" Height="229"  Width="591">
         <StackPanel Orientation="Vertical" Margin="12,0,12,72">
