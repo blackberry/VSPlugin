@@ -265,13 +265,19 @@ namespace RIM.VSNDK_Package.Settings.Models
                 if (pwd != null)
                     DevicePassword = GlobalFunctions.Decrypt(pwd.ToString());
 
+            }
+            catch
+            {
+            }
+
+            try
+            {
                 object ip = rkSettingsPath.GetValue("device_IP");
                 if (ip != null)
                     DeviceIP = ip.ToString();
             }
             catch
             {
-
             }
 
             rkSettingsPath.Close();
@@ -294,14 +300,19 @@ namespace RIM.VSNDK_Package.Settings.Models
                 object pwd = rkSettingsPath.GetValue("simulator_password");
                 if (pwd != null)
                     SimulatorPassword = GlobalFunctions.Decrypt(pwd.ToString());
-                
+            }
+            catch
+            {
+            }
+
+            try
+            {
                 object ip = rkSettingsPath.GetValue("simulator_IP");
                 if (ip != null)
                     SimulatorIP = ip.ToString();
             }
             catch
             {
-
             }
 
             rkSettingsPath.Close();
