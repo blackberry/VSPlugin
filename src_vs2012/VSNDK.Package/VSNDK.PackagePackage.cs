@@ -720,6 +720,14 @@ namespace RIM.VSNDK_Package
         }
 
         /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetInstalledSimulatorList();
+        }
+
+        /// <summary>
         /// Public property to retrieve the singleton instance
         /// </summary>
         public static InstalledSimulatorListSingleton Instance

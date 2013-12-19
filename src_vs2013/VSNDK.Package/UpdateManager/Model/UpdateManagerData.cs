@@ -119,6 +119,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         public void RefreshSimulatorScreen()
         {
+            InstalledSimulatorListSingleton.Instance.RefreshData();
             SimulatorListSingleton.Instance.RefreshData();
             Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
         }
