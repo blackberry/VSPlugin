@@ -48,6 +48,7 @@ namespace RIM.VSNDK_Package.DebugToken
         /// </summary>
         public DebugTokenDialog()
         {
+            Mouse.OverrideCursor = Cursors.Wait;
             deployTokenData = new DebugTokenData();
 
          //   DebugTokenData._initializedCorrectly = true;
@@ -77,6 +78,7 @@ namespace RIM.VSNDK_Package.DebugToken
 
             btnAdd.IsEnabled = !deployTokenData.AlreadyRegistered;
             btnRefresh.IsEnabled = deployTokenData.AlreadyRegistered;
+            Mouse.OverrideCursor = Cursors.Arrow;
         }
 
         /// <summary>
@@ -88,8 +90,7 @@ namespace RIM.VSNDK_Package.DebugToken
         {
             try
             {
-                this.Cursor = Cursors.Wait;
-
+                Mouse.OverrideCursor = Cursors.Wait;
 
                 if (!isRegistering)
                 {
@@ -112,7 +113,7 @@ namespace RIM.VSNDK_Package.DebugToken
             finally
             {
                 isRegistering = false;
-                this.Cursor = Cursors.Arrow;
+                Mouse.OverrideCursor = Cursors.Arrow;
             }
         }
 
@@ -124,8 +125,7 @@ namespace RIM.VSNDK_Package.DebugToken
         /// <param name="e"></param>
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
-            
+            Mouse.OverrideCursor = Cursors.Wait;
 
             if (!isRegistering)
             {
@@ -146,8 +146,13 @@ namespace RIM.VSNDK_Package.DebugToken
             }
 
             isRegistering = false;
-            this.Cursor = Cursors.Arrow;
+            Mouse.OverrideCursor = Cursors.Arrow;
 
+        }
+
+        private void btnClose_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
 
     }
