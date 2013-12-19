@@ -24,6 +24,7 @@ using System.Windows.Data;
 using RIM.VSNDK_Package.Signing;
 using System.Windows.Forms;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace RIM.VSNDK_Package.DebugToken.Model
 {
@@ -209,12 +210,18 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
         public bool resetPassword()
         {
+            System.Windows.Forms.Cursor currentCursor = System.Windows.Forms.Cursor.Current;
+            Mouse.OverrideCursor = System.Windows.Input.Cursors.Arrow;
+
             _errors = "";
             RegistrationWindow win = new RegistrationWindow();
             win.ResizeMode = System.Windows.ResizeMode.NoResize;
             bool? res = win.ShowDialog();
             if (res == true)
                 KeyStorePassword = win.tbPassword.Password;
+
+            if (currentCursor.ToString().Contains("Wait"))
+                Mouse.OverrideCursor = System.Windows.Input.Cursors.Wait;
 
             return res == true;
         }
