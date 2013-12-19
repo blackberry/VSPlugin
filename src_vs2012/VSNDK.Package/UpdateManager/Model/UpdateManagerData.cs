@@ -344,7 +344,16 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             DebugTokenData dtokenData;
 
             if (!isSim)
+            {
                 dtokenData = new DebugTokenData();
+                string LocalFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\";
+                string CertPath = LocalFolder + "author.p12";
+
+                if (!File.Exists(CertPath))
+                {
+                    return false;
+                }
+            }
 
             getDeviceSimInfo(isSim);
 

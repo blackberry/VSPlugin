@@ -1078,9 +1078,14 @@ namespace RIM.VSNDK_Package
             key.Close();
 
             string pidString = "";
-            getPID((DTE2)_dte, ref pidString);
-
-            bool CancelDefault = LaunchDebugTarget(pidString);
+            if (getPID((DTE2)_dte, ref pidString))
+            {
+                bool CancelDefault = LaunchDebugTarget(pidString);
+            }
+            else
+            {
+                MessageBox.Show("Failed to debug the application. This can happen when the Verbosity is set to Quiet.\n\nPlease, close the app in case it was launched in the device/simulator.", "Failed to launch debugger", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary> 
@@ -1180,7 +1185,7 @@ namespace RIM.VSNDK_Package
             // Check for successful deployment
             if (System.Text.RegularExpressions.Regex.IsMatch(outputText, "Info: done"))
             {
-                string pattern = @"\s+result::(\d+)\r\n.+";
+                string pattern = @"\s+result::(\d+)\r\n.+|\s+result::(\d+) \(TaskId:";
                 Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
 
                 // Match the regular expression pattern against a text string.
@@ -1191,6 +1196,15 @@ namespace RIM.VSNDK_Package
                 {
                     Group g = m.Groups[1];
                     CaptureCollection cc = g.Captures;
+                    if (cc.Count == 0)
+                    {   // Diagnostic verbosity mode
+                        g = m.Groups[2];
+                        cc = g.Captures;
+                    }
+
+                    if (cc.Count == 0)
+                        return false;
+
                     Capture c = cc[0];
                     pidString = c.ToString();
 
