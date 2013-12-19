@@ -52,7 +52,7 @@
                 </StackPanel>
             </GroupBox>
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal" Width="90">
-                <Button Name="btnClose" IsCancel="True" Height="25" Width="71" Content="Close" Click="btnClose_Click" HorizontalAlignment="Right" />
+                <Button Name="btnClose" IsCancel="True" Height="25" Width="71" Content="Close" HorizontalAlignment="Right" />
             </StackPanel>
         </StackPanel>
     </Grid>

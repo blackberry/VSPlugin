@@ -1465,7 +1465,7 @@ namespace RIM.VSNDK_Package
             var DebugTokenDialog = new DebugToken.DebugTokenDialog();
             // Show the dialog.
             if (!DebugTokenDialog.IsClosing)
-                DebugTokenDialog.Show();
+                DebugTokenDialog.ShowDialog();
         }
 
         private void MenuItemCallback(object sender, EventArgs e)
