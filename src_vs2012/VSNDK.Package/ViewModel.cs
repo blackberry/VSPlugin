@@ -1038,7 +1038,7 @@ namespace RIM.VSNDK_Package
         {
             get
             {
-                return _qnxSchema.description.Trim();
+                return _qnxSchema.description;
             }
             set
             {
