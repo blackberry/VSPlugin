@@ -165,7 +165,7 @@
                                 </StackPanel>
                              </Expander>
                             <Expander Header="Permissions" Margin="10, 2" Name="grpPermissions" VerticalAlignment="Top">
-                                <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Left" Name="grdPermissions" Width="750" Height="368" ItemsSource="{Binding PermissionList}"  GridLinesVisibility="None">
+                                <DataGrid AutoGenerateColumns="False" HorizontalAlignment="Left" Name="grdPermissions" Width="770" Height="368" ItemsSource="{Binding PermissionList}"  GridLinesVisibility="None">
                                     <DataGrid.Columns>
                                         <DataGridTemplateColumn Width="20">
                                             <DataGridTemplateColumn.CellTemplate>
@@ -181,8 +181,16 @@
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Permission" Width="300" Binding="{Binding Permission, Mode=TwoWay}"/>
-                                        <DataGridTextColumn Header="Identifier" Width="300" Binding="{Binding Identifier, Mode=TwoWay}" />
+                                        <DataGridTextColumn Header="Permission" Width="160" Binding="{Binding Permission, Mode=TwoWay}"/>
+                                        <DataGridTextColumn Header="Identifier" Width="160" Binding="{Binding Identifier, Mode=TwoWay}" />
+                                        <DataGridTemplateColumn Width="400" Header="Description">
+                                            <DataGridTemplateColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBox IsReadOnly="True" ToolTip="{Binding Description, Mode=TwoWay}" Text="{Binding Description, Mode=TwoWay}" VerticalAlignment="Top"  Width="350" BorderThickness="0" />
+                                                </DataTemplate>
+                                            </DataGridTemplateColumn.CellTemplate>
+                                        </DataGridTemplateColumn>
+           
                                     </DataGrid.Columns>
                                 </DataGrid>
                             </Expander>
