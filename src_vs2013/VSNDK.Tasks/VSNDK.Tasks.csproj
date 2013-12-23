@@ -86,7 +86,6 @@
     <Compile Include="BBSigner.cs" />
     <Compile Include="RemoveFlagFile.cs" />
     <Compile Include="MakeAllAndFormatOutputMessages.cs" />
-    <Compile Include="WriteDebuggerArgs.cs" />
     <Compile Include="CheckIfInstalled.cs" />
     <Compile Include="DiffManifests.cs" />
     <Compile Include="GenerateMakefile.cs" />
