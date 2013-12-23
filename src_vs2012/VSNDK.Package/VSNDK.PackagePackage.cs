@@ -824,6 +824,7 @@ namespace RIM.VSNDK_Package
         private bool _isDeploying = false;
         private OutputWindowPane _owP;
         private bool isDebugConfiguration = true;
+        private string processName = "";
 
         #endregion
 
@@ -1025,6 +1026,7 @@ namespace RIM.VSNDK_Package
                             if (p1.UniqueName == startupProject)
                             {
                                 buildThese.Add(p1.FullName);
+                                processName = p1.Name;
 
                                 ConfigurationManager config = p1.ConfigurationManager;
                                 Configuration active = config.ActiveConfiguration;
@@ -1036,7 +1038,7 @@ namespace RIM.VSNDK_Package
                                         if (prop.Name == "OutputPath")
                                         {
                                             string[] path = new string[2];
-                                            path[0] = p1.Name + "_" + _isSimulator.ToString();
+                                            path[0] = p1.Name;
                                             path[1] = prop.Value.ToString();
                                             _targetDir.Add(path);
                                             break;
@@ -1166,14 +1168,6 @@ namespace RIM.VSNDK_Package
             nvc.Add("ToolsPath", toolsPath);
             nvc.Add("PublicKeyPath", publicKeyPath);
 
-            // Decrypt stored password.
-            byte[] data = Convert.FromBase64String(password);
-            if (data.Length > 0)
-            {
-                byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-                nvc.Add("Password", Encoding.Unicode.GetString(decrypted));
-            }
-
             info.bstrArg = NameValueCollectionHelper.DumpToString(nvc);
 
             info.bstrRemoteMachine = null; // debug locally
@@ -1217,39 +1211,52 @@ namespace RIM.VSNDK_Package
         /// <returns> TRUE if successful, False if not. </returns>
         private bool getProcessInfo(DTE2 dte, ref string pidString, ref string toolsPath, ref string publicKeyPath, ref string targetIP, ref string password, ref string executablePath)
         {
+            string currentPath = "";
 
-            // Read debugger args from a file (it is set when the Deploy task is run)
-            System.IO.StreamReader argsFile = null;
+            foreach (string[] paths in _targetDir)
+            {
+                if (paths[0] == processName)
+                {
+                    currentPath = paths[1];
+                    break;
+                }
+            }
+
+            executablePath = currentPath + processName; // The executable path
+            executablePath = executablePath.Replace('\\', '/');
+            publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
+            publicKeyPath = publicKeyPath.Replace('\\', '/');
+
             try
             {
-                string localAppData = Environment.GetEnvironmentVariable("AppData");
-                argsFile = new System.IO.StreamReader(localAppData + @"\BlackBerry\vsndk-args-file.txt");
+                RegistryKey rkHKCU = Registry.CurrentUser;
+                RegistryKey rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+                toolsPath = rkPluginRegKey.GetValue("NDKHostPath").ToString() + "/usr/bin";
+                toolsPath = toolsPath.Replace('\\', '/');
+
+                if (_isSimulator)
+                {
+                    targetIP = rkPluginRegKey.GetValue("simulator_IP").ToString();
+                    password = rkPluginRegKey.GetValue("simulator_password").ToString();
+                }
+                else
+                {
+                    targetIP = rkPluginRegKey.GetValue("device_IP").ToString();
+                    password = rkPluginRegKey.GetValue("device_password").ToString();
+                }
+
+                // Decrypt stored password.
+                byte[] data = Convert.FromBase64String(password);
+                if (data.Length > 0)
+                {
+                    byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
+                    password = Encoding.Unicode.GetString(decrypted);
+                }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Debug.Fail("Unexpected exception in LaunchDebugTarget");
+                System.Windows.Forms.MessageBox.Show(ex.Message, "Microsoft Visual Studio", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
             }
-
-
-            targetIP = argsFile.ReadLine(); // The device (IP address)
-            executablePath = argsFile.ReadLine(); // The executable path
-            string isSimulator = argsFile.ReadLine();
-            toolsPath = argsFile.ReadLine();
-            publicKeyPath = argsFile.ReadLine();
-
-            // Decrypt stored password.
-            byte[] data = Convert.FromBase64String(argsFile.ReadLine());
-            if (data.Length > 0)
-            {
-                byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-                password = Encoding.Unicode.GetString(decrypted);
-            }
-
-            string processName = "";
-            if (executablePath.LastIndexOf('\\') != -1)
-                processName = executablePath.Substring(executablePath.LastIndexOf('\\') + 1);
-            else
-                processName = executablePath.Substring(executablePath.LastIndexOf('/') + 1);
 
             pidString = getPIDfromGDB(processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
 
@@ -1259,6 +1266,8 @@ namespace RIM.VSNDK_Package
                 // Store proccess name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
                 // source code for a running process.
                 // First read the file.
+                processName += "_" + _isSimulator.ToString();
+
                 string processesPaths = "";
                 System.IO.StreamReader readProcessesPathsFile = null;
                 try
@@ -1274,18 +1283,6 @@ namespace RIM.VSNDK_Package
 
                 // Updating the contents.
                 int begin = processesPaths.IndexOf(processName + ":>");
-
-                //                    string currentPath = dte.ActiveDocument.Path;
-                string currentPath = "";
-
-                foreach (string[] paths in _targetDir)
-                {
-                    if (paths[0] == processName)
-                    {
-                        currentPath = paths[1];
-                        break;
-                    }
-                }
 
                 if (begin != -1)
                 {
