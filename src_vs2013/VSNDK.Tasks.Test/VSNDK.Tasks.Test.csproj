@@ -47,7 +47,6 @@
   <ItemGroup>
     <Compile Include="MakeAllAndFormatOutputMessagesTestClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="WriteDebuggerArgsTestClass.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\VSNDK.Tasks\VSNDK.Tasks.csproj">

@@ -51,6 +51,8 @@ echo "%buildresults%\VSNDK.Package.dll" to "%ProgRoot%\Microsoft Visual Studio 1
 copy "%buildresults%\VSNDK.Package.dll" "%ProgRoot%\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\NDK Plugin\VSNDK.Package.dll"
 echo "%buildresults%\VSNDK.Package.pkgdef" to "%ProgRoot%\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\NDK Plugin\VSNDK.Package.pkgdef"
 copy "%buildresults%\VSNDK.Package.pkgdef" "%ProgRoot%\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\NDK Plugin\VSNDK.Package.pkgdef" 
+echo "%buildresults%\GDBParser.dll" to "%ProgRoot%\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\NDK Plugin\GDBParser.dll"
+copy "%buildresults%\GDBParser.dll" "%ProgRoot%\Microsoft Visual Studio 12.0\Common7\IDE\Extensions\NDK Plugin\GDBParser.dll" 
 
 REM     //********************************************************************************************
 REM     // Copy MSBuild Files

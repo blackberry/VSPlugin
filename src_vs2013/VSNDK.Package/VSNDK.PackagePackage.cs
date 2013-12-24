@@ -36,6 +36,7 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using RIM.VSNDK_Package.UpdateManager.Model;
+using VSNDK.Parser;
 
 namespace RIM.VSNDK_Package
 {
@@ -823,6 +824,7 @@ namespace RIM.VSNDK_Package
         private bool _isDeploying = false;
         private OutputWindowPane _owP;
         private bool isDebugConfiguration = true;
+        private string processName = "";
 
         #endregion
 
@@ -1024,6 +1026,7 @@ namespace RIM.VSNDK_Package
                             if (p1.UniqueName == startupProject)
                             {
                                 buildThese.Add(p1.FullName);
+                                processName = p1.Name;
 
                                 ConfigurationManager config = p1.ConfigurationManager;
                                 Configuration active = config.ActiveConfiguration;
@@ -1035,7 +1038,7 @@ namespace RIM.VSNDK_Package
                                         if (prop.Name == "OutputPath")
                                         {
                                             string[] path = new string[2];
-                                            path[0] = p1.Name + "_" + _isSimulator.ToString();
+                                            path[0] = p1.Name;
                                             path[1] = prop.Value.ToString();
                                             _targetDir.Add(path);
                                             break;
@@ -1124,9 +1127,14 @@ namespace RIM.VSNDK_Package
             key.Close();
 
             string pidString = "";
-            if (getPID((DTE2)_dte, ref pidString))
+            string toolsPath = "";
+            string publicKeyPath = "";
+            string targetIP = "";
+            string password = "";
+            string executablePath = "";
+            if (getProcessInfo((DTE2)_dte, ref pidString, ref toolsPath, ref publicKeyPath, ref targetIP, ref password, ref executablePath))
             {
-                bool CancelDefault = LaunchDebugTarget(pidString);
+                bool CancelDefault = LaunchDebugTarget(pidString, toolsPath, publicKeyPath, targetIP, password, executablePath);
             }
             else
             {
@@ -1139,7 +1147,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         /// <param name="pidString"> Process ID in string format. </param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool LaunchDebugTarget(string pidString)
+        private bool LaunchDebugTarget(string pidString, string toolsPath, string publicKeyPath, string targetIP, string password, string executablePath)
         {
             Microsoft.VisualStudio.Shell.ServiceProvider sp =
                  new Microsoft.VisualStudio.Shell.ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
@@ -1151,37 +1159,16 @@ namespace RIM.VSNDK_Package
             info.cbSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(info);
             info.dlo = Microsoft.VisualStudio.Shell.Interop.DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
-            // Read debugger args from a file (it is set when the Deploy task is run)
-            System.IO.StreamReader argsFile = null;
-            try
-            {
-                string localAppData = Environment.GetEnvironmentVariable("AppData");
-                argsFile = new System.IO.StreamReader(localAppData + @"\BlackBerry\vsndk-args-file.txt");
-            }
-            catch (Exception e)
-            {
-                Debug.Fail("Unexpected exception in LaunchDebugTarget");
-            }
-
             // Store all debugger arguments in a string
             var nvc = new NameValueCollection();
             nvc.Add("pid", pidString);
-            nvc.Add("targetIP", argsFile.ReadLine()); // The device (IP address)
-            info.bstrExe = argsFile.ReadLine(); // The executable path
-            nvc.Add("isSimulator", argsFile.ReadLine());
-            nvc.Add("ToolsPath", argsFile.ReadLine());
-            nvc.Add("PublicKeyPath", argsFile.ReadLine());
-
-            // Decrypt stored password.
-            byte[] data = Convert.FromBase64String(argsFile.ReadLine());
-            if (data.Length > 0)
-            {
-                byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-                nvc.Add("Password", Encoding.Unicode.GetString(decrypted));
-            }
+            nvc.Add("targetIP", targetIP); // The device (IP address)
+            info.bstrExe = executablePath; // The executable path
+            nvc.Add("isSimulator", _isSimulator.ToString());
+            nvc.Add("ToolsPath", toolsPath);
+            nvc.Add("PublicKeyPath", publicKeyPath);
 
             info.bstrArg = NameValueCollectionHelper.DumpToString(nvc);
-            argsFile.Close();
 
             info.bstrRemoteMachine = null; // debug locally
             info.fSendStdoutToOutputWindow = 0; // Let stdout stay with the application.
@@ -1222,105 +1209,149 @@ namespace RIM.VSNDK_Package
         /// <param name="dte"> Application Object. </param>
         /// <param name="pidString"> Returns the Process ID as a string. </param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool getPID(DTE2 dte, ref string pidString)
+        private bool getProcessInfo(DTE2 dte, ref string pidString, ref string toolsPath, ref string publicKeyPath, ref string targetIP, ref string password, ref string executablePath)
         {
-            // Select all of the text
-            _owP.TextDocument.Selection.SelectAll();
-            string outputText = _owP.TextDocument.Selection.Text;
+            string currentPath = "";
 
-            // Check for successful deployment
-            if (System.Text.RegularExpressions.Regex.IsMatch(outputText, "Info: done"))
+            foreach (string[] paths in _targetDir)
             {
-                string pattern = @"\s+result::(\d+)\r\n.+|\s+result::(\d+) \(TaskId:";
-                Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
-
-                // Match the regular expression pattern against a text string.
-                Match m = r.Match(outputText);
-
-                // Take first match
-                if (m.Success)
+                if (paths[0] == processName)
                 {
-                    Group g = m.Groups[1];
-                    CaptureCollection cc = g.Captures;
-                    if (cc.Count == 0)
-                    {   // Diagnostic verbosity mode
-                        g = m.Groups[2];
-                        cc = g.Captures;
-                    }
+                    currentPath = paths[1];
+                    break;
+                }
+            }
 
-                    if (cc.Count == 0)
-                        return false;
+            executablePath = currentPath + processName; // The executable path
+            executablePath = executablePath.Replace('\\', '/');
+            publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
+            publicKeyPath = publicKeyPath.Replace('\\', '/');
 
-                    Capture c = cc[0];
-                    pidString = c.ToString();
+            try
+            {
+                RegistryKey rkHKCU = Registry.CurrentUser;
+                RegistryKey rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+                toolsPath = rkPluginRegKey.GetValue("NDKHostPath").ToString() + "/usr/bin";
+                toolsPath = toolsPath.Replace('\\', '/');
 
-                    // Store proccess name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
-                    // source code for a running process.
-                    // First read the file.
-                    string processesPaths = "";
-                    System.IO.StreamReader readProcessesPathsFile = null;
-                    try
-                    {
-                        readProcessesPathsFile = new System.IO.StreamReader(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
-                        processesPaths = readProcessesPathsFile.ReadToEnd();
-                        readProcessesPathsFile.Close();
-                    }
-                    catch (Exception e)
-                    {
-                        processesPaths = "";
-                    }
-
-                    // Updating the contents.
-                    int begin = outputText.IndexOf("Deploy started: Project: ") + 25;
-                    if (begin == -1)
-                        begin = outputText.IndexOf("Project: ") + 9;
-                    int end = outputText.IndexOf(", Configuration:", begin);
-                    string processName = outputText.Substring(begin, end - begin) + "_" + _isSimulator.ToString();
-                    begin = processesPaths.IndexOf(processName + ":>");
-
-                    //                    string currentPath = dte.ActiveDocument.Path;
-                    string currentPath = "";
-
-                    foreach (string[] paths in _targetDir)
-                    {
-                        if (paths[0] == processName)
-                        {
-                            currentPath = paths[1];
-                            break;
-                        }
-                    }
-
-                    if (begin != -1)
-                    {
-                        begin += processName.Length + 2;
-                        end = processesPaths.IndexOf("\r\n", begin);
-                        processesPaths = processesPaths.Substring(0, begin) + currentPath + processesPaths.Substring(end);
-                    }
-                    else
-                    {
-                        processesPaths = processesPaths + processName + ":>" + currentPath + "\r\n";
-                    }
-
-                    // Writing contents to file.
-                    System.IO.StreamWriter writeProcessesPathsFile = null;
-                    try
-                    {
-                        writeProcessesPathsFile = new System.IO.StreamWriter(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt", false);
-                        writeProcessesPathsFile.Write(processesPaths);
-                        writeProcessesPathsFile.Close();
-                    }
-                    catch (Exception e)
-                    {
-                    }
-
-                    return true;
+                if (_isSimulator)
+                {
+                    targetIP = rkPluginRegKey.GetValue("simulator_IP").ToString();
+                    password = rkPluginRegKey.GetValue("simulator_password").ToString();
                 }
                 else
                 {
-                    return false;
+                    targetIP = rkPluginRegKey.GetValue("device_IP").ToString();
+                    password = rkPluginRegKey.GetValue("device_password").ToString();
+                }
+
+                // Decrypt stored password.
+                byte[] data = Convert.FromBase64String(password);
+                if (data.Length > 0)
+                {
+                    byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
+                    password = Encoding.Unicode.GetString(decrypted);
                 }
             }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message, "Microsoft Visual Studio", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+            }
+
+            pidString = getPIDfromGDB(processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
+
+            if (pidString != "")
+            {
+
+                // Store proccess name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
+                // source code for a running process.
+                // First read the file.
+                processName += "_" + _isSimulator.ToString();
+
+                string processesPaths = "";
+                System.IO.StreamReader readProcessesPathsFile = null;
+                try
+                {
+                    readProcessesPathsFile = new System.IO.StreamReader(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
+                    processesPaths = readProcessesPathsFile.ReadToEnd();
+                    readProcessesPathsFile.Close();
+                }
+                catch (Exception e)
+                {
+                    processesPaths = "";
+                }
+
+                // Updating the contents.
+                int begin = processesPaths.IndexOf(processName + ":>");
+
+                if (begin != -1)
+                {
+                    begin += processName.Length + 2;
+                    int end = processesPaths.IndexOf("\r\n", begin);
+                    processesPaths = processesPaths.Substring(0, begin) + currentPath + processesPaths.Substring(end);
+                }
+                else
+                {
+                    processesPaths = processesPaths + processName + ":>" + currentPath + "\r\n";
+                }
+
+                // Writing contents to file.
+                System.IO.StreamWriter writeProcessesPathsFile = null;
+                try
+                {
+                    writeProcessesPathsFile = new System.IO.StreamWriter(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt", false);
+                    writeProcessesPathsFile.Write(processesPaths);
+                    writeProcessesPathsFile.Close();
+                }
+                catch (Exception e)
+                {
+                }
+
+                return true;
+            }
             return false;
+        }
+
+        private string getPIDfromGDB(string processName, string IP, string password, bool isSimulator, string toolsPath, string publicKeyPath)
+        {
+            string PID = "";
+            string response = GDBParser.GetPIDsThroughGDB(IP, password, isSimulator, toolsPath, publicKeyPath, 7);
+
+            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
+            {
+                if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
+                {
+                    MessageBox.Show("Please, verify if the Device/Simulator IP in \"BlackBerry -> Settings\" menu is correct and check if it is connected.", "Device/Simulator not connected or not configured properly", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                    if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
+                    {
+                        string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
+                        string caption = "";
+                        if (txt.IndexOf("The requested address is not valid in its context.") != -1)
+                        {
+                            txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
+                            caption = "Invalid IP";
+                        }
+                        else
+                        {
+                            txt += "\n\nPlease, verify if the device/simulator is connected.";
+                            caption = "Connection failed";
+                        }
+                        MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                response = "";
+            }
+            else if (response.Contains("^done"))
+            {
+                int i = response.IndexOf(processName + " - ");
+                if (i != -1)
+                {
+                    i += processName.Length + 3;
+                    PID = response.Substring(i, response.IndexOf('/', i) - i);
+                }
+            }
+            return PID;
         }
 
 
