@@ -31,8 +31,8 @@ REM     // Copy GDBParser and DebugEngine Files
 REM     **********************************************************************************************
 echo Make Directory "%ProgRoot%\BlackBerry\VSPlugin-NDK"
 md "%ProgRoot%\BlackBerry\VSPlugin-NDK"
-echo Copy "%buildresults%\GDBParser.dll" to "%ProgRoot%\BlackBerry\VSPlugin-NDK\GDBParser.dll"
-copy "%buildresults%\GDBParser.dll" "%ProgRoot%\BlackBerry\VSPlugin-NDK\GDBParser.dll" 
+echo "%buildresults%\GDBParser.dll" to "%ProgRoot%\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\NDK Plugin\GDBParser.dll"
+copy "%buildresults%\GDBParser.dll" "%ProgRoot%\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\NDK Plugin\GDBParser.dll" 
 echo Copy "%buildresults%\GDBWrapper.exe" to "%ProgRoot%\BlackBerry\VSPlugin-NDK\GDBWrapper.exe"
 copy "%buildresults%\GDBWrapper.exe" "%ProgRoot%\BlackBerry\VSPlugin-NDK\GDBWrapper.exe" 
 echo Copy "%buildresults%\Instructions.txt" to "%ProgRoot%\BlackBerry\VSPlugin-NDK\Instructions.txt"
@@ -51,8 +51,6 @@ echo "%buildresults%\VSNDK.Package.dll" to "%ProgRoot%\Microsoft Visual Studio 1
 copy "%buildresults%\VSNDK.Package.dll" "%ProgRoot%\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\NDK Plugin\VSNDK.Package.dll"
 echo "%buildresults%\VSNDK.Package.pkgdef" to "%ProgRoot%\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\NDK Plugin\VSNDK.Package.pkgdef"
 copy "%buildresults%\VSNDK.Package.pkgdef" "%ProgRoot%\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\NDK Plugin\VSNDK.Package.pkgdef" 
-echo "%buildresults%\GDBParser.dll" to "%ProgRoot%\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\NDK Plugin\GDBParser.dll"
-copy "%buildresults%\GDBParser.dll" "%ProgRoot%\Microsoft Visual Studio 11.0\Common7\IDE\Extensions\NDK Plugin\GDBParser.dll" 
 
 REM     //********************************************************************************************
 REM     // Copy MSBuild Files
