@@ -89,6 +89,16 @@ namespace VSNDK.DebugEngine
         /// </summary>
         private EventSinkCollection m_eventSinks = new EventSinkCollection();
 
+        /// <summary>
+        /// Stores the last time that the list of running processes was refreshed. 
+        /// Used to avoid issues in case the user spams the refresh button.
+        /// </summary>
+        private DateTime lastTimeRefresh = DateTime.Now;
+
+        /// <summary>
+        /// Stores the list of running processes in the simulator/device.
+        /// </summary>
+        private IDebugProcess2[] processes = null;
 
         /// <summary>
         /// Constructor.
@@ -135,7 +145,7 @@ namespace VSNDK.DebugEngine
 
             string publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
 
-            string response = GDBParser.GetPIDsThroughGDB(m_IP, m_password, m_isSimulator, m_toolsPath, publicKeyPath, 7);
+            string response = GDBParser.GetPIDsThroughGDB(m_IP, m_password, m_isSimulator, m_toolsPath, publicKeyPath, 12);
 
             if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
             {
@@ -290,15 +300,25 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumProcesses(out IEnumDebugProcesses2 ppEnum)
         {
-            IEnumerable<AD7Process> procList = GetProcesses();
-            IDebugProcess2[] processes = new IDebugProcess2[procList.Count()];
-            int i = 0;
-            foreach (var debugProcess in procList)
+            DateTime now = DateTime.Now;
+
+            TimeSpan diff = now - lastTimeRefresh;
+            double seconds = diff.TotalSeconds;
+
+            if (seconds > 1)
             {
-                processes[i] = debugProcess;
-                i++;
+                IEnumerable<AD7Process> procList = GetProcesses();
+                processes = new IDebugProcess2[procList.Count()];
+                int i = 0;
+                foreach (var debugProcess in procList)
+                {
+                    processes[i] = debugProcess;
+                    i++;
+                }
+                lastTimeRefresh = DateTime.Now;
             }
             ppEnum = new AD7ProcessEnum(processes);
+
             return VSConstants.S_OK;
         }
 
