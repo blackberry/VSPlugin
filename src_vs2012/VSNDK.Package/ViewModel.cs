@@ -92,6 +92,7 @@ namespace RIM.VSNDK_Package
         private string _permission;
         private string _identifier;
         private string _permisionImagePath;
+        private string _description;
 
         public bool IsChecked
         {
@@ -132,11 +133,22 @@ namespace RIM.VSNDK_Package
             }
         }
 
-        public PermissionItemClass(bool isChecked, string permission, string identifier, string permissionImagePath)
+        public string Description
+        {
+            get { return _description; }
+            set 
+            { 
+                _description = value;
+                OnPropertyChanged("Description");
+            }
+        }
+
+        public PermissionItemClass(bool isChecked, string permission, string identifier, string description, string permissionImagePath)
         {
             _isChecked = isChecked;
             _permission = permission;
             _identifier = identifier;
+            _description = description;
             _permisionImagePath = permissionImagePath;
         }
 
@@ -516,48 +528,48 @@ namespace RIM.VSNDK_Package
 
             if (oldListMethod) // Old Listing Method
             {
-                PermissionItemClass permissionItem = new PermissionItemClass(isPermissionChecked("bbm_connect"), "BlackBerry Messenger", "bbm_connect", getPermissionIcon("bbm_connect"));
+                PermissionItemClass permissionItem = new PermissionItemClass(isPermissionChecked("bbm_connect"), "BlackBerry Messenger", "bbm_connect", "Allows this app to connect to the BBM Social Platform to access BBM contact lists and user profiles, invite BBM contacts to download your app, initiate BBM chats and share content from within your app, or stream data between apps in real time.", getPermissionIcon("bbm_connect"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_calendars"), "Calendar", "access_pimdomain_calendars", getPermissionIcon("access_pimdomain_calendars"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_calendars"), "Calendar", "access_pimdomain_calendars", "Allows this app to access the calendar on the device. This access includes viewing, adding, and deleting calendar appointments.", getPermissionIcon("access_pimdomain_calendars"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("use_camera"), "Camera", "use_camera", getPermissionIcon("use_camera"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("use_camera"), "Camera", "use_camera", "Allows this app to take pictures, record video, and use the flash.", getPermissionIcon("use_camera"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_contacts"), "Contacts", "access_pimdomain_contacts", getPermissionIcon("access_pimdomain_contacts"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_contacts"), "Contacts", "access_pimdomain_contacts", "Allows this app to access the contacts stored on the device. This access includes viewing, creating, and deleting the contacts.", getPermissionIcon("access_pimdomain_contacts"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("read_device_identifying_information"), "Device Identifying Information", "read_device_identifying_information", getPermissionIcon("read_device_identifying_information"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("read_device_identifying_information"), "Device Identifying Information", "read_device_identifying_information", "Allows this app to access device identifiers such as serial number and PIN.", getPermissionIcon("read_device_identifying_information"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_messages"), "Email and PIN Message", "access_pimdomain_messages", getPermissionIcon("access_pimdomain_messages"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_messages"), "Email and PIN Message", "access_pimdomain_messages", "Allows this app to access the email and PIN messages stored on the device. This access includes viewing, creating, sending, and deleting the messages.", getPermissionIcon("access_pimdomain_messages"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_internet"), "Internet", "access_internet", getPermissionIcon("access_internet"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_internet"), "Internet", "access_internet", "Allows this app to use Wi-fi, wired, or other connections to a destination that is not local on the user's device.", getPermissionIcon("access_internet"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("read_geolocation"), "GPS Location", "read_geolocation", getPermissionIcon("read_geolocation"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("read_geolocation"), "GPS Location", "read_geolocation", "Allows this app to access the current GPS location of the device.", getPermissionIcon("read_geolocation"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_location_services"), "Location", "access_location_services", getPermissionIcon("access_location_services"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_location_services"), "Location", "access_location_services", "Allows this app to access the device’s current or saved locations.", getPermissionIcon("access_location_services"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("record_audio"), "Microphone", "record_audio", getPermissionIcon("record_audio"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("record_audio"), "Microphone", "record_audio", "Allows this app to record sound using the microphone.", getPermissionIcon("record_audio"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_notebooks"), "Notebooks", "access_pimdomain_notebooks", getPermissionIcon("access_pimdomain_notebooks"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_pimdomain_notebooks"), "Notebooks", "access_pimdomain_notebooks", "Allows this app to access the content stored in the notebooks on the device. This access includes adding and deleting entries and content.", getPermissionIcon("access_pimdomain_notebooks"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("post_notification"), "Post Notifications", "post_notification", getPermissionIcon("post_notification"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("post_notification"), "Post Notifications", "post_notification", "Post a notification to the notifications area of the screen.", getPermissionIcon("post_notification"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("run_when_backgrounded"), "Run When Backgrounded", "run_when_backgrounded", getPermissionIcon("run_when_backgrounded"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("run_when_backgrounded"), "Run When Backgrounded", "run_when_backgrounded", "Allows background processing. Without this permission, the app is stopped when the user switches focus to another app. Apps that use this permission are rigorously reviewed for acceptance to BlackBerry App World storefront for their use of power.", getPermissionIcon("run_when_backgrounded"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_shared"), "Shared Files", "access_shared", getPermissionIcon("access_shared"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_shared"), "Shared Files", "access_shared", "Allows this app to access pictures, music, documents, and other files stored on the user's device, at a remote storage provider, on a media card, or in the cloud.", getPermissionIcon("access_shared"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_sms_mms"), "Text Messages", "access_sms_mms", getPermissionIcon("access_sms_mms"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_sms_mms"), "Text Messages", "access_sms_mms", "Allows this app to access the text messages stored on the device. The access includes viewing, creating, sending, and deleting text messages.", getPermissionIcon("access_sms_mms"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("_sys_use_consumer_push"), "Consumer Push", "_sys_use_consumer_push", getPermissionIcon("_sys_use_consumer_push"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("_sys_use_consumer_push"), "Consumer Push", "_sys_use_consumer_push", "Allows this app to use the Push Service with the BlackBerry Internet Service. This access allows the app to receive and request push messages. To use the Push Service with the BlackBerry Internet Service, you must register with Research In Motion. When you register, you receive a confirmation email message that contains information that your application needs to receive and request push messages. For more information about registering, visit https://developer.blackberry.com/services/push/. If you're using the Push Service with the BlackBerry Enterprise Server or the BlackBerry Device Service, you don't need to register with RIM.", getPermissionIcon("_sys_use_consumer_push"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("narrow_landscape_exit"), "Narrow Swipe Up", "narrow_landscape_exit", getPermissionIcon("narrow_landscape_exit"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("narrow_landscape_exit"), "Narrow Swipe Up", "narrow_landscape_exit", "", getPermissionIcon("narrow_landscape_exit"));
                 PermissionList.Add(permissionItem);
-                permissionItem = new PermissionItemClass(isPermissionChecked("access_phone"), "Phone", "access_phone", getPermissionIcon("access_phone"));
+                permissionItem = new PermissionItemClass(isPermissionChecked("access_phone"), "Phone", "access_phone", "Determine when a user is on a phone call. This access includes access to the phone number assigned to the device and the BlackBerry ID of the user.", getPermissionIcon("access_phone"));
                 PermissionList.Add(permissionItem);
             }
             else
             {
                 foreach (XmlNode p in pList)
                 {
-                    PermissionItemClass permissionItem = new PermissionItemClass(isPermissionChecked(p["id"].InnerText), p["name"].InnerText, p["id"].InnerText, getPermissionIcon(p["id"].InnerText));
+                    PermissionItemClass permissionItem = new PermissionItemClass(isPermissionChecked(p["id"].InnerText), p["name"].InnerText, p["id"].InnerText, p["description"].InnerText, getPermissionIcon(p["id"].InnerText));
                     PermissionList.Add(permissionItem);
                 }
             }
