@@ -965,7 +965,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             else
             {
                 Status = "Complete";
-
+                IsInstalling = false;
                 installed = true;
 
                 if (_isRuntime)
