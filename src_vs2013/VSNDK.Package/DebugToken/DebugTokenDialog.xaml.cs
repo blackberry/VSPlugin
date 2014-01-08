@@ -51,18 +51,8 @@ namespace RIM.VSNDK_Package.DebugToken
             Mouse.OverrideCursor = Cursors.Wait;
             deployTokenData = new DebugTokenData();
 
-         //   DebugTokenData._initializedCorrectly = true;
-
             InitializeComponent();
 
-            //if (debugTokenData._initializedCorrectly == false)
-            //{
-            //    btnAdd.IsEnabled = false;
-            //    btnRefresh.IsEnabled = false;
-            //    IsClosing = true;
-            //    this.Close();
-            //    return;
-            //}
             gridMain.DataContext = deployTokenData;
 
             if (deployTokenData.Error != "")
