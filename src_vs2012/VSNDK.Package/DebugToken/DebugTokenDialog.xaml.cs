@@ -90,14 +90,10 @@ namespace RIM.VSNDK_Package.DebugToken
                     {
                         deployTokenData.Error = "";
                         e.Handled = true;
-                        btnAdd.IsEnabled = false;
-                        btnRefresh.IsEnabled = false;
                     }
-                    else
-                    {
-                        btnAdd.IsEnabled = false;
-                        btnRefresh.IsEnabled = true;
-                    }
+
+                    btnAdd.IsEnabled = !deployTokenData.AlreadyRegistered;
+                    btnRefresh.IsEnabled = deployTokenData.AlreadyRegistered;
                 }
             }
             finally
@@ -125,14 +121,11 @@ namespace RIM.VSNDK_Package.DebugToken
                 {
                     deployTokenData.Error = "";
                     e.Handled = true;
-                    btnAdd.IsEnabled = false;
-                    btnRefresh.IsEnabled = false;
                 }
-                else
-                {
-                    btnAdd.IsEnabled = false;
-                    btnRefresh.IsEnabled = true;
-                }
+                
+                btnAdd.IsEnabled = !deployTokenData.AlreadyRegistered;
+                btnRefresh.IsEnabled = deployTokenData.AlreadyRegistered;
+
             }
 
             isRegistering = false;
