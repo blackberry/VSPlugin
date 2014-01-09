@@ -140,7 +140,7 @@ namespace RIM.VSNDK_Package.Signing.Models
         /// <param name="toZipFile">Path to destination zip file</param>
         public void Backup(string toZipFile)
         {
-            using (Package pkg = Package.Open(CertPath + toZipFile, FileMode.Create))
+            using (Package pkg = Package.Open(toZipFile, FileMode.Create))
             {
                 AddUriToPackage(_p12, pkg);
                 AddUriToPackage(_tokencsk, pkg);
