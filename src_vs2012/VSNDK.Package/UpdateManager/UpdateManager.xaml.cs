@@ -115,14 +115,16 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    if (((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).IsInstalled == 2)
+
+                    List<APITargetClass> apiList = APITargetListSingleton.Instance._tempAPITargetList.FindAll(i => i.IsInstalled > 0);
+                    if (apiList.Count <= 1)
                     {
-                        MessageBox.Show("The API Level that you are currently trying to uninstall was not added via the Update Manager.  Please remove via the Windows Add/Remove programs utility.", "Update Manager", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                        MessageBox.Show("The BlackBerry Plug-in for Microsoft Visual Studio requires at least one API Target to function correctly.  Removal of the last API Target is prohibited.", "Update Manager", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
                     }
                     else
                     {
                         this.Simulators.IsEnabled = false;
-                        data.UninstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false);
+                        data.UninstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).LatestVersion, false);
                     }
                 }
             }
