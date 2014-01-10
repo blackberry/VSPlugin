@@ -14,7 +14,7 @@
             <ItemsControl Name="APILevel" ItemsSource="{Binding APITargets}" BorderThickness="0" Margin="50,0,10,0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <RadioButton GroupName="API" IsChecked="{Binding IsDefault}" >
+                        <RadioButton GroupName="API" Visibility="{Binding Path=AvailableVisibility}" IsChecked="{Binding Path=IsDefault}">
                             <TextBlock Text="{Binding TargetName}" />
                         </RadioButton>
                     </DataTemplate>

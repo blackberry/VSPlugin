@@ -101,6 +101,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             Simulators2 = new CollectionView(SimulatorListSingleton.Instance._simulatorList.FindAll(i => i.APILevel.Contains(apiLevel)));
         }
 
+
         /// <summary>
         /// Refresh all the lists
         /// </summary>
@@ -108,10 +109,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             InstalledAPIListSingleton.Instance.RefreshData();
             installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
-            //InstalledNDKListSingleton.Instance.RefreshData();
-            //installedNDKList = InstalledNDKListSingleton.Instance._installedNDKList;
-            //APITargetListSingleton.Instance.RefreshData();
-            //APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
+            APITargetListSingleton.Instance.RefreshData();
+            APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
         }
 
         /// <summary>

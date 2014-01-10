@@ -71,12 +71,14 @@ namespace RIM.VSNDK_Package
         public string TargetVersion { get; set; }
         public string LatestVersion { get; set; }
         public int IsInstalled { get; set; }
+        public bool IsAPIDefault { get; set; }
         public bool IsUpdate { get; set; }
+
 
         public string IsDefault
         {
             get { return TargetVersion == DefaultVersion ? "True" : "False"; }
-            set 
+            set
             {
                 if (value == "True")
                     DefaultVersion = TargetVersion;
@@ -92,7 +94,7 @@ namespace RIM.VSNDK_Package
 
         public string AvailableVisibility
         {
-            get { return IsInstalled == 0 ? "visible" : "collapsed"; }
+            get { return ((IsAPIDefault) && (IsInstalled == 0)) ? "visible" : "collapsed"; }
         }
 
         public string UpdateVisibility
@@ -350,7 +352,8 @@ namespace RIM.VSNDK_Package
 
         private APITargetListSingleton()
         {
-            GetAvailableAPIList(); 
+            GetAvailableAPIList();
+            GetDefaultAPIList();
         }
 
 
@@ -360,7 +363,84 @@ namespace RIM.VSNDK_Package
         public void RefreshData()
         {
             _instance.GetAvailableAPIList();
+            _instance.GetDefaultAPIList();
         }
+
+        /// <summary>
+        /// Retrieve list of API's from 
+        /// </summary>
+        /// <returns></returns>
+        private void GetDefaultAPIList()
+        {
+            if (GlobalFunctions.isOnline())
+            {
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                startInfo.UseShellExecute = false;
+                startInfo.CreateNoWindow = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.RedirectStandardOutput = true;
+                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
+                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDefaultsDataReceived);
+
+
+                /// Get Device PIN
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = string.Format(@"/C " + GlobalFunctions.bbndkPathConst + @"\eclipsec --list");
+
+                try
+                {
+                    p.Start();
+                    p.BeginErrorReadLine();
+                    p.BeginOutputReadLine();
+                    p.WaitForExit();
+                    p.Close();
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// On Data Received event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void APIListDefaultsDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            string version = "";
+            string name = "";
+
+            if (e.Data != null)
+            {
+                if ((e.Data.ToLower().Contains("error")) || (_error != ""))
+                {
+                    _error = _error + e.Data;
+                }
+                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")) || (e.Data.Contains("Beta")))
+                {
+                    // Do Nothing
+                }
+                else
+                {
+                    version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
+                    name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
+
+                    APITargetClass api = _tempAPITargetList.Find(i => i.TargetVersion == version);
+
+                    if (api != null)
+                    {
+                        api.IsAPIDefault = true;
+                        api.TargetName = name;
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// Retrieve list of API's from 
@@ -382,7 +462,7 @@ namespace RIM.VSNDK_Package
 
                 /// Get Device PIN
                 startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = string.Format(@"/C " + GlobalFunctions.bbndkPathConst + @"\eclipsec --list");
+                startInfo.Arguments = string.Format(@"/C " + GlobalFunctions.bbndkPathConst + @"\eclipsec --list-all");
 
                 try
                 {
@@ -429,6 +509,7 @@ namespace RIM.VSNDK_Package
                 {
                     version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
                     name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
+                    name = name.Replace("(EXTERNAL_NDK)", "");
                     description = "Device Support Unknown.";
                     
 
