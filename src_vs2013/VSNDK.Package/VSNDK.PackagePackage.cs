@@ -1167,6 +1167,7 @@ namespace RIM.VSNDK_Package
             nvc.Add("isSimulator", _isSimulator.ToString());
             nvc.Add("ToolsPath", toolsPath);
             nvc.Add("PublicKeyPath", publicKeyPath);
+            nvc.Add("Password", password);
 
             info.bstrArg = NameValueCollectionHelper.DumpToString(nvc);
 
