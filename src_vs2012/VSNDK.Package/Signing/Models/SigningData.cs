@@ -173,6 +173,11 @@ namespace RIM.VSNDK_Package.Signing.Models
         public bool Register(string authorID, string password)
         {
             bool success = false;
+            if (authorID.Trim().ToUpper().Contains("BLACKBERRY"))
+            {
+                _errors += "BlackBerry is a reserved word and cannot be used in \"author name\".\n";
+                return false;
+            }
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
             startInfo.UseShellExecute = false;
