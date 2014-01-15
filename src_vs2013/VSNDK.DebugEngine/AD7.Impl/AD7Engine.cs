@@ -873,6 +873,8 @@ namespace VSNDK.DebugEngine
                         else
                             this.m_threads[i]._filename = listThreads[i]._filename;
                     }
+                    this.m_threads[i].__stackFrames = listThreads[i].__stackFrames;
+                    this.m_threads[i]._suspendCount = listThreads[i]._suspendCount;
                 } 
 
                 ppEnum = new AD7ThreadEnum(this.m_threads);

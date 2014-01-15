@@ -1219,7 +1219,7 @@ namespace RIM.VSNDK_Package
             }
             else
             {
-                MessageBox.Show("Failed to debug the application. This can happen when the Verbosity is set to Quiet.\n\nPlease, close the app in case it was launched in the device/simulator.", "Failed to launch debugger", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Failed to debug the application.\n\nPlease, close the app in case it was launched in the device/simulator.", "Failed to launch debugger", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

@@ -1374,7 +1374,14 @@ namespace VSNDK.DebugEngine
                             m_threadId = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                             ini = end + 1;
-                            m_processId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                            try
+                            {
+                                m_processId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                            }
+                            catch
+                            {
+                                m_processId = 0;
+                            }
 
                             m_eventDispatcher.engine._updateThreads = true;
 
@@ -1885,6 +1892,8 @@ namespace VSNDK.DebugEngine
                 case '0':  // Display the m_console message in the VS output window. Example: 80,\"\"[New pid 15380494 tid 2]\\n\"\"!80
                     ini = 4;
                     end = ev.IndexOf("\"!80", 4);
+                    if (end == -1)
+                        end = ev.Length;
                     m_console = ev.Substring(ini, (end - ini));
 
                 // TODO: Call the method/event that will output this message in the VS output window.
@@ -1893,6 +1902,8 @@ namespace VSNDK.DebugEngine
                 case '1':  // Display the m_stdOut message in the VS standard output window. Instruction should look like this: 81,\"\" ... "\"!81
                     ini = 4;
                     end = ev.IndexOf("\"!81", 4);
+                    if (end == -1)
+                        end = ev.Length;
                     m_stdOut = ev.Substring(ini, (end - ini));
 
                 // TODO: Call the method/event that will output this message in the VS standar output window.
