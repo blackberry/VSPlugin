@@ -354,6 +354,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             bool retVal = false;
             string baseVersion = "10.2.0.0";
+            string currentAPIVersion = getCurrentAPIVersion();
             DebugTokenData dtokenData;
 
             if (!isSim)
@@ -371,16 +372,42 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             getDeviceSimInfo(isSim);
 
             if (getDeviceInfo())
-            { //** Device Info retrieved - validate API's 
-                if (getCurrentAPIVersion() != _deviceosversion)
-                { //** Currently selected API version is different from attached device OS version.  
-                    if (IsAPIInstalled(_deviceosversion, "") > 0)
+            {
+                if (currentAPIVersion.Substring(0,4) == "10.2")
+                {
+                    if (_deviceosversion != currentAPIVersion)
                     {
-                        retVal = true;
+                        if (IsRuntimeInstalled(_deviceosversion))
+                        {
+                            retVal = true;
+                        }
+                        else
+                        {
+                            UpdateManagerDialog umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
+                            if (umd.ShowDialog() == true)
+                            {
+                                retVal = true;
+                            }
+                            else
+                            {
+                                retVal = false;
+                            }
+                        }
                     }
                     else
                     {
-                        if (baseVersion.CompareTo(_deviceosversion) > 0)
+                        retVal = true;
+                    }
+                }
+                else
+                {
+                    if (_deviceosversion.Substring(0, 4) != "10.2")
+                    {
+                        if (IsAPIInstalled(_deviceosversion, "") > 0)
+                        {
+                            retVal = true;
+                        }
+                        else
                         {
                             UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", _deviceosversion, false, false);
 
@@ -393,81 +420,13 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                                 retVal = false;
                             }
                         }
-                        else
-                        {
-                            if (IsRuntimeInstalled(_deviceosversion))
-                            {
-                                retVal = true;
-                            }
-                            else
-                            {
-                                if (IsAPIInstalled(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')), "") == 0)
-                                {
-                                    string apiLevel = GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')));
-
-                                    if (apiLevel != "")
-                                    {
-                                        if (IsAPIInstalled(apiLevel, "") > 0)
-                                        {   // If the returned API level to be installed is different from the _deviceosversion,
-                                            // it could be already installed.
-                                            UpdateManagerDialog umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
-                                            if (umd.ShowDialog() == true)
-                                            {
-                                                retVal = true;
-                                            }
-                                            else
-                                            {
-                                                retVal = false;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", apiLevel, false, false);
-                                            if (umd.ShowDialog() == true)
-                                            {
-                                                umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
-                                                if (umd.ShowDialog() == true)
-                                                {
-                                                    retVal = true;
-                                                }
-                                                else
-                                                {
-                                                    retVal = false;
-                                                }
-                                            }
-                                            else
-                                            {
-                                                retVal = false;
-                                            }
-                                        }
-                                    }
-                                    else
-                                        MessageBox.Show("API level not supported at this moment.\n\nAborting...", "API level not supported", MessageBoxButton.OK, MessageBoxImage.Error);
-                                }
-                                else
-                                {
-                                    UpdateManagerDialog umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
-                                    if (umd.ShowDialog() == true)
-                                    {
-                                        retVal = true;
-                                    }
-                                    else
-                                    {
-                                        retVal = false;
-                                    }
-                                }
-                            }
-                        }
+                    }
+                    else
+                    {
+                        retVal = true;
                     }
                 }
-                else
-                {
-                    retVal = true;
-                }
-            }
-            else
-            {
-                retVal = false;
+                retVal = true;
             }
 
             return retVal;

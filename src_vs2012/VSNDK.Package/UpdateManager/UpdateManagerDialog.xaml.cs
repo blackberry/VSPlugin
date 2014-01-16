@@ -71,6 +71,15 @@ namespace RIM.VSNDK_Package.UpdateManager
 
             InitializeComponent();
 
+            if (version != "default")
+            {
+                APILevel.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                APILevel.Visibility = System.Windows.Visibility.Visible;
+            }
+
             data = new UpdateManagerData();
             gridMain.DataContext = data;  
 
