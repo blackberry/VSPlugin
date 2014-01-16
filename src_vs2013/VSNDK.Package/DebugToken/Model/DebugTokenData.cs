@@ -39,7 +39,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
         private static string _deviceIP;
         private static string _devicePassword;
-        private static string _errors;
+        private static string _errors = "";
         private static string _devicePin = "Not Attached";
         private static string _companyName = "";
         private static string _authorID = "";
@@ -266,12 +266,10 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                 _authorID = "";
                 _companyName = "";
                 _tmpTokenAuthor = "";
-                if (_errors == null)
-                    _errors = "";
 
                 if ((DeviceIP == "") || (DeviceIP == null))
                 {
-                    MessageBox.Show("Missing Device IP", "Missing Device IP", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    this.Error = "You have a missing or incorrect Device IP.  Please check BlackBerry - Settings.";   
                     rkPluginRegKey.Close();
                     rkHKCU.Close();
                     _initializedCorrectly = false;

@@ -57,7 +57,7 @@ namespace RIM.VSNDK_Package.DebugToken
 
             if (deployTokenData.Error != "")
             {
-                MessageBox.Show(deployTokenData.Error, PkgResources.Errors);
+                MessageBox.Show(deployTokenData.Error, "Debug Tokens", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
                 deployTokenData.Error = "";
 
                 IsClosing = true;
