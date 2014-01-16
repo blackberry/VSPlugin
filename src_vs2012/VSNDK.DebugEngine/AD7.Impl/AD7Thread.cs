@@ -60,7 +60,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// The suspend count determines how many times the IDebugThread2::Suspend method has been called so far.
         /// </summary>
-        private uint _suspendCount;
+        public uint _suspendCount;
 
         /// <summary>
         /// Full long path file name.
@@ -310,11 +310,6 @@ namespace VSNDK.DebugEngine
                             frameInfo[3] = longPathName.ToString();
                         }
                         AD7StackFrame frame = AD7StackFrame.create(_engine, this, frameInfo, ref created);
-                        if (frame.m_thread.__stackFrames == null) // that's weird, but sometimes VS is not initializing __stackFrames, so I added this loop to avoid other problems.
-                        {
-                            while (frame.m_thread.__stackFrames == null)
-                                frame.m_thread.__stackFrames = new ArrayList() { frame };
-                        }
                         frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
                     }
                 }

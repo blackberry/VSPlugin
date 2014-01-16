@@ -127,7 +127,12 @@ char path_log[_MAX_PATH];
 
 
 /// <summary> 
-/// Generic function to print to a log file. 
+/// Used to store the path to the parsed GDB responses output log, generated when the sendingCommands2GDB thread is started and needed in parsedLogPrint(). 
+/// </summary>
+char parse_log[_MAX_PATH];
+
+
+/// <summary> /// Generic function to print to a log file. 
 /// </summary>
 /// <param name="buffer"> Message to be printed to a log file. </param>
 void GDBConsole::logPrint(char* buffer) {	
@@ -1542,8 +1547,17 @@ void parseGDB(string response, string parsingInstruction, int seqStamp)
 {
 	char variables[10][128];
 	char result[ParsedMessageSize] = "";
+	string parsed = "";
 
-	strcpy(result, parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1).c_str());
+	char print[16384] = "";
+	strcpy(print, ("GDB - " + response).c_str());
+	parsedLogPrint(print);
+	
+	parsed = parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1);
+	strcpy(result, parsed.c_str());
+	
+	strcpy(print, ("Parsed - " + parsed).c_str());
+	parsedLogPrint(print);
 
 	if (strcmp(result,"") == 0)
 	{
@@ -1574,8 +1588,17 @@ unsigned __stdcall parseGDBResponseThread(void *arg)
 
 	char result[ParsedMessageSize] = "";
 	char variables[10][128];
+	string parsed = "";
 
-	strcpy(result, parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1).c_str());
+	char print[4096] = "";
+	strcpy(print, ("GDB - " + response).c_str());
+	parsedLogPrint(print);
+	
+	parsed = parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1);
+	strcpy(result, parsed.c_str());
+	
+	strcpy(print, ("Parsed - " + parsed).c_str());
+	parsedLogPrint(print);
 
 	if (strcmp(result,"") == 0)
 	{
@@ -1589,6 +1612,28 @@ unsigned __stdcall parseGDBResponseThread(void *arg)
 	return 0;
 }
 
+/// <summary> 
+/// Generic function to print the GDB response and the parsed one to a log file. 
+/// </summary>
+/// <param name="buffer"> Message to be printed to a log file. </param>
+void parsedLogPrint(char* buffer) {
+	if (LOG_GDB_RAW_IO) {
+		time_t tt = time(NULL);
+		struct tm tm;
+		char buf[32];
+		
+		tm = *localtime(&tt);
+		
+		strftime(buf, 31, "%H:%M:%S", &tm);
+		
+		FILE* file = fopen((char *)parse_log, "a");
+		if (buffer[0] == 'P')
+			fprintf(file, "%s - %s\n\n", buf, buffer);
+		else
+			fprintf(file, "%s - %s", buf, buffer);
+		fclose(file);
+	}
+}
 
 /// <summary> 
 /// Thread responsible for listening for GDB outputs. Thread sendingCommands2GDB start this one, that stays alive till the 
@@ -1835,6 +1880,15 @@ unsigned __stdcall sendingCommands2GDB(void *arg)
 {
 	GDBConsole *console = (GDBConsole *)arg;
 	
+	String^ tempPath = Environment::GetEnvironmentVariable("APPDATA");
+	tempPath += "\\BlackBerry\\parsedGDBResponse-output.log";
+	pin_ptr<const wchar_t> path_buffer = PtrToStringChars(tempPath);
+	
+	int ret = wcstombs(parse_log, path_buffer, _MAX_PATH);
+	
+	FILE* file = fopen(parse_log, "w"); // Delete a possible existing file.
+	fclose(file);
+
 	// Initializing listeningGDB thread data.
 	HANDLE listeningThread;
 	unsigned threadID;
@@ -1876,6 +1930,7 @@ unsigned __stdcall sendingCommands2GDB(void *arg)
 		string param = "";
 		bool sync = false;
 		int previousSeqId;
+		char print[256] = "Command - ";
 
 		removeFromInputBuffer(inputCommandSend);
 		while (strcmp(inputCommandSend,"") == 0)
@@ -1947,6 +2002,9 @@ unsigned __stdcall sendingCommands2GDB(void *arg)
 
 		console->sendCommand(commandSend);
 
+		strcat(print, commandSend);
+		parsedLogPrint(print);
+		
 		if ((strcmp(inputCommandSend, "-exec-continue") == 0) || (strcmp(inputCommandSend, "-exec-continue --thread 1") == 0))
 		{
 			while (!isGDBBufferEmpty())

@@ -700,10 +700,7 @@ namespace VSNDK.DebugEngine
                 thread.__stackFrames = new ArrayList();
 
             AD7StackFrame newFrame = new AD7StackFrame(engine, thread, frameInfo);
-            if (thread.__stackFrames == null) // that's weird, but sometimes VS is not initializing __stackFrames, so I added this loop to avoid other problems.
-                thread.__stackFrames = new ArrayList() { newFrame };
-            else
-                thread.__stackFrames.Add(newFrame);
+            thread.__stackFrames.Add(newFrame);
             created = true;
             return newFrame;
         }
@@ -885,18 +882,19 @@ namespace VSNDK.DebugEngine
                 }
                 else
                 {
-                    frameInfo.m_bstrFuncName = "[External Code]";
                     // No source information, so only return the module name and the instruction pointer.
-                    /*
                     if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_MODULE) != 0)
                     {
-                        frameInfo.m_bstrFuncName = EngineUtils.GetAddressDescription(module, ip);
+                        if ((this.m_functionName != "") && (this.m_functionName != "??"))
+                            frameInfo.m_bstrFuncName = this.m_functionName;
+                        else
+                            frameInfo.m_bstrFuncName = "[External Code]";
                     }
                     else
                     {
-                        frameInfo.m_bstrFuncName = EngineUtils.GetAddressDescription(null, ip);
+                        frameInfo.m_bstrFuncName = "[External Code]";
                     }
-                    */
+                    
                 }
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_FUNCNAME;
             }
@@ -1240,19 +1238,22 @@ namespace VSNDK.DebugEngine
 
             try
             {
-                if (m_hasSource)
-                {
-                    // Assume all lines begin and end at the beginning of the line.
-                    TEXT_POSITION begTp = new TEXT_POSITION();
-                    begTp.dwColumn = 0;
+                // Assume all lines begin and end at the beginning of the line.
+                TEXT_POSITION begTp = new TEXT_POSITION();
+                begTp.dwColumn = 0;
+                if (m_lineNum != 0)
                     begTp.dwLine = m_lineNum - 1;
-                    TEXT_POSITION endTp = new TEXT_POSITION();
-                    endTp.dwColumn = 0;
+                else
+                    begTp.dwLine = 0;
+                TEXT_POSITION endTp = new TEXT_POSITION();
+                endTp.dwColumn = 0;
+                if (m_lineNum != 0)
                     endTp.dwLine = m_lineNum - 1;
+                else
+                    endTp.dwLine = 0;
 
-                    docContext = new AD7DocumentContext(m_documentName, begTp, endTp, null);
-                    return VSConstants.S_OK;
-                }
+                docContext = new AD7DocumentContext(m_documentName, begTp, endTp, null);
+                return VSConstants.S_OK;
             }
             catch (Exception e)
             {
