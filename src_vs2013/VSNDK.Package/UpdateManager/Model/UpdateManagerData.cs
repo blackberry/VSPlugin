@@ -228,6 +228,27 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <returns>true if successful</returns>
         public bool UninstallAPI(string version, bool isSimulator)
         {
+            if (isSimulator)
+            {
+                string name = @"C:\bbndk_vs\simulator_" + version.Replace('.', '_');
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process");
+                ManagementObjectCollection collection = searcher.Get();
+                foreach (ManagementObject item in collection)
+                {
+                    try
+                    {
+                        if (item["CommandLine"].ToString().Contains(name))
+                        {
+                            MessageBox.Show("The selected simulator is being used.\n\nPlease, close the simulator and try again.", "Cannot uninstall the simulator", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            return false;
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+
             bool success = false;
             _error = "";
             _isSimulator = isSimulator;
