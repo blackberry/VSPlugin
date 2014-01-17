@@ -205,6 +205,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// </summary>
         public DebugTokenData()
         {
+            _initializedCorrectly = true;
             refreshScreen();
         }
 

@@ -1637,7 +1637,7 @@ namespace RIM.VSNDK_Package
             // Create the dialog instance without Help support.
             var DebugTokenDialog = new DebugToken.DebugTokenDialog();
             // Show the dialog.
-            if (!DebugTokenDialog.IsClosing)
+            if ((!DebugTokenDialog.IsClosing) && (VSNDK_Package.DebugToken.Model.DebugTokenData._initializedCorrectly))
                 DebugTokenDialog.ShowDialog();
         }
 
