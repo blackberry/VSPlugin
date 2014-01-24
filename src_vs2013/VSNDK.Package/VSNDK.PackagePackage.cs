@@ -899,6 +899,7 @@ namespace RIM.VSNDK_Package
         private bool _isSimulator;
         private BuildEvents _buildEvents;
         private List<string[]> _targetDir = null;
+        private List<String> buildThese = null;
         private bool _hitPlay = false;
         private int _amountOfProjects = 0;
         private string _error = "";
@@ -1087,62 +1088,31 @@ namespace RIM.VSNDK_Package
             bool success = true;
             try
             {
-                Microsoft.Win32.RegistryKey key;
-                key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("VSNDK");
-                key.SetValue("Run", "True");
-                key.Close();
-
-                _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
-
-                try
+                if (buildThese.Count != 0)
                 {
-                    Solution2 soln = (Solution2)_dte.Solution;
-                    List<String> buildThese = new List<String>();
-                    _targetDir = new List<string[]>();
+                    Microsoft.Win32.RegistryKey key;
+                    key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("VSNDK");
+                    key.SetValue("Run", "True");
+                    key.Close();
 
-                    foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
+                    _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+
+                    try
                     {
-                        foreach (Project p1 in soln.Projects)
-                        {
-                            if (p1.UniqueName == startupProject)
-                            {
-                                buildThese.Add(p1.FullName);
-                                processName = p1.Name;
-
-                                ConfigurationManager config = p1.ConfigurationManager;
-                                Configuration active = config.ActiveConfiguration;
-
-                                foreach (Property prop in active.Properties)
-                                {
-                                    try
-                                    {
-                                        if (prop.Name == "OutputPath")
-                                        {
-                                            string[] path = new string[2];
-                                            path[0] = p1.Name;
-                                            path[1] = prop.Value.ToString();
-                                            _targetDir.Add(path);
-                                            break;
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                }
-
-                                break;
-                            }
-                        }
+                        Solution2 soln = (Solution2)_dte.Solution;
+                        _hitPlay = true;
+                        _amountOfProjects = buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
+                        foreach (string projectName in buildThese)
+                            soln.SolutionBuild.BuildProject("Debug", projectName, false);
                     }
-
-                    _hitPlay = true;
-                    _amountOfProjects = buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
-                    foreach (string projectName in buildThese)
-                        soln.SolutionBuild.BuildProject("Debug", projectName, false);
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                        success = false;
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    Debug.WriteLine(ex.Message);
                     success = false;
                 }
             }
@@ -1342,6 +1312,41 @@ namespace RIM.VSNDK_Package
 
             pidString = getPIDfromGDB(processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
 
+            if (pidString == "")
+            {
+                // Select all of the text
+                _owP.TextDocument.Selection.SelectAll();
+                string outputText = _owP.TextDocument.Selection.Text;
+
+                // Check for successful deployment
+                if (System.Text.RegularExpressions.Regex.IsMatch(outputText, "Info: done"))
+                {
+                    string pattern = @"\s+result::(\d+)\r\n.+|\s+result::(\d+) \(TaskId:";
+                    Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
+
+                    // Match the regular expression pattern against a text string.
+                    Match m = r.Match(outputText);
+
+                    // Take first match
+                    if (m.Success)
+                    {
+                        Group g = m.Groups[1];
+                        CaptureCollection cc = g.Captures;
+                        if (cc.Count == 0)
+                        {   // Diagnostic verbosity mode
+                            g = m.Groups[2];
+                            cc = g.Captures;
+                        }
+
+                        if (cc.Count != 0)
+                        {
+                            Capture c = cc[0];
+                            pidString = c.ToString();
+                        }
+                    }
+                }
+            }
+
             if (pidString != "")
             {
 
@@ -1521,6 +1526,53 @@ namespace RIM.VSNDK_Package
             }
             else
             {
+                try
+                {
+                    Solution2 soln = (Solution2)_dte.Solution;
+                    buildThese = new List<String>();
+                    _targetDir = new List<string[]>();
+
+                    foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
+                    {
+                        foreach (Project p1 in soln.Projects)
+                        {
+                            if (p1.UniqueName == startupProject)
+                            {
+                                buildThese.Add(p1.FullName);
+                                processName = p1.Name;
+
+                                ConfigurationManager config = p1.ConfigurationManager;
+                                Configuration active = config.ActiveConfiguration;
+
+                                foreach (Property prop in active.Properties)
+                                {
+                                    try
+                                    {
+                                        if (prop.Name == "OutputPath")
+                                        {
+                                            string[] path = new string[2];
+                                            path[0] = p1.Name;
+                                            path[1] = prop.Value.ToString();
+                                            _targetDir.Add(path);
+                                            break;
+                                        }
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+
+                
                 // Create a reference to the Output window.
                 // Create a tool window reference for the Output window
                 // and window pane.
@@ -1533,7 +1585,11 @@ namespace RIM.VSNDK_Package
 
                 if (isDebugConfiguration)
                 {
-                    UpdateManagerData upData = new UpdateManagerData();
+                    UpdateManagerData upData;
+                    if (_targetDir.Count > 0)
+                        upData = new UpdateManagerData(_targetDir[0][1]);
+                    else
+                        upData = new UpdateManagerData();
 
                     if (!upData.validateDeviceVersion(_isSimulator))
                     {
@@ -1637,7 +1693,7 @@ namespace RIM.VSNDK_Package
             // Create the dialog instance without Help support.
             var DebugTokenDialog = new DebugToken.DebugTokenDialog();
             // Show the dialog.
-            if (!DebugTokenDialog.IsClosing)
+            if ((!DebugTokenDialog.IsClosing) && (VSNDK_Package.DebugToken.Model.DebugTokenData._initializedCorrectly))
                 DebugTokenDialog.ShowDialog();
         }
 
