@@ -232,8 +232,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             foreach (int pid in installProcessID)
             {
-                var p = System.Diagnostics.Process.GetProcessById(pid);
-                p.Kill();
+                try
+                {
+                    var p = System.Diagnostics.Process.GetProcessById(pid);
+                    p.Kill();
+                }
+                catch
+                {
+
+                }
             }
         }
 
