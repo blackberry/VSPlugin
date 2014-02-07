@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
         xmlns:pa="clr-namespace:RIM.VSNDK_Package.UpdateManager.Model"                 
-        Title="Simulators" Height="483" Width="613" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Topmost="True" Closing="Window_Closing">
+        Title="Simulators" Height="483" Width="613" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Closing="Window_Closing">
 
     <Grid Name="gridMain" Height="437">
         <GroupBox Header="Installed" Height="165" HorizontalAlignment="Left" Margin="12,12,0,0" Name="groupBox1" VerticalAlignment="Top" Width="574">
