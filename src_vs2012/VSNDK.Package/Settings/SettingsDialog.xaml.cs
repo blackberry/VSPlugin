@@ -91,11 +91,15 @@ namespace RIM.VSNDK_Package.Settings
             this.Cursor = System.Windows.Input.Cursors.Wait;
 
             UpdateManager.UpdateManager updateManager = UpdateManager.UpdateManager.create();
-            updateManager.ShowDialog();
 
-            _data.RefreshScreen();
-            NDKEntry.ItemsSource = null;
-            NDKEntry.ItemsSource = _data.NDKEntries;
+            if (updateManager != null)
+            {
+                updateManager.ShowDialog();
+
+                _data.RefreshScreen();
+                NDKEntry.ItemsSource = null;
+                NDKEntry.ItemsSource = _data.NDKEntries;
+            }
 
             this.Cursor = System.Windows.Input.Cursors.Hand;
 

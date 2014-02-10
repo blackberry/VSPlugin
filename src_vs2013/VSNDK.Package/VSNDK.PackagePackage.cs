@@ -395,6 +395,19 @@ namespace RIM.VSNDK_Package
                     p.BeginOutputReadLine();
                     p.WaitForExit();
                     p.Close();
+                    if (_error != "")
+                    {
+                        if (!GlobalFunctions.isOnline())
+                        {
+                            MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        else
+                        {
+                            MessageBox.Show(_error, "Get default API list failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        _error = "";
+                        _tempAPITargetList = null;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -473,6 +486,19 @@ namespace RIM.VSNDK_Package
                     p.BeginOutputReadLine();
                     p.WaitForExit();
                     p.Close();
+                    if (_error != "")
+                    {
+                        if (!GlobalFunctions.isOnline())
+                        {
+                            MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        else
+                        {
+                            MessageBox.Show(_error, "Get available API list failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        _error = "";
+                        _tempAPITargetList = null;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -591,8 +617,8 @@ namespace RIM.VSNDK_Package
             if (e.Data != null)
             {
                 System.Diagnostics.Debug.WriteLine(e.Data);
-
-                MessageBox.Show(e.Data);
+                _error += e.Data + "\n";
+//                MessageBox.Show(e.Data);
             }
         }
 
@@ -685,6 +711,19 @@ namespace RIM.VSNDK_Package
                     p.BeginOutputReadLine();
                     p.WaitForExit();
                     p.Close();
+                    if (_error != "")
+                    {
+                        if (!GlobalFunctions.isOnline())
+                        {
+                            MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        else
+                        {
+                            MessageBox.Show(_error, "Get simulator list failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        _error = "";
+                        _simulatorList = null;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -704,8 +743,8 @@ namespace RIM.VSNDK_Package
             if (e.Data != null)
             {
                 System.Diagnostics.Debug.WriteLine(e.Data);
-
-                MessageBox.Show(e.Data);
+                _error += e.Data + "\n";
+//                MessageBox.Show(e.Data);
             }
         }
 
