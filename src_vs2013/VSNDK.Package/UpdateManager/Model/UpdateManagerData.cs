@@ -89,8 +89,24 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
             installedNDKList = InstalledNDKListSingleton.Instance._installedNDKList;
-            APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
-            Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
+
+            if (APITargetListSingleton.Instance._tempAPITargetList == null)
+            {
+                APITargetListSingleton.Instance.RefreshData();
+            }
+            if (APITargetListSingleton.Instance._tempAPITargetList != null)
+            {
+                APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
+
+                if (SimulatorListSingleton.Instance._simulatorList == null)
+                {
+                    SimulatorListSingleton.Instance.RefreshData();
+                }
+                if (SimulatorListSingleton.Instance._simulatorList != null)
+                {
+                    Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
+                }
+            }
         }
 
         /// <summary>
@@ -102,9 +118,24 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
             installedNDKList = InstalledNDKListSingleton.Instance._installedNDKList;
-            APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
-            Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
 
+            if (APITargetListSingleton.Instance._tempAPITargetList == null)
+            {
+                APITargetListSingleton.Instance.RefreshData();
+            }
+            if (APITargetListSingleton.Instance._tempAPITargetList != null)
+            {
+                APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
+
+                if (SimulatorListSingleton.Instance._simulatorList == null)
+                {
+                    SimulatorListSingleton.Instance.RefreshData();
+                }
+                if (SimulatorListSingleton.Instance._simulatorList != null)
+                {
+                    Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
+                }
+            }
             _outputPath = outputPath;
         }
 
@@ -161,7 +192,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             }
             
 
-            Status = "Installing API Level";
+            Status = "Installing...";
 
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
@@ -253,7 +284,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             if (isSimulator)
             {
-                string name = @"C:\bbndk_vs\simulator_" + version.Replace('.', '_');
+                string name = bbndkPathConst + @"\simulator_" + version.Replace('.', '_');
                 ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process");
                 ManagementObjectCollection collection = searcher.Get();
                 foreach (ManagementObject item in collection)
@@ -496,7 +527,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                 return "";
             }
 
-            int pos = makefile.IndexOf(@"C:/bbndk_vs/target_");
+            int pos = makefile.IndexOf(bbndkPathConst.Replace('\\','/') + @"/target_");
             if (pos == -1)
                 return "";
             pos += 19;
@@ -1042,9 +1073,28 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             isConfiguring = false;
 
-            if (_error != "")
+            if (_errors != "")
             {
                 Status = "Error";
+                IsInstalling = false;
+                installed = true;
+
+                if (!GlobalFunctions.isOnline())
+                {
+                    MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                }
+                else
+                {
+                    MessageBox.Show(_errors, "Update Manager", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                }
+
+                RefreshScreen();
+            }
+            else if (_error != "")
+            {
+                Status = "Error";
+                IsInstalling = false;
+                installed = true;
 
                 MessageBox.Show(_error, "Update Manager", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
 
