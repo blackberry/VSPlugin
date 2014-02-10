@@ -266,7 +266,6 @@ namespace RIM.VSNDK_Package.Import.Model
                 AddSummaryString("Added BlackBerry Configuration");
                 cfgs = mgr.AddPlatform(BLACKBERRYSIMULATOR, "Win32", true);
                 AddSummaryString("Added BlackBerry Simulator Configuration");
-                mgr.DeletePlatform("Win32");
             }
             catch (Exception e)
             {
