@@ -1,5 +1,5 @@
 #BlackBerry Native Plug-in for Microsoft Visual Studio
-The BlackBerry Native Plug-in for Microsoft Visual Studio integrates with your Microsoft Visual Studio development environment. You can use the BlackBerry Native Plug-in for Microsoft Visual Studio to develop C and C++ applications that target the BlackBerry 10 OS and the BlackBerry PlayBook OS.
+The BlackBerry Native Plug-in for Microsoft Visual Studio integrates with your Microsoft Visual Studio development environment. You can use the BlackBerry Native Plug-in for Microsoft Visual Studio to develop C and C++ applications that target the BlackBerry 10 OS.
 
 ##License
 All assets in this repository, unless otherwise stated through sub-directory LICENSE or NOTICE files, are subject to the Apache Software License v.2.0.
@@ -29,9 +29,9 @@ The BlackBerry Native Plug-in for Microsoft Visual Studio project currently cont
 4. If you made changes to code which you own, send a message via github messages to one of the Committers listed below to have your code merged.
 
 ## Code Guidelines
-1. All functions should be prefaced by a standard Microsoft Visual Studio comment block detailing what the function does and including definitions of the parameters.
-2. Code lines should be indented four spaces per editor tab.
-3. Variable names should be in CamelCase format. For example, backColor.
+* All functions should be prefaced by a standard Microsoft Visual Studio comment block detailing what the function does and including definitions of the parameters.
+* Code lines should be indented four spaces per editor tab.
+* Variable names should be in CamelCase format. For example, backColor.
 
 ## Committers
 * [David Burgess](http://github.com/dbrgss)
