@@ -432,12 +432,6 @@
             Add Bar Descriptor to each project. 
             </summary>
         </member>
-        <member name="M:VSNDK.AddIn.VSNDKAddIn.AddBlackBerryConfigurations(EnvDTE.Project)">
-            <summary> 
-            Add BlackBerry configurations to the project. 
-            </summary>
-            <param name="proj"> Represents a project in the integrated development environment. </param>
-        </member>
         <member name="T:VSNDK.AddIn.VSNDKCommandEvents">
             <summary> 
             Responsible for customization of VSShell command events for VSNDK. 

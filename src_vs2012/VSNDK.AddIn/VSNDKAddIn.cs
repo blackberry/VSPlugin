@@ -44,6 +44,13 @@ using System.Runtime.InteropServices;
 
 namespace VSNDK.AddIn
 {
+    
+    public class configtableentry
+    {
+        public string config;
+        public string platform;
+        public bool deployable;
+    }
 
     /// <summary>
     /// 
@@ -54,6 +61,9 @@ namespace VSNDK.AddIn
         private DTE2 _applicationObject; 
         private EnvDTE.AddIn _addInInstance;
         private TokenProcessor tokenProcessor;
+
+        private List<configtableentry> configTable;
+
 
         private const string BLACKBERRY = "BlackBerry";
         private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
@@ -81,10 +91,11 @@ namespace VSNDK.AddIn
             _applicationObject = appObj;
             _addInInstance = addin;
 
+            configTable = new List<configtableentry>();
+
             /// Register Command Events
             _commandEvents = new VSNDKCommandEvents(appObj);
             _commandEvents.RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
-            _commandEvents.RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionCfg, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
             _commandEvents.RegisterCommand(GuidList.guidVSDebugGroup, CommandConstants.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
 
             DisableIntelliSenseErrorReport(true);
@@ -157,7 +168,7 @@ namespace VSNDK.AddIn
         /// <param name="CancelDefault">Cancel the default execution of the command. </param>
         private void cmdNewPlatform_beforeExec(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
         {
-            /// Add Code Here
+            getSolutionPlarformConfig();
         }
 
         
@@ -170,6 +181,7 @@ namespace VSNDK.AddIn
         /// <param name="CustomOut">Custom OUT Object. </param>
         private void cmdNewPlatform_afterExec(string Guid, int ID, object CustomIn, object CustomOut)
         {
+            SolutionPlarformConfig();
             AddBarDescriptor();
         }
 
@@ -209,6 +221,73 @@ namespace VSNDK.AddIn
             }
         }
 
+        /// <summary>
+        /// Set solution config after edit
+        /// </summary>
+        private void SolutionPlarformConfig()
+        {
+            DTE dte = _applicationObject as DTE;
+
+            SolutionConfigurations SGS = dte.Solution.SolutionBuild.SolutionConfigurations;
+
+            foreach (SolutionConfiguration SG in SGS)
+            {
+                string name = SG.Name;
+
+                SolutionContexts SCS = SG.SolutionContexts;
+                foreach (SolutionContext SC in SCS)
+                {
+                    string cname = SC.ConfigurationName;
+                    string pname = SC.PlatformName;
+                    string prname = SC.ProjectName;
+
+                    configtableentry e = configTable.Find(i => (i.config == cname) && (i.platform == pname));
+
+                    if (e != null)
+                    {
+                        configTable.Remove(e);
+                    }
+                    else
+                    {
+                        SC.ShouldDeploy = true;
+                    }
+
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Get solution configuration before edit
+        /// </summary>
+        private void getSolutionPlarformConfig()
+        {
+            DTE dte = _applicationObject as DTE;
+
+            SolutionConfigurations SGS = dte.Solution.SolutionBuild.SolutionConfigurations;
+
+            foreach (SolutionConfiguration SG in SGS)
+            {
+                string name = SG.Name;
+
+                SolutionContexts SCS = SG.SolutionContexts;
+                foreach (SolutionContext SC in SCS)
+                {
+                    string cname = SC.ConfigurationName;
+                    string pname = SC.PlatformName;
+                    string prname = SC.ProjectName;
+
+                    configtableentry c = new configtableentry();
+                    c.platform = pname;
+                    c.config = cname;
+                    c.deployable = SC.ShouldDeploy;
+
+                    configTable.Add(c);
+                }
+            }
+
+        }
+
 
         /// <summary> 
         /// Add Bar Descriptor to each project. 
@@ -219,6 +298,7 @@ namespace VSNDK.AddIn
             {
                 DTE dte = _applicationObject as DTE;
                 Projects projs = dte.Solution.Projects;
+
 
                 List<Project> projList = new List<Project>();
                 foreach (Project proj in projs)
@@ -301,28 +381,5 @@ namespace VSNDK.AddIn
             }
         }
 
-
-        /// <summary> 
-        /// Add BlackBerry configurations to the project. 
-        /// </summary>
-        /// <param name="proj"> Represents a project in the integrated development environment. </param>
-        private void AddBlackBerryConfigurations(Project proj)
-        {
-            try
-            {
-                ConfigurationManager mgr = proj.ConfigurationManager;
-                Configurations cfgs = mgr.AddPlatform(BLACKBERRY, "Win32", true);
-                mgr.DeletePlatform("Win32");
-                mgr.AddConfigurationRow("Device-Debug", "Debug", true);
-                mgr.AddConfigurationRow("Simulator", "Debug", true);
-                mgr.DeleteConfigurationRow("Debug");
-                mgr.AddConfigurationRow("Device-Release", "Release", true);
-                mgr.DeleteConfigurationRow("Release");
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-        }
     }
 }
