@@ -15,17 +15,17 @@ All assets in this repository, unless otherwise stated through sub-directory LIC
 ##Contributing
 The BlackBerry Native Plug-in for Microsoft Visual Studio project currently contains the following code branches; 
 
-**Master Branch** - Contains the latest production release (stable) of the source code.  This branch is fully tested by the Test team and is the same code that is used to build the officially released version available on the BlackBerry website.   
+**Master Branch** - The master branch contains the latest production release of the source code. This code is considered stable and is fully tested by the Test team. You can [download the binaries] (http://developer.blackberry.com/native/downloads/) from the Downloads page on the BlackBerry developer website.   
 
-**Next Branch** - Contains the latest working release (possibly unstable) of the source code.  The code is not have been fully tested and has passed unit tests only.  At some point a full regression test cycle will be performed on the ‘next’ branch and the code will be promoted to the ‘master’ branch.
+**Next Branch** - The next branch contains the latest beta release of the source code. This code may be unstable and is not fully tested because it has passed unit tests only. At some point, a full regression test cycle is performed on the next branch and the code is promoted to the master branch.
 
-**Feature Branch** - Contain the code changes required to implement specific features or issues being worked on for the ‘next’ release. (unstable)  These branches are denoted by the following naming scheme in the repository: next-### where ### is the related Issue number.   When implementation is complete, the branch is unit and integration tested and then merged into the ‘next’ branch.
+**Feature Branch** - Feature branches contain the code changes required to implement specific features or issues being worked on for the next release. This code is considered unstable. These branches are denoted by the following naming scheme in the repository: next-### (where ### is the related issue number). When implementation is completed, the branch is unit and integration tested and then merged into the next branch.
 
 **To contribute code to this repository you must be [signed up as an official contributor](http://blackberry.github.com/howToContribute.html).**
 
-1. Fork the **VSPlugin** repository
-2. Make the changes/additions to your fork
-3. Send a pull request from your fork back to the **VSPlugin** repository
+1. Fork the **VSPlugin** repository.
+2. Make the changes/additions to your fork.
+3. Send a pull request from your fork back to the **VSPlugin** repository.
 4. If you made changes to code which you own, send a message via github messages to one of the Committers listed below to have your code merged.
 
 ## Code Guidelines
