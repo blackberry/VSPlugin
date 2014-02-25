@@ -30,7 +30,7 @@ The BlackBerry Native Plug-in for Microsoft Visual Studio project currently cont
 1. Fork the **VSPlugin** repository.
 2. Make the changes/additions to your fork.
 3. Send a pull request from your fork back to the **VSPlugin** repository.
-4. If you made changes to code which you own, send a message via github messages to one of the Committers listed below to have your code merged.
+4. If you made changes to code which you own, contact one of the Committers listed below to have your code merged.
 
 ## Code guidelines
 * All functions should be prefaced by a standard Microsoft Visual Studio comment block detailing what the function does and including definitions of the parameters.
