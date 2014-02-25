@@ -4,16 +4,20 @@ The BlackBerry Native Plug-in for Microsoft Visual Studio integrates with your M
 ##License
 All assets in this repository, unless otherwise stated through sub-directory LICENSE or NOTICE files, are subject to the Apache Software License v.2.0.
 
-##Build Requirements
-1. Install Microsoft Visual Studio 2010
-2. Install [Visual Studio SP1 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=21835)
+##Build requirements
+Install
+* [Microsoft Visual Studio Professional 2012 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=30668)
 
-##Build Commands
+or
+
+* [Microsoft Visual Studio Professional 2013 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=40758)
+
+##Build commands
 1. VSNDKPluginBuild.bat – A batch file that builds the various components of the BlackBerry Native Plug-in to the ..\buildresults folder.
 2. VSNDKPluginSetup.bat – A batch file that installs the newly built components of the BlackBerry Native Plug-in to the correct locations on your computer. 
 
 ##Contributing
-The BlackBerry Native Plug-in for Microsoft Visual Studio project currently contains the following code branches; 
+The BlackBerry Native Plug-in for Microsoft Visual Studio project currently contains the following code branches: 
 
 **Master Branch** - The master branch contains the latest production release of the source code. This code is considered stable and is fully tested by the Test team. You can [download the binaries] (http://developer.blackberry.com/native/downloads/) from the Downloads page on the BlackBerry developer website.   
 
@@ -28,7 +32,7 @@ The BlackBerry Native Plug-in for Microsoft Visual Studio project currently cont
 3. Send a pull request from your fork back to the **VSPlugin** repository.
 4. If you made changes to code which you own, send a message via github messages to one of the Committers listed below to have your code merged.
 
-## Code Guidelines
+## Code guidelines
 * All functions should be prefaced by a standard Microsoft Visual Studio comment block detailing what the function does and including definitions of the parameters.
 * Code lines should be indented four spaces per editor tab.
 * Variable names should be in CamelCase format. For example, backColor.
@@ -37,5 +41,5 @@ The BlackBerry Native Plug-in for Microsoft Visual Studio project currently cont
 * [David Burgess](http://github.com/dbrgss)
 * [Gustavo Arnold](http://github.com/guarnold)
 
-## Reference Material
+## Reference material
 * [Using Microsoft Visual Studio] (https://developer.blackberry.com/native/documentation/core/vs_using_microsoft_visual_studio.html)
