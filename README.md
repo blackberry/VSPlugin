@@ -43,3 +43,4 @@ The BlackBerry Native Plug-in for Microsoft Visual Studio project currently cont
 
 ## Reference material
 * [Using Microsoft Visual Studio] (https://developer.blackberry.com/native/documentation/core/vs_using_microsoft_visual_studio.html)
+* Although Microsoft Visual Studio 2010 is no longer supported, you can still [download the plug-in and the docs] (http://developer.blackberry.com/native/downloads/) from the Downloads page. 
