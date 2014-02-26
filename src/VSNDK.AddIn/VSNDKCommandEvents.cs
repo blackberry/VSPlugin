@@ -22,20 +22,34 @@ using EnvDTE80;
 
 namespace VSNDK.AddIn
 {
-    /// <summary>
-    /// Responsible for customization of VSShell command events for VSNDK
+
+    /// <summary> 
+    /// Responsible for customization of VSShell command events for VSNDK. 
     /// </summary>
     public class VSNDKCommandEvents
     {
         private DTE2 dte;
         private Dictionary<int, CommandEvents> cmdEvents;
 
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dte"> Application Object. </param>
         public VSNDKCommandEvents(DTE2 dte)
         {
             this.dte = dte;
             cmdEvents = new Dictionary<int, CommandEvents>();
         }
 
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="guid"></param>
+        /// <param name="cmdId"></param>
+        /// <param name="afterHandler"></param>
+        /// <param name="beforeHandler"></param>
         public void RegisterCommand( string guid, int cmdId, _dispCommandEvents_AfterExecuteEventHandler afterHandler, _dispCommandEvents_BeforeExecuteEventHandler beforeHandler)
         {
             cmdEvents[cmdId] = dte.Events.get_CommandEvents(guid, cmdId);
@@ -46,7 +60,5 @@ namespace VSNDK.AddIn
                 e.BeforeExecute += beforeHandler;
             }
         }
-
     }
-
 }

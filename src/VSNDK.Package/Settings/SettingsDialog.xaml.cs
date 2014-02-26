@@ -31,6 +31,10 @@ using System.Xml;
 using System.Windows.Forms;
 using PkgResources = RIM.VSNDK_Package.Resources;
 using RIM.VSNDK_Package.Settings.Models;
+using System.Net;
+using System.Net.Sockets;
+using RIM.VSNDK_Package.UpdateManager.Model;
+using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.Settings
 {
@@ -40,16 +44,23 @@ namespace RIM.VSNDK_Package.Settings
     /// </summary>
     public partial class SettingsDialog : DialogWindow
     {
+        private SettingsData _data;
+
+        /// <summary>
+        /// Settings Dialog Constructor
+        /// </summary>
         public SettingsDialog()
         {
+
             InitializeComponent();
-            SettingsData data = gridMain.DataContext as SettingsData;
-            if (data != null)
-           {
-             //  this.NDKPath.SelectedValue = "test2"; 
-                data.getSimulatorInfo();
-                data.getDeviceInfo();
-            }
+
+            _data = new SettingsData();
+            gridMain.DataContext = _data;
+
+            _data.getSimulatorInfo();
+            _data.getDeviceInfo();
+            tbDevicePassword.Password = _data.DevicePassword;
+            tbSimulatorPassword.Password = _data.SimulatorPassword;
         }
 
         /// <summary>
@@ -59,16 +70,33 @@ namespace RIM.VSNDK_Package.Settings
         /// <param name="e"></param>
         private void btnOK_Click(object sender, RoutedEventArgs e)
         {
-            SettingsData data = gridMain.DataContext as SettingsData;
-            if (data != null)
-            {
-                data.setDeviceInfo();
-                data.setSimulatorInfo();
-                data.setNDKPaths(); 
-            }
-
+            _data.DevicePassword = tbDevicePassword.Password;
+            _data.SimulatorPassword = tbSimulatorPassword.Password;
+            _data.setDeviceInfo();
+            _data.setSimulatorInfo();
+            _data.NDKEntryClass = (NDKEntryClass)NDKEntry.SelectedItem;
+            _data.setNDKPaths(); 
 
             DialogResult = true; ;
+
+        }
+
+        /// <summary>
+        /// Open App Target Dialog
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Update_Click(object sender, RoutedEventArgs e)
+        {
+            this.Cursor = System.Windows.Input.Cursors.Wait;
+
+            UpdateManager.UpdateManager updateManager = UpdateManager.UpdateManager.create();
+
+            _data.RefreshScreen();
+            NDKEntry.ItemsSource = null;
+            NDKEntry.ItemsSource = _data.NDKEntries;
+
+            this.Cursor = System.Windows.Input.Cursors.Hand;
 
         }
     }

@@ -24,23 +24,25 @@
 
 using namespace std;
 
-#define NumberOfInstructions 48
-#define InputBufferSize 50
-#define GDBBufferSize 100
-#define OutputBufferSize 100  // ??? I think 50 would be enough. Left 500 only for testing purposes
-#define SyncInstructionsSize 50
-#define GDBCommandSize 256
-#define ParsedMessageSize 8192
-#define MultipleThreads 0 // 1 - use multiple parsing threads, 0 doesn't
+#define NumberOfInstructions 48 // Number of parsing instructions in Instructios.txt file.
+#define InputBufferSize 50		// Input buffer is used by the debug engine to send GDB commands.
+#define GDBBufferSize 100		// Intermediate buffer is used as a communication channel between 
+								// sendingCommands2GDB and listeningGDB threads.
+#define OutputBufferSize 100	// Output buffer is used to send the parsed GDB responses to the debug engine.
+#define SyncInstructionsSize 50 // This number is used to separate the Output buffer in two parts: first part 
+								// for synchronous commands; and second for asynchronous ones.
+#define GDBCommandSize 256		// Maximum size for a GDB command.
+#define ParsedMessageSize 8192	// Maximum size for a parsed GDB response.
+#define MultipleThreads 0		// 1 - use multiple parsing threads, 0 - single parsing thread.
 #define MAX_EVENT_NAME_LENGTH 256
-#define WAIT_TIME 1000L  // max amount of time to wait for single events.
+#define WAIT_TIME 1000L			// max amount of time to wait for single events.
 
-#define LOG_GDB_RAW_IO 1
+#define LOG_GDB_RAW_IO 1		// 1 - generate GDB output log file; 0 - do not generate.
 
 class GDBConsole {
 
 private:	
-	static GDBConsole* m_instance;
+	static GDBConsole* m_instance;	// represents an instance of GDB debugger.
     HANDLE m_hInputRead, m_hInputWrite, m_hOutputRead, m_hOutputWrite, m_hErrorWrite;	
 	BOOL m_isClosed;
 	static TCHAR* m_pcGDBCmd;
@@ -52,38 +54,57 @@ private:
 
 	GDBConsole();		
 	void cleanup();
+	HANDLE getStdOutHandle();
+	BOOL isClosed();
+	BOOL isMoreOutputAvailable ();
+	void logPrint(char*);
 	void prepAndLaunchRedirectedChild();		
+	int readOutput(CHAR*, int, int*);
 
 public:	
 	~GDBConsole();	
-	static void shutdown();
 	static GDBConsole* getInstance();
-	static void setGDBPath(const TCHAR*);
-	BOOL isClosed();
-	int readOutput(CHAR*, int, int*);
 	int sendCommand(const CHAR*);
-	HANDLE getStdOutHandle();
-
-	void sendCtrlC(); // For testing
+	void sendCtrlC();
+	static void setGDBPath(const TCHAR*);
+	static void shutdown();
+	string waitForPrompt(bool);
+	string waitForPromptWithTimeout(int);
 };
 
-void getThisDLLPath(wchar_t*, const wchar_t*, const wchar_t*);
-void ErrorExit(LPTSTR);
 void DisplayError(LPCTSTR);
-string waitForPrompt(GDBConsole*, bool);
+void ErrorExit(LPTSTR);
+
+// Threads responsible for calling the right GDBConsole methods to send commands to GDB and to get responses from GDB. They are also 
+// responsible for handling the messages that are sent to/received from GDB.
 unsigned __stdcall listeningGDB(void *);
 unsigned __stdcall sendingCommands2GDB(void *);
-unsigned __stdcall parseGDBResponseThread(void *);  // call this function if using multithreaded parsing or (see below)
-void parseGDB(string, string, int);	// call this function if not using multithreaded parsing
-string parseGDB(string, string);	// call this function when starting GDB (this one doesn't use the OutputBuffer)
+
+// Functions that perform some specific tasks to the above threads responsible for sending GDB commands and receiving GDB responses.
+int getInstructionCode(string, unordered_map<string, int>, string*);
+int getSeqID(string);
+bool insertingCommandCodes(unordered_map<string, int> *, string [NumberOfInstructions]);
+
+// Functions/thread responsible for parsing GDB responses.
+unsigned __stdcall parseGDBResponseThread(void *);  // Call this function if using multithreaded parsing or (see below).
+void parseGDB(string, string, int);	// call this function if not using multithreaded parsing.
+string parseGDB(string, string);	// Call this function when starting GDB (this one doesn't use the OutputBuffer).
+string parseGDB(string*, string, int, bool, char[10][128], string); // The above functions will call this one that is the one responsible for parsing the GDB response.
+
+// Functions that perform some specific tasks to the one responsible for parsing GDB responses.
+int findClosing(char, char, string, int);
+int getNextChar(char, string, int);
+int searchResponse(string, string, int, int, bool, char);
+string substituteVariables(string, char[10][128]);
+
+// The following methods are responsible for manipulating the buffers (Input, GDB and Output).
 void cleanBuffers();
+bool addIntoInputBuffer(char [GDBCommandSize]);
+void removeFromInputBuffer(char *);
+bool isInputBufferEmpty();
 bool addIntoGDBBuffer(int, int, string);
 int removeFromGDBBuffer(int, string*);
 bool isGDBBufferEmpty();
 bool addIntoOutputBuffer(int, char *);
 void removeFromOutputBuffer(char *);
 void removeSyncFromOutputBuffer(char *, int);
-bool addIntoInputBuffer(char [GDBCommandSize]);
-void removeFromInputBuffer(char *);
-bool isInputBufferEmpty();
-bool insertingCommandCodes(unordered_map<string, int> *, string [NumberOfInstructions]);

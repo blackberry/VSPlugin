@@ -37,11 +37,13 @@ namespace RIM.VSNDK_Package.DebugToken
     /// </summary>
     public partial class DebugTokenDialog : DialogWindow
     {
+        #region Member Variables and Constants
         private DebugTokenData deployTokenData;
         public bool IsClosing = false;
+        #endregion
 
         /// <summary>
-        /// Constructor
+        /// DebugTokenDialog Constructor
         /// </summary>
         public DebugTokenDialog()
         {
@@ -53,6 +55,8 @@ namespace RIM.VSNDK_Package.DebugToken
             {
                 btnAdd.IsEnabled = false;
                 btnRefresh.IsEnabled = false;
+                IsClosing = true;
+                this.Close();
                 return;
             }
             deployTokenData = gridMain.DataContext as DebugTokenData;
@@ -83,7 +87,7 @@ namespace RIM.VSNDK_Package.DebugToken
             {
                 this.Cursor = Cursors.Wait;
 
-                if (!(deployTokenData.addDevice()))
+                if (!(deployTokenData.addDevice(this)))
                 {
                     deployTokenData.Error = "";
                     e.Handled = true;
@@ -100,8 +104,8 @@ namespace RIM.VSNDK_Package.DebugToken
             {
                 this.Cursor = Cursors.Arrow;
             }
-            
         }
+
 
         /// <summary>
         /// Refresh debug token to device and registration file.
@@ -112,7 +116,7 @@ namespace RIM.VSNDK_Package.DebugToken
         {
             this.Cursor = Cursors.Wait;
 
-            if (!(deployTokenData.refreshDevice()))
+            if (!(deployTokenData.refreshDevice(this)))
             {
                 deployTokenData.Error = "";
                 e.Handled = true;

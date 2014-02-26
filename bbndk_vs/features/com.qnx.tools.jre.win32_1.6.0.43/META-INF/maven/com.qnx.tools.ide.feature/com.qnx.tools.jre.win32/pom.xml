@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.qnx.tools.ide</groupId>
+		<artifactId>bbt-parent</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+		<relativePath>../..</relativePath>
+	</parent>
+
+	<version>1.6.0.43</version>
+	<groupId>com.qnx.tools.ide.feature</groupId>
+	<artifactId>com.qnx.tools.jre.win32</artifactId>
+	<packaging>eclipse-feature</packaging>
+
+	<profiles>
+		<profile>
+			<id>createJreWindows</id>
+			<activation><file><missing>jre-6u43-windows-i586.tar.gz</missing></file></activation>
+			<build>
+				<plugins>	
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>build-root-files</id>
+								<phase>generate-resources</phase>
+								<configuration>
+									<target>
+										<property name="jreVersion" value="jre1.6.0_43"/>
+										<property name="jreArchive.win32" value="jre-6u43-windows-i586.tar.gz"/>
+										<property name="jreHTTPPath" value="${svnDepURL}/jre/${jreVersion}/"/>
+		
+										<get src="${jreHTTPPath}${jreArchive.win32}" dest="."/>
+										<untar src="${jreArchive.win32}" dest="." compression="gzip"/>
+										<move file="${jreVersion}" tofile="jre"/>
+									</target>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+</project>

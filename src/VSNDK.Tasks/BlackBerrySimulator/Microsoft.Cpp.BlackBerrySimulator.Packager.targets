@@ -24,7 +24,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <UsingTask TaskName="GetAppInfo"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   <UsingTask TaskName="CheckIfInstalled"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   <UsingTask TaskName="VCMessage" AssemblyName="Microsoft.Build.CppTasks.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <UsingTask TaskName="CheckFlagFile"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="RemoveFlagFile"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   <UsingTask TaskName="WriteDebuggerArgs"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
 
   <PropertyGroup  Condition="$(Configuration.Contains('Release'))">
@@ -74,8 +74,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <!-- Get app's ID from bar descriptor. -->
     <GetAppInfo
+        ProjectDir="$(ProjectDir)"
+        ApplicationDescriptorXml ="%(BuildBar.ApplicationDescriptorXml)"
+        AppName = "$(ProjectName)"
         Condition="%(BuildBar.DevMode) == 'true'"
-        ApplicationDescriptorXml ="$(ApplicationDescriptorXml)"
       >
       <Output TaskParameter="AppId" PropertyName="AppId" />
     </GetAppInfo>
@@ -100,15 +102,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <PropertyGroup>
       <BuildBar_MinimalRebuildFromTracking Condition="'$(BuildType)' != 'Build' or '$(ForceRebuild)' == 'true'">false</BuildBar_MinimalRebuildFromTracking>
       <BuildBar_MinimalRebuildFromTracking Condition="'$(BuildBar_MinimalRebuildFromTracking)' == ''">true</BuildBar_MinimalRebuildFromTracking>
-      <ToolPath Condition="$(IsAppInstalled) == 'false'">$(BuildBarToolPath)</ToolPath>
-      <ToolPath Condition="$(IsAppInstalled) == 'true'">$(OptimizedDeployToolPath)</ToolPath>
     </PropertyGroup>
 
     <BBNativePackager  Condition="'$(RunBuildBar)' == 'true'"
         Sources                        ="@(BuildBar)"
         Platform                       ="$(Platform)"
         Configuration                  ="$(Configuration)"
-        ApplicationDescriptorXml       ="$(ApplicationDescriptorXml)"
+        ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
+        AppName                        = "$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
@@ -136,7 +137,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <Output TaskParameter="Password" PropertyName="Password" />
     </BBNativePackager>
 
-    <Message Text="Built .bar file." Importance="high" />
     <Message Condition="'$(BuildBarSkippedExecution)' == 'false'" Text="$(MSBuildProjectFile) -&gt; $(OutputBar)" Importance="High" />
 
     <!-- Signing the bar file -->
@@ -167,7 +167,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <!-- Store executable path in a file so it can be read by LaunchProcess() -->
     <WriteDebuggerArgs
-        ExePath ="$(TargetPath)"
+        ProjectDir ="$(ProjectDir)"
+        OutDir = "$(OutDir)"
+        AppName = "$(TargetName)"
         Device  ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
         isSimulator ="true"
         ToolsPath ="$(BuildBarToolPath)"
@@ -178,8 +180,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <!-- Get app's ID from bar descriptor. -->
     <GetAppInfo
+        ProjectDir="$(ProjectDir)"
+        ApplicationDescriptorXml ="%(BuildBar.ApplicationDescriptorXml)"
+        AppName = "$(ProjectName)"
         Condition="%(BuildBar.DevMode) == 'true'"
-        ApplicationDescriptorXml ="$(ApplicationDescriptorXml)"
       >
       <Output TaskParameter="AppId" PropertyName="AppId" />
     </GetAppInfo>
@@ -188,7 +192,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <BBDeploy
         Condition="%(BuildBar.DevMode) == 'true'"
         ToolExe           ="$(DeployToolExe)"
-        ToolPath          ="$(OptimizedDeployToolPath)"
+        ToolPath          ="$(BuildBarToolPath)"
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
         Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
         ListInstalledApps ="true"
@@ -211,8 +215,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <CallTarget Targets="OptimizedDeploy" Condition="$(IsAppInstalled) == 'true'" />
 
     <!-- Remove the -debugNative flag if it was set. -->
-    <CheckFlagFile
-        Action="remove"
+    <RemoveFlagFile
         FlagFile="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
       />
   </Target>
@@ -222,14 +225,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <BuildBar Include="@(None)" />
     </ItemGroup>
 
-    <CheckFlagFile
-        Condition="%(BuildBar.DevMode) == 'true'"
-        Action="check"
-        FlagFile="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
-      >
-      <Output TaskParameter="IsFlagSet" PropertyName="IsDebugging" />
-    </CheckFlagFile>
-
     <BBDeploy
         ToolExe           ="$(DeployToolExe)"
         ToolPath          ="$(BuildBarToolPath)"
@@ -238,7 +233,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Package           ="$(ProjectDir)%(BuildBar.OutputFile)"
         InstallApp        ="true"
         LaunchApp         ="true"
-        DebugNative       ="$(IsDebugging)"
+        FlagFile          ="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
+        DebugNative       ="false"
       />
   </Target>
 
@@ -252,7 +248,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Sources                        ="@(BuildBar)"
         Platform                       ="$(Platform)"
         Configuration                  ="$(Configuration)"
-        ApplicationDescriptorXml       ="$(ApplicationDescriptorXml)"
+        ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
+        AppName                        = "$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
@@ -263,7 +260,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         TargetFormat                   ="%(BuildBar.TargetFormat)"
         OutputFile                     ="%(BuildBar.OutputFile)"
         ToolExe                        ="$(BuildBarToolExe)"
-        ToolPath                       ="$(OptimizedDeployToolPath)"
+        ToolPath                       ="$(BuildBarToolPath)"
         TrackFileAccess                ="$(TrackFileAccess)"
         MinimalRebuildFromTracking     ="$(BuildBar_MinimalRebuildFromTracking)"
         TrackerLogDirectory            ="%(BuildBar.TrackerLogDirectory)"
@@ -283,7 +280,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <!-- Get the target manifest. -->
     <BBDeploy
         ToolExe           ="$(DeployToolExe)"
-        ToolPath          ="$(OptimizedDeployToolPath)"
+        ToolPath          ="$(BuildBarToolPath)"
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
         Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
         LocalManifestFile ="localManifest.mf"
@@ -315,7 +312,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <!-- Deploy new and modified files to the device. -->
     <BBDeploy Condition="$(ModifiedFilesCount) > 0"
         ToolExe           ="$(DeployToolExe)"
-        ToolPath          ="$(OptimizedDeployToolPath)"
+        ToolPath          ="$(BuildBarToolPath)"
         LocalManifestFile ="localManifest.mf"
         PutFile           ="%(ModifiedFiles.SourcePath)"
         PutFileSaveAs     ="%(ModifiedFiles.Identity)"
@@ -334,24 +331,17 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         DeleteFiles     ="@(DeletedFiles)"
       />
 
-    <CheckFlagFile
-        Condition="%(BuildBar.DevMode) == 'true'"
-        Action="check"
-        FlagFile="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
-      >
-      <Output TaskParameter="IsFlagSet" PropertyName="IsDebugging" />
-    </CheckFlagFile>
-
     <!-- Launch the app without installing it. -->
     <BBDeploy
         ToolExe           ="$(DeployToolExe)"
-        ToolPath          ="$(OptimizedDeployToolPath)"
+        ToolPath          ="$(BuildBarToolPath)"
         PackageId         ="$(PackageId)"
         PackageName       ="$(PackageName)"
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
         Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
         LaunchApp         ="true"
-        DebugNative       ="$(IsDebugging)"
+        FlagFile          ="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
+        DebugNative       ="false"
       />
 
     <!-- Delete temporary files used by the optimized build process. -->

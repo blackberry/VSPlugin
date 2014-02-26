@@ -1,10 +1,10 @@
 Info: Package created: Device-Debug\FallingBlocks.bar
-Archive-Manifest-Version: 1.1
-Archive-Created-By: BlackBerry Elf BAR Packager 1.6
+Archive-Manifest-Version: 1.5
+Archive-Created-By: BlackBerry Elf BAR Packager 1.9
 
 Package-Type: application
-Package-Author: RIM Canada
-Package-Author-Id: gYAAgDthaMCeIcQicW0p4fUkeSM
+Package-Author: David Burgess
+Package-Author-Id: gYAAgITWetvsq61EuszuYEkcRZU
 Package-Name: com.example.FallingBlocks
 Package-Id: testDev_llingBlocks37d009c_
 Package-Version: 1.0.0.1
@@ -17,19 +17,22 @@ Application-Description: The FallingBlocks application
 Application-Version: 1.0.0.1
 Application-Version-Id: testMS4wLjAuMSAgICAgICAgICA
 Application-Category: core.games
-Application-Requires-System: Tablet OS/10.0.4.0
+Application-Requires-System: BlackBerry 10/10.0.9.0
 Application-Development-Mode: true
 
 Entry-Point-Name: FallingBlocks
+Entry-Point-Key: e1
 Entry-Point: LD_LIBRARY_PATH=app/native/lib app/native/FallingBlocks
 Entry-Point-Type: Qnx/Elf
+Entry-Point-Icon: native/blackberry-tablet-default-icon.png
 Entry-Point-System-Actions: run_native
 
 Archive-Asset-Name: native/FallingBlocks
-Archive-Asset-SHA-512-Digest: GrqZpWwRGX8i5eptG-K9mcFXOjzLOLQAslDIqRFdp84z1Fq8W_mw4oOVRyMkmvdBVrCX7ayHGnr69XEDjN2N2w
+Archive-Asset-SHA-512-Digest: 2YRSs7RYvi0EvPoEDqhJt-8aRilmsDvCaI_PgT9HrHrmT4brRdZ9vJ6vgi0Ry0AAhO6sLh1BiVZoNRBT_dJInQ
+Archive-Asset-Type: Qnx/Elf
 
 Archive-Asset-Name: native/bar-descriptor.xml
-Archive-Asset-SHA-512-Digest: 5jxaQQFAszk1nSRAF-J6Y8qtgzVXYe3jnAK0B8J5gfRQAa1BCPCloqrtAzJyMWHRmHUymAWvhUV6oPwgGDT7Yg
+Archive-Asset-SHA-512-Digest: N-Q1M7kxjCiVr75TxacNmPJT3YFp0amQvR-NSXqS_fbNn89TkazEui9EC5PBLhsOClVYXumoBmtiL3EBF0Q3eQ
 
-Archive-Asset-Name: META-INF/MANIFEST.bbr
-Archive-Asset-SHA-512-Digest: Psxui2KqDOcaYEzn8DbtDSKeyblHz5BZFvvnabTbnxW3iI5LJCYOj6lxfbjkFH_uRa4ptbCLZn3304xRHqbRiA
+Archive-Asset-Name: native/blackberry-tablet-default-icon.png
+Archive-Asset-SHA-512-Digest: cDyyTf-3OIUlDa4QJas8D21pZ7sMV6suHDZNJoQzquGgsYrIItk0LIbcvzOIOgeuAl4CDONzM-NJ9POH_piHDw

@@ -17,7 +17,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <PropertyGroup>
     <QNX_TARGET>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@NDKTargetPath)</QNX_TARGET>
     <QNX_HOST>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@NDKHostPath)</QNX_HOST>
-    <from_file>$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
+    <from_file Condition="'$(QNX_HOST)' != ''">$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
     <QCC_CONF_PATH Condition="'$(QCC_CONF_PATH)' == ''">$(QNX_HOST)\etc\qcc\gcc</QCC_CONF_PATH>
     <CPUVARDIR>x86</CPUVARDIR>
     <CompilerVersion>$(from_file)</CompilerVersion>
@@ -28,16 +28,18 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <SSHPrivateKeyPath>$(AppDataPath)/BlackBerry/bbt_id_rsa</SSHPrivateKeyPath>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Platform)'=='BlackBerrySimulator'">
+    <DebuggerFlavor>VSNDKDebugEngine</DebuggerFlavor>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <PlatformToolsetVersion>qcc2.0</PlatformToolsetVersion>
     <QccToolsPath>$(QNX_HOST)\usr\bin</QccToolsPath>
-    <AdvancedToolsPath Condition="Exists('C:\Program Files (x86)\BlackBerry\VSPlugin-NDK')">C:\Program Files (x86)\BlackBerry\VSPlugin-NDK\bin</AdvancedToolsPath>
-    <AdvancedToolsPath Condition="$(AdvancedToolsPath) == ''">C:\Program Files\BlackBerry\VSPlugin-NDK\bin</AdvancedToolsPath>
     <QccCompiler>qcc.exe</QccCompiler>
     <QccLinker>qcc.exe</QccLinker>
     <QccLibrarian>qcc.exe</QccLibrarian>
     <BuildBarToolExe>blackberry-nativepackager.bat</BuildBarToolExe>
-    <SignerBarToolExe>blackberry-signer.bat</SignerBarToolExe>
+    <SignerBarToolExe>$(MSBuildProgramFiles32)\BlackBerry\VSPlugin-NDK\qnxtools\bin\blackberry-signer.bat</SignerBarToolExe>
     <DeployToolExe>blackberry-deploy.bat</DeployToolExe>
     <BuildBarToolPath>$(QccToolsPath)</BuildBarToolPath>
     <DeployToolPath>$(QccToolsPath)</DeployToolPath>
@@ -46,7 +48,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <SSHToolPath>$(QccToolsPath)</SSHToolPath>
     <SSHKeygenToolExe>$(QccToolsPath)\ssh-keygen.exe</SSHKeygenToolExe>
     <ConnectToolExe>$(QccToolsPath)\blackberry-connect.bat</ConnectToolExe>
-    <OptimizedDeployToolPath>$(AdvancedToolsPath)</OptimizedDeployToolPath>
 
     <VCInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
     <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
@@ -70,6 +71,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <ExecutablePath Condition="'$(ExecutablePath)' == ''">$(QNX_HOST)\usr\bin;$(PATH);</ExecutablePath>
     <IncludePath Condition="'$(IncludePath)' == ''">$(QNX_TARGET)\usr\include;$(QNX_TARGET)\usr\include\freetype2;$(QNX_TARGET)\..\target-override\usr\include;</IncludePath>
     <LibraryPath Condition="'$(LibraryPath)' == ''">$(QccLibPath);$(QNX_TARGET)\..\target-override\$(CPUVARDIR)\lib;$(QNX_TARGET)\..\target-override\$(CPUVARDIR)\usr\lib;</LibraryPath>
+    <ExcludePath Condition="'$(ExcludePath)' == ''"></ExcludePath>    
     <NativeExecutablePath Condition="'$(NativeExecutablePath)' == ''">$(ExecutablePath)</NativeExecutablePath>
   </PropertyGroup>
 

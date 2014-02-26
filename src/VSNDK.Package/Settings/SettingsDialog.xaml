@@ -3,22 +3,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
         Title="Settings" Height="334" Width="627">
-    
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="SettingsDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
 
-    <Grid Name="gridMain" VerticalAlignment="Top" DataContext="{StaticResource settingsData}"  Width="608" xmlns:RIM_password="clr-namespace:RIM.VSNDK_Package.Signing.Models">
+    <Grid Name="gridMain" VerticalAlignment="Top" Width="608" xmlns:RIM_password="clr-namespace:RIM.VSNDK_Package.Signing.Models">
         <StackPanel Orientation="Vertical" Name="MainPanel" VerticalAlignment="Top" Height="299">
-            <GroupBox Header="BlackBerry NDK Settings" Name="gbBlackBerryNDKSettings" VerticalAlignment="Stretch" Height="55" Margin="5,5,5,5">
+            <GroupBox Header="BlackBerry API Levels" Name="gbBlackBerryNDKSettings" VerticalAlignment="Stretch" Height="55" Margin="5,5,5,5">
                 <StackPanel Orientation="Vertical" Height="33" Width="528">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch">
-                        <Label Content="NDK Path:" Width="83" Height="28" />
-                        <ComboBox Height="23" Name="NDKEntry" Width="437" ItemsSource="{Binding Path=NDKEntries}" DisplayMemberPath="NDKName" SelectedValuePath="NDKName" SelectedItem="{Binding Path=NDKEntryClass}" />
+                        <Label Content="API Level:" Width="83" Height="28" />
+                        <ComboBox Height="23" Name="NDKEntry" Width="340" ItemsSource="{Binding Path=NDKEntries}" DisplayMemberPath="NDKName" SelectedValuePath="NDKName" SelectedItem="{Binding Path=NDKEntryClass}" />
+                        <Button Margin="10,0,0,0" Content="Get More.." Height="23" Name="button1" Width="85" Click="Update_Click" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
@@ -30,8 +23,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Stretch" Height="28">
                         <Label Content="Device Password:" Width="170" Height="28" />
-                        <PasswordBox Name="tbDevicePassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" RIM_password:PasswordBoxAssistant.BindPassword="true"  RIM_password:PasswordBoxAssistant.BoundPassword="{Binding Path=DevicePassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                        </PasswordBox>
+                        <PasswordBox Name="tbDevicePassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" DataContext="{Binding Path=DevicePassword}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
@@ -43,7 +35,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Stretch" Height="28">
                         <Label Content="Simulator Password:" Width="170" Height="28" />
-                        <PasswordBox Name="tbSimulatorPassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" RIM_password:PasswordBoxAssistant.BindPassword="true"  RIM_password:PasswordBoxAssistant.BoundPassword="{Binding Path=SimulatorPassword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                        <PasswordBox Name="tbSimulatorPassword" HorizontalAlignment="Left" VerticalAlignment="Center" Width="350" DataContext="{Binding Path=SimulatorPassword}" />
                     </StackPanel>
                 </StackPanel>
             </GroupBox>

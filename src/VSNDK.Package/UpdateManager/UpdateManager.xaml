@@ -1,0 +1,48 @@
+﻿<Window x:Class="RIM.VSNDK_Package.UpdateManager.UpdateManager"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
+        xmlns:pa="clr-namespace:RIM.VSNDK_Package.UpdateManager.Model"                 
+        Title="API Level" Height="483" Width="613" ShowInTaskbar="False" WindowStartupLocation="CenterOwner" ResizeMode="NoResize" Topmost="True" Closing="Window_Closing">
+
+    <Grid Name="gridMain" Height="437">
+        <GroupBox Header="Installed" Height="165" HorizontalAlignment="Left" Margin="12,12,0,0" Name="groupBox1" VerticalAlignment="Top" Width="574">
+            <ScrollViewer Name="Hello" VerticalScrollBarVisibility="Auto">
+                <ItemsControl Name="APITargets" ItemsSource="{Binding Path=APITargets}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Width="500" Visibility="{Binding Path=InstalledVisibility}">
+                                <StackPanel Orientation="Vertical" Width="400">
+                                    <TextBlock Text="{Binding Path=TargetName}" FontWeight="Bold" />
+                                    <TextBlock Text="{Binding Path=TargetDescription}" FontStyle="Italic" />
+                                </StackPanel>
+                                <Button Content="Uninstall" Height="23" HorizontalAlignment="Right" Click="Uninstall_Click" Visibility="{Binding Path=NoUpdateVisibility}" />
+                                <Button Content="Update" Height="23" HorizontalAlignment="Right" Visibility="{Binding Path=UpdateVisibility}" Click="Uninstall_Click" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </GroupBox>
+        <Button Content="Close" Height="23" HorizontalAlignment="Left" Margin="505,402,0,0" Name="Close" VerticalAlignment="Top" Width="75" Click="Close_Click" IsEnabled="{Binding Path=IsInstalling}" />
+        <Button Content="Get Simulators" Height="23" HorizontalAlignment="Left" Margin="410,402,0,0" Name="Simulators" VerticalAlignment="Top" Width="89" Click="Simulators_Click" IsEnabled="{Binding Path=IsInstalling}" />
+        <GroupBox Header="Available" Height="165" HorizontalAlignment="Left" Margin="11,194,0,0" Name="groupBox2" VerticalAlignment="Top" Width="574">
+            <ScrollViewer Name="test1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Path=APITargets}" Name="lbAvailable">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal" Width="500" Visibility="{Binding Path=AvailableVisibility}">
+                                <StackPanel Orientation="Vertical" Width="400">
+                                    <TextBlock FontWeight="Bold" Text="{Binding Path=TargetName}" />
+                                    <TextBlock FontStyle="Italic" Text="{Binding Path=TargetDescription}" />
+                                </StackPanel>
+                                <Button Content="Install" Height="23" HorizontalAlignment="Right" Click="Install_Click" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </GroupBox>
+        <Label Name="Status" Height="28" HorizontalAlignment="Left" Margin="18,366,0,0" VerticalAlignment="Top" Width="562" Content="{Binding Path=Status}" />
+    </Grid>
+</Window>

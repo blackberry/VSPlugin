@@ -53,6 +53,11 @@ namespace VSNDK.Tasks
         #endregion
 
         #region ctors
+
+        /// <summary>
+        /// VSNDKTasks Constructor
+        /// </summary>
+        /// <param name="res"></param>
         public VSNDKTasks(ResourceManager res)
             : base(res)
         {
@@ -71,28 +76,44 @@ namespace VSNDK.Tasks
             this.switchOrderList.Add(ENHANCED_SECURITY);
             this.switchOrderList.Add(POSITION_INDEPENDENT_EXECUTABLE);
             this.switchOrderList.Add(COMPILE_AS);
-            //UseCommandProcessor = true;
         }
         #endregion
 
         #region overrides
-        //don't use response file for msbuild because it is removed before qcc to run GCC compiler 
+        /// <summary>
+        /// don't use response file for msbuild because it is removed before qcc to run GCC compiler 
+        /// </summary>
+        /// <param name="responseFilePath"></param>
+        /// <returns></returns>
         protected override string GetResponseFileSwitch(string responseFilePath)
         {
             return string.Empty;
         }
-        //instead pass the response file to command line commands
+
+        /// <summary>
+        /// instead pass the response file to command line commands
+        /// </summary>
+        /// <returns></returns>
         protected override string GenerateCommandLineCommands()
         {
             string cmd = GenerateResponseFileCommands();
             return cmd;
         }
 
+        /// <summary>
+        /// Function to assign out of date sources
+        /// </summary>
+        /// <param name="sources"></param>
+        /// <returns></returns>
         protected override ITaskItem[] AssignOutOfDateSources(ITaskItem[] sources)
         {
             base.ActiveToolSwitches[SOURCES].TaskItemArray = sources;
             return sources;
         }
+
+        /// <summary>
+        /// Getter/Setter for SwitchOrderList property
+        /// </summary>
         protected override ArrayList SwitchOrderList
         {
             get
@@ -101,6 +122,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for TrackedInputFiles property
+        /// </summary>
         protected override Microsoft.Build.Framework.ITaskItem[] TrackedInputFiles
         {
             get
@@ -109,6 +133,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for TrackerIntermediateDirectory
+        /// </summary>
         protected override string TrackerIntermediateDirectory
         {
             get
@@ -121,21 +148,35 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for ToolName property
+        /// </summary>
         protected  override string ToolName
         {
             get { return QccExe; }
         }
 
+        /// <summary>
+        /// Getter/Setter for LogEventsFromTextOutput
+        /// </summary>
+        /// <param name="singleLine"></param>
+        /// <param name="messageImportance"></param>
         protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
         {
             base.LogEventsFromTextOutput(Reformat(singleLine), messageImportance);
         }
 
-        //Reformat the qcc compiler error to msbuild known error format
-        //singeLine: main.c:53: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'int'
-        //or         main.c:38:19: error: hello.h: No such file or directory
-        //output: main.c(53): error QCC001: expected '=', ',', ';', 'asm' or '__attribute__' before 'int'
-        //TODO: this method need to be updated in case any more error formats of qcc compiler 
+
+
+        /// <summary>
+        /// Reformat the qcc compiler error to msbuild known error format
+        /// singeLine: main.c:53: error: expected '=', ',', ';', 'asm' or '__attribute__' before 'int'
+        /// or        main.c:38:19: error: hello.h: No such file or directory
+        /// output: main.c(53): error QCC001: expected '=', ',', ';', 'asm' or '__attribute__' before 'int'
+        /// TODO: this method need to be updated in case any more error formats of qcc compiler 
+        /// </summary>
+        /// <param name="singleLine"></param>
+        /// <returns></returns>
         private string Reformat(string singleLine)
         {
             string msbuilError = singleLine;
@@ -153,6 +194,9 @@ namespace VSNDK.Tasks
             return msbuilError;
         }
 
+        /// <summary>
+        /// getter/setter for UseUnicodeOutput
+        /// </summary>
         protected override bool UseUnicodeOutput
         {
             get
@@ -164,6 +208,10 @@ namespace VSNDK.Tasks
         #endregion //override
 
         #region properties
+
+        /// <summary>
+        /// Getter/Setter for GenerateDebugInformation property
+        /// </summary>
         public virtual bool GenerateDebugInformation
         {
             get
@@ -183,15 +231,17 @@ namespace VSNDK.Tasks
                     Description = "Generate Debug Info (-g)",
                     ArgumentRelationList = new ArrayList()
                 };
-                //switch2.ArgumentRelationList.Add(new ArgumentRelation(GENERATE_DEBUG_INFORMATION, "true", false, ""));
                 switch2.SwitchValue = "-g";
                 switch2.Name = GENERATE_DEBUG_INFORMATION;
                 switch2.BooleanValue = value;
                 base.ActiveToolSwitches.Add(GENERATE_DEBUG_INFORMATION, switch2);
                 base.AddActiveSwitchToolValue(switch2);
-                //switch2.Overrides.AddLast(new KeyValuePair<string, string>("g", "G"));
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for WarningLevel property
+        /// </summary>
         public virtual string WarningLevel
         {
             get
@@ -231,6 +281,10 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for TreatWarningAsError property
+        /// </summary>
         public virtual bool TreatWarningAsError
         {
             get
@@ -258,6 +312,10 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for BuildingInIDE property
+        /// </summary>
         public virtual bool BuildingInIDE
         {
             get
@@ -277,6 +335,10 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for GccExceptHandling property
+        /// </summary>
         public virtual string GccExceptionHandling
         {
             get
@@ -305,6 +367,10 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for Optimization property
+        /// </summary>
         public virtual string Optimization
         {
             get
@@ -333,7 +399,11 @@ namespace VSNDK.Tasks
                 base.ActiveToolSwitches.Add(OPTIMIZATION, switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }
-        }       
+        }   
+    
+        /// <summary>
+        /// Getter/Setter for PlatformToolset property
+        /// </summary>
         public virtual string PlatformToolset
         {
             get
@@ -341,6 +411,10 @@ namespace VSNDK.Tasks
                 return "qcc";
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for TrackerLogDirectory
+        /// </summary>
         public virtual string TrackerLogDirectory
 		{
 			get
@@ -365,6 +439,10 @@ namespace VSNDK.Tasks
 				base.AddActiveSwitchToolValue( switch2 );
 			}
 		}
+
+        /// <summary>
+        /// Getter/Setter for TargetMachine property
+        /// </summary>
         public virtual string TargetMachine
         {
             get
@@ -393,6 +471,10 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for CompileAs property
+        /// </summary>
         public virtual string CompileAs
         {
             get
@@ -422,6 +504,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for Verbose property
+        /// </summary>
         public bool Verbose
         {
             get
@@ -444,6 +529,10 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for EnhancedSecutiry property
+        /// </summary>
         public virtual bool EnhancedSecurity
         {
             get
@@ -466,10 +555,19 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Return the Get Enhanced Security string.  
+        /// </summary>
+        /// <returns></returns>
         protected virtual string GetEnhancedSecuritySwitchValue()
         {
             return "-fstack-protector-all";
         }
+
+        /// <summary>
+        /// Getter/Setter for the PIE property
+        /// </summary>
         public bool PIE
         {
             get
@@ -492,11 +590,30 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for the ProfilingCall property
+        /// </summary>
         public bool ProfilingCall { get; set; }
+
+        /// <summary>
+        /// Getter/Setter for the CodeCoverage property
+        /// </summary>
         public bool CodeCoverage { get; set; }
+
+        /// <summary>
+        /// Getter/Setter for the Mudflap property
+        /// </summary>
         public bool Mudflap { get; set; }
+
+        /// <summary>
+        /// Getter/Setter for the QccExe property
+        /// </summary>
         public string QccExe { get; set; }
 
+        /// <summary>
+        /// Getter/Setter for the CompilerVersionTarget property
+        /// </summary>
         public string CompilerVersionTarget
         {
             get
@@ -525,8 +642,14 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the LinkSharedLibrary property
+        /// </summary>
         public virtual bool LinkSharedLibrary { get; set; }
 
+        /// <summary>
+        /// Getter/Setter for the Sources property
+        /// </summary>
         [Required]
         public virtual ITaskItem[] Sources
         {

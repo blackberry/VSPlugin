@@ -23,12 +23,19 @@ using System.IO;
 using System.Windows.Data;
 using RIM.VSNDK_Package.Signing;
 using System.Windows.Forms;
+using System.ComponentModel;
 
 namespace RIM.VSNDK_Package.DebugToken.Model
 {
 
-    class DebugTokenData : NotifyPropertyChanged
+    /// <summary>
+    /// The DataModel for the DebugToken dialog
+    /// </summary>
+    public class DebugTokenData : INotifyPropertyChanged
     {
+
+        #region Member Variables and Constants
+
         private static string _deviceIP;
         private static string _devicePassword;
         private static string _errors;
@@ -39,19 +46,24 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         private static string _ndkTargetPath;
         private static string _ndkHostPath;
         private static string _certPath;
+        private static string _deviceosversion = "";
         private static string _storepass;
-        private static string _localRIMFolder;
+        private static string _localFolder;
         private static bool _alreadyRegistered = false;
         private static string _tokenExpiryDate = "";
         private static string _tmpTokenExpiryDate = "";
         private static string _tokenAuthor = "";
         private static string _tmpTokenAuthor = "";
         public static bool _initializedCorrectly = true;
-
         private const string _colCompanyName = "CompanyName";
         private const string _colAuthorID = "AuthorID";
         private const string _colAttachedDevice = "AttachedDevice";
         private const string _colExpiryDate = "ExpiryDate";
+        public static bool restart = false;
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Company Name Property
@@ -63,6 +75,69 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         }
 
         /// <summary>
+        /// KeyStore Password
+        /// </summary>
+        public string KeyStorePassword
+        {
+            get { return _storepass; }
+            set { _storepass = value; }
+        }
+
+        /// <summary>
+        /// Device PIN
+        /// </summary>
+        public string DevicePIN
+        {
+            get { return _devicePin; }
+            set { _devicePin = value; }
+        }
+
+        /// <summary>
+        /// Device Password
+        /// </summary>
+        public string DevicePassword
+        {
+            get { return _devicePassword; }
+            set { _devicePassword = value; }
+        }
+
+        /// <summary>
+        /// Device PIN
+        /// </summary>
+        public string DeviceIP 
+        {
+            get { return _deviceIP; }
+            set { _deviceIP = value; }
+        }
+
+        /// <summary>
+        /// Device OS Version
+        /// </summary>
+        public string DeviceOSVersion
+        {
+            get { return _deviceosversion; }
+            set { _deviceosversion = value; }
+        }
+
+        /// <summary>
+        /// Signing Certificate Path Property
+        /// </summary>
+        public string CertPath
+        {
+            get { return _certPath; }
+            set { _certPath = value; }
+        }
+
+        /// <summary>
+        /// Local Folder Property
+        /// </summary>
+        public string LocalFolder
+        {
+            get { return _localFolder; }
+            set { _localFolder = value; }
+        }
+
+        /// <summary>
         /// Expiry Date Property
         /// </summary>
         public string ExpiryDate
@@ -71,7 +146,9 @@ namespace RIM.VSNDK_Package.DebugToken.Model
             set { _tokenExpiryDate = value; OnPropertyChanged(_colExpiryDate); }
         }
 
-        //Contains any errors during the registration
+        /// <summary>
+        /// Contains any errors during the registration
+        /// </summary>
         public string Error
         {
             get { return _errors; }
@@ -103,21 +180,24 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         {
             get
             {
-                if (_devicePin != "Not Attached")
+              
+                if (DevicePIN != "Not Attached")
                 {
-                    return _devicePin.Substring(0, 2) + _devicePin.Substring(2, 8).ToUpper();
+                    return DevicePIN.Substring(0, 2) + DevicePIN.Substring(2, 8).ToUpper();
                 }
                 else
                 {
-                    return _devicePin;
+                    return DevicePIN;
                 }
             }
             set 
-            { 
-                _devicePin = value;
+            {
+                DevicePIN = value;
                 OnPropertyChanged(_colAttachedDevice);
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Constructor
@@ -130,10 +210,11 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         public bool resetPassword()
         {
             _errors = "";
-            ResetPasswordWindow win = new ResetPasswordWindow();
+            RegistrationWindow win = new RegistrationWindow();
+            win.ResizeMode = System.Windows.ResizeMode.NoResize;
             bool? res = win.ShowDialog();
             if (res == true)
-                _storepass = win.tbCSKPassword.Password;
+                KeyStorePassword = win.tbPassword.Password;
 
             return res == true;
         }
@@ -143,9 +224,10 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// </summary>
         private void refreshScreen()
         {
-            string certPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\author.p12";
+            LocalFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\";
+            CertPath = LocalFolder + "author.p12";
 
-            if (!File.Exists(certPath))
+            if (!File.Exists(CertPath))
             {
                 System.Windows.Forms.MessageBox.Show("Missing Signing Keys. Use menu \"BlackBerry\" -> \"Signing\" to register your signing keys.", "Signing keys not registered", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 _initializedCorrectly = false;
@@ -154,7 +236,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                 _authorID = "";
                 _companyName = "";
                 _tokenExpiryDate = "";
-                _devicePin = "Not Attached";
+                DevicePIN = "Not Attached";
                 return;
             }
 
@@ -164,13 +246,11 @@ namespace RIM.VSNDK_Package.DebugToken.Model
             try
             {
                 rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                _deviceIP = rkPluginRegKey.GetValue("device_IP").ToString();
-                _devicePassword = rkPluginRegKey.GetValue("device_password").ToString();
+                DeviceIP = rkPluginRegKey.GetValue("device_IP").ToString();
+                DevicePassword = rkPluginRegKey.GetValue("device_password").ToString();
                 _ndkHostPath = rkPluginRegKey.GetValue("NDKHostPath").ToString();
                 _ndkTargetPath = rkPluginRegKey.GetValue("NDKTargetPath").ToString();
-                _storepass = (rkPluginRegKey.GetValue("CSKPass") != null) ? rkPluginRegKey.GetValue("CSKPass").ToString() : "";
-                _localRIMFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\";
-                _certPath = _localRIMFolder + "author.p12";
+                KeyStorePassword = (rkPluginRegKey.GetValue("CSKPass") != null) ? rkPluginRegKey.GetValue("CSKPass").ToString() : "";
                 _alreadyRegistered = false;
                 _tokenExpiryDate = "";
                 _tmpTokenExpiryDate = "";
@@ -182,7 +262,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                 if (_errors == null)
                     _errors = "";
 
-                if ((_deviceIP == "") || (_deviceIP == null))
+                if ((DeviceIP == "") || (DeviceIP == null))
                 {
                     MessageBox.Show("Missing Device IP", "Missing Device IP", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     rkPluginRegKey.Close();
@@ -193,15 +273,15 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                     _authorID = "";
                     _companyName = "";
                     _tokenExpiryDate = "";
-                    _devicePin = "Not Attached";
+                    DevicePIN = "Not Attached";
                     return;
                 }
 
-                if (_devicePassword != null)
+                if (DevicePassword != null)
                 {
                     try
                     {
-                        _devicePassword = Decrypt(_devicePassword);
+                        DevicePassword = Decrypt(DevicePassword);
                     }
                     catch
                     {
@@ -214,24 +294,23 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                         _authorID = "";
                         _companyName = "";
                         _tokenExpiryDate = "";
-                        _devicePin = "Not Attached";
+                        DevicePIN = "Not Attached";
                         return;
                     }
                 }
 
-                if (_storepass != "")
+                if (KeyStorePassword != "")
                 {
-                    _storepass = Decrypt(_storepass);
+                    KeyStorePassword = Decrypt(KeyStorePassword);
                 }
 
-                if (getDevicePin())
+                if (getDeviceInfo())
                 {
                     if (getDebugTokenInfo())
                     {
                         isRegistered();
                     }
                 }
-
             }
             catch (Exception ex)
             {
@@ -246,15 +325,15 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// <summary>
         /// Add current device to device list.
         /// </summary>
-        public bool addDevice()
+        public bool addDevice(DebugTokenDialog parent)
         {
-            if (_devicePin == "Not Attached")
+            if (DevicePIN == "Not Attached")
             {
                 _errors = "No device attached.\n";
                 return false;
             }
 
-            if (_storepass == "")
+            if (KeyStorePassword == "")
             {
                 if (!resetPassword())
                     return false;
@@ -262,14 +341,16 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if (createDebugToken()) uploadDebugToken();
 
-            while (_errors.Contains("invalid password"))
+            if ((_errors.Contains("invalid password")) || (_errors.Contains("password is not valid")) || (_errors.Contains("invalid store password")))
             {
-                MessageBox.Show(_errors, "Invalid Password");
+                MessageBox.Show("The specified password is invalid.\n\nPlease, enter the same one that you used to generate your BB ID Token.\n\nIf you don't remember it, you might close the next window, unregister and register again using BlackBerry -> Signing menu.",_errors, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                if (!resetPassword())
-                    return false;
-
-                if (createDebugToken()) uploadDebugToken();
+                parent.Close();
+                if (resetPassword())
+                {
+                    restart = true;
+                }
+                return false;
             }
 
             if (_errors.Contains("Cannot connect:"))
@@ -281,7 +362,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                 _authorID = "";
                 _companyName = "";
                 _tokenExpiryDate = "";
-                _devicePin = "Not Attached";
+                DevicePIN = "Not Attached";
                 return false;
             }
 
@@ -292,15 +373,15 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// <summary>
         /// Refresh current device to device list.
         /// </summary>
-        public bool refreshDevice()
+        public bool refreshDevice(DebugTokenDialog parent)
         {
-            if (_devicePin == "Not Attached")
+            if (DevicePIN == "Not Attached")
             {
                 _errors = "No device attached.\n";
                 return false;
             }
 
-            if (_storepass == "")
+            if (KeyStorePassword == "")
             {
                 if (!resetPassword())
                     return false;
@@ -308,14 +389,16 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             if (createDebugToken()) uploadDebugToken();
 
-            while (_errors.Contains("invalid password"))
+            if ((_errors.Contains("invalid password")) || (_errors.Contains("password is not valid")) || (_errors.Contains("invalid store password")))
             {
-                MessageBox.Show(_errors, "Invalid Password");
+                MessageBox.Show("The specified password is invalid.\n\nPlease, enter the same one that you used to generate your BB ID Token.\n\nIf you don't remember it, you might close the next window, unregister and register again using BlackBerry -> Signing menu.",_errors, MessageBoxButtons.OK, MessageBoxIcon.Error);
 
-                if (!resetPassword())
-                    return false;
-
-                if (createDebugToken()) uploadDebugToken();
+                parent.Close();
+                if (resetPassword())
+                {
+                    restart = true;
+                }
+                return false;
             }
 
             if (_errors.Contains("Cannot connect:"))
@@ -327,7 +410,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                 _authorID = "";
                 _companyName = "";
                 _tokenExpiryDate = "";
-                _devicePin = "Not Attached";
+                DevicePIN = "Not Attached";
                 return false;
             }
 
@@ -343,9 +426,8 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         {
             bool success = false;
 
-            if (!File.Exists(_localRIMFolder  + "DebugToken.bar"))
+            if (!File.Exists(LocalFolder  + "DebugToken.bar"))
             {
-                //  _errors = PkgResources.NativSDKNotInstalled;
                 return success;
             }
 
@@ -361,7 +443,8 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-airpackager.bat -listManifest ""{0}""", _localRIMFolder + "DebugToken.bar");
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
+            startInfo.Arguments = string.Format(@"/C blackberry-airpackager.bat -listManifest ""{0}""", LocalFolder + "DebugToken.bar");
 
             try
             {
@@ -391,16 +474,15 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         }
         
         /// <summary>
-        /// Get the device PIN of the connected device
+        /// Get the device Info of the connected device
         /// </summary>
         /// <returns>True if successful</returns>
-        private bool getDevicePin()
+        public bool getDeviceInfo()
         {
             bool success = false;
 
-            if (string.IsNullOrEmpty(_deviceIP))
+            if (string.IsNullOrEmpty(DeviceIP))
             {
-              //  _errors = PkgResources.NativSDKNotInstalled;
                 return success;
             }
 
@@ -413,10 +495,10 @@ namespace RIM.VSNDK_Package.DebugToken.Model
             p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
             p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
 
-
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format("/C blackberry-deploy.bat -listDeviceInfo {0} -password {1}", _deviceIP, _devicePassword);
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\"; 
+            startInfo.Arguments = string.Format("/C blackberry-deploy.bat -listDeviceInfo {0} -password {1}", DeviceIP, DevicePassword);
 
             try
             {
@@ -432,7 +514,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                 {
                     success = true;
                 }
-                
+
                 p.Close();
             }
             catch (Exception e)
@@ -479,12 +561,11 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         {
             bool success = false;
 
-            if (string.IsNullOrEmpty(_deviceIP))
+            if (string.IsNullOrEmpty(DeviceIP))
             {
-                //  _errors = PkgResources.NativSDKNotInstalled;
                 return success;
             }
-            else if (!File.Exists(_localRIMFolder + "DebugToken.bar"))
+            else if (!File.Exists(LocalFolder + "DebugToken.bar"))
             {
                 return success;
             }
@@ -500,7 +581,8 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-deploy.bat -installDebugToken ""{0}"" -device {1} -password {2}", _localRIMFolder + "DebugToken.bar", _deviceIP, _devicePassword);
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
+            startInfo.Arguments = string.Format(@"/C blackberry-deploy.bat -installDebugToken ""{0}"" -device {1} -password {2}", LocalFolder + "DebugToken.bar", DeviceIP, DevicePassword);
 
             try
             {
@@ -537,9 +619,8 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         {
             bool success = false;
 
-            if (string.IsNullOrEmpty(_deviceIP))
+            if (string.IsNullOrEmpty(DeviceIP))
             {
-                //  _errors = PkgResources.NativSDKNotInstalled;
                 return success;
             }
             else if (string.IsNullOrEmpty(_authorID))
@@ -558,7 +639,8 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-deploy.bat -uninstallApp -device {0} -password {1} -package-id {2}", _deviceIP, _devicePassword, _authorID);
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
+            startInfo.Arguments = string.Format(@"/C blackberry-deploy.bat -uninstallApp -device {0} -password {1} -package-id {2}", DeviceIP, DevicePassword, _authorID);
 
             try
             {
@@ -591,11 +673,11 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// Create a new Debug Token for connected device
         /// </summary>
         /// <returns>True if successful</returns>
-        private bool createDebugToken()
+        public bool createDebugToken()
         {
             bool success = false;
 
-            if (string.IsNullOrEmpty(_certPath))
+            if (string.IsNullOrEmpty(CertPath))
             {
                 return success;
             }
@@ -611,7 +693,10 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             /// Request Debug Token
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -cskpass {0} -keystore ""{1}"" -storepass {2} -device-id ""{3}"" ""{4}""", _storepass, _certPath, _storepass, _devicePin, _localRIMFolder + "DebugToken.bar");
+            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
+            startInfo.Arguments = string.Format(@"/C blackberry-debugtokenrequest.bat -storepass {0} -deviceid ""{1}"" ""{2}""",
+                KeyStorePassword, DevicePIN, LocalFolder + "DebugToken.bar");
+
 
             try
             {
@@ -665,6 +750,8 @@ namespace RIM.VSNDK_Package.DebugToken.Model
                     _tmpTokenExpiryDate = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
                 else if (e.Data.Contains("[n]debug_token_author::"))
                     _tokenAuthor = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
+                else if (e.Data.Contains("scmbundle::"))
+                    _deviceosversion = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
             }
         }
 
@@ -704,7 +791,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// <see cref="SecureString"/> should be used.</remarks>
         /// <exception cref="ArgumentNullException">If <paramref name="plainText"/>
         /// is a null reference.</exception>
-        private string Encrypt(string plainText)
+        public string Encrypt(string plainText)
         {
             if (plainText == null) throw new ArgumentNullException("plainText");
 
@@ -728,7 +815,7 @@ namespace RIM.VSNDK_Package.DebugToken.Model
         /// is essential, <see cref="SecureString"/> should be used.</remarks>
         /// <exception cref="ArgumentNullException">If <paramref name="cipher"/>
         /// is a null reference.</exception>
-        private string Decrypt(string cipher)
+        public string Decrypt(string cipher)
         {
             if (cipher == null) throw new ArgumentNullException("cipher");
 
@@ -740,6 +827,24 @@ namespace RIM.VSNDK_Package.DebugToken.Model
 
             return Encoding.Unicode.GetString(decrypted);
         }
+
+        #region INotifyPropertyChanged Implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        /// <summary>
+        /// Fire the PropertyChnaged event handler on change of property
+        /// </summary>
+        /// <param name="propName"></param>
+        protected void OnPropertyChanged(string propName)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(propName));
+            }
+        }
+
+        #endregion
 
     }
 }

@@ -27,50 +27,45 @@ using System.Windows.Shapes;
 using RIM.VSNDK_Package.Signing.Models;
 using System.IO;
 using Microsoft.VisualStudio.PlatformUI;
+using Microsoft.Win32;
+using System.Xml;
 
 namespace RIM.VSNDK_Package.Signing
 {
     /// <summary>
     /// Interaction logic for SigningDialog.xaml
     /// </summary>
-    public partial class SigningDialog : DialogWindow
+    public partial class SigningDialog : Window
     {
-        private string certPath;
+        private SigningData signingData = null;
 
         public SigningDialog()
         {
             InitializeComponent();
 
-            certPath = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) +  @"\Research In Motion\author.p12";
-            UpdateUI(File.Exists(certPath));
-
+            signingData = new SigningData();
+            gridMain.DataContext = signingData; 
         }
 
         /// <summary>
-        /// Private method to update the screen UI
-        /// </summary>
-        /// <param name="registered"></param>
-        private void UpdateUI(bool registered)
-        {
-            RIMSiginingAuthorityData data = gbRIMSigningAuthority.DataContext as RIMSiginingAuthorityData;
-            if (data != null)
-            {
-                data.Registered = registered;
-                btnRegister.IsEnabled = !registered;
-                btnUnregister.IsEnabled = registered;
-            }
-        }
-
-        /// <summary>
-        /// Show the Regisration Dialog
+        /// Open BlackBerry Signing in the default browser and start a thread that will move the downloaded 
+        /// bbidtoken.csk file to the right folder. Then, it is presented the Regisration Dialog.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
-            RegistrationWindow win = new RegistrationWindow();
-            bool? res = win.ShowDialog();
-            UpdateUI(File.Exists(certPath));
+            Browser wb = new Browser(this);
+            wb.ShowDialog();
+
+            if (!signingData.Registered)
+            {
+                RegistrationWindow win = new RegistrationWindow();
+                win.ResizeMode = System.Windows.ResizeMode.NoResize;
+                bool? res = win.ShowDialog();
+            }
+
+            signingData.RefreshScreen();
         }
 
         /// <summary>
@@ -82,7 +77,8 @@ namespace RIM.VSNDK_Package.Signing
         {
             DeRegisterWindow win = new DeRegisterWindow();
             bool? res = win.ShowDialog();
-            UpdateUI(File.Exists(certPath));    
+
+            signingData.RefreshScreen();    
         }
 
         /// <summary>
@@ -92,8 +88,9 @@ namespace RIM.VSNDK_Package.Signing
         /// <param name="e"></param>
         private void btnBackup_Click(object sender, RoutedEventArgs e)
         {
-            BackupRestoreData brData = gbBackupRestore.DataContext as BackupRestoreData;
             string zipfile = string.Empty;
+            
+            ///Create Dialog
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog();
             dlg.FileName = "signingkey";
             dlg.DefaultExt = ".zip"; // Default file extension
@@ -102,7 +99,7 @@ namespace RIM.VSNDK_Package.Signing
             if (result == true)
             {
                 zipfile = dlg.FileName;
-                brData.Backup(System.IO.Path.GetDirectoryName(certPath), zipfile);
+                signingData.Backup(zipfile);
             }
         }
 
@@ -113,7 +110,6 @@ namespace RIM.VSNDK_Package.Signing
         /// <param name="e"></param>
         private void btnRestore_Click(object sender, RoutedEventArgs e)
         {
-            BackupRestoreData brData = gbBackupRestore.DataContext as BackupRestoreData;
             string zipfile = string.Empty;
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".zip"; // Default file extension
@@ -122,10 +118,9 @@ namespace RIM.VSNDK_Package.Signing
             if (result == true)
             {
                 zipfile = dlg.FileName;
-                brData.Restore(zipfile, System.IO.Path.GetDirectoryName(certPath));
-                UpdateUI(File.Exists(certPath));
+                signingData.Restore(zipfile);
+                signingData.RefreshScreen(); 
             }
         }
-
     }
 }

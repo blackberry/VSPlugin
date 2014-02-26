@@ -4,9 +4,9 @@
   <name>FallingBlocks Test</name>
   <versionNumber>1.0.0</versionNumber>
   <buildId>1</buildId>
-  <description>The FallingBlocks application is used for displaying falling blocks. Hello</description>
-  <author>RIM Canada</author>
-  <authorId>gYAAgDthaMCeIcQicW0p4fUkeSM</authorId>
+  <description>The FallingBlocks application is used for displaying falling blocks.</description>
+  <author>David Burgess</author>
+  <authorId>gYAAgITWetvsq61EuszuYEkcRZU</authorId>
   <category>core.games</category>
   <initialWindow>
     <autoOrients />
@@ -14,11 +14,9 @@
     <systemChrome>noneasdasdf</systemChrome>
     <transparent>true</transparent>
   </initialWindow>
-  <asset path="icon.png" public="true" entry="" type="">lib/icon.png</asset>
-  <asset path="sample-splashscreen-landscape.png" public="true" entry="" type="Qnx/Elf">sample-splashscreen-landscape.png</asset>
-  <asset path="sample-splashscreen-portrait.png" public="true" entry="" type="">lib/sample-splashscreen-portrait.png</asset>
-  <asset path="LICENSE">LICENSE</asset>
-  <asset path="NOTICE">NOTICE</asset>
+  <asset path="icon.png" public="false" entry="" type="">icon.png</asset>
+  <asset path="sample-splashscreen-landscape.png" public="false" entry="" type="">sample-splashscreen-landscape.png</asset>
+  <asset path="sample-splashscreen-portrait.png" public="false" entry="" type="">sample-splashscreen-portrait.png</asset>
   <configuration id="com.qnx.qcc.configuration.exe.debug.342123362" name="Device-Debug">
     <platformArchitecture>armle-v7</platformArchitecture>
     <asset path="Device-Debug/FallingBlocks" entry="true" type="Qnx/Elf">FallingBlocks</asset>

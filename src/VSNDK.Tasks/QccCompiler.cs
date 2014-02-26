@@ -63,6 +63,9 @@ namespace VSNDK.Tasks
         #endregion
 
         #region overrides
+        /// <summary>
+        /// Getter/Setter for the AlwaysAppend property
+        /// </summary>
         protected override string AlwaysAppend
         {
             get
@@ -71,6 +74,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the AttributeFileTracking property
+        /// </summary>
         public override bool AttributeFileTracking
         {
             get
@@ -79,6 +85,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the TrackedInputFiles property
+        /// </summary>
         protected override Microsoft.Build.Framework.ITaskItem[] TrackedInputFiles
         {
             get
@@ -87,7 +96,13 @@ namespace VSNDK.Tasks
             }
         }
 
-
+        /// <summary>
+        /// Execute the specified tool for building
+        /// </summary>
+        /// <param name="pathToTool"></param>
+        /// <param name="responseFileCommands"></param>
+        /// <param name="commandLineCommands"></param>
+        /// <returns></returns>
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
             foreach (ITaskItem item in this.Sources)
@@ -98,6 +113,9 @@ namespace VSNDK.Tasks
             return base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
         }
 
+        /// <summary>
+        /// Getter/Setter for the WriteTLogNames property
+        /// </summary>
         protected override string[] WriteTLogNames
         {
             get
@@ -105,6 +123,10 @@ namespace VSNDK.Tasks
                 return new string[] { "qcc_compiler.write.1.tlog", "qcc_compiler.*.write.1.tlog" };
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for the CommandTLogName property
+        /// </summary>
         protected override string CommandTLogName
         {
             get
@@ -112,6 +134,10 @@ namespace VSNDK.Tasks
                 return "qcc_compiler.command.1.tlog";
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for the ReadTLogNames property
+        /// </summary>
         protected override string[] ReadTLogNames
         {
             get
@@ -122,6 +148,10 @@ namespace VSNDK.Tasks
         #endregion //override
 
         #region properties
+
+        /// <summary>
+        /// GetterSetter for the AdditionalIncludeDirectories property.
+        /// </summary>
         public string[] AdditionalIncludeDirectories
         {
             get
@@ -148,6 +178,10 @@ namespace VSNDK.Tasks
                 base.AddActiveSwitchToolValue(switch2);
             }
         }
+
+        /// <summary>
+        /// Getter/Setter for the Ansi property
+        /// </summary>
         public bool Ansi
         {
             get
@@ -171,6 +205,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the MinimalRebuild property
+        /// </summary>
         public virtual bool MinimalRebuild
         {
             get
@@ -197,6 +234,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the ObjectFileName property 
+        /// </summary>
         public string ObjectFileName
         {
             get
@@ -224,6 +264,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the ExpandAttributedSource property 
+        /// </summary>
         public bool ExpandAttributedSource
         {
             get
@@ -247,6 +290,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the FavorSizeOrSpeed property
+        /// </summary>
         public string FavorSizeOrSpeed
         {
             get
@@ -276,6 +322,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PreprocessKeepComments property
+        /// </summary>
         public bool PreprocessKeepComments
         {
             get
@@ -299,6 +348,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for hte PreprocessorDefinitions property
+        /// </summary>
         public string[] PreprocessorDefinitions
         {
             get
@@ -326,6 +378,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PreprocessOutput property
+        /// </summary>
         [Output]
         public ITaskItem[] PreprocessOutput
         {
@@ -339,6 +394,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PreprocessOutputPath
+        /// </summary>
         public string PreprocessOutputPath
         {
             get
@@ -366,6 +424,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PreprocessSuppressLineNumbers property
+        /// </summary>
         public bool PreprocessSuppressLineNumbers
         {
             get
@@ -389,6 +450,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the PreprocessToFile property
+        /// </summary>
         public bool PreprocessToFile
         {
             get
@@ -412,6 +476,9 @@ namespace VSNDK.Tasks
             }
         }
 
+        /// <summary>
+        /// Getter/Setter for the UndefinePreprocessorDefinition property
+        /// </summary>
         public string[] UndefinePreprocessorDefinition
         {
             get
