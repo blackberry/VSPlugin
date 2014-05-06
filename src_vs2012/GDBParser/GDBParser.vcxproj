@@ -76,7 +76,7 @@
       <ResourceOutputFileName>$(IntDir)GDBParser.res</ResourceOutputFileName>
     </ResourceCompile>
     <Link>
-      <RegisterOutput>true</RegisterOutput>
+      <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>psapi.lib;$(ProgramFiles)\Microsoft Visual Studio 11.0\DIA SDK\lib\diaguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>GDBParser.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
