@@ -14,6 +14,11 @@ samples/HelloWorldDisplay/HelloWorldDisplay/Simulator-Debug/
 
 
 # user configuration files
+src/VSNDK.opensdf
+src/VSNDK.sdf
+src/VSNDK.sln.DotSettings
+src/VSNDK.sln.DotSettings.user
+src/VSNDK.suo
 src/GDBParser/GDBParser.vcxproj.user
 src/GDBWrapper/GDBWrapper.vcxproj.user
 src/VSNDK.AddIn/VSNDK.AddIn.csproj.user
@@ -41,6 +46,24 @@ src_vs2013/VSNDK.AddIn/VSNDK.AddIn.csproj.user
 
 
 # build temp outputs
+src/Debug/
+src/GDBParser.UnitTests/bin/
+src/GDBParser.UnitTests/obj/
+src/GDBParser/Debug/
+src/GDBWrapper/Debug/
+src/VSNDK.AddIn/bin/
+src/VSNDK.AddIn/obj/
+src/VSNDK.DebugEngine/bin/
+src/VSNDK.DebugEngine/obj/
+src/VSNDK.Package.Test/bin/
+src/VSNDK.Package.Test/obj/
+src/VSNDK.Package/bin/
+src/VSNDK.Package/obj/
+src/VSNDK.Tasks.Test/bin/
+src/VSNDK.Tasks.Test/obj/
+src/VSNDK.Tasks/bin/
+src/VSNDK.Tasks/obj/
+
 src_vs2012/Debug/
 src_vs2012/GDBParser/Debug/
 src_vs2012/GDBParser.UnitTests/bin/
