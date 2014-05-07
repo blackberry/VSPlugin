@@ -192,9 +192,80 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
         {
-            AD7PortRequest port_request = (AD7PortRequest)pRequest;
-            var port = CreatePort(port_request);
-            m_ports.Add(port.m_guid, port);
+            bool sucess = true;
+            AD7PortRequest port_request = null;
+            AD7Port port = null;
+            try
+            {
+                port_request = (AD7PortRequest)pRequest;
+            }
+            catch
+            {
+                sucess = false;
+                string portRequestName;
+                AD7Port defaultPort = null;
+                pRequest.GetPortName(out portRequestName);
+                string search = "";
+                if (portRequestName.ToLower().Contains("device"))
+                    search = "device";
+                else if (portRequestName.ToLower().Contains("simulator"))
+                    search = "simulator";
+                else
+                {
+                    search = portRequestName.ToLower();
+                }
+                foreach (var p in m_ports)
+                {
+                    AD7Port tempPort = p.Value;
+                    if (defaultPort == null)
+                        defaultPort = tempPort;
+
+                    string tempPortName = "";
+                    tempPort.GetPortName(out tempPortName);
+                    if (tempPortName.ToLower().Contains(search))
+                    {
+                        port = tempPort;
+                        break;
+                    }
+                    else
+                    {
+                        string IP = search;
+                        do
+                        {
+                            int pos = IP.LastIndexOf('.');
+                            if (pos != -1)
+                            {
+                                IP = IP.Remove(pos);
+                                if (tempPortName.Contains(IP))
+                                {
+                                    port = tempPort;
+                                    break;
+                                }
+                            }
+                            else
+                                IP = "";
+                        } while (IP != "");
+                        if (IP != "")
+                            break;
+                    }
+                }
+                if (port == null)
+                {
+                    if (defaultPort != null)
+                    {
+                        port = defaultPort;
+                    }
+                    else
+                        port = new AD7Port(this, port_request, Guid.NewGuid(), "", "", true, "");
+                }
+            }
+            if (sucess)
+            {
+                port = CreatePort(port_request);
+                Guid portGuid;
+                port.GetPortId(out portGuid);
+                m_ports.Add(portGuid, port);
+            }
             ppPort = port;
             return VSConstants.S_OK; 
         }

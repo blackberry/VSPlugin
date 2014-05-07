@@ -20,12 +20,12 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
+using RIM.VSNDK_Package;
 using VSNDK.Parser;
 //using VSNDK.AddIn;
 using VSNDK.Package;
 
 using NameValueCollection = System.Collections.Specialized.NameValueCollection;
-using NameValueCollectionHelper = VSNDK.Package.NameValueCollectionHelper;
 using System.Collections;
 using System.Windows.Forms;
 
@@ -340,7 +340,7 @@ namespace VSNDK.DebugEngine
 
                     m_running.Set();
 
-                    if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning)
+                    if (Package.ControlDebugEngine.isDebugEngineRunning)
                         HandleProcessExecution.m_mre.Reset();
                 }
             }
@@ -795,7 +795,10 @@ namespace VSNDK.DebugEngine
         public int EnumThreads(out IEnumDebugThreads2 ppEnum)
         {
             AD7Thread[] listThreads = null;
-            int currentThread = GetListOfThreads(out listThreads);
+            int currentThread = 0;
+
+            if (m_state != DE_STATE.RUN_MODE)
+                currentThread = GetListOfThreads(out listThreads);
 
             // the following code seems to be weird but I had to update each field of this.m_process._threads because, when using
             // "this.m_process._threads = listThreads;" without having a new thread, VS starts to duplicate the existing threads 
@@ -804,7 +807,10 @@ namespace VSNDK.DebugEngine
             if ((currentThread == -1) || (listThreads == null))
             {
                 ppEnum = null;
-                return VSConstants.S_FALSE;
+                if (currentThread == 0)
+                    return VSConstants.S_OK;
+                else
+                    return VSConstants.S_FALSE;
             }
 
             if (listThreads.Length != this.m_threads.Length)
@@ -867,6 +873,8 @@ namespace VSNDK.DebugEngine
                         else
                             this.m_threads[i]._filename = listThreads[i]._filename;
                     }
+                    this.m_threads[i].__stackFrames = listThreads[i].__stackFrames;
+                    this.m_threads[i]._suspendCount = listThreads[i]._suspendCount;
                 } 
 
                 ppEnum = new AD7ThreadEnum(this.m_threads);
