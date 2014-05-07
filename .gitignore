@@ -29,6 +29,7 @@ src/VSNDK.Tasks/VSNDK.Tasks.csproj.user
 src_vs2012/VSNDK.sdf
 src_vs2012/VSNDK.opensdf
 src_vs2012/VSNDK.sln.DotSettings
+src_vs2012/VSNDK.sln.DotSettings.user
 src_vs2012/VSNDK.v11.suo
 src_vs2012/GDBParser/GDBParser.vcxproj.user
 src_vs2012/GDBWrapper/GDBWrapper.vcxproj.user
@@ -88,6 +89,7 @@ src_vs2013/GDBParser.UnitTests/bin/
 src_vs2013/GDBParser.UnitTests/obj/
 src_vs2013/GDBParser/Debug/
 src_vs2013/GDBWrapper/Debug/
+src_vs2013/ipch/
 src_vs2013/VSNDK.AddIn/bin/
 src_vs2013/VSNDK.AddIn/obj/
 src_vs2013/VSNDK.DebugEngine/bin/
