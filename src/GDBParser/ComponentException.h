@@ -19,18 +19,19 @@ BEGIN_NAMESPACE
 public ref class ComponentException : public Exception
 {
 public:
-	ComponentException(HRESULT hr) : Exception()
-	{
-		this->HResult = hr;
-	}
+    ComponentException(HRESULT hr)
+        : Exception()
+    {
+        Exception::HResult = hr;
+    }
 
-	property HRESULT HResult
-	{
-		HRESULT get()
-		{
-			return Exception::HResult;
-		}
-	}
+    property HRESULT HResult
+    {
+        HRESULT get()
+        {
+            return Exception::HResult;
+        }
+    }
 };
 
 END_NAMESPACE

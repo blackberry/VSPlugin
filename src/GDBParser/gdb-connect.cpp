@@ -1627,11 +1627,14 @@ void parsedLogPrint(char* buffer) {
 		strftime(buf, 31, "%H:%M:%S", &tm);
 		
 		FILE* file = fopen((char *)parse_log, "a");
-		if (buffer[0] == 'P')
-			fprintf(file, "%s - %s\n\n", buf, buffer);
-		else
-			fprintf(file, "%s - %s", buf, buffer);
-		fclose(file);
+        if (file != NULL)
+        {
+		    if (buffer[0] == 'P')
+			    fprintf(file, "%s - %s\n\n", buf, buffer);
+		    else
+			    fprintf(file, "%s - %s", buf, buffer);
+		    fclose(file);
+        }
 	}
 }
 
@@ -1840,6 +1843,7 @@ bool insertingCommandCodes(unordered_map<string, int> *map, string parsingInstru
         cout << "\nCouldn't open Instructions.txt.\n";
 		return 0;
     }
+
 	int count = 0;
 	while(true)
 	{
