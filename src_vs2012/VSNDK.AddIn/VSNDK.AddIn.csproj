@@ -92,19 +92,33 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AssemblyInfo.cs">
-      <SubType>Code</SubType>
+    <Compile Include="..\..\src\VSNDK.AddIn\Connect.cs">
+      <Link>Connect.cs</Link>
     </Compile>
-    <Compile Include="Connect.cs">
-      <SubType>Code</SubType>
+    <Compile Include="..\..\src\VSNDK.AddIn\Guids.cs">
+      <Link>Guids.cs</Link>
     </Compile>
-    <Compile Include="Guids.cs" />
-    <Compile Include="NameValueCollectionHelper.cs" />
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="TokenProcessor.cs" />
-    <Compile Include="VSNDKAddIn.cs" />
-    <Compile Include="VSNDKCommandEvents.cs" />
-    <Compile Include="VSNDKConstants.cs" />
+    <Compile Include="..\..\src\VSNDK.AddIn\NameValueCollectionHelper.cs">
+      <Link>NameValueCollectionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.AddIn\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.AddIn\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.AddIn\TokenProcessor.cs">
+      <Link>TokenProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.AddIn\VSNDKAddIn.cs">
+      <Link>VSNDKAddIn.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.AddIn\VSNDKCommandEvents.cs">
+      <Link>VSNDKCommandEvents.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.AddIn\VSNDKConstants.cs">
+      <Link>VSNDKConstants.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="EnvDTE100">
