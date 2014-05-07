@@ -24,7 +24,20 @@
 /// </summary>
 class CGDBParserModule : public CAtlDllModuleT< CGDBParserModule >
 {
+#if _ATL_VER >= 0x0C00
 
+public:
+    // Added missing method, as it was removed between from VS2013 ATL library version.
+    // The unsuffixed name has the same meaning as the old one with 'S' from the VS2010.
+    inline HRESULT WINAPI UpdateRegistryFromResourceS(
+        _In_ UINT nResID,
+        _In_ BOOL bRegister,
+        _In_opt_ struct _ATL_REGMAP_ENTRY* pMapEntries /*= NULL*/) throw()
+    {
+        return UpdateRegistryFromResource(nResID, bRegister, pMapEntries);
+    }
+
+#endif
 };
 
 CGDBParserModule _GDBParserModule;
@@ -41,11 +54,11 @@ STDAPI DllRegisterServer(void)
     WCHAR wszThisFile[MAX_PATH + 1];
     GetModuleFileName(_hModThis, wszThisFile, MAX_PATH + 1);
 
-	// Cut off the FileName. GDBPARSERPATH should point to GDBParserAPI
-	WCHAR wszPath[MAX_PATH + 1];
-	WCHAR* wszFileName;
-	GetFullPathName(wszThisFile, MAX_PATH + 1, wszPath, &wszFileName);
-	*wszFileName = L'\0';
+    // Cut off the FileName. GDBPARSERPATH should point to GDBParserAPI
+    WCHAR wszPath[MAX_PATH + 1];
+    WCHAR* wszFileName;
+    GetFullPathName(wszThisFile, MAX_PATH + 1, wszPath, &wszFileName);
+    *wszFileName = L'\0';
 
     // Register the sample engine in the Visual Studio registry hive. See GDBParser.rgs for what is added.
      _ATL_REGMAP_ENTRY rgMap[] =
@@ -55,7 +68,7 @@ STDAPI DllRegisterServer(void)
     };
 
     HRESULT hr = _GDBParserModule.UpdateRegistryFromResourceS(IDR_GDBPARSER, true, rgMap);
-	return hr;
+    return hr;
 }
 
 
@@ -69,11 +82,11 @@ STDAPI DllUnregisterServer(void)
     WCHAR wszThisFile[MAX_PATH + 1];
     GetModuleFileName(_hModThis, wszThisFile, MAX_PATH + 1);
 
-	// Cut off the FileName. GDBPARSERPATH should point to GDBParserAPI
-	WCHAR wszPath[MAX_PATH + 1];
-	WCHAR* wszFileName;
-	GetFullPathName(wszThisFile, MAX_PATH + 1, wszPath, &wszFileName);
-	*wszFileName = L'\0';
+    // Cut off the FileName. GDBPARSERPATH should point to GDBParserAPI
+    WCHAR wszPath[MAX_PATH + 1];
+    WCHAR* wszFileName;
+    GetFullPathName(wszThisFile, MAX_PATH + 1, wszPath, &wszFileName);
+    *wszFileName = L'\0';
 
     // Register the sample engine in the Visual Studio registry hive. See GDBParser.rgs for what is added.
      _ATL_REGMAP_ENTRY rgMap[] =
@@ -83,7 +96,7 @@ STDAPI DllUnregisterServer(void)
     };
 
     HRESULT hr = _GDBParserModule.UpdateRegistryFromResourceS(IDR_GDBPARSER, false, rgMap);
-	return hr;
+    return hr;
 }
 
 
@@ -92,20 +105,19 @@ STDAPI DllUnregisterServer(void)
 /// <param name="ul_reason_for_call"> </param>
 /// <param name="lpReserved"> </param>
 /// <returns> TRUE. </returns>
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-					 )
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
     _hModThis = hModule;
-	switch (ul_reason_for_call)
-	{
-	case DLL_PROCESS_ATTACH:
-	case DLL_THREAD_ATTACH:
-	case DLL_THREAD_DETACH:
-	case DLL_PROCESS_DETACH:
-		break;
-	}
-	return TRUE;
+    switch (ul_reason_for_call)
+    {
+        case DLL_PROCESS_ATTACH:
+            ::DisableThreadLibraryCalls(hModule);
+            break;
+        case DLL_THREAD_ATTACH:
+        case DLL_THREAD_DETACH:
+        case DLL_PROCESS_DETACH:
+            break;
+    }
+    return TRUE;
 }
 
