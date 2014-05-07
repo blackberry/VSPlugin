@@ -18,19 +18,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Constants.cpp">
+    <ClCompile Include="..\..\src\GDBParser\Constants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="..\..\src\GDBParser\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gdb-connect.cpp">
+    <ClCompile Include="..\..\src\GDBParser\gdb-connect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GDBParserAPI.cpp">
+    <ClCompile Include="..\..\src\GDBParser\GDBParserAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,13 +41,13 @@
     <None Include="GDBParser.rgs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Instructions.txt" />
+    <None Include="..\..\src\GDBParser\Instructions.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ComponentException.h">
+    <ClInclude Include="..\..\src\GDBParser\ComponentException.h">
       <Filter>Internal Header files</Filter>
     </ClInclude>
-    <ClInclude Include="ProjInclude.h">
+    <ClInclude Include="..\..\src\GDBParser\ProjInclude.h">
       <Filter>Internal Header files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
@@ -56,13 +56,13 @@
     <ClInclude Include="stdafx.h">
       <Filter>Internal Header files</Filter>
     </ClInclude>
-    <ClInclude Include="WorkerUtil.h">
+    <ClInclude Include="..\..\src\GDBParser\WorkerUtil.h">
       <Filter>Internal Header files</Filter>
     </ClInclude>
-    <ClInclude Include="gdb-connect.h">
+    <ClInclude Include="..\..\src\GDBParser\gdb-connect.h">
       <Filter>Internal Header files</Filter>
     </ClInclude>
-    <ClInclude Include="GDBParserAPI.h">
+    <ClInclude Include="..\..\src\GDBParser\GDBParserAPI.h">
       <Filter>Source Files\GDBParser API Header files</Filter>
     </ClInclude>
   </ItemGroup>

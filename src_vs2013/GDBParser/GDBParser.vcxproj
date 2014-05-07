@@ -62,7 +62,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>C:\VSPlugin-Git\vsplugin-ndk\src\gdb-connect;$(ProgramFiles)\Microsoft Visual Studio 10.0\DIA SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VSInstallDir)\DIA SDK\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>Default</BasicRuntimeChecks>
@@ -126,8 +126,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Constants.cpp" />
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="..\..\src\GDBParser\Constants.cpp" />
+    <ClCompile Include="..\..\src\GDBParser\dllmain.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </PrecompiledHeader>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</CompileAsManaged>
@@ -135,26 +135,26 @@
       </PrecompiledHeader>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</CompileAsManaged>
     </ClCompile>
-    <ClCompile Include="gdb-connect.cpp" />
+    <ClCompile Include="..\..\src\GDBParser\gdb-connect.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="GDBParserAPI.cpp" />
+    <ClCompile Include="..\..\src\GDBParser\GDBParserAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="GDBParser.def" />
     <None Include="GDBParser.rgs" />
-    <None Include="Instructions.txt" />
+    <None Include="..\..\src\GDBParser\Instructions.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="gdb-connect.h" />
-    <ClInclude Include="GDBParserAPI.h" />
-    <ClInclude Include="ComponentException.h" />
-    <ClInclude Include="ProjInclude.h" />
+    <ClInclude Include="..\..\src\GDBParser\gdb-connect.h" />
+    <ClInclude Include="..\..\src\GDBParser\GDBParserAPI.h" />
+    <ClInclude Include="..\..\src\GDBParser\ComponentException.h" />
+    <ClInclude Include="..\..\src\GDBParser\ProjInclude.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="WorkerUtil.h" />
+    <ClInclude Include="..\..\src\GDBParser\WorkerUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GDBParser.rc" />

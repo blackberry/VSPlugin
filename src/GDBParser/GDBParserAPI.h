@@ -36,7 +36,7 @@ public:
 	static bool is_Input_Buffer_Empty();
     static void exitGDB();
 
-	static bool s_running = false;
+    static bool s_running = false;
 
 private:
 	static void setNDKVars(bool);

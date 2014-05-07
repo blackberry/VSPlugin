@@ -75,6 +75,8 @@ public:
 void DisplayError(LPCTSTR);
 void ErrorExit(LPTSTR);
 
+void parsedLogPrint(char*);
+
 // Threads responsible for calling the right GDBConsole methods to send commands to GDB and to get responses from GDB. They are also 
 // responsible for handling the messages that are sent to/received from GDB.
 unsigned __stdcall listeningGDB(void *);
