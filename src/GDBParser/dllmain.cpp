@@ -22,8 +22,11 @@
 /// <summary> 
 /// Use the ATL Registrar to register the engine. 
 /// </summary>
-class CGDBParserModule : public CAtlDllModuleT< CGDBParserModule >
+class CGDBParserModule : public CAtlDllModuleT<CGDBParserModule>
 {
+private:
+    HMODULE     _hModule;
+
 #if _ATL_VER >= 0x0C00
 
 public:
@@ -38,10 +41,40 @@ public:
     }
 
 #endif
+
+public:
+    // Stores the handle to current library instance.
+    void SetModuleHandle(HMODULE hModule)
+    {
+        _hModule = hModule;
+    }
+
+    // Inserts into the specified buffer the path to the current library.
+    BOOL GetDirectory(LPTSTR buffer, size_t size)
+    {
+        TCHAR wszLibNameBuffer[MAX_PATH];
+        TCHAR *lpszFileName = NULL;
+
+        if (buffer == NULL)
+            return FALSE;
+
+        // get the binary's full-path:
+        GetModuleFileName(_hModule, wszLibNameBuffer, MAX_PATH);
+        if (GetLastError() != ERROR_SUCCESS)
+            return FALSE;
+
+        // remove the file-name:
+        if (!GetFullPathName(wszLibNameBuffer, size, buffer, &lpszFileName))
+            return FALSE;
+
+        if (lpszFileName == NULL)
+            return FALSE;
+        *lpszFileName = _T('\0');
+        return TRUE;
+    }
 };
 
 CGDBParserModule _GDBParserModule;
-HMODULE _hModThis;
 
 
 /// <summary> 
@@ -50,20 +83,17 @@ HMODULE _hModThis;
 /// <returns> HRESULT </returns>
 STDAPI DllRegisterServer(void)
 {
-    // Get this binaries full-path
-    WCHAR wszThisFile[MAX_PATH + 1];
-    GetModuleFileName(_hModThis, wszThisFile, MAX_PATH + 1);
-
-    // Cut off the FileName. GDBPARSERPATH should point to GDBParserAPI
     WCHAR wszPath[MAX_PATH + 1];
-    WCHAR* wszFileName;
-    GetFullPathName(wszThisFile, MAX_PATH + 1, wszPath, &wszFileName);
-    *wszFileName = L'\0';
 
+    // Get this binary's path
+    if (!_GDBParserModule.GetDirectory(wszPath, MAX_PATH + 1))
+        return E_FAIL;
+
+    // GDBPARSERPATH should point to GDBParserAPI
     // Register the sample engine in the Visual Studio registry hive. See GDBParser.rgs for what is added.
      _ATL_REGMAP_ENTRY rgMap[] =
     {
-        {L"GDBPARSERPATH",                   wszPath},
+        {L"GDBPARSERPATH", wszPath},
         {NULL, NULL}
     };
 
@@ -78,16 +108,13 @@ STDAPI DllRegisterServer(void)
 /// <returns> HRESULT </returns>
 STDAPI DllUnregisterServer(void)
 {
-    // Get this binaries full-path
-    WCHAR wszThisFile[MAX_PATH + 1];
-    GetModuleFileName(_hModThis, wszThisFile, MAX_PATH + 1);
-
-    // Cut off the FileName. GDBPARSERPATH should point to GDBParserAPI
     WCHAR wszPath[MAX_PATH + 1];
-    WCHAR* wszFileName;
-    GetFullPathName(wszThisFile, MAX_PATH + 1, wszPath, &wszFileName);
-    *wszFileName = L'\0';
 
+    // Get this binary's path
+    if (!_GDBParserModule.GetDirectory(wszPath, MAX_PATH + 1))
+        return E_FAIL;
+
+    // GDBPARSERPATH should point to GDBParserAPI
     // Register the sample engine in the Visual Studio registry hive. See GDBParser.rgs for what is added.
      _ATL_REGMAP_ENTRY rgMap[] =
     {
@@ -107,7 +134,8 @@ STDAPI DllUnregisterServer(void)
 /// <returns> TRUE. </returns>
 BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
 {
-    _hModThis = hModule;
+    _GDBParserModule.SetModuleHandle(hModule);
+
     switch (ul_reason_for_call)
     {
         case DLL_PROCESS_ATTACH:
