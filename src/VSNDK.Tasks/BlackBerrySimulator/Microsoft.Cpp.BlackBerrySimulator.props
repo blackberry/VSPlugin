@@ -66,6 +66,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Redefine the Target Macros-->
   <PropertyGroup>
     <TargetPath>$([System.IO.Path]::Combine($(ProjectDir),$(OutDir)$(LibPrefix)$(TargetName)$(TargetExt)))</TargetPath>
+    <TargetPath>$(TargetPath.TrimEnd('\'))</TargetPath>
     <TargetFileName>$([System.IO.Path]::GetFileName('$(TargetPath)'))</TargetFileName>
     <TargetDir>$([System.IO.Path]::GetDirectoryName('$(TargetPath)'))</TargetDir>
     <TargetName>$(LibPrefix)$(ProjectName)</TargetName>

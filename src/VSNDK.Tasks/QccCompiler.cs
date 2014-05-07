@@ -316,7 +316,7 @@ namespace VSNDK.Tasks
                 switch2.SwitchValue = base.ReadSwitchMap("FavorSizeOrSpeed", switchMap, value);
                 switch2.Name = "FavorSizeOrSpeed";
                 switch2.Value = value;
-                switch2.MultiValues = true;
+                switch2.MultipleValues = true;
                 base.ActiveToolSwitches.Add("FavorSizeOrSpeed", switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }

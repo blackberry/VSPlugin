@@ -456,7 +456,11 @@ namespace VSNDK.Tasks
                 switch2.SwitchValue = base.ReadSwitchMap(TARGET_FORMAT, switchMap, value);
                 switch2.Name = TARGET_FORMAT;
                 switch2.Value = value;
+#if PLATFORM_VS2010
                 switch2.MultiValues = true;
+#else
+                switch2.MultipleValues = true;
+#endif
                 base.ActiveToolSwitches.Add(TARGET_FORMAT, switch2);
                 base.AddActiveSwitchToolValue(switch2);
             }
