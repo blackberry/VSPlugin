@@ -36,6 +36,7 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using RIM.VSNDK_Package.UpdateManager.Model;
+using VSNDK.Parser;
 
 namespace RIM.VSNDK_Package
 {
@@ -63,13 +64,28 @@ namespace RIM.VSNDK_Package
     /// </summary>
     public class APITargetClass
     {
+        private string DefaultVersion = "10.2.0.1155";
+
         public string TargetName { get; set; }
         public string TargetDescription { get; set; }
         public string TargetVersion { get; set; }
         public string LatestVersion { get; set; }
         public int IsInstalled { get; set; }
+        public bool IsAPIDefault { get; set; }
         public bool IsUpdate { get; set; }
-        public bool IsBeta { get; set; }
+
+
+        public string IsDefault
+        {
+            get { return TargetVersion == DefaultVersion ? "True" : "False"; }
+            set
+            {
+                if (value == "True")
+                    DefaultVersion = TargetVersion;
+                else
+                    DefaultVersion = "";
+            }
+        }
 
         public string InstalledVisibility
         {
@@ -78,7 +94,7 @@ namespace RIM.VSNDK_Package
 
         public string AvailableVisibility
         {
-            get { return IsInstalled == 0 ? "visible" : "collapsed"; }
+            get { return ((IsAPIDefault) && (IsInstalled == 0)) ? "visible" : "collapsed"; }
         }
 
         public string UpdateVisibility
@@ -89,7 +105,7 @@ namespace RIM.VSNDK_Package
         public string NoUpdateVisibility
         {
             get { return IsUpdate ? "collapsed" : "visible"; }
-        }
+        } 
 
         public APITargetClass(string name, string description, string version)
         {
@@ -99,7 +115,6 @@ namespace RIM.VSNDK_Package
             LatestVersion = version;
             IsInstalled = 0;
             IsUpdate = false;
-            IsBeta = false;
         }
     }
 
@@ -177,6 +192,14 @@ namespace RIM.VSNDK_Package
         }
 
         /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetInstalledAPIList();
+        }
+
+        /// <summary>
         /// Public property to retrieve the singleton instance
         /// </summary>
         public static InstalledAPIListSingleton Instance
@@ -187,6 +210,7 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new InstalledAPIListSingleton();
                 }
+                
                 return _instance;
             }
         }
@@ -250,6 +274,16 @@ namespace RIM.VSNDK_Package
             GetInstalledNDKList();
         }
 
+
+        /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetInstalledNDKList();
+        }
+
+   
         /// <summary>
         /// Public property to retrieve the singleton instance
         /// </summary>
@@ -261,6 +295,8 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new InstalledNDKListSingleton();
                 }
+
+
                 return _instance;
             }
         }
@@ -317,7 +353,107 @@ namespace RIM.VSNDK_Package
         private APITargetListSingleton()
         {
             GetAvailableAPIList();
+            GetDefaultAPIList();
         }
+
+
+        /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetAvailableAPIList();
+            _instance.GetDefaultAPIList();
+        }
+
+        /// <summary>
+        /// Retrieve list of API's from 
+        /// </summary>
+        /// <returns></returns>
+        private void GetDefaultAPIList()
+        {
+            if (GlobalFunctions.isOnline())
+            {
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                startInfo.UseShellExecute = false;
+                startInfo.CreateNoWindow = true;
+                startInfo.RedirectStandardError = true;
+                startInfo.RedirectStandardOutput = true;
+                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
+                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDefaultsDataReceived);
+
+
+                /// Get Device PIN
+                startInfo.FileName = "cmd.exe";
+                startInfo.Arguments = string.Format(@"/C " + GlobalFunctions.bbndkPathConst + @"\eclipsec --list");
+
+                try
+                {
+                    p.Start();
+                    p.BeginErrorReadLine();
+                    p.BeginOutputReadLine();
+                    p.WaitForExit();
+                    p.Close();
+                    if (_error != "")
+                    {
+                        if (!GlobalFunctions.isOnline())
+                        {
+                            MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        else
+                        {
+                            MessageBox.Show(_error, "Get default API list failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        _error = "";
+                        _tempAPITargetList = null;
+                    }
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
+                    System.Diagnostics.Debug.WriteLine(e.Message);
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// On Data Received event handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void APIListDefaultsDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        {
+            string version = "";
+            string name = "";
+
+            if (e.Data != null)
+            {
+                if ((e.Data.ToLower().Contains("error")) || (_error != ""))
+                {
+                    _error = _error + e.Data;
+                }
+                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")) || (e.Data.Contains("Beta")))
+                {
+                    // Do Nothing
+                }
+                else
+                {
+                    version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
+                    name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
+
+                    APITargetClass api = _tempAPITargetList.Find(i => i.TargetVersion == version);
+
+                    if (api != null)
+                    {
+                        api.IsAPIDefault = true;
+                        api.TargetName = name;
+                    }
+                }
+            }
+        }
+
 
         /// <summary>
         /// Retrieve list of API's from 
@@ -339,7 +475,7 @@ namespace RIM.VSNDK_Package
 
                 /// Get Device PIN
                 startInfo.FileName = "cmd.exe";
-                startInfo.Arguments = string.Format(@"/C " + GlobalFunctions.bbndkPathConst + @"\eclipsec --list");
+                startInfo.Arguments = string.Format(@"/C " + GlobalFunctions.bbndkPathConst + @"\eclipsec --list-all");
 
                 try
                 {
@@ -350,6 +486,19 @@ namespace RIM.VSNDK_Package
                     p.BeginOutputReadLine();
                     p.WaitForExit();
                     p.Close();
+                    if (_error != "")
+                    {
+                        if (!GlobalFunctions.isOnline())
+                        {
+                            MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        else
+                        {
+                            MessageBox.Show(_error, "Get available API list failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        _error = "";
+                        _tempAPITargetList = null;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -378,7 +527,7 @@ namespace RIM.VSNDK_Package
                 {
                     _error = _error + e.Data;
                 }
-                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")))
+                else if ((e.Data.Contains("Location:")) || (e.Data.Contains("Available")) || (e.Data.Contains("Beta")))
                 {
                     // Do Nothing
                 }
@@ -386,6 +535,7 @@ namespace RIM.VSNDK_Package
                 {
                     version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
                     name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
+                    name = name.Replace("(EXTERNAL_NDK)", "");
                     description = "Device Support Unknown.";
                     
 
@@ -415,8 +565,6 @@ namespace RIM.VSNDK_Package
                                 break;
                         }
                     }
-
-                    api.IsBeta = name.Contains("Beta");
 
                 }
             }
@@ -469,8 +617,8 @@ namespace RIM.VSNDK_Package
             if (e.Data != null)
             {
                 System.Diagnostics.Debug.WriteLine(e.Data);
-
-                MessageBox.Show(e.Data);
+                _error += e.Data + "\n";
+//                MessageBox.Show(e.Data);
             }
         }
 
@@ -485,6 +633,7 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new APITargetListSingleton();
                 }
+
                 return _instance;
             }
         }
@@ -508,6 +657,15 @@ namespace RIM.VSNDK_Package
         }
 
         /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetSimulatorList();
+        }
+
+
+        /// <summary>
         /// Public property to retrieve the singleton instance
         /// </summary>
         public static SimulatorListSingleton Instance
@@ -518,6 +676,7 @@ namespace RIM.VSNDK_Package
                 {
                     _instance = new SimulatorListSingleton();
                 }
+
                 return _instance;
             }
         }
@@ -552,6 +711,19 @@ namespace RIM.VSNDK_Package
                     p.BeginOutputReadLine();
                     p.WaitForExit();
                     p.Close();
+                    if (_error != "")
+                    {
+                        if (!GlobalFunctions.isOnline())
+                        {
+                            MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        }
+                        else
+                        {
+                            MessageBox.Show(_error, "Get simulator list failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                        _error = "";
+                        _simulatorList = null;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -571,8 +743,8 @@ namespace RIM.VSNDK_Package
             if (e.Data != null)
             {
                 System.Diagnostics.Debug.WriteLine(e.Data);
-
-                MessageBox.Show(e.Data);
+                _error += e.Data + "\n";
+//                MessageBox.Show(e.Data);
             }
         }
 
@@ -669,6 +841,14 @@ namespace RIM.VSNDK_Package
         }
 
         /// <summary>
+        /// Public function to refresh data.
+        /// </summary>
+        public void RefreshData()
+        {
+            _instance.GetInstalledSimulatorList();
+        }
+
+        /// <summary>
         /// Public property to retrieve the singleton instance
         /// </summary>
         public static InstalledSimulatorListSingleton Instance
@@ -746,7 +926,7 @@ namespace RIM.VSNDK_Package
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
-    [ProvideAutoLoad(VSConstants.UICONTEXT.NoSolution_string)]
+    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackagePkgString)]
     public sealed class VSNDK_PackagePackage : Package
     {
@@ -758,12 +938,14 @@ namespace RIM.VSNDK_Package
         private bool _isSimulator;
         private BuildEvents _buildEvents;
         private List<string[]> _targetDir = null;
+        private List<String> buildThese = null;
         private bool _hitPlay = false;
         private int _amountOfProjects = 0;
         private string _error = "";
         private bool _isDeploying = false;
         private OutputWindowPane _owP;
         private bool isDebugConfiguration = true;
+        private string processName = "";
 
         #endregion
 
@@ -793,15 +975,23 @@ namespace RIM.VSNDK_Package
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             base.RegisterEditorFactory(new EditorFactory(this));
 
-            _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
-
-            SetNDKPath();
 
             APITargetListSingleton api = APITargetListSingleton.Instance;
             InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
             InstalledNDKListSingleton ndkList = InstalledNDKListSingleton.Instance;
             SimulatorListSingleton simList = SimulatorListSingleton.Instance;
             InstalledSimulatorListSingleton installedSimList = InstalledSimulatorListSingleton.Instance;
+
+            _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+
+            if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
+            {
+                UpdateManager.UpdateManagerDialog ud = new UpdateManager.UpdateManagerDialog("Please choose your default API Level to be used by the Visual Studio Plug-in.", "default", false, false);
+                ud.ShowDialog();
+            }
+
+
+            SetNDKPath();
 
             _commandEvents = new VSNDKCommandEvents((DTE2)_dte);
             _commandEvents.RegisterCommand(GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
@@ -842,6 +1032,32 @@ namespace RIM.VSNDK_Package
         #endregion
 
         #region private methods
+
+        /// <summary>
+        /// Check to see if current solution is configured with a BlackBerry Configuration.
+        /// </summary>
+        /// <param name="dte"></param>
+        /// <returns></returns>
+        private bool IsBlackBerrySolution(EnvDTE.DTE dte)
+        {
+            bool res = false;
+
+            if (dte.Solution.FullName != "")
+            {
+                string fileText = System.IO.File.ReadAllText(dte.Solution.FullName);
+
+                if (fileText.Contains("Debug|BlackBerry"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return res;
+        }
 
         /// <summary>
         /// Set the NDK path into the registry if not already set.
@@ -911,61 +1127,31 @@ namespace RIM.VSNDK_Package
             bool success = true;
             try
             {
-                Microsoft.Win32.RegistryKey key;
-                key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("VSNDK");
-                key.SetValue("Run", "True");
-                key.Close();
-
-                _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
-
-                try
+                if (buildThese.Count != 0)
                 {
-                    Solution2 soln = (Solution2)_dte.Solution;
-                    List<String> buildThese = new List<String>();
-                    _targetDir = new List<string[]>();
+                    Microsoft.Win32.RegistryKey key;
+                    key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("VSNDK");
+                    key.SetValue("Run", "True");
+                    key.Close();
 
-                    foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
+                    _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+
+                    try
                     {
-                        foreach (Project p1 in soln.Projects)
-                        {
-                            if (p1.UniqueName == startupProject)
-                            {
-                                buildThese.Add(p1.FullName);
-
-                                ConfigurationManager config = p1.ConfigurationManager;
-                                Configuration active = config.ActiveConfiguration;
-
-                                foreach (Property prop in active.Properties)
-                                {
-                                    try
-                                    {
-                                        if (prop.Name == "OutputPath")
-                                        {
-                                            string[] path = new string[2];
-                                            path[0] = p1.Name + "_" + _isSimulator.ToString();
-                                            path[1] = prop.Value.ToString();
-                                            _targetDir.Add(path);
-                                            break;
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                }
-
-                                break;
-                            }
-                        }
+                        Solution2 soln = (Solution2)_dte.Solution;
+                        _hitPlay = true;
+                        _amountOfProjects = buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
+                        foreach (string projectName in buildThese)
+                            soln.SolutionBuild.BuildProject("Debug", projectName, false);
                     }
-
-                    _hitPlay = true;
-                    _amountOfProjects = buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
-                    foreach (string projectName in buildThese)
-                        soln.SolutionBuild.BuildProject("Debug", projectName, false);
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine(ex.Message);
+                        success = false;
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    Debug.WriteLine(ex.Message);
                     success = false;
                 }
             }
@@ -1031,9 +1217,19 @@ namespace RIM.VSNDK_Package
             key.Close();
 
             string pidString = "";
-            getPID((DTE2)_dte, ref pidString);
-
-            bool CancelDefault = LaunchDebugTarget(pidString);
+            string toolsPath = "";
+            string publicKeyPath = "";
+            string targetIP = "";
+            string password = "";
+            string executablePath = "";
+            if (getProcessInfo((DTE2)_dte, ref pidString, ref toolsPath, ref publicKeyPath, ref targetIP, ref password, ref executablePath))
+            {
+                bool CancelDefault = LaunchDebugTarget(pidString, toolsPath, publicKeyPath, targetIP, password, executablePath);
+            }
+            else
+            {
+                MessageBox.Show("Failed to debug the application.\n\nPlease, close the app in case it was launched in the device/simulator.", "Failed to launch debugger", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         /// <summary> 
@@ -1041,7 +1237,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         /// <param name="pidString"> Process ID in string format. </param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool LaunchDebugTarget(string pidString)
+        private bool LaunchDebugTarget(string pidString, string toolsPath, string publicKeyPath, string targetIP, string password, string executablePath)
         {
             Microsoft.VisualStudio.Shell.ServiceProvider sp =
                  new Microsoft.VisualStudio.Shell.ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
@@ -1053,37 +1249,17 @@ namespace RIM.VSNDK_Package
             info.cbSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(info);
             info.dlo = Microsoft.VisualStudio.Shell.Interop.DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
-            // Read debugger args from a file (it is set when the Deploy task is run)
-            System.IO.StreamReader argsFile = null;
-            try
-            {
-                string localAppData = Environment.GetEnvironmentVariable("AppData");
-                argsFile = new System.IO.StreamReader(localAppData + @"\BlackBerry\vsndk-args-file.txt");
-            }
-            catch (Exception e)
-            {
-                Debug.Fail("Unexpected exception in LaunchDebugTarget");
-            }
-
             // Store all debugger arguments in a string
             var nvc = new NameValueCollection();
             nvc.Add("pid", pidString);
-            nvc.Add("targetIP", argsFile.ReadLine()); // The device (IP address)
-            info.bstrExe = argsFile.ReadLine(); // The executable path
-            nvc.Add("isSimulator", argsFile.ReadLine());
-            nvc.Add("ToolsPath", argsFile.ReadLine());
-            nvc.Add("PublicKeyPath", argsFile.ReadLine());
-
-            // Decrypt stored password.
-            byte[] data = Convert.FromBase64String(argsFile.ReadLine());
-            if (data.Length > 0)
-            {
-                byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-                nvc.Add("Password", Encoding.Unicode.GetString(decrypted));
-            }
+            nvc.Add("targetIP", targetIP); // The device (IP address)
+            info.bstrExe = executablePath; // The executable path
+            nvc.Add("isSimulator", _isSimulator.ToString());
+            nvc.Add("ToolsPath", toolsPath);
+            nvc.Add("PublicKeyPath", publicKeyPath);
+            nvc.Add("Password", password);
 
             info.bstrArg = NameValueCollectionHelper.DumpToString(nvc);
-            argsFile.Close();
 
             info.bstrRemoteMachine = null; // debug locally
             info.fSendStdoutToOutputWindow = 0; // Let stdout stay with the application.
@@ -1124,96 +1300,184 @@ namespace RIM.VSNDK_Package
         /// <param name="dte"> Application Object. </param>
         /// <param name="pidString"> Returns the Process ID as a string. </param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool getPID(DTE2 dte, ref string pidString)
+        private bool getProcessInfo(DTE2 dte, ref string pidString, ref string toolsPath, ref string publicKeyPath, ref string targetIP, ref string password, ref string executablePath)
         {
-            // Select all of the text
-            _owP.TextDocument.Selection.SelectAll();
-            string outputText = _owP.TextDocument.Selection.Text;
+            string currentPath = "";
 
-            // Check for successful deployment
-            if (System.Text.RegularExpressions.Regex.IsMatch(outputText, "Info: done"))
+            foreach (string[] paths in _targetDir)
             {
-                string pattern = @"\s+result::(\d+)\r\n.+";
-                Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
-
-                // Match the regular expression pattern against a text string.
-                Match m = r.Match(outputText);
-
-                // Take first match
-                if (m.Success)
+                if (paths[0] == processName)
                 {
-                    Group g = m.Groups[1];
-                    CaptureCollection cc = g.Captures;
-                    Capture c = cc[0];
-                    pidString = c.ToString();
+                    currentPath = paths[1];
+                    break;
+                }
+            }
 
-                    // Store proccess name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
-                    // source code for a running process.
-                    // First read the file.
-                    string processesPaths = "";
-                    System.IO.StreamReader readProcessesPathsFile = null;
-                    try
-                    {
-                        readProcessesPathsFile = new System.IO.StreamReader(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
-                        processesPaths = readProcessesPathsFile.ReadToEnd();
-                        readProcessesPathsFile.Close();
-                    }
-                    catch (Exception e)
-                    {
-                        processesPaths = "";
-                    }
+            executablePath = currentPath + processName; // The executable path
+            executablePath = executablePath.Replace('\\', '/');
+            publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
+            publicKeyPath = publicKeyPath.Replace('\\', '/');
 
-                    // Updating the contents.
-                    int begin = outputText.IndexOf("Deploy started: Project: ") + 25;
-                    if (begin == -1)
-                        begin = outputText.IndexOf("Project: ") + 9;
-                    int end = outputText.IndexOf(", Configuration:", begin);
-                    string processName = outputText.Substring(begin, end - begin) + "_" + _isSimulator.ToString();
-                    begin = processesPaths.IndexOf(processName + ":>");
+            try
+            {
+                RegistryKey rkHKCU = Registry.CurrentUser;
+                RegistryKey rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
+                toolsPath = rkPluginRegKey.GetValue("NDKHostPath").ToString() + "/usr/bin";
+                toolsPath = toolsPath.Replace('\\', '/');
 
-                    //                    string currentPath = dte.ActiveDocument.Path;
-                    string currentPath = "";
-
-                    foreach (string[] paths in _targetDir)
-                    {
-                        if (paths[0] == processName)
-                        {
-                            currentPath = paths[1];
-                            break;
-                        }
-                    }
-
-                    if (begin != -1)
-                    {
-                        begin += processName.Length + 2;
-                        end = processesPaths.IndexOf("\r\n", begin);
-                        processesPaths = processesPaths.Substring(0, begin) + currentPath + processesPaths.Substring(end);
-                    }
-                    else
-                    {
-                        processesPaths = processesPaths + processName + ":>" + currentPath + "\r\n";
-                    }
-
-                    // Writing contents to file.
-                    System.IO.StreamWriter writeProcessesPathsFile = null;
-                    try
-                    {
-                        writeProcessesPathsFile = new System.IO.StreamWriter(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt", false);
-                        writeProcessesPathsFile.Write(processesPaths);
-                        writeProcessesPathsFile.Close();
-                    }
-                    catch (Exception e)
-                    {
-                    }
-
-                    return true;
+                if (_isSimulator)
+                {
+                    targetIP = rkPluginRegKey.GetValue("simulator_IP").ToString();
+                    password = rkPluginRegKey.GetValue("simulator_password").ToString();
                 }
                 else
                 {
-                    return false;
+                    targetIP = rkPluginRegKey.GetValue("device_IP").ToString();
+                    password = rkPluginRegKey.GetValue("device_password").ToString();
+                }
+
+                // Decrypt stored password.
+                byte[] data = Convert.FromBase64String(password);
+                if (data.Length > 0)
+                {
+                    byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
+                    password = Encoding.Unicode.GetString(decrypted);
                 }
             }
+            catch (Exception ex)
+            {
+                System.Windows.Forms.MessageBox.Show(ex.Message, "Microsoft Visual Studio", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+            }
+
+            pidString = getPIDfromGDB(processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
+
+            if (pidString == "")
+            {
+                // Select all of the text
+                _owP.TextDocument.Selection.SelectAll();
+                string outputText = _owP.TextDocument.Selection.Text;
+
+                // Check for successful deployment
+                if (System.Text.RegularExpressions.Regex.IsMatch(outputText, "Info: done"))
+                {
+                    string pattern = @"\s+result::(\d+)\r\n.+|\s+result::(\d+) \(TaskId:";
+                    Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
+
+                    // Match the regular expression pattern against a text string.
+                    Match m = r.Match(outputText);
+
+                    // Take first match
+                    if (m.Success)
+                    {
+                        Group g = m.Groups[1];
+                        CaptureCollection cc = g.Captures;
+                        if (cc.Count == 0)
+                        {   // Diagnostic verbosity mode
+                            g = m.Groups[2];
+                            cc = g.Captures;
+                        }
+
+                        if (cc.Count != 0)
+                        {
+                            Capture c = cc[0];
+                            pidString = c.ToString();
+                        }
+                    }
+                }
+            }
+
+            if (pidString != "")
+            {
+
+                // Store proccess name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
+                // source code for a running process.
+                // First read the file.
+                processName += "_" + _isSimulator.ToString();
+
+                string processesPaths = "";
+                System.IO.StreamReader readProcessesPathsFile = null;
+                try
+                {
+                    readProcessesPathsFile = new System.IO.StreamReader(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
+                    processesPaths = readProcessesPathsFile.ReadToEnd();
+                    readProcessesPathsFile.Close();
+                }
+                catch (Exception e)
+                {
+                    processesPaths = "";
+                }
+
+                // Updating the contents.
+                int begin = processesPaths.IndexOf(processName + ":>");
+
+                if (begin != -1)
+                {
+                    begin += processName.Length + 2;
+                    int end = processesPaths.IndexOf("\r\n", begin);
+                    processesPaths = processesPaths.Substring(0, begin) + currentPath + processesPaths.Substring(end);
+                }
+                else
+                {
+                    processesPaths = processesPaths + processName + ":>" + currentPath + "\r\n";
+                }
+
+                // Writing contents to file.
+                System.IO.StreamWriter writeProcessesPathsFile = null;
+                try
+                {
+                    writeProcessesPathsFile = new System.IO.StreamWriter(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt", false);
+                    writeProcessesPathsFile.Write(processesPaths);
+                    writeProcessesPathsFile.Close();
+                }
+                catch (Exception e)
+                {
+                }
+
+                return true;
+            }
             return false;
+        }
+
+        private string getPIDfromGDB(string processName, string IP, string password, bool isSimulator, string toolsPath, string publicKeyPath)
+        {
+            string PID = "";
+            string response = GDBParser.GetPIDsThroughGDB(IP, password, isSimulator, toolsPath, publicKeyPath, 7);
+
+            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
+            {
+                if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
+                {
+                    MessageBox.Show("Please, verify if the Device/Simulator IP in \"BlackBerry -> Settings\" menu is correct and check if it is connected.", "Device/Simulator not connected or not configured properly", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                    if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
+                    {
+                        string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
+                        string caption = "";
+                        if (txt.IndexOf("The requested address is not valid in its context.") != -1)
+                        {
+                            txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
+                            caption = "Invalid IP";
+                        }
+                        else
+                        {
+                            txt += "\n\nPlease, verify if the device/simulator is connected.";
+                            caption = "Connection failed";
+                        }
+                        MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+                response = "";
+            }
+            else if (response.Contains("^done"))
+            {
+                int i = response.IndexOf(processName + " - ");
+                if (i != -1)
+                {
+                    i += processName.Length + 3;
+                    PID = response.Substring(i, response.IndexOf('/', i) - i);
+                }
+            }
+            return PID;
         }
 
 
@@ -1245,7 +1509,6 @@ namespace RIM.VSNDK_Package
 
 
         #endregion
-
 
 
         #region Event Handlers
@@ -1302,6 +1565,53 @@ namespace RIM.VSNDK_Package
             }
             else
             {
+                try
+                {
+                    Solution2 soln = (Solution2)_dte.Solution;
+                    buildThese = new List<String>();
+                    _targetDir = new List<string[]>();
+
+                    foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
+                    {
+                        foreach (Project p1 in soln.Projects)
+                        {
+                            if (p1.UniqueName == startupProject)
+                            {
+                                buildThese.Add(p1.FullName);
+                                processName = p1.Name;
+
+                                ConfigurationManager config = p1.ConfigurationManager;
+                                Configuration active = config.ActiveConfiguration;
+
+                                foreach (Property prop in active.Properties)
+                                {
+                                    try
+                                    {
+                                        if (prop.Name == "OutputPath")
+                                        {
+                                            string[] path = new string[2];
+                                            path[0] = p1.Name;
+                                            path[1] = prop.Value.ToString();
+                                            _targetDir.Add(path);
+                                            break;
+                                        }
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+
+                                break;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                }
+
+                
                 // Create a reference to the Output window.
                 // Create a tool window reference for the Output window
                 // and window pane.
@@ -1314,7 +1624,11 @@ namespace RIM.VSNDK_Package
 
                 if (isDebugConfiguration)
                 {
-                    UpdateManagerData upData = new UpdateManagerData();
+                    UpdateManagerData upData;
+                    if (_targetDir.Count > 0)
+                        upData = new UpdateManagerData(_targetDir[0][1]);
+                    else
+                        upData = new UpdateManagerData();
 
                     if (!upData.validateDeviceVersion(_isSimulator))
                     {
@@ -1366,6 +1680,13 @@ namespace RIM.VSNDK_Package
         /// <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
         public void OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
         {
+            InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
+            if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
+            {
+                UpdateManager.UpdateManagerDialog ud = new UpdateManager.UpdateManagerDialog("Please choose your default API Level to be used by the Visual Studio Plug-in.", "default", false, false);
+                ud.ShowDialog();
+            }
+
             if ((Action == vsBuildAction.vsBuildActionBuild) || (Action == vsBuildAction.vsBuildActionRebuildAll))
             {
                 if ((_hitPlay == false) && (_isDeploying == false)) // means that the "play" building and deploying process was cancelled before, so we have to disable the 
@@ -1398,7 +1719,7 @@ namespace RIM.VSNDK_Package
         private void ShowSettingsWindow(object sender, EventArgs e)
         {
             var SettingsDialog = new Settings.SettingsDialog();
-            var m = SettingsDialog.ShowModal();
+            var m = SettingsDialog.ShowDialog();
         }
 
         /// <summary>
@@ -1411,8 +1732,8 @@ namespace RIM.VSNDK_Package
             // Create the dialog instance without Help support.
             var DebugTokenDialog = new DebugToken.DebugTokenDialog();
             // Show the dialog.
-            if (!DebugTokenDialog.IsClosing)
-                DebugTokenDialog.ShowModal();
+            if ((!DebugTokenDialog.IsClosing) && (VSNDK_Package.DebugToken.Model.DebugTokenData._initializedCorrectly))
+                DebugTokenDialog.ShowDialog();
         }
 
         private void MenuItemCallback(object sender, EventArgs e)

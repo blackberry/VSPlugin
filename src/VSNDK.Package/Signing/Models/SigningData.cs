@@ -140,7 +140,7 @@ namespace RIM.VSNDK_Package.Signing.Models
         /// <param name="toZipFile">Path to destination zip file</param>
         public void Backup(string toZipFile)
         {
-            using (Package pkg = Package.Open(CertPath + toZipFile, FileMode.Create))
+            using (Package pkg = Package.Open(toZipFile, FileMode.Create))
             {
                 AddUriToPackage(_p12, pkg);
                 AddUriToPackage(_tokencsk, pkg);
@@ -173,6 +173,11 @@ namespace RIM.VSNDK_Package.Signing.Models
         public bool Register(string authorID, string password)
         {
             bool success = false;
+            if (authorID.Trim().ToUpper().Contains("BLACKBERRY"))
+            {
+                _errors += "BlackBerry is a reserved word and cannot be used in \"author name\".\n";
+                return false;
+            }
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
             startInfo.UseShellExecute = false;

@@ -35,10 +35,11 @@ namespace RIM.VSNDK_Package.DebugToken
     /// <summary>
     /// Interaction logic for DebugTokenDialog.xaml
     /// </summary>
-    public partial class DebugTokenDialog : DialogWindow
+    public partial class DebugTokenDialog : Window
     {
         #region Member Variables and Constants
         private DebugTokenData deployTokenData;
+        private bool isRegistering = false;
         public bool IsClosing = false;
         #endregion
 
@@ -47,23 +48,22 @@ namespace RIM.VSNDK_Package.DebugToken
         /// </summary>
         public DebugTokenDialog()
         {
-            DebugTokenData._initializedCorrectly = true;
+            Mouse.OverrideCursor = Cursors.Wait;
+            deployTokenData = new DebugTokenData();
+
+            if (!DebugTokenData._initializedCorrectly)
+            {
+                Mouse.OverrideCursor = Cursors.Arrow;
+                return;
+            }
 
             InitializeComponent();
 
-            if (DebugTokenData._initializedCorrectly == false)
-            {
-                btnAdd.IsEnabled = false;
-                btnRefresh.IsEnabled = false;
-                IsClosing = true;
-                this.Close();
-                return;
-            }
-            deployTokenData = gridMain.DataContext as DebugTokenData;
+            gridMain.DataContext = deployTokenData;
 
             if (deployTokenData.Error != "")
             {
-                MessageBox.Show(deployTokenData.Error, PkgResources.Errors);
+                MessageBox.Show(deployTokenData.Error, "Debug Tokens", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
                 deployTokenData.Error = "";
 
                 IsClosing = true;
@@ -74,6 +74,7 @@ namespace RIM.VSNDK_Package.DebugToken
 
             btnAdd.IsEnabled = !deployTokenData.AlreadyRegistered;
             btnRefresh.IsEnabled = deployTokenData.AlreadyRegistered;
+            Mouse.OverrideCursor = Cursors.Arrow;
         }
 
         /// <summary>
@@ -85,24 +86,26 @@ namespace RIM.VSNDK_Package.DebugToken
         {
             try
             {
-                this.Cursor = Cursors.Wait;
+                Mouse.OverrideCursor = Cursors.Wait;
 
-                if (!(deployTokenData.addDevice(this)))
+                if (!isRegistering)
                 {
-                    deployTokenData.Error = "";
-                    e.Handled = true;
-                    btnAdd.IsEnabled = false;
-                    btnRefresh.IsEnabled = false;
-                }
-                else
-                {
-                    btnAdd.IsEnabled = false;
-                    btnRefresh.IsEnabled = true;
+                    isRegistering = true;
+
+                    if (!(deployTokenData.addDevice(this)))
+                    {
+                        deployTokenData.Error = "";
+                        e.Handled = true;
+                    }
+
+                    btnAdd.IsEnabled = !deployTokenData.AlreadyRegistered;
+                    btnRefresh.IsEnabled = deployTokenData.AlreadyRegistered;
                 }
             }
             finally
             {
-                this.Cursor = Cursors.Arrow;
+                isRegistering = false;
+                Mouse.OverrideCursor = Cursors.Arrow;
             }
         }
 
@@ -114,22 +117,26 @@ namespace RIM.VSNDK_Package.DebugToken
         /// <param name="e"></param>
         private void btnRefresh_Click(object sender, RoutedEventArgs e)
         {
-            this.Cursor = Cursors.Wait;
+            Mouse.OverrideCursor = Cursors.Wait;
 
-            if (!(deployTokenData.refreshDevice(this)))
+            if (!isRegistering)
             {
-                deployTokenData.Error = "";
-                e.Handled = true;
-                btnAdd.IsEnabled = false;
-                btnRefresh.IsEnabled = false;
-            }
-            else
-            {
-                btnAdd.IsEnabled = false;
-                btnRefresh.IsEnabled = true;
+                isRegistering = true;
+
+                if (!(deployTokenData.refreshDevice(this)))
+                {
+                    deployTokenData.Error = "";
+                    e.Handled = true;
+                }
+                
+                btnAdd.IsEnabled = !deployTokenData.AlreadyRegistered;
+                btnRefresh.IsEnabled = deployTokenData.AlreadyRegistered;
+
             }
 
-            this.Cursor = Cursors.Arrow;
+            isRegistering = false;
+            Mouse.OverrideCursor = Cursors.Arrow;
+
         }
 
     }

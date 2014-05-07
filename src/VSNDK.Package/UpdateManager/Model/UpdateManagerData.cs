@@ -74,6 +74,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         private List<APIClass> installedNDKList;
         private List<string> installedRuntimeList;
         private string _deviceosversion;
+        private string _outputPath = "";
 
         #endregion
 
@@ -88,9 +89,54 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
             installedNDKList = InstalledNDKListSingleton.Instance._installedNDKList;
-            APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
-            Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
-            
+
+            if (APITargetListSingleton.Instance._tempAPITargetList == null)
+            {
+                APITargetListSingleton.Instance.RefreshData();
+            }
+            if (APITargetListSingleton.Instance._tempAPITargetList != null)
+            {
+                APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
+
+                if (SimulatorListSingleton.Instance._simulatorList == null)
+                {
+                    SimulatorListSingleton.Instance.RefreshData();
+                }
+                if (SimulatorListSingleton.Instance._simulatorList != null)
+                {
+                    Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Constructor
+        /// </summary>
+        public UpdateManagerData(string outputPath)
+        {
+            Status = "";
+
+            installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
+            installedNDKList = InstalledNDKListSingleton.Instance._installedNDKList;
+
+            if (APITargetListSingleton.Instance._tempAPITargetList == null)
+            {
+                APITargetListSingleton.Instance.RefreshData();
+            }
+            if (APITargetListSingleton.Instance._tempAPITargetList != null)
+            {
+                APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
+
+                if (SimulatorListSingleton.Instance._simulatorList == null)
+                {
+                    SimulatorListSingleton.Instance.RefreshData();
+                }
+                if (SimulatorListSingleton.Instance._simulatorList != null)
+                {
+                    Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
+                }
+            }
+            _outputPath = outputPath;
         }
 
         /// <summary>
@@ -102,20 +148,26 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             Simulators2 = new CollectionView(SimulatorListSingleton.Instance._simulatorList.FindAll(i => i.APILevel.Contains(apiLevel)));
         }
 
+
         /// <summary>
         /// Refresh all the lists
         /// </summary>
         public void RefreshScreen()
         {
-            //((VSNDK_PackagePackage)_pkg).GetInstalledAPIList();
-            //// ((VSNDK_PackagePackage)_pkg).GetAvailableAPIList();
-            //((VSNDK_PackagePackage)_pkg).GetInstalledSimulatorList();
-            //((VSNDK_PackagePackage)_pkg).GetSimulatorList();
+            InstalledAPIListSingleton.Instance.RefreshData();
+            installedAPIList = InstalledAPIListSingleton.Instance._installedAPIList;
+            APITargetListSingleton.Instance.RefreshData();
+            APITargets = new CollectionView(APITargetListSingleton.Instance._tempAPITargetList);
+        }
 
-            //installedAPIList = ((VSNDK_PackagePackage)_pkg).InstalledAPIList;
-            //installedNDKList = ((VSNDK_PackagePackage)_pkg).InstalledNDKList;
-            //APITargets = new CollectionView(((VSNDK_PackagePackage)_pkg).APITargetList);
-            //Simulators = new CollectionView(((VSNDK_PackagePackage)_pkg).SimulatorList);
+        /// <summary>
+        /// Refresh all the lists
+        /// </summary>
+        public void RefreshSimulatorScreen()
+        {
+            InstalledSimulatorListSingleton.Instance.RefreshData();
+            SimulatorListSingleton.Instance.RefreshData();
+            Simulators = new CollectionView(SimulatorListSingleton.Instance._simulatorList);
         }
 
         /// <summary>
@@ -130,9 +182,17 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             _isSimulator = isSimulator;
             _error = "";
 
-            installVersion = version;
+            if (version == "default")
+            {
+                installVersion = GetDefaultLevel();
+            }
+            else
+            {
+                installVersion = version;
+            }
+            
 
-            Status = "Installing API Level";
+            Status = "Installing...";
 
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
@@ -147,7 +207,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0} {1} {2}", version, isRuntime ? "--runtime" : "", isSimulator ? "--simulator" : "");
+            startInfo.Arguments = string.Format(@"/C " + bbndkPathConst + @"\eclipsec --install {0} {1} {2}", installVersion, isRuntime ? "--runtime" : "", isSimulator ? "--simulator" : "");
 
             try
             {
@@ -203,8 +263,15 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             foreach (int pid in installProcessID)
             {
-                var p = System.Diagnostics.Process.GetProcessById(pid);
-                p.Kill();
+                try
+                {
+                    var p = System.Diagnostics.Process.GetProcessById(pid);
+                    p.Kill();
+                }
+                catch
+                {
+
+                }
             }
         }
 
@@ -215,6 +282,27 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <returns>true if successful</returns>
         public bool UninstallAPI(string version, bool isSimulator)
         {
+            if (isSimulator)
+            {
+                string name = bbndkPathConst + @"\simulator_" + version.Replace('.', '_');
+                ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process");
+                ManagementObjectCollection collection = searcher.Get();
+                foreach (ManagementObject item in collection)
+                {
+                    try
+                    {
+                        if (item["CommandLine"].ToString().Contains(name))
+                        {
+                            MessageBox.Show("The selected simulator is being used.\n\nPlease, close the simulator and try again.", "Cannot uninstall the simulator", MessageBoxButton.OK, MessageBoxImage.Warning);
+                            return false;
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+
             bool success = false;
             _error = "";
             _isSimulator = isSimulator;
@@ -301,7 +389,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <param name="version">Check version number</param>
         /// <param name="name">Check API name</param>
         /// <returns>true if installed</returns>
-        private int IsAPIInstalled(string version, string name, bool allowSubstringVersion)
+        private int IsAPIInstalled(string version, string name)
         {
             int success = 0;
 
@@ -309,34 +397,23 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             if (version.StartsWith("2.1.0"))
                 version = "2.1.0";
 
-            while ((success == 0) && (version.Contains('.')))
+            if (InstalledAPIListSingleton.Instance._installedAPIList != null)
             {
-                if (InstalledAPIListSingleton.Instance._installedAPIList != null)
-                {
-                    APIClass result = InstalledAPIListSingleton.Instance._installedAPIList.Find(i => i.Version.Contains(version));
+                APIClass result = InstalledAPIListSingleton.Instance._installedAPIList.FindLast(i => i.Version.Contains(version));
 
-                    if (result != null)
-                    {
-                        success = 1;
-                    }
+                if (result != null)
+                {
+                    success = 1;
                 }
+            }
 
-                if (InstalledNDKListSingleton.Instance._installedNDKList != null)
+            if (InstalledNDKListSingleton.Instance._installedNDKList != null)
+            {
+                APIClass result = InstalledNDKListSingleton.Instance._installedNDKList.FindLast(i => i.Version.Contains(version));
+
+                if (result != null)
                 {
-                    APIClass result = InstalledNDKListSingleton.Instance._installedNDKList.Find(i => i.Version.Contains(version));
-
-                    if (result != null)
-                    {
-                        success = 2;
-                    }
-                }
-
-                if (!allowSubstringVersion)
-                    break;
-
-                if (success == 0)
-                {
-                    version = version.Substring(0, version.LastIndexOf('.'));
+                    success = 2;
                 }
             }
 
@@ -352,98 +429,166 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             bool retVal = false;
             string baseVersion = "10.2.0.0";
+            string currentAPIVersion = getCurrentAPIVersion();
             DebugTokenData dtokenData;
 
             if (!isSim)
+            {
                 dtokenData = new DebugTokenData();
+                string LocalFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\";
+                string CertPath = LocalFolder + "author.p12";
+
+                if (!File.Exists(CertPath))
+                {
+                    return false;
+                }
+            }
 
             getDeviceSimInfo(isSim);
 
             if (getDeviceInfo())
-            { //** Device Info retrieved - validate API's 
-                if (getCurrentAPIVersion() != _deviceosversion)
-                { //** Currently selected API version is different from attached device OS version.  
-                    if (IsAPIInstalled(_deviceosversion, "", false) > 0)
+            {
+                string buildVersion = getBuildVersion();
+                if ((buildVersion != "") && (_deviceosversion != "") && (compareVersions(_deviceosversion, buildVersion) < 0))
+                {
+                    if (isSim)
+                    {
+                        MessageBox.Show("The simulator operating system does not support the API level used to build the app.\n\nSimulator operating system version: " + _deviceosversion + "\nAPI level version used to build the app: " + buildVersion + "\n\nPlease select an API level that is supported by the operating system and rebuild the project before start debugging.", "API level not supported by the simulator's operating system", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    else
+                    {
+                        MessageBox.Show("The device operating system does not support the API level used to build the app.\n\nDevice operating system version: " + _deviceosversion + "\nAPI level version used to build the app: " + buildVersion + "\n\nPlease select an API level that is supported by the operating system and rebuild the project before start debugging.", "API level not supported by the device's operating system", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                    return false;
+                }
+
+                if (_deviceosversion == currentAPIVersion)
+                {
+                    SetRuntime("");
+                    retVal = true;
+                }
+                else if ((_deviceosversion.Substring(0, 4) == "10.1") || (_deviceosversion.Substring(0, 4) == "10.0"))
+                {
+                    SetRuntime("");
+                    if (IsAPIInstalled(_deviceosversion, "") > 0)
                     {
                         retVal = true;
                     }
                     else
                     {
-                        if (baseVersion.CompareTo(_deviceosversion) > 0)
-                        {
-                            UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", _deviceosversion, false, false);
+                        UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", _deviceosversion, false, false);
 
-                            if (umd.ShowDialog() == true)
-                            {
-                                retVal = true;
-                            }
-                            else
-                            {
-                                retVal = false;
-                            }
+                        if (umd.ShowDialog() == true)
+                        {
+                            retVal = true;
                         }
                         else
                         {
-                            if (IsRuntimeInstalled(_deviceosversion))
-                            {
-                                retVal = true;
-                            }
-                            else
-                            {
-                                if (IsAPIInstalled(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')), "", true) == 0)
-                                {
-                                    string apiLevel = GetAPILevel(_deviceosversion.Substring(0, _deviceosversion.LastIndexOf('.')));
-
-                                    if (apiLevel != "")
-                                    {
-                                        UpdateManagerDialog umd = new UpdateManagerDialog("The API Level for the operating system version of the attached device is not currently installed.  Would you like to install it now?", apiLevel, false, false);
-                                        if (umd.ShowDialog() == true)
-                                        {
-                                            umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
-                                            if (umd.ShowDialog() == true)
-                                            {
-                                                retVal = true;
-                                            }
-                                            else
-                                            {
-                                                retVal = false;
-                                            }
-                                        }
-                                        else
-                                        {
-                                            retVal = false;
-                                        }
-                                    }
-                                    else
-                                        MessageBox.Show("API level not supported at this moment.\n\nAborting...", "API level not supported", MessageBoxButton.OK, MessageBoxImage.Error);
-                                }
-                                else
-                                {
-                                    UpdateManagerDialog umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
-                                    if (umd.ShowDialog() == true)
-                                    {
-                                        retVal = true;
-                                    }
-                                    else
-                                    {
-                                        retVal = false;
-                                    }
-                                }
-                            }
+                            retVal = false;
                         }
                     }
                 }
-                else
+                else if (IsRuntimeInstalled(_deviceosversion))
                 {
+                    SetRuntime(_deviceosversion);
                     retVal = true;
                 }
-            }
-            else
-            {
-                retVal = false;
+                else
+                {
+                    UpdateManagerDialog umd = new UpdateManagerDialog("The Runtime Libraries for the operating system version of the attached device are not currently installed.  Would you like to install them now?", _deviceosversion, true, false);
+                    if (umd.ShowDialog() == true)
+                    {
+                        // runtime was already set by the Update Manager.
+                        retVal = true;
+                    }
+                    else
+                    {
+                        SetRuntime("");
+                        retVal = false;
+                    }
+                }
             }
 
             return retVal;
+        }
+
+        private string getBuildVersion()
+        {
+            string makefile = "";
+            System.IO.StreamReader readMakefile = null;
+            try
+            {
+                readMakefile = new System.IO.StreamReader(_outputPath + @"\makefile");
+                makefile = readMakefile.ReadToEnd();
+                readMakefile.Close();
+            }
+            catch (Exception e)
+            {
+                return "";
+            }
+
+            int pos = makefile.IndexOf(bbndkPathConst.Replace('\\','/') + @"/target_");
+            if (pos == -1)
+                return "";
+            pos += 19;
+            int end = makefile.IndexOf('/', pos);
+            if (end == -1)
+                return "";
+
+            return (makefile.Substring(pos, end - pos).Replace('_','.'));
+
+        }
+
+        private int compareVersions(string str1, string str2)
+        {
+            int n1, n2;
+            do
+            {
+                int pos = str1.IndexOf('.');
+                if (pos == -1)
+                {
+                    n1 = Convert.ToInt32(str1);
+                    str1 = "";
+                }
+                else
+                {
+                    n1 = Convert.ToInt32(str1.Substring(0, pos));
+                    str1 = str1.Substring(pos + 1);
+                }
+
+                pos = str2.IndexOf('.');
+                if (pos == -1)
+                {
+                    n2 = Convert.ToInt32(str2);
+                    str2 = "";
+                }
+                else
+                {
+                    n2 = Convert.ToInt32(str2.Substring(0, pos));
+                    str2 = str2.Substring(pos + 1);
+                }
+
+                if (n1 > n2)
+                    return 1;
+                else if (n2 > n1)
+                    return -1;
+
+            } while ((str1 != "") && (str2 != ""));
+
+            if (str1 != "")
+            {
+                str1 = str1.Replace(".","");
+                if (Convert.ToInt32(str1) != 0)
+                    return 1;
+            }
+            else if (str2 != "")
+            {
+                str2 = str2.Replace(".", "");
+                if (Convert.ToInt32(str2) != 0)
+                    return -1;
+            } 
+            
+            return 0;
         }
 
         /// <summary>
@@ -735,7 +880,10 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
             try
             {
-                string remotePath = bbndkPathConst + @"\runtime_" + version.Replace('.', '_') + @"\qnx6\armle-v7\";
+                string remotePath = "";
+
+                if (version != "")
+                    remotePath = bbndkPathConst + @"\runtime_" + version.Replace('.', '_') + @"\qnx6\armle-v7\";
 
                 rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
                 rkNDKPath.SetValue("NDKRemotePath", remotePath);
@@ -755,9 +903,19 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public void SetSelectedAPI(string version)
         {
 
+            /// Set default version
+            if (version == "default")
+            {
+                installVersion = GetDefaultLevel();
+            }
+            else
+            {
+                installVersion = version;
+            }
+            
             if (installedAPIList != null)
             {
-                APIClass result = installedAPIList.Find(i => i.Version.Contains(version));
+                APIClass result = installedAPIList.Find(i => i.Version.Contains(installVersion));
 
                 if (result != null)
                 {
@@ -859,7 +1017,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             string retVal = "";
 
-            while ((retVal == "") && (version.Contains('.')))
+            while (retVal == "")
             {
                 if (APITargetListSingleton.Instance._tempAPITargetList != null)
                 {
@@ -873,7 +1031,33 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
                 if (retVal == "")
                 {
-                    version = version.Substring(0, version.LastIndexOf('.'));
+                    int lastDot = version.LastIndexOf('.');
+                    if (lastDot != -1)
+                        version = version.Substring(0, lastDot);
+                    else
+                        break;
+                }
+            }
+
+            return retVal;
+        }
+
+        /// <summary>
+        /// Given a runtime version get the associated API Level version.
+        /// </summary>
+        /// <param name="version"></param>
+        /// <returns></returns>
+        public string GetDefaultLevel()
+        {
+            string retVal = "";
+
+            if (APITargetListSingleton.Instance._tempAPITargetList != null)
+            {
+                APITargetClass apiLevel = APITargetListSingleton.Instance._tempAPITargetList.FindLast(i => i.IsDefault.Contains("True"));
+
+                if (apiLevel != null)
+                {
+                    retVal = apiLevel.TargetVersion;
                 }
             }
 
@@ -889,9 +1073,28 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             isConfiguring = false;
 
-            if (_error != "")
+            if (_errors != "")
             {
                 Status = "Error";
+                IsInstalling = false;
+                installed = true;
+
+                if (!GlobalFunctions.isOnline())
+                {
+                    MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                }
+                else
+                {
+                    MessageBox.Show(_errors, "Update Manager", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+                }
+
+                RefreshScreen();
+            }
+            else if (_error != "")
+            {
+                Status = "Error";
+                IsInstalling = false;
+                installed = true;
 
                 MessageBox.Show(_error, "Update Manager", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
 
@@ -901,26 +1104,25 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             else
             {
                 Status = "Complete";
-
-                RefreshScreen();
-
-                //if (installVersion != "")
-                //{
-                //    SetSelectedAPI(installVersion);
+                IsInstalling = false;
+                installed = true;
 
                 if (_isRuntime)
                 {
                     SetRuntime(installVersion);
                     _isRuntime = false;
                 }
+                else if (_isSimulator)
+                {
+                    RefreshSimulatorScreen();
+                }
+                else 
+                {
+                    RefreshScreen();
+                    SetSelectedAPI(installVersion);
+                }
 
-                //    installVersion = "";
-
-                    installVersion = "";
-               
-                installed = true;
             }
-   //         IsInstalling = false;
         }
 
         /// <summary>

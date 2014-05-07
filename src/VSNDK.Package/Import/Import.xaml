@@ -4,15 +4,7 @@
         xmlns:ui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.10.0"
         Title="Import Summary" Height="335" Width="729" ResizeMode="NoResize">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="ImportDictionary.xaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-
-    <Grid Name="gridMain" VerticalAlignment="Top" DataContext="{StaticResource importModel}" >
+    <Grid Name="gridMain" VerticalAlignment="Top" >
         <StackPanel Orientation="Vertical" Name="MainPanel" VerticalAlignment="Top" Height="293" Margin="5,5,5,5">
             <StackPanel HorizontalAlignment="Left" Orientation="Vertical">
                 <ListBox Name="SummaryString" Height="259" Width="706" DataContext="{Binding Path=SummaryString}" ItemsSource="{Binding}" />

@@ -20,7 +20,7 @@ using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using EnvDTE80;
 
-namespace VSNDK.Package
+namespace RIM.VSNDK_Package
 {
 
     /// <summary> 

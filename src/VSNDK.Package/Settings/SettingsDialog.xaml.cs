@@ -42,7 +42,7 @@ namespace RIM.VSNDK_Package.Settings
     /// <summary>
     /// Interaction logic for Settings.xaml
     /// </summary>
-    public partial class SettingsDialog : DialogWindow
+    public partial class SettingsDialog : Window
     {
         private SettingsData _data;
 
@@ -92,9 +92,14 @@ namespace RIM.VSNDK_Package.Settings
 
             UpdateManager.UpdateManager updateManager = UpdateManager.UpdateManager.create();
 
-            _data.RefreshScreen();
-            NDKEntry.ItemsSource = null;
-            NDKEntry.ItemsSource = _data.NDKEntries;
+            if (updateManager != null)
+            {
+                updateManager.ShowDialog();
+
+                _data.RefreshScreen();
+                NDKEntry.ItemsSource = null;
+                NDKEntry.ItemsSource = _data.NDKEntries;
+            }
 
             this.Cursor = System.Windows.Input.Cursors.Hand;
 

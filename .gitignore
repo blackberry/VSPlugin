@@ -44,7 +44,7 @@ src_vs2013/VSNDK.sln.DotSettings
 src_vs2013/VSNDK.v12.suo
 src_vs2013/GDBParser/GDBParser.vcxproj.user
 src_vs2013/VSNDK.AddIn/VSNDK.AddIn.csproj.user
-
+src_vs2013/VSNDK.Package/VSNDK.Package.csproj.user
 
 # build temp outputs
 src/Debug/

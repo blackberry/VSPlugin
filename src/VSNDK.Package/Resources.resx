@@ -124,7 +124,7 @@
     <value>You have to specify a confirm password</value>
   </data>
   <data name="CSJPasswordMissing" xml:space="preserve">
-    <value>You have to specify BlackBerry ID token password and it must be at least 6 characters long</value>
+    <value>You have to specify a BlackBerry ID token password and it must be at least 6 characters long</value>
   </data>
   <data name="CSJPinMissing" xml:space="preserve">
     <value>You have to provide the Pin</value>

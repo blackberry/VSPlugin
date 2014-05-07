@@ -44,6 +44,7 @@ namespace RIM.VSNDK_Package.Import
         private Project _project;
         private string _sourceDir;
         private string _destDir;
+        private ImportModel _data;
 
         /// <summary>
         /// Import Constructor
@@ -51,6 +52,9 @@ namespace RIM.VSNDK_Package.Import
         public Import()
         {
             InitializeComponent();
+
+            _data = new ImportModel();
+            gridMain.DataContext = _data;
         }
 
         /// <summary>
@@ -62,6 +66,9 @@ namespace RIM.VSNDK_Package.Import
         public Import(Project project, string sourceDir, string destDir)
         {
             InitializeComponent();
+
+            _data = new ImportModel();
+            gridMain.DataContext = _data;
 
             _project = project;
             _sourceDir = sourceDir;
