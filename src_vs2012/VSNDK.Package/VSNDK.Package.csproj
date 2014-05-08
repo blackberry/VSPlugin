@@ -252,6 +252,11 @@
       <Link>Signing\SigningDialog.xaml.cs</Link>
       <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\DebugTokenInfo.cs" />
+    <Compile Include="Tools\DebugTokenInfoRunner.cs" />
+    <Compile Include="Tools\RunnerDefaults.cs" />
+    <Compile Include="Tools\ToolRunner.cs" />
+    <Compile Include="Tools\ToolRunnerEventArgs.cs" />
     <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
