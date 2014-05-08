@@ -200,7 +200,7 @@ namespace VSNDK.DebugEngine
         {
             string func = "";
 
-            if ((this._id != "") && (this._id != this._engine.currentThread()._id))
+            if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
                 _engine.eDispatcher.selectThread(this._id);
 
             string stackResponse = _engine.eDispatcher.getStackFrames().Replace("#;;;;", "");
@@ -228,8 +228,8 @@ namespace VSNDK.DebugEngine
                     }
                 }
 
-                if ((this._id != "") && (this._id != this._engine.currentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.currentThread()._id);
+                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
+                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
             }
 
             return func;
@@ -275,7 +275,7 @@ namespace VSNDK.DebugEngine
             }
 
             // Ask for general stack information.
-            if ((this._id != "") && (this._id != this._engine.currentThread()._id))
+            if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
                 _engine.eDispatcher.selectThread(this._id);
 
             string stackResponse = _engine.eDispatcher.getStackFrames().Replace("#;;;;", "");
@@ -350,21 +350,21 @@ namespace VSNDK.DebugEngine
                     }
                 }
 
-                if ((this._id != "") && (this._id != this._engine.currentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.currentThread()._id);
+                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
+                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
 
                 return Constants.S_OK;
             }
             catch (ComponentException e)
             {
-                if ((this._id != "") && (this._id != this._engine.currentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.currentThread()._id);
+                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
+                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
                 return e.HResult;
             }
             catch (Exception e)
             {
-                if ((this._id != "") && (this._id != this._engine.currentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.currentThread()._id);
+                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
+                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
                 return EngineUtils.UnexpectedException(e);
             }
         }

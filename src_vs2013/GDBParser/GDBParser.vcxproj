@@ -151,7 +151,6 @@
     <ClInclude Include="..\..\src\GDBParser\gdb-connect.h" />
     <ClInclude Include="..\..\src\GDBParser\GDBParserAPI.h" />
     <ClInclude Include="..\..\src\GDBParser\ComponentException.h" />
-    <ClInclude Include="..\..\src\GDBParser\ProjInclude.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="..\..\src\GDBParser\WorkerUtil.h" />

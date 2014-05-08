@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
-using System.Windows.Data;
 using System.IO;
 using System.IO.Packaging;
 using Microsoft.Win32;
@@ -308,15 +304,15 @@ namespace RIM.VSNDK_Package.Signing.Models
         /// </summary>
         public void CleanUp()
         {
-            if (!File.Exists(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\author.p12"))
+            if (!File.Exists(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\author.p12"))
             {
-                FileInfo fi_csk = new FileInfo(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\bbidtoken.csk");
+                FileInfo fi_csk = new FileInfo(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\bbidtoken.csk");
 
                 try
                 {
                     fi_csk.Delete();
                 }
-                catch (System.IO.IOException ex)
+                catch (IOException)
                 {
 
                 }
@@ -332,10 +328,9 @@ namespace RIM.VSNDK_Package.Signing.Models
         {
             if (File.Exists(_certPath + file))
             {
-                Uri uri = null;
-                PackagePart pkgPart = null;
-                uri = PackUriHelper.CreatePartUri(new Uri(file, UriKind.Relative));
-                pkgPart = pkg.CreatePart(uri, string.Empty);
+                Uri uri = PackUriHelper.CreatePartUri(new Uri(file, UriKind.Relative));
+                PackagePart pkgPart = pkg.CreatePart(uri, string.Empty);
+
                 using (FileStream fileStream = new FileStream(_certPath + file, FileMode.Open, FileAccess.Read))
                 {
                     CopyStream(fileStream, pkgPart.GetStream());
@@ -347,7 +342,6 @@ namespace RIM.VSNDK_Package.Signing.Models
         /// Function to unzip and restore a set of singing keys
         /// </summary>
         /// <param name="fromZipFile"></param>
-        /// <param name="certPath"></param>
         public void Restore(string fromZipFile)
         {
 
@@ -368,49 +362,38 @@ namespace RIM.VSNDK_Package.Signing.Models
         /// <summary>
         /// Method to create file at the temp folder
         /// </summary>
-        /// <param name="rootFolder"></param>
-        /// <param name="contentFileURI"></param>
-        /// <returns></returns>
         private void createFile(ZipPackagePart contentFile)
         {
             // Initially create file under the folder specified
-            string contentFilePath = string.Empty;
-            contentFilePath = contentFile.Uri.OriginalString.Replace('/',
-                             System.IO.Path.DirectorySeparatorChar);
+            string contentFilePath = contentFile.Uri.OriginalString.Replace('/', Path.DirectorySeparatorChar);
 
-            if (contentFilePath.StartsWith(
-                System.IO.Path.DirectorySeparatorChar.ToString()))
+            if (contentFilePath.StartsWith(Path.DirectorySeparatorChar.ToString()))
             {
-                contentFilePath = contentFilePath.TrimStart(
-                                         System.IO.Path.DirectorySeparatorChar);
+                contentFilePath = contentFilePath.TrimStart(Path.DirectorySeparatorChar);
             }
             else
             {
                 //do nothing
             }
 
-            contentFilePath = System.IO.Path.Combine(_certPath, contentFilePath);
+            contentFilePath = Path.Combine(_certPath, contentFilePath);
 
             //Check for the folder already exists. If not then create that folder
 
-            if (System.IO.Directory.Exists(
-                System.IO.Path.GetDirectoryName(contentFilePath)) != true)
+            if (Directory.Exists(Path.GetDirectoryName(contentFilePath)) != true)
             {
-                System.IO.Directory.CreateDirectory(
-                          System.IO.Path.GetDirectoryName(contentFilePath));
+                Directory.CreateDirectory(Path.GetDirectoryName(contentFilePath));
             }
             else
             {
                 //do nothing
             }
 
-            System.IO.FileStream newFileStream =
-                    System.IO.File.Create(contentFilePath);
+            var newFileStream = File.Create(contentFilePath);
             newFileStream.Close();
             byte[] content = new byte[contentFile.GetStream().Length];
             contentFile.GetStream().Read(content, 0, content.Length);
-            System.IO.File.WriteAllBytes(contentFilePath, content);
-
+            File.WriteAllBytes(contentFilePath, content);
         }
 
         /// <summary>
@@ -422,7 +405,8 @@ namespace RIM.VSNDK_Package.Signing.Models
         {
             const int bufSize = 0x1000;
             byte[] buf = new byte[bufSize];
-            int bytesRead = 0;
+            int bytesRead;
+
             while ((bytesRead = source.Read(buf, 0, bufSize)) > 0)
                 target.Write(buf, 0, bytesRead);
         }

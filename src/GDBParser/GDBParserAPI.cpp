@@ -14,24 +14,37 @@
 
 #include "stdafx.h"
 
-#pragma managed(on)
-
 #include <string>
-#include < stdio.h >
-#include < stdlib.h >
-#include < vcclr.h >
+#include <stdio.h>
+#include <stdlib.h>
+#include <vcclr.h>
+
+#include "ComponentException.h"
+#include "WorkerUtil.h"
+#include "GDBParserAPI.h"
+#include "gdb-connect.h"
+
+#pragma warning(push)
+#pragma warning(disable:4091)
+#include <msclr\lock.h>
+#pragma warning(pop)
+
+
+using namespace std;
+
 using namespace System;
+using namespace System::Diagnostics;
 using namespace System::Text::RegularExpressions;
 using namespace Microsoft::Win32;
 
-#include "ProjInclude.h"
+#define ASSERT(cond) _ASSERT(cond)
+#ifdef DEBUG
+#   define VERIFY(statement) Debug::Assert((statement) != 0, #statement)
+#else
+#   define VERIFY(statement) statement
+#endif
 
-// GDBParser API header files (in alphabetical order)
-#include "GDBParserAPI.h"
-
-#include "gdb-connect.h"
-
-using namespace std;
+#pragma managed(on)
 
 
 /// <summary> 
@@ -63,7 +76,7 @@ CAutoPtr <char> convertToAutoPtrFromString(String^ str) {
 String^ GDBParser::removeGDBResponse()
 {
 	char output[ParsedMessageSize] = "";
-	removeFromOutputBuffer(output);
+	removeFromOutputBuffer(output, _countof(output));
 	String ^systemstring = gcnew String(output);
 	return systemstring;
 }
@@ -129,9 +142,9 @@ String^ GDBParser::parseCommand(String^ GDBCommand, int ID)
 		Sleep(0); // keep trying to add into buffer
 
 	while (strcmp(output,"") == 0 && s_running)
-		removeSyncFromOutputBuffer(output, ID);
+		removeSyncFromOutputBuffer(output, _countof(output), ID);
 	if (strcmp(output,"$#@EMPTY@#$") == 0) // This string means that both GDB and the parser worked well and returned an empty string.
-		strcpy(output,"");
+        output[0] = '\0';
 
 	String ^systemstring = gcnew String(output);
 	return systemstring;
@@ -207,9 +220,9 @@ void GDBParser::BlackBerryConnect(String^ IPAddrStr, String^ toolsPath, String^ 
 
     char args[256];
     if (!String::IsNullOrEmpty(password))
-        sprintf(args, "java.exe -Xmx512M -jar \"%s\\..\\lib\\Connect.jar\" %s -password %s -sshPublicKey \"%s\"", apTools, apDevice, apPass, apKey);
+        sprintf_s(args, _countof(args), "java.exe -Xmx512M -jar \"%s\\..\\lib\\Connect.jar\" %s -password %s -sshPublicKey \"%s\"", apTools, apDevice, apPass, apKey);
     else
-        sprintf(args, "java.exe -Xmx512M -jar \"%s\\..\\lib\\Connect.jar\" %s -sshPublicKey \"%s\"", apTools, apDevice, apKey);
+        sprintf_s(args, _countof(args), "java.exe -Xmx512M -jar \"%s\\..\\lib\\Connect.jar\" %s -sshPublicKey \"%s\"", apTools, apDevice, apKey);
 
     // Launch the process
     if (!CreateProcessA(NULL, args, NULL, NULL, TRUE,
@@ -278,7 +291,7 @@ String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimula
 //		console->sendCommand(pcCmd);
 //		response = console->waitForPrompt(true);
 
-		sprintf(pcCmd, "1-target-select qnx %s:8000\r\n", ip);
+        sprintf_s(pcCmd, _countof(pcCmd), "1-target-select qnx %s:8000\r\n", ip);
 		console->sendCommand(pcCmd);
 		response = console->waitForPromptWithTimeout(timeout);
 		if ((response == "") || (response[0] == '!')) //found an error
@@ -289,7 +302,7 @@ String^ GDBParser::GetPIDsThroughGDB(String^ IP, String^ password, bool isSimula
 
 		if ((response != "") && (response != "TIMEOUT!") && (response.find("1^error,msg=",0) == -1)) //there is no error from previous response
 		{
-			sprintf(pcCmd, "info pidlist\r\n");
+            sprintf_s(pcCmd, _countof(pcCmd), "info pidlist\r\n");
 			console->sendCommand(pcCmd);
 			response = console->waitForPrompt(true);
 			if ((response == "") || (response[0] == '!')) //found an error
@@ -392,7 +405,7 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 //	console->sendCommand(pcCmd);
 //	response = console->waitForPrompt(true);
 
-	sprintf(pcCmd, "1-gdb-set breakpoint pending on\r\n");
+    sprintf_s(pcCmd, _countof(pcCmd), "1-gdb-set breakpoint pending on\r\n");
 	console->sendCommand(pcCmd);
 	response = console->waitForPrompt(true);
 	parsed = parseGDB(response, parsingInstructions[8]);
@@ -402,7 +415,7 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 		return false;
 	}
 
-	sprintf(pcCmd, "4-target-select qnx %s:8000\r\n", apDevice);
+    sprintf_s(pcCmd, _countof(pcCmd), "4-target-select qnx %s:8000\r\n", apDevice);
 	console->sendCommand(pcCmd);
 	response = console->waitForPrompt(true);
 	parsed = parseGDB(response, parsingInstructions[3]);
@@ -412,7 +425,7 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 		return false;
 	}
 
-	sprintf(pcCmd, "5-file-exec-and-symbols %s\r\n", apBinaryFile);		
+	sprintf_s(pcCmd, _countof(pcCmd), "5-file-exec-and-symbols %s\r\n", apBinaryFile);		
 	console->sendCommand(pcCmd);
 	response = console->waitForPrompt(true);
 	parsed = parseGDB(response, parsingInstructions[7]);
@@ -426,7 +439,7 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 	{
 		m_remotePath = m_remotePath + "\\lib;" + m_remotePath + "\\usr\\lib;" + m_remotePath + "\\usr\\lib\\qt4";
 		CAutoPtr <char> apPath = convertToAutoPtrFromString(m_remotePath);
-		sprintf(pcCmd, "6set solib-search-path %s\r\n", apPath);    
+		sprintf_s(pcCmd, _countof(pcCmd), "6set solib-search-path %s\r\n", apPath);    
 		console->sendCommand(pcCmd);
 		response = console->waitForPrompt(true);
 		parsed = parseGDB(response, parsingInstructions[8]);
@@ -437,7 +450,7 @@ bool GDBParser::LaunchProcess(String^ pidStr, String^ exeStr, String^ IPAddrStr,
 		}
 	}
   
-	sprintf(pcCmd, "7-target-attach %d\r\n", pid);
+	sprintf_s(pcCmd, _countof(pcCmd), "7-target-attach %d\r\n", pid);
 	console->sendCommand(pcCmd);
 	response = console->waitForPrompt(true);
 	parsed = parseGDB(response, parsingInstructions[6]);
@@ -624,7 +637,7 @@ String^ GDBParserUnitTests::parse_GDB(String^ response, String^ parsingInstructi
 
 		if (aux.length() > 128)
 			aux[127] = '\0';
-		strcpy(v[i], aux.c_str());
+		strcpy_s(v[i], _countof(v[0]), aux.c_str());
 	}
 
 	string output = parseGDB(&r, p, respBegin, repeat, v, s);
@@ -699,21 +712,21 @@ int GDBParserUnitTests::search_Response(String^ response, String^ txt, int begin
 /// <returns> Returns the new modified string. </returns>
 String^ GDBParserUnitTests::substitute_Variables(String^ txt, array<String^>^ variables)
 {
-	CAutoPtr <char> apTxt = convertToAutoPtrFromString(txt);
-	string t = apTxt;
-	char v[10][128];
-	for (int i = 0; i< 10; i++)
-	{
-		CAutoPtr <char> apAux = convertToAutoPtrFromString(variables[i]);
-		string aux = apAux;
+    CAutoPtr <char> apTxt = convertToAutoPtrFromString(txt);
+    string t = apTxt;
+    char v[10][128];
+    for (int i = 0; i< 10; i++)
+    {
+        CAutoPtr <char> apAux = convertToAutoPtrFromString(variables[i]);
+        string aux = apAux;
 
-		if (aux.length() > 128)
-			aux[127] = '\0';
-		strcpy(v[i], aux.c_str());
-	}
-	string output = substituteVariables(t, v);
-	String ^systemstring = gcnew String(output.c_str());
-	return systemstring;
+        if (aux.length() > 128)
+            aux[127] = '\0';
+        strcpy_s(v[i], _countof(v[0]), aux.c_str());
+    }
+    string output = substituteVariables(t, v);
+    String ^systemstring = gcnew String(output.c_str());
+    return systemstring;
 }
 
 
@@ -724,10 +737,10 @@ String^ GDBParserUnitTests::substitute_Variables(String^ txt, array<String^>^ va
 /// <returns> Returns TRUE - successfully added; or FALSE - failed to add. </returns>
 bool GDBParserUnitTests::add_Into_Input_Buffer(String^ command)
 {
-	CAutoPtr <char> apCmd = convertToAutoPtrFromString(command);
-	char GDBCommand[GDBCommandSize];
-	strcpy(GDBCommand, apCmd);
-	return addIntoInputBuffer(GDBCommand);
+    CAutoPtr <char> apCmd = convertToAutoPtrFromString(command);
+    char GDBCommand[GDBCommandSize];
+    strcpy_s(GDBCommand, _countof(GDBCommand), apCmd);
+    return addIntoInputBuffer(GDBCommand);
 }
 
 
@@ -737,10 +750,10 @@ bool GDBParserUnitTests::add_Into_Input_Buffer(String^ command)
 /// <returns> Returns the next command that would be sent to GDB. </returns>
 String^ GDBParserUnitTests::remove_From_Input_Buffer()
 {
-	char command[GDBCommandSize] = "";
-	removeFromInputBuffer(command);
-	string basicstring(command);
-	return(gcnew String(basicstring.c_str()));
+    char command[GDBCommandSize] = "";
+    removeFromInputBuffer(command, _countof(command));
+    string basicstring(command);
+    return gcnew String(basicstring.c_str());
 }
 
 
@@ -770,9 +783,9 @@ String^ GDBParserUnitTests::remove_From_Input_Buffer()
 /// <returns> Returns TRUE - successfully added; or FALSE - failed to add. </returns>
 bool GDBParserUnitTests::add_Into_GDB_Buffer(int seq_id, int instructionCode, String^ param)
 {
-	CAutoPtr <char> apParam = convertToAutoPtrFromString(param);
-	string p = apParam;
-	return addIntoGDBBuffer(seq_id, instructionCode, p);
+    CAutoPtr <char> apParam = convertToAutoPtrFromString(param);
+    string p = apParam;
+    return addIntoGDBBuffer(seq_id, instructionCode, p);
 }
 
 
@@ -784,10 +797,10 @@ bool GDBParserUnitTests::add_Into_GDB_Buffer(int seq_id, int instructionCode, St
 /// <returns> Returns the instruction code associated to the sequential id (seq). </returns>
 int GDBParserUnitTests::remove_From_GDB_Buffer(int seq, [Runtime::InteropServices::Out] String^ %param)
 {
-	string p = "";
-	int code = removeFromGDBBuffer(seq, &p);
-	param = gcnew String(p.c_str());
-	return code;
+    string p = "";
+    int code = removeFromGDBBuffer(seq, &p);
+    param = gcnew String(p.c_str());
+    return code;
 }
 
 
@@ -797,7 +810,7 @@ int GDBParserUnitTests::remove_From_GDB_Buffer(int seq, [Runtime::InteropService
 /// <returns> Returns TRUE if empty; FALSE if not. </returns>
 bool GDBParserUnitTests::is_GDB_Buffer_Empty()
 {
-	return isGDBBufferEmpty();
+    return isGDBBufferEmpty();
 }
 
 
@@ -809,10 +822,10 @@ bool GDBParserUnitTests::is_GDB_Buffer_Empty()
 /// <returns> Returns TRUE - successfully added; or FALSE - failed to add. </returns>
 bool GDBParserUnitTests::add_Into_Output_Buffer(int seq_stamp, String^ message)
 {
-	CAutoPtr <char> apResp = convertToAutoPtrFromString(message);
-	char parsedMessage[GDBCommandSize];
-	strcpy(parsedMessage, apResp);
-	return addIntoOutputBuffer(seq_stamp, parsedMessage);
+    CAutoPtr <char> apResp = convertToAutoPtrFromString(message);
+    char parsedMessage[GDBCommandSize];
+    strcpy_s(parsedMessage, _countof(parsedMessage), apResp);
+    return addIntoOutputBuffer(seq_stamp, parsedMessage);
 }
 
 
@@ -823,10 +836,10 @@ bool GDBParserUnitTests::add_Into_Output_Buffer(int seq_stamp, String^ message)
 /// <param name="output"> Returns the supposed parsed GDB response. </param>
 String^ GDBParserUnitTests::remove_From_Output_Buffer()
 {
-	char response[GDBCommandSize] = "";
-	removeFromOutputBuffer(response);
-	string basicstring(response);
-	return(gcnew String(basicstring.c_str()));
+    char response[GDBCommandSize] = "";
+    removeFromOutputBuffer(response, _countof(response));
+    string basicstring(response);
+    return gcnew String(basicstring.c_str());
 }
 
 
@@ -838,10 +851,10 @@ String^ GDBParserUnitTests::remove_From_Output_Buffer()
 /// <param name="ID"> ID of the supposed GDB command. </param>
 String^ GDBParserUnitTests::remove_Sync_From_Output_Buffer(int ID)
 {
-	char response[GDBCommandSize] = "";
-	removeSyncFromOutputBuffer(response, ID);
-	string basicstring(response);
-	return(gcnew String(basicstring.c_str()));
+    char response[GDBCommandSize] = "";
+    removeSyncFromOutputBuffer(response, _countof(response), ID);
+    string basicstring(response);
+    return gcnew String(basicstring.c_str());
 }
 
 

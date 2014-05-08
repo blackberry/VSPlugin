@@ -13,11 +13,7 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Collections;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -57,7 +53,7 @@ namespace VSNDK.Tasks
 
                 return true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return false;
             }

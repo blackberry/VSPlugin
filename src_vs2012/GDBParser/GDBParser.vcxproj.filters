@@ -41,9 +41,6 @@
     <None Include="..\..\src\GDBParser\Instructions.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\src\GDBParser\ProjInclude.h">
-      <Filter>Header files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Header files</Filter>
     </ClInclude>

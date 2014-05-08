@@ -46,7 +46,6 @@ namespace RIM.VSNDK_Package.UpdateManager
 
             umData = new UpdateManagerData();
             gridMain.DataContext = umData;
-            this.Close.IsEnabled = true;
         }
 
         /// <summary>

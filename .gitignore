@@ -52,6 +52,7 @@ src/GDBParser.UnitTests/bin/
 src/GDBParser.UnitTests/obj/
 src/GDBParser/Debug/
 src/GDBWrapper/Debug/
+src/ipch/
 src/VSNDK.AddIn/bin/
 src/VSNDK.AddIn/obj/
 src/VSNDK.DebugEngine/bin/

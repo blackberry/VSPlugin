@@ -15,11 +15,13 @@
 #pragma once
 
 #include <unordered_map>
+#include <vcclr.h>
 
 #define NumberOfInstructions 48
 #define GDBCommandSize 256
 
 using namespace std;
+using namespace System;
 
 BEGIN_NAMESPACE
 

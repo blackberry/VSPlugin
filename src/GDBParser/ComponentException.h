@@ -14,9 +14,14 @@
 
 #pragma once
 
+#include <vcclr.h>
+
+#pragma managed(on)
+
+
 BEGIN_NAMESPACE
 
-public ref class ComponentException : public Exception
+public ref class ComponentException : public System::Exception
 {
 public:
     ComponentException(HRESULT hr)

@@ -13,18 +13,9 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using System.IO;
@@ -36,7 +27,7 @@ namespace RIM.VSNDK_Package
     /// </summary>
     public partial class VsDesignerControl : UserControl
     {
-        private ServiceProvider _serviceProvider;
+        private readonly ServiceProvider _serviceProvider;
         /// <summary>
         /// Primary Constructor
         /// </summary>
@@ -55,7 +46,7 @@ namespace RIM.VSNDK_Package
             DataContext = viewModel;
             InitializeComponent();
             // wait until we're initialized to handle events
-            viewModel.ViewModelChanged += new EventHandler(ViewModelChanged);
+            viewModel.ViewModelChanged += ViewModelChanged;
         }
 
         internal void DoIdle()
@@ -64,7 +55,7 @@ namespace RIM.VSNDK_Package
             // otherwise, we should skip and this will be called again
             // once focus is regained
             IViewModel viewModel = DataContext as IViewModel;
-            if (viewModel != null && this.IsKeyboardFocusWithin)
+            if (viewModel != null && IsKeyboardFocusWithin)
             {
                 viewModel.DoIdle();
             }
@@ -91,7 +82,7 @@ namespace RIM.VSNDK_Package
         /// <returns></returns>
         private Boolean IsTextAllowed(String text) 
         { 
-            return Array.TrueForAll<Char>(text.ToCharArray(), 
+            return Array.TrueForAll(text.ToCharArray(), 
                 delegate(Char c) { return Char.IsDigit(c) || Char.IsControl(c); }); 
         }     
         
@@ -159,7 +150,7 @@ namespace RIM.VSNDK_Package
             try
             {
                 DTE dte = (DTE)_serviceProvider.GetService(typeof(DTE));
-                string solutionDir = System.IO.Path.GetDirectoryName(dte.Solution.FullName);
+                string solutionDir = Path.GetDirectoryName(dte.Solution.FullName);
 
 
                 Projects projs = dte.Solution.Projects;
@@ -181,7 +172,7 @@ namespace RIM.VSNDK_Package
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -251,7 +242,7 @@ namespace RIM.VSNDK_Package
                 if (viewModel != null)
                 {
                     viewModel.UnCheckPermission((grdPermissions.SelectedItem as PermissionItemClass).Identifier);
-                };
+                }
             }
 
         }
@@ -290,19 +281,17 @@ namespace RIM.VSNDK_Package
 
         private void CheckBox_Click_1(object sender, RoutedEventArgs e)
         {
-            bool isPublic = false;
-
             IViewModel viewModel = DataContext as IViewModel;
             if (viewModel != null)
             {
-                isPublic = (sender as CheckBox).IsChecked == true;
+                bool isPublic = (sender as CheckBox).IsChecked == true;
                 viewModel.EditLocalAsset((grdAssets.SelectedItem as asset).Value, isPublic, "");
             }
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            string assetType = "";
+            string assetType;
 
             if (e.RemovedItems.Count != 0)
             {

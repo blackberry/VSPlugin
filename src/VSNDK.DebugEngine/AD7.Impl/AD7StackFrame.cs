@@ -13,13 +13,10 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.Text;
 using Microsoft.VisualStudio;
 using VSNDK.Parser;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
 
 namespace VSNDK.DebugEngine
 {
@@ -376,10 +373,8 @@ namespace VSNDK.DebugEngine
         /// <param name="VSNames"> The Names of the variables used by VS. </param>
         public VariableInfo(string name, string type, string baseType, string value, EventDispatcher dispatcher, ArrayList GDBNames, ArrayList VSNames)
         {
-            /// numChildren - The result of the createvar returns ERROR or a number from 0 to "n" where "n" is the number of children 
-            /// of the variable.
-            string numChildren = ""; 
-            
+            // numChildren - The result of the createvar returns ERROR or a number from 0 to "n" where "n" is the number of children of the variable.
+
             _name = name;
             _type = type;
             _value = value;
@@ -400,12 +395,11 @@ namespace VSNDK.DebugEngine
                 // This is an array, struct, union, or pointer.
                 // Create a variable object so we can list this variable's children.
 
-                /// Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
-                /// name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
-                /// same index position. This bool variable just indicate if this prefix is used or not.
+                // Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
+                // name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
+                // same index position. This bool variable just indicate if this prefix is used or not.
                 bool hasVsNdK_ = false; 
-
-                numChildren = dispatcher.createVar(_name, ref hasVsNdK_);
+                string numChildren = dispatcher.createVar(_name, ref hasVsNdK_);
 
                 if (hasVsNdK_)
                 {
@@ -421,20 +415,20 @@ namespace VSNDK.DebugEngine
                         _children = new ArrayList();
                         if (type.Contains("struct"))
                             if (type[type.Length - 1] == '*')
-                                this.listChildren(dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
+                                listChildren(dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
                             else if (type.Contains("["))
-                                this.listChildren(dispatcher, "struct[]", GDBNames, VSNames, hasVsNdK_, null);
+                                listChildren(dispatcher, "struct[]", GDBNames, VSNames, hasVsNdK_, null);
                             else
-                                this.listChildren(dispatcher, "struct", GDBNames, VSNames, hasVsNdK_, null);
+                                listChildren(dispatcher, "struct", GDBNames, VSNames, hasVsNdK_, null);
                         else if (type.Contains("["))
-                            this.listChildren(dispatcher, "[]", GDBNames, VSNames, hasVsNdK_, null);
+                            listChildren(dispatcher, "[]", GDBNames, VSNames, hasVsNdK_, null);
                         else if (type.Contains("*"))
-                            this.listChildren(dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
+                            listChildren(dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
                         else
-                            this.listChildren(dispatcher, "", GDBNames, VSNames, hasVsNdK_, null);
+                            listChildren(dispatcher, "", GDBNames, VSNames, hasVsNdK_, null);
                     }
                 }
-                catch (FormatException e)
+                catch (FormatException)
                 {
 
                 }
@@ -726,14 +720,14 @@ namespace VSNDK.DebugEngine
             {
                 m_lineNum = Convert.ToUInt32(frameInfo[4]);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 m_lineNum = 0;
             }
 
             _locals = new ArrayList();
             _arguments = new ArrayList();
-            m_hasSource = (m_lineNum == 0) ? false : true;
+            m_hasSource = m_lineNum != 0;
             ArrayList evaluatedVars = new ArrayList();
             
             // Add the variable filter list to the evaluatedVars list.
@@ -1233,7 +1227,7 @@ namespace VSNDK.DebugEngine
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 docContext)
         {
-            this.m_engine.cleanEvaluatedThreads();
+            m_engine.cleanEvaluatedThreads();
             docContext = null;
 
             try
@@ -1259,8 +1253,6 @@ namespace VSNDK.DebugEngine
             {
                 return EngineUtils.UnexpectedException(e);
             }
-
-            return VSConstants.S_FALSE;
         }
 
 
@@ -1295,27 +1287,27 @@ namespace VSNDK.DebugEngine
                 SetFrameInfo(dwFieldSpec, out pFrameInfo[0]);
 
                 int frame = 0;
-                if (this.m_thread.__stackFrames != null)
+                if (m_thread.__stackFrames != null)
                 {
-                    foreach (AD7StackFrame sf in this.m_thread.__stackFrames)
+                    foreach (AD7StackFrame sf in m_thread.__stackFrames)
                     {
-                        if (sf.m_functionName == this.m_functionName)
+                        if (sf.m_functionName == m_functionName)
                             break;
                         frame++;
                     }
                 }
 
-                if (this.m_thread._id != this.m_engine.currentThread()._id)
-                    this.m_engine.eDispatcher.selectThread(this.m_thread._id);
+                if (m_thread._id != m_engine.CurrentThread()._id)
+                    m_engine.eDispatcher.selectThread(m_thread._id);
 
                 // Waits for the parsed response for the GDB/MI command that changes the selected frame.
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
                 GDBParser.parseCommand("-stack-select-frame " + frame, 5);
 
-                if (this.m_thread._id != this.m_engine.currentThread()._id)
-                    this.m_engine.eDispatcher.selectThread(this.m_engine.currentThread()._id);
+                if (m_thread._id != m_engine.CurrentThread()._id)
+                    m_engine.eDispatcher.selectThread(m_engine.CurrentThread()._id);
 
-                this.m_engine.cleanEvaluatedThreads();
+                m_engine.cleanEvaluatedThreads();
                 
                 return VSConstants.S_OK;
             }

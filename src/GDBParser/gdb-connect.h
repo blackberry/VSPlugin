@@ -14,8 +14,6 @@
 
 #pragma once
 
-#include <windows.h>
-
 #include "stdafx.h"
 #include <strsafe.h>
 #include <string>
@@ -59,7 +57,7 @@ private:
 	BOOL isMoreOutputAvailable ();
 	void logPrint(char*);
 	void prepAndLaunchRedirectedChild();		
-	int readOutput(CHAR*, int, int*);
+	int readOutput(CHAR*, int, size_t*);
 
 public:	
 	~GDBConsole();	
@@ -102,11 +100,11 @@ string substituteVariables(string, char[10][128]);
 // The following methods are responsible for manipulating the buffers (Input, GDB and Output).
 void cleanBuffers();
 bool addIntoInputBuffer(char [GDBCommandSize]);
-void removeFromInputBuffer(char *);
+void removeFromInputBuffer(char *, size_t);
 bool isInputBufferEmpty();
 bool addIntoGDBBuffer(int, int, string);
 int removeFromGDBBuffer(int, string*);
 bool isGDBBufferEmpty();
 bool addIntoOutputBuffer(int, char *);
-void removeFromOutputBuffer(char *);
-void removeSyncFromOutputBuffer(char *, int);
+void removeFromOutputBuffer(char *, size_t);
+void removeSyncFromOutputBuffer(char *, size_t, int);

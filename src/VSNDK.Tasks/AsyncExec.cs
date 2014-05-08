@@ -13,14 +13,11 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using Microsoft.Build.Tasks;
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Specialized;
-using Microsoft.Build.Framework;
 using System.Security.Cryptography;
 
 namespace VSNDK.Tasks
@@ -73,7 +70,7 @@ namespace VSNDK.Tasks
                 startInfo.WorkingDirectory = workingDirectory;
             }
 
-            StringDictionary environmentOverride = this.EnvironmentOverride;
+            StringDictionary environmentOverride = EnvironmentOverride;
             if (environmentOverride != null)
             {
                 foreach (DictionaryEntry entry in environmentOverride)

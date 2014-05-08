@@ -14,20 +14,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using System.Windows.Data;
-using RIM.VSNDK_Package.Settings;
-using RIM.VSNDK_Package.DebugToken;
 using System.IO;
-using System.Xml;
-using System.Linq;
 using System.Windows;
 using RIM.VSNDK_Package.DebugToken.Model;
 using Microsoft.Win32;
-using Microsoft.VisualStudio.Shell;
-using System.Security.Cryptography;
 using System.Management;
 
 namespace RIM.VSNDK_Package.UpdateManager.Model
@@ -224,7 +218,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
                     {
                         installProcessID.Add(Convert.ToInt32(item["ProcessId"].ToString()));
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                     }
                 }
@@ -428,7 +422,6 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         public bool validateDeviceVersion(bool isSim)
         {
             bool retVal = false;
-            string baseVersion = "10.2.0.0";
             string currentAPIVersion = getCurrentAPIVersion();
             DebugTokenData dtokenData;
 
@@ -515,14 +508,14 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         private string getBuildVersion()
         {
             string makefile = "";
-            System.IO.StreamReader readMakefile = null;
+            StreamReader readMakefile;
             try
             {
-                readMakefile = new System.IO.StreamReader(_outputPath + @"\makefile");
+                readMakefile = new StreamReader(_outputPath + @"\makefile");
                 makefile = readMakefile.ReadToEnd();
                 readMakefile.Close();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return "";
             }
@@ -570,9 +563,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
 
                 if (n1 > n2)
                     return 1;
-                else if (n2 > n1)
+                if (n2 > n1)
                     return -1;
-
             } while ((str1 != "") && (str2 != ""));
 
             if (str1 != "")
@@ -597,20 +589,21 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// <returns>True if successful</returns>
         public bool getDeviceInfo()
         {
-            bool success = false;
+            bool success;
 
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+            Process p = new Process();
+            ProcessStartInfo startInfo = p.StartInfo;
+
             startInfo.UseShellExecute = false;
             startInfo.CreateNoWindow = true;
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardOutput = true;
-            p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_ErrorDataReceived);
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(DeviceInfoDataReceived);
+            p.ErrorDataReceived += p_ErrorDataReceived;
+            p.OutputDataReceived += DeviceInfoDataReceived;
 
             /// Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.WorkingDirectory = System.Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
+            startInfo.WorkingDirectory = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\qnxtools\\bin\\";
             startInfo.Arguments = string.Format("/C blackberry-deploy.bat -listDeviceInfo {0} {1}", DeviceIP, DevicePassword == "" ? "" : "-password " + DevicePassword);
 
             try
@@ -646,8 +639,8 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
             }
             catch (Exception e)
             {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
+                Debug.WriteLine(startInfo.Arguments);
+                Debug.WriteLine(e.Message);
                 success = false;
                 if (_errors != "")
                 {
@@ -674,26 +667,28 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void DeviceInfoDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        private void DeviceInfoDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null)
             {
-                System.Diagnostics.Debug.WriteLine(e.Data);
+                Debug.WriteLine(e.Data);
                 if (e.Data.Contains("Error:"))
                     _errors += e.Data + "\n";
                 else if (e.Data.Contains("scmbundle::"))
                     _deviceosversion = e.Data.Substring(e.Data.LastIndexOf("::") + 2);
             }
-        }        /// <summary>
+        }
+        
+        /// <summary>
         /// On Data Received event handler
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void p_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        private void p_OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null)
             {
-                System.Diagnostics.Debug.WriteLine(e.Data);
+                Debug.WriteLine(e.Data);
                 if (e.Data.Contains("Error:"))
                     _errors += e.Data + "\n";
                 else if (e.Data.Contains("scmbundle::"))
@@ -705,7 +700,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         /// Retrieve a list of the installed runtimes on the PC.
         /// </summary>
         /// <returns></returns>
-        private bool getInstalledRuntimeTargetList()
+        private bool GetInstalledRuntimeTargetList()
         {
             bool success = false;
 
@@ -992,7 +987,7 @@ namespace RIM.VSNDK_Package.UpdateManager.Model
         {
             bool success = false;
 
-            getInstalledRuntimeTargetList();
+            GetInstalledRuntimeTargetList();
 
             if (installedRuntimeList != null)
             {

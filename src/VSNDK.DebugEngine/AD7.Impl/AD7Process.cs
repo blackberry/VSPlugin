@@ -14,17 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using VSNDK.Parser;
-using System.Collections.Specialized;
-using Microsoft.VisualStudio.Shell.Interop;
-//using VSNDK.AddIn;
-using System.Windows.Forms;
-
 
 namespace VSNDK.DebugEngine
 {
@@ -45,7 +37,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Identifies the session in which this process is attached to.
         /// </summary>
-        IDebugSession2 session;
+        private IDebugSession2 session;
         
         /// <summary>
         /// The name of the process. Not used till now. Has no value assigned to it.
@@ -60,7 +52,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// The IDebugPort2 object that represents the port on which the process was launched.
         /// </summary>
-        IDebugPort2 _port = null;
+        private IDebugPort2 _port;
         
         /// <summary>
         /// Process GUID.
@@ -71,11 +63,6 @@ namespace VSNDK.DebugEngine
         /// Process ID.
         /// </summary>
         public string _processID;
-
-        /// <summary>
-        /// The server on which this process is running. Not used till now. Has no value assigned to it.
-        /// </summary>
-        IDebugCoreServer2 _server;
 
         /// <summary>
         /// The AD7Engine object that represents the DE.
@@ -239,22 +226,22 @@ namespace VSNDK.DebugEngine
             {
                 if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_FILE_NAME) != 0)
                 {
-                    pProcessInfo[0].bstrFileName = this._name;
+                    pProcessInfo[0].bstrFileName = _name;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_FILE_NAME;
                 }
                 if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_BASE_NAME) != 0)
                 {
-                    pProcessInfo[0].bstrBaseName = this._name.Substring(_name.LastIndexOf('/') + 1);
+                    pProcessInfo[0].bstrBaseName = _name.Substring(_name.LastIndexOf('/') + 1);
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_BASE_NAME;
                 }
                 if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_TITLE) != 0)
                 {
-                    pProcessInfo[0].bstrTitle = this._name;
+                    pProcessInfo[0].bstrTitle = _name;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_TITLE;
                 }
                 if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_PROCESS_ID) != 0)
                 {
-                    pProcessInfo[0].ProcessId.dwProcessId = Convert.ToUInt32(this._processID);
+                    pProcessInfo[0].ProcessId.dwProcessId = Convert.ToUInt32(_processID);
                     pProcessInfo[0].ProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_PROCESS_ID;
                 }
@@ -350,7 +337,7 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetServer(out IDebugCoreServer2 ppServer)
         {
-            ppServer = _server;
+            ppServer = null;
             return VSConstants.S_OK;
         }
 

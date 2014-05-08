@@ -15,32 +15,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using EnvDTE80;
 using EnvDTE;
 using Microsoft.VisualStudio.VCProjectEngine;
 using System.Diagnostics;
-using System.Globalization;
 using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.Project;
-using Microsoft.Build.Execution;
-using System.Xml;
-using Microsoft.Win32;
-using System.Security.Cryptography;
 using System.IO;
-
-using Extensibility;
-using System.Resources;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
-
-using NameValueCollection = System.Collections.Specialized.NameValueCollection;
-using NameValueCollectionHelper = VSNDK.AddIn.NameValueCollectionHelper;
-using System.Runtime.InteropServices;
 
 namespace VSNDK.AddIn
 {
@@ -60,9 +41,9 @@ namespace VSNDK.AddIn
         private VSNDKCommandEvents _commandEvents;
         private DTE2 _applicationObject; 
         private EnvDTE.AddIn _addInInstance;
-        private TokenProcessor tokenProcessor;
+        private TokenProcessor _tokenProcessor;
 
-        private List<configtableentry> configTable;
+        private List<configtableentry> _configTable;
 
 
         private const string BLACKBERRY = "BlackBerry";
@@ -75,11 +56,6 @@ namespace VSNDK.AddIn
         
         public static bool isDebugEngineRunning = false;
 
-        public VSNDKAddIn()
-        {
-        }
-
-
         /// <summary> 
         /// Run initialization code on first connection of the AddIn. 
         /// </summary>
@@ -87,13 +63,13 @@ namespace VSNDK.AddIn
         /// <param name="addin"> Add In Object. </param>
         public void Connect(DTE2 appObj, EnvDTE.AddIn addin)
         {
-            /// Initialize External and Internal Variables.
+            // Initialize External and Internal Variables.
             _applicationObject = appObj;
             _addInInstance = addin;
 
-            configTable = new List<configtableentry>();
+            _configTable = new List<configtableentry>();
 
-            /// Register Command Events
+            // Register Command Events
             _commandEvents = new VSNDKCommandEvents(appObj);
             _commandEvents.RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
             _commandEvents.RegisterCommand(GuidList.guidVSDebugGroup, CommandConstants.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
@@ -151,8 +127,8 @@ namespace VSNDK.AddIn
         private void DisableIntelliSenseErrorReport(bool disable)
         {
             DTE dte = _applicationObject as DTE;
-            EnvDTE.Properties txtEdCpp = dte.get_Properties("TextEditor", "C/C++ Specific");
-            EnvDTE.Property prop = txtEdCpp.Item("DisableErrorReporting");
+            var txtEdCpp = dte.get_Properties("TextEditor", "C/C++ Specific");
+            var prop = txtEdCpp.Item("DisableErrorReporting");
             if (prop != null)
                 prop.Value = disable;
         }
@@ -168,7 +144,7 @@ namespace VSNDK.AddIn
         /// <param name="CancelDefault">Cancel the default execution of the command. </param>
         private void cmdNewPlatform_beforeExec(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
         {
-            getSolutionPlarformConfig();
+            GetSolutionPlarformConfig();
         }
 
         
@@ -196,7 +172,7 @@ namespace VSNDK.AddIn
         /// <param name="CancelDefault">Cancel the default execution of the command. </param>
         private void cmdNewFunctionBreakpoint_beforeExec(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
         {
-            /// Add Code Here
+            // Add Code Here
         }
 
 
@@ -241,11 +217,11 @@ namespace VSNDK.AddIn
                     string pname = SC.PlatformName;
                     string prname = SC.ProjectName;
 
-                    configtableentry e = configTable.Find(i => (i.config == cname) && (i.platform == pname));
+                    configtableentry e = _configTable.Find(i => (i.config == cname) && (i.platform == pname));
 
                     if (e != null)
                     {
-                        configTable.Remove(e);
+                        _configTable.Remove(e);
                     }
                     else
                     {
@@ -260,7 +236,7 @@ namespace VSNDK.AddIn
         /// <summary>
         /// Get solution configuration before edit
         /// </summary>
-        private void getSolutionPlarformConfig()
+        private void GetSolutionPlarformConfig()
         {
             DTE dte = _applicationObject as DTE;
 
@@ -282,7 +258,7 @@ namespace VSNDK.AddIn
                     c.config = cname;
                     c.deployable = SC.ShouldDeploy;
 
-                    configTable.Add(c);
+                    _configTable.Add(c);
                 }
             }
 
@@ -347,30 +323,30 @@ namespace VSNDK.AddIn
                     string n = proj.Name;
                     if (baritem == null)
                     {
-                        tokenProcessor = new TokenProcessor();
+                        _tokenProcessor = new TokenProcessor();
                         Debug.WriteLine("Add bar descriptor file to the project");
                         string templatePath = dte.Solution.ProjectItemsTemplatePath(proj.Kind);
                         templatePath += BAR_DESCRIPTOR_PATH + BAR_DESCRIPTOR;
-                        tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", proj.Name);
-                        string destination = System.IO.Path.GetFileName(templatePath);
+                        _tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", proj.Name);
+                        string destination = Path.GetFileName(templatePath);
 
                         // Remove directory used in previous versions of this plug-in.
-                        string folder = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(proj.FullName), proj.Name + "_barDescriptor");
+                        string folder = Path.Combine(Path.GetDirectoryName(proj.FullName), proj.Name + "_barDescriptor");
                         if (Directory.Exists(folder))
                         {
                             try
                             {
                                 Directory.Delete(folder);
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                             }
                         }
 
-                        folder = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(proj.FullName), "BlackBerry-" + proj.Name);
-                        System.IO.Directory.CreateDirectory(folder);
-                        destination = System.IO.Path.Combine(folder, destination);
-                        tokenProcessor.UntokenFile(templatePath, destination);
+                        folder = Path.Combine(Path.GetDirectoryName(proj.FullName), "BlackBerry-" + proj.Name);
+                        Directory.CreateDirectory(folder);
+                        destination = Path.Combine(folder, destination);
+                        _tokenProcessor.UntokenFile(templatePath, destination);
                         ProjectItem projectitem = proj.ProjectItems.AddFromFile(destination);
                     }
                 }

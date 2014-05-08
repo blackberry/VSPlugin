@@ -19,9 +19,7 @@ using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using Microsoft.Win32;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.VCProjectEngine;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.Xml;
 using System.IO;
@@ -29,7 +27,6 @@ using System.Collections.Generic;
 using System.Linq;
 using EnvDTE;
 using System.Windows.Forms;
-using VSNDK.Package;
 using EnvDTE80;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
@@ -248,7 +245,7 @@ namespace RIM.VSNDK_Package
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -311,7 +308,7 @@ namespace RIM.VSNDK_Package
             {
                 _installedNDKList = new List<APIClass>();
 
-                string dirPaths = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
+                string dirPaths = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
 
                 string[] filePaths = Directory.GetFiles(dirPaths, "*.xml");
                 foreach (string file in filePaths)
@@ -334,7 +331,7 @@ namespace RIM.VSNDK_Package
                     }
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
 
             }
@@ -374,14 +371,15 @@ namespace RIM.VSNDK_Package
         {
             if (GlobalFunctions.isOnline())
             {
-                System.Diagnostics.Process p = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                var p = new System.Diagnostics.Process();
+                ProcessStartInfo startInfo = p.StartInfo;
+
                 startInfo.UseShellExecute = false;
                 startInfo.CreateNoWindow = true;
                 startInfo.RedirectStandardError = true;
                 startInfo.RedirectStandardOutput = true;
-                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
-                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDefaultsDataReceived);
+                p.ErrorDataReceived += ErrorDataReceived;
+                p.OutputDataReceived += APIListDefaultsDataReceived;
 
 
                 /// Get Device PIN
@@ -411,8 +409,8 @@ namespace RIM.VSNDK_Package
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                    System.Diagnostics.Debug.WriteLine(e.Message);
+                    Debug.WriteLine(startInfo.Arguments);
+                    Debug.WriteLine(e.Message);
                 }
             }
 
@@ -423,11 +421,8 @@ namespace RIM.VSNDK_Package
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void APIListDefaultsDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        private void APIListDefaultsDataReceived(object sender, DataReceivedEventArgs e)
         {
-            string version = "";
-            string name = "";
-
             if (e.Data != null)
             {
                 if ((e.Data.ToLower().Contains("error")) || (_error != ""))
@@ -440,8 +435,8 @@ namespace RIM.VSNDK_Package
                 }
                 else
                 {
-                    version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
-                    name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
+                    string version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
+                    string name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
 
                     APITargetClass api = _tempAPITargetList.Find(i => i.TargetVersion == version);
 
@@ -463,14 +458,14 @@ namespace RIM.VSNDK_Package
         {
             if (GlobalFunctions.isOnline())
             {
-                System.Diagnostics.Process p = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                var p = new System.Diagnostics.Process();
+                var startInfo = p.StartInfo;
                 startInfo.UseShellExecute = false;
                 startInfo.CreateNoWindow = true;
                 startInfo.RedirectStandardError = true;
                 startInfo.RedirectStandardOutput = true;
-                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
-                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(APIListDataReceived);
+                p.ErrorDataReceived += ErrorDataReceived;
+                p.OutputDataReceived += APIListDataReceived;
 
 
                 /// Get Device PIN
@@ -502,8 +497,8 @@ namespace RIM.VSNDK_Package
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                    System.Diagnostics.Debug.WriteLine(e.Message);
+                    Debug.WriteLine(startInfo.Arguments);
+                    Debug.WriteLine(e.Message);
                 }
             }
 
@@ -514,13 +509,8 @@ namespace RIM.VSNDK_Package
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void APIListDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        private void APIListDataReceived(object sender, DataReceivedEventArgs e)
         {
-            string name = "";
-            string description = "";
-            string version = "";
-            APITargetClass api = null;
-
             if (e.Data != null)
             {
                 if ((e.Data.ToLower().Contains("error")) || (_error != ""))
@@ -533,13 +523,10 @@ namespace RIM.VSNDK_Package
                 }
                 else
                 {
-                    version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
-                    name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3);
-                    name = name.Replace("(EXTERNAL_NDK)", "");
-                    description = "Device Support Unknown.";
-                    
-
-                    api = _tempAPITargetList.Find(i => i.TargetName == name);
+                    string version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
+                    string name = e.Data.Substring(e.Data.LastIndexOf(" - ") + 3).Replace("(EXTERNAL_NDK)", "");
+                    string description = "Device Support Unknown.";
+                    APITargetClass api = _tempAPITargetList.Find(i => i.TargetName == name);
 
                     if (api == null)
                     {
@@ -612,11 +599,11 @@ namespace RIM.VSNDK_Package
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null)
             {
-                System.Diagnostics.Debug.WriteLine(e.Data);
+                Debug.WriteLine(e.Data);
                 _error += e.Data + "\n";
 //                MessageBox.Show(e.Data);
             }
@@ -689,14 +676,14 @@ namespace RIM.VSNDK_Package
         {
             if (GlobalFunctions.isOnline())
             {
-                System.Diagnostics.Process p = new System.Diagnostics.Process();
-                System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
+                var p = new System.Diagnostics.Process();
+                var startInfo = p.StartInfo;
                 startInfo.UseShellExecute = false;
                 startInfo.CreateNoWindow = true;
                 startInfo.RedirectStandardError = true;
                 startInfo.RedirectStandardOutput = true;
-                p.ErrorDataReceived += new System.Diagnostics.DataReceivedEventHandler(ErrorDataReceived);
-                p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(SimulatorListDataReceived);
+                p.ErrorDataReceived += ErrorDataReceived;
+                p.OutputDataReceived += SimulatorListDataReceived;
 
                 /// Get Device PIN
                 startInfo.FileName = "cmd.exe";
@@ -727,8 +714,8 @@ namespace RIM.VSNDK_Package
                 }
                 catch (Exception e)
                 {
-                    System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                    System.Diagnostics.Debug.WriteLine(e.Message);
+                    Debug.WriteLine(startInfo.Arguments);
+                    Debug.WriteLine(e.Message);
                 }
             }
         }
@@ -738,11 +725,11 @@ namespace RIM.VSNDK_Package
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void ErrorDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        private void ErrorDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null)
             {
-                System.Diagnostics.Debug.WriteLine(e.Data);
+                Debug.WriteLine(e.Data);
                 _error += e.Data + "\n";
 //                MessageBox.Show(e.Data);
             }
@@ -753,13 +740,8 @@ namespace RIM.VSNDK_Package
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void SimulatorListDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
+        private void SimulatorListDataReceived(object sender, DataReceivedEventArgs e)
         {
-            string apilevel = "";
-            string version = "";
-
-            SimulatorsClass sim = null;
-
             if (e.Data != null)
             {
                 if ((e.Data.ToLower().Contains("error")) || (_error != ""))
@@ -772,10 +754,10 @@ namespace RIM.VSNDK_Package
                 }
                 else
                 {
-                    version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
-                    apilevel = version.Split('.')[0] + "." + version.Split('.')[1];
+                    string version = e.Data.Substring(0, e.Data.LastIndexOf(" - "));
+                    string apilevel = version.Split('.')[0] + "." + version.Split('.')[1];
 
-                    sim = _simulatorList.Find(i => i.APILevel == apilevel);
+                    SimulatorsClass sim = _simulatorList.Find(i => i.APILevel == apilevel);
 
                     if (sim == null)
                     {
@@ -926,26 +908,24 @@ namespace RIM.VSNDK_Package
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
-    [ProvideAutoLoad(Microsoft.VisualStudio.Shell.Interop.UIContextGuids80.SolutionExists)]
+    [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackagePkgString)]
     public sealed class VSNDK_PackagePackage : Package
     {
-
         #region private member variables
 
-        private EnvDTE.DTE _dte;
+        private DTE _dte;
         private VSNDKCommandEvents _commandEvents;
         private bool _isSimulator;
         private BuildEvents _buildEvents;
-        private List<string[]> _targetDir = null;
-        private List<String> buildThese = null;
-        private bool _hitPlay = false;
-        private int _amountOfProjects = 0;
-        private string _error = "";
-        private bool _isDeploying = false;
+        private List<string[]> _targetDir;
+        private List<String> _buildThese;
+        private bool _hitPlay;
+        private int _amountOfProjects;
+        private bool _isDeploying;
         private OutputWindowPane _owP;
-        private bool isDebugConfiguration = true;
-        private string processName = "";
+        private bool _isDebugConfiguration = true;
+        private string _processName = "";
 
         #endregion
 
@@ -960,7 +940,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         public VSNDK_PackagePackage()
         {
-            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", this.ToString()));
+            Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", ToString()));
         }
 
         /// <summary>
@@ -969,11 +949,11 @@ namespace RIM.VSNDK_Package
         /// </summary>
         protected override void Initialize()
         {
-            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", this.ToString()));
+            Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
             base.Initialize();
 
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
-            base.RegisterEditorFactory(new EditorFactory(this));
+            RegisterEditorFactory(new EditorFactory(this));
 
 
             APITargetListSingleton api = APITargetListSingleton.Instance;
@@ -982,7 +962,7 @@ namespace RIM.VSNDK_Package
             SimulatorListSingleton simList = SimulatorListSingleton.Instance;
             InstalledSimulatorListSingleton installedSimList = InstalledSimulatorListSingleton.Instance;
 
-            _dte = (EnvDTE.DTE)GetService(typeof(EnvDTE.DTE));
+            _dte = (DTE)GetService(typeof(DTE));
 
             if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
             {
@@ -999,7 +979,7 @@ namespace RIM.VSNDK_Package
             _commandEvents.RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidStartDebugContext, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
 
             _buildEvents = _dte.Events.BuildEvents;
-            _buildEvents.OnBuildBegin += new _dispBuildEvents_OnBuildBeginEventHandler(this.OnBuildBegin);
+            _buildEvents.OnBuildBegin += OnBuildBegin;
 
 
 
@@ -1023,7 +1003,7 @@ namespace RIM.VSNDK_Package
                 mcs.AddCommand(menuDebugTokenWin);
 
                 // Create the command for the menu item.
-                CommandID projCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, (int)PkgCmdIDList.cmdidfooLocalBox);
+                CommandID projCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidfooLocalBox);
                 OleMenuCommand projItem = new OleMenuCommand(MenuItemCallback, projCommandID);
                 mcs.AddCommand(projItem);
             }
@@ -1127,7 +1107,7 @@ namespace RIM.VSNDK_Package
             bool success = true;
             try
             {
-                if (buildThese.Count != 0)
+                if (_buildThese.Count != 0)
                 {
                     Microsoft.Win32.RegistryKey key;
                     key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("VSNDK");
@@ -1140,8 +1120,8 @@ namespace RIM.VSNDK_Package
                     {
                         Solution2 soln = (Solution2)_dte.Solution;
                         _hitPlay = true;
-                        _amountOfProjects = buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
-                        foreach (string projectName in buildThese)
+                        _amountOfProjects = _buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
+                        foreach (string projectName in _buildThese)
                             soln.SolutionBuild.BuildProject("Debug", projectName, false);
                     }
                     catch (Exception ex)
@@ -1175,7 +1155,7 @@ namespace RIM.VSNDK_Package
 
             if ((outputText == "") || (System.Text.RegularExpressions.Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
             {
-                if (isDebugConfiguration)
+                if (_isDebugConfiguration)
                 {
                     // Write file to flag the deploy task that it should use the -debugNative option
                     string fileContent = "Use -debugNative.\r\n";
@@ -1222,7 +1202,7 @@ namespace RIM.VSNDK_Package
             string targetIP = "";
             string password = "";
             string executablePath = "";
-            if (getProcessInfo((DTE2)_dte, ref pidString, ref toolsPath, ref publicKeyPath, ref targetIP, ref password, ref executablePath))
+            if (GetProcessInfo((DTE2)_dte, ref pidString, ref toolsPath, ref publicKeyPath, ref targetIP, ref password, ref executablePath))
             {
                 bool CancelDefault = LaunchDebugTarget(pidString, toolsPath, publicKeyPath, targetIP, password, executablePath);
             }
@@ -1266,8 +1246,8 @@ namespace RIM.VSNDK_Package
             info.clsidCustom = new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}"); // Set the launching engine the VSNDK engine guid
             info.grfLaunch = 0;
 
-            IntPtr pInfo = System.Runtime.InteropServices.Marshal.AllocCoTaskMem((int)info.cbSize);
-            System.Runtime.InteropServices.Marshal.StructureToPtr(info, pInfo, false);
+            IntPtr pInfo = Marshal.AllocCoTaskMem((int)info.cbSize);
+            Marshal.StructureToPtr(info, pInfo, false);
 
             try
             {
@@ -1287,7 +1267,7 @@ namespace RIM.VSNDK_Package
             {
                 if (pInfo != IntPtr.Zero)
                 {
-                    System.Runtime.InteropServices.Marshal.FreeCoTaskMem(pInfo);
+                    Marshal.FreeCoTaskMem(pInfo);
                 }
             }
 
@@ -1300,20 +1280,20 @@ namespace RIM.VSNDK_Package
         /// <param name="dte"> Application Object. </param>
         /// <param name="pidString"> Returns the Process ID as a string. </param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool getProcessInfo(DTE2 dte, ref string pidString, ref string toolsPath, ref string publicKeyPath, ref string targetIP, ref string password, ref string executablePath)
+        private bool GetProcessInfo(DTE2 dte, ref string pidString, ref string toolsPath, ref string publicKeyPath, ref string targetIP, ref string password, ref string executablePath)
         {
             string currentPath = "";
 
             foreach (string[] paths in _targetDir)
             {
-                if (paths[0] == processName)
+                if (paths[0] == _processName)
                 {
                     currentPath = paths[1];
                     break;
                 }
             }
 
-            executablePath = currentPath + processName; // The executable path
+            executablePath = currentPath + _processName; // The executable path
             executablePath = executablePath.Replace('\\', '/');
             publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
             publicKeyPath = publicKeyPath.Replace('\\', '/');
@@ -1322,7 +1302,7 @@ namespace RIM.VSNDK_Package
             {
                 RegistryKey rkHKCU = Registry.CurrentUser;
                 RegistryKey rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                toolsPath = rkPluginRegKey.GetValue("NDKHostPath").ToString() + "/usr/bin";
+                toolsPath = rkPluginRegKey.GetValue("NDKHostPath") + "/usr/bin";
                 toolsPath = toolsPath.Replace('\\', '/');
 
                 if (_isSimulator)
@@ -1346,10 +1326,10 @@ namespace RIM.VSNDK_Package
             }
             catch (Exception ex)
             {
-                System.Windows.Forms.MessageBox.Show(ex.Message, "Microsoft Visual Studio", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                MessageBox.Show(ex.Message, "Microsoft Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            pidString = getPIDfromGDB(processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
+            pidString = getPIDfromGDB(_processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
 
             if (pidString == "")
             {
@@ -1358,7 +1338,7 @@ namespace RIM.VSNDK_Package
                 string outputText = _owP.TextDocument.Selection.Text;
 
                 // Check for successful deployment
-                if (System.Text.RegularExpressions.Regex.IsMatch(outputText, "Info: done"))
+                if (Regex.IsMatch(outputText, "Info: done"))
                 {
                     string pattern = @"\s+result::(\d+)\r\n.+|\s+result::(\d+) \(TaskId:";
                     Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
@@ -1392,44 +1372,44 @@ namespace RIM.VSNDK_Package
                 // Store proccess name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
                 // source code for a running process.
                 // First read the file.
-                processName += "_" + _isSimulator.ToString();
+                _processName += "_" + _isSimulator.ToString();
 
-                string processesPaths = "";
-                System.IO.StreamReader readProcessesPathsFile = null;
+                string processesPaths;
+                StreamReader readProcessesPathsFile;
                 try
                 {
-                    readProcessesPathsFile = new System.IO.StreamReader(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
+                    readProcessesPathsFile = new StreamReader(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
                     processesPaths = readProcessesPathsFile.ReadToEnd();
                     readProcessesPathsFile.Close();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     processesPaths = "";
                 }
 
                 // Updating the contents.
-                int begin = processesPaths.IndexOf(processName + ":>");
+                int begin = processesPaths.IndexOf(_processName + ":>");
 
                 if (begin != -1)
                 {
-                    begin += processName.Length + 2;
+                    begin += _processName.Length + 2;
                     int end = processesPaths.IndexOf("\r\n", begin);
                     processesPaths = processesPaths.Substring(0, begin) + currentPath + processesPaths.Substring(end);
                 }
                 else
                 {
-                    processesPaths = processesPaths + processName + ":>" + currentPath + "\r\n";
+                    processesPaths = processesPaths + _processName + ":>" + currentPath + "\r\n";
                 }
 
                 // Writing contents to file.
-                System.IO.StreamWriter writeProcessesPathsFile = null;
+                StreamWriter writeProcessesPathsFile;
                 try
                 {
-                    writeProcessesPathsFile = new System.IO.StreamWriter(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt", false);
+                    writeProcessesPathsFile = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt", false);
                     writeProcessesPathsFile.Write(processesPaths);
                     writeProcessesPathsFile.Close();
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                 }
 
@@ -1540,7 +1520,7 @@ namespace RIM.VSNDK_Package
             bool bbPlatform = false;
             if (_dte.Solution.SolutionBuild.ActiveConfiguration != null)
             {
-                isDebugConfiguration = checkDebugConfiguration();
+                _isDebugConfiguration = checkDebugConfiguration();
 
                 SolutionContexts scCollection = _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts;
                 foreach (SolutionContext sc in scCollection)
@@ -1568,7 +1548,7 @@ namespace RIM.VSNDK_Package
                 try
                 {
                     Solution2 soln = (Solution2)_dte.Solution;
-                    buildThese = new List<String>();
+                    _buildThese = new List<String>();
                     _targetDir = new List<string[]>();
 
                     foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
@@ -1577,8 +1557,8 @@ namespace RIM.VSNDK_Package
                         {
                             if (p1.UniqueName == startupProject)
                             {
-                                buildThese.Add(p1.FullName);
-                                processName = p1.Name;
+                                _buildThese.Add(p1.FullName);
+                                _processName = p1.Name;
 
                                 ConfigurationManager config = p1.ConfigurationManager;
                                 Configuration active = config.ActiveConfiguration;
@@ -1622,7 +1602,7 @@ namespace RIM.VSNDK_Package
                 _owP.Activate();
 
 
-                if (isDebugConfiguration)
+                if (_isDebugConfiguration)
                 {
                     UpdateManagerData upData;
                     if (_targetDir.Count > 0)

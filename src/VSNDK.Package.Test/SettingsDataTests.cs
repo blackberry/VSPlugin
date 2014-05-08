@@ -112,7 +112,7 @@ namespace VSNDK.Package.Test
                 }
             }
 
-            settingsDataObject.getDeviceInfo();
+            settingsDataObject.GetDeviceInfo();
 
             Assert.IsNullOrEmpty(settingsDataObject.DeviceIP, "Device IP is not empty or null, " + settingsDataObject.DeviceIP);
             Assert.IsNullOrEmpty(settingsDataObject.DevicePassword, "Device Password is not empty or null, " + settingsDataObject.DevicePassword);
@@ -146,7 +146,7 @@ namespace VSNDK.Package.Test
                 }
             }
 
-            settingsDataObject.getDeviceInfo();
+            settingsDataObject.GetDeviceInfo();
 
             Assert.IsTrue(settingsDataObject.DeviceIP == ipAddr , "Device IP value is not equal to test value, " + ipAddr + "!= " + settingsDataObject.DeviceIP);
             Assert.IsTrue(settingsDataObject.DevicePassword == password, "Device Password value is not equal to test value, " + password + " != " + settingsDataObject.DevicePassword);
@@ -165,7 +165,7 @@ namespace VSNDK.Package.Test
             settingsDataObject.DeviceIP = deviceIP;
             settingsDataObject.DevicePassword = devicePassword;
 
-            settingsDataObject.setDeviceInfo();
+            settingsDataObject.SetDeviceInfo();
 
 
             string keyName = @"Software\BlackBerry\BlackBerryVSPlugin";
@@ -209,7 +209,7 @@ namespace VSNDK.Package.Test
                 }
             }
 
-            settingsDataObject.getSimulatorInfo();
+            settingsDataObject.GetSimulatorInfo();
 
             Assert.IsNullOrEmpty(settingsDataObject.SimulatorIP, "Simulator IP is not empty or null, " + settingsDataObject.SimulatorIP);
             Assert.IsNullOrEmpty(settingsDataObject.SimulatorPassword, "Simulator Password is not empty or null, " + settingsDataObject.SimulatorPassword);
@@ -243,7 +243,7 @@ namespace VSNDK.Package.Test
                 }
             }
 
-            settingsDataObject.getSimulatorInfo();
+            settingsDataObject.GetSimulatorInfo();
 
             Assert.IsTrue(settingsDataObject.SimulatorIP == ipAddr , "Simulator IP value is not equal to test value, " + ipAddr + "!= " + settingsDataObject.SimulatorIP);
             Assert.IsTrue(settingsDataObject.SimulatorPassword == password, "Simulator Password value is not equal to test value, " + password + " != " + settingsDataObject.SimulatorPassword);
@@ -262,7 +262,7 @@ namespace VSNDK.Package.Test
             settingsDataObject.SimulatorIP = simulatorIP;
             settingsDataObject.SimulatorPassword = simulatorPassword;
 
-            settingsDataObject.setSimulatorInfo();
+            settingsDataObject.SetSimulatorInfo();
 
 
             string keyName = @"Software\BlackBerry\BlackBerryVSPlugin";
@@ -306,7 +306,7 @@ namespace VSNDK.Package.Test
                 }
             }
 
-            settingsDataObject.getNDKPath();
+            settingsDataObject.GetNDKPath();
 
             Assert.IsNullOrEmpty(settingsDataObject.HostPath, "Host Path is not empty or null, " + settingsDataObject.HostPath);
             Assert.IsNullOrEmpty(settingsDataObject.TargetPath, "Target Path is not empty or null, " + settingsDataObject.TargetPath);
@@ -340,7 +340,7 @@ namespace VSNDK.Package.Test
                 }
             }
 
-            settingsDataObject.getNDKPath();
+            settingsDataObject.GetNDKPath();
 
             Assert.IsTrue(settingsDataObject.HostPath == hostPath, "Host Path value is not equal to test value, " + hostPath + "!= " + settingsDataObject.HostPath);
             Assert.IsTrue(settingsDataObject.TargetPath == targetPath, "Target Path value is not equal to test value, " + targetPath + " != " + settingsDataObject.TargetPath);
@@ -355,7 +355,7 @@ namespace VSNDK.Package.Test
             string version = "10.2.0.1155";
             string name = "BlackBerry Native SDK 10.2";
 
-            string result = settingsDataObject.getAPIName(version);
+            string result = settingsDataObject.GetAPIName(version);
 
             Assert.IsTrue(result == name, "API Name does not matched expected result., " + result + "!= " + name);
         }
@@ -369,7 +369,7 @@ namespace VSNDK.Package.Test
             string version = "1.1.1.1";
             string name = "";
 
-            string result = settingsDataObject.getAPIName(version);
+            string result = settingsDataObject.GetAPIName(version);
 
             Assert.IsTrue(result == name, "API Name does not matched expected result., " + result + "!= " + name);
         }
@@ -540,7 +540,7 @@ namespace VSNDK.Package.Test
             regKey.SetValue("NDKHostPath", "");
 
             // Run Test
-            settingsDataObject.setNDKPaths();
+            settingsDataObject.SetNDKPaths();
 
             // Validate Test
             Assert.IsTrue(regKey.GetValue("NDKHostPath").ToString() == hostPath, "Host path does not match expected result");

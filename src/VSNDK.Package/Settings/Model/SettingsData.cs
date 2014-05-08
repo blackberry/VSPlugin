@@ -14,15 +14,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
-using System.Collections;
 using Microsoft.Win32;
 using System.Xml;
 using System.IO;
 using System.Windows.Data;
-using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.Settings.Models
 {
@@ -50,7 +46,6 @@ namespace RIM.VSNDK_Package.Settings.Models
         #region Member Variables and Constants
         private string _deviceIP;
         private string _devicePassword;
-        private Package _pkg;
         private string _simulatorIP;
         private string _simulatorPassword;
         private CollectionView _ndkEntries;
@@ -59,11 +54,11 @@ namespace RIM.VSNDK_Package.Settings.Models
         private string _targetPath;
         private string _hostPath;
 
-        private const string _colDeviceIP = "DeviceIP";
-        private const string _colDevicePW = "DevicePassword";
-        private const string _colSimulatorIP = "SimulatorIP";
-        private const string _colSimulatorPW = "SimulatorPassword";
-        private const string _colNDKEntry = "NDKEntry";
+        private const string ColDeviceIp = "DeviceIP";
+        private const string ColDevicePw = "DevicePassword";
+        private const string ColSimulatorIp = "SimulatorIP";
+        private const string ColSimulatorPw = "SimulatorPassword";
+        private const string ColNdkEntry = "NDKEntry";
         #endregion
 
         /// <summary>
@@ -71,8 +66,8 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         public SettingsData()
         {
-            getDeviceInfo();
-            getSimulatorInfo();
+            GetDeviceInfo();
+            GetSimulatorInfo();
             RefreshScreen();
         }
 
@@ -81,13 +76,13 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         public void RefreshScreen()
         {
-            /// Get the NDK Path data
-            getNDKPath();
+            // Get the NDK Path data
+            GetNDKPath();
 
-            /// Refresh the NDK List
+            // Refresh the NDK List
             string[] dirPaths = new string[2];
             dirPaths[0] = Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)) + @"bbndk_vs\..\qconfig\";
-            dirPaths[1] = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
+            dirPaths[1] = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\";
             IList<NDKEntryClass> NDKList = new List<NDKEntryClass>();
 
             for (int i = 0; i < 2; i++)
@@ -130,23 +125,19 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// </summary>
         /// <param name="version">version to match</param>
         /// <returns></returns>
-        public string getAPIName(string version)
+        public string GetAPIName(string version)
         {
-            string result = "";
-
             APITargetListSingleton ap = APITargetListSingleton.Instance;
            
             foreach (APITargetClass target in ap._tempAPITargetList)
             {
                 if (target.TargetVersion  == version)
                 {
-                    result = target.TargetName;
-                    break;
+                    return target.TargetName;
                 }
             }
 
-            return result;
-
+            return string.Empty;
         }
 
         #region Properties
@@ -157,7 +148,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         public string DeviceIP
         {
             get { return _deviceIP; }
-            set { _deviceIP = value; OnPropertyChanged(_colDeviceIP); }
+            set { _deviceIP = value; OnPropertyChanged(ColDeviceIp); }
         }
 
         /// <summary>
@@ -184,7 +175,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         public string DevicePassword
         {
             get { return _devicePassword; }
-            set { _devicePassword = value; OnPropertyChanged(_colDevicePW); }
+            set { _devicePassword = value; OnPropertyChanged(ColDevicePw); }
         }
 
         /// <summary>
@@ -193,7 +184,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         public string SimulatorIP
         {
             get { return _simulatorIP; }
-            set { _simulatorIP = value; OnPropertyChanged(_colSimulatorIP); }
+            set { _simulatorIP = value; OnPropertyChanged(ColSimulatorIp); }
         }
 
         /// <summary>
@@ -202,7 +193,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         public string SimulatorPassword
         {
             get { return _simulatorPassword; }
-            set { _simulatorPassword = value; OnPropertyChanged(_colSimulatorPW); }
+            set { _simulatorPassword = value; OnPropertyChanged(ColSimulatorPw); }
         }
 
         /// <summary>
@@ -224,7 +215,7 @@ namespace RIM.VSNDK_Package.Settings.Models
             {
                 if (_ndkEntry == value) return;
                 _ndkEntry = value;
-                OnPropertyChanged(_colNDKEntry);
+                OnPropertyChanged(ColNdkEntry);
             }
         }
 
@@ -234,7 +225,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// Set Device Password and IP
         /// </summary>
         /// <returns></returns>
-        public void setDeviceInfo()
+        public void SetDeviceInfo()
         {
             registerTargetInfo(DevicePassword, DeviceIP, "device");
         }
@@ -243,7 +234,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// Set Simulator Password and IP
         /// </summary>
         /// <returns></returns>
-        public void setSimulatorInfo()
+        public void SetSimulatorInfo()
         {
             registerTargetInfo(SimulatorPassword, SimulatorIP, "simulator");
         }
@@ -252,7 +243,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// Function to retrieve device info from the registry
         /// </summary>
         /// <returns></returns>
-        public void getDeviceInfo()
+        public void GetDeviceInfo()
         {
             RegistryKey rkHKCU = Registry.CurrentUser;
             RegistryKey rkSettingsPath = null;
@@ -288,7 +279,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// Function to retrieve simulator info from the registry
         /// </summary>
         /// <returns></returns>
-        public void getSimulatorInfo()
+        public void GetSimulatorInfo()
         {
             RegistryKey rkHKCU = Registry.CurrentUser;
             RegistryKey rkSettingsPath = null;
@@ -357,7 +348,7 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// <summary>
         /// Set the NDK Path into the register for future reference by the MSBUILD
         /// </summary>
-        public void setNDKPaths()
+        public void SetNDKPaths()
         {
             RegistryKey rkHKCU = Registry.CurrentUser;
             RegistryKey rkNDKPath = null;
@@ -368,15 +359,14 @@ namespace RIM.VSNDK_Package.Settings.Models
                 rkNDKPath.SetValue("NDKHostPath", _ndkEntry.HostPath);
                 rkNDKPath.SetValue("NDKTargetPath", _ndkEntry.TargetPath);
 
-                string qnx_config = System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK";
+                string qnx_config = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK";
 
-                System.Environment.SetEnvironmentVariable("QNX_TARGET", _ndkEntry.TargetPath);
-                System.Environment.SetEnvironmentVariable("QNX_HOST", _ndkEntry.HostPath);
-                System.Environment.SetEnvironmentVariable("QNX_CONFIGURATION", qnx_config);
+                Environment.SetEnvironmentVariable("QNX_TARGET", _ndkEntry.TargetPath);
+                Environment.SetEnvironmentVariable("QNX_HOST", _ndkEntry.HostPath);
+                Environment.SetEnvironmentVariable("QNX_CONFIGURATION", qnx_config);
 
-                string ndkpath = string.Format(@"{0}/usr/bin;{1}\bin;{0}/usr/qde/eclipse/jre/bin;", _ndkEntry.HostPath, qnx_config) +
-                    System.Environment.GetEnvironmentVariable("PATH");
-                System.Environment.SetEnvironmentVariable("PATH", ndkpath);
+                string ndkpath = string.Format(@"{0}/usr/bin;{1}\bin;{0}/usr/qde/eclipse/jre/bin;", _ndkEntry.HostPath, qnx_config) + Environment.GetEnvironmentVariable("PATH");
+                Environment.SetEnvironmentVariable("PATH", ndkpath);
             }
             catch
             {
@@ -391,9 +381,9 @@ namespace RIM.VSNDK_Package.Settings.Models
         /// Return the NDK Path from the registry
         /// </summary>
         /// <returns></returns>
-        public bool getNDKPath()
+        public bool GetNDKPath()
         {
-            bool success = false;
+            bool success;
 
             RegistryKey rkHKCU = Registry.CurrentUser;
             RegistryKey rkNDKPath = null;
