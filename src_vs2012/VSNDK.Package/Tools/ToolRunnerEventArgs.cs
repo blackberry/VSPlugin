@@ -9,10 +9,17 @@ namespace RIM.VSNDK_Package.Tools
     {
         #region Properties
 
-        public ToolRunnerEventArgs(string output, string error)
+        public ToolRunnerEventArgs(int exitCode, string output, string error)
         {
+            ExitCode = exitCode;
             Output = output;
             Error = error;
+        }
+
+        public int ExitCode
+        {
+            get;
+            private set;
         }
 
         public string Output
@@ -25,6 +32,11 @@ namespace RIM.VSNDK_Package.Tools
         {
             get;
             private set;
+        }
+
+        public bool IsSuccessfull
+        {
+            get { return string.IsNullOrEmpty(Error); }
         }
 
         #endregion

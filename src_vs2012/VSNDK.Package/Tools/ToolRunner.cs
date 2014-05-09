@@ -189,7 +189,7 @@ namespace RIM.VSNDK_Package.Tools
             var finishedHandler = Finished;
             if (finishedHandler != null)
             {
-                finishedHandler(this, new ToolRunnerEventArgs(outputText, errorText));
+                finishedHandler(this, new ToolRunnerEventArgs(_process.ExitCode, outputText, errorText));
             }
 
             _isProcessing = false;
