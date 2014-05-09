@@ -12,7 +12,6 @@ namespace RIM.VSNDK_Package.Model
 
         public DebugTokenInfo()
         {
-            _description = string.Empty;
             SystemActions = new string[0];
             Devices = new ulong[0];
         }
