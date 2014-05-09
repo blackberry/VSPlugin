@@ -11,6 +11,12 @@ namespace RIM.VSNDK_Package.Tools
         private string _ip;
         private string _password;
 
+        /// <summary>
+        /// Init consturctor.
+        /// </summary>
+        /// <param name="workingDirectory">Tools directory</param>
+        /// <param name="ip">Device IP</param>
+        /// <param name="password">Device password</param>
         public DeviceInfoRunner(string workingDirectory, string ip, string password)
             : base("cmd.exe", workingDirectory)
         {
@@ -84,7 +90,6 @@ namespace RIM.VSNDK_Package.Tools
                 // if during parsing found any runtime error, overwrite current state:
                 if (!string.IsNullOrEmpty(runtimeError))
                 {
-                    LastOutput = null;
                     LastError = runtimeError;
                 }
             }
