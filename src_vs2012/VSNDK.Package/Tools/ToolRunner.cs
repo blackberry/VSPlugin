@@ -16,6 +16,9 @@ namespace RIM.VSNDK_Package.Tools
 
         public event EventHandler<ToolRunnerEventArgs> Finished;
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public ToolRunner()
         {
             _process = new Process();
@@ -27,6 +30,18 @@ namespace RIM.VSNDK_Package.Tools
 
             _process.OutputDataReceived += OutputDataReceived;
             _process.ErrorDataReceived += ErrorDataReceived;
+        }
+
+        /// <summary>
+        /// Init constructor. Setups the executable and its working directory.
+        /// </summary>
+        /// <param name="fileName">Name of the binary to execute</param>
+        /// <param name="workingDirectory">Executable working directory</param>
+        public ToolRunner(string fileName, string workingDirectory)
+            : this()
+        {
+            FileName = fileName;
+            WorkingDirectory = workingDirectory;
         }
 
         #region Properties
@@ -57,13 +72,13 @@ namespace RIM.VSNDK_Package.Tools
         public string LastOutput
         {
             get;
-            private set;
+            protected set;
         }
 
         public string LastError
         {
             get;
-            private set;
+            protected set;
         }
 
         #endregion
