@@ -49,6 +49,7 @@
     <RunRegRiched>true</RunRegRiched>
     <Prefer32Bit>false</Prefer32Bit>
     <PlatformTarget>x86</PlatformTarget>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -253,7 +254,11 @@
       <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Model\DebugTokenInfo.cs" />
+    <Compile Include="Model\DeviceDebugTokenInfo.cs" />
+    <Compile Include="Model\DeviceInfo.cs" />
+    <Compile Include="Model\DeviceTheme.cs" />
     <Compile Include="Tools\DebugTokenInfoRunner.cs" />
+    <Compile Include="Tools\DeviceInfoRunner.cs" />
     <Compile Include="Tools\RunnerDefaults.cs" />
     <Compile Include="Tools\ToolRunner.cs" />
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />

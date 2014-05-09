@@ -17,6 +17,7 @@ namespace VSNDK.Package.Test
             Assert.IsTrue(result, "Unable to start the tool");
             Assert.IsNotNull(runner.LastOutput);
             Assert.IsNull(runner.LastError);
+            Assert.IsNotNull(runner.DebugToken);
         }
 
         [Test]
@@ -39,6 +40,19 @@ namespace VSNDK.Package.Test
             }
 
             Assert.IsFalse(runner.IsProcessing, "Tool execution got too much time!");
+            Assert.IsNotNull(runner.LastOutput);
+            Assert.IsNull(runner.LastError);
+            Assert.IsNotNull(runner.DebugToken);
+        }
+
+        [Test]
+        [Ignore("Device-IP dependant test will only run somewhere correctly")]
+        public void LoadDeviceInfo()
+        {
+            var runner = new DeviceInfoRunner(RunnerDefaults.TestToolsDirectory, "10.0.0.127", "test");
+            var result = runner.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
             Assert.IsNotNull(runner.LastOutput);
             Assert.IsNull(runner.LastError);
         }

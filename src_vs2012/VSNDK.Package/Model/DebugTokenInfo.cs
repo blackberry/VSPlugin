@@ -1,9 +1,22 @@
 ﻿using System;
+using System.Text;
 
 namespace RIM.VSNDK_Package.Model
 {
+    /// <summary>
+    /// Model data describing info about debug token.
+    /// </summary>
     internal sealed class DebugTokenInfo
     {
+        private string _description;
+
+        public DebugTokenInfo()
+        {
+            _description = string.Empty;
+            SystemActions = new string[0];
+            Devices = new ulong[0];
+        }
+
         #region Properties
 
         public string ID
@@ -73,6 +86,45 @@ namespace RIM.VSNDK_Package.Model
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            if (_description == null)
+                _description = GetDescription();
+
+            return _description;
+        }
+
+        private string GetDescription()
+        {
+            var result = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(Author))
+            {
+                result.Append(Author);
+            }
+            else
+            {
+                result.Append(AuthorID);
+            }
+            result.Append(" (");
+            result.Append(ExpiryDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"));
+
+            // serialize list of device PINs as hexadecimal values:
+            if (Devices.Length > 0)
+            {
+                result.Append(", ");
+                for (int i = 0; i < Devices.Length; i++)
+                {
+                    if (i > 0)
+                        result.Append(",");
+                    result.Append(Devices[i].ToString("X"));
+                }
+            }
+
+            result.Append(")");
+            return result.ToString();
+        }
 
         /// <summary>
         /// Creates new instance of the DebugTokenInfo based on specified data, or null if data is invalid.
@@ -164,19 +216,11 @@ namespace RIM.VSNDK_Package.Model
 
             for (int i = 0; i < items.Length; i++)
             {
-                deviceIDs[i] = ParseDeviceId(items[i]);
+                deviceIDs[i] = DeviceInfo.ParseDeviceId(items[i]);
             }
 
+            Array.Sort(deviceIDs);
             return deviceIDs;
-        }
-
-        private static ulong ParseDeviceId(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return 0;
-
-            ulong id;
-            return ulong.TryParse(text, out id) ? id : 0;
         }
 
         private static DateTime ParseDate(string text)
