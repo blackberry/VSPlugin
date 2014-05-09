@@ -6,6 +6,7 @@ namespace RIM.VSNDK_Package.Tools
     internal static class RunnerDefaults
     {
         public static readonly string TestToolsDirectory;
+        public static readonly string TestNdkDirectory;
         public static readonly string ConfigurationDirectory;
 
         static RunnerDefaults()
@@ -15,6 +16,7 @@ namespace RIM.VSNDK_Package.Tools
 #if DEBUG
             // TODO: PH: 2014-05-08: for now hardcoded my repository path:
             TestToolsDirectory = @"S:\vs-plugin\qnxtools\bin";
+            TestNdkDirectory = @"S:\vs-plugin\bbndk_vs";
 #endif
         }
 

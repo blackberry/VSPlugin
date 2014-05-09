@@ -253,10 +253,13 @@
       <Link>Signing\SigningDialog.xaml.cs</Link>
       <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Model\ApiInfo.cs" />
+    <Compile Include="Model\ApiLevelListTypes.cs" />
     <Compile Include="Model\DebugTokenInfo.cs" />
     <Compile Include="Model\DeviceDebugTokenInfo.cs" />
     <Compile Include="Model\DeviceInfo.cs" />
     <Compile Include="Model\DeviceTheme.cs" />
+    <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
     <Compile Include="Tools\ApplicationRemoveRunner.cs" />
     <Compile Include="Tools\DebugTokenCreateRunner.cs" />
     <Compile Include="Tools\DebugTokenInfoRunner.cs" />

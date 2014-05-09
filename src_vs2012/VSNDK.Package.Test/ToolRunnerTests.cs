@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using NUnit.Framework;
+using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
 
 namespace VSNDK.Package.Test
@@ -122,6 +123,45 @@ namespace VSNDK.Package.Test
             Assert.IsNotNull(informer.DebugToken);
             Assert.IsNotNull(informer.DebugToken.Devices);
             Assert.AreEqual(2, informer.DebugToken.Devices.Length);
+        }
+
+        [Test]
+        public void LoadDefaultApiLevelList()
+        {
+            var runner = new ApiLevelListLoadRunner(RunnerDefaults.TestNdkDirectory, ApiLevelListTypes.Default);
+            var result = runner.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
+            Assert.IsNotNull(runner.LastOutput);
+            Assert.IsNull(runner.LastError);
+            Assert.IsNotNull(runner.APIs);
+            Assert.IsTrue(runner.APIs.Length > 0);
+        }
+
+        [Test]
+        public void LoadFullApiLevelList()
+        {
+            var runner = new ApiLevelListLoadRunner(RunnerDefaults.TestNdkDirectory, ApiLevelListTypes.Full);
+            var result = runner.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
+            Assert.IsNotNull(runner.LastOutput);
+            Assert.IsNull(runner.LastError);
+            Assert.IsNotNull(runner.APIs);
+            Assert.IsTrue(runner.APIs.Length > 0);
+        }
+
+        [Test]
+        public void LoadSimulatorApiLevelList()
+        {
+            var runner = new ApiLevelListLoadRunner(RunnerDefaults.TestNdkDirectory, ApiLevelListTypes.Simulators);
+            var result = runner.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
+            Assert.IsNotNull(runner.LastOutput);
+            Assert.IsNull(runner.LastError);
+            Assert.IsNotNull(runner.APIs);
+            Assert.IsTrue(runner.APIs.Length > 0);
         }
     }
 }
