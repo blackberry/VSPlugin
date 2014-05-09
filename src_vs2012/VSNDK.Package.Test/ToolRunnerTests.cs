@@ -101,5 +101,27 @@ namespace VSNDK.Package.Test
             Assert.IsNull(cleaner.LastError);
             Assert.IsTrue(cleaner.RemovedSuccessfully);
         }
+
+        [Test]
+        [Ignore("Keystore password and device PINs must be fixed, otherwise Signing Authority will cause it to fail")]
+        public void CreateDebugTokenInfo()
+        {
+            string debugToken = RunnerDefaults.ConfigFileName("debugtoken-new.bar");
+            var runner = new DebugTokenCreateRunner(RunnerDefaults.TestToolsDirectory, debugToken, "test", new[] { 0x1ul, 0x2ul });
+            var result = runner.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
+            Assert.IsNotNull(runner.LastOutput);
+            Assert.IsNull(runner.LastError);
+            Assert.IsTrue(runner.CreatedSuccessfully);
+
+            var informer = new DebugTokenInfoRunner(RunnerDefaults.TestToolsDirectory, debugToken);
+            result = informer.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
+            Assert.IsNotNull(informer.DebugToken);
+            Assert.IsNotNull(informer.DebugToken.Devices);
+            Assert.AreEqual(2, informer.DebugToken.Devices.Length);
+        }
     }
 }
