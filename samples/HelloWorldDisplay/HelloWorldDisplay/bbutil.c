@@ -24,7 +24,7 @@
 #include <math.h>
 #include "bbutil.h"
 
-#define USING_GL11;
+#define USING_GL11
 
 //#include <GLES/gl.h>
 //#include <GLES/glext.h>

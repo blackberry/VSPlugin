@@ -64,7 +64,7 @@ namespace VSNDK.DebugEngine
 
             EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
 
-            if ((thread == null) && (m_engine != null) && (m_engine.thread != null) && (program != null) && (eventObject != null) && (riidEvent != null) && (attributes != null))
+            if ((thread == null) && (m_engine != null) && (m_engine.thread != null) && (program != null) && (eventObject != null) && (riidEvent != null) && (attributes != 0))
             {
                 if (m_engine._currentThreadIndex != -1)
                 {

@@ -25,7 +25,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <UsingTask TaskName="CheckIfInstalled"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   <UsingTask TaskName="VCMessage" AssemblyName="Microsoft.Build.CppTasks.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   <UsingTask TaskName="RemoveFlagFile"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="WriteDebuggerArgs"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
   
   <PropertyGroup  Condition="$(Configuration.Contains('Release'))">
     <RunBuildBar>true</RunBuildBar>
@@ -172,19 +171,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </ItemGroup>
 
     <Error Condition="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@device_IP) == ''" Text=" Target device ip is not set. See menu BlackBerry -> Settings" />
-
-    <!-- Store executable path in a file so it can be read by LaunchProcess() -->
-    <WriteDebuggerArgs
-        ProjectDir ="$(ProjectDir)"
-        OutDir = "$(OutDir)"
-        AppName = "$(TargetName)"
-        Device  ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@device_IP)"
-        isSimulator ="false"
-        ToolsPath ="$(BuildBarToolPath)"
-        PublicKeyPath ="$(SSHPublicKeyPath)"
-        Password ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@device_password)"
-      >      
-    </WriteDebuggerArgs>
 
     <!-- Get app's ID from bar descriptor. -->
     <GetAppInfo

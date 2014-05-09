@@ -725,7 +725,7 @@ namespace VSNDK.DebugEngine
         public static void Send(AD7Engine engine)
         {
             var xEvent = new AD7StepCompletedEvent();
-            engine.Callback.Send(xEvent, IID, engine.currentThread());
+            engine.Callback.Send(xEvent, IID, engine.CurrentThread());
         }
 
         #region IDebugEvent2 Members
@@ -761,7 +761,7 @@ namespace VSNDK.DebugEngine
         public static void Send(AD7Engine engine)
         {
             var xEvent = new AD7EntryPointEvent();
-            engine.Callback.Send(xEvent, IID, engine.currentThread());
+            engine.Callback.Send(xEvent, IID, engine.CurrentThread());
         }
     }
 }

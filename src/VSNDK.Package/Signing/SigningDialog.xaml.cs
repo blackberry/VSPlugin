@@ -58,7 +58,7 @@ namespace RIM.VSNDK_Package.Signing
             Browser wb = new Browser(this);
             wb.ShowDialog();
 
-            if (!signingData.Registered)
+            if ((!signingData.Registered) && (File.Exists(signingData.bbidtokenPath)))
             {
                 RegistrationWindow win = new RegistrationWindow();
                 win.ResizeMode = System.Windows.ResizeMode.NoResize;

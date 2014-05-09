@@ -13,17 +13,10 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using EnvDTE;
-using EnvDTE80;
 using System.Runtime.InteropServices;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Runtime.Serialization;
 using System.Diagnostics;
-using Microsoft.Build.Utilities;
 using Microsoft.Build.Framework;
 using System.Text.RegularExpressions;
 
@@ -37,14 +30,13 @@ namespace VSNDK.Tasks
         #region Member Variables and Constants
 
         private string _projectDir;
-        private string _intDir;
         private string _outDir;
 
-        private static StringBuilder stdOutput = null;
-        private static StringBuilder errorOutput = null;
-        private IBuildEngine buildEngine;
-        private System.Diagnostics.Process proc = null;
-        private ITaskHost hostObject;
+        private static StringBuilder _stdOutput;
+        private static StringBuilder _errorOutput;
+        private IBuildEngine _buildEngine;
+        private Process _proc;
+        private ITaskHost _hostObject;
 
         private string _numProcessors;
 
@@ -55,8 +47,8 @@ namespace VSNDK.Tasks
         /// </summary>
         public IBuildEngine BuildEngine
         {
-            get { return buildEngine; }
-            set { buildEngine = value; }
+            get { return _buildEngine; }
+            set { _buildEngine = value; }
         }
 
         /// <summary>
@@ -64,8 +56,8 @@ namespace VSNDK.Tasks
         /// </summary>
         public ITaskHost HostObject
         {
-            get { return hostObject; }
-            set { hostObject = value; }
+            get { return _hostObject; }
+            set { _hostObject = value; }
         }
 
         /// <summary>
@@ -122,9 +114,9 @@ namespace VSNDK.Tasks
                 // The following commands are needed to redirect the standard and error outputs.
                 // These streams are read asynchronously using an event handler.
                 procStartInfo.RedirectStandardOutput = true;
-                stdOutput = new StringBuilder("");
+                _stdOutput = new StringBuilder("");
                 procStartInfo.RedirectStandardError = true;
-                errorOutput = new StringBuilder("");
+                _errorOutput = new StringBuilder("");
 
                 // Setting the work directory.
                 string rootedOutDir = (Path.IsPathRooted(OutDir)) ? OutDir : ProjectDir + OutDir;
@@ -134,19 +126,19 @@ namespace VSNDK.Tasks
                 procStartInfo.CreateNoWindow = true;
 
                 // Create a process and assign its ProcessStartInfo
-                proc = new System.Diagnostics.Process();
-                proc.StartInfo = procStartInfo;
+                _proc = new Process();
+                _proc.StartInfo = procStartInfo;
 
                 // Set ours events handlers to asynchronously read the standard and error outputs.
-                proc.OutputDataReceived += new DataReceivedEventHandler(StdOutputHandler);
-                proc.ErrorDataReceived += new DataReceivedEventHandler(ErrorOutputHandler);
+                _proc.OutputDataReceived += StdOutputHandler;
+                _proc.ErrorDataReceived += ErrorOutputHandler;
 
                 // Start the process
-                proc.Start();
+                _proc.Start();
 
                 // Start the asynchronous read of the standard and error output stream.
-                proc.BeginOutputReadLine();
-                proc.BeginErrorReadLine();
+                _proc.BeginOutputReadLine();
+                _proc.BeginErrorReadLine();
 
                 do
                 {
@@ -154,7 +146,7 @@ namespace VSNDK.Tasks
                     // This code is correct, don't remove it. WaitForExit freezes the IDE while waiting for the end of the build process.
                     // With this loop and the time out, the IDE won't be frozen enabling the build process to be cancelled.
                 }
-                while (!proc.WaitForExit(1000));
+                while (!_proc.WaitForExit(1000));
 
             }
             catch (Exception e)
@@ -163,14 +155,14 @@ namespace VSNDK.Tasks
                 return false;
             }
 
-            if (errorOutput.ToString().IndexOf(": error:") == -1)
+            if (_errorOutput.ToString().IndexOf(": error:") == -1)
             {
-                int pos = errorOutput.ToString().LastIndexOf("\\make:");
+                int pos = _errorOutput.ToString().LastIndexOf("\\make:");
                 if (pos == -1)
                     return true;
                 else
                 {
-                    pos = errorOutput.ToString().IndexOf("Error ", pos);
+                    pos = _errorOutput.ToString().IndexOf("Error ", pos);
                     if (pos == -1)
                         return true;
                 }
@@ -339,7 +331,7 @@ namespace VSNDK.Tasks
                                     StringBuilder longPathName = new StringBuilder(1024);
                                     string shortPathName = newPath.Substring(0, end);
                                     GetLongPathName(shortPathName, longPathName, longPathName.Capacity);
-                                    newPath = longPathName.ToString() + newPath.Substring(end);
+                                    newPath = longPathName + newPath.Substring(end);
                                 }
 
                                 diff += (newPath.Length - oldPath.Length);
@@ -495,7 +487,7 @@ namespace VSNDK.Tasks
                 }
 
                 // Add the text to the collected output. 
-                errorOutput.Append(Environment.NewLine + outputText);
+                _errorOutput.Append(Environment.NewLine + outputText);
             }
         }
 
@@ -543,7 +535,7 @@ namespace VSNDK.Tasks
         {
             try
             {
-                proc.Kill();
+                _proc.Kill();
             }
             catch (Exception ex)
             {

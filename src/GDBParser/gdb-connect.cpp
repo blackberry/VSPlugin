@@ -19,9 +19,8 @@
 #include "stdafx.h"
 
 #include "gdb-connect.h"
-#include <windows.h>
-#include <strsafe.h>
 
+#include <strsafe.h>
 #include <string>
 #include <iostream>
 #include <fstream>
@@ -29,7 +28,7 @@
 #include <unordered_map>
 
 #include <process.h>
-#include < vcclr.h >
+#include <vcclr.h>
 
 using namespace std;
 using namespace System;
@@ -127,23 +126,34 @@ char path_log[_MAX_PATH];
 
 
 /// <summary> 
-/// Generic function to print to a log file. 
+/// Used to store the path to the parsed GDB responses output log, generated when the sendingCommands2GDB thread is started and needed in parsedLogPrint(). 
+/// </summary>
+char parse_log[_MAX_PATH];
+
+
+/// <summary> /// Generic function to print to a log file. 
 /// </summary>
 /// <param name="buffer"> Message to be printed to a log file. </param>
-void GDBConsole::logPrint(char* buffer) {	
-	if (LOG_GDB_RAW_IO) {
-		time_t tt = time(NULL);
-		struct tm tm;
-		char buf[32];
+void GDBConsole::logPrint(char* buffer)
+{
+#if LOG_GDB_RAW_IO
+    time_t tt = time(NULL);
+    struct tm tm;
+    char buf[32];
 
-		tm = *localtime(&tt);
+    localtime_s(&tm, &tt);
+    strftime(buf, 31, "%H:%M:%S", &tm);
 
-		strftime(buf, 31, "%H:%M:%S", &tm);
+    FILE* file = NULL;
+    errno_t retCode;
 
-		FILE* file = fopen((char *)path_log, "a");
-		fprintf(file, "%s - %s", buf, buffer);
-		fclose(file);
-	}
+    retCode = fopen_s(&file, path_log, "a");
+    if (file != NULL && retCode == 0)
+    {
+        fprintf(file, "%s - %s", buf, buffer);
+        fclose(file);
+    }
+#endif
 }
 
 
@@ -156,14 +166,14 @@ GDBConsole::GDBConsole() :
 	m_hCleanupMutex(NULL)
 {
     HANDLE hOutputReadTmp = NULL;
-	HANDLE hInputWriteTmp = NULL;    
+    HANDLE hInputWriteTmp = NULL;
     SECURITY_ATTRIBUTES sa;
 
     out_OutputBuffer = SyncInstructionsSize;
     in_InputBuffer = 0;
-	out_InputBuffer = 0;
+    out_InputBuffer = 0;
 
-	m_hCleanupMutex = CreateMutex(NULL, FALSE, NULL);
+    m_hCleanupMutex = CreateMutex(NULL, FALSE, NULL);
 
     // Set up the security attributes struct used when creating the pipes.
     sa.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -217,14 +227,17 @@ GDBConsole::GDBConsole() :
     if (!CloseHandle(m_hInputRead )) DisplayError(_T("CloseHandle"));
     if (!CloseHandle(m_hErrorWrite)) DisplayError(_T("CloseHandle"));
 
-	String^ tempPath = Environment::GetEnvironmentVariable("APPDATA"); 
-	tempPath += "\\BlackBerry\\gdb-output.log";
-	pin_ptr<const wchar_t> path_buffer = PtrToStringChars(tempPath);
+    GetEnvironmentVariableA("AppData", path_log, _countof(path_log));
+    strcat_s(path_log, _countof(path_log), "\\BlackBerry\\gdb-output.log");
 
-	int ret = wcstombs ( path_log, path_buffer, _MAX_PATH );
-
-	FILE* file = fopen(path_log, "w"); // Delete a possible existing file.
-	fclose(file);
+    FILE* file = NULL;
+    errno_t retCode;
+    
+    retCode = fopen_s(&file, path_log, "w"); // Delete a possible existing file.
+    if (file != NULL && retCode == 0)
+    {
+        fclose(file);
+    }
 }
 
 
@@ -326,7 +339,6 @@ GDBConsole::~GDBConsole() {
 /// </summary>
 void GDBConsole::prepAndLaunchRedirectedChild(void)
 {
-	HANDLE stdHandles[3];
 	LPCTSTR lpApplicationName = NULL;
     PROCESS_INFORMATION pi;
     STARTUPINFO si;
@@ -335,8 +347,8 @@ void GDBConsole::prepAndLaunchRedirectedChild(void)
 	TCHAR eventCtrlCName[MAX_EVENT_NAME_LENGTH];
 	TCHAR eventTerminateName[MAX_EVENT_NAME_LENGTH];
 
-	_stprintf(eventCtrlCName, _T("Ctrl-C-%i"), pid);
-	_stprintf(eventTerminateName, _T("Terminate-%i"), pid);
+    _stprintf_s(eventCtrlCName, _countof(eventCtrlCName), _T("Ctrl-C-%i"), pid);
+    _stprintf_s(eventTerminateName, _countof(eventTerminateName), _T("Terminate-%i"), pid);
 
 	// Create event for wrapper process to wait on for CTRL-C.
 	m_eventCtrlC = CreateEventW(NULL, FALSE, FALSE, eventCtrlCName);
@@ -374,7 +386,7 @@ void GDBConsole::prepAndLaunchRedirectedChild(void)
         DisplayError(_T("prepAndLaunchRedirectedChild: failed to allocate memory for pCmdLine"));
     }    
 	
-	_stprintf(pCmdLine, _T("\"%s\" \"%s\" \"%s\" \"%s\""), FilePath, m_pcGDBCmd, eventCtrlCName, eventTerminateName);
+	_stprintf_s(pCmdLine, numChars, _T("\"%s\" \"%s\" \"%s\" \"%s\""), FilePath, m_pcGDBCmd, eventCtrlCName, eventTerminateName);
 			
     // Launch the process (create a new console).
     if (!CreateProcess(NULL,			/* executable name */
@@ -410,7 +422,7 @@ void GDBConsole::prepAndLaunchRedirectedChild(void)
 /// <returns> One of these integer values: 0 - Error; 1 - Success; 2 - Read everything from buffer but the message was not written 
 /// completed, maybe because the message is bigger than the buffer, maybe because GDB didn't finish writing the message. Call it 
 /// again to keep reading. </returns>
-int GDBConsole::readOutput(CHAR* lpBuffer, int bufSize, int* nCharsRead)
+int GDBConsole::readOutput(CHAR* lpBuffer, int bufSize, size_t* nCharsRead)
 {		
     DWORD nBytesRead;	
 
@@ -437,11 +449,14 @@ int GDBConsole::readOutput(CHAR* lpBuffer, int bufSize, int* nCharsRead)
 			cleanup();
 			return 0;
 		} else {
-			ErrorExit(_T("ReadFile"));				
+			ErrorExit(_T("ReadFile"));
 		}
 	}
-		
-	*nCharsRead = nBytesRead / sizeof(CHAR);
+	
+    if (nCharsRead != NULL)
+    {
+	    *nCharsRead = nBytesRead / sizeof(CHAR);
+    }
 
 	const char* pLastChar = lpBuffer + nBytesRead;
 	pLastChar -= 2;		
@@ -549,7 +564,7 @@ BOOL GDBConsole::isMoreOutputAvailable () {
 /// <returns> Returns output received from GDB or "" if there is no GDB output. </returns>
 string GDBConsole::waitForPromptWithTimeout(int seconds) {
 	char lpBuffer [1024];
-	int nCharsRead = 0;
+	size_t nCharsRead = 0;
 	int rc = 0;
 	BOOL isPromptReady = FALSE;
 	const char* promptString = "(gdb) \r\n";
@@ -611,7 +626,7 @@ string GDBConsole::waitForPromptWithTimeout(int seconds) {
 /// <returns> Returns output received from GDB or "" if there is no GDB output. </returns>
 string GDBConsole::waitForPrompt(bool sync) {
 	char lpBuffer [1024];
-	int nCharsRead = 0;
+	size_t nCharsRead = 0;
 	int rc = 0;
 	BOOL isPromptReady = FALSE;
 	const char* promptString = "(gdb) \r\n";
@@ -665,7 +680,6 @@ void DisplayError(LPCTSTR pszAPI)
     LPVOID lpvMessageBuffer;
     TCHAR szPrintBuffer[512];
 	DWORD bufSize = 512 * sizeof(TCHAR);
-    DWORD nCharsWritten;
 
     FormatMessage(
             FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
@@ -727,8 +741,9 @@ void cleanBuffers()
 {
 	for (int i = 0; i < InputBufferSize; i++)
 	{
-		strcpy(inputBuffer[i],"");
+		inputBuffer[i][0] = '\0';
 	}
+
 	in_InputBuffer = 0;
 	out_InputBuffer = 0;
 	for (int i = 0; i < GDBBufferSize; i++)
@@ -739,7 +754,7 @@ void cleanBuffers()
 	GDBBuffer.quantity = 0;
 	for (int i = 0; i < OutputBufferSize; i++)
 	{
-		strcpy(outputBuffer[i], "");
+		outputBuffer[i][0] = '\0';
 	}
 	out_OutputBuffer = SyncInstructionsSize;
 }
@@ -844,7 +859,7 @@ bool addIntoOutputBuffer(int seq_stamp, char *parsedMessage)
 	WaitForSingleObject( hOutputBufferMutex, INFINITE );
 	if (strcmp(outputBuffer[pos], "") == 0)	// "" means that the [pos] entry is "empty" or "not used".
 	{
-		strcpy(outputBuffer[pos], parsedMessage);
+        strcpy_s(outputBuffer[pos], _countof(outputBuffer[0]), parsedMessage);
 		got = true;
 		if (pos >= SyncInstructionsSize)
 			SetEvent(asyncOutputEvent); // Wake up "removeFromOutputBuffer", if needed.
@@ -859,13 +874,13 @@ bool addIntoOutputBuffer(int seq_stamp, char *parsedMessage)
 /// asynchronous GDB RESPONSE or a non synchronous GDB COMMAND. This managed part of Output buffer is circular. 
 /// </summary>
 /// <param name="output"> Returns the parsed GDB response. </param>
-void removeFromOutputBuffer(char * output)
+void removeFromOutputBuffer(char * output, size_t size)
 {
 	WaitForSingleObject( hOutputBufferMutex, INFINITE );
 	if (strcmp(outputBuffer[out_OutputBuffer], "") != 0)
 	{
-		strcpy(output, outputBuffer[out_OutputBuffer]);
-		strcpy(outputBuffer[out_OutputBuffer], "");
+		strcpy_s(output, size, outputBuffer[out_OutputBuffer]);
+		outputBuffer[out_OutputBuffer][0] = '\0';
 		out_OutputBuffer += 1;
 		if (out_OutputBuffer == OutputBufferSize)
 			out_OutputBuffer = SyncInstructionsSize; // Positions 0 to "SyncInstructionsSize - 1" are reserved for synchronous commands.
@@ -885,17 +900,17 @@ void removeFromOutputBuffer(char * output)
 /// </summary>
 /// <param name="output"> Returns the parsed GDB response. </param>
 /// <param name="ID"> ID of the GDB command. </param>
-void removeSyncFromOutputBuffer(char * output, int ID)
+void removeSyncFromOutputBuffer(char * output, size_t size, int ID)
 {
 	if ((ID < 0) || (ID >= SyncInstructionsSize))
 		return;
 	WaitForSingleObject( hOutputBufferMutex, INFINITE );
 	if (strcmp(outputBuffer[ID], "") != 0)
 	{
-		strcpy(output, outputBuffer[ID]);
-		strcpy(outputBuffer[ID], "");
+		strcpy_s(output, size, outputBuffer[ID]);
+		outputBuffer[ID][0] = '\0';
 	}
-	ReleaseMutex( hOutputBufferMutex);
+	ReleaseMutex(hOutputBufferMutex);
 }
 
 
@@ -930,7 +945,7 @@ bool addIntoInputBuffer(char GDBCommand[GDBCommandSize])
 	{
 		if (in_InputBuffer == out_InputBuffer)
 			fireEvent = true;
-		strcpy(inputBuffer[in_InputBuffer], GDBCommand);
+		strcpy_s(inputBuffer[in_InputBuffer], _countof(inputBuffer[0]), GDBCommand);
 		in_InputBuffer += 1;
 		if (in_InputBuffer == InputBufferSize)
 			in_InputBuffer = 0;
@@ -947,13 +962,13 @@ bool addIntoInputBuffer(char GDBCommand[GDBCommandSize])
 /// Used by sendingCommands2GDB thread to get the next command to be sent to GDB. Input buffer is a circular one. 
 /// </summary>
 /// <param name="input"> Returns the next command to be sent to GDB. </param>
-void removeFromInputBuffer(char * input)
+void removeFromInputBuffer(char * input, size_t size)
 {
 	WaitForSingleObject( hInputBufferMutex, INFINITE );
 	if (in_InputBuffer != out_InputBuffer)
 	{
-		strcpy(input, inputBuffer[out_InputBuffer]);
-		strcpy(inputBuffer[out_InputBuffer],"");
+		strcpy_s(input, size, inputBuffer[out_InputBuffer]);
+		inputBuffer[out_InputBuffer][0] = '\0';
 		out_InputBuffer += 1;
 		if (out_InputBuffer == InputBufferSize)
 			out_InputBuffer = 0;
@@ -1025,7 +1040,8 @@ int getSeqID(string response)
 			begin--;
 		begin++;
 	}
-	response.copy(seqIDstr, end - begin, begin);
+
+    response._Copy_s(seqIDstr, _countof(seqIDstr), end - begin, begin);
 	seqID = atoi(seqIDstr);
 	return(seqID); 
 }
@@ -1126,7 +1142,7 @@ string substituteVariables(string txt, char variables[10][128])
 {
 	do
 	{
-		int aux = getNextChar('$', txt, 0);
+		size_t aux = getNextChar('$', txt, 0);
 		if (aux < txt.length())
 		{
 			aux++;
@@ -1191,10 +1207,10 @@ int findClosing(char opening, char closing, string parsingInstruction, int ini)
 /// <returns> Returns the parsed GDB response. </returns>
 string parseGDB(string *response, string parsingInstruction, int respBegin, bool repeat, char variables[10][128], string separator) 
 {
-	string result = "";			// This variable will be the parsed GDB response.
-	string originalParsingInstruction = parsingInstruction;	// Backup of parsing instruction.
-	int parsePos = 0;			// Current character to be read in parsing instruction.
-	int home = respBegin;		// Save the current position in GDB response.
+	string result = "";         // This variable will be the parsed GDB response.
+	string originalParsingInstruction = parsingInstruction; // Backup of parsing instruction.
+	size_t parsePos = 0;        // Current character to be read in parsing instruction.
+	int home = respBegin;       // Save the current position in GDB response.
 	int respEnd = 0;
 	int limit = (*response).length();
 	bool found = false;
@@ -1491,7 +1507,7 @@ string parseGDB(string *response, string parsingInstruction, int respBegin, bool
 				string r = parseGDB(response, parsingInstruction.substr(parsePos, end - parsePos), respBegin, false, variables, "#");
 				if (r == "")
 					break;
-				strcpy(variables[varNumber], r.c_str());
+                strcpy_s(variables[varNumber], _countof(variables[0]), r.c_str());
 
 				parsePos = end + 3; // jump $$;
 			}
@@ -1525,7 +1541,7 @@ string parseGDB(string response, string parsingInstruction)
 	char variables[10][128];
 	char result[ParsedMessageSize] = "";
 
-	strcpy(result, parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1).c_str());
+	strcpy_s(result, _countof(result), parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1).c_str());
 
 	return (result);
 }
@@ -1542,13 +1558,22 @@ void parseGDB(string response, string parsingInstruction, int seqStamp)
 {
 	char variables[10][128];
 	char result[ParsedMessageSize] = "";
+	string parsed = "";
 
-	strcpy(result, parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1).c_str());
+	char print[16384] = "";
+	strcpy_s(print, _countof(print), ("GDB - " + response).c_str());
+	parsedLogPrint(print);
+	
+	parsed = parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1);
+	strcpy_s(result, _countof(result), parsed.c_str());
+	
+	strcpy_s(print, _countof(print), ("Parsed - " + parsed).c_str());
+	parsedLogPrint(print);
 
 	if (strcmp(result,"") == 0)
 	{
 		// TODO? Unexpected response. Must handle it.
-		strcpy(result, "$#@EMPTY@#$"); // Sending this string to be sure that the parser worked well and returned an empty string.
+		strcpy_s(result, _countof(result), "$#@EMPTY@#$"); // Sending this string to be sure that the parser worked well and returned an empty string.
 	}
 
 	while (!addIntoOutputBuffer(seqStamp, result))
@@ -1574,13 +1599,22 @@ unsigned __stdcall parseGDBResponseThread(void *arg)
 
 	char result[ParsedMessageSize] = "";
 	char variables[10][128];
+	string parsed = "";
 
-	strcpy(result, parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1).c_str());
+	char print[4096] = "";
+	strcpy_s(print, _countof(print), ("GDB - " + response).c_str());
+	parsedLogPrint(print);
+	
+	parsed = parseGDB(&response, parsingInstruction, 0, false, variables, "#").substr(0, ParsedMessageSize - 1);
+    strcpy_s(result, _countof(result), parsed.c_str());
+	
+	strcpy_s(print, _countof(print), ("Parsed - " + parsed).c_str());
+	parsedLogPrint(print);
 
 	if (strcmp(result,"") == 0)
 	{
 		// TODO? Unexpected response. Must handle it.
-		strcpy(result, "$#@EMPTY@#$"); // Sending this string to be sure that parsed worked well and returned an empty string.
+		strcpy_s(result, _countof(result), "$#@EMPTY@#$"); // Sending this string to be sure that parsed worked well and returned an empty string.
 	}
 
 	while (!addIntoOutputBuffer(seqStamp, result))
@@ -1589,6 +1623,33 @@ unsigned __stdcall parseGDBResponseThread(void *arg)
 	return 0;
 }
 
+/// <summary> 
+/// Generic function to print the GDB response and the parsed one to a log file. 
+/// </summary>
+/// <param name="buffer"> Message to be printed to a log file. </param>
+void parsedLogPrint(char* buffer) {
+#if LOG_GDB_RAW_IO
+    time_t tt = time(NULL);
+    struct tm tm;
+    char buf[32];
+
+    localtime_s(&tm, &tt);
+    strftime(buf, 31, "%H:%M:%S", &tm);
+
+    FILE* file = NULL;
+    errno_t retCode;
+
+    retCode = fopen_s(&file, parse_log, "a");
+    if (file != NULL && retCode == 0)
+    {
+        if (buffer[0] == 'P')
+            fprintf(file, "%s - %s\n\n", buf, buffer);
+        else
+            fprintf(file, "%s - %s", buf, buffer);
+        fclose(file);
+    }
+#endif
+}
 
 /// <summary> 
 /// Thread responsible for listening for GDB outputs. Thread sendingCommands2GDB start this one, that stays alive till the 
@@ -1680,11 +1741,11 @@ unsigned __stdcall listeningGDB(void *arg)
 					
 					ParsingThreadDetails *details = new(ParsingThreadDetails);
 				
-					details->parsingInstruction = new(char[listen->parsingInstructions[instructionCode].length()]);
-					strcpy(details->parsingInstruction, listen->parsingInstructions[instructionCode].c_str());
-					details->response = new(char[oneResponse.length()]);
-					strcpy(details->response, oneResponse.c_str());
-					details->seqStamp = new(int);
+					details->parsingInstruction = new char[listen->parsingInstructions[instructionCode].length()];
+                    strcpy_s(details->parsingInstruction, listen->parsingInstructions[instructionCode].length(), listen->parsingInstructions[instructionCode].c_str());
+					details->response = new char[oneResponse.length()];
+					strcpy_s(details->response, oneResponse.length(), oneResponse.c_str());
+					details->seqStamp = new int;
 					if ((seqId >= 0) && (seqId < SyncInstructionsSize))
 						*(details->seqStamp) = seqId;
 					else				
@@ -1795,6 +1856,7 @@ bool insertingCommandCodes(unordered_map<string, int> *map, string parsingInstru
         cout << "\nCouldn't open Instructions.txt.\n";
 		return 0;
     }
+
 	int count = 0;
 	while(true)
 	{
@@ -1833,8 +1895,20 @@ bool insertingCommandCodes(unordered_map<string, int> *map, string parsingInstru
 /// <returns> 0 </returns>
 unsigned __stdcall sendingCommands2GDB(void *arg)
 {
-	GDBConsole *console = (GDBConsole *)arg;
-	
+    GDBConsole *console = (GDBConsole *)arg;
+
+    GetEnvironmentVariableA("AppData", path_log, _countof(path_log));
+    strcat_s(path_log, _countof(path_log), "\\BlackBerry\\gdb-output.log");
+
+    FILE* file = NULL;
+    errno_t retCode;
+
+    retCode = fopen_s(&file, parse_log, "w"); // Delete a possible existing file.
+    if (file != NULL && retCode == 0)
+    {
+        fclose(file);
+    }
+
 	// Initializing listeningGDB thread data.
 	HANDLE listeningThread;
 	unsigned threadID;
@@ -1876,13 +1950,14 @@ unsigned __stdcall sendingCommands2GDB(void *arg)
 		string param = "";
 		bool sync = false;
 		int previousSeqId;
+		char print[256] = "Command - ";
 
-		removeFromInputBuffer(inputCommandSend);
+        removeFromInputBuffer(inputCommandSend, _countof(inputCommandSend));
 		while (strcmp(inputCommandSend,"") == 0)
 		{
 			if (in_InputBuffer == out_InputBuffer) // if true, input buffer is empty.
 				WaitForSingleObject(inputEvent, WAIT_TIME);
-			removeFromInputBuffer(inputCommandSend);
+			removeFromInputBuffer(inputCommandSend, _countof(inputCommandSend));
 		}
 
 		if ((inputCommandSend[0] >= '0') && (inputCommandSend[0] <= '4')) // Means that it is a synchronous command and the instruction
@@ -1892,7 +1967,7 @@ unsigned __stdcall sendingCommands2GDB(void *arg)
 			previousSeqId = seq_id;
 			seq_id = ((inputCommandSend[0] - '0') * 10) + (inputCommandSend[1] - '0');
 			char *aux_str = inputCommandSend + 2;
-			strcpy(inputCommandSend, aux_str);
+            strcpy_s(inputCommandSend, _countof(inputCommandSend), aux_str);
 		}
 
 		if (strcmp(inputCommandSend, "-exec-interrupt") == 0)
@@ -1924,10 +1999,10 @@ unsigned __stdcall sendingCommands2GDB(void *arg)
 				Sleep(0);
 		}
 
-		itoa(seq_id, commandSend, 10);
+        _itoa_s(seq_id, commandSend, _countof(commandSend), 10);
 
-		strcat(commandSend, inputCommandSend);
-		strcat(commandSend, "\r\n");
+        strcat_s(commandSend, _countof(commandSend), inputCommandSend);
+		strcat_s(commandSend, _countof(commandSend), "\r\n");
 
 		instructionCodeSend = getInstructionCode(inputCommandSend, commandCodesMap, &param);
 		if (instructionCodeSend == -1)
@@ -1947,12 +2022,15 @@ unsigned __stdcall sendingCommands2GDB(void *arg)
 
 		console->sendCommand(commandSend);
 
+		strcat_s(print, _countof(print), commandSend);
+		parsedLogPrint(print);
+		
 		if ((strcmp(inputCommandSend, "-exec-continue") == 0) || (strcmp(inputCommandSend, "-exec-continue --thread 1") == 0))
 		{
 			while (!isGDBBufferEmpty())
 				Sleep(0);
 		}
-		strcpy(lastCommandSend, inputCommandSend);
+        strcpy_s(lastCommandSend, _countof(lastCommandSend), inputCommandSend);
 
 		if (!sync)
 			seq_id++;

@@ -15,11 +15,13 @@
 #pragma once
 
 #include <unordered_map>
+#include <vcclr.h>
 
 #define NumberOfInstructions 48
 #define GDBCommandSize 256
 
 using namespace std;
+using namespace System;
 
 BEGIN_NAMESPACE
 
@@ -36,7 +38,7 @@ public:
 	static bool is_Input_Buffer_Empty();
     static void exitGDB();
 
-	static bool s_running = false;
+    static bool s_running = false;
 
 private:
 	static void setNDKVars(bool);

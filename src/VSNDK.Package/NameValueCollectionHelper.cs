@@ -18,7 +18,7 @@ using System.Linq;
 using System.Text;
 using System.Collections.Specialized;
 
-namespace VSNDK.Package
+namespace RIM.VSNDK_Package
 {
     /// <summary>
     /// 

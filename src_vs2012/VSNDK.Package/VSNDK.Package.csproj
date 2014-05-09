@@ -12,7 +12,8 @@
     <RootNamespace>RIM.VSNDK_Package</RootNamespace>
     <AssemblyName>VSNDK.Package</AssemblyName>
     <SignAssembly>false</SignAssembly>
-    <AssemblyOriginatorKeyFile>Key.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
@@ -47,6 +48,7 @@
     <WarningLevel>4</WarningLevel>
     <RunRegRiched>true</RunRegRiched>
     <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -58,6 +60,7 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <RunRegRiched>true</RunRegRiched>
     <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
@@ -87,6 +90,7 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
@@ -156,138 +160,259 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="bar-descriptor.cs" />
-    <Compile Include="ControlDebugEngine.cs" />
-    <Compile Include="DebugToken\DebugTokenDialog.xaml.cs">
+    <Compile Include="..\..\src\VSNDK.Package\bar-descriptor.cs">
+      <Link>bar-descriptor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\ControlDebugEngine.cs">
+      <Link>ControlDebugEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\DebugToken\DebugTokenDialog.xaml.cs">
+      <Link>DebugToken\DebugTokenDialog.xaml.cs</Link>
       <DependentUpon>DebugTokenDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="DebugToken\Model\DebugTokenData.cs" />
-    <Compile Include="EditorFactory.cs" />
-    <Compile Include="EditorFactoryNotifyForProject.cs" />
-    <Compile Include="EditorPane.cs" />
-    <Compile Include="GlobalFunctions.cs" />
-    <Compile Include="Import\Model\ImportModel.cs" />
-    <Compile Include="Import\Import.xaml.cs">
+    <Compile Include="..\..\src\VSNDK.Package\DebugToken\Model\DebugTokenData.cs">
+      <Link>DebugToken\Model\DebugTokenData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\EditorFactory.cs">
+      <Link>EditorFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\EditorFactoryNotifyForProject.cs">
+      <Link>EditorFactoryNotifyForProject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\EditorPane.cs">
+      <Link>EditorPane.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\GlobalFunctions.cs">
+      <Link>GlobalFunctions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\GlobalSuppressions.cs">
+      <Link>GlobalSuppressions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Guids.cs">
+      <Link>Guids.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Import\Import.xaml.cs">
+      <Link>Import\Import.xaml.cs</Link>
       <DependentUpon>Import.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IViewModel.cs" />
-    <Compile Include="NameValueCollectionHelper.cs" />
-    <Compile Include="Settings\Model\SettingsData.cs" />
-    <Compile Include="Settings\SettingsDialog.xaml.cs">
-      <DependentUpon>SettingsDialog.xaml</DependentUpon>
+    <Compile Include="..\..\src\VSNDK.Package\Import\Model\ImportModel.cs">
+      <Link>Import\Model\ImportModel.cs</Link>
     </Compile>
-    <Compile Include="Signing\Browser.cs">
-      <SubType>Form</SubType>
+    <Compile Include="..\..\src\VSNDK.Package\IViewModel.cs">
+      <Link>IViewModel.cs</Link>
     </Compile>
-    <Compile Include="Signing\Browser.Designer.cs">
-      <DependentUpon>Browser.cs</DependentUpon>
+    <Compile Include="..\..\src\VSNDK.Package\Logger.cs">
+      <Link>Logger.cs</Link>
     </Compile>
-    <Compile Include="Signing\DeRegisterWindow.xaml.cs">
-      <DependentUpon>DeRegisterWindow.xaml</DependentUpon>
+    <Compile Include="..\..\src\VSNDK.Package\NameValueCollectionHelper.cs">
+      <Link>NameValueCollectionHelper.cs</Link>
     </Compile>
-    <Compile Include="Signing\Models\SigningData.cs" />
-    <Compile Include="Signing\RegistrationWindow.xaml.cs">
-      <DependentUpon>RegistrationWindow.xaml</DependentUpon>
+    <Compile Include="..\..\src\VSNDK.Package\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
     </Compile>
-    <Compile Include="Signing\SigningDialog.xaml.cs">
-      <DependentUpon>SigningDialog.xaml</DependentUpon>
+    <Compile Include="..\..\src\VSNDK.Package\PkgCmdID.cs">
+      <Link>PkgCmdID.cs</Link>
     </Compile>
-    <Compile Include="NativeMethods.cs" />
-    <Compile Include="UpdateManager\Model\UpdateManagerData.cs" />
-    <Compile Include="UpdateManager\SimulatorManager.xaml.cs">
-      <DependentUpon>SimulatorManager.xaml</DependentUpon>
+    <Compile Include="..\..\src\VSNDK.Package\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="UpdateManager\UpdateManager.xaml.cs">
-      <DependentUpon>UpdateManager.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UpdateManager\UpdateManagerDialog.xaml.cs">
-      <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ViewModel.cs" />
-    <Compile Include="VsDesignerControl.xaml.cs">
-      <DependentUpon>VsDesignerControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="VSMacroRecorder.cs" />
-    <Compile Include="VSNDKCommandEvents.cs" />
-    <Compile Include="VSNDKConstants.cs" />
-    <Compile Include="XmlEditorDesignerViewRegistration.cs" />
-    <Resource Include="Resources\BlackBerryMessager.bmp" />
-    <Resource Include="Resources\Calendar.bmp" />
-    <Resource Include="Resources\Camera.bmp" />
-    <Resource Include="Resources\Contacts.bmp" />
-    <Resource Include="Resources\DeviceIdentifyingInfo.bmp" />
-    <Resource Include="Resources\EmailPINMessages.bmp" />
-    <Resource Include="Resources\GPSLocation.bmp" />
-    <Resource Include="Resources\Internet.bmp" />
-    <Resource Include="Resources\Location.bmp" />
-    <Resource Include="Resources\Mircrophone.bmp" />
-    <Resource Include="Resources\Notebooks.bmp" />
-    <Resource Include="Resources\PostNotifications.bmp" />
-    <Resource Include="Resources\RunBackgrounded.bmp" />
-    <Resource Include="Resources\SharedFiles.bmp" />
-    <Resource Include="Resources\TextMessages.bmp" />
-    <Resource Include="Resources\CaptureScreen.bmp" />
-    <Resource Include="Resources\Gamepad.bmp" />
-    <Resource Include="Resources\MyContactInfo.bmp" />
-    <Resource Include="Resources\Phone.bmp" />
-    <Resource Include="Resources\PhoneControl.bmp" />
-    <Resource Include="Resources\Push.bmp" />
-    <Resource Include="Resources\info.png" />
-    <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Compile Include="Guids.cs" />
-    <Compile Include="Resources.Designer.cs">
+    <Compile Include="..\..\src\VSNDK.Package\Resources.Designer.cs">
+      <Link>Resources.Designer.cs</Link>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="VSNDK.PackagePackage.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PkgCmdID.cs" />
+    <Compile Include="..\..\src\VSNDK.Package\Settings\Model\SettingsData.cs">
+      <Link>Settings\Model\SettingsData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Settings\SettingsDialog.xaml.cs">
+      <Link>Settings\SettingsDialog.xaml.cs</Link>
+      <DependentUpon>SettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Signing\Browser.cs">
+      <Link>Signing\Browser.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Signing\Browser.designer.cs">
+      <Link>Signing\Browser.designer.cs</Link>
+      <DependentUpon>Browser.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Signing\DeRegisterWindow.xaml.cs">
+      <Link>Signing\DeRegisterWindow.xaml.cs</Link>
+      <DependentUpon>DeRegisterWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Signing\Models\SigningData.cs">
+      <Link>Signing\Models\SigningData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Signing\RegistrationWindow.xaml.cs">
+      <Link>Signing\RegistrationWindow.xaml.cs</Link>
+      <DependentUpon>RegistrationWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\Signing\SigningDialog.xaml.cs">
+      <Link>Signing\SigningDialog.xaml.cs</Link>
+      <DependentUpon>SigningDialog.xaml</DependentUpon>
+    </Compile>
+    <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
+      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src\VSNDK.Package\Templates\bar-descriptor.cs">
+      <Link>Templates\bar-descriptor.cs</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Compile Include="..\..\src\VSNDK.Package\UpdateManager\Model\UpdateManagerData.cs">
+      <Link>UpdateManager\Model\UpdateManagerData.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\UpdateManager\SimulatorManager.xaml.cs">
+      <Link>UpdateManager\SimulatorManager.xaml.cs</Link>
+      <DependentUpon>SimulatorManager.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\UpdateManager\UpdateManager.xaml.cs">
+      <Link>UpdateManager\UpdateManager.xaml.cs</Link>
+      <DependentUpon>UpdateManager.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\UpdateManager\UpdateManagerDialog.xaml.cs">
+      <Link>UpdateManager\UpdateManagerDialog.xaml.cs</Link>
+      <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
+    </Compile>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\BlackBerryMessager.bmp">
+      <Link>Resources\BlackBerryMessager.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Calendar.bmp">
+      <Link>Resources\Calendar.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Camera.bmp">
+      <Link>Resources\Camera.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\CaptureScreen.bmp">
+      <Link>Resources\CaptureScreen.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Contacts.bmp">
+      <Link>Resources\Contacts.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\DeviceIdentifyingInfo.bmp">
+      <Link>Resources\DeviceIdentifyingInfo.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\EmailPINMessages.bmp">
+      <Link>Resources\EmailPINMessages.bmp</Link>
+    </Resource>
+    <Content Include="..\..\src\VSNDK.Package\Resources\File.ico">
+      <Link>Resources\File.ico</Link>
+    </Content>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Gamepad.bmp">
+      <Link>Resources\Gamepad.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\GPSLocation.bmp">
+      <Link>Resources\GPSLocation.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Images_24bit.bmp">
+      <Link>Resources\Images_24bit.bmp</Link>
+    </Resource>
+    <None Include="..\..\src\VSNDK.Package\Resources\Images_32bit.bmp">
+      <Link>Resources\Images_32bit.bmp</Link>
+    </None>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\info.png">
+      <Link>Resources\info.png</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Internet.bmp">
+      <Link>Resources\Internet.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Location.bmp">
+      <Link>Resources\Location.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Mircrophone.bmp">
+      <Link>Resources\Mircrophone.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\MyContactInfo.bmp">
+      <Link>Resources\MyContactInfo.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Notebooks.bmp">
+      <Link>Resources\Notebooks.bmp</Link>
+    </Resource>
+    <Content Include="..\..\src\VSNDK.Package\Resources\Package.ico">
+      <Link>Resources\Package.ico</Link>
+    </Content>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Phone.bmp">
+      <Link>Resources\Phone.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\PhoneControl.bmp">
+      <Link>Resources\PhoneControl.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\PostNotifications.bmp">
+      <Link>Resources\PostNotifications.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\Push.bmp">
+      <Link>Resources\Push.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\RunBackgrounded.bmp">
+      <Link>Resources\RunBackgrounded.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\SharedFiles.bmp">
+      <Link>Resources\SharedFiles.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src\VSNDK.Package\Resources\TextMessages.bmp">
+      <Link>Resources\TextMessages.bmp</Link>
+    </Resource>
+    <Compile Include="..\..\src\VSNDK.Package\ViewModel.cs">
+      <Link>ViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\VsDesignerControl.xaml.cs">
+      <Link>VsDesignerControl.xaml.cs</Link>
+      <DependentUpon>VsDesignerControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\VSMacroRecorder.cs">
+      <Link>VSMacroRecorder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\VSNDK.PackagePackage.cs">
+      <Link>VSNDK.PackagePackage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\VSNDKCommandEvents.cs">
+      <Link>VSNDKCommandEvents.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\VSNDKConstants.cs">
+      <Link>VSNDKConstants.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Package\XmlEditorDesignerViewRegistration.cs">
+      <Link>XmlEditorDesignerViewRegistration.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources.resx">
+    <EmbeddedResource Include="..\..\src\VSNDK.Package\Resources.resx">
+      <Link>Resources.resx</Link>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Signing\Browser.resx">
+    <EmbeddedResource Include="..\..\src\VSNDK.Package\Signing\Browser.resx">
+      <Link>Signing\Browser.resx</Link>
       <DependentUpon>Browser.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="VSPackage.resx">
+    <EmbeddedResource Include="..\..\src\VSNDK.Package\VSPackage.resx">
+      <Link>VSPackage.resx</Link>
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\VSNDK.Package\Key.snk">
+      <Link>Key.snk</Link>
+    </None>
+    <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsd">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsd</Link>
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Key.snk" />
-  </ItemGroup>
-  <ItemGroup>
     <VSCTCompile Include="VSNDK.Package.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Resources\Images_32bit.bmp" />
-    <Resource Include="Resources\Images_24bit.bmp" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="RichEditObjectModel">
@@ -301,63 +426,53 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\File.ico" />
-    <Content Include="Resources\Package.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="DebugToken\DebugTokenDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="..\..\src\VSNDK.Package\DebugToken\DebugTokenDialog.xaml">
+      <Link>DebugToken\DebugTokenDialog.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Import\Import.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Settings\SettingsDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
+    <Page Include="..\..\src\VSNDK.Package\Import\Import.xaml">
+      <Link>Import\Import.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Signing\DeRegisterWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Signing\RegistrationWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
+    <Page Include="..\..\src\VSNDK.Package\Settings\SettingsDialog.xaml">
+      <Link>Settings\SettingsDialog.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Signing\SigningDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UpdateManager\SimulatorManager.xaml">
+    <Page Include="..\..\src\VSNDK.Package\Signing\DeRegisterWindow.xaml">
+      <Link>Signing\DeRegisterWindow.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="UpdateManager\UpdateManager.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UpdateManager\UpdateManagerDialog.xaml">
+    <Page Include="..\..\src\VSNDK.Package\Signing\RegistrationWindow.xaml">
+      <Link>Signing\RegistrationWindow.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="VsDesignerControl.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="..\..\src\VSNDK.Package\Signing\SigningDialog.xaml">
+      <Link>Signing\SigningDialog.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\..\src\VSNDK.Package\UpdateManager\SimulatorManager.xaml">
+      <Link>UpdateManager\SimulatorManager.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\..\src\VSNDK.Package\UpdateManager\UpdateManager.xaml">
+      <Link>UpdateManager\UpdateManager.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\..\src\VSNDK.Package\UpdateManager\UpdateManagerDialog.xaml">
+      <Link>UpdateManager\UpdateManagerDialog.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\..\src\VSNDK.Package\VsDesignerControl.xaml">
+      <Link>VsDesignerControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -385,13 +500,24 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
       <Project>{cc7b28e0-cb31-44f7-a380-e7072f670f38}</Project>
       <Name>GDBParser</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>

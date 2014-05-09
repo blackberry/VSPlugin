@@ -76,51 +76,87 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BarDescriptor\Parser.cs" />
-    <Compile Include="BarDescriptor\Schema\bar-descriptor.cs">
+    <Compile Include="..\..\src\VSNDK.Tasks\AsyncExec.cs">
+      <Link>AsyncExec.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\BarDescriptor\Parser.cs">
+      <Link>BarDescriptor\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\BarDescriptor\Schema\bar-descriptor.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
     </Compile>
-    <Compile Include="AsyncExec.cs" />
-    <Compile Include="BBDeploy.cs" />
-    <Compile Include="BBNativePackager.cs" />
-    <Compile Include="BBSigner.cs" />
-    <Compile Include="RemoveFlagFile.cs" />
-    <Compile Include="MakeAllAndFormatOutputMessages.cs" />
-    <Compile Include="CheckIfInstalled.cs" />
-    <Compile Include="DiffManifests.cs" />
-    <Compile Include="GenerateMakefile.cs" />
-    <Compile Include="GetAppInfo.cs" />
-    <Compile Include="PackagerCmdBuilder.cs" />
-    <Compile Include="SSHDelete.cs" />
-    <Compile Include="VSNDKTasks.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
+    <Compile Include="..\..\src\VSNDK.Tasks\BBDeploy.cs">
+      <Link>BBDeploy.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\BBNativePackager.cs">
+      <Link>BBNativePackager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\BBSigner.cs">
+      <Link>BBSigner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\CheckIfInstalled.cs">
+      <Link>CheckIfInstalled.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\DiffManifests.cs">
+      <Link>DiffManifests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\GenerateMakefile.cs">
+      <Link>GenerateMakefile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\GetAppInfo.cs">
+      <Link>GetAppInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\MakeAllAndFormatOutputMessages.cs">
+      <Link>MakeAllAndFormatOutputMessages.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\PackagerCmdBuilder.cs">
+      <Link>PackagerCmdBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\Properties\Resources.Designer.cs">
+      <Link>Properties\Resources.Designer.cs</Link>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="QccCompiler.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QccLib.cs" />
-    <Compile Include="QccLink.cs" />
+    <Compile Include="..\..\src\VSNDK.Tasks\QccCompiler.cs">
+      <Link>QccCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\QccLib.cs">
+      <Link>QccLib.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\QccLink.cs">
+      <Link>QccLink.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\RemoveFlagFile.cs">
+      <Link>RemoveFlagFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\SSHDelete.cs">
+      <Link>SSHDelete.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src\VSNDK.Tasks\VSNDKTasks.cs">
+      <Link>VSNDKTasks.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="BarDescriptor\Schema\bar-descriptor.xsd">
+    <None Include="..\..\src\VSNDK.Tasks\BarDescriptor\Schema\bar-descriptor.xsd">
+      <Link>BarDescriptor\Schema\bar-descriptor.xsd</Link>
       <SubType>Designer</SubType>
     </None>
-    <None Include="BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets">
+      <Link>BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets</Link>
     </None>
-    <None Include="BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets">
+      <Link>BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets</Link>
+    </None>
+    <None Include="..\..\src\VSNDK.Tasks\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
+      <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets</Link>
+    </None>
+    <None Include="..\..\src\VSNDK.Tasks\BlackBerry\Microsoft.CppBuild.BlackBerry.targets">
+      <Link>BlackBerry\Microsoft.CppBuild.BlackBerry.targets</Link>
     </None>
     <None Include="BlackBerry\Platform.default.props">
       <SubType>Designer</SubType>
@@ -131,10 +167,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="BlackBerry\Platform.targets">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Microsoft.CppBuild.BlackBerry.targets">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -157,10 +189,6 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Include="BlackBerrySimulator\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerrySimulator.qcc.props">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
@@ -170,74 +198,62 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="BarDescriptor\Schema\bar-descriptor.xml">
-      <SubType>Designer</SubType>
+    <Content Include="..\..\src\VSNDK.Tasks\BarDescriptor\Schema\bar-descriptor.xml">
+      <Link>BarDescriptor\Schema\bar-descriptor.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\debugger_ndk.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\debugger_ndk.xml">
+      <Link>BlackBerrySimulator\Rules\debugger_ndk.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\debugger_ndk.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml">
+      <Link>BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\ndk_general_ps.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\ndk_directories.xml">
+      <Link>BlackBerrySimulator\Rules\ndk_directories.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\ndk_directories.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\ndk_general.xml">
+      <Link>BlackBerrySimulator\Rules\ndk_general.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\ndk_general.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\ndk_general_ps.xml">
+      <Link>BlackBerrySimulator\Rules\ndk_general_ps.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\ndkProjectItemsSchema.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\packager.xml">
+      <Link>BlackBerrySimulator\Rules\packager.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\qcc_cl.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\qcc_cl.xml">
+      <Link>BlackBerrySimulator\Rules\qcc_cl.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\qcc_lib.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\qcc_lib.xml">
+      <Link>BlackBerrySimulator\Rules\qcc_lib.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\qcc_link.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\qcc_link.xml">
+      <Link>BlackBerrySimulator\Rules\qcc_link.xml</Link>
     </Content>
-    <Content Include="BlackBerry\Rules\packager.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\debugger_ndk.xml">
+      <Link>BlackBerry\Rules\debugger_ndk.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\ndkProjectItemsSchema.xml">
+      <Link>BlackBerry\Rules\ndkProjectItemsSchema.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\ndk_directories.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\ndk_directories.xml">
+      <Link>BlackBerry\Rules\ndk_directories.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\ndk_general.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\ndk_general.xml">
+      <Link>BlackBerry\Rules\ndk_general.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\ndk_general_ps.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\ndk_general_ps.xml">
+      <Link>BlackBerry\Rules\ndk_general_ps.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\packager.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\packager.xml">
+      <Link>BlackBerry\Rules\packager.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\qcc_cl.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\qcc_cl.xml">
+      <Link>BlackBerry\Rules\qcc_cl.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\qcc_lib.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\qcc_lib.xml">
+      <Link>BlackBerry\Rules\qcc_lib.xml</Link>
     </Content>
-    <Content Include="BlackBerrySimulator\Rules\qcc_link.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\qcc_link.xml">
+      <Link>BlackBerry\Rules\qcc_link.xml</Link>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -261,6 +277,14 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\src\VSNDK.Tasks\Properties\Resources.resx">
+      <Link>Properties\Resources.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <!--  <ItemGroup>
     <WCFMetadata Include="Service References\" />

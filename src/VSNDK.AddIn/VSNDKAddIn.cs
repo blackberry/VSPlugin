@@ -15,35 +15,23 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using EnvDTE80;
 using EnvDTE;
 using Microsoft.VisualStudio.VCProjectEngine;
 using System.Diagnostics;
-using System.Globalization;
 using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.Project;
-using Microsoft.Build.Execution;
-using System.Xml;
-using Microsoft.Win32;
-using System.Security.Cryptography;
 using System.IO;
-
-using Extensibility;
-using System.Resources;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.OLE.Interop;
-
-using NameValueCollection = System.Collections.Specialized.NameValueCollection;
-using NameValueCollectionHelper = VSNDK.AddIn.NameValueCollectionHelper;
-using System.Runtime.InteropServices;
 
 namespace VSNDK.AddIn
 {
+    
+    public class configtableentry
+    {
+        public string config;
+        public string platform;
+        public bool deployable;
+    }
 
     /// <summary>
     /// 
@@ -53,7 +41,10 @@ namespace VSNDK.AddIn
         private VSNDKCommandEvents _commandEvents;
         private DTE2 _applicationObject; 
         private EnvDTE.AddIn _addInInstance;
-        private TokenProcessor tokenProcessor;
+        private TokenProcessor _tokenProcessor;
+
+        private List<configtableentry> _configTable;
+
 
         private const string BLACKBERRY = "BlackBerry";
         private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
@@ -63,12 +54,7 @@ namespace VSNDK.AddIn
         private const string BAR_DESCRIPTOR = "bar-descriptor.xml";
         private const string BAR_DESCRIPTOR_PATH = @"\..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033\";
         
-//        public static bool isDebugEngineRunning = false;
-
-        public VSNDKAddIn()
-        {
-        }
-
+        public static bool isDebugEngineRunning = false;
 
         /// <summary> 
         /// Run initialization code on first connection of the AddIn. 
@@ -77,14 +63,15 @@ namespace VSNDK.AddIn
         /// <param name="addin"> Add In Object. </param>
         public void Connect(DTE2 appObj, EnvDTE.AddIn addin)
         {
-            /// Initialize External and Internal Variables.
+            // Initialize External and Internal Variables.
             _applicationObject = appObj;
             _addInInstance = addin;
 
-            /// Register Command Events
+            _configTable = new List<configtableentry>();
+
+            // Register Command Events
             _commandEvents = new VSNDKCommandEvents(appObj);
             _commandEvents.RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
-            _commandEvents.RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionCfg, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
             _commandEvents.RegisterCommand(GuidList.guidVSDebugGroup, CommandConstants.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
 
             DisableIntelliSenseErrorReport(true);
@@ -140,8 +127,8 @@ namespace VSNDK.AddIn
         private void DisableIntelliSenseErrorReport(bool disable)
         {
             DTE dte = _applicationObject as DTE;
-            EnvDTE.Properties txtEdCpp = dte.get_Properties("TextEditor", "C/C++ Specific");
-            EnvDTE.Property prop = txtEdCpp.Item("DisableErrorReporting");
+            var txtEdCpp = dte.get_Properties("TextEditor", "C/C++ Specific");
+            var prop = txtEdCpp.Item("DisableErrorReporting");
             if (prop != null)
                 prop.Value = disable;
         }
@@ -157,7 +144,7 @@ namespace VSNDK.AddIn
         /// <param name="CancelDefault">Cancel the default execution of the command. </param>
         private void cmdNewPlatform_beforeExec(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
         {
-            /// Add Code Here
+            GetSolutionPlarformConfig();
         }
 
         
@@ -170,6 +157,7 @@ namespace VSNDK.AddIn
         /// <param name="CustomOut">Custom OUT Object. </param>
         private void cmdNewPlatform_afterExec(string Guid, int ID, object CustomIn, object CustomOut)
         {
+            SolutionPlarformConfig();
             AddBarDescriptor();
         }
 
@@ -184,7 +172,7 @@ namespace VSNDK.AddIn
         /// <param name="CancelDefault">Cancel the default execution of the command. </param>
         private void cmdNewFunctionBreakpoint_beforeExec(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
         {
-            /// Add Code Here
+            // Add Code Here
         }
 
 
@@ -209,6 +197,73 @@ namespace VSNDK.AddIn
             }
         }
 
+        /// <summary>
+        /// Set solution config after edit
+        /// </summary>
+        private void SolutionPlarformConfig()
+        {
+            DTE dte = _applicationObject as DTE;
+
+            SolutionConfigurations SGS = dte.Solution.SolutionBuild.SolutionConfigurations;
+
+            foreach (SolutionConfiguration SG in SGS)
+            {
+                string name = SG.Name;
+
+                SolutionContexts SCS = SG.SolutionContexts;
+                foreach (SolutionContext SC in SCS)
+                {
+                    string cname = SC.ConfigurationName;
+                    string pname = SC.PlatformName;
+                    string prname = SC.ProjectName;
+
+                    configtableentry e = _configTable.Find(i => (i.config == cname) && (i.platform == pname));
+
+                    if (e != null)
+                    {
+                        _configTable.Remove(e);
+                    }
+                    else
+                    {
+                        SC.ShouldDeploy = true;
+                    }
+
+                }
+            }
+
+        }
+
+        /// <summary>
+        /// Get solution configuration before edit
+        /// </summary>
+        private void GetSolutionPlarformConfig()
+        {
+            DTE dte = _applicationObject as DTE;
+
+            SolutionConfigurations SGS = dte.Solution.SolutionBuild.SolutionConfigurations;
+
+            foreach (SolutionConfiguration SG in SGS)
+            {
+                string name = SG.Name;
+
+                SolutionContexts SCS = SG.SolutionContexts;
+                foreach (SolutionContext SC in SCS)
+                {
+                    string cname = SC.ConfigurationName;
+                    string pname = SC.PlatformName;
+                    string prname = SC.ProjectName;
+
+                    configtableentry c = new configtableentry();
+                    c.platform = pname;
+                    c.config = cname;
+                    c.deployable = SC.ShouldDeploy;
+
+                    _configTable.Add(c);
+                }
+            }
+
+        }
+
 
         /// <summary> 
         /// Add Bar Descriptor to each project. 
@@ -219,6 +274,7 @@ namespace VSNDK.AddIn
             {
                 DTE dte = _applicationObject as DTE;
                 Projects projs = dte.Solution.Projects;
+
 
                 List<Project> projList = new List<Project>();
                 foreach (Project proj in projs)
@@ -256,41 +312,41 @@ namespace VSNDK.AddIn
                         }
                         continue;
                     }
-
+                    
                     if (Convert.ToInt16(prop.Value) != Convert.ToInt16(ConfigurationTypes.typeApplication))
                         continue;
 
                     if (config.PlatformName != BLACKBERRY && config.PlatformName != BLACKBERRYSIMULATOR)
                         continue;
-
+                    
                     ProjectItem baritem = proj.ProjectItems.Item(BAR_DESCRIPTOR);
                     string n = proj.Name;
                     if (baritem == null)
                     {
-                        tokenProcessor = new TokenProcessor();
+                        _tokenProcessor = new TokenProcessor();
                         Debug.WriteLine("Add bar descriptor file to the project");
                         string templatePath = dte.Solution.ProjectItemsTemplatePath(proj.Kind);
                         templatePath += BAR_DESCRIPTOR_PATH + BAR_DESCRIPTOR;
-                        tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", proj.Name);
-                        string destination = System.IO.Path.GetFileName(templatePath);
+                        _tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", proj.Name);
+                        string destination = Path.GetFileName(templatePath);
 
                         // Remove directory used in previous versions of this plug-in.
-                        string folder = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(proj.FullName), proj.Name + "_barDescriptor");
+                        string folder = Path.Combine(Path.GetDirectoryName(proj.FullName), proj.Name + "_barDescriptor");
                         if (Directory.Exists(folder))
                         {
                             try
                             {
                                 Directory.Delete(folder);
                             }
-                            catch (Exception e)
+                            catch (Exception)
                             {
                             }
                         }
 
-                        folder = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(proj.FullName), "BlackBerry-" + proj.Name);
-                        System.IO.Directory.CreateDirectory(folder);
-                        destination = System.IO.Path.Combine(folder, destination);
-                        tokenProcessor.UntokenFile(templatePath, destination);
+                        folder = Path.Combine(Path.GetDirectoryName(proj.FullName), "BlackBerry-" + proj.Name);
+                        Directory.CreateDirectory(folder);
+                        destination = Path.Combine(folder, destination);
+                        _tokenProcessor.UntokenFile(templatePath, destination);
                         ProjectItem projectitem = proj.ProjectItems.AddFromFile(destination);
                     }
                 }
@@ -301,28 +357,5 @@ namespace VSNDK.AddIn
             }
         }
 
-
-        /// <summary> 
-        /// Add BlackBerry configurations to the project. 
-        /// </summary>
-        /// <param name="proj"> Represents a project in the integrated development environment. </param>
-        private void AddBlackBerryConfigurations(Project proj)
-        {
-            try
-            {
-                ConfigurationManager mgr = proj.ConfigurationManager;
-                Configurations cfgs = mgr.AddPlatform(BLACKBERRY, "Win32", true);
-                mgr.DeletePlatform("Win32");
-                mgr.AddConfigurationRow("Device-Debug", "Debug", true);
-                mgr.AddConfigurationRow("Simulator", "Debug", true);
-                mgr.DeleteConfigurationRow("Debug");
-                mgr.AddConfigurationRow("Device-Release", "Release", true);
-                mgr.DeleteConfigurationRow("Release");
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
-            }
-        }
     }
 }

@@ -12,6 +12,10 @@ or
 
 * [Microsoft Visual Studio Professional 2013 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=40758)
 
+Please note, that currently there is a bug in DIA SDK of Visual Studio 2013.
+If Visual Studio 2013 is installed on a machine, where Visual Studio 2012 did already existed, DIA SDK will be by placed inside it.
+More info [here] (http://connect.microsoft.com/VisualStudio/feedback/details/814147/dia-sdk-installed-into-wrong-directory).
+
 ##Build commands
 1. VSNDKPluginBuild.bat – A batch file that builds the various components of the BlackBerry Native Plug-in to the ..\buildresults folder.
 2. VSNDKPluginSetup.bat – A batch file that installs the newly built components of the BlackBerry Native Plug-in to the correct locations on your computer. 

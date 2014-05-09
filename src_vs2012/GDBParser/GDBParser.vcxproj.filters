@@ -5,32 +5,29 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
-    <Filter Include="Internal Header files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
     </Filter>
-    <Filter Include="Source Files\GDBParser API Header files">
-      <UniqueIdentifier>{3bb6314f-66c5-4c9f-b290-dfa7cf75aeea}</UniqueIdentifier>
+    <Filter Include="Header files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Constants.cpp">
+    <ClCompile Include="..\..\src\GDBParser\Constants.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
+    <ClCompile Include="..\..\src\GDBParser\dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="gdb-connect.cpp">
+    <ClCompile Include="..\..\src\GDBParser\gdb-connect.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GDBParserAPI.cpp">
+    <ClCompile Include="..\..\src\GDBParser\GDBParserAPI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -41,29 +38,26 @@
     <None Include="GDBParser.rgs">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="Instructions.txt" />
+    <None Include="..\..\src\GDBParser\Instructions.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ComponentException.h">
-      <Filter>Internal Header files</Filter>
-    </ClInclude>
-    <ClInclude Include="ProjInclude.h">
-      <Filter>Internal Header files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
-      <Filter>Internal Header files</Filter>
+      <Filter>Header files</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h">
-      <Filter>Internal Header files</Filter>
+      <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="WorkerUtil.h">
-      <Filter>Internal Header files</Filter>
+    <ClInclude Include="..\..\src\GDBParser\WorkerUtil.h">
+      <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="gdb-connect.h">
-      <Filter>Internal Header files</Filter>
+    <ClInclude Include="..\..\src\GDBParser\gdb-connect.h">
+      <Filter>Header files</Filter>
     </ClInclude>
-    <ClInclude Include="GDBParserAPI.h">
-      <Filter>Source Files\GDBParser API Header files</Filter>
+    <ClInclude Include="..\..\src\GDBParser\ComponentException.h">
+      <Filter>Header files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\GDBParser\GDBParserAPI.h">
+      <Filter>Header files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

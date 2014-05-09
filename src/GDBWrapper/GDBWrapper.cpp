@@ -49,8 +49,7 @@ void DisplayError(LPCTSTR pszAPI)
 {
     LPVOID lpvMessageBuffer;
     TCHAR szPrintBuffer[512];
-	DWORD bufSize = 512 * sizeof(TCHAR);
-    DWORD nCharsWritten;
+    DWORD bufSize = 512 * sizeof(TCHAR);
 
     FormatMessage(
             FORMAT_MESSAGE_ALLOCATE_BUFFER|FORMAT_MESSAGE_FROM_SYSTEM,
@@ -109,12 +108,19 @@ void ErrorExit(LPTSTR lpszFunction)
 /// Generic function to print to a log file. 
 /// </summary>
 /// <param name="buffer"> Message to be printed to a log file. </param>
-void logPrint(TCHAR* buffer) {
-	if (LOG_GDB_RAW_IO) {
-		FILE* file = fopen(path_log, "a");
-		_ftprintf(file, _T("%s\r\n"), buffer);
-		fclose(file);
-	}
+void logPrint(TCHAR* buffer)
+{
+#if LOG_GDB_RAW_IO
+    FILE* file = NULL;
+    errno_t retCode;
+
+    retCode = fopen_s(&file, path_log, "a");
+    if (file != NULL && retCode == 0)
+    {
+        _ftprintf(file, _T("%s\r\n"), buffer);
+        fclose(file);
+    }
+#endif
 }
 
 // End region that needs to go into a library
@@ -260,17 +266,16 @@ int _tmain(int argc, _TCHAR* argv[])
 	TCHAR msg[1024];
 	memset(msg, 0, 1024);
 	
-    WCHAR wszThisFile[MAX_PATH + 1];
-    GetModuleFileName(NULL, wszThisFile, MAX_PATH + 1);
-	
-	String^ tempPath = Environment::GetEnvironmentVariable("APPDATA"); 
-	tempPath += "\\BlackBerry\\wrapper.log";
-	pin_ptr<const wchar_t> path_buffer = PtrToStringChars(tempPath);
+    GetEnvironmentVariableA("AppData", path_log, _countof(path_log));
+    strcat_s(path_log, _countof(path_log), "\\BlackBerry\\wrapper.log");
 
-	int ret = wcstombs ( path_log, path_buffer, _MAX_PATH );
-
-	FILE* file = fopen(path_log, "w"); // just to delete a possible existing file
-	fclose(file);
+    FILE* file = NULL;
+    errno_t retCode;
+    retCode = fopen_s(&file, path_log, "w"); // just to delete a possible existing file
+    if (file != NULL && retCode == 0)
+    {
+        fclose(file);
+    }
 
 	logPrint(_T("Starting"));
 
@@ -278,15 +283,15 @@ int _tmain(int argc, _TCHAR* argv[])
 	handles[0] = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[2]); // Ctrl-C signal
 	handles[1] = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[3]); // Signal to terminate the wrapper process
 
-	_stprintf(msg, _T("args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3]);
+    _stprintf_s(msg, _countof(msg), _T("args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3]);
 	_tprintf(msg);
 	logPrint(msg);
 
-	_stprintf(msg, _T("Ctrl-C handler: name: %s handle: %p\r\n"), argv[2], handles[0]);
+	_stprintf_s(msg, _countof(msg), _T("Ctrl-C handler: name: %s handle: %p\r\n"), argv[2], handles[0]);
 	_tprintf(msg);
 	logPrint(msg);	
 
-	_stprintf(msg, _T("Terminate handler: name: %s handle: %p\r\n"), argv[3], handles[1]);
+	_stprintf_s(msg, _countof(msg), _T("Terminate handler: name: %s handle: %p\r\n"), argv[3], handles[1]);
 	_tprintf(msg);
 	logPrint(msg);	
 	

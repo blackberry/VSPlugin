@@ -13,20 +13,14 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
+using RIM.VSNDK_Package;
 using VSNDK.Parser;
-//using VSNDK.AddIn;
-using VSNDK.Package;
-
 using NameValueCollection = System.Collections.Specialized.NameValueCollection;
-using NameValueCollectionHelper = VSNDK.Package.NameValueCollectionHelper;
-using System.Collections;
 using System.Windows.Forms;
 
 namespace VSNDK.DebugEngine
@@ -64,7 +58,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
         /// </summary>
-        EngineCallback m_engineCallback = null;
+        EngineCallback m_engineCallback;
         internal EngineCallback Callback
         {
             get { return m_engineCallback; }
@@ -94,7 +88,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// A unique identifier for the program being debugged.
         /// </summary>
-        Guid m_programGUID;
+        private Guid _mProgramGuid;
 
         /// <summary>
         /// A module loaded in the debuggee process to the debugger. It is always null because the AD7Module class is 
@@ -125,10 +119,10 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Array of threads of the program that is being debugged.
         /// </summary>
-        private AD7Thread[] m_threads = null;
+        private AD7Thread[] _threads;
         public AD7Thread[] thread
         {
-            get { return m_threads; }
+            get { return _threads; }
         }
 
         /// <summary>
@@ -194,7 +188,7 @@ namespace VSNDK.DebugEngine
         ~AD7Engine()
         {
             // Transition DE state
-            m_state = AD7Engine.DE_STATE.DONE;
+            m_state = DE_STATE.DONE;
         }
 
         #region IDebugEngine2 Members
@@ -215,22 +209,22 @@ namespace VSNDK.DebugEngine
 
             if (aCeltPrograms != 1)
             {
-                System.Diagnostics.Debug.Fail("VSNDK Debugger only supports one debug target at a time.");
+                Debug.Fail("VSNDK Debugger only supports one debug target at a time.");
                 throw new ArgumentException();
             }
 
             try
             {
-                EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out m_programGUID));
+                EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out _mProgramGuid));
 
                 m_program = rgpPrograms[0];
 
                 // It is NULL when the user attached the debugger to a running process (by using Attach to Process UI). When that 
                 // happens, some objects must be instantiated, as well as GDB must be launched. Those ones are instantiated/launched
                 // by LaunchSuspended and ResumeProcess methods when debugging an open project.
-                if (this.m_engineCallback == null) 
+                if (m_engineCallback == null) 
                 {
-                    VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = true;
+                    Package.ControlDebugEngine.isDebugEngineRunning = true;
                     m_engineCallback = new EngineCallback(this, ad7Callback);
 
                     AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
@@ -239,17 +233,17 @@ namespace VSNDK.DebugEngine
                     string publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
                     string progName = pnt.m_programName.Substring(pnt.m_programName.LastIndexOf('/') + 1);
 
-                    string exePath = "";
-                    string processesPaths = "";
-                    System.IO.StreamReader readProcessesPathsFile = null;
+                    string exePath;
+                    string processesPaths;
+                    System.IO.StreamReader readProcessesPathsFile;
                     // Read the file ProcessesPath.txt to try to get the file location of the executable file.
                     try
                     {
-                        readProcessesPathsFile = new System.IO.StreamReader(System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
+                        readProcessesPathsFile = new System.IO.StreamReader(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
                         processesPaths = readProcessesPathsFile.ReadToEnd();
                         readProcessesPathsFile.Close();
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         processesPaths = "";
                     }
@@ -279,20 +273,20 @@ namespace VSNDK.DebugEngine
                         }
                         m_eventDispatcher = new EventDispatcher(this);
                         m_module = new AD7Module();
-                        m_progNode = new AD7ProgramNode(m_process._processGUID, m_process._processID, exePath, new Guid(AD7Engine.Id));
+                        m_progNode = new AD7ProgramNode(m_process._processGUID, m_process._processID, exePath, new Guid(Id));
                         AddThreadsToProgram();
                     }
                     else
                     {
                         GDBParser.exitGDB();
-                        VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = false;
+                        Package.ControlDebugEngine.isDebugEngineRunning = false;
                         return VSConstants.E_FAIL;
                     }
                 }
                 AD7EngineCreateEvent.Send(this);
                 AD7ProgramCreateEvent.Send(this);
                 AD7ModuleLoadEvent.Send(this, m_module, true);
-                AD7LoadCompleteEvent.Send(this, currentThread());
+                AD7LoadCompleteEvent.Send(this, CurrentThread());
 
                 // If the reason for attaching is ATTACH_REASON_LAUNCH, the DE needs to send the IDebugEntryPointEvent2 event.
                 // See http://msdn.microsoft.com/en-us/library/bb145136%28v=vs.100%29.aspx
@@ -301,7 +295,7 @@ namespace VSNDK.DebugEngine
                     AD7EntryPointEvent ad7Event = new AD7EntryPointEvent();
                     Guid riidEvent = new Guid(AD7EntryPointEvent.IID);
                     uint attributes = (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING | (uint)enum_EVENTATTRIBUTES.EVENT_SYNCHRONOUS;
-                    int rc = ad7Callback.Event(this, null, m_program, currentThread(), ad7Event, ref riidEvent, attributes);
+                    int rc = ad7Callback.Event(this, null, m_program, CurrentThread(), ad7Event, ref riidEvent, attributes);
                     Debug.Assert(rc == VSConstants.S_OK);
                 }
             }
@@ -324,23 +318,21 @@ namespace VSNDK.DebugEngine
             // If not already broken, send the interrupt
             if (m_state != DE_STATE.DESIGN_MODE && m_state != DE_STATE.BREAK_MODE && m_state != DE_STATE.STEP_MODE)
             {
-                bool signalReceived;
-                bool hitBreakAll;
-                if (EventDispatcher.m_GDBRunMode == true)
+                if (EventDispatcher.m_GDBRunMode)
                 {
                     HandleProcessExecution.m_mre.Reset();
-                    hitBreakAll = m_running.WaitOne();
+                    m_running.WaitOne();
 
                     // Sends the GDB command that interrupts the background execution of the target.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
                     GDBParser.addGDBCommand(@"-exec-interrupt");
 
                     // Ensure the process is interrupted before returning                
-                    signalReceived = HandleProcessExecution.m_mre.WaitOne(1000);
+                    HandleProcessExecution.m_mre.WaitOne(1000);
 
                     m_running.Set();
 
-                    if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning)
+                    if (Package.ControlDebugEngine.isDebugEngineRunning)
                         HandleProcessExecution.m_mre.Reset();
                 }
             }
@@ -375,9 +367,9 @@ namespace VSNDK.DebugEngine
                     m_eventDispatcher = null;
                     m_module = null;
                     m_progNode = null;
-                    m_programGUID = Guid.Empty;
+                    _mProgramGuid = Guid.Empty;
 
-                    m_threads = null;
+                    _threads = null;
                     GC.Collect();
                 }
                 else
@@ -568,13 +560,13 @@ namespace VSNDK.DebugEngine
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugEngineLaunch2.LaunchSuspended(string pszServer, IDebugPort2 port, string exe, string args, string dir, string env, string options, enum_LAUNCH_FLAGS launchFlags, uint hStdInput, uint hStdOutput, uint hStdError, IDebugEventCallback2 ad7Callback, out IDebugProcess2 process)
         {            
-            Debug.Assert(m_programGUID == Guid.Empty);
+            Debug.Assert(_mProgramGuid == Guid.Empty);
 
             process = null;
 
             try
             {
-                VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = true;
+                Package.ControlDebugEngine.isDebugEngineRunning = true;
                 m_engineCallback = new EngineCallback(this, ad7Callback);
 
                 // Read arguments back from the args string
@@ -597,10 +589,10 @@ namespace VSNDK.DebugEngine
                 {
                     process = m_process = new AD7Process(this, port);
                     m_eventDispatcher = new EventDispatcher(this);
-                    m_programGUID = m_process._processGUID;
+                    _mProgramGuid = m_process._processGUID;
                     m_module = new AD7Module();
 //                    m_progNode = new AD7ProgramNode(m_process.PhysID, pid, exePath, new Guid(AD7Engine.Id));
-                    m_progNode = new AD7ProgramNode(m_process._processGUID, pid, exePath, new Guid(AD7Engine.Id));
+                    m_progNode = new AD7ProgramNode(m_process._processGUID, pid, exePath, new Guid(Id));
                     AddThreadsToProgram();
 
                     AD7EngineCreateEvent.Send(this);
@@ -610,7 +602,7 @@ namespace VSNDK.DebugEngine
                 else
                 {
                     GDBParser.exitGDB();
-                    VSNDK.Package.ControlDebugEngine.isDebugEngineRunning = false;
+                    Package.ControlDebugEngine.isDebugEngineRunning = false;
                     return VSConstants.E_FAIL;
                 }
             }
@@ -640,19 +632,19 @@ namespace VSNDK.DebugEngine
 
                 // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
                 // which will complete the hookup with AD7
-                IDebugPort2 port = null;
+                IDebugPort2 port;
                 EngineUtils.RequireOk(process.GetPort(out port));
                 
                 IDebugDefaultPort2 defaultPort = (IDebugDefaultPort2)port;
                 
-                IDebugPortNotify2 portNotify = null;
+                IDebugPortNotify2 portNotify;
                 EngineUtils.RequireOk(defaultPort.GetPortNotify(out portNotify));
 
                 EngineUtils.RequireOk(portNotify.AddProgramNode(m_progNode));
 
                 Callback.OnModuleLoad(m_module);
 
-                Callback.OnThreadStart(currentThread());
+                Callback.OnThreadStart(CurrentThread());
             }
             catch (Exception e)
             {
@@ -795,7 +787,10 @@ namespace VSNDK.DebugEngine
         public int EnumThreads(out IEnumDebugThreads2 ppEnum)
         {
             AD7Thread[] listThreads = null;
-            int currentThread = GetListOfThreads(out listThreads);
+            int currentThread = 0;
+
+            if (m_state != DE_STATE.RUN_MODE)
+                currentThread = GetListOfThreads(out listThreads);
 
             // the following code seems to be weird but I had to update each field of this.m_process._threads because, when using
             // "this.m_process._threads = listThreads;" without having a new thread, VS starts to duplicate the existing threads 
@@ -804,72 +799,74 @@ namespace VSNDK.DebugEngine
             if ((currentThread == -1) || (listThreads == null))
             {
                 ppEnum = null;
-                return VSConstants.S_FALSE;
+                return currentThread == 0 ? VSConstants.S_OK : VSConstants.S_FALSE;
             }
 
-            if (listThreads.Length != this.m_threads.Length)
+            if (listThreads.Length != _threads.Length)
             {
-                foreach (AD7Thread t in this.m_threads)
+                foreach (AD7Thread t in _threads)
                 {
                     AD7ThreadDestroyEvent.Send(this, 0, t);
                 }
-                this.m_threads = null;
-                this.m_threads = new AD7Thread[listThreads.Length];
-                this.m_threads = listThreads;
-                this._currentThreadIndex = currentThread;
-                foreach (AD7Thread t in this.m_threads)
+                _threads = null;
+                _threads = new AD7Thread[listThreads.Length];
+                _threads = listThreads;
+                _currentThreadIndex = currentThread;
+                foreach (AD7Thread t in _threads)
                 {
                     m_engineCallback.OnThreadStart(t);
                 }
-                ppEnum = new AD7ThreadEnum(this.m_threads);
+                ppEnum = new AD7ThreadEnum(_threads);
             }
             else 
             {
-                if (this._currentThreadIndex != currentThread)
+                if (_currentThreadIndex != currentThread)
                 {
-                    this._currentThreadIndex = currentThread;
+                    _currentThreadIndex = currentThread;
                 }
 
                 for (int i = 0; i < listThreads.Length; i++)
                 {
-                    if (this.m_threads[i]._engine != listThreads[i]._engine)
+                    if (_threads[i]._engine != listThreads[i]._engine)
                     {
-                        this.m_threads[i]._engine = listThreads[i]._engine;
+                        _threads[i]._engine = listThreads[i]._engine;
                     }
-                    if (this.m_threads[i]._threadDisplayName != listThreads[i]._threadDisplayName)
+                    if (_threads[i]._threadDisplayName != listThreads[i]._threadDisplayName)
                     {
-                        this.m_threads[i]._threadDisplayName = listThreads[i]._threadDisplayName;
+                        _threads[i]._threadDisplayName = listThreads[i]._threadDisplayName;
                     }
-                    if (this.m_threads[i]._id != listThreads[i]._id)
+                    if (_threads[i]._id != listThreads[i]._id)
                     {
-                        this.m_threads[i]._id = listThreads[i]._id;
+                        _threads[i]._id = listThreads[i]._id;
                     }
-                    if (this.m_threads[i]._state != listThreads[i]._state)
+                    if (_threads[i]._state != listThreads[i]._state)
                     {
-                        this.m_threads[i]._state = listThreads[i]._state;
+                        _threads[i]._state = listThreads[i]._state;
                     }
-                    if (this.m_threads[i]._targetID != listThreads[i]._targetID)
+                    if (_threads[i]._targetID != listThreads[i]._targetID)
                     {
-                        this.m_threads[i]._targetID = listThreads[i]._targetID;
+                        _threads[i]._targetID = listThreads[i]._targetID;
                     }
-                    if (this.m_threads[i]._priority != listThreads[i]._priority)
+                    if (_threads[i]._priority != listThreads[i]._priority)
                     {
-                        this.m_threads[i]._priority = listThreads[i]._priority;
+                        _threads[i]._priority = listThreads[i]._priority;
                     }
-                    if (this.m_threads[i]._line != listThreads[i]._line)
+                    if (_threads[i]._line != listThreads[i]._line)
                     {
-                        this.m_threads[i]._line = listThreads[i]._line;
+                        _threads[i]._line = listThreads[i]._line;
                     }
-                    if (this.m_threads[i]._filename != listThreads[i]._filename)
+                    if (_threads[i]._filename != listThreads[i]._filename)
                     {
                         if (listThreads[i]._filename == "")
-                            this.m_threads[i]._filename = "";
+                            _threads[i]._filename = "";
                         else
-                            this.m_threads[i]._filename = listThreads[i]._filename;
+                            _threads[i]._filename = listThreads[i]._filename;
                     }
+                    _threads[i].__stackFrames = listThreads[i].__stackFrames;
+                    _threads[i]._suspendCount = listThreads[i]._suspendCount;
                 } 
 
-                ppEnum = new AD7ThreadEnum(this.m_threads);
+                ppEnum = new AD7ThreadEnum(this._threads);
             }
             return VSConstants.S_OK;
         }
@@ -967,8 +964,8 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetProgramId(out Guid guidProgramId)
         {
-            if (m_programGUID != null)
-                guidProgramId = m_programGUID;
+            if (_mProgramGuid != null)
+                guidProgramId = _mProgramGuid;
             else
                 guidProgramId = m_process._processGUID;
 
@@ -1000,30 +997,30 @@ namespace VSNDK.DebugEngine
                 // Equivalent to F11 hotkey.
                 // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, diving 
                 // into function if it is a function call. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                GDBParser.addGDBCommand("-exec-step --thread " + this.m_threads[this._currentThreadIndex]._id);
+                GDBParser.addGDBCommand("-exec-step --thread " + this._threads[this._currentThreadIndex]._id);
             }
             else if (sk == enum_STEPKIND.STEP_OVER)
             { 
                 // Equivalent to F10 hotkey.
                 // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, but 
                 // without diving into functions. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                GDBParser.addGDBCommand("-exec-next --thread " + this.m_threads[this._currentThreadIndex]._id);
+                GDBParser.addGDBCommand("-exec-next --thread " + this._threads[this._currentThreadIndex]._id);
             }
             else if (sk == enum_STEPKIND.STEP_OUT)
             { 
                 // Equivalent to Shift-F11 hotkey.
-                if (eDispatcher.getStackDepth(this.m_threads[this._currentThreadIndex]._id) > 1)
+                if (eDispatcher.getStackDepth(this._threads[this._currentThreadIndex]._id) > 1)
                 {
                     // Sends the GDB command that resumes the execution of the inferior program until the current function is exited.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                    GDBParser.addGDBCommand("-exec-finish --thread " + this.m_threads[this._currentThreadIndex]._id + " --frame 0");
+                    GDBParser.addGDBCommand("-exec-finish --thread " + this._threads[this._currentThreadIndex]._id + " --frame 0");
                 }
                 else
                 {
                     // If this the only frame left, do a step-over.
                     // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, but 
                     // without diving into functions. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                    GDBParser.addGDBCommand("-exec-next --thread " + this.m_threads[this._currentThreadIndex]._id);
+                    GDBParser.addGDBCommand("-exec-next --thread " + this._threads[this._currentThreadIndex]._id);
                 }
             }
             else if (sk == enum_STEPKIND.STEP_BACKWARDS)
@@ -1225,7 +1222,7 @@ namespace VSNDK.DebugEngine
         /// </summary>
         public void resetStackFrames()
         {
-            foreach (AD7Thread t in m_threads)
+            foreach (AD7Thread t in _threads)
             {
                 if (t.__stackFrames != null)
                 {
@@ -1242,21 +1239,21 @@ namespace VSNDK.DebugEngine
         /// </summary>
         public void UpdateListOfThreads()
         {
-            foreach (AD7Thread t in this.m_threads)
+            foreach (AD7Thread t in this._threads)
             {
                 // Send events to VS to destroy its current debugged threads.
                 AD7ThreadDestroyEvent.Send(this, 0, t);
             }
 
-            this.m_threads = null;
+            this._threads = null;
             // Get the current list of threads and store them into a temporary variable listThreads.
-            this._currentThreadIndex = GetListOfThreads(out this.m_threads);
+            this._currentThreadIndex = GetListOfThreads(out this._threads);
 
-            if ((this._currentThreadIndex == -1) || (this.m_threads == null))
+            if ((this._currentThreadIndex == -1) || (this._threads == null))
                 return;
 
             // Send events to VS to add this list of debugged threads.
-            foreach (AD7Thread t in this.m_threads)
+            foreach (AD7Thread t in this._threads)
             {
                 m_engineCallback.OnThreadStart(t);
             }
@@ -1312,12 +1309,12 @@ namespace VSNDK.DebugEngine
                 }
                 return currentThreadIndex;
             }
-            catch (ComponentException e)
+            catch (ComponentException)
             {
                 threadObjects = null;
                 return -1;
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 threadObjects = null;
                 return -1;
@@ -1329,10 +1326,10 @@ namespace VSNDK.DebugEngine
         /// Returns the current thread.
         /// </summary>
         /// <returns> If successful, returns the current thread; otherwise, returns NULL. </returns>
-        public AD7Thread currentThread()
+        public AD7Thread CurrentThread()
         {
             if (_currentThreadIndex != -1)
-                return m_threads[_currentThreadIndex];
+                return _threads[_currentThreadIndex];
             return null;
         }
 
@@ -1342,12 +1339,12 @@ namespace VSNDK.DebugEngine
         /// </summary>
         /// <param name="id"> The ID of the thread to search for. </param>
         /// <returns> If successful, returns the selected thread; otherwise, returns NULL. </returns>
-        public AD7Thread selectThread(string id)
+        public AD7Thread SelectThread(string id)
         {
-            for (int i = 0; i < this.m_threads.Length; i++)
+            for (int i = 0; i < _threads.Length; i++)
             {
-                if (this.m_threads[i]._id == id)
-                    return (m_threads[i]);
+                if (_threads[i]._id == id)
+                    return (_threads[i]);
             }
             return null;
         }
@@ -1357,13 +1354,13 @@ namespace VSNDK.DebugEngine
         /// Set a given thread as the current one.
         /// </summary>
         /// <param name="id"> The ID of the thread. </param>
-        public void setAsCurrentThread(string id)
+        public void SetAsCurrentThread(string id)
         {
-            for (int i = 0; i < this.m_threads.Length; i++)
+            for (int i = 0; i < _threads.Length; i++)
             {
-                if (this.m_threads[i]._id == id)
+                if (_threads[i]._id == id)
                 {
-                    this._currentThreadIndex = i;
+                    _currentThreadIndex = i;
                     break;
                 }
             }
@@ -1376,11 +1373,11 @@ namespace VSNDK.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int AddThreadsToProgram()
         {
-            m_threads = null;
-            _currentThreadIndex = GetListOfThreads(out m_threads);
+            _threads = null;
+            _currentThreadIndex = GetListOfThreads(out _threads);
             if (_currentThreadIndex != -1)
             {
-                foreach (AD7Thread t in m_threads)
+                foreach (AD7Thread t in _threads)
                 {
                     m_engineCallback.OnThreadStart(t);
                 }

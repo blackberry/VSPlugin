@@ -60,7 +60,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// The suspend count determines how many times the IDebugThread2::Suspend method has been called so far.
         /// </summary>
-        private uint _suspendCount;
+        public uint _suspendCount;
 
         /// <summary>
         /// Full long path file name.
@@ -200,7 +200,7 @@ namespace VSNDK.DebugEngine
         {
             string func = "";
 
-            if ((this._id != "") && (this._id != this._engine.currentThread()._id))
+            if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
                 _engine.eDispatcher.selectThread(this._id);
 
             string stackResponse = _engine.eDispatcher.getStackFrames().Replace("#;;;;", "");
@@ -228,8 +228,8 @@ namespace VSNDK.DebugEngine
                     }
                 }
 
-                if ((this._id != "") && (this._id != this._engine.currentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.currentThread()._id);
+                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
+                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
             }
 
             return func;
@@ -275,7 +275,7 @@ namespace VSNDK.DebugEngine
             }
 
             // Ask for general stack information.
-            if ((this._id != "") && (this._id != this._engine.currentThread()._id))
+            if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
                 _engine.eDispatcher.selectThread(this._id);
 
             string stackResponse = _engine.eDispatcher.getStackFrames().Replace("#;;;;", "");
@@ -310,11 +310,6 @@ namespace VSNDK.DebugEngine
                             frameInfo[3] = longPathName.ToString();
                         }
                         AD7StackFrame frame = AD7StackFrame.create(_engine, this, frameInfo, ref created);
-                        if (frame.m_thread.__stackFrames == null) // that's weird, but sometimes VS is not initializing __stackFrames, so I added this loop to avoid other problems.
-                        {
-                            while (frame.m_thread.__stackFrames == null)
-                                frame.m_thread.__stackFrames = new ArrayList() { frame };
-                        }
                         frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
                     }
                 }
@@ -355,21 +350,21 @@ namespace VSNDK.DebugEngine
                     }
                 }
 
-                if ((this._id != "") && (this._id != this._engine.currentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.currentThread()._id);
+                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
+                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
 
                 return Constants.S_OK;
             }
             catch (ComponentException e)
             {
-                if ((this._id != "") && (this._id != this._engine.currentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.currentThread()._id);
+                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
+                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
                 return e.HResult;
             }
             catch (Exception e)
             {
-                if ((this._id != "") && (this._id != this._engine.currentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.currentThread()._id);
+                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
+                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
                 return EngineUtils.UnexpectedException(e);
             }
         }

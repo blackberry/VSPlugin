@@ -46,7 +46,6 @@ namespace RIM.VSNDK_Package.UpdateManager
 
             umData = new UpdateManagerData();
             gridMain.DataContext = umData;
-            this.Close.IsEnabled = true;
         }
 
         /// <summary>
@@ -72,7 +71,14 @@ namespace RIM.VSNDK_Package.UpdateManager
             }
             else
             {
-                umData.InstallAPI(((SimulatorsClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false, true);
+                if (!GlobalFunctions.isOnline())
+                {
+                    System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                }
+                else
+                {
+                    umData.InstallAPI(((SimulatorsClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false, true);
+                }
             }
         }
 
@@ -89,7 +95,14 @@ namespace RIM.VSNDK_Package.UpdateManager
             }
             else
             {
-                umData.UninstallAPI(((SimulatorsClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, true);
+                if (!GlobalFunctions.isOnline())
+                {
+                    System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                }
+                else
+                {
+                    umData.UninstallAPI(((SimulatorsClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, true);
+                }
             }
         }
 

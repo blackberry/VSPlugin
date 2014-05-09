@@ -47,9 +47,6 @@
     <ClInclude Include="ComponentException.h">
       <Filter>Internal Header files</Filter>
     </ClInclude>
-    <ClInclude Include="ProjInclude.h">
-      <Filter>Internal Header files</Filter>
-    </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Internal Header files</Filter>
     </ClInclude>

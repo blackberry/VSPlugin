@@ -35,7 +35,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -43,7 +43,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;PLATFORM_VS2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -57,7 +57,7 @@
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.CPPTasks.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.Build.CPPTasks.Common.dll</HintPath>
+      <HintPath>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\Microsoft.Build.CPPTasks.Common.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
@@ -82,7 +82,6 @@
     <Compile Include="BBSigner.cs" />
     <Compile Include="RemoveFlagFile.cs" />
     <Compile Include="MakeAllAndFormatOutputMessages.cs" />
-    <Compile Include="WriteDebuggerArgs.cs" />
     <Compile Include="CheckIfInstalled.cs" />
     <Compile Include="DiffManifests.cs" />
     <Compile Include="GenerateMakefile.cs" />

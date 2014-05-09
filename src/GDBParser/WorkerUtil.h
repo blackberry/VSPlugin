@@ -14,9 +14,11 @@
 
 #pragma once
 
-BEGIN_NAMESPACE
-
 #include <assert.h>
+#include <vcclr.h>
+
+
+BEGIN_NAMESPACE
 
 inline HRESULT HRFromWin32Error(LONG lError)
 {
@@ -47,68 +49,63 @@ inline HRESULT HRWin32ErrorCall(LONG lError)
 
 inline void __declspec(noreturn) ThrowHR(HRESULT hr)
 {
-	throw gcnew ComponentException(hr);
+    throw gcnew ComponentException(hr);
 }
 
 inline void __declspec(noreturn) ThrowLastError()
 {
-	HRESULT hr = HRLastError();
+    HRESULT hr = HRLastError();
 
-	ThrowHR(hr);
+    ThrowHR(hr);
 }
 
 inline void Win32BoolCall(BOOL fCondition)
 {
-	if (!fCondition)
-	{
-		ThrowLastError();
-	}
+    if (!fCondition)
+    {
+        ThrowLastError();
+    }
 }
 
 inline void Win32ErrorCall(DWORD err)
 {
-	if (err != 0)
-	{
-		ThrowHR(HRESULT_FROM_WIN32(err));
-	}
+    if (err != 0)
+    {
+        ThrowHR(HRESULT_FROM_WIN32(err));
+    }
 }
 
 inline HANDLE Win32HandleCall(HANDLE h)
 {
-	if (h == NULL || h == INVALID_HANDLE_VALUE)
-	{
-		ThrowLastError();
-	}
+    if (h == NULL || h == INVALID_HANDLE_VALUE)
+    {
+        ThrowLastError();
+    }
 
-	return h;
+    return h;
 }
 
-inline int StringLength(String^ s)
+inline int StringLength(System::String^ s)
 {
-	if (s == nullptr)
-	{
-		return 0;
-	}
+    if (s == nullptr)
+    {
+        return 0;
+    }
 
-	return s->Length;
+    return s->Length;
 }
 
-inline String^ GetProcessName(HANDLE hProcess)
+inline System::String^ GetProcessName(HANDLE hProcess)
 {
-	WCHAR szProcessNameBuff[MAX_PATH+1];
-	DWORD nChars = GetModuleFileNameEx(
-		hProcess, // process
-		NULL,     // Module handle
-		szProcessNameBuff,
-		_countof(szProcessNameBuff)
-		);
+    WCHAR szProcessNameBuff[MAX_PATH+1];
+    DWORD nChars = GetModuleFileNameEx(hProcess, NULL, szProcessNameBuff, _countof(szProcessNameBuff));
 
-	Win32BoolCall(nChars > 0 && nChars <= _countof(szProcessNameBuff));
+    Win32BoolCall(nChars > 0 && nChars <= _countof(szProcessNameBuff));
 
-	return gcnew String(szProcessNameBuff);
+    return gcnew System::String(szProcessNameBuff);
 }
 
-inline LPWSTR wcsdup(String^ source)
+inline LPWSTR wcsdup(System::String^ source)
 {
 	pin_ptr<const wchar_t> pSource = PtrToStringChars( source );
 	int cch = (( source->Length+1) * 2);
@@ -118,10 +115,10 @@ inline LPWSTR wcsdup(String^ source)
 	return pDest;
 }
 
-inline String^ StringPrefixReplace(int oldPrefixLen, String^ newPrefix, String^ s)
+inline System::String^ StringPrefixReplace(int oldPrefixLen, System::String^ newPrefix, System::String^ s)
 {
 	int lengthNeeded = s->Length + newPrefix->Length - oldPrefixLen;
-	Text::StringBuilder^ sb = gcnew Text::StringBuilder(lengthNeeded, lengthNeeded);
+	System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder(lengthNeeded, lengthNeeded);
 
 	sb->Append(newPrefix);
 	sb->Append(s, oldPrefixLen, s->Length-oldPrefixLen);
@@ -129,13 +126,13 @@ inline String^ StringPrefixReplace(int oldPrefixLen, String^ newPrefix, String^ 
 	return sb->ToString();
 }
 
-inline String^ StringPrefixReplace(String^ oldPrefix, String^ newPrefix, String^ s)
+inline System::String^ StringPrefixReplace(System::String^ oldPrefix, System::String^ newPrefix, System::String^ s)
 {
 	return StringPrefixReplace(oldPrefix->Length, newPrefix, s);
 }
 
 // Note: return value does not include a trailing slash
-inline int FindCommonPathSuffixLength(String^ path1, String^ path2)
+inline int FindCommonPathSuffixLength(System::String^ path1, System::String^ path2)
 {
 	const int len1 = path1->Length;
 	const int len2 = path2->Length;

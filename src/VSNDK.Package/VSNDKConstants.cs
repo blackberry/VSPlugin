@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace VSNDK.Package
+namespace RIM.VSNDK_Package
 {
     /// <summary> 
     /// Command IDs exposed by VisualStudio. 

@@ -109,7 +109,7 @@ namespace RIM.VSNDK_Package.Import.Model
                     }
                 }
             }
-            catch (UnauthorizedAccessException e)
+            catch (UnauthorizedAccessException)
             {
                 return false;
             }
@@ -204,7 +204,7 @@ namespace RIM.VSNDK_Package.Import.Model
                         }
                         else
                         {
-                            AddSummaryString("Duplicate File: " + System.IO.Path.Combine(destination, fileInfo1.Name));
+                            AddSummaryString("Duplicate File: " + Path.Combine(destination, fileInfo1.Name));
                         }
 
                     }
@@ -212,11 +212,11 @@ namespace RIM.VSNDK_Package.Import.Model
                 }
                 else
                 {
-                    AddSummaryString("File Skipped: " + System.IO.Path.Combine(destination, fileInfo1.Name));
+                    AddSummaryString("File Skipped: " + Path.Combine(destination, fileInfo1.Name));
                 }
 
             }
-            catch (Exception e)
+            catch (Exception)
             {
 
             }
@@ -225,7 +225,6 @@ namespace RIM.VSNDK_Package.Import.Model
         /// <summary>
         /// Add Folder to Specified Project
         /// </summary>
-        /// <param name="path"></param>
         private VCFilter AddFolderToProject(Project proj, string dirInfo, string newDir, VCFilter filter)
         {
             VCFilter localFilter = filter;
@@ -266,7 +265,6 @@ namespace RIM.VSNDK_Package.Import.Model
                 AddSummaryString("Added BlackBerry Configuration");
                 cfgs = mgr.AddPlatform(BLACKBERRYSIMULATOR, "Win32", true);
                 AddSummaryString("Added BlackBerry Simulator Configuration");
-                mgr.DeletePlatform("Win32");
             }
             catch (Exception e)
             {

@@ -35,7 +35,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// The private AD7Engine object that represents the DE.
         /// </summary>
-        private AD7Engine m_engine = null;
+        private AD7Engine m_engine;
         
         /// <summary>
         /// The public AD7Engine object that represents the DE.
@@ -48,7 +48,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Thread responsible for handling asynchronous output from GDB.
         /// </summary>
-        private Thread m_processingThread = null;
+        private Thread m_processingThread;
 
         /// <summary>
         /// Represents the object that process asynchronous GDB's output by classifying it by type (e.g. breakpoint event).
@@ -142,22 +142,22 @@ namespace VSNDK.DebugEngine
             /// <summary>
             /// This object manages debug events in the engine.
             /// </summary>
-            private EventDispatcher m_eventDispatcher = null;
+            private EventDispatcher m_eventDispatcher;
 
             /// <summary>
             /// This object manages breakpoints events.
             /// </summary>
-            private HandleBreakpoints m_hBreakpoints = null;            
+            private HandleBreakpoints m_hBreakpoints;
 
             /// <summary>
             /// This object manages events related to execution control (processes, threads, programs). 
             /// </summary>
-            private HandleProcessExecution m_hProcExe = null;
+            private HandleProcessExecution m_hProcExe;
 
             /// <summary>
             /// This object manages events related to output messages.
             /// </summary>
-            private HandleOutputs m_hOutputs = null;
+            private HandleOutputs m_hOutputs;
 
             /// <summary>
             /// Boolean variable that corresponds to the event dispatcher status. When false, exit the event dispatch loop.
@@ -765,7 +765,7 @@ namespace VSNDK.DebugEngine
                         m_engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
 
                         // Found a bound breakpoint
-                        m_engine.Callback.OnBreakpoint(m_engine.selectThread(threadID), xBoundBreakpoints.AsReadOnly());
+                        m_engine.Callback.OnBreakpoint(m_engine.SelectThread(threadID), xBoundBreakpoints.AsReadOnly());
 
                         if (bbp.m_isHitCountEqual)
                         {
@@ -976,7 +976,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Boolean variable that indicates if this breakpoint is enable (true) or disable (false).
         /// </summary>
-        private bool m_enable = false;
+        private bool m_enable;
 
         /// <summary>
         /// Breakpoint address.
@@ -1021,7 +1021,7 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// This object manages debug events in the engine.
         /// </summary>
-        private EventDispatcher m_eventDispatcher = null;
+        private EventDispatcher m_eventDispatcher;
 
         /// <summary>
         /// GDB_ID Property
@@ -1232,8 +1232,8 @@ namespace VSNDK.DebugEngine
                         {
                             m_eventDispatcher.engine.UpdateListOfThreads();
                         }
-                        m_eventDispatcher.engine.selectThread(m_threadID).setCurrentLocation(m_filename, (uint)m_line);
-                        m_eventDispatcher.engine.setAsCurrentThread(m_threadID);
+                        m_eventDispatcher.engine.SelectThread(m_threadID).setCurrentLocation(m_filename, (uint)m_line);
+                        m_eventDispatcher.engine.SetAsCurrentThread(m_threadID);
 
                         // A breakpoint can be hit during a step
                         if (m_eventDispatcher.engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
@@ -1374,7 +1374,14 @@ namespace VSNDK.DebugEngine
                             m_threadId = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                             ini = end + 1;
-                            m_processId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                            try
+                            {
+                                m_processId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                            }
+                            catch
+                            {
+                                m_processId = 0;
+                            }
 
                             m_eventDispatcher.engine._updateThreads = true;
 
@@ -1473,8 +1480,8 @@ namespace VSNDK.DebugEngine
                             }
                             if (m_threadId > 0)
                             {
-                                m_eventDispatcher.engine.selectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.setAsCurrentThread(m_threadId.ToString());
+                                m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
                             }
                             
                             // Call the method/event that will let SDM know that the debugged program was interrupted.
@@ -1530,8 +1537,8 @@ namespace VSNDK.DebugEngine
                             if (m_threadId > 0)
                             {
                                 if ((EventDispatcher.m_unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.engine.selectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.setAsCurrentThread(m_threadId.ToString());
+                                    m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
                             }
 
                             HandleProcessExecution.onStepCompleted(m_eventDispatcher, m_file, (uint)m_line);
@@ -1572,8 +1579,8 @@ namespace VSNDK.DebugEngine
                             if (m_threadId > 0)
                             {
                                 if ((EventDispatcher.m_unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.engine.selectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.setAsCurrentThread(m_threadId.ToString());
+                                    m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
                             }
 
                             HandleProcessExecution.onStepCompleted(m_eventDispatcher, m_file, (uint)m_line);
@@ -1595,8 +1602,8 @@ namespace VSNDK.DebugEngine
                             if (m_threadId > 0)
                             {
                                 if ((EventDispatcher.m_unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.engine.selectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.setAsCurrentThread(m_threadId.ToString());
+                                    m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
                             }
 
                             if (m_eventDispatcher.engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
@@ -1628,7 +1635,7 @@ namespace VSNDK.DebugEngine
                                 {
                                     // We don't have symbols for this function so further stepping won't be possible. Return from this function.
                                     VSNDK.DebugEngine.EventDispatcher.m_unknownCode = true;
-                                    m_eventDispatcher.engine.Step(m_eventDispatcher.engine.currentThread(), enum_STEPKIND.STEP_OUT, enum_STEPUNIT.STEP_LINE);
+                                    m_eventDispatcher.engine.Step(m_eventDispatcher.engine.CurrentThread(), enum_STEPKIND.STEP_OUT, enum_STEPUNIT.STEP_LINE);
                                 }
                             }
                             break;
@@ -1735,8 +1742,8 @@ namespace VSNDK.DebugEngine
                             }
                             if (m_threadId > 0)
                             {
-                                m_eventDispatcher.engine.selectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.setAsCurrentThread(m_threadId.ToString());
+                                m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
                             }
 
                             onInterrupt(m_threadId);
@@ -1835,7 +1842,7 @@ namespace VSNDK.DebugEngine
             // Only send OnAsyncBreakComplete if break-all was requested by the user
             if (!m_needsResumeAfterInterrupt)
             {
-                m_eventDispatcher.engine.Callback.OnAsyncBreakComplete(m_eventDispatcher.engine.selectThread(threadID.ToString()));
+                m_eventDispatcher.engine.Callback.OnAsyncBreakComplete(m_eventDispatcher.engine.SelectThread(threadID.ToString()));
             }
         }
     }
@@ -1885,6 +1892,8 @@ namespace VSNDK.DebugEngine
                 case '0':  // Display the m_console message in the VS output window. Example: 80,\"\"[New pid 15380494 tid 2]\\n\"\"!80
                     ini = 4;
                     end = ev.IndexOf("\"!80", 4);
+                    if (end == -1)
+                        end = ev.Length;
                     m_console = ev.Substring(ini, (end - ini));
 
                 // TODO: Call the method/event that will output this message in the VS output window.
@@ -1893,6 +1902,8 @@ namespace VSNDK.DebugEngine
                 case '1':  // Display the m_stdOut message in the VS standard output window. Instruction should look like this: 81,\"\" ... "\"!81
                     ini = 4;
                     end = ev.IndexOf("\"!81", 4);
+                    if (end == -1)
+                        end = ev.Length;
                     m_stdOut = ev.Substring(ini, (end - ini));
 
                 // TODO: Call the method/event that will output this message in the VS standar output window.

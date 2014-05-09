@@ -68,9 +68,7 @@ namespace RIM.VSNDK_Package.Signing
                 MessageBox.Show(signingData.Messages, "Registration Window", MessageBoxButton.OK, MessageBoxImage.Information, MessageBoxResult.OK);
                 signingData.Messages = null;
             }
-
-            signingData.Register("", "");
-            
+           
             DialogResult = true;
         }
 

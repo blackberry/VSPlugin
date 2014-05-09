@@ -12,21 +12,10 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using RIM.VSNDK_Package.UpdateManager.Model;
-using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.VisualStudio.Shell;
 
 namespace RIM.VSNDK_Package.UpdateManager
 {
@@ -35,7 +24,7 @@ namespace RIM.VSNDK_Package.UpdateManager
     /// </summary>
     public partial class UpdateManager : Window
     {
-        private UpdateManagerData data = null;
+        private readonly UpdateManagerData _data;
 
         /// <summary>
         /// Constructor
@@ -45,18 +34,17 @@ namespace RIM.VSNDK_Package.UpdateManager
 
             InitializeComponent();
 
-            data = new UpdateManagerData();
+            _data = new UpdateManagerData();
 
-            gridMain.DataContext = data;
-            this.Close.IsEnabled = true;
-            this.Simulators.IsEnabled = true;
+            gridMain.DataContext = _data;
+            Simulators.IsEnabled = true;
         }
 
-        public static UpdateManager create()
+        public static UpdateManager Create()
         {
             if (!GlobalFunctions.isOnline())
             {
-                System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
                 return null;
             }
             else
@@ -73,7 +61,7 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Close_Click(object sender, RoutedEventArgs e)
         {
-            DialogResult = data.installed;
+            DialogResult = _data.installed;
         }
 
         /// <summary>
@@ -93,8 +81,15 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    this.Simulators.IsEnabled = false;
-                    data.InstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false, false);
+                    if (!GlobalFunctions.isOnline())
+                    {
+                        MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                    }
+                    else
+                    {
+                        Simulators.IsEnabled = false;
+                        data.InstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false, false);
+                    }
                 }
             }
         }
@@ -115,14 +110,23 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    if (((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).IsInstalled == 2)
+
+                    List<APITargetClass> apiList = APITargetListSingleton.Instance._tempAPITargetList.FindAll(i => i.IsInstalled > 0);
+                    if (apiList.Count <= 1)
                     {
-                        MessageBox.Show("The API Level that you are currently trying to uninstall was not added via the Update Manager.  Please remove via the Windows Add/Remove programs utility.", "Update Manager", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                        MessageBox.Show("The BlackBerry Plug-in for Microsoft Visual Studio requires at least one API Target to function correctly.  Removal of the last API Target is prohibited.", "Update Manager", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
                     }
                     else
                     {
-                        this.Simulators.IsEnabled = false;
-                        data.UninstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, false);
+                        if (!GlobalFunctions.isOnline())
+                        {
+                            System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                        }
+                        else
+                        {
+                            this.Simulators.IsEnabled = false;
+                            data.UninstallAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).LatestVersion, false);
+                        }
                     }
                 }
             }
@@ -144,8 +148,15 @@ namespace RIM.VSNDK_Package.UpdateManager
                 }
                 else
                 {
-                    this.Simulators.IsEnabled = false;
-                    data.UpdateAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, ((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).LatestVersion);
+                    if (!GlobalFunctions.isOnline())
+                    {
+                        System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+                    }
+                    else
+                    {
+                        this.Simulators.IsEnabled = false;
+                        data.UpdateAPI(((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).TargetVersion, ((APITargetClass)((StackPanel)((Button)sender).Parent).DataContext).LatestVersion);
+                    }
                 }
 
             }
@@ -158,11 +169,11 @@ namespace RIM.VSNDK_Package.UpdateManager
         /// <param name="e"></param>
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if ((!data.installed) && (data.IsInstalling))
+            if ((!_data.installed) && (_data.IsInstalling))
             {
-                if (data.isConfiguring)
+                if (_data.isConfiguring)
                 {
-                    data.waitTerminateInstallation();
+                    _data.waitTerminateInstallation();
                 }
                 else
                 {
@@ -173,15 +184,15 @@ namespace RIM.VSNDK_Package.UpdateManager
                     }
                     else
                     {
-                        if (data.isConfiguring)
+                        if (_data.isConfiguring)
                         {
-                            data.waitTerminateInstallation();
+                            _data.waitTerminateInstallation();
                         }
                         else
                         {
-                            data.cancelInstallation();
-                            data.installed = false;
-                            data.Error = "Download cancelled by the user. You must be able to debug only after completing the download.";
+                            _data.cancelInstallation();
+                            _data.installed = false;
+                            _data.Error = "Download cancelled by the user. You must be able to debug only after completing the download.";
                         }
                     }
                 }
@@ -190,8 +201,16 @@ namespace RIM.VSNDK_Package.UpdateManager
 
         private void Simulators_Click(object sender, RoutedEventArgs e)
         {
-            SimulatorManager sm = new SimulatorManager();
-            sm.ShowDialog();
+            if (!GlobalFunctions.isOnline())
+            {
+                System.Windows.MessageBox.Show("You are currently experiencing internet connection issues and cannot access the Update Manager server.  Please check your connection or try again later.", "Settings", MessageBoxButton.OK, MessageBoxImage.Warning, MessageBoxResult.OK);
+            }
+            else
+            {
+                SimulatorManager sm = new SimulatorManager();
+                sm.ShowDialog();
+            }
+
         }
     }
 }

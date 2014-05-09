@@ -13,10 +13,7 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio;
-using VSNDK.Parser;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Collections;
 
@@ -33,13 +30,13 @@ namespace VSNDK.DebugEngine
         /// <summary>
         /// Object that contains all information about a variable / expression.
         /// </summary>
-        private VariableInfo _variableInfo;
+        private readonly VariableInfo _variableInfo;
 
 
         /// <summary>
         /// Object that contains all information about a stack frame.
         /// </summary>
-        private AD7StackFrame _stackFrame;
+        private readonly AD7StackFrame _stackFrame;
 
 
         /// <summary>
@@ -109,7 +106,7 @@ namespace VSNDK.DebugEngine
                 // then set the pProperty field so the debugger can call back when the chilren are enumerated.
                 if ((dwFields & enum_DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP) != 0 || _variableInfo._children != null)
                 {
-                    propertyInfo.pProperty = (IDebugProperty2)this;
+                    propertyInfo.pProperty = this;
                     propertyInfo.dwFields = (enum_DEBUGPROP_INFO_FLAGS)((uint)propertyInfo.dwFields | (uint)(DEBUGPROP_INFO_FLAGS.DEBUGPROP_INFO_PROP));
                 }
 
@@ -139,7 +136,7 @@ namespace VSNDK.DebugEngine
         /// INFINITE to wait indefinitely. </param>
         /// <param name="ppEnum"> Returns an IEnumDebugPropertyInfo2 object containing a list of the child properties. </param>
         /// <returns> If successful, returns S_OK; otherwise returns S_FALSE. </returns>
-        public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref System.Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum)
+        public int EnumChildren(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, ref Guid guidFilter, enum_DBG_ATTRIB_FLAGS dwAttribFilter, string pszNameFilter, uint dwTimeout, out IEnumDebugPropertyInfo2 ppEnum)
         {
             ppEnum = null;
 
@@ -152,17 +149,17 @@ namespace VSNDK.DebugEngine
                         // This is an array, struct, union, or pointer.
                         // Create a variable object so we can list this variable's children.
 
-                        /// Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
-                        /// name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
-                        /// same index position. This bool variable just indicate if this prefix is used or not.
-                        bool hasVsNdK_ = false;
+                        // Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
+                        // name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
+                        // same index position. This bool variable just indicate if this prefix is used or not.
+                        bool hasVsNDK = false;
 
-                        string numChildren = AD7StackFrame.m_dispatcher.createVar(_variableInfo._name, ref hasVsNdK_);
+                        string numChildren = AD7StackFrame.m_dispatcher.createVar(_variableInfo._name, ref hasVsNDK);
 
                         ArrayList GDBNames = new ArrayList();
                         ArrayList VSNames = new ArrayList();
 
-                        if (hasVsNdK_)
+                        if (hasVsNDK)
                         {
                             _variableInfo._GDBName = "VsNdK_" + _variableInfo._name;
                             GDBNames.Add("VsNdK_" + _variableInfo._name);
@@ -175,24 +172,24 @@ namespace VSNDK.DebugEngine
                             {
                                 if (_variableInfo._type.Contains("struct"))
                                     if (_variableInfo._type[_variableInfo._type.Length - 1] == '*')
-                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
+                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNDK, null);
                                     else if (_variableInfo._type.Contains("["))
-                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct[]", GDBNames, VSNames, hasVsNdK_, null);
+                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct[]", GDBNames, VSNames, hasVsNDK, null);
                                     else
-                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct", GDBNames, VSNames, hasVsNdK_, null);
+                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct", GDBNames, VSNames, hasVsNDK, null);
                                 else if (_variableInfo._type.Contains("["))
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "[]", GDBNames, VSNames, hasVsNdK_, null);
+                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "[]", GDBNames, VSNames, hasVsNDK, null);
                                 else if (_variableInfo._type.Contains("*"))
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNdK_, null);
+                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNDK, null);
                                 else
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "", GDBNames, VSNames, hasVsNdK_, null);
+                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "", GDBNames, VSNames, hasVsNDK, null);
 
                             }
                         }
-                        catch (FormatException e)
+                        catch (FormatException)
                         {
                         }
-                        AD7StackFrame.m_dispatcher.deleteVar(_variableInfo._name, hasVsNdK_);
+                        AD7StackFrame.m_dispatcher.deleteVar(_variableInfo._name, hasVsNDK);
                     }
                     DEBUG_PROPERTY_INFO[] properties = new DEBUG_PROPERTY_INFO[_variableInfo._children.Count];
                     int i = 0;
@@ -208,7 +205,7 @@ namespace VSNDK.DebugEngine
             }
             else if (_stackFrame != null)
             {
-                uint elementsReturned = 0;
+                uint elementsReturned;
                 _stackFrame.CreateLocalsPlusArgsProperties(dwFields, out elementsReturned, out ppEnum);
                 return VSConstants.S_OK;
             }
@@ -244,7 +241,7 @@ namespace VSNDK.DebugEngine
         /// information. For example, this parameter might return an IUnknown interface that can be queried for an IDebugDocumentText2 
         /// interface. </param>
         /// <returns> Not implemented. </returns>
-        public int GetExtendedInfo(ref System.Guid guidExtendedInfo, out object pExtendedInfo)
+        public int GetExtendedInfo(ref Guid guidExtendedInfo, out object pExtendedInfo)
         {
             throw new Exception("The method or operation is not implemented.");
         }
@@ -366,7 +363,7 @@ namespace VSNDK.DebugEngine
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout)
         {
             string result = "";
-            VariableInfo.evaluateExpression(this._variableInfo._name + "=" + pszValue, ref result, null);
+            VariableInfo.evaluateExpression(_variableInfo._name + "=" + pszValue, ref result, null);
 
             return VSConstants.S_OK;
         }
