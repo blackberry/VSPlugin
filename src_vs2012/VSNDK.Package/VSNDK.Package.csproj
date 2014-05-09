@@ -258,6 +258,7 @@
     <Compile Include="Model\DeviceInfo.cs" />
     <Compile Include="Model\DeviceTheme.cs" />
     <Compile Include="Tools\DebugTokenInfoRunner.cs" />
+    <Compile Include="Tools\DebugTokenUploadRunner.cs" />
     <Compile Include="Tools\DeviceInfoRunner.cs" />
     <Compile Include="Tools\RunnerDefaults.cs" />
     <Compile Include="Tools\ToolRunner.cs" />

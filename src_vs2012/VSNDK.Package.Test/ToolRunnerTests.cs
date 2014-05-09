@@ -56,5 +56,18 @@ namespace VSNDK.Package.Test
             Assert.IsNotNull(runner.LastOutput);
             Assert.IsNull(runner.LastError);
         }
+
+        [Test]
+        [Ignore("Device-IP dependant test will only run somewhere correctly")]
+        public void UploadDebugTokenInfo()
+        {
+            var runner = new DebugTokenUploadRunner(RunnerDefaults.TestToolsDirectory, RunnerDefaults.ConfigFileName("debugtoken.bar"), "10.0.0.127", "test");
+            var result = runner.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
+            Assert.IsNotNull(runner.LastOutput);
+            Assert.IsNull(runner.LastError);
+            Assert.IsTrue(runner.UploadedSuccessfully);
+        }
     }
 }
