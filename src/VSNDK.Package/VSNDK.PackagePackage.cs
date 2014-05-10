@@ -32,6 +32,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
+using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.UpdateManager.Model;
 using VSNDK.Parser;
 
@@ -914,6 +915,7 @@ namespace RIM.VSNDK_Package
     {
         #region private member variables
 
+        private BlackBerryPaneTraceListener _traceWindow;
         private DTE _dte;
         private VSNDKCommandEvents _commandEvents;
         private bool _isSimulator;
@@ -951,6 +953,14 @@ namespace RIM.VSNDK_Package
         {
             Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
             base.Initialize();
+
+            // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
+            _traceWindow = new BlackBerryPaneTraceListener("BlackBerry", true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceOutputWindowPane);
+            _traceWindow.Activate();
+
+            // and set it to monitor all logs (they have to be marked with 'BlackBerry' category! aka TraceLog.Category):
+            TraceLog.Add(_traceWindow);
+            TraceLog.WriteLine("BlackBerry plugin started");
 
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new EditorFactory(this));

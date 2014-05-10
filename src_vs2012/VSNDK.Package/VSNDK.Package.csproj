@@ -253,6 +253,10 @@
       <Link>Signing\SigningDialog.xaml.cs</Link>
       <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
+    <Compile Include="Diagnostics\TimeTracker.cs" />
+    <Compile Include="Diagnostics\TraceLog.cs" />
+    <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
     <Compile Include="Model\ApiInfo.cs" />
     <Compile Include="Model\ApiLevelListTypes.cs" />
     <Compile Include="Model\DebugTokenInfo.cs" />

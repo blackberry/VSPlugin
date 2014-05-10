@@ -33,5 +33,9 @@ namespace RIM.VSNDK_Package
         public static readonly Guid guidVSNDK_PackageCmdSet = new Guid(guidVSNDK_PackageCmdSetString);
         public static readonly Guid guidVSNDK_PackageEditorFactory = new Guid(guidVsTemplateDesignerEditorFactoryString);
         public static readonly Guid guidTest = new Guid(guidVSStd2KString);
+
+        // Guid of the new pane with output messages
+        public const string guidTraceOutputWindowPaneString = "09963e4f-18ea-40e5-ba9e-1bc375ad68d1";
+        public static readonly Guid GUID_TraceOutputWindowPane = new Guid(guidTraceOutputWindowPaneString);
     };
 }

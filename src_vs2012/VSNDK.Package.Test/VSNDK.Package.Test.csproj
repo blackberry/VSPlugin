@@ -73,6 +73,7 @@
     <Compile Include="..\..\src\VSNDK.Package.Test\UpdateManagerDataTestClass.cs">
       <Link>UpdateManagerDataTestClass.cs</Link>
     </Compile>
+    <Compile Include="DiagnosticTests.cs" />
     <Compile Include="ParserTests.cs" />
     <Compile Include="ToolRunnerTests.cs" />
   </ItemGroup>
