@@ -913,7 +913,10 @@ namespace RIM.VSNDK_Package
     // This attribute registers a tool window exposed by this package.
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackageString)]
-    [ProvideOptionPage(typeof(GeneralOptionPage), "BlackBerry", "General", 113, 115, true)]
+    [ProvideOptionPage(typeof(GeneralOptionPage), "BlackBerry", "General", 1001, 1002, true)]
+    [ProvideOptionPage(typeof(LogsOptionPage), "BlackBerry", "Logs", 1001, 1003, true)]
+    [ProvideOptionPage(typeof(ApiLevelOptionPage), "BlackBerry", "API Levels", 1001, 1004, true)]
+    [ProvideOptionPage(typeof(TargetsOptionPage), "BlackBerry", "Targets", 1001, 1005, true)]
     public sealed class VSNDK_PackagePackage : Package
     {
         #region private member variables
@@ -1029,6 +1032,11 @@ namespace RIM.VSNDK_Package
                                                                             },
                                                                         devicesCommandID);
                 mcs.AddCommand(devicesMenu);
+
+                // Create command for 'Configure...' [targets] menu
+                CommandID configureCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsConfigure);
+                MenuCommand configureMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(TargetsOptionPage)), configureCommandID);
+                mcs.AddCommand(configureMenu);
 
                 // Create the command for the menu item.
                 CommandID projCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidfooLocalBox);

@@ -265,6 +265,15 @@
     <Compile Include="Model\DeviceTheme.cs" />
     <Compile Include="Model\Integration\DynamicMenuCommand.cs" />
     <Compile Include="Model\NdkInfo.cs" />
+    <Compile Include="Options\ApiLevelOptionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\ApiLevelOptionControl.Designer.cs">
+      <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\ApiLevelOptionPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -272,6 +281,24 @@
       <DependentUpon>GeneralOptionControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\GeneralOptionPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\LogsOptionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\LogsOptionControl.Designer.cs">
+      <DependentUpon>LogsOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\LogsOptionPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Options\TargetsOptionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\TargetsOptionControl.Designer.cs">
+      <DependentUpon>TargetsOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\TargetsOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
@@ -425,8 +452,17 @@
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="Options\ApiLevelOptionControl.resx">
+      <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\GeneralOptionControl.resx">
       <DependentUpon>GeneralOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\LogsOptionControl.resx">
+      <DependentUpon>LogsOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\TargetsOptionControl.resx">
+      <DependentUpon>TargetsOptionControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
