@@ -11,7 +11,7 @@ namespace VSNDK.Package.Test
     {
         const string IP = "10.0.0.127";
         const string Password = "test";
-        readonly static string DebugTokenPath = RunnerDefaults.ConfigFileName("debugtoken.bar");
+        readonly static string DebugTokenPath = RunnerDefaults.DataFileName("debugtoken.bar");
 
         [Test]
         public void LoadDebugTokenInfo()
@@ -107,7 +107,7 @@ namespace VSNDK.Package.Test
         [Ignore("Keystore password and device PINs must be fixed, otherwise Signing Authority will cause it to fail")]
         public void CreateDebugTokenInfo()
         {
-            string debugToken = RunnerDefaults.ConfigFileName("debugtoken-new.bar");
+            string debugToken = RunnerDefaults.DataFileName("debugtoken-new.bar");
             var runner = new DebugTokenCreateRunner(RunnerDefaults.TestToolsDirectory, debugToken, "test", new[] { 0x1ul, 0x2ul });
             var result = runner.Execute();
 
@@ -162,6 +162,15 @@ namespace VSNDK.Package.Test
             Assert.IsNull(runner.LastError);
             Assert.IsNotNull(runner.APIs);
             Assert.IsTrue(runner.APIs.Length > 0);
+        }
+
+        [Test]
+        public void LoadInstalledNdkInfo()
+        {
+            var info = NdkInfo.Load(RunnerDefaults.InstallationConfigDirectory);
+
+            Assert.IsNotNull(info);
+            Assert.IsTrue(info.Length > 0);
         }
     }
 }

@@ -3,9 +3,9 @@
 namespace RIM.VSNDK_Package.Model
 {
     /// <summary>
-    /// Descriptor of a NDK.
+    /// Descriptor of a available remotely NDK.
     /// </summary>
-    internal sealed class ApiInfo
+    internal class ApiInfo
     {
         public ApiInfo(string name, Version version)
         {

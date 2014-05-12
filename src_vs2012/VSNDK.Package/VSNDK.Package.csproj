@@ -263,6 +263,7 @@
     <Compile Include="Model\DeviceDebugTokenInfo.cs" />
     <Compile Include="Model\DeviceInfo.cs" />
     <Compile Include="Model\DeviceTheme.cs" />
+    <Compile Include="Model\NdkInfo.cs" />
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

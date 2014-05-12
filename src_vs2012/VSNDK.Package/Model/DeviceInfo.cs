@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Globalization;
+using System.Xml;
 
 namespace RIM.VSNDK_Package.Model
 {
@@ -9,6 +11,7 @@ namespace RIM.VSNDK_Package.Model
         public DeviceInfo()
         {
             ScreenResolution = Size.Empty;
+            IconResolution = Size.Empty;
         }
 
         #region Properties
@@ -79,6 +82,12 @@ namespace RIM.VSNDK_Package.Model
             private set;
         }
 
+        public Size IconResolution
+        {
+            get;
+            private set;
+        }
+
         public DeviceDebugTokenInfo DebugToken
         {
             get;
@@ -89,11 +98,19 @@ namespace RIM.VSNDK_Package.Model
 
         public override string ToString()
         {
+            if (string.IsNullOrEmpty(ModelName))
+            {
+                if (SystemVersion == null)
+                    return Name;
+
+                return string.Concat(Name, " ( OS v", SystemVersion, ")");
+            }
+
             return string.Concat(Name, " (", ModelName, ", OS v", SystemVersion, ")");
         }
 
         /// <summary>
-        /// Parses device information out of given text.
+        /// Parses device information out of given PPS text.
         /// </summary>
         public static DeviceInfo Parse(string text, out string error)
         {
@@ -186,9 +203,11 @@ namespace RIM.VSNDK_Package.Model
                                     if (string.IsNullOrEmpty(result.ModelNumber))
                                         result.ModelNumber = "STL100-0";
                                     if (result.ScreenDPI == 0)
-                                        result.ScreenDPI = 169;
+                                        result.ScreenDPI = 167;
                                     if (result.ScreenResolution.IsEmpty)
                                         result.ScreenResolution = new Size(1024, 600);
+                                    if (result.IconResolution.IsEmpty)
+                                        result.IconResolution = new Size(90, 90); // copied from Z10/Z30/Q10
                                 }
                                 break;
                             case "scmbundle":
@@ -210,7 +229,10 @@ namespace RIM.VSNDK_Package.Model
                                 result.ScreenDPI = GetNumber(value);
                                 break;
                             case "screen_res":
-                                result.ScreenResolution = GetScreenResolution(value);
+                                result.ScreenResolution = GetResolution(value);
+                                break;
+                            case "icon_res":
+                                result.IconResolution = GetResolution(value);
                                 break;
                         }
                         break;
@@ -301,7 +323,7 @@ namespace RIM.VSNDK_Package.Model
             throw new FormatException("Invalid boolean value");
         }
 
-        private static Size GetScreenResolution(string text)
+        private static Size GetResolution(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return Size.Empty;
@@ -414,6 +436,112 @@ namespace RIM.VSNDK_Package.Model
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Loads info about devices from XML file, given by the reader.
+        /// It supports only one format - the one from NDK descriptor.
+        /// </summary>
+        public static DeviceInfo[] Load(XmlReader reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException("reader");
+
+            var result = new List<DeviceInfo>();
+            DeviceInfo info = null;
+            bool isAboutIcon = false;
+
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    switch (reader.Name)
+                    {
+                        case "device":
+                            info = new DeviceInfo();
+                            isAboutIcon = false;
+                            break;
+                        case "name":
+                            if (info != null)
+                                info.ModelFullName = info.Name = reader.ReadString();
+                            break;
+                        case "kind":
+                            if (info != null)
+                                info.ModelFamily = reader.ReadString();
+                            break;
+                        case "ppi":
+                            if (info != null)
+                                info.ScreenDPI = GetNumber(reader.ReadString());
+                            break;
+                        case "icon":
+                            if (info != null)
+                            {
+                                isAboutIcon = true;
+                            }
+                            break;
+                        case "width":
+                            if (info != null)
+                            {
+                                if (isAboutIcon)
+                                    info.IconResolution = UpdateWidth(reader.ReadString(), info.IconResolution.Height);
+                                else
+                                    info.ScreenResolution = UpdateWidth(reader.ReadString(), info.ScreenResolution.Height);
+                            }
+                            break;
+                        case "height":
+                            if (info != null)
+                            {
+                                if (isAboutIcon)
+                                    info.IconResolution = UpdateHeight(info.IconResolution.Width, reader.ReadString());
+                                else
+                                    info.ScreenResolution = UpdateHeight(info.ScreenResolution.Width, reader.ReadString());
+                            }
+                            break;
+
+                    }
+                }
+
+                if (reader.NodeType == XmlNodeType.EndElement)
+                {
+                    // ok, got full info about the device:
+                    if (reader.Name == "device")
+                    {
+                        if (info != null && !string.IsNullOrEmpty(info.Name))
+                        {
+                            result.Add(info);
+                            info = null;
+                        }
+
+                        continue;
+                    }
+
+                    if (reader.Name == "icon")
+                    {
+                        isAboutIcon = false;
+                        continue;
+                    }
+
+                    // interesting section has been read, no need to parse further:
+                    if (reader.Name == "devices")
+                        break;
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        private static Size UpdateWidth(string width, double height)
+        {
+            var value = GetNumber(width);
+
+            return new Size(value, height < 0 ? 0 : height);
+        }
+
+        private static Size UpdateHeight(double width, string height)
+        {
+            var value = GetNumber(height);
+
+            return new Size(width < 0 ? 0 : width, value);
         }
     }
 }
