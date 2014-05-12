@@ -967,12 +967,7 @@ namespace RIM.VSNDK_Package
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new EditorFactory(this));
 
-
-            APITargetListSingleton api = APITargetListSingleton.Instance;
             InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
-            InstalledNDKListSingleton ndkList = InstalledNDKListSingleton.Instance;
-            SimulatorListSingleton simList = SimulatorListSingleton.Instance;
-            InstalledSimulatorListSingleton installedSimList = InstalledSimulatorListSingleton.Instance;
 
             _dte = (DTE)GetService(typeof(DTE));
 
