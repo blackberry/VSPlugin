@@ -33,6 +33,7 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model.Integration;
 using RIM.VSNDK_Package.Options;
 using RIM.VSNDK_Package.UpdateManager.Model;
 using VSNDK.Parser;
@@ -911,7 +912,7 @@ namespace RIM.VSNDK_Package
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
-    [Guid(GuidList.guidVSNDK_PackagePkgString)]
+    [Guid(GuidList.guidVSNDK_PackageString)]
     [ProvideOptionPage(typeof(GeneralOptionPage), "BlackBerry", "General", 113, 115, true)]
     public sealed class VSNDK_PackagePackage : Package
     {
@@ -964,11 +965,14 @@ namespace RIM.VSNDK_Package
             TraceLog.Add(_traceWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
 
+            InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
+            TraceLog.WriteLine(" * loaded NDK descriptions");
+
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new EditorFactory(this));
+            TraceLog.WriteLine(" * registered editors");
 
-            InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
-
+            
             _dte = (DTE)GetService(typeof(DTE));
 
             if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
@@ -988,33 +992,53 @@ namespace RIM.VSNDK_Package
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
 
-
+            TraceLog.WriteLine(" * subscribed to IDE events");
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if ( null != mcs )
             {
                 // Create the command for the tool window
-                CommandID toolwndCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, (int)PkgCmdIDList.cmdidBlackBerryTools);
+                CommandID toolwndCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTools);
                 MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
                 mcs.AddCommand( menuToolWin );
 
                 // Create the command for the settings window
-                CommandID wndSettingsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, (int)PkgCmdIDList.cmdidBlackBerrySettings);
+                CommandID wndSettingsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerrySettings);
                 MenuCommand menuSettingsWin = new MenuCommand(ShowSettingsWindow, wndSettingsCommandID);
                 mcs.AddCommand(menuSettingsWin);
 
                 // Create the command for the Debug Token window
-                CommandID wndDebugTokenCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, (int)PkgCmdIDList.cmdidBlackBerryDebugToken);
+                CommandID wndDebugTokenCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryDebugToken);
                 MenuCommand menuDebugTokenWin = new MenuCommand(ShowDebugTokenWindow, wndDebugTokenCommandID);
                 mcs.AddCommand(menuDebugTokenWin);
+
+                // Create command for the 'Options...' menu
+                CommandID optionsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryOptions);
+                MenuCommand optionsMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(GeneralOptionPage)), optionsCommandID);
+                mcs.AddCommand(optionsMenu);
+
+                // Create dynamic command for the 'devices-list' menu
+                CommandID devicesCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsDevicesPlaceholder);
+                DynamicMenuCommand devicesMenu = new DynamicMenuCommand(InstalledNDKListSingleton.Instance._installedNDKList, null,
+                                                                        (cmd, colletion, index) =>
+                                                                            {
+                                                                                var item = index >= 0 && index < colletion.Count ? ((List<APIClass>) colletion)[index] : null;
+                                                                                cmd.Checked = index == 0;
+                                                                                cmd.Text = item != null ? item.Name : "-";
+                                                                            },
+                                                                        devicesCommandID);
+                mcs.AddCommand(devicesMenu);
 
                 // Create the command for the menu item.
                 CommandID projCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidfooLocalBox);
                 OleMenuCommand projItem = new OleMenuCommand(MenuItemCallback, projCommandID);
                 mcs.AddCommand(projItem);
+
+                TraceLog.WriteLine(" * initialized menus");
             }
 
+            TraceLog.WriteLine("-------------------- DONE");
         }
         #endregion
 
