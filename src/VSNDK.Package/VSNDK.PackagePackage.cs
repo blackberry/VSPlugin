@@ -33,6 +33,7 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Options;
 using RIM.VSNDK_Package.UpdateManager.Model;
 using VSNDK.Parser;
 
@@ -911,6 +912,7 @@ namespace RIM.VSNDK_Package
     // This attribute registers a tool window exposed by this package.
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackagePkgString)]
+    [ProvideOptionPage(typeof(GeneralOptionPage), "BlackBerry", "General", 113, 115, true)]
     public sealed class VSNDK_PackagePackage : Package
     {
         #region private member variables

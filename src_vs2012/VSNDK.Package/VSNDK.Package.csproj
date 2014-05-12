@@ -263,6 +263,15 @@
     <Compile Include="Model\DeviceDebugTokenInfo.cs" />
     <Compile Include="Model\DeviceInfo.cs" />
     <Compile Include="Model\DeviceTheme.cs" />
+    <Compile Include="Options\GeneralOptionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\GeneralOptionControl.Designer.cs">
+      <DependentUpon>GeneralOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\GeneralOptionPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
     <Compile Include="Tools\ApplicationRemoveRunner.cs" />
     <Compile Include="Tools\DebugTokenCreateRunner.cs" />
@@ -412,6 +421,9 @@
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\GeneralOptionControl.resx">
+      <DependentUpon>GeneralOptionControl.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
