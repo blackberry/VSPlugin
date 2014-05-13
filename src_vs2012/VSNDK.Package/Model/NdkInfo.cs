@@ -12,6 +12,8 @@ namespace RIM.VSNDK_Package.Model
     /// </summary>
     internal sealed class NdkInfo : ApiInfo, IComparable<NdkInfo>
     {
+        private const string DescriptorFileName = "blackberry-sdk-descriptor.xml";
+
         public NdkInfo(string name, Version version, string hostPath, string targetPath, DeviceInfo[] devices)
             : base(name, version)
         {
@@ -25,6 +27,40 @@ namespace RIM.VSNDK_Package.Model
             HostPath = hostPath;
             TargetPath = targetPath;
             Devices = devices;
+        }
+
+        public NdkInfo(string name, Version version, string hostPath, string targetPath)
+            : base(name, version)
+        {
+            if (string.IsNullOrEmpty(hostPath))
+                throw new ArgumentNullException("hostPath");
+            if (string.IsNullOrEmpty(targetPath))
+                throw new ArgumentNullException("targetPath");
+
+            HostPath = hostPath;
+            TargetPath = targetPath;
+
+            ////////////////////////
+            // and now load devices, based on some heuristics, keeping in mind, that this field can't be never null:
+            var ndkDescriptor = Path.Combine(targetPath, DescriptorFileName);
+            DeviceInfo[] devices = LoadDevices(ndkDescriptor);
+
+            // if failed to load devices, try to find one folder above:
+            if (devices == null)
+            {
+                ndkDescriptor = Path.Combine(targetPath, "..", DescriptorFileName);
+                devices = LoadDevices(ndkDescriptor);
+            }
+
+            // or another above:
+            if (devices == null)
+            {
+                ndkDescriptor = Path.Combine(targetPath, "..", "..", DescriptorFileName);
+                devices = LoadDevices(ndkDescriptor);
+            }
+
+            // OK, give up, and say it's unknown:
+            Devices = devices ?? new DeviceInfo[0];
         }
 
         #region Properties
@@ -176,31 +212,8 @@ namespace RIM.VSNDK_Package.Model
                 {
                     if (!string.IsNullOrEmpty(targetPath) && !string.IsNullOrEmpty(hostPath))
                     {
-                        const string DescriptorFileName = "blackberry-sdk-descriptor.xml";
-
-                        var ndkDescriptor = Path.Combine(targetPath, DescriptorFileName);
-                        DeviceInfo[] devices = LoadDevices(ndkDescriptor);
-
-                        // if failed to load devices, try to find one folder above:
-                        if (devices == null)
-                        {
-                            ndkDescriptor = Path.Combine(targetPath, "..", DescriptorFileName);
-                            devices = LoadDevices(ndkDescriptor);
-                        }
-
-                        // or another above:
-                        if (devices == null)
-                        {
-                            ndkDescriptor = Path.Combine(targetPath, "..", "..", DescriptorFileName);
-                            devices = LoadDevices(ndkDescriptor);
-                        }
-
-                        // OK, give up, and say it's unknown:
-                        if (devices == null)
-                            devices = new DeviceInfo[0];
-
                         // try to define info about the installation:
-                        return new NdkInfo(name, version, hostPath, targetPath, devices);
+                        return new NdkInfo(name, version, hostPath, targetPath);
                     }
 
                     return null;
@@ -244,7 +257,7 @@ namespace RIM.VSNDK_Package.Model
 
             var result = new List<NdkInfo>();
 
-            // list all configuration files:
+            // list all configuration files, across all known folders:
             foreach (var folder in globalNdkConfigFolders)
             {
                 if (Directory.Exists(folder))
@@ -257,6 +270,7 @@ namespace RIM.VSNDK_Package.Model
                         {
                             try
                             {
+                                // read them:
                                 using (var fileReader = new StreamReader(file, Encoding.UTF8))
                                 {
                                     using (var reader = XmlReader.Create(fileReader))
@@ -265,8 +279,9 @@ namespace RIM.VSNDK_Package.Model
                                         if (info != null && info.Exists())
                                         {
                                             var existingIndex = IndexOf(result, info);
-                                            
-                                            // if NDK info exist with exacly the same paths, prefer to keep the one with longer name:
+
+                                            // and store only unique ones:
+                                            // (if NDK info exist with exacly the same paths, prefer to keep the one with longer name)
                                             if (existingIndex >= 0)
                                             {
                                                 var existingItem = result[existingIndex];
@@ -301,14 +316,21 @@ namespace RIM.VSNDK_Package.Model
             return result.ToArray();
         }
 
-        private static int IndexOf(IEnumerable<NdkInfo> list, NdkInfo info)
+        /// <summary>
+        /// Returns an index of a given NdkInfo inside a collection.
+        /// The search is based by matching few critical properties of an object.
+        /// </summary>
+        public static int IndexOf(IEnumerable<NdkInfo> list, NdkInfo info)
         {
-            int i = 0;
-            foreach (var item in list)
+            if (info != null)
             {
-                if (item.Matches(info))
-                    return i;
-                i++;
+                int i = 0;
+                foreach (var item in list)
+                {
+                    if (item.Matches(info))
+                        return i;
+                    i++;
+                }
             }
             return -1;
         }
@@ -375,8 +397,8 @@ namespace RIM.VSNDK_Package.Model
             if (string.IsNullOrEmpty(parentDir))
                 return null;
 
-            var devicesFileName = Path.Combine(folder, "blackberry-sdk-descriptor.xml");
-            if (File.Exists(devicesFileName))
+            var devicesDescriptorFileName = Path.Combine(folder, DescriptorFileName);
+            if (File.Exists(devicesDescriptorFileName))
             {
                 // find host folder
                 var hostDirs = Directory.GetDirectories(parentDir, "host*");
@@ -388,11 +410,8 @@ namespace RIM.VSNDK_Package.Model
                 if (version == null)
                     version = new Version(10, 0, 1);
 
-                // load devices' info
-                var devices = LoadDevices(devicesFileName);
-
                 return new NdkInfo(string.Concat("BlackBerry Local SDK ", version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
-                                   version, hostDirs[0], folder, devices);
+                                   version, Path.Combine(hostDirs[0], "win32", "x86"), Path.Combine(folder, "qnx6"));
             }
 
             return null;
@@ -419,6 +438,62 @@ namespace RIM.VSNDK_Package.Model
                 return null;
 
             return new Version(versionString);
+        }
+
+        public void Save(string outputDirectory)
+        {
+            if (string.IsNullOrEmpty(outputDirectory))
+                throw new ArgumentNullException("outputDirectory");
+
+            // normalize file name:
+            var fileName = new StringBuilder(string.IsNullOrEmpty(Name) ? "vsplugin_target_" + Version + DateTime.Now.ToString("yyyy-MM-dd_HH_mm_ss") + ".xml" : Name + ".xml");
+
+            for (int i = 0; i < fileName.Length; i++)
+            {
+                char c = fileName[i];
+                if (!(char.IsLetterOrDigit(c) || c == '_' || c == '-' || c == '.'))
+                {
+                    fileName[i] = '_';
+                }
+            }
+
+            // generate content:
+            const string content = @"<?xml version=""1.0"" encoding=""UTF-8"" standalone=""no""?>
+<qnxSystemDefinition>
+  <installation>
+    <name>{0}</name>
+    <version>{1}</version>
+    <host>{2}</host>
+    <target>{3}</target>
+    <annotation>
+      <appInfo source=""Custom SDK""/>
+    </annotation>
+  </installation>
+</qnxSystemDefinition>
+";
+            XmlDocument doc = new XmlDocument();
+            doc.LoadXml(content);
+
+            string name = Name ?? string.Empty;
+            string version = Version.ToString();
+            string hostPath = HostPath.Replace('\\', '/');
+            string targetPath = TargetPath.Replace('\\', '/');
+
+            var inst = doc.DocumentElement["installation"];
+            if (inst != null)
+            {
+                inst["name"].InnerText = name;
+                inst["version"].InnerText = version;
+                inst["host"].InnerText = hostPath;
+                inst["target"].InnerText = targetPath;
+            }
+            else
+            {
+                throw new FormatException("Invalid data to process");
+            }
+
+            // store it:
+            doc.Save(Path.Combine(outputDirectory, fileName.ToString()));
         }
     }
 }

@@ -49,7 +49,7 @@ namespace RIM.VSNDK_Package.Options
 
             if (!Control.HasSelectedNDK || PackageViewModel.Instance.ActiveNDK == null)
             {
-                if (MessageBoxHelper.Show("No NDK set as active or the one seems to not exist. You won't be able to compile anything. Do you want to correct it?",
+                if (MessageBoxHelper.Show("No NDK is set as active. You won't be able to compile anything.\r\nDo you want to correct it manually?",
                                           "API Level Settings",
                                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {

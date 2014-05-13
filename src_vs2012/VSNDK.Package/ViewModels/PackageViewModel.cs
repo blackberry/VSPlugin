@@ -82,18 +82,15 @@ namespace RIM.VSNDK_Package.ViewModels
             }
             set
             {
-                if (value != null)
+                if (value != null && !value.Matches(_activeNDK))
                 {
-                    var index = Array.IndexOf(InstalledNDKs, value);
+                    var index = IndexOfInstalled(value);
                     if (index < 0)
                         throw new ArgumentOutOfRangeException("value", "Invalid value set, it must belong to the InstalledNDKs first");
 
-                    if (!value.Matches(_activeNDK))
-                    {
-                        _activeNDK = value;
-                        TraceLog.WriteLine("Changed active NDK to: \"{0}\"", _activeNDK);
-                        SaveActiveNDK();
-                    }
+                    _activeNDK = _installedNDKs[index];
+                    TraceLog.WriteLine("Changed active NDK to: \"{0}\"", _activeNDK);
+                    SaveActiveNDK();
                 }
             }
         }
@@ -101,9 +98,17 @@ namespace RIM.VSNDK_Package.ViewModels
         #endregion
 
         /// <summary>
+        /// Gets an index of identical installed NDK.
+        /// </summary>
+        public int IndexOfInstalled(NdkInfo info)
+        {
+            return NdkInfo.IndexOf(InstalledNDKs, info);
+        }
+
+        /// <summary>
         /// Persists info about currently selected NDK into the registry.
         /// </summary>
-        public void SaveActiveNDK()
+        private void SaveActiveNDK()
         {
             if (_activeNDK == null || !_activeNDK.Exists())
             {
@@ -135,6 +140,15 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 TraceLog.WriteException(ex, "Unable to clear info about active NDK");
             }
+        }
+
+        /// <summary>
+        /// Resets the cached lists of NDKs, allowing to reload them again.
+        /// </summary>
+        public void ResetNDKs()
+        {
+            _installedNDKs = null;
+            _activeNDK = null;
         }
     }
 }

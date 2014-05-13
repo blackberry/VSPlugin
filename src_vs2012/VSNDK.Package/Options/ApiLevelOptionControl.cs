@@ -2,6 +2,7 @@
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Options.Dialogs;
+using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options
@@ -54,8 +55,23 @@ namespace RIM.VSNDK_Package.Options
 
             if (form.ShowDialog() == DialogResult.OK)
             {
-                
+                var ndk = form.NewNdk;
+                if (ndk != null)
+                {
+                    // save inside 'installation config' directory:
+                    ndk.Save(RunnerDefaults.InstallationConfigDirectory);
+
+                    // reload NDKs
+                    _vm.ReloadAndActivate(ndk);
+                    PopulateNDKs();
+                }
             }
+        }
+
+        private void bttInstallNew_Click(object sender, EventArgs e)
+        {
+            var form = new InstallNdkForm();
+            form.ShowDialog();
         }
     }
 }

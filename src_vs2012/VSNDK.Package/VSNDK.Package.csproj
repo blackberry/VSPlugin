@@ -289,6 +289,12 @@
       <DependentUpon>DeviceForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\Dialogs\DialogDeviceClass.cs" />
+    <Compile Include="Options\Dialogs\InstallNdkForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\InstallNdkForm.Designer.cs">
+      <DependentUpon>InstallNdkForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -489,6 +495,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\DeviceForm.resx">
       <DependentUpon>DeviceForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\InstallNdkForm.resx">
+      <DependentUpon>InstallNdkForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\GeneralOptionControl.resx">
       <DependentUpon>GeneralOptionControl.cs</DependentUpon>

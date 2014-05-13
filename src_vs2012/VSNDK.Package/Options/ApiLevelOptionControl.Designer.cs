@@ -91,6 +91,7 @@
             this.bttInstallNew.TabIndex = 5;
             this.bttInstallNew.Text = "&Install New...";
             this.bttInstallNew.UseVisualStyleBackColor = true;
+            this.bttInstallNew.Click += new System.EventHandler(this.bttInstallNew_Click);
             // 
             // label2
             // 

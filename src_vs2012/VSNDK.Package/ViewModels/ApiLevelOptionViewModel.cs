@@ -14,5 +14,11 @@ namespace RIM.VSNDK_Package.ViewModels
             get { return PackageViewModel.Instance.ActiveNDK; }
             set { PackageViewModel.Instance.ActiveNDK = value; }
         }
+
+        public void ReloadAndActivate(NdkInfo ndk)
+        {
+            PackageViewModel.Instance.ResetNDKs();
+            ActiveNDK = ndk;
+        }
     }
 }
