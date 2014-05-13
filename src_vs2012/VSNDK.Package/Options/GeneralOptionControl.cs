@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Diagnostics;
+using System.Windows.Forms;
 using RIM.VSNDK_Package.Tools;
 
 namespace RIM.VSNDK_Package.Options
@@ -11,6 +12,7 @@ namespace RIM.VSNDK_Package.Options
 
             txtNdkPath.Text = RunnerDefaults.NdkDirectory;
             txtToolsPath.Text = RunnerDefaults.ToolsDirectory;
+            txtProfilePath.Text = RunnerDefaults.DataDirectory;
         }
 
         #region Properties
@@ -37,6 +39,11 @@ namespace RIM.VSNDK_Package.Options
         private void bttToolsBrowse_Click(object sender, System.EventArgs e)
         {
             txtToolsPath.Text = DialogHelper.BrowseForFolder(txtToolsPath.Text, "Browse for Tools folder");
+        }
+
+        private void bttOpenProfile_Click(object sender, System.EventArgs e)
+        {
+            Process.Start("Explorer.exe", "/e,\"" + txtProfilePath.Text + "\"");
         }
     }
 }

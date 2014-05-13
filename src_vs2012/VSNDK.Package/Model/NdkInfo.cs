@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -331,6 +330,95 @@ namespace RIM.VSNDK_Package.Model
                 return cmp;
 
             return string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        /// <summary>
+        /// Try to find an NDK definition somewhere in specified folder or around.
+        /// </summary>
+        public static NdkInfo Scan(string folder)
+        {
+            if (string.IsNullOrEmpty(folder))
+                return null;
+
+            if (!Directory.Exists(folder))
+                return null;
+
+            // is it a target folder directly?
+            NdkInfo info = ScanByTargetFolder(folder);
+            if (info != null)
+                return info;
+
+            // is it a root folder?
+            var targetDirs = Directory.GetDirectories(folder, "target*");
+            if (targetDirs.Length != 0)
+            {
+                info = ScanByTargetFolder(targetDirs[0]);
+                if (info != null)
+                    return info;
+            }
+
+            // is it a host folder?
+            var parentDir = Path.GetDirectoryName(folder);
+            if (string.IsNullOrEmpty(parentDir))
+                return null;
+
+            targetDirs = Directory.GetDirectories(parentDir, "target*");
+            if (targetDirs.Length == 0)
+                return null;
+
+            return ScanByTargetFolder(targetDirs[0]);
+        }
+
+        private static NdkInfo ScanByTargetFolder(string folder)
+        {
+            var parentDir = Path.GetDirectoryName(folder);
+            if (string.IsNullOrEmpty(parentDir))
+                return null;
+
+            var devicesFileName = Path.Combine(folder, "blackberry-sdk-descriptor.xml");
+            if (File.Exists(devicesFileName))
+            {
+                // find host folder
+                var hostDirs = Directory.GetDirectories(parentDir, "host*");
+                if (hostDirs.Length == 0)
+                    return null;
+
+                // extract version out of the current folder name
+                var version = GetVersionFromFolderName(Path.GetFileName(folder));
+                if (version == null)
+                    version = new Version(10, 0, 1);
+
+                // load devices' info
+                var devices = LoadDevices(devicesFileName);
+
+                return new NdkInfo(string.Concat("BlackBerry Local SDK ", version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
+                                   version, hostDirs[0], folder, devices);
+            }
+
+            return null;
+        }
+
+        private static Version GetVersionFromFolderName(string directoryName)
+        {
+            if (string.IsNullOrEmpty(directoryName))
+                return null;
+
+            int i = directoryName.Length;
+
+            // find the version substring at the end of the name:
+            while (i > 0 && directoryName[i - 1] == '_' || char.IsDigit(directoryName[i - 1]))
+                i--;
+
+            // we might read one char too much:
+            if (i < directoryName.Length && directoryName[i] == '_')
+                i++;
+
+            // parse:
+            var versionString = directoryName.Substring(i).Trim().Replace('_', '.');
+            if (string.IsNullOrEmpty(versionString) || versionString.IndexOf('.') < 0)
+                return null;
+
+            return new Version(versionString);
         }
     }
 }

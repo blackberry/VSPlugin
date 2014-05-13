@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Model;
+using RIM.VSNDK_Package.Options.Dialogs;
 using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options
@@ -45,6 +46,16 @@ namespace RIM.VSNDK_Package.Options
         internal void OnApply()
         {
             _vm.ActiveNDK = cmbNDKs.SelectedItem as NdkInfo;
+        }
+
+        private void bttAddLocal_Click(object sender, EventArgs e)
+        {
+            var form = new AddLocalNdkForm();
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                
+            }
         }
     }
 }
