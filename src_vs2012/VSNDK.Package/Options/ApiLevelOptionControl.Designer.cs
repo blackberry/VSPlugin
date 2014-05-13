@@ -41,12 +41,12 @@
             this.txtDescription.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtDescription.Location = new System.Drawing.Point(100, 60);
+            this.txtDescription.Location = new System.Drawing.Point(6, 85);
             this.txtDescription.Multiline = true;
             this.txtDescription.Name = "txtDescription";
             this.txtDescription.ReadOnly = true;
             this.txtDescription.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtDescription.Size = new System.Drawing.Size(434, 218);
+            this.txtDescription.Size = new System.Drawing.Size(528, 193);
             this.txtDescription.TabIndex = 8;
             // 
             // cmbNDKs
@@ -55,10 +55,10 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.cmbNDKs.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbNDKs.FormattingEnabled = true;
-            this.cmbNDKs.Location = new System.Drawing.Point(100, 33);
+            this.cmbNDKs.Location = new System.Drawing.Point(6, 58);
             this.cmbNDKs.MaxDropDownItems = 25;
             this.cmbNDKs.Name = "cmbNDKs";
-            this.cmbNDKs.Size = new System.Drawing.Size(434, 21);
+            this.cmbNDKs.Size = new System.Drawing.Size(528, 21);
             this.cmbNDKs.TabIndex = 7;
             this.cmbNDKs.SelectedIndexChanged += new System.EventHandler(this.cmbNDKs_SelectedIndexChanged);
             // 

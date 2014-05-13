@@ -960,6 +960,7 @@ namespace RIM.VSNDK_Package
         {
             Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
             base.Initialize();
+            MessageBoxHelper.Initialise(this);
 
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
             _traceWindow = new BlackBerryPaneTraceListener("BlackBerry", true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceOutputWindowPane);

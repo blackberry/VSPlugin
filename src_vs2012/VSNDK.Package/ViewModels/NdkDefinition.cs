@@ -43,7 +43,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Retrieves info about used NDK from registry.
         /// </summary>
-        public static NdkDefinition LoadInfo()
+        public static NdkDefinition Load()
         {
             RegistryKey registry = Registry.CurrentUser;
             RegistryKey settings;
@@ -67,7 +67,7 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 var xHostPath = settings.GetValue(FieldHostPath);
                 if (xHostPath != null)
-                    hostPath = xHostPath.ToString();
+                    hostPath = Path.GetFullPath(xHostPath.ToString());
             }
             catch
             {
@@ -77,7 +77,7 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 var xTargetPath = settings.GetValue(FieldTargetPath);
                 if (xTargetPath != null)
-                    targetPath = xTargetPath.ToString();
+                    targetPath = Path.GetFullPath(xTargetPath.ToString());
             }
             catch
             {
@@ -94,9 +94,34 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Removes NDK info from the registry.
+        /// </summary>
+        public static void Delete()
+        {
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            try
+            {
+                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                if (settings == null)
+                    return;
+
+                settings.DeleteSubKey(FieldHostPath);
+                settings.DeleteSubKey(FieldTargetPath);
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
+        }
+
+        /// <summary>
         /// Saves NDK info into the registry.
         /// </summary>
-        public void SaveInfo()
+        public void Save()
         {
             RegistryKey registry = Registry.CurrentUser;
             RegistryKey settings = null;
@@ -120,9 +145,6 @@ namespace RIM.VSNDK_Package.ViewModels
 
                 string ndkpath = string.Format(@"{0}/usr/bin;{1}\bin;{0}/usr/qde/eclipse/jre/bin;", HostPath, qnxConfigPath) + Environment.GetEnvironmentVariable("PATH");
                 Environment.SetEnvironmentVariable("PATH", ndkpath);
-            }
-            catch
-            {
             }
             finally
             {

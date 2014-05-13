@@ -63,23 +63,23 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Retrieves device definition from the registry.
         /// </summary>
-        public static DeviceDefinition LoadDeviceInfo()
+        public static DeviceDefinition LoadDevice()
         {
-            return LoadInfo(DeviceDefinitionType.Device);
+            return Load(DeviceDefinitionType.Device);
         }
 
         /// <summary>
         /// Retrieves simulator definition from the registry.
         /// </summary>
-        public static DeviceDefinition LoadSimulatorInfo()
+        public static DeviceDefinition LoadSimulator()
         {
-            return LoadInfo(DeviceDefinitionType.Simulator);
+            return Load(DeviceDefinitionType.Simulator);
         }
 
         /// <summary>
         /// Retrieves device definition from registry.
         /// </summary>
-        public static DeviceDefinition LoadInfo(DeviceDefinitionType type)
+        public static DeviceDefinition Load(DeviceDefinitionType type)
         {
             if (type != DeviceDefinitionType.Device && type != DeviceDefinitionType.Simulator)
                 throw new ArgumentOutOfRangeException("type", "Unspported device type");
@@ -148,9 +148,35 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Removes the info about selected device from the registry.
+        /// </summary>
+        public static void Delete(DeviceDefinitionType type)
+        {
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            try
+            {
+                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                if (settings == null)
+                    return;
+
+                settings.DeleteSubKey(type == DeviceDefinitionType.Device ? FieldDeviceName : FieldSimulatorName);
+                settings.DeleteSubKey(type == DeviceDefinitionType.Device ? FieldDeviceIP : FieldSimulatorIP);
+                settings.DeleteSubKey(type == DeviceDefinitionType.Device ? FieldDevicePassword : FieldSimulatorPassword);
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
+        }
+
+        /// <summary>
         /// Saves given data about the device or simulator into the registry.
         /// </summary>
-        public void SaveInfo()
+        public void Save()
         {
             RegistryKey registry = Registry.CurrentUser;
             RegistryKey settings = null;
@@ -171,10 +197,6 @@ namespace RIM.VSNDK_Package.ViewModels
                 settings.SetValue(Type == DeviceDefinitionType.Device ? FieldDeviceName : FieldSimulatorName, Name);
                 settings.SetValue(Type == DeviceDefinitionType.Device ? FieldDeviceIP : FieldSimulatorIP, IP);
                 settings.SetValue(Type == DeviceDefinitionType.Device ? FieldDevicePassword : FieldSimulatorPassword, GlobalFunctions.Encrypt(Password));
-            }
-            catch
-            {
-
             }
             finally
             {

@@ -1,8 +1,10 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio.Shell;
+using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options
 {
@@ -40,5 +42,20 @@ namespace RIM.VSNDK_Package.Options
         }
 
         #endregion
+
+        protected override void OnApply(PageApplyEventArgs e)
+        {
+            Control.OnApply();
+
+            if (!Control.HasSelectedNDK || PackageViewModel.Instance.ActiveNDK == null)
+            {
+                if (MessageBoxHelper.Show("No NDK set as active or the one seems to not exist. You won't be able to compile anything. Do you want to correct it?",
+                                          "API Level Settings",
+                                          MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    e.ApplyBehavior = ApplyKind.Cancel;
+                }
+            }
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using RIM.VSNDK_Package.Model;
+﻿using System;
+using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
 
 namespace RIM.VSNDK_Package.ViewModels
@@ -28,6 +30,7 @@ namespace RIM.VSNDK_Package.ViewModels
         #endregion
 
         private NdkInfo[] _installedNDKs;
+        private NdkInfo _activeNDK;
 
         public PackageViewModel()
         {
@@ -49,6 +52,89 @@ namespace RIM.VSNDK_Package.ViewModels
             }
         }
 
-    #endregion
+        /// <summary>
+        /// Loads info about currently used NDK from registry.
+        /// </summary>
+        public NdkInfo ActiveNDK
+        {
+            get
+            {
+                if (_activeNDK != null)
+                    return _activeNDK;
+
+                // or try to find it:
+                var settings = NdkDefinition.Load();
+
+                if (settings == null)
+                    return null;
+
+                // find matching installed NDK by comparing paths:
+                foreach(var info in InstalledNDKs)
+                    if (info.Matches(settings.HostPath, settings.TargetPath))
+                    {
+                        _activeNDK = info;
+
+                        TraceLog.WriteLine("Found active NDK: \"{0}\"", _activeNDK);
+                        return info;
+                    }
+
+                return null;
+            }
+            set
+            {
+                if (value != null)
+                {
+                    var index = Array.IndexOf(InstalledNDKs, value);
+                    if (index < 0)
+                        throw new ArgumentOutOfRangeException("value", "Invalid value set, it must belong to the InstalledNDKs first");
+
+                    if (!value.Matches(_activeNDK))
+                    {
+                        _activeNDK = value;
+                        TraceLog.WriteLine("Changed active NDK to: \"{0}\"", _activeNDK);
+                        SaveActiveNDK();
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Persists info about currently selected NDK into the registry.
+        /// </summary>
+        public void SaveActiveNDK()
+        {
+            if (_activeNDK == null || !_activeNDK.Exists())
+            {
+                TraceLog.WarnLine("Invalid NDK to set as active!");
+                return;
+            }
+
+            try
+            {
+                var setting = new NdkDefinition(_activeNDK.HostPath, _activeNDK.TargetPath);
+                setting.Save();
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to activate NDK \"{0}\"", _activeNDK);
+            }
+        }
+
+        /// <summary>
+        /// Removes info about selected NDK from the registry.
+        /// </summary>
+        public void DeleteActiveNDK()
+        {
+            try
+            {
+                NdkDefinition.Delete();
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to clear info about active NDK");
+            }
+        }
     }
 }
