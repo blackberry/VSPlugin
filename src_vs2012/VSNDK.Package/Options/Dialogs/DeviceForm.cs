@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
 
@@ -12,6 +13,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
     internal partial class DeviceForm : Form
     {
         private DeviceInfoRunner _runner;
+        private string _loadedDeviceName;
 
         public DeviceForm(string title)
         {
@@ -52,6 +54,26 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         {
             get;
             private set;
+        }
+
+        public string LoadedDeviceName
+        {
+            get { return _loadedDeviceName; }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                {
+                    _loadedDeviceName = null;
+                    bttSetName.Text = string.Empty;
+                    bttSetName.Visible = false;
+                }
+                else
+                {
+                    _loadedDeviceName = value;
+                    bttSetName.Text = "<< " + value.Substring(0, value.Length > 14 ? 14 : value.Length) + "..."; // up to 15chars
+                    bttSetName.Visible = true;
+                }
+            }
         }
 
         #endregion
@@ -130,6 +152,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             }
 
             IsConnected = false;
+            LoadedDeviceName = null;
             _runner = new DeviceInfoRunner(RunnerDefaults.ToolsDirectory, DeviceIP, DevicePassword);
             _runner.Finished += RunnerOnFinished;
 
@@ -146,6 +169,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             {
                 TraceLog.WriteLine("Found device: {0} with IP: {1}", _runner.DeviceInfo.ToString(), DeviceIP);
                 AppendLog("Device found:" + Environment.NewLine + _runner.DeviceInfo.ToLongDescription());
+                Invoke(new Action<DeviceInfo>(UpdateWithDevice), _runner.DeviceInfo);
                 IsConnected = true;
             }
             else
@@ -157,6 +181,11 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             _runner.Finished -= RunnerOnFinished;
             _runner = null;
+        }
+
+        private void UpdateWithDevice(DeviceInfo deviceInfo)
+        {
+            LoadedDeviceName = deviceInfo != null ? deviceInfo.Name : null;
         }
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
@@ -187,6 +216,11 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void bttSetName_Click(object sender, EventArgs e)
+        {
+            txtName.Text = LoadedDeviceName;
         }
     }
 }

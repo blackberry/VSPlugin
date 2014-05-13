@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.bttSetName = new System.Windows.Forms.Button();
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.txtIP = new System.Windows.Forms.TextBox();
@@ -48,6 +49,7 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.bttSetName);
             this.groupBox1.Controls.Add(this.txtPassword);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.txtIP);
@@ -62,6 +64,17 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Device Target Properties";
+            // 
+            // bttSetName
+            // 
+            this.bttSetName.Location = new System.Drawing.Point(260, 50);
+            this.bttSetName.Name = "bttSetName";
+            this.bttSetName.Size = new System.Drawing.Size(138, 23);
+            this.bttSetName.TabIndex = 8;
+            this.bttSetName.Text = "Set ";
+            this.bttSetName.UseVisualStyleBackColor = true;
+            this.bttSetName.Visible = false;
+            this.bttSetName.Click += new System.EventHandler(this.bttSetName_Click);
             // 
             // txtPassword
             // 
@@ -222,5 +235,6 @@
         private System.Windows.Forms.Button bttTest;
         private System.Windows.Forms.Button bttOK;
         private System.Windows.Forms.Button bttCancel;
+        private System.Windows.Forms.Button bttSetName;
     }
 }
