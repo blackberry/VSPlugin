@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
@@ -65,14 +66,39 @@ namespace RIM.VSNDK_Package.Model
         }
 
         /// <summary>
+        /// Compares two paths, if they are identical.
+        /// </summary>
+        private static bool HasPath(string pathA, string pathB)
+        {
+            if (string.IsNullOrEmpty(pathA) && string.IsNullOrEmpty(pathB))
+                return true;
+
+            // assuming that paths we aquired by Path.GetFullPath(...)
+            return string.Compare(pathA, pathB, StringComparison.InvariantCultureIgnoreCase) == 0;
+        }
+
+        /// <summary>
         /// Checks if specified path points to the same folder as TargetPath.
         /// </summary>
         public bool HasTargetPath(string path)
         {
-            if (string.IsNullOrEmpty(path) && string.IsNullOrEmpty(TargetPath))
-                return true;
+            return HasPath(TargetPath, path);
+        }
 
-            return string.Compare(path, TargetPath, StringComparison.InvariantCultureIgnoreCase) == 0;
+        /// <summary>
+        /// Checks if given NDK info has identical paths.
+        /// </summary>
+        public bool Matches(string hostPath, string targetPath)
+        {
+            return HasPath(HostPath, hostPath) && HasPath(TargetPath, targetPath);
+        }
+
+        /// <summary>
+        /// Checks if given NDKs are identical.
+        /// </summary>
+        public bool Matches(NdkInfo ndk)
+        {
+            return HasPath(HostPath, ndk != null ? ndk.HostPath : null) && HasPath(TargetPath, ndk != null ? ndk.TargetPath : null);
         }
 
         /// <summary>
@@ -203,8 +229,7 @@ namespace RIM.VSNDK_Package.Model
             }
             catch (Exception ex)
             {
-                TraceLog.WriteLine("Unable to load NDK descriptor file: \"{0}\"", ndkDescriptorFileName);
-                TraceLog.WriteException(ex);
+                TraceLog.WriteException(ex, "Unable to load NDK descriptor file: \"{0}\"", ndkDescriptorFileName);
 
                 return null;
             }
@@ -228,6 +253,7 @@ namespace RIM.VSNDK_Package.Model
                     try
                     {
                         var files = Directory.GetFiles(folder, "*.xml", SearchOption.AllDirectories);
+
                         foreach (var file in files)
                         {
                             try
@@ -238,21 +264,36 @@ namespace RIM.VSNDK_Package.Model
                                     {
                                         var info = Load(reader);
                                         if (info != null && info.Exists())
-                                            result.Add(info);
+                                        {
+                                            var existingIndex = IndexOf(result, info);
+                                            
+                                            // if NDK info exist with exacly the same paths, prefer to keep the one with longer name:
+                                            if (existingIndex >= 0)
+                                            {
+                                                var existingItem = result[existingIndex];
+                                                if (existingItem.Name != null && info.Name != null && existingItem.Name.Length < info.Name.Length)
+                                                {
+                                                    result.RemoveAt(existingIndex);
+                                                    result.Add(info);
+                                                }
+                                            }
+                                            else
+                                            {
+                                                result.Add(info);
+                                            }
+                                        }
                                     }
                                 }
                             }
                             catch (Exception ex)
                             {
-                                TraceLog.WriteLine("Unable to open configuration file: \"{0}\"", file);
-                                TraceLog.WriteException(ex);
+                                TraceLog.WriteException(ex, "Unable to open configuration file: \"{0}\"", file);
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        TraceLog.WriteLine("Unable to load info about configuration files from folder: \"{0}\"", folder);
-                        TraceLog.WriteException(ex);
+                        TraceLog.WriteException(ex, "Unable to load info about configuration files from folder: \"{0}\"", folder);
                     }
                 }
             }
@@ -261,6 +302,17 @@ namespace RIM.VSNDK_Package.Model
             return result.ToArray();
         }
 
+        private static int IndexOf(IEnumerable<NdkInfo> list, NdkInfo info)
+        {
+            int i = 0;
+            foreach (var item in list)
+            {
+                if (item.Matches(info))
+                    return i;
+                i++;
+            }
+            return -1;
+        }
 
         /// <summary>
         /// Compares the current object with another object of the same type.
