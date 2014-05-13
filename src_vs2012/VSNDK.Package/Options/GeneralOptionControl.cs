@@ -31,25 +31,12 @@ namespace RIM.VSNDK_Package.Options
 
         private void bttNdkBrowse_Click(object sender, System.EventArgs e)
         {
-            txtNdkPath.Text = BrowseForFolder(txtNdkPath.Text, "Browse for NDK folder");
+            txtNdkPath.Text = DialogHelper.BrowseForFolder(txtNdkPath.Text, "Browse for NDK folder");
         }
 
         private void bttToolsBrowse_Click(object sender, System.EventArgs e)
         {
-            txtToolsPath.Text = BrowseForFolder(txtToolsPath.Text, "Browse for Tools folder");
-        }
-
-        private string BrowseForFolder(string startupPath, string description)
-        {
-            var browser = new FolderBrowserDialog();
-            browser.ShowNewFolderButton = true;
-            browser.SelectedPath = startupPath;
-            browser.Description = description;
-
-            if (browser.ShowDialog() == DialogResult.OK)
-                return browser.SelectedPath;
-
-            return startupPath;
+            txtToolsPath.Text = DialogHelper.BrowseForFolder(txtToolsPath.Text, "Browse for Tools folder");
         }
     }
 }

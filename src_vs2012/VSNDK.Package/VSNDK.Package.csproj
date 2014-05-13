@@ -275,6 +275,7 @@
     <Compile Include="Options\ApiLevelOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Options\DialogHelper.cs" />
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>

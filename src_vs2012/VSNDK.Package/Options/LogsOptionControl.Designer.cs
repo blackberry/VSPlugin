@@ -32,7 +32,7 @@
             this.chbLimitLogs = new System.Windows.Forms.CheckBox();
             this.label1 = new System.Windows.Forms.Label();
             this.txtLogPath = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.bttBrowse = new System.Windows.Forms.Button();
             this.numLogLimit = new System.Windows.Forms.NumericUpDown();
             ((System.ComponentModel.ISupportInitialize)(this.numLogLimit)).BeginInit();
             this.SuspendLayout();
@@ -40,6 +40,8 @@
             // chbInjectLogs
             // 
             this.chbInjectLogs.AutoSize = true;
+            this.chbInjectLogs.Checked = true;
+            this.chbInjectLogs.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chbInjectLogs.Location = new System.Drawing.Point(6, 76);
             this.chbInjectLogs.Name = "chbInjectLogs";
             this.chbInjectLogs.Size = new System.Drawing.Size(213, 17);
@@ -50,6 +52,8 @@
             // chbLimitLogs
             // 
             this.chbLimitLogs.AutoSize = true;
+            this.chbLimitLogs.Checked = true;
+            this.chbLimitLogs.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chbLimitLogs.Location = new System.Drawing.Point(6, 44);
             this.chbLimitLogs.Name = "chbLimitLogs";
             this.chbLimitLogs.Size = new System.Drawing.Size(151, 17);
@@ -75,15 +79,16 @@
             this.txtLogPath.Size = new System.Drawing.Size(439, 20);
             this.txtLogPath.TabIndex = 1;
             // 
-            // button1
+            // bttBrowse
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(530, 4);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "Browse...";
-            this.button1.UseVisualStyleBackColor = true;
+            this.bttBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttBrowse.Location = new System.Drawing.Point(530, 4);
+            this.bttBrowse.Name = "bttBrowse";
+            this.bttBrowse.Size = new System.Drawing.Size(75, 23);
+            this.bttBrowse.TabIndex = 2;
+            this.bttBrowse.Text = "Browse...";
+            this.bttBrowse.UseVisualStyleBackColor = true;
+            this.bttBrowse.Click += new System.EventHandler(this.bttBrowse_Click);
             // 
             // numLogLimit
             // 
@@ -103,7 +108,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.numLogLimit);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.bttBrowse);
             this.Controls.Add(this.txtLogPath);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.chbLimitLogs);
@@ -122,7 +127,7 @@
         private System.Windows.Forms.CheckBox chbLimitLogs;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtLogPath;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bttBrowse;
         private System.Windows.Forms.NumericUpDown numLogLimit;
     }
 }

@@ -36,5 +36,10 @@ namespace RIM.VSNDK_Package.Options
         }
 
         #endregion
+
+        private void bttBrowse_Click(object sender, System.EventArgs e)
+        {
+            txtLogPath.Text = DialogHelper.BrowseForFolder(txtLogPath.Text, "Browse for Logs folder");
+        }
     }
 }
