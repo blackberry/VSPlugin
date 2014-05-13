@@ -21,7 +21,8 @@ namespace RIM.VSNDK_Package
         public const int cmdidBlackBerryDebugToken = 0x0203;
         public const int cmdidBlackBerryOptions = 0x0301;
         public const int cmdidBlackBerryTargetsDevicesPlaceholder = 0x0401;
-        public const int cmdidBlackBerryTargetsConfigure = 0x0501;
+        public const int cmdidBlackBerryTargetsApiLevelsPlaceholder = 0x0501;
+        public const int cmdidBlackBerryTargetsConfigure = 0x0601;
 
         public const int cmdidBlackBerryProjectImport = 0x0104;
         public const int cmdidfooLocalBox = 0x0105;

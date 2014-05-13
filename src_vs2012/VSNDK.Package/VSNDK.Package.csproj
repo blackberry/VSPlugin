@@ -276,6 +276,13 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\DialogHelper.cs" />
+    <Compile Include="Options\Dialogs\DeviceForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\DeviceForm.Designer.cs">
+      <DependentUpon>DeviceForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Dialogs\DialogDeviceClass.cs" />
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -470,6 +477,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\ApiLevelOptionControl.resx">
       <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\DeviceForm.resx">
+      <DependentUpon>DeviceForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\GeneralOptionControl.resx">
       <DependentUpon>GeneralOptionControl.cs</DependentUpon>

@@ -33,9 +33,11 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Model.Integration;
 using RIM.VSNDK_Package.Options;
 using RIM.VSNDK_Package.UpdateManager.Model;
+using RIM.VSNDK_Package.ViewModels;
 using VSNDK.Parser;
 
 namespace RIM.VSNDK_Package
@@ -970,6 +972,7 @@ namespace RIM.VSNDK_Package
             TraceLog.Add(_traceWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
 
+
             var options = GetDialogPage(typeof(GeneralOptionPage)) as GeneralOptionPage;
             var path = options.NdkPath;
 
@@ -1028,15 +1031,36 @@ namespace RIM.VSNDK_Package
 
                 // Create dynamic command for the 'devices-list' menu
                 CommandID devicesCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsDevicesPlaceholder);
-                DynamicMenuCommand devicesMenu = new DynamicMenuCommand(InstalledNDKListSingleton.Instance._installedNDKList, null,
-                                                                        (cmd, colletion, index) =>
+                DynamicMenuCommand devicesMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledNDKs,
+                                                                        (cmd, collection, index) =>
                                                                             {
-                                                                                var item = index >= 0 && index < colletion.Count ? ((List<APIClass>) colletion)[index] : null;
-                                                                                cmd.Checked = index == 0;
-                                                                                cmd.Text = item != null ? item.Name : "-";
+                                                                                var item = index >= 0 && index < collection.Count ? ((NdkInfo[])collection)[index] : null;
+                                                                                PackageViewModel.Instance.ActiveNDK = item;
+                                                                            },
+                                                                        (cmd, collection, index) =>
+                                                                            {
+                                                                                var item = index >= 0 && index < collection.Count ? ((NdkInfo[]) collection)[index] : null;
+                                                                                cmd.Checked = item == PackageViewModel.Instance.ActiveNDK;
+                                                                                cmd.Text = item != null ? item.ToString() : "-";
                                                                             },
                                                                         devicesCommandID);
                 mcs.AddCommand(devicesMenu);
+                // Create dynamic command for the 'api-level-list' menu
+                CommandID apiLevelCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsApiLevelsPlaceholder);
+                DynamicMenuCommand apiLevelMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledNDKs,
+                                                                         (cmd, collection, index) =>
+                                                                             {
+                                                                                 var item = index >= 0 && index < collection.Count ? ((NdkInfo[]) collection)[index] : null;
+                                                                                 PackageViewModel.Instance.ActiveNDK = item;
+                                                                             },
+                                                                         (cmd, collection, index) =>
+                                                                             {
+                                                                                 var item = index >= 0 && index < collection.Count ? ((NdkInfo[]) collection)[index] : null;
+                                                                                 cmd.Checked = item == PackageViewModel.Instance.ActiveNDK;
+                                                                                 cmd.Text = item != null ? item.ToString() : "-";
+                                                                             },
+                                                                         apiLevelCommandID);
+                mcs.AddCommand(apiLevelMenu);
 
                 // Create command for 'Configure...' [targets] menu
                 CommandID configureCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsConfigure);

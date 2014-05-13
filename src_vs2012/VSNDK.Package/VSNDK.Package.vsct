@@ -80,7 +80,10 @@
             <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Devices" priority="0x0100">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
             </Group>
-            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Configuration" priority="0x0200">
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_ApiLevels" priority="0x0200">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Configuration" priority="0x0300">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
             </Group>
 
@@ -139,6 +142,18 @@
                 <Strings>
                     <ButtonText>[Target Devices]</ButtonText>
                     <ToolTipText>Select a device to run the application on</ToolTipText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsApiLevelsPlaceholder" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_ApiLevels" />
+                <CommandFlag>DynamicItemStart</CommandFlag>
+                <CommandFlag>DynamicVisibility</CommandFlag>
+                <CommandFlag>DefaultInvisible</CommandFlag>
+                <CommandFlag>TextChanges</CommandFlag>
+                <CommandFlag>NoButtonCustomize</CommandFlag>
+                <Strings>
+                    <ButtonText>[Target API Levels]</ButtonText>
+                    <ToolTipText>Select a NDK with desired API Level to run the application against</ToolTipText>
                 </Strings>
             </Button>
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsConfigure" priority="0x0100" type="Button">
@@ -214,14 +229,16 @@
             <IDSymbol name="cmdidBlackBerryTopMenuGroup_Common" value="0x200" />
             <IDSymbol name="cmdidBlackBerryTopMenuGroup_Options" value="0x300" />
             <IDSymbol name="cmdidBlackBerryTargetsGroup_Devices" value="0x400" />
-            <IDSymbol name="cmdidBlackBerryTargetsGroup_Configuration" value="0x500" />
+            <IDSymbol name="cmdidBlackBerryTargetsGroup_ApiLevels" value="0x500" />
+            <IDSymbol name="cmdidBlackBerryTargetsGroup_Configuration" value="0x600" />
             
             <IDSymbol name="cmdidBlackBerryTools" value="0x0201" />
             <IDSymbol name="cmdidBlackBerrySettings" value="0x0202" />
             <IDSymbol name="cmdidBlackBerryDebugToken" value="0x0203" />
             <IDSymbol name="cmdidBlackBerryOptions" value="0x0301" />
             <IDSymbol name="cmdidBlackBerryTargetsDevicesPlaceholder" value="0x401" />
-            <IDSymbol name="cmdidBlackBerryTargetsConfigure" value="0x501" />
+            <IDSymbol name="cmdidBlackBerryTargetsApiLevelsPlaceholder" value="0x501" />
+            <IDSymbol name="cmdidBlackBerryTargetsConfigure" value="0x601" />
             
             
             <IDSymbol name="cmdidBlackBerryProjectImport" value="0x104" />

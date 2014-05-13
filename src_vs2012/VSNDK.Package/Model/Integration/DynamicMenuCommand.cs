@@ -11,7 +11,9 @@ namespace RIM.VSNDK_Package.Model.Integration
     internal sealed class DynamicMenuCommand : OleMenuCommand
     {
         private readonly Predicate<int> _displayPredicate;
-        private readonly Action<DynamicMenuCommand, ICollection, int> _processedQueryStatus; 
+        private readonly Action<DynamicMenuCommand, ICollection, int> _invokeHandler;
+        private readonly Action<DynamicMenuCommand, ICollection, int> _processedQueryStatus;
+        private readonly Func<ICollection> _getCollection; 
         private readonly ICollection _collection;
 
         public DynamicMenuCommand(Predicate<int> displayPredicate, EventHandler invokeHandler, EventHandler beforeQueryStatusHandler, CommandID id)
@@ -24,7 +26,7 @@ namespace RIM.VSNDK_Package.Model.Integration
         }
 
         public DynamicMenuCommand(ICollection collection, EventHandler invokeHandler, Action<DynamicMenuCommand, ICollection, int> beforeQueryStatus, CommandID id)
-            : base(invokeHandler, null, BeforeCollectionQueryStatusUpdate, id)
+            : base(invokeHandler, null, InternalBeforeCollectionQueryStatusUpdate, id)
         {
             if (collection == null)
                 throw new ArgumentNullException("collection");
@@ -34,6 +36,36 @@ namespace RIM.VSNDK_Package.Model.Integration
             _displayPredicate = InternalCollectionPredicate;
             _processedQueryStatus = beforeQueryStatus;
             _collection = collection;
+        }
+
+        public DynamicMenuCommand(Func<ICollection> collectionHandler, Action<DynamicMenuCommand, ICollection, int> invokeHandler, Action<DynamicMenuCommand, ICollection, int> beforeQueryStatus, CommandID id)
+            : base(InternalInvokeHandler, null, InternalBeforeCollectionQueryStatusUpdate, id)
+        {
+            if (collectionHandler == null)
+                throw new ArgumentNullException("collectionHandler");
+            if (beforeQueryStatus == null)
+                throw new ArgumentNullException("beforeQueryStatus");
+
+            _displayPredicate = InternalCollectionPredicate;
+            _invokeHandler = invokeHandler;
+            _processedQueryStatus = beforeQueryStatus;
+            _getCollection = collectionHandler;
+        }
+
+        private ICollection Collection
+        {
+            get
+            {
+                ICollection result = null;
+
+                if (_getCollection != null)
+                    result = _getCollection();
+
+                if (result == null)
+                    result = _collection;
+
+                return result;
+            }
         }
 
         public override bool DynamicItemMatch(int cmdId)
@@ -50,17 +82,35 @@ namespace RIM.VSNDK_Package.Model.Integration
 
         private bool InternalCollectionPredicate(int cmdId)
         {
-            return cmdId >= CommandID.ID && (cmdId - CommandID.ID) < _collection.Count;
+            var collection = Collection;
+
+            if (collection == null)
+                return false;
+
+            return cmdId >= CommandID.ID && (cmdId - CommandID.ID) < collection.Count;
         }
 
-        private static void BeforeCollectionQueryStatusUpdate(object sender, EventArgs e)
+        private static void InternalBeforeCollectionQueryStatusUpdate(object sender, EventArgs e)
         {
             var command = (DynamicMenuCommand)sender;
 
             int index = command.MatchedCommandId == 0 ? 0 : command.MatchedCommandId - command.CommandID.ID;
 
             // and ask for further status update:
-            command._processedQueryStatus(command, command._collection, index);
+            command._processedQueryStatus(command, command.Collection, index);
+        }
+
+        private static void InternalInvokeHandler(object sender, EventArgs e)
+        {
+            var command = (DynamicMenuCommand) sender;
+
+            int index = command.MatchedCommandId == 0 ? 0 : command.MatchedCommandId - command.CommandID.ID;
+
+            // and notify about selection made:
+            if (command._invokeHandler != null)
+            {
+                command._invokeHandler(command, command.Collection, index);
+            }
         }
     }
 }
