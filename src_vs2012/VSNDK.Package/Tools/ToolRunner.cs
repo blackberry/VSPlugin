@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
+using RIM.VSNDK_Package.Diagnostics;
 
 namespace RIM.VSNDK_Package.Tools
 {
@@ -145,12 +146,15 @@ namespace RIM.VSNDK_Package.Tools
                 _process.BeginErrorReadLine();
                 _process.BeginOutputReadLine();
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 Debug.WriteLine(_process.StartInfo.Arguments);
-                Debug.WriteLine(e.Message);
+                TraceLog.WriteException(ex, "Unable to start {0}", GetType().Name);
 
                 _process.Close();
+
+                if (Finished != null)
+                    Finished(this, new ToolRunnerEventArgs(-1, null, null));
             }
         }
 
@@ -173,6 +177,7 @@ namespace RIM.VSNDK_Package.Tools
         {
             var outputText = _output.Length > 0 ? _output.ToString() : null;
             var errorText = _error.Length > 0 ? _error.ToString() : null;
+            var exitCode = _process.ExitCode;
 
             _output = null;
             _error = null;
@@ -189,7 +194,7 @@ namespace RIM.VSNDK_Package.Tools
             var finishedHandler = Finished;
             if (finishedHandler != null)
             {
-                finishedHandler(this, new ToolRunnerEventArgs(_process.ExitCode, outputText, errorText));
+                finishedHandler(this, new ToolRunnerEventArgs(exitCode, outputText, errorText));
             }
 
             _isProcessing = false;
@@ -198,6 +203,27 @@ namespace RIM.VSNDK_Package.Tools
         protected virtual void ConsumeResults(string output, string error)
         {
             // do nothing, subclasses should handle parsing output
+        }
+
+        /// <summary>
+        /// Extracts the error messages out of the given text.
+        /// </summary>
+        protected static string ExtractErrorMessages(string error)
+        {
+            if (string.IsNullOrEmpty(error))
+                return null;
+
+            var result = new StringBuilder();
+            var lines = error.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var line in lines)
+            {
+                if (line.StartsWith("error: ", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result.AppendLine(line.Substring(7).Trim());
+                }
+            }
+
+            return result.ToString();
         }
     }
 }
