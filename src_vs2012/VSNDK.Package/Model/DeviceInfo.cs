@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using System.Windows;
 using System.Globalization;
 using System.Xml;
@@ -110,6 +111,24 @@ namespace RIM.VSNDK_Package.Model
             }
 
             return string.Concat(Name, " (", ModelName, ", OS v", SystemVersion, ")");
+        }
+
+        /// <summary>
+        /// Gets the values of all fields.
+        /// </summary>
+        public string ToLongDescription()
+        {
+            var result = new StringBuilder();
+
+            result.Append("Name: ").AppendLine(Name);
+            result.Append("PIN: ").AppendLine(PIN.ToString("X"));
+            result.Append("Model: ").Append(ModelName).Append(" (").Append(ModelNumber).AppendLine(")");
+            result.Append("Model Family: ").AppendLine(ModelFamily);
+            result.Append("System: ").Append(SystemName).Append(" (").Append(SystemVersion).AppendLine(")");
+            result.Append("Resolution: ").Append((uint) ScreenResolution.Width).Append("x").Append((uint) ScreenResolution.Height).Append(" (").Append(ScreenDPI).AppendLine("dpi)");
+            result.Append("Theme: ").Append(DefaultTheme.ToString());
+
+            return result.ToString();
         }
 
         /// <summary>

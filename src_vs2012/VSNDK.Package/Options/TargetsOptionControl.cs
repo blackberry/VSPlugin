@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows.Forms;
+using RIM.VSNDK_Package.Options.Dialogs;
 
 namespace RIM.VSNDK_Package.Options
 {
@@ -15,6 +9,21 @@ namespace RIM.VSNDK_Package.Options
         public TargetsOptionControl()
         {
             InitializeComponent();
+        }
+
+        private void lnkMoreInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            Process.Start("http://developer.blackberry.com/native/documentation/cascades/getting_started/setting_up.html");
+        }
+
+        private void bttAdd_Click(object sender, System.EventArgs e)
+        {
+            var form = new DeviceForm("Add new Target Device");
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                
+            }
         }
     }
 }
