@@ -48,6 +48,30 @@ namespace RIM.VSNDK_Package.Diagnostics
         }
 
         /// <summary>
+        /// Writes a warning message.
+        /// </summary>
+        [Conditional("TRACE")]
+        public static void WarnLine(string message)
+        {
+            if (message == null)
+                return;
+
+            Trace.WriteLine("!! " + message, Category);
+        }
+
+        /// <summary>
+        /// Writes a warning message.
+        /// </summary>
+        [Conditional("TRACE")]
+        public static void WarnLine(string format, params object[] args)
+        {
+            if (format == null)
+                return;
+
+            Trace.WriteLine("!! " + string.Format(format, args), Category);
+        }
+
+        /// <summary>
         /// Writes info about the exception.
         /// </summary>
         [Conditional("TRACE")]
@@ -56,15 +80,51 @@ namespace RIM.VSNDK_Package.Diagnostics
             if (ex == null)
                 return;
 
-            Trace.WriteLine(FlatException(ex), Category);
+            Trace.WriteLine(FlatException(ex, null), Category);
+        }
+
+        /// <summary>
+        /// Writes info about the exception.
+        /// </summary>
+        [Conditional("TRACE")]
+        public static void WriteException(Exception ex, string message)
+        {
+            if (ex == null)
+            {
+                WriteLine(message);
+            }
+            else
+            {
+                Trace.WriteLine(FlatException(ex, message), Category);
+            }
+        }
+
+        /// <summary>
+        /// Writes info about the exception.
+        /// </summary>
+        [Conditional("TRACE")]
+        public static void WriteException(Exception ex, string format, params object[] args)
+        {
+            if (ex == null)
+            {
+                WriteLine(format, args);
+            }
+            else
+            {
+                string message = format == null ? null : string.Format(format, args);
+                Trace.WriteLine(FlatException(ex, message), Category);
+            }
         }
 
         /// <summary>
         /// Converts exception data into a single string.
         /// </summary>
-        private static string FlatException(Exception ex)
+        private static string FlatException(Exception ex, string message)
         {
             var result = new StringBuilder();
+
+            if (message != null)
+                result.AppendLine(message);
 
             while (ex != null)
             {
