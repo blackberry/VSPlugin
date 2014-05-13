@@ -68,5 +68,10 @@ namespace RIM.VSNDK_Package.Options
         }
 
         #endregion
+
+        public override void SaveSettingsToStorage()
+        {
+            base.SaveSettingsToStorage();
+        }
     }
 }

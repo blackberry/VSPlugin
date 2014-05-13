@@ -1,4 +1,5 @@
 ﻿using System.Windows.Forms;
+using RIM.VSNDK_Package.Tools;
 
 namespace RIM.VSNDK_Package.Options
 {
@@ -7,6 +8,9 @@ namespace RIM.VSNDK_Package.Options
         public GeneralOptionControl()
         {
             InitializeComponent();
+
+            txtNdkPath.Text = RunnerDefaults.NdkDirectory;
+            txtToolsPath.Text = RunnerDefaults.ToolsDirectory;
         }
 
         #region Properties

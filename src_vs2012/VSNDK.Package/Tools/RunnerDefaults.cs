@@ -7,13 +7,22 @@ namespace RIM.VSNDK_Package.Tools
     {
         public static readonly string TestToolsDirectory;
         public static readonly string TestNdkDirectory;
+
+        public static readonly string ToolsDirectory;
+        public static readonly string NdkDirectory;
         public static readonly string DataDirectory;
         public static readonly string InstallationConfigDirectory;
+        public static readonly string SupplementaryInstallationConfigDirectory;
+        public static readonly string RegistryPath;
 
         static RunnerDefaults()
         {
-            DataDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion";
-            InstallationConfigDirectory = Path.Combine(DataDirectory, @"BlackBerry Native SDK\qconfig");
+            ToolsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
+            NdkDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
+            DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Research In Motion");
+            InstallationConfigDirectory = Path.Combine(DataDirectory, "BlackBerry Native SDK", "qconfig");
+            SupplementaryInstallationConfigDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs", "..", "qconfig");
+            RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
 
 #if DEBUG
             // TODO: PH: 2014-05-08: for now hardcoded my repository path:

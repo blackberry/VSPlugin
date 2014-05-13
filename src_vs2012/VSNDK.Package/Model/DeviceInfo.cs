@@ -6,6 +6,9 @@ using System.Xml;
 
 namespace RIM.VSNDK_Package.Model
 {
+    /// <summary>
+    /// Detailed info about a physical device received from BlackBerry tools and services.
+    /// </summary>
     internal sealed class DeviceInfo
     {
         public DeviceInfo()

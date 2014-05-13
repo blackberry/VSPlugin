@@ -56,5 +56,10 @@ namespace RIM.VSNDK_Package.Options
         }
 
         #endregion
+
+        protected override void OnApply(PageApplyEventArgs e)
+        {
+            base.OnApply(e);
+        }
     }
 }

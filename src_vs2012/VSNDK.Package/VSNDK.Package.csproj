@@ -292,6 +292,15 @@
     <Compile Include="Options\LogsOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Options\SigningOptionControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\SigningOptionControl.Designer.cs">
+      <DependentUpon>SigningOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\SigningOptionPage.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Options\TargetsOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -301,6 +310,11 @@
     <Compile Include="Options\TargetsOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ViewModels\ApiLevelViewModel.cs" />
+    <Compile Include="ViewModels\DeviceDefinition.cs" />
+    <Compile Include="ViewModels\DeviceDefinitionType.cs" />
+    <Compile Include="ViewModels\NdkDefinition.cs" />
+    <Compile Include="ViewModels\PackageViewModel.cs" />
     <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
     <Compile Include="Tools\ApplicationRemoveRunner.cs" />
     <Compile Include="Tools\DebugTokenCreateRunner.cs" />
@@ -460,6 +474,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\LogsOptionControl.resx">
       <DependentUpon>LogsOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\SigningOptionControl.resx">
+      <DependentUpon>SigningOptionControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\TargetsOptionControl.resx">
       <DependentUpon>TargetsOptionControl.cs</DependentUpon>

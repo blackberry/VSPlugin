@@ -65,6 +65,55 @@ namespace RIM.VSNDK_Package.Model
         }
 
         /// <summary>
+        /// Checks if specified path points to the same folder as TargetPath.
+        /// </summary>
+        public bool HasTargetPath(string path)
+        {
+            if (string.IsNullOrEmpty(path) && string.IsNullOrEmpty(TargetPath))
+                return true;
+
+            return string.Compare(path, TargetPath, StringComparison.InvariantCultureIgnoreCase) == 0;
+        }
+
+        /// <summary>
+        /// Gets the long description for this NDK.
+        /// </summary>
+        public string ToLongDescription()
+        {
+            var result = new StringBuilder();
+
+            result.AppendLine(Name).AppendLine();
+            result.AppendLine("Version:");
+            result.Append(" - ").AppendLine(Version.ToString());
+            result.AppendLine();
+
+            result.AppendLine("Devices:");
+            if (Devices.Length > 0)
+            {
+                foreach (var device in Devices)
+                {
+                    result.Append(" - ").Append(device.ModelFullName).Append(", ").AppendLine(device.ModelFamily);
+                    result.Append("     ")
+                          .Append(device.ScreenDPI)
+                          .Append("ppi, icon: ")
+                          .Append(((int) device.IconResolution.Width).ToString())
+                          .Append("x")
+                          .AppendLine(((int) device.IconResolution.Height).ToString());
+                }
+            }
+            else
+            {
+                result.AppendLine(" No supported device information found.");
+            }
+            result.AppendLine();
+            result.AppendLine("Paths:");
+            result.Append(" - host: ").AppendLine(HostPath);
+            result.Append(" - target: ").AppendLine(TargetPath);
+
+            return result.ToString();
+        }
+
+        /// <summary>
         /// Loads info about a single NDK from specific config file, given as XML.
         /// </summary>
         public static NdkInfo Load(XmlReader reader)
@@ -90,10 +139,10 @@ namespace RIM.VSNDK_Package.Model
                             version = new Version(reader.ReadString());
                             break;
                         case "host":
-                            hostPath = reader.ReadString();
+                            hostPath = Path.GetFullPath(reader.ReadString());
                             break;
                         case "target":
-                            targetPath = reader.ReadString();
+                            targetPath = Path.GetFullPath(reader.ReadString());
                             break;
                     }
                 }
@@ -164,44 +213,47 @@ namespace RIM.VSNDK_Package.Model
         /// <summary>
         /// Loads info about all installed NDKs.
         /// </summary>
-        public static NdkInfo[] Load(string globalNdkConfigFolder)
+        public static NdkInfo[] Load(params string[] globalNdkConfigFolders)
         {
-            if (string.IsNullOrEmpty(globalNdkConfigFolder))
-                throw new ArgumentNullException("globalNdkConfigFolder");
+            if (globalNdkConfigFolders == null)
+                throw new ArgumentNullException("globalNdkConfigFolders");
 
             var result = new List<NdkInfo>();
 
             // list all configuration files:
-            if (Directory.Exists(globalNdkConfigFolder))
+            foreach (var folder in globalNdkConfigFolders)
             {
-                try
+                if (Directory.Exists(folder))
                 {
-                    var files = Directory.GetFiles(globalNdkConfigFolder, "*.xml", SearchOption.AllDirectories);
-                    foreach (var file in files)
+                    try
                     {
-                        try
+                        var files = Directory.GetFiles(folder, "*.xml", SearchOption.AllDirectories);
+                        foreach (var file in files)
                         {
-                            using (var fileReader = new StreamReader(file, Encoding.UTF8))
+                            try
                             {
-                                using (var reader = XmlReader.Create(fileReader))
+                                using (var fileReader = new StreamReader(file, Encoding.UTF8))
                                 {
-                                    var info = Load(reader);
-                                    if (info != null && info.Exists())
-                                        result.Add(info);
+                                    using (var reader = XmlReader.Create(fileReader))
+                                    {
+                                        var info = Load(reader);
+                                        if (info != null && info.Exists())
+                                            result.Add(info);
+                                    }
                                 }
                             }
-                        }
-                        catch (Exception ex)
-                        {
-                            TraceLog.WriteLine("Unable to open configuration file: \"{0}\"", file);
-                            TraceLog.WriteException(ex);
+                            catch (Exception ex)
+                            {
+                                TraceLog.WriteLine("Unable to open configuration file: \"{0}\"", file);
+                                TraceLog.WriteException(ex);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    TraceLog.WriteLine("Unable to load info about configuration files from folder: \"{0}\"", globalNdkConfigFolder);
-                    TraceLog.WriteException(ex);
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteLine("Unable to load info about configuration files from folder: \"{0}\"", folder);
+                        TraceLog.WriteException(ex);
+                    }
                 }
             }
 

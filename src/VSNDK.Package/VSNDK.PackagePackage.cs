@@ -917,6 +917,7 @@ namespace RIM.VSNDK_Package
     [ProvideOptionPage(typeof(LogsOptionPage), "BlackBerry", "Logs", 1001, 1003, true)]
     [ProvideOptionPage(typeof(ApiLevelOptionPage), "BlackBerry", "API Levels", 1001, 1004, true)]
     [ProvideOptionPage(typeof(TargetsOptionPage), "BlackBerry", "Targets", 1001, 1005, true)]
+    [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
     public sealed class VSNDK_PackagePackage : Package
     {
         #region private member variables
@@ -967,6 +968,9 @@ namespace RIM.VSNDK_Package
             // and set it to monitor all logs (they have to be marked with 'BlackBerry' category! aka TraceLog.Category):
             TraceLog.Add(_traceWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
+
+            var options = GetDialogPage(typeof(GeneralOptionPage)) as GeneralOptionPage;
+            var path = options.NdkPath;
 
             InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
             TraceLog.WriteLine(" * loaded NDK descriptions");

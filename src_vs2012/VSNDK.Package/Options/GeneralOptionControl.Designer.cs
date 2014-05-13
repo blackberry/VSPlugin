@@ -30,12 +30,12 @@
         {
             this.txtNdkPath = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtToolsPath = new System.Windows.Forms.TextBox();
-            this.bttNdkBrowse = new System.Windows.Forms.Button();
-            this.bttToolsBrowse = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
+            this.bttToolsBrowse = new System.Windows.Forms.Button();
+            this.bttNdkBrowse = new System.Windows.Forms.Button();
+            this.txtToolsPath = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -66,43 +66,14 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Locations";
             // 
-            // label1
+            // label3
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(15, 26);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "NDK Path:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(15, 46);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(109, 13);
-            this.label2.TabIndex = 3;
-            this.label2.Text = "(Visual Studio Edition)";
-            // 
-            // txtToolsPath
-            // 
-            this.txtToolsPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtToolsPath.Location = new System.Drawing.Point(91, 80);
-            this.txtToolsPath.Name = "txtToolsPath";
-            this.txtToolsPath.Size = new System.Drawing.Size(429, 20);
-            this.txtToolsPath.TabIndex = 5;
-            // 
-            // bttNdkBrowse
-            // 
-            this.bttNdkBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttNdkBrowse.Location = new System.Drawing.Point(526, 23);
-            this.bttNdkBrowse.Name = "bttNdkBrowse";
-            this.bttNdkBrowse.Size = new System.Drawing.Size(75, 23);
-            this.bttNdkBrowse.TabIndex = 2;
-            this.bttNdkBrowse.Text = "Browse...";
-            this.bttNdkBrowse.UseVisualStyleBackColor = true;
-            this.bttNdkBrowse.Click += new System.EventHandler(this.bttNdkBrowse_Click);
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(15, 83);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(61, 13);
+            this.label3.TabIndex = 4;
+            this.label3.Text = "Tools Path:";
             // 
             // bttToolsBrowse
             // 
@@ -115,14 +86,43 @@
             this.bttToolsBrowse.UseVisualStyleBackColor = true;
             this.bttToolsBrowse.Click += new System.EventHandler(this.bttToolsBrowse_Click);
             // 
-            // label3
+            // bttNdkBrowse
             // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 83);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(61, 13);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Tools Path:";
+            this.bttNdkBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttNdkBrowse.Location = new System.Drawing.Point(526, 23);
+            this.bttNdkBrowse.Name = "bttNdkBrowse";
+            this.bttNdkBrowse.Size = new System.Drawing.Size(75, 23);
+            this.bttNdkBrowse.TabIndex = 2;
+            this.bttNdkBrowse.Text = "Browse...";
+            this.bttNdkBrowse.UseVisualStyleBackColor = true;
+            this.bttNdkBrowse.Click += new System.EventHandler(this.bttNdkBrowse_Click);
+            // 
+            // txtToolsPath
+            // 
+            this.txtToolsPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtToolsPath.Location = new System.Drawing.Point(91, 80);
+            this.txtToolsPath.Name = "txtToolsPath";
+            this.txtToolsPath.Size = new System.Drawing.Size(429, 20);
+            this.txtToolsPath.TabIndex = 5;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(15, 46);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(109, 13);
+            this.label2.TabIndex = 3;
+            this.label2.Text = "(Visual Studio Edition)";
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(15, 26);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(58, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "NDK Path:";
             // 
             // GeneralOptionControl
             // 
