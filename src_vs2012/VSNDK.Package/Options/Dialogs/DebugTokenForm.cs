@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Model;
@@ -15,6 +16,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private DeviceInfoRunner _deviceInfoRunner;
         private DebugTokenUploadRunner _tokenUploadRunner;
         private ApplicationRemoveRunner _tokenRemoveRunner;
+        private DebugTokenCreateRunner _tokenCreateRunner;
         private DebugTokenInfo _tokenInfo;
         private bool _startup;
 
@@ -59,6 +61,11 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         public bool IsRemovingToken
         {
             get { return _tokenRemoveRunner != null; }
+        }
+
+        public bool IsCreatingToken
+        {
+            get { return _tokenCreateRunner != null; }
         }
 
         public bool IsLoadingDeviceInfo
@@ -189,7 +196,6 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             else
             {
                 TraceLog.WriteLine("Failed to load info about debug token: \"{0}\"", _tokenInfoRunner.DebugTokenLocation);
-                TraceLog.WarnLine(_tokenInfoRunner.LastOutput);
                 AppendTokenLog(_tokenInfoRunner.LastError);
             }
 
@@ -380,9 +386,6 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             if (success)
             {
                 TraceLog.WriteLine("Uploaded debug token to device: {0}", _device);
-
-                // reload device info:
-                LoadDeviceInfo(_device, true);
             }
             else
             {
@@ -395,6 +398,12 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             _tokenUploadRunner = null;
 
             UpdateDeviceStatusUI(true);
+
+            if (success)
+            {
+                // reload device info:
+                LoadDeviceInfo(_device, true);
+            }
         }
 
         #endregion
@@ -436,9 +445,6 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             if (success)
             {
                 TraceLog.WriteLine("Removed debug token a device: {0}", _device);
-
-                // reload device info:
-                LoadDeviceInfo(_device, true);
             }
             else
             {
@@ -452,6 +458,85 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             _tokenRemoveRunner = null;
 
             UpdateDeviceStatusUI(true);
+
+            if (success)
+            {
+                // reload device info:
+                LoadDeviceInfo(_device, true);
+            }
+        }
+
+        #endregion
+
+        #region Debug Token Create Runner
+
+        private void CreateDebugToken(string fileName, ulong pin)
+        {
+            if (IsCreatingToken)
+                return;
+
+            var devices = MergeDevices(_tokenInfo, pin);
+
+            ClearTokenLogs();
+            AppendTokenLog("Creating new debug token...");
+            _tokenInfo = null;
+            DebugTokenPath = fileName;
+            UpdateTokenStatusUI(false);
+
+            // and create token asynchronously:
+            _tokenCreateRunner = new DebugTokenCreateRunner(RunnerDefaults.ToolsDirectory, fileName, _vm.Developer.CskPassword, devices);
+            _tokenCreateRunner.Dispatcher = EventDispatcher.From(this);
+            _tokenCreateRunner.Finished += TokenCreateRunnerOnFinished;
+            _tokenCreateRunner.ExecuteAsync();
+        }
+
+        private static ulong[] MergeDevices(DebugTokenInfo existingToken, ulong pin)
+        {
+            // will be only for current device:
+            if (existingToken == null || existingToken.Devices == null || existingToken.Devices.Length == 0)
+                return new[] { pin };
+
+            // already contains:
+            if (existingToken.Contains(pin))
+                return existingToken.Devices;
+
+            var result = new ulong[existingToken.Devices.Length + 1];
+            result[0] = pin;
+
+            for (int i = 0; i < existingToken.Devices.Length; i++)
+                result[i + 1] = existingToken.Devices[i];
+            return result;
+        }
+
+        private void TokenCreateRunnerOnFinished(object sender, ToolRunnerEventArgs e)
+        {
+            bool success = string.IsNullOrEmpty(_tokenCreateRunner.LastError) && _tokenCreateRunner.CreatedSuccessfully;
+            AppendTokenLog("--- DONE with " + (success ? "success" : "failure") + Environment.NewLine);
+
+            string path = success ? _tokenCreateRunner.DebugTokenLocation : null;
+
+            if (success)
+            {
+                TraceLog.WriteLine("Created new debug token at: \"{0}\"", path);
+                AppendTokenLog("Debug token created at:" + Environment.NewLine + path);
+            }
+            else
+            {
+                TraceLog.WriteLine("Failed to create debug token at: \"{0}\"", path);
+                AppendTokenLog(_tokenCreateRunner.LastError);
+            }
+
+            _tokenCreateRunner.Finished -= TokenCreateRunnerOnFinished;
+            _tokenCreateRunner = null;
+
+            UpdateTokenStatusUI(true);
+            UpdateDeviceStatusUI(!IsLoadingDeviceInfo);
+
+            if (success)
+            {
+                // reload token info:
+                LoadTokenInfo(path);
+            }
         }
 
         #endregion
@@ -496,6 +581,39 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private void bttRemove_Click(object sender, EventArgs e)
         {
             RemoveDebugToken();
+        }
+
+        private void bttTokenRenew_Click(object sender, EventArgs e)
+        {
+            var details = _vm.GetDetails(_device);
+            if (details == null || details.PIN == 0)
+            {
+                MessageBoxHelper.Show("Please connect first the device and load its properties", "Missing device PIN", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            if (string.IsNullOrEmpty(_vm.Developer.CskPassword))
+            {
+                var form = new PasswordForm();
+
+                if (form.ShowDialog() != DialogResult.OK)
+                {
+                    TraceLog.WarnLine("Update of BBID Token CSK password rejected");
+                    return;
+                }
+
+                // save password (for current session only for persistantly):
+                _vm.Developer.UpdatePassword(form.Password, form.ShouldRemember);
+            }
+
+            // ask where to store the debug-token:
+            var startupPath = string.IsNullOrEmpty(DebugTokenPath) ? RunnerDefaults.DataDirectory : Path.GetDirectoryName(DebugTokenPath);
+            var saveFile = DialogHelper.SaveBarFile("Renewed debug token location", startupPath, "debugtoken-" + DateTime.Now.ToString("yyyy-MM-hh") + ".bar");
+
+            if (saveFile.ShowDialog() == DialogResult.OK)
+            {
+                CreateDebugToken(saveFile.FileName, details.PIN);
+            }
         }
     }
 }

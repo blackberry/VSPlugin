@@ -185,7 +185,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            txtIP.Enabled = DeviceClass != DialogDeviceClass.UsbDevice;
+            txtIP.ReadOnly = DeviceClass != DialogDeviceClass.UsbDevice;
 
             if (DeviceClass == DialogDeviceClass.UsbDevice)
             {

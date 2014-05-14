@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
@@ -30,6 +29,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
         #endregion
 
+        private DeveloperDefinition _developer;
         private NdkInfo[] _installedNDKs;
         private NdkInfo _activeNDK;
         private DeviceDefinition[] _targetDevices;
@@ -41,6 +41,20 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         #region Properties
+
+        public DeveloperDefinition Developer
+        {
+            get
+            {
+                if (_developer == null)
+                {
+                    // load info about current developer:
+                    _developer = DeveloperDefinition.Load(RunnerDefaults.DataDirectory);
+                }
+
+                return _developer;
+            }
+        }
 
         public NdkInfo[] InstalledNDKs
         {

@@ -36,5 +36,23 @@ namespace RIM.VSNDK_Package.Options
 
             return openFile;
         }
+
+        /// <summary>
+        /// Returns preconfigured window for saving BAR file.
+        /// </summary>
+        public static SaveFileDialog SaveBarFile(string title, string startupPath, string fileName)
+        {
+            var saveFile = new SaveFileDialog();
+            saveFile.Title = title;
+            saveFile.InitialDirectory = startupPath;
+            saveFile.FileName = fileName;
+            saveFile.DefaultExt = ".bar";
+            saveFile.Filter = "Bar files|*.bar|All files|*.*";
+            saveFile.FilterIndex = 0;
+            saveFile.CreatePrompt = false;
+            saveFile.OverwritePrompt = true;
+
+            return saveFile;
+        }
     }
 }

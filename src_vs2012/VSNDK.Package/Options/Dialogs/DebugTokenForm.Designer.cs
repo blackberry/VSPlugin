@@ -72,9 +72,10 @@
             this.bttTokenRenew.Location = new System.Drawing.Point(442, 80);
             this.bttTokenRenew.Name = "bttTokenRenew";
             this.bttTokenRenew.Size = new System.Drawing.Size(75, 23);
-            this.bttTokenRenew.TabIndex = 5;
+            this.bttTokenRenew.TabIndex = 4;
             this.bttTokenRenew.Text = "&Renew...";
             this.bttTokenRenew.UseVisualStyleBackColor = true;
+            this.bttTokenRenew.Click += new System.EventHandler(this.bttTokenRenew_Click);
             // 
             // bttTokenCreate
             // 
@@ -83,7 +84,7 @@
             this.bttTokenCreate.Location = new System.Drawing.Point(442, 51);
             this.bttTokenCreate.Name = "bttTokenCreate";
             this.bttTokenCreate.Size = new System.Drawing.Size(75, 23);
-            this.bttTokenCreate.TabIndex = 4;
+            this.bttTokenCreate.TabIndex = 3;
             this.bttTokenCreate.Text = "Cr&eate...";
             this.bttTokenCreate.UseVisualStyleBackColor = true;
             // 
@@ -98,7 +99,7 @@
             this.txtDebugTokenLog.ReadOnly = true;
             this.txtDebugTokenLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtDebugTokenLog.Size = new System.Drawing.Size(416, 88);
-            this.txtDebugTokenLog.TabIndex = 3;
+            this.txtDebugTokenLog.TabIndex = 5;
             // 
             // bttTokenBrowse
             // 
@@ -137,7 +138,7 @@
             this.bttOK.Location = new System.Drawing.Point(460, 381);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
-            this.bttOK.TabIndex = 1;
+            this.bttOK.TabIndex = 3;
             this.bttOK.Text = "&Close";
             this.bttOK.UseVisualStyleBackColor = true;
             // 
@@ -155,7 +156,7 @@
             this.groupBox2.Location = new System.Drawing.Point(12, 163);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(523, 212);
-            this.groupBox2.TabIndex = 2;
+            this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Devices";
             // 
@@ -166,7 +167,7 @@
             this.bttRemove.Location = new System.Drawing.Point(442, 129);
             this.bttRemove.Name = "bttRemove";
             this.bttRemove.Size = new System.Drawing.Size(75, 23);
-            this.bttRemove.TabIndex = 5;
+            this.bttRemove.TabIndex = 4;
             this.bttRemove.Text = "Re&move";
             this.bttRemove.UseVisualStyleBackColor = true;
             this.bttRemove.Click += new System.EventHandler(this.bttRemove_Click);
@@ -178,7 +179,7 @@
             this.bttUpload.Location = new System.Drawing.Point(442, 46);
             this.bttUpload.Name = "bttUpload";
             this.bttUpload.Size = new System.Drawing.Size(75, 23);
-            this.bttUpload.TabIndex = 4;
+            this.bttUpload.TabIndex = 2;
             this.bttUpload.Text = "&Upload";
             this.bttUpload.UseVisualStyleBackColor = true;
             this.bttUpload.Click += new System.EventHandler(this.bttUpload_Click);
@@ -194,7 +195,7 @@
             this.txtDeviceLog.ReadOnly = true;
             this.txtDeviceLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtDeviceLog.Size = new System.Drawing.Size(416, 160);
-            this.txtDeviceLog.TabIndex = 3;
+            this.txtDeviceLog.TabIndex = 5;
             // 
             // cmbDevices
             // 
@@ -205,7 +206,7 @@
             this.cmbDevices.MaxDropDownItems = 25;
             this.cmbDevices.Name = "cmbDevices";
             this.cmbDevices.Size = new System.Drawing.Size(189, 21);
-            this.cmbDevices.TabIndex = 0;
+            this.cmbDevices.TabIndex = 1;
             this.cmbDevices.SelectedIndexChanged += new System.EventHandler(this.cmbDevices_SelectedIndexChanged);
             // 
             // bttDeviceLoad
@@ -214,7 +215,7 @@
             this.bttDeviceLoad.Location = new System.Drawing.Point(442, 75);
             this.bttDeviceLoad.Name = "bttDeviceLoad";
             this.bttDeviceLoad.Size = new System.Drawing.Size(75, 23);
-            this.bttDeviceLoad.TabIndex = 2;
+            this.bttDeviceLoad.TabIndex = 3;
             this.bttDeviceLoad.Text = "Re&load info";
             this.bttDeviceLoad.UseVisualStyleBackColor = true;
             this.bttDeviceLoad.Click += new System.EventHandler(this.bttDeviceLoad_Click);
@@ -225,7 +226,7 @@
             this.label2.Location = new System.Drawing.Point(17, 22);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(41, 13);
-            this.label2.TabIndex = 1;
+            this.label2.TabIndex = 0;
             this.label2.Text = "Target:";
             // 
             // lblError
@@ -234,7 +235,7 @@
             this.lblError.Location = new System.Drawing.Point(30, 378);
             this.lblError.Name = "lblError";
             this.lblError.Size = new System.Drawing.Size(418, 35);
-            this.lblError.TabIndex = 6;
+            this.lblError.TabIndex = 2;
             this.lblError.Text = "- error -";
             this.lblError.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblError.Visible = false;

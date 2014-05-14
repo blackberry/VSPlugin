@@ -15,6 +15,14 @@ namespace RIM.VSNDK_Package.ViewModels
         private Dictionary<DeviceDefinition, DeviceInfo> _details;
 
         /// <summary>
+        /// Gets the reference to current developer.
+        /// </summary>
+        public DeveloperDefinition Developer
+        {
+            get { return PackageViewModel.Instance.Developer; }
+        }
+
+        /// <summary>
         /// Gets the list of target devices.
         /// </summary>
         public ICollection<DeviceDefinition> Devices
