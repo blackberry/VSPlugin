@@ -69,7 +69,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 else
                 {
                     _loadedDeviceName = value;
-                    bttSetName.Text = "<< " + value.Substring(0, value.Length > 14 ? 14 : value.Length) + "..."; // up to 15chars
+                    bttSetName.Text = "<< " + (value.Length > 14 ? value.Substring(0, 14) + "..." : value); // up to 15chars
                     bttSetName.Visible = true;
                 }
             }

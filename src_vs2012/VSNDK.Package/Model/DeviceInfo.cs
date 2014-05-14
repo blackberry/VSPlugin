@@ -342,6 +342,10 @@ namespace RIM.VSNDK_Package.Model
             if (string.CompareOrdinal(text, "0") == 0)
                 return false;
 
+            // PH: no reason, but sometimes boolean field is presented as JSON (especially debug-token-valid field)...
+            if (string.CompareOrdinal(text, "{}") == 0)
+                return false;
+
             throw new FormatException("Invalid boolean value");
         }
 

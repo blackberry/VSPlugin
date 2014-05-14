@@ -86,12 +86,96 @@ namespace RIM.VSNDK_Package.Model
 
         #endregion
 
+        /// <summary>
+        /// Checks, whether this debug token is build agains specified device.
+        /// </summary>
+        public bool Contains(ulong device)
+        {
+            if (device == 0)
+                return false;
+            if (Devices == null || Devices.Length == 0)
+                return false;
+
+            for (int i = 0; i < Devices.Length; i++)
+            {
+                if (device == Devices[i])
+                    return true;
+            }
+
+            return false;
+        }
+
+
         public override string ToString()
         {
             if (_description == null)
                 _description = GetDescription();
 
             return _description;
+        }
+
+        /// <summary>
+        /// Gets the long description summary of the debug token.
+        /// </summary>
+        public string ToLongDescription(bool mostImportantOnly)
+        {
+            var result = new StringBuilder();
+
+            if (!mostImportantOnly)
+            {
+                result.Append("Name: ").Append(Name).Append(" (").Append(ID).AppendLine(")");
+                result.Append("Author: ").AppendLine(Author);
+            }
+
+            // print dates:
+            if (ExpiryDate != DateTime.MinValue)
+                result.Append("Expiry Date: ").AppendLine(ExpiryDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"));
+            if (!mostImportantOnly)
+            {
+                if (IssueDate != DateTime.MinValue)
+                    result.Append("Issue Date: ").AppendLine(IssueDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"));
+                result.Append("Version: ").Append(Version).Append(" (ID: ").Append(VersionID).AppendLine(")");
+            }
+
+            // print affected devices:
+            if (mostImportantOnly && Devices.Length > 0)
+            {
+                result.Append("Devices: ");
+                int i = 0;
+                foreach (var device in Devices)
+                {
+                    if (i > 0)
+                        result.Append(", ");
+                    result.Append(device.ToString("X"));
+                    i++;
+                }
+                result.AppendLine();
+            }
+
+            if (mostImportantOnly)
+            {
+                result.Append("Author: ").AppendLine(Author);
+                result.Append("Author ID: ").AppendLine(AuthorID);
+            }
+
+            // print system actions allowed:
+            if (mostImportantOnly && SystemActions.Length > 0)
+            {
+                result.AppendLine();
+                result.Append("Actions: ");
+                
+                int i = 0;
+                foreach (var action in SystemActions)
+                {
+                    if (i > 0)
+                        result.Append(", ");
+                    result.Append(action);
+                    i++;
+                }
+                result.AppendLine();
+            }
+
+            return result.ToString();
         }
 
         private string GetDescription()

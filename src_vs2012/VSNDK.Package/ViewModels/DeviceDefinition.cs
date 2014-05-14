@@ -61,6 +61,14 @@ namespace RIM.VSNDK_Package.ViewModels
             private set;
         }
 
+        /// <summary>
+        /// Gets non-null short name of this device.
+        /// </summary>
+        public string ShortName
+        {
+            get { return string.IsNullOrEmpty(Name) ? IP : Name; }
+        }
+
         #endregion
 
         /// <summary>

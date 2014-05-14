@@ -19,5 +19,22 @@ namespace RIM.VSNDK_Package.Options
 
             return startupPath;
         }
+
+        /// <summary>
+        /// Returns preconfigured window for opening BAR files.
+        /// </summary>
+        public static OpenFileDialog OpenBarFile(string title, string startupPath)
+        {
+            var openFile = new OpenFileDialog();
+            openFile.Title = title;
+            openFile.InitialDirectory = startupPath;
+            openFile.DefaultExt = ".bar";
+            openFile.Filter = "Bar files|*.bar|All files|*.*";
+            openFile.FilterIndex = 0;
+            openFile.CheckFileExists = true;
+            openFile.CheckPathExists = true;
+
+            return openFile;
+        }
     }
 }

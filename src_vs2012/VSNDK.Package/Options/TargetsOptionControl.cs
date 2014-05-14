@@ -37,7 +37,7 @@ namespace RIM.VSNDK_Package.Options
             
             foreach (var device in _vm.Devices)
             {
-                ListViewItem item = new ListViewItem();
+                var item = new ListViewItem();
                 item.Tag = device;
                 item.Text = _vm.IsActive(device) ? "x" : string.Empty;
                 item.SubItems.Add(device.Type == DeviceDefinitionType.Simulator ? "S" : string.Empty);
@@ -47,7 +47,7 @@ namespace RIM.VSNDK_Package.Options
                 listTargets.Items.Add(item);
             }
 
-            bttDebugToken.Enabled = _vm.ActiveDevice != null;
+            bttDebugToken.Enabled = _vm.RealDevicesCount > 0;
         }
 
         private void lnkMoreInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -59,8 +59,13 @@ namespace RIM.VSNDK_Package.Options
         {
             var device = SelectedDevice;
 
-            bttEdit.Enabled = bttRemove.Enabled = device != null;
-            bttActivate.Enabled = device != null && _vm.IsActive(device);
+            bttEdit.Enabled = bttRemove.Enabled = bttActivate.Enabled = device != null;
+
+            // update the button with 'debug-token' deployment, to limit it only to valid devices:
+            device = SelectedDevice ?? _vm.ActiveDevice;
+            if (device != null && device.Type != DeviceDefinitionType.Device)
+                device = null;
+            bttDebugToken.Enabled = _vm.RealDevicesCount > 0 && device != null;
         }
 
         private void listTargets_DoubleClick(object sender, System.EventArgs e)
@@ -110,6 +115,22 @@ namespace RIM.VSNDK_Package.Options
             {
                 _vm.Remove(device);
                 PopulateDevices();
+            }
+        }
+
+        private void bttDebugToken_Click(object sender, System.EventArgs e)
+        {
+            var device = SelectedDevice ?? _vm.ActiveDevice;
+
+            if (device != null && device.Type != DeviceDefinitionType.Device)
+                device = null;
+
+            var form = new DebugTokenForm();
+            form.SetVM(_vm, device);
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+
             }
         }
 

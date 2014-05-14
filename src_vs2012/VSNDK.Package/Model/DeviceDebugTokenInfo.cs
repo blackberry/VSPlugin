@@ -72,6 +72,27 @@ namespace RIM.VSNDK_Package.Model
             return _description;
         }
 
+        /// <summary>
+        /// Gets full info about this object.
+        /// </summary>
+        public string ToLongDescription()
+        {
+            var result = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(Author))
+                result.Append("Author: ").AppendLine(Author);
+            if (ExpiryDate != DateTime.MinValue)
+                result.Append("Expiry Date: ").AppendLine(ExpiryDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"));
+
+            if (ValidationErrorCode != 0)
+            {
+                result.Append("Error Code: ").AppendLine(ValidationErrorCode.ToString());
+                result.Append("Error Message: ").AppendLine(ValidationErrorMessage);
+            }
+
+            return result.ToString();
+        }
+
         private string GetDescription()
         {
             var result = new StringBuilder();

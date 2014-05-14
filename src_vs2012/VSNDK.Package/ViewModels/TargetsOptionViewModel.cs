@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using RIM.VSNDK_Package.Model;
 
 namespace RIM.VSNDK_Package.ViewModels
 {
@@ -11,6 +12,7 @@ namespace RIM.VSNDK_Package.ViewModels
         private List<DeviceDefinition> _devices;
         private DeviceDefinition _activeDevice;
         private DeviceDefinition _activeSimulator;
+        private Dictionary<DeviceDefinition, DeviceInfo> _details;
 
         /// <summary>
         /// Gets the list of target devices.
@@ -25,6 +27,7 @@ namespace RIM.VSNDK_Package.ViewModels
                     _devices = new List<DeviceDefinition>(PackageViewModel.Instance.TargetDevices);
                     _activeDevice = PackageViewModel.Instance.ActiveDevice;
                     _activeSimulator = PackageViewModel.Instance.ActiveSimulator;
+                    UpdateRealDevicesCount();
                 }
 
                 return _devices;
@@ -34,6 +37,28 @@ namespace RIM.VSNDK_Package.ViewModels
         public DeviceDefinition ActiveDevice
         {
             get { return _activeDevice; }
+        }
+
+        public int RealDevicesCount
+        {
+            get;
+            private set;
+        }
+
+        private void UpdateRealDevicesCount()
+        {
+            int count = 0;
+
+            if (_devices != null)
+            {
+                foreach (var d in _devices)
+                {
+                    if (d.Type == DeviceDefinitionType.Device)
+                        count++;
+                }
+            }
+
+            RealDevicesCount = count;
         }
 
         public bool IsActive(DeviceDefinition device)
@@ -51,6 +76,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             _devices.Add(device);
             _devices.Sort();
+            UpdateRealDevicesCount();
 
             // and set as activate automatically:
             if (_activeDevice == null && device.Type == DeviceDefinitionType.Device)
@@ -113,6 +139,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             _devices[index] = newDevice;
             _devices.Sort();
+            UpdateRealDevicesCount();
 
             if (_activeDevice == oldDevice)
             {
@@ -133,6 +160,8 @@ namespace RIM.VSNDK_Package.ViewModels
                 return;
 
             _devices.Remove(device);
+            UpdateRealDevicesCount();
+
             if (_activeDevice == device)
             {
                 _activeDevice = null;
@@ -143,6 +172,43 @@ namespace RIM.VSNDK_Package.ViewModels
                 {
                     _activeSimulator = null;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets detailed physical device description if available.
+        /// </summary>
+        public DeviceInfo GetDetails(DeviceDefinition device)
+        {
+            if (device == null)
+                return null;
+            if (_details == null)
+                return null;
+
+            DeviceInfo details;
+            return _details.TryGetValue(device, out details) ? details : null;
+        }
+
+        /// <summary>
+        /// Sets or updates detailed info about particular device.
+        /// </summary>
+        public void SetDetails(DeviceDefinition device, DeviceInfo details)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            if (details == null)
+            {
+                if (_details != null)
+                    _details.Remove(device);
+            }
+            else
+            {
+                if (_details == null)
+                    _details = new Dictionary<DeviceDefinition, DeviceInfo>();
+
+                // add or update info:
+                _details[device] = details;
             }
         }
 

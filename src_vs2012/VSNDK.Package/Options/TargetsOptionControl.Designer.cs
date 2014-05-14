@@ -31,6 +31,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.listTargets = new System.Windows.Forms.ListView();
             this.columnActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.columnIP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
@@ -40,7 +41,6 @@
             this.lnkMoreInfo = new System.Windows.Forms.LinkLabel();
             this.bttDebugToken = new System.Windows.Forms.Button();
             this.bttActivate = new System.Windows.Forms.Button();
-            this.columnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -85,6 +85,12 @@
             // 
             this.columnActive.Text = "A";
             this.columnActive.Width = 20;
+            // 
+            // columnType
+            // 
+            this.columnType.Text = "T";
+            this.columnType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.columnType.Width = 20;
             // 
             // columnName
             // 
@@ -163,6 +169,7 @@
             this.bttDebugToken.TabIndex = 2;
             this.bttDebugToken.Text = "&Upload debug token...";
             this.bttDebugToken.UseVisualStyleBackColor = true;
+            this.bttDebugToken.Click += new System.EventHandler(this.bttDebugToken_Click);
             // 
             // bttActivate
             // 
@@ -175,12 +182,6 @@
             this.bttActivate.Text = "Set &Activate";
             this.bttActivate.UseVisualStyleBackColor = true;
             this.bttActivate.Click += new System.EventHandler(this.bttActivate_Click);
-            // 
-            // columnType
-            // 
-            this.columnType.Text = "T";
-            this.columnType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.columnType.Width = 20;
             // 
             // TargetsOptionControl
             // 
