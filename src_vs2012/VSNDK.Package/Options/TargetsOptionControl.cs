@@ -39,7 +39,7 @@ namespace RIM.VSNDK_Package.Options
             {
                 ListViewItem item = new ListViewItem();
                 item.Tag = device;
-                item.Text = _vm.IsSelected(device) ? "x" : string.Empty;
+                item.Text = _vm.IsActive(device) ? "x" : string.Empty;
                 item.SubItems.Add(device.Type == DeviceDefinitionType.Simulator ? "S" : string.Empty);
                 item.SubItems.Add(device.Name);
                 item.SubItems.Add(device.IP);
@@ -59,7 +59,8 @@ namespace RIM.VSNDK_Package.Options
         {
             var device = SelectedDevice;
 
-            bttEdit.Enabled = bttRemove.Enabled = bttActivate.Enabled = device != null;
+            bttEdit.Enabled = bttRemove.Enabled = device != null;
+            bttActivate.Enabled = device != null && _vm.IsActive(device);
         }
 
         private void listTargets_DoubleClick(object sender, System.EventArgs e)

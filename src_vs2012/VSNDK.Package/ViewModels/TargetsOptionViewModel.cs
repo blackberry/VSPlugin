@@ -36,7 +36,7 @@ namespace RIM.VSNDK_Package.ViewModels
             get { return _activeDevice; }
         }
 
-        public bool IsSelected(DeviceDefinition device)
+        public bool IsActive(DeviceDefinition device)
         {
             if (device == null)
                 return false;
