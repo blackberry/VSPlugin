@@ -88,6 +88,12 @@ namespace RIM.VSNDK_Package.Tools
             protected set;
         }
 
+        public object Tag
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         private void OutputDataReceived(object sender, DataReceivedEventArgs e)
@@ -110,6 +116,8 @@ namespace RIM.VSNDK_Package.Tools
         {
             if (_isProcessing)
                 throw new InvalidOperationException("The process is already running");
+            if (string.IsNullOrEmpty(FileName))
+                throw new InvalidOperationException("No executable to start");
 
             PrepareExecution();
 
