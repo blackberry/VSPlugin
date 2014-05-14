@@ -18,7 +18,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         {
             InitializeComponent();
 
-            Name = title;
+            Text = title;
             cmbType.SelectedIndex = 0;
             IsConnected = false;
         }
