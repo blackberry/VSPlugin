@@ -111,14 +111,20 @@ namespace RIM.VSNDK_Package.Tools
                 // check, if there is any runtime error message:
                 foreach (var line in lines)
                 {
-                    if (line.StartsWith("error:", StringComparison.InvariantCultureIgnoreCase))
+                    if (line.StartsWith("error: ", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        LastError = line.Substring(6).Trim();;
+                        LastError = line.Substring(7).Trim();
                         break;
                     }
                     if (string.Compare("result::success", line, StringComparison.InvariantCultureIgnoreCase) == 0)
                     {
                         RemovedSuccessfully = true;
+                        break;
+                    }
+                    if (line.StartsWith("result::failure", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        RemovedSuccessfully = false;
+                        LastError = line.Substring(15).Trim();
                         break;
                     }
                 }
