@@ -9,7 +9,7 @@ namespace RIM.VSNDK_Package.Options
 {
     public partial class ApiLevelOptionControl : UserControl
     {
-        private readonly ApiLevelOptionViewModel _vm = new ApiLevelOptionViewModel();
+        private ApiLevelOptionViewModel _vm = new ApiLevelOptionViewModel();
 
         public ApiLevelOptionControl()
         {
@@ -47,6 +47,12 @@ namespace RIM.VSNDK_Package.Options
         internal void OnApply()
         {
             _vm.ActiveNDK = cmbNDKs.SelectedItem as NdkInfo;
+        }
+
+        public void OnClosed()
+        {
+            _vm = new ApiLevelOptionViewModel();
+            PopulateNDKs();
         }
 
         private void bttAddLocal_Click(object sender, EventArgs e)

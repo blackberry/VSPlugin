@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Options.Dialogs;
 using RIM.VSNDK_Package.ViewModels;
@@ -7,7 +8,7 @@ namespace RIM.VSNDK_Package.Options
 {
     public partial class TargetsOptionControl : UserControl
     {
-        private readonly TargetsOptionViewModel _vm = new TargetsOptionViewModel();
+        private TargetsOptionViewModel _vm = new TargetsOptionViewModel();
 
         public TargetsOptionControl()
         {
@@ -110,11 +111,13 @@ namespace RIM.VSNDK_Package.Options
         {
             var device = SelectedDevice;
 
-            if (MessageBoxHelper.Show(device.Type == DeviceDefinitionType.Device ? "Remove the device?" : "Remove the simulator?",
+            if (device != null
+                && MessageBoxHelper.Show(device.Type == DeviceDefinitionType.Device ? "Remove the device?" : "Remove the simulator?",
                                       device.ToString(), MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
                 _vm.Remove(device);
                 PopulateDevices();
+                listTargets_SelectedIndexChanged(null, EventArgs.Empty);
             }
         }
 
@@ -135,6 +138,12 @@ namespace RIM.VSNDK_Package.Options
         public void OnApply()
         {
             _vm.Apply();
+        }
+
+        public void OnReset()
+        {
+            _vm = new TargetsOptionViewModel();
+            PopulateDevices();
         }
     }
 }

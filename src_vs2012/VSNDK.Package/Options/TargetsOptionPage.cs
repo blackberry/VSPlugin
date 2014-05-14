@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -44,6 +45,12 @@ namespace RIM.VSNDK_Package.Options
         protected override void OnApply(PageApplyEventArgs e)
         {
             Control.OnApply();
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            base.OnClosed(e);
+            Control.OnReset();
         }
     }
 }
