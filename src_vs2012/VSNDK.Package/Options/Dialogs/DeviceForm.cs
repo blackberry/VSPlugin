@@ -113,6 +113,8 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private void ClearLog()
         {
             txtLogs.Text = string.Empty;
+            txtLogs.SelectionLength = 0;
+            txtLogs.SelectionStart = 0;
         }
 
         private void AppendLog(string text)
@@ -185,7 +187,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            txtIP.ReadOnly = DeviceClass != DialogDeviceClass.UsbDevice;
+            txtIP.ReadOnly = DeviceClass == DialogDeviceClass.UsbDevice;
 
             if (DeviceClass == DialogDeviceClass.UsbDevice)
             {
