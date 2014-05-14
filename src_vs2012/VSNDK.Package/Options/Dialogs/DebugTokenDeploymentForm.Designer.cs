@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.bttTokenRenew = new System.Windows.Forms.Button();
             this.bttTokenCreate = new System.Windows.Forms.Button();
             this.txtDebugTokenLog = new System.Windows.Forms.TextBox();
             this.bttTokenBrowse = new System.Windows.Forms.Button();
@@ -37,6 +36,7 @@
             this.label1 = new System.Windows.Forms.Label();
             this.bttOK = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.bttAdd = new System.Windows.Forms.Button();
             this.bttRemove = new System.Windows.Forms.Button();
             this.bttUpload = new System.Windows.Forms.Button();
             this.txtDeviceLog = new System.Windows.Forms.TextBox();
@@ -52,7 +52,6 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.bttTokenRenew);
             this.groupBox1.Controls.Add(this.bttTokenCreate);
             this.groupBox1.Controls.Add(this.txtDebugTokenLog);
             this.groupBox1.Controls.Add(this.bttTokenBrowse);
@@ -65,28 +64,16 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Debug Token";
             // 
-            // bttTokenRenew
-            // 
-            this.bttTokenRenew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttTokenRenew.Enabled = false;
-            this.bttTokenRenew.Location = new System.Drawing.Point(442, 80);
-            this.bttTokenRenew.Name = "bttTokenRenew";
-            this.bttTokenRenew.Size = new System.Drawing.Size(75, 23);
-            this.bttTokenRenew.TabIndex = 4;
-            this.bttTokenRenew.Text = "&Renew...";
-            this.bttTokenRenew.UseVisualStyleBackColor = true;
-            this.bttTokenRenew.Click += new System.EventHandler(this.bttTokenRenew_Click);
-            // 
             // bttTokenCreate
             // 
             this.bttTokenCreate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttTokenCreate.Enabled = false;
             this.bttTokenCreate.Location = new System.Drawing.Point(442, 51);
             this.bttTokenCreate.Name = "bttTokenCreate";
             this.bttTokenCreate.Size = new System.Drawing.Size(75, 23);
             this.bttTokenCreate.TabIndex = 3;
             this.bttTokenCreate.Text = "Cr&eate...";
             this.bttTokenCreate.UseVisualStyleBackColor = true;
+            this.bttTokenCreate.Click += new System.EventHandler(this.bttTokenCreate_Click);
             // 
             // txtDebugTokenLog
             // 
@@ -147,6 +134,7 @@
             this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox2.Controls.Add(this.bttAdd);
             this.groupBox2.Controls.Add(this.bttRemove);
             this.groupBox2.Controls.Add(this.bttUpload);
             this.groupBox2.Controls.Add(this.txtDeviceLog);
@@ -158,7 +146,17 @@
             this.groupBox2.Size = new System.Drawing.Size(523, 212);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Devices";
+            this.groupBox2.Text = "Onto Device";
+            // 
+            // bttAdd
+            // 
+            this.bttAdd.Location = new System.Drawing.Point(270, 19);
+            this.bttAdd.Name = "bttAdd";
+            this.bttAdd.Size = new System.Drawing.Size(30, 23);
+            this.bttAdd.TabIndex = 6;
+            this.bttAdd.Text = "+";
+            this.bttAdd.UseVisualStyleBackColor = true;
+            this.bttAdd.Click += new System.EventHandler(this.bttAdd_Click);
             // 
             // bttRemove
             // 
@@ -240,7 +238,7 @@
             this.lblError.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.lblError.Visible = false;
             // 
-            // DebugTokenForm
+            // DebugTokenDeploymentForm
             // 
             this.AcceptButton = this.bttOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -281,9 +279,9 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ComboBox cmbDevices;
         private System.Windows.Forms.TextBox txtDeviceLog;
-        private System.Windows.Forms.Button bttTokenRenew;
         private System.Windows.Forms.Button bttUpload;
         private System.Windows.Forms.Button bttRemove;
         private System.Windows.Forms.Label lblError;
+        private System.Windows.Forms.Button bttAdd;
     }
 }

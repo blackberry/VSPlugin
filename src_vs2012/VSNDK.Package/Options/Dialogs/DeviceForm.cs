@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Tools;
@@ -12,6 +13,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
     internal partial class DeviceForm : Form
     {
         private DeviceInfoRunner _runner;
+        private ulong _pin;
         private string _loadedDeviceName;
 
         public DeviceForm(string title)
@@ -55,6 +57,11 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             private set;
         }
 
+        public bool IsDiscoverMode
+        {
+            get { return cmbNames.Visible; }
+        }
+
         public string LoadedDeviceName
         {
             get { return _loadedDeviceName; }
@@ -70,8 +77,18 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 {
                     _loadedDeviceName = value;
                     bttSetName.Text = "<< " + (value.Length > 14 ? value.Substring(0, 14) + "..." : value); // up to 15chars
-                    bttSetName.Visible = true;
+                    bttSetName.Visible = txtName.Visible;
                 }
+            }
+        }
+
+        public ulong PIN
+        {
+            get { return _pin; }
+            private set
+            {
+                _pin = value;
+                txtPIN.Text = value == 0 ? string.Empty : value.ToString("X");
             }
         }
 
@@ -100,6 +117,31 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             DeviceName = device.Name;
             DeviceIP = device.IP;
             DevicePassword = device.Password;
+        }
+
+        public void SetDiscoverMode(IEnumerable<DeviceDefinition> devices)
+        {
+            cmbType.Enabled = false;
+            txtName.Visible = false;
+            cmbNames.Visible = true;
+            bttTest.Visible = false;
+            bttDiscover.Visible = true;
+            bttOK.Enabled = false;
+            lblType.Visible = false;
+            lblPIN.Visible = true;
+            cmbType.Visible = false;
+            txtPIN.Visible = true;
+
+            cmbNames.Items.Clear();
+            cmbNames.Items.Add(new ComboBoxItem(string.Empty));
+            if (devices != null)
+            {
+                foreach (var device in devices)
+                {
+                    cmbNames.Items.Add(new ComboBoxItem(device.ShortName, device));
+                }
+            }
+            cmbNames.SelectedIndex = 0;
         }
 
         private DialogDeviceClass GetDeviceClass(DeviceDefinitionType type, string ip)
@@ -154,6 +196,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             IsConnected = false;
             LoadedDeviceName = null;
+            PIN = 0;
             _runner = new DeviceInfoRunner(RunnerDefaults.ToolsDirectory, DeviceIP, DevicePassword);
             _runner.Dispatcher = EventDispatcher.From(this);
             _runner.Finished += RunnerOnFinished;
@@ -172,6 +215,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 TraceLog.WriteLine("Found device: {0} with IP: {1}", _runner.DeviceInfo.ToString(), DeviceIP);
                 AppendLog("Device found:" + Environment.NewLine + _runner.DeviceInfo.ToLongDescription());
                 LoadedDeviceName = _runner.DeviceInfo != null ? _runner.DeviceInfo.Name : null;
+                PIN = _runner.DeviceInfo != null ? _runner.DeviceInfo.PIN : 0;
                 IsConnected = true;
             }
             else
@@ -183,6 +227,8 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             _runner.Finished -= RunnerOnFinished;
             _runner = null;
+
+            bttOK.Enabled = PIN > 0;
         }
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
@@ -211,6 +257,13 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 return;
             }
 
+            if (IsDiscoverMode && PIN == 0)
+            {
+                MessageBoxHelper.Show("Sorry, no PIN found yet", "Target Device", MessageBoxIcon.Error);
+                ActiveControl = bttDiscover;
+                return;
+            }
+
             DialogResult = DialogResult.OK;
             Close();
         }
@@ -218,6 +271,23 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private void bttSetName_Click(object sender, EventArgs e)
         {
             txtName.Text = LoadedDeviceName;
+        }
+
+        private void cmbNames_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var item = cmbNames.SelectedItem as ComboBoxItem;
+            var info = item != null ? item.Tag as DeviceDefinition : null;
+
+            if (info != null)
+            {
+                DeviceIP = info.IP;
+                DevicePassword = info.Password;
+            }
+            else
+            {
+                DeviceIP = string.Empty;
+                DevicePassword = string.Empty;
+            }
         }
     }
 }

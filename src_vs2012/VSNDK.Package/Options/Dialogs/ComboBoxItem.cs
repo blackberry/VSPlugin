@@ -14,6 +14,12 @@
             Text = text;
         }
 
+        public ComboBoxItem(string text, object tag)
+        {
+            Text = text;
+            Tag = tag;
+        }
+
         #region Properties
 
         public string Text

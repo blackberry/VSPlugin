@@ -127,11 +127,9 @@ namespace RIM.VSNDK_Package.Options
 
             var form = new DebugTokenDeploymentForm();
             form.SetVM(_vm, device);
+            form.AskOnStartup = false;
 
-            if (form.ShowDialog() == DialogResult.OK)
-            {
-
-            }
+            form.ShowDialog();
         }
 
         public void OnApply()

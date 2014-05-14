@@ -48,6 +48,12 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
         #region Properties
 
+        public bool AskOnStartup
+        {
+            get { return _startup; }
+            set { _startup = value; }
+        }
+
         public bool IsLoadingTokenInfo
         {
             get { return _tokenInfoRunner != null; }
@@ -214,7 +220,6 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         {
             bttTokenBrowse.Enabled = completed;
             bttTokenCreate.Enabled = completed;
-            bttTokenRenew.Enabled = completed;
 
             if (!completed)
             {
@@ -474,12 +479,10 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
         #region Debug Token Create Runner
 
-        private void CreateDebugToken(string fileName, ulong pin)
+        private void CreateDebugToken(string fileName, ulong[] devicePins)
         {
             if (IsCreatingToken)
                 return;
-
-            var devices = MergeDevices(_tokenInfo, pin);
 
             ClearTokenLogs();
             AppendTokenLog("Creating new debug token...");
@@ -488,28 +491,10 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             UpdateTokenStatusUI(false);
 
             // and create token asynchronously:
-            _tokenCreateRunner = new DebugTokenCreateRunner(RunnerDefaults.ToolsDirectory, fileName, _vm.Developer.CskPassword, devices);
+            _tokenCreateRunner = new DebugTokenCreateRunner(RunnerDefaults.ToolsDirectory, fileName, _vm.Developer.CskPassword, devicePins);
             _tokenCreateRunner.Dispatcher = EventDispatcher.From(this);
             _tokenCreateRunner.Finished += TokenCreateRunnerOnFinished;
             _tokenCreateRunner.ExecuteAsync();
-        }
-
-        private static ulong[] MergeDevices(DebugTokenInfo existingToken, ulong pin)
-        {
-            // will be only for current device:
-            if (existingToken == null || existingToken.Devices == null || existingToken.Devices.Length == 0)
-                return new[] { pin };
-
-            // already contains:
-            if (existingToken.Contains(pin))
-                return existingToken.Devices;
-
-            var result = new ulong[existingToken.Devices.Length + 1];
-            result[0] = pin;
-
-            for (int i = 0; i < existingToken.Devices.Length; i++)
-                result[i + 1] = existingToken.Devices[i];
-            return result;
         }
 
         private void TokenCreateRunnerOnFinished(object sender, ToolRunnerEventArgs e)
@@ -587,7 +572,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             RemoveDebugToken();
         }
 
-        private void bttTokenRenew_Click(object sender, EventArgs e)
+        private void bttTokenCreate_Click(object sender, EventArgs e)
         {
             var details = _vm.GetDetails(_device);
             if (details == null || details.PIN == 0)
@@ -616,7 +601,32 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             if (saveFile.ShowDialog() == DialogResult.OK)
             {
-                CreateDebugToken(saveFile.FileName, details.PIN);
+                // show PINs editor:
+                var form = new PinListForm();
+                form.OptionalDevices = _vm.Devices;
+                form.Add(_tokenInfo != null ? _tokenInfo.Devices : null);
+                form.Add(details.PIN);
+
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    var devicePINs = form.PINs;
+                    if (devicePINs == null || devicePINs.Length == 0)
+                        devicePINs = new[] { details.PIN };
+
+                    CreateDebugToken(saveFile.FileName, devicePINs);
+                }
+            }
+        }
+
+        private void bttAdd_Click(object sender, EventArgs e)
+        {
+            var form = new DeviceForm("Add new Target Device");
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var device = form.ToDevice();
+                _vm.Add(device);
+                PopulateDevices(device);
             }
         }
     }

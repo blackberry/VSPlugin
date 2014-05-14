@@ -308,6 +308,12 @@
     <Compile Include="Options\Dialogs\PasswordForm.Designer.cs">
       <DependentUpon>PasswordForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Options\Dialogs\PinListForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\PinListForm.Designer.cs">
+      <DependentUpon>PinListForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -520,6 +526,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\PasswordForm.resx">
       <DependentUpon>PasswordForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\PinListForm.resx">
+      <DependentUpon>PinListForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\GeneralOptionControl.resx">
       <DependentUpon>GeneralOptionControl.cs</DependentUpon>
