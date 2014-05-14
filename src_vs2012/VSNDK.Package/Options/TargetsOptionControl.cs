@@ -125,7 +125,7 @@ namespace RIM.VSNDK_Package.Options
             if (device != null && device.Type != DeviceDefinitionType.Device)
                 device = null;
 
-            var form = new DebugTokenForm();
+            var form = new DebugTokenDeploymentForm();
             form.SetVM(_vm, device);
 
             if (form.ShowDialog() == DialogResult.OK)

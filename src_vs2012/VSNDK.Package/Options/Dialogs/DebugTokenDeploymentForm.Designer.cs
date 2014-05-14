@@ -1,6 +1,6 @@
 ﻿namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    internal partial class DebugTokenForm
+    internal partial class DebugTokenDeploymentForm
     {
         /// <summary>
         /// Required designer variable.
@@ -254,7 +254,7 @@
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
-            this.Name = "DebugTokenForm";
+            this.Name = "DebugTokenDeploymentForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

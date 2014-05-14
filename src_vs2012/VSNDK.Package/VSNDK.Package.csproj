@@ -283,11 +283,11 @@
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\Dialogs\ComboBoxItem.cs" />
-    <Compile Include="Options\Dialogs\DebugTokenForm.cs">
+    <Compile Include="Options\Dialogs\DebugTokenDeploymentForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Options\Dialogs\DebugTokenForm.Designer.cs">
-      <DependentUpon>DebugTokenForm.cs</DependentUpon>
+    <Compile Include="Options\Dialogs\DebugTokenDeploymentForm.Designer.cs">
+      <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\Dialogs\DeviceForm.cs">
       <SubType>Form</SubType>
@@ -509,8 +509,8 @@
     <EmbeddedResource Include="Options\Dialogs\AddLocalNdkForm.resx">
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Options\Dialogs\DebugTokenForm.resx">
-      <DependentUpon>DebugTokenForm.cs</DependentUpon>
+    <EmbeddedResource Include="Options\Dialogs\DebugTokenDeploymentForm.resx">
+      <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\DeviceForm.resx">
       <DependentUpon>DeviceForm.cs</DependentUpon>

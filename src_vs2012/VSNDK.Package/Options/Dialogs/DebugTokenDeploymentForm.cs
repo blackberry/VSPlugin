@@ -8,7 +8,7 @@ using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    internal partial class DebugTokenForm : Form
+    internal partial class DebugTokenDeploymentForm : Form
     {
         private TargetsOptionViewModel _vm;
         private DeviceDefinition _device;
@@ -20,7 +20,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private DebugTokenInfo _tokenInfo;
         private bool _startup;
 
-        public DebugTokenForm()
+        public DebugTokenDeploymentForm()
         {
             InitializeComponent();
 
@@ -136,6 +136,8 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private void ClearTokenLogs()
         {
             txtDebugTokenLog.Text = string.Empty;
+            txtDebugTokenLog.SelectionLength = 0;
+            txtDebugTokenLog.SelectionStart = 0;
         }
 
         private void AppendTokenLog(string message)
@@ -149,6 +151,8 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private void ClearDeviceLogs()
         {
             txtDeviceLog.Text = string.Empty;
+            txtDeviceLog.SelectionLength = 0;
+            txtDeviceLog.SelectionStart = 0;
         }
 
         private void AppendDeviceLog(string message)
