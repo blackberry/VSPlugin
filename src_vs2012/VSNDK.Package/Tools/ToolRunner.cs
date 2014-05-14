@@ -47,6 +47,12 @@ namespace RIM.VSNDK_Package.Tools
 
         #region Properties
 
+        public IEventDispatcher Dispatcher
+        {
+            get;
+            set;
+        }
+
         public string FileName
         {
             get { return _process.StartInfo.FileName; }
@@ -152,9 +158,7 @@ namespace RIM.VSNDK_Package.Tools
                 TraceLog.WriteException(ex, "Unable to start {0}", GetType().Name);
 
                 _process.Close();
-
-                if (Finished != null)
-                    Finished(this, new ToolRunnerEventArgs(-1, null, null));
+                NotifyFinished(-1, null, null);
             }
         }
 
@@ -162,6 +166,24 @@ namespace RIM.VSNDK_Package.Tools
         {
             _process.Exited -= AsyncProcessExited;
             CompleteExecution();
+        }
+
+        private void NotifyFinished(int exitCode, string output, string error)
+        {
+            var finishedHandler = Finished;
+
+            if (finishedHandler != null)
+            {
+                // perform a cross-thread notification (in case we want to update UI directly from the handler)
+                if (Dispatcher != null)
+                {
+                    Dispatcher.Invoke(finishedHandler, this, new ToolRunnerEventArgs(exitCode, output, error));
+                }
+                else
+                {
+                    finishedHandler(this, new ToolRunnerEventArgs(exitCode, output, error));
+                }
+            }
         }
 
         private void PrepareExecution()
@@ -191,11 +213,7 @@ namespace RIM.VSNDK_Package.Tools
             ConsumeResults(outputText, errorText);
 
             // notify other listeners, in case they want to get something extra:
-            var finishedHandler = Finished;
-            if (finishedHandler != null)
-            {
-                finishedHandler(this, new ToolRunnerEventArgs(exitCode, outputText, errorText));
-            }
+            NotifyFinished(exitCode, outputText, errorText);
 
             _isProcessing = false;
         }

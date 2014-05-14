@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
 
@@ -154,6 +153,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             IsConnected = false;
             LoadedDeviceName = null;
             _runner = new DeviceInfoRunner(RunnerDefaults.ToolsDirectory, DeviceIP, DevicePassword);
+            _runner.Dispatcher = EventDispatcher.From(this);
             _runner.Finished += RunnerOnFinished;
 
             AppendLog("Testing connection...");
@@ -169,7 +169,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             {
                 TraceLog.WriteLine("Found device: {0} with IP: {1}", _runner.DeviceInfo.ToString(), DeviceIP);
                 AppendLog("Device found:" + Environment.NewLine + _runner.DeviceInfo.ToLongDescription());
-                Invoke(new Action<DeviceInfo>(UpdateWithDevice), _runner.DeviceInfo);
+                LoadedDeviceName = _runner.DeviceInfo != null ? _runner.DeviceInfo.Name : null;
                 IsConnected = true;
             }
             else
@@ -181,11 +181,6 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             _runner.Finished -= RunnerOnFinished;
             _runner = null;
-        }
-
-        private void UpdateWithDevice(DeviceInfo deviceInfo)
-        {
-            LoadedDeviceName = deviceInfo != null ? deviceInfo.Name : null;
         }
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
