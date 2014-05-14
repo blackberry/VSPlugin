@@ -108,7 +108,7 @@ namespace RIM.VSNDK_Package.Tools
             // list of devices:
             foreach (var device in Devices)
             {
-                args.Append(" -deviceid \"0x").Append(device.ToString("X")).Append('"');
+                args.Append(" -devicepin \"").Append(device.ToString("X")).Append('"');
             }
 
             // path to the output .bar file:
