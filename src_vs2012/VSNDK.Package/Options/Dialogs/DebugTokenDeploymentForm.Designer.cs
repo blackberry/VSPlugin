@@ -95,7 +95,7 @@
             this.bttTokenBrowse.Name = "bttTokenBrowse";
             this.bttTokenBrowse.Size = new System.Drawing.Size(75, 23);
             this.bttTokenBrowse.TabIndex = 2;
-            this.bttTokenBrowse.Text = "&Browse...";
+            this.bttTokenBrowse.Text = "&Open...";
             this.bttTokenBrowse.UseVisualStyleBackColor = true;
             this.bttTokenBrowse.Click += new System.EventHandler(this.bttTokenBrowse_Click);
             // 

@@ -424,6 +424,9 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             if (IsRemovingToken)
                 return;
 
+            if (MessageBoxHelper.Show("Remove debug-token from that device?", _device.ShortName, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                return;
+
             ClearDeviceLogs();
             if (_device == null)
             {
