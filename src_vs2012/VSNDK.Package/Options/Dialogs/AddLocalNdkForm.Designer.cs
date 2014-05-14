@@ -181,10 +181,10 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(18, 31);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(586, 13);
+            this.label1.Size = new System.Drawing.Size(558, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "Specify the location of a local NDK and name it uniquely. Use Browse buttons belo" +
-    "w, to let them be detected automatically.";
+    "w, to automate the whole process.";
             // 
             // AddLocalNdkForm
             // 

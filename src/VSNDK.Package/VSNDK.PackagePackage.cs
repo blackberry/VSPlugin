@@ -1031,16 +1031,16 @@ namespace RIM.VSNDK_Package
 
                 // Create dynamic command for the 'devices-list' menu
                 CommandID devicesCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsDevicesPlaceholder);
-                DynamicMenuCommand devicesMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledNDKs,
+                DynamicMenuCommand devicesMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.TargetDevices,
                                                                         (cmd, collection, index) =>
                                                                             {
-                                                                                var item = index >= 0 && index < collection.Count ? ((NdkInfo[])collection)[index] : null;
-                                                                                PackageViewModel.Instance.ActiveNDK = item;
+                                                                                var item = index >= 0 && index < collection.Count ? ((DeviceDefinition[])collection)[index] : null;
+                                                                                PackageViewModel.Instance.ActiveDevice = item;
                                                                             },
                                                                         (cmd, collection, index) =>
                                                                             {
-                                                                                var item = index >= 0 && index < collection.Count ? ((NdkInfo[]) collection)[index] : null;
-                                                                                cmd.Checked = item == PackageViewModel.Instance.ActiveNDK;
+                                                                                var item = index >= 0 && index < collection.Count ? ((DeviceDefinition[])collection)[index] : null;
+                                                                                cmd.Checked = item == PackageViewModel.Instance.ActiveDevice || item == PackageViewModel.Instance.ActiveSimulator;
                                                                                 cmd.Text = item != null ? item.ToString() : "-";
                                                                             },
                                                                         devicesCommandID);

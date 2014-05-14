@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
@@ -31,6 +32,9 @@ namespace RIM.VSNDK_Package.ViewModels
 
         private NdkInfo[] _installedNDKs;
         private NdkInfo _activeNDK;
+        private DeviceDefinition[] _targetDevices;
+        private DeviceDefinition _activeDevice;
+        private DeviceDefinition _activeSimulator;
 
         public PackageViewModel()
         {
@@ -91,6 +95,108 @@ namespace RIM.VSNDK_Package.ViewModels
                     _activeNDK = _installedNDKs[index];
                     TraceLog.WriteLine("Changed active NDK to: \"{0}\"", _activeNDK);
                     SaveActiveNDK();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of all available target devices.
+        /// </summary>
+        public DeviceDefinition[] TargetDevices
+        {
+            get
+            {
+                if (_targetDevices == null)
+                {
+                    _targetDevices = DeviceDefinition.LoadAll();
+
+                    var device = DeviceDefinition.LoadDevice();
+                    var simulator = DeviceDefinition.LoadSimulator();
+
+                    _activeDevice = DeviceDefinition.Find(_targetDevices, device);
+                    _activeSimulator = DeviceDefinition.Find(_targetDevices, simulator);
+
+                    TraceLog.WriteLine("Loaded list of Target Devices");
+                    TraceLog.WriteLine("Found active Target Devices:");
+                    TraceLog.WriteLine(" * device - {0}", _activeDevice != null ? _activeDevice.ToString() : "none");
+                    TraceLog.WriteLine(" * simulator - {0}", _activeSimulator != null ? _activeSimulator.ToString() : "none");
+                }
+
+                return _targetDevices;
+            }
+            set
+            {
+                _targetDevices = value ?? new DeviceDefinition[0];
+                DeviceDefinition.SaveAll(_targetDevices);
+
+                ActiveDevice = DeviceDefinition.Find(_targetDevices, _activeDevice);
+                ActiveSimulator = DeviceDefinition.Find(_targetDevices, _activeSimulator);
+            }
+        }
+
+        /// <summary>
+        /// Gets the reference to currently active device.
+        /// </summary>
+        public DeviceDefinition ActiveDevice
+        {
+            get { return _activeDevice; }
+            set
+            {
+                // check, if type is expected:
+                if (value != null && value.Type == DeviceDefinitionType.Simulator)
+                {
+                    ActiveSimulator = value;
+                    return;
+                }
+
+                // update field and store it:
+                if (_activeDevice != value)
+                {
+                    _activeDevice = value;
+
+                    if (_activeDevice == null)
+                    {
+                        DeviceDefinition.Delete(DeviceDefinitionType.Device);
+                        TraceLog.WarnLine("No Target Device is active now");
+                    }
+                    else
+                    {
+                        _activeDevice.Save();
+                        TraceLog.WriteLine("Set active Target Device: {0}", _activeDevice);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the reference to currently active simulator.
+        /// </summary>
+        public DeviceDefinition ActiveSimulator
+        {
+            get { return _activeSimulator; }
+            set
+            {
+                // check if type is as expected:
+                if (value != null && value.Type == DeviceDefinitionType.Device)
+                {
+                    ActiveDevice = value;
+                    return;
+                }
+
+                // update field and store it:
+                if (_activeSimulator != value)
+                {
+                    _activeSimulator = value;
+                    if (_activeSimulator == null)
+                    {
+                        DeviceDefinition.Delete(DeviceDefinitionType.Simulator);
+                        TraceLog.WarnLine("No Target Simulator is active now");
+                    }
+                    else
+                    {
+                        _activeSimulator.Save();
+                        TraceLog.WriteLine("Set active Target Device: {0}", _activeDevice);
+                    }
                 }
             }
         }

@@ -1,19 +1,73 @@
 ﻿using System.Diagnostics;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Options.Dialogs;
+using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options
 {
     public partial class TargetsOptionControl : UserControl
     {
+        private readonly TargetsOptionViewModel _vm = new TargetsOptionViewModel();
+
         public TargetsOptionControl()
         {
             InitializeComponent();
+
+            PopulateDevices();
+        }
+
+        #region Properties
+
+        private DeviceDefinition SelectedDevice
+        {
+            get
+            {
+                if (listTargets.SelectedItems.Count != 1)
+                    return null;
+
+                return listTargets.SelectedItems[0].Tag as DeviceDefinition;
+            }
+        }
+
+        #endregion
+
+        private void PopulateDevices()
+        {
+            listTargets.Items.Clear();
+            
+            foreach (var device in _vm.Devices)
+            {
+                ListViewItem item = new ListViewItem();
+                item.Tag = device;
+                item.Text = _vm.IsSelected(device) ? "x" : string.Empty;
+                item.SubItems.Add(device.Type == DeviceDefinitionType.Simulator ? "S" : string.Empty);
+                item.SubItems.Add(device.Name);
+                item.SubItems.Add(device.IP);
+
+                listTargets.Items.Add(item);
+            }
+
+            bttDebugToken.Enabled = _vm.ActiveDevice != null;
         }
 
         private void lnkMoreInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
             Process.Start("http://developer.blackberry.com/native/documentation/cascades/getting_started/setting_up.html");
+        }
+
+        private void listTargets_SelectedIndexChanged(object sender, System.EventArgs e)
+        {
+            var device = SelectedDevice;
+
+            bttEdit.Enabled = bttRemove.Enabled = bttActivate.Enabled = device != null;
+        }
+
+        private void listTargets_DoubleClick(object sender, System.EventArgs e)
+        {
+            if (SelectedDevice != null)
+            {
+                bttEdit_Click(sender, e);
+            }
         }
 
         private void bttAdd_Click(object sender, System.EventArgs e)
@@ -22,8 +76,45 @@ namespace RIM.VSNDK_Package.Options
 
             if (form.ShowDialog() == DialogResult.OK)
             {
-                
+                _vm.Add(form.ToDevice());
+                PopulateDevices();
             }
+        }
+
+        private void bttEdit_Click(object sender, System.EventArgs e)
+        {
+            var form = new DeviceForm("Edit Target Device");
+            var device = SelectedDevice;
+            form.FromDevice(device);
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                _vm.Update(device, form.ToDevice());
+                PopulateDevices();
+            }
+        }
+
+        private void bttActivate_Click(object sender, System.EventArgs e)
+        {
+            _vm.SetActive(SelectedDevice);
+            PopulateDevices();
+        }
+
+        private void bttRemove_Click(object sender, System.EventArgs e)
+        {
+            var device = SelectedDevice;
+
+            if (MessageBoxHelper.Show(device.Type == DeviceDefinitionType.Device ? "Remove the device?" : "Remove the simulator?",
+                                      device.ToString(), MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                _vm.Remove(device);
+                PopulateDevices();
+            }
+        }
+
+        public void OnApply()
+        {
+            _vm.Apply();
         }
     }
 }

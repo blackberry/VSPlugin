@@ -345,6 +345,7 @@
     <Compile Include="Tools\RunnerDefaults.cs" />
     <Compile Include="Tools\ToolRunner.cs" />
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />
+    <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
     <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>

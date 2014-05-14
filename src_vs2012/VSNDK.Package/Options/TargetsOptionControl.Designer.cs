@@ -29,16 +29,18 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.listTargets = new System.Windows.Forms.ListView();
+            this.columnActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnIP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.label1 = new System.Windows.Forms.Label();
             this.bttAdd = new System.Windows.Forms.Button();
             this.bttEdit = new System.Windows.Forms.Button();
             this.bttRemove = new System.Windows.Forms.Button();
             this.lnkMoreInfo = new System.Windows.Forms.LinkLabel();
             this.bttDebugToken = new System.Windows.Forms.Button();
-            this.listTargets = new System.Windows.Forms.ListView();
-            this.columnActive = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.columnIP = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.bttActivate = new System.Windows.Forms.Button();
+            this.columnType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -50,10 +52,49 @@
             this.groupBox1.Controls.Add(this.listTargets);
             this.groupBox1.Location = new System.Drawing.Point(3, 46);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(644, 169);
+            this.groupBox1.Size = new System.Drawing.Size(461, 301);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Known Targets";
+            // 
+            // listTargets
+            // 
+            this.listTargets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listTargets.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.columnActive,
+            this.columnType,
+            this.columnName,
+            this.columnIP});
+            this.listTargets.FullRowSelect = true;
+            this.listTargets.GridLines = true;
+            this.listTargets.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.listTargets.HideSelection = false;
+            this.listTargets.Location = new System.Drawing.Point(6, 19);
+            this.listTargets.MultiSelect = false;
+            this.listTargets.Name = "listTargets";
+            this.listTargets.Size = new System.Drawing.Size(449, 276);
+            this.listTargets.TabIndex = 0;
+            this.listTargets.UseCompatibleStateImageBehavior = false;
+            this.listTargets.View = System.Windows.Forms.View.Details;
+            this.listTargets.SelectedIndexChanged += new System.EventHandler(this.listTargets_SelectedIndexChanged);
+            this.listTargets.DoubleClick += new System.EventHandler(this.listTargets_DoubleClick);
+            // 
+            // columnActive
+            // 
+            this.columnActive.Text = "A";
+            this.columnActive.Width = 20;
+            // 
+            // columnName
+            // 
+            this.columnName.Text = "Name";
+            this.columnName.Width = 150;
+            // 
+            // columnIP
+            // 
+            this.columnIP.Text = "IP";
+            this.columnIP.Width = 100;
             // 
             // label1
             // 
@@ -61,7 +102,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.label1.Location = new System.Drawing.Point(0, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(737, 33);
+            this.label1.Size = new System.Drawing.Size(551, 33);
             this.label1.TabIndex = 1;
             this.label1.Text = "In order to connect to the device, you must enable the [Development Mode]. It can" +
     " be found at Settings > Security and Privacy > Development Mode.";
@@ -69,7 +110,7 @@
             // bttAdd
             // 
             this.bttAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttAdd.Location = new System.Drawing.Point(653, 51);
+            this.bttAdd.Location = new System.Drawing.Point(470, 51);
             this.bttAdd.Name = "bttAdd";
             this.bttAdd.Size = new System.Drawing.Size(88, 23);
             this.bttAdd.TabIndex = 2;
@@ -81,23 +122,25 @@
             // 
             this.bttEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bttEdit.Enabled = false;
-            this.bttEdit.Location = new System.Drawing.Point(653, 80);
+            this.bttEdit.Location = new System.Drawing.Point(470, 80);
             this.bttEdit.Name = "bttEdit";
             this.bttEdit.Size = new System.Drawing.Size(88, 23);
             this.bttEdit.TabIndex = 2;
             this.bttEdit.Text = "&Edit...";
             this.bttEdit.UseVisualStyleBackColor = true;
+            this.bttEdit.Click += new System.EventHandler(this.bttEdit_Click);
             // 
             // bttRemove
             // 
             this.bttRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.bttRemove.Enabled = false;
-            this.bttRemove.Location = new System.Drawing.Point(653, 109);
+            this.bttRemove.Location = new System.Drawing.Point(470, 109);
             this.bttRemove.Name = "bttRemove";
             this.bttRemove.Size = new System.Drawing.Size(88, 23);
             this.bttRemove.TabIndex = 2;
             this.bttRemove.Text = "&Remove";
             this.bttRemove.UseVisualStyleBackColor = true;
+            this.bttRemove.Click += new System.EventHandler(this.bttRemove_Click);
             // 
             // lnkMoreInfo
             // 
@@ -114,46 +157,36 @@
             // 
             this.bttDebugToken.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bttDebugToken.Enabled = false;
-            this.bttDebugToken.Location = new System.Drawing.Point(653, 167);
+            this.bttDebugToken.Location = new System.Drawing.Point(470, 299);
             this.bttDebugToken.Name = "bttDebugToken";
             this.bttDebugToken.Size = new System.Drawing.Size(88, 48);
             this.bttDebugToken.TabIndex = 2;
             this.bttDebugToken.Text = "&Upload debug token...";
             this.bttDebugToken.UseVisualStyleBackColor = true;
             // 
-            // listTargets
+            // bttActivate
             // 
-            this.listTargets.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.listTargets.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnActive,
-            this.columnName,
-            this.columnIP});
-            this.listTargets.Location = new System.Drawing.Point(6, 19);
-            this.listTargets.Name = "listTargets";
-            this.listTargets.Size = new System.Drawing.Size(632, 144);
-            this.listTargets.TabIndex = 0;
-            this.listTargets.UseCompatibleStateImageBehavior = false;
+            this.bttActivate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttActivate.Enabled = false;
+            this.bttActivate.Location = new System.Drawing.Point(470, 138);
+            this.bttActivate.Name = "bttActivate";
+            this.bttActivate.Size = new System.Drawing.Size(88, 23);
+            this.bttActivate.TabIndex = 4;
+            this.bttActivate.Text = "Set &Activate";
+            this.bttActivate.UseVisualStyleBackColor = true;
+            this.bttActivate.Click += new System.EventHandler(this.bttActivate_Click);
             // 
-            // columnActive
+            // columnType
             // 
-            this.columnActive.Text = "A";
-            this.columnActive.Width = 20;
-            // 
-            // columnName
-            // 
-            this.columnName.Text = "Name";
-            this.columnName.Width = 80;
-            // 
-            // columnIP
-            // 
-            this.columnIP.Text = "IP";
+            this.columnType.Text = "T";
+            this.columnType.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.columnType.Width = 20;
             // 
             // TargetsOptionControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.bttActivate);
             this.Controls.Add(this.lnkMoreInfo);
             this.Controls.Add(this.bttDebugToken);
             this.Controls.Add(this.bttRemove);
@@ -162,7 +195,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.groupBox1);
             this.Name = "TargetsOptionControl";
-            this.Size = new System.Drawing.Size(744, 223);
+            this.Size = new System.Drawing.Size(558, 355);
             this.groupBox1.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -182,6 +215,8 @@
         private System.Windows.Forms.ColumnHeader columnActive;
         private System.Windows.Forms.ColumnHeader columnName;
         private System.Windows.Forms.ColumnHeader columnIP;
+        private System.Windows.Forms.Button bttActivate;
+        private System.Windows.Forms.ColumnHeader columnType;
 
     }
 }
