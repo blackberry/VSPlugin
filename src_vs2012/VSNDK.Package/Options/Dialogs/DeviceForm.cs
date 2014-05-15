@@ -82,6 +82,22 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             }
         }
 
+        private DeviceDefinition SelectedDevice
+        {
+            get
+            {
+                if (cmbNames.Enabled && cmbNames.Visible)
+                {
+                    var item = cmbNames.SelectedItem as ComboBoxItem;
+                    var device = item != null ? item.Tag as DeviceDefinition : null;
+
+                    return device;
+                }
+
+                return null;
+            }
+        }
+
         public ulong PIN
         {
             get { return _pin; }
@@ -142,6 +158,9 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 }
             }
             cmbNames.SelectedIndex = 0;
+            cmbNames.Enabled = cmbNames.Items.Count > 1;
+
+            ActiveControl = txtIP;
         }
 
         private DialogDeviceClass GetDeviceClass(DeviceDefinitionType type, string ip)

@@ -229,5 +229,16 @@ namespace RIM.VSNDK_Package.ViewModels
             PackageViewModel.Instance.ActiveDevice = _activeDevice;
             PackageViewModel.Instance.ActiveSimulator = _activeSimulator;
         }
+
+        /// <summary>
+        /// User cancelled settings.
+        /// </summary>
+        public void Reset()
+        {
+            _devices = null;
+            _activeDevice = null;
+            _activeSimulator = null;
+            _details = null;
+        }
     }
 }

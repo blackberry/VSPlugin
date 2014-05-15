@@ -9,7 +9,7 @@ namespace RIM.VSNDK_Package.Options
 {
     public partial class ApiLevelOptionControl : UserControl
     {
-        private ApiLevelOptionViewModel _vm = new ApiLevelOptionViewModel();
+        private readonly ApiLevelOptionViewModel _vm = new ApiLevelOptionViewModel();
 
         public ApiLevelOptionControl()
         {
@@ -51,7 +51,6 @@ namespace RIM.VSNDK_Package.Options
 
         public void OnClosed()
         {
-            _vm = new ApiLevelOptionViewModel();
             PopulateNDKs();
         }
 

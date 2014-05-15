@@ -48,8 +48,7 @@
             <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" priority="0x0100" type="Menu">
                 <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
                 <Strings>
-                    <ButtonText>BlackBerry</ButtonText>
-                    <CommandName>BlackBerry</CommandName>
+                    <ButtonText>&amp;BlackBerry</ButtonText>
                 </Strings>
             </Menu>
 
@@ -57,7 +56,7 @@
             <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" priority="0x0100" type="Menu">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Targets" />
                 <Strings>
-                    <ButtonText>Targets</ButtonText>
+                    <ButtonText>&amp;Targets</ButtonText>
                 </Strings>
             </Menu>
 
@@ -126,7 +125,7 @@
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryOptions" priority="0x0100" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" />
                 <Strings>
-                    <ButtonText>Options...</ButtonText>
+                    <ButtonText>&amp;Options...</ButtonText>
                     <ToolTipText>Opens BlackBerry dedicated settings</ToolTipText>
                 </Strings>
             </Button>
@@ -159,7 +158,7 @@
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsConfigure" priority="0x0100" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Configuration" />
                 <Strings>
-                    <ButtonText>Configure...</ButtonText>
+                    <ButtonText>&amp;Configure...</ButtonText>
                 </Strings>
             </Button>
 

@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.Diagnostics;
+using System.Windows.Forms;
 
 namespace RIM.VSNDK_Package.Options
 {
@@ -53,6 +54,39 @@ namespace RIM.VSNDK_Package.Options
             saveFile.OverwritePrompt = true;
 
             return saveFile;
+        }
+
+        /// <summary>
+        /// Opens Windows Explorer window with specified path.
+        /// </summary>
+        public static void StartExplorer(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            Process.Start("Explorer.exe", "/e,\"" + path + "\"");
+        }
+
+        /// <summary>
+        /// Opens Windows Explorer window with specified file selected.
+        /// </summary>
+        public static void StartExplorerForFile(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+            Process.Start("Explorer.exe", "/select,\"" + path + "\"");
+        }
+
+        /// <summary>
+        /// Opens a default web-browser with specified URL.
+        /// </summary>
+        public static void StartURL(string url)
+        {
+            if (string.IsNullOrEmpty(url) || !(url.StartsWith("http://") || url.StartsWith("https://")))
+                return;
+
+            Process.Start(url);
         }
     }
 }

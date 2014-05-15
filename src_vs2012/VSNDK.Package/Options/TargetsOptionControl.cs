@@ -8,7 +8,7 @@ namespace RIM.VSNDK_Package.Options
 {
     public partial class TargetsOptionControl : UserControl
     {
-        private TargetsOptionViewModel _vm = new TargetsOptionViewModel();
+        private readonly TargetsOptionViewModel _vm = new TargetsOptionViewModel();
 
         public TargetsOptionControl()
         {
@@ -53,7 +53,7 @@ namespace RIM.VSNDK_Package.Options
 
         private void lnkMoreInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            Process.Start("http://developer.blackberry.com/native/documentation/cascades/getting_started/setting_up.html");
+            DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/cascades/getting_started/setting_up.html");
         }
 
         private void listTargets_SelectedIndexChanged(object sender, System.EventArgs e)
@@ -133,6 +133,9 @@ namespace RIM.VSNDK_Package.Options
             form.AskOnStartup = false;
 
             form.ShowDialog();
+
+            // refresh the list, as it's possible to add new device from debug-token deployment form:
+            PopulateDevices();
         }
 
         public void OnApply()
@@ -142,7 +145,7 @@ namespace RIM.VSNDK_Package.Options
 
         public void OnReset()
         {
-            _vm = new TargetsOptionViewModel();
+            _vm.Reset();
             PopulateDevices();
         }
     }

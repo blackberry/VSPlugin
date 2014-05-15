@@ -24,6 +24,15 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             set { chkRemember.Checked = value; }
         }
 
+        /// <summary>
+        /// Shows the option to indicate, if password should be remembered or not.
+        /// </summary>
+        public bool ShowRemember
+        {
+            get { return chkRemember.Visible; }
+            set { chkRemember.Visible = value; }
+        }
+
         #endregion
 
         private void bttOK_Click(object sender, EventArgs e)

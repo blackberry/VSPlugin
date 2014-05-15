@@ -29,6 +29,12 @@ namespace RIM.VSNDK_Package.Options
             set { txtToolsPath.Text = value; }
         }
 
+        public string ProfilePath
+        {
+            get { return txtProfilePath.Text; }
+            set { txtProfilePath.Text = value; }
+        }
+
         #endregion
 
         private void bttNdkBrowse_Click(object sender, System.EventArgs e)
@@ -43,7 +49,7 @@ namespace RIM.VSNDK_Package.Options
 
         private void bttOpenProfile_Click(object sender, System.EventArgs e)
         {
-            Process.Start("Explorer.exe", "/e,\"" + txtProfilePath.Text + "\"");
+            DialogHelper.StartExplorer(ProfilePath);
         }
     }
 }
