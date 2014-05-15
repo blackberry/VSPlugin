@@ -41,5 +41,10 @@ namespace RIM.VSNDK_Package.Options
 
         #endregion
 
+        protected override void OnActivate(CancelEventArgs e)
+        {
+            base.OnActivate(e);
+            Control.OnActivate();
+        }
     }
 }

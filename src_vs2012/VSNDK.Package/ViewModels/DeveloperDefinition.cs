@@ -1,6 +1,8 @@
 ﻿using System;
 using System.IO;
+using System.Security.Cryptography.X509Certificates;
 using Microsoft.Win32;
+using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Tools;
 
 namespace RIM.VSNDK_Package.ViewModels
@@ -21,9 +23,18 @@ namespace RIM.VSNDK_Package.ViewModels
 
             CertificateFileName = certificatePath;
             CskPassword = cskPassword;
+
+            // get the author directly from certificate:
+            Name = LoadIssuer(CertificateFileName, CskPassword);
         }
 
         #region Properties
+
+        public string Name
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Gets the path to the author.p12 file.
@@ -43,6 +54,22 @@ namespace RIM.VSNDK_Package.ViewModels
             private set;
         }
 
+        /// <summary>
+        /// Checks, if CskPassword is setup.
+        /// </summary>
+        public bool HasPassword
+        {
+            get { return !string.IsNullOrEmpty(CskPassword); }
+        }
+
+        /// <summary>
+        /// Checks if developer completed registration.
+        /// </summary>
+        public bool IsRegistered
+        {
+            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFileName); }
+        }
+
         #endregion
 
         /// <summary>
@@ -53,6 +80,14 @@ namespace RIM.VSNDK_Package.ViewModels
             CskPassword = password;
             if (remember)
                 SavePassword();
+        }
+
+        /// <summary>
+        /// Tries to reload issuer from the certificate.
+        /// </summary>
+        public string UpdateName(string password)
+        {
+            return Name = LoadIssuer(CertificateFileName, string.IsNullOrEmpty(password) ? CskPassword : password);
         }
 
         /// <summary>
@@ -85,28 +120,40 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Checks, if the CSK password is stored in registry.
         /// </summary>
-        public bool CheckIsPasswordSaved()
+        public bool IsPasswordSaved
         {
-            RegistryKey registry = Registry.CurrentUser;
-            RegistryKey settings = null;
-
-            try
+            get
             {
-                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
-                if (settings == null)
-                    return false;
+                RegistryKey registry = Registry.CurrentUser;
+                RegistryKey settings = null;
 
-                if (CskPassword == null)
-                    CskPassword = string.Empty;
+                try
+                {
+                    settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                    if (settings == null)
+                        return false;
 
-                return settings.GetValue(FieldCskPassword, null) != null;
+                    if (CskPassword == null)
+                        CskPassword = string.Empty;
+
+                    return settings.GetValue(FieldCskPassword, null) != null;
+                }
+                finally
+                {
+                    if (settings != null)
+                        settings.Close();
+                    registry.Close();
+                }
             }
-            finally
-            {
-                if (settings != null)
-                    settings.Close();
-                registry.Close();
-            }
+        }
+
+        /// <summary>
+        /// Removes password stored inside registry and cached in this class.
+        /// </summary>
+        public void DeleteCskPassword()
+        {
+            DeletePassword();
+            CskPassword = null;
         }
 
         /// <summary>
@@ -188,6 +235,31 @@ namespace RIM.VSNDK_Package.ViewModels
             registry.Close();
 
             return new DeveloperDefinition(certificateFileName, cskPassword);
+        }
+
+        /// <summary>
+        /// Loads 'issuer' field from the X.509 certificate.
+        /// </summary>
+        public static string LoadIssuer(string certificateFileName, string password)
+        {
+            try
+            {
+                if (!File.Exists(certificateFileName) || string.IsNullOrEmpty(password))
+                    return null;
+
+                var cert = new X509Certificate(certificateFileName, password);
+                var issuer = cert.Issuer;
+
+                if (issuer != null && issuer.StartsWith("CN=", StringComparison.InvariantCultureIgnoreCase))
+                    issuer = issuer.Substring(3).Trim();
+
+                return issuer;
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to read data from certificate: \"{0}\"", certificateFileName);
+                return null;
+            }
         }
     }
 }
