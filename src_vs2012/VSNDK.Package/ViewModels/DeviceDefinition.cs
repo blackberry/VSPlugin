@@ -235,16 +235,13 @@ namespace RIM.VSNDK_Package.ViewModels
 
             try
             {
-                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
-                settings.DeleteSubKey(type == DeviceDefinitionType.Device ? FieldDeviceName : FieldSimulatorName);
-                settings.DeleteSubKey(type == DeviceDefinitionType.Device ? FieldDeviceIP : FieldSimulatorIP);
-                settings.DeleteSubKey(type == DeviceDefinitionType.Device ? FieldDevicePassword : FieldSimulatorPassword);
-            }
-            catch (UnauthorizedAccessException)
-            {
+                settings.DeleteValue(type == DeviceDefinitionType.Device ? FieldDeviceName : FieldSimulatorName, false);
+                settings.DeleteValue(type == DeviceDefinitionType.Device ? FieldDeviceIP : FieldSimulatorIP, false);
+                settings.DeleteValue(type == DeviceDefinitionType.Device ? FieldDevicePassword : FieldSimulatorPassword, false);
             }
             finally
             {

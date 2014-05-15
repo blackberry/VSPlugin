@@ -119,11 +119,11 @@ namespace RIM.VSNDK_Package.ViewModels
 
             try
             {
-                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
-                settings.DeleteSubKey(FieldCskPassword);
+                settings.DeleteValue(FieldCskPassword, false);
             }
             finally
             {

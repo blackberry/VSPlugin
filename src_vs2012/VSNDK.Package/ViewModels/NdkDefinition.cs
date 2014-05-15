@@ -103,12 +103,12 @@ namespace RIM.VSNDK_Package.ViewModels
 
             try
             {
-                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
-                settings.DeleteSubKey(FieldHostPath);
-                settings.DeleteSubKey(FieldTargetPath);
+                settings.DeleteValue(FieldHostPath, false);
+                settings.DeleteValue(FieldTargetPath, false);
             }
             finally
             {
