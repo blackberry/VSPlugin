@@ -156,6 +156,11 @@ namespace RIM.VSNDK_Package.Model
             {
                 result.Append("Author: ").AppendLine(Author);
                 result.Append("Author ID: ").AppendLine(AuthorID);
+
+                result.AppendLine();
+                result.Append("App ID: ").AppendLine(ID);
+                result.Append("App Name: ").AppendLine(Name);
+                result.Append("App Version: ").Append(Version).Append(" (").Append(VersionID).AppendLine(")");
             }
 
             // print system actions allowed:
