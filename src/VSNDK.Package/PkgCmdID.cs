@@ -16,15 +16,25 @@ namespace RIM.VSNDK_Package
 {
     internal static class PkgCmdIDList
     {
-        public const int cmdidBlackBerryTools =    0x0201;
-        public const int cmdidBlackBerrySettings = 0x0202;
-        public const int cmdidBlackBerryDebugToken = 0x0203;
-        public const int cmdidBlackBerryOptions = 0x0301;
-        public const int cmdidBlackBerryTargetsDevicesPlaceholder = 0x0401;
-        public const int cmdidBlackBerryTargetsApiLevelsPlaceholder = 0x0501;
-        public const int cmdidBlackBerryTargetsConfigure = 0x0601;
+        public const int cmdidBlackBerryTools = 0x201;
+        public const int cmdidBlackBerrySettings = 0x202;
+        public const int cmdidBlackBerryDebugToken = 0x203;
+        public const int cmdidBlackBerryOptions = 0x301;
+        public const int cmdidBlackBerryTargetsDevicesPlaceholder = 0x501;
+        public const int cmdidBlackBerryTargetsApiLevelsPlaceholder = 0x601;
+        public const int cmdidBlackBerryTargetsConfigure = 0x701;
+
+        public const int cmdidBlackBerryHelpDocNative = 0x901;
+        public const int cmdidBlackBerryHelpDocCascades = 0x902;
+        public const int cmdidBlackBerryHelpDocPlayBook = 0x903;
+        public const int cmdidBlackBerryHelpSamplesNative = 0x1001;
+        public const int cmdidBlackBerryHelpSamplesCascades = 0x1002;
+        public const int cmdidBlackBerryHelpSamplesPlayBook = 0x1003;
+        public const int cmdidBlackBerryHelpSamplesOpenSource = 0x1004;
+        public const int cmdidBlackBerryHelpAbout = 0x1101;
+
 
         public const int cmdidBlackBerryProjectImport = 0x0104;
         public const int cmdidfooLocalBox = 0x0105;
-    };
+    }
 }

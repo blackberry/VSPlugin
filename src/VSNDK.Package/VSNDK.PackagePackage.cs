@@ -1012,7 +1012,7 @@ namespace RIM.VSNDK_Package
                 // Create the command for the tool window
                 CommandID toolwndCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTools);
                 MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
-                mcs.AddCommand( menuToolWin );
+                mcs.AddCommand(menuToolWin);
 
                 // Create the command for the settings window
                 CommandID wndSettingsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerrySettings);
@@ -1062,6 +1062,19 @@ namespace RIM.VSNDK_Package
                                                                          apiLevelCommandID);
                 mcs.AddCommand(apiLevelMenu);
 
+                // Create command for 'Help' menus
+                var helpCmdIDs = new[] {
+                                            PkgCmdIDList.cmdidBlackBerryHelpDocNative, PkgCmdIDList.cmdidBlackBerryHelpDocCascades, PkgCmdIDList.cmdidBlackBerryHelpDocPlayBook,
+                                            PkgCmdIDList.cmdidBlackBerryHelpSamplesNative, PkgCmdIDList.cmdidBlackBerryHelpSamplesCascades, PkgCmdIDList.cmdidBlackBerryHelpSamplesPlayBook, PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource,
+                                            PkgCmdIDList.cmdidBlackBerryHelpAbout
+                                       };
+                foreach (var cmdID in helpCmdIDs)
+                {
+                    CommandID helpCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, cmdID);
+                    MenuCommand helpMenu = new MenuCommand(OpenHelpWebPage, helpCommandID);
+                    mcs.AddCommand(helpMenu);
+                }
+
                 // Create command for 'Configure...' [targets] menu
                 CommandID configureCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsConfigure);
                 MenuCommand configureMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(TargetsOptionPage)), configureCommandID);
@@ -1077,6 +1090,41 @@ namespace RIM.VSNDK_Package
 
             TraceLog.WriteLine("-------------------- DONE");
         }
+
+        private void OpenHelpWebPage(object sender, EventArgs e)
+        {
+            var menuCommand = sender as MenuCommand;
+            int cmdID = menuCommand != null ? menuCommand.CommandID.ID : 0;
+
+            switch (cmdID)
+            {
+                case PkgCmdIDList.cmdidBlackBerryHelpDocNative:
+                    DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/core/framework.html");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpDocCascades:
+                    DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpDocPlayBook:
+                    DialogHelper.StartURL("http://developer.blackberry.com/playbook/native/documentation/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSamplesNative:
+                    DialogHelper.StartURL("http://developer.blackberry.com/native/sampleapps/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSamplesCascades:
+                    DialogHelper.StartURL("http://developer.blackberry.com/native/sampleapps/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSamplesPlayBook:
+                    DialogHelper.StartURL("http://developer.blackberry.com/playbook/native/sampleapps/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource:
+                    DialogHelper.StartURL("https://github.com/blackberry");
+                    break;
+                default:
+                    TraceLog.WarnLine("Unknown Help item requested");
+                    break;
+            }
+        }
+
         #endregion
 
         #region private methods
@@ -1558,7 +1606,6 @@ namespace RIM.VSNDK_Package
 
         #endregion
 
-
         #region Event Handlers
 
         /// <summary> 
@@ -1817,6 +1864,5 @@ namespace RIM.VSNDK_Package
         }
         
         #endregion
-
     }
 }
