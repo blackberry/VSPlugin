@@ -57,6 +57,40 @@ namespace RIM.VSNDK_Package.Options
         }
 
         /// <summary>
+        /// Returns preconfigured window for opening ZIP files.
+        /// </summary>
+        public static OpenFileDialog OpenZipFile(string title)
+        {
+            var openFile = new OpenFileDialog();
+            openFile.Title = title;
+            openFile.DefaultExt = ".bar";
+            openFile.Filter = "Zip files|*.zip|All files|*.*";
+            openFile.FilterIndex = 0;
+            openFile.CheckFileExists = true;
+            openFile.CheckPathExists = true;
+
+            return openFile;
+        }
+
+        /// <summary>
+        /// Returns preconfigured window for saving ZIP file.
+        /// </summary>
+        public static SaveFileDialog SaveZipFile(string title, string fileName)
+        {
+            var saveFile = new SaveFileDialog();
+            saveFile.Title = title;
+            saveFile.FileName = fileName;
+            saveFile.DefaultExt = ".zip";
+            saveFile.Filter = "Zip files|*.zip|All files|*.*";
+            saveFile.FilterIndex = 0;
+            saveFile.CreatePrompt = false;
+            saveFile.OverwritePrompt = true;
+
+            return saveFile;
+        }
+
+
+        /// <summary>
         /// Opens Windows Explorer window with specified path.
         /// </summary>
         public static void StartExplorer(string path)

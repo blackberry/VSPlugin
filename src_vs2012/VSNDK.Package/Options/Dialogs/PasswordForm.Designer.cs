@@ -67,9 +67,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(20, 50);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(307, 13);
+            this.label2.Size = new System.Drawing.Size(311, 13);
             this.label2.TabIndex = 2;
-            this.label2.Text = "(password set when downloading the BlackBerry ID CSK token)";
+            this.label2.Text = "(password set when created the BlackBerry ID token or CSK file)";
             // 
             // txtPassword
             // 
@@ -132,7 +132,7 @@
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "CSK Password Request";
+            this.Text = "Password Request";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);

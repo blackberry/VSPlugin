@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Packaging;
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.Win32;
 using RIM.VSNDK_Package.Diagnostics;
@@ -13,23 +14,28 @@ namespace RIM.VSNDK_Package.ViewModels
     internal sealed class DeveloperDefinition
     {
         private const string DefaultCertificateName = "author.p12";
+        private const string DefaultCskName = "bbidtoken.csk";
         private const string FieldCertificateFileName = "certificate";
         private const string FieldCskPassword = "CSKPass";
 
-        public DeveloperDefinition(string certificatePath, string cskPassword)
+        public DeveloperDefinition(string dataPath, string certificatePath, string cskPassword)
         {
-            if (string.IsNullOrEmpty(certificatePath))
-                throw new ArgumentNullException("certificatePath");
+            if (string.IsNullOrEmpty(dataPath))
+                throw new ArgumentNullException("dataPath");
 
+            DataPath = dataPath;
             CertificateFileName = certificatePath;
             CskPassword = cskPassword;
 
             // get the author directly from certificate:
-            Name = LoadIssuer(CertificateFileName, CskPassword);
+            Name = LoadIssuer(CertificateFullPath, CskPassword);
         }
 
         #region Properties
 
+        /// <summary>
+        /// Gets the name of the developer (publisher).
+        /// </summary>
         public string Name
         {
             get;
@@ -37,12 +43,29 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
-        /// Gets the path to the author.p12 file.
+        /// Gets the location, where all developer configuration files are stored.
+        /// </summary>
+        public string DataPath
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the name of certificate file (author.p12).
         /// </summary>
         public string CertificateFileName
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets the full path to the developers certificate.
+        /// </summary>
+        public string CertificateFullPath
+        {
+            get { return string.IsNullOrEmpty(CertificateFileName) ? null : Path.Combine(DataPath, CertificateFileName); }
         }
 
         /// <summary>
@@ -67,7 +90,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public bool IsRegistered
         {
-            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFileName); }
+            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath); }
         }
 
         #endregion
@@ -87,7 +110,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public string UpdateName(string password)
         {
-            return Name = LoadIssuer(CertificateFileName, string.IsNullOrEmpty(password) ? CskPassword : password);
+            return Name = LoadIssuer(CertificateFullPath, string.IsNullOrEmpty(password) ? CskPassword : password);
         }
 
         /// <summary>
@@ -181,6 +204,57 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Updates path to the certificate inside the registry.
+        /// </summary>
+        private void SaveCertificatePath()
+        {
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            try
+            {
+                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                if (settings == null)
+                    return;
+
+                if (string.Compare(DefaultCertificateName, CertificateFileName, StringComparison.InvariantCultureIgnoreCase) == 0)
+                    settings.DeleteValue(FieldCertificateFileName, false);
+                else
+                    settings.SetValue(FieldCertificateFileName, CertificateFileName);
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
+        }
+
+        /// <summary>
+        /// Removes certificate path from registry.
+        /// </summary>
+        private void DeleteCertificatePath()
+        {
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            try
+            {
+                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                if (settings == null)
+                    return;
+
+                settings.DeleteValue(FieldCertificateFileName, false);
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
+        }
+
+        /// <summary>
         /// Creates new developer-definition object based on info read from registry and around.
         /// </summary>
         public static DeveloperDefinition Load(string dataPath)
@@ -218,7 +292,7 @@ namespace RIM.VSNDK_Package.ViewModels
             }
             // set default, if loading failed:
             if (string.IsNullOrEmpty(certificateFileName))
-                certificateFileName = Path.Combine(dataPath, DefaultCertificateName);
+                certificateFileName = DefaultCertificateName;
 
             // IP
             try
@@ -234,7 +308,7 @@ namespace RIM.VSNDK_Package.ViewModels
             settings.Close();
             registry.Close();
 
-            return new DeveloperDefinition(certificateFileName, cskPassword);
+            return new DeveloperDefinition(dataPath, certificateFileName, cskPassword);
         }
 
         /// <summary>
@@ -259,6 +333,209 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 TraceLog.WriteException(ex, "Unable to read data from certificate: \"{0}\"", certificateFileName);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of files, that are assumed to be a developer profile for signing applications.
+        /// </summary>
+        private string[] GetProfileFiles()
+        {
+            return new[] { CertificateFileName, "bbidtoken.csk", "barsigner.db",
+                                    "bbsigner.csk", "bb_id_rsa", "bb_id_rsa.pub",
+
+                                    // PH: TODO: but I have also files:
+                                    "barsigner.csk", "bbt_id_rsa", "bbt_id_rsa.pub"};
+        }
+
+        /// <summary>
+        /// Saves all developer profile info into specified file.
+        /// </summary>
+        public bool BackupProfile(string outputFile)
+        {
+            if (string.IsNullOrEmpty(outputFile))
+                return false;
+
+            var fileNames = GetProfileFiles();
+
+            try
+            {
+                using (var package = Package.Open(outputFile, FileMode.Create))
+                {
+                    foreach (var name in fileNames)
+                    {
+                        Append(package, name, Path.Combine(DataPath, name));
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to export profile to file: \"{0}\"", outputFile);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Appends file to the ZIP package.
+        /// </summary>
+        private static void Append(Package package, string name, string fullPathName)
+        {
+            if (File.Exists(fullPathName))
+            {
+                Uri uri = PackUriHelper.CreatePartUri(new Uri(name, UriKind.Relative));
+                PackagePart part = package.CreatePart(uri, string.Empty);
+
+                using (var fileStream = new FileStream(fullPathName, FileMode.Open, FileAccess.Read))
+                {
+                    CopyStream(fileStream, part.GetStream());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Copy a stream from one stream to another.
+        /// </summary>
+        private static void CopyStream(Stream source, Stream target)
+        {
+            if (source == null)
+                throw new ArgumentNullException("source");
+            if (target == null)
+                throw new ArgumentNullException("target");
+
+            var buffer = new byte[0x1000];
+            int bytesRead;
+
+            while ((bytesRead = source.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                target.Write(buffer, 0, bytesRead);
+            }
+        }
+
+        /// <summary>
+        /// Extracts the developer profile.
+        /// </summary>
+        public bool RestoreProfile(string inputFile)
+        {
+            if (string.IsNullOrEmpty(inputFile))
+                return false;
+
+            if (File.Exists(inputFile))
+            {
+                string p12FileName = null;
+
+                try
+                {
+                    // make the password invalid:
+                    DeletePassword();
+
+                    // extract all files that are within the backup package:
+                    using (var package = Package.Open(inputFile, FileMode.Open, FileAccess.ReadWrite))
+                    {
+                        foreach (var part in package.GetParts())
+                        {
+                            var name = ExtractFile(part, DataPath);
+                            if (name != null && name.EndsWith(".p12"))
+                            {
+                                p12FileName = Path.GetFileName(name);
+                            }
+                        }
+                    }
+
+                    // no certificate found inside?
+                    if (string.IsNullOrEmpty(p12FileName))
+                        return false;
+
+                    // update save it for future reference:
+                    CertificateFileName = p12FileName;
+                    SaveCertificatePath();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Impossible to restore profile: \"{0}\"", inputFile);
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Extract file under specified directory.
+        /// </summary>
+        public static string ExtractFile(PackagePart part, string folder)
+        {
+            // initially create file under the folder specified
+            string filePath = part.Uri.OriginalString.Replace('/', Path.DirectorySeparatorChar);
+
+            // remove trailing directory separator:
+            if (!string.IsNullOrEmpty(filePath) && filePath[0] == Path.DirectorySeparatorChar)
+            {
+                filePath = filePath.TrimStart(Path.DirectorySeparatorChar);
+            }
+
+            filePath = Path.Combine(folder, filePath);
+            var dirName = Path.GetDirectoryName(filePath);
+            if (!string.IsNullOrEmpty(dirName))
+            {
+                Directory.CreateDirectory(dirName);
+            }
+
+            // extract file:
+            using (var output = File.Create(filePath))
+            {
+                CopyStream(part.GetStream(), output);
+            }
+
+            return filePath;
+        }
+
+        /// <summary>
+        /// Writes a BlackBerry ID token file.
+        /// </summary>
+        public void SaveBlackBerryToken(string content)
+        {
+            var fileName = Path.Combine(DataPath, DefaultCskName);
+
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+            if (!string.IsNullOrEmpty(content))
+            {
+                File.WriteAllText(fileName, content);
+            }
+        }
+
+        /// <summary>
+        /// Delete all files that belong to the developer profile.
+        /// Removes its password etc.
+        /// </summary>
+        public void DeleteProfile()
+        {
+            var files = GetProfileFiles();
+
+            foreach (var fileName in files)
+            {
+                var fullName = Path.Combine(DataPath, fileName);
+                if (File.Exists(fullName))
+                    File.Delete(fullName);
+            }
+
+            DeleteCskPassword();
+            CertificateFileName = null;
+            Name = null;
+        }
+
+        /// <summary>
+        /// Removes some profile temporary files, that are not needed anymore, when registration process completed.
+        /// </summary>
+        public void CleanupProfile()
+        {
+            if (!IsRegistered)
+            {
+                DeleteProfile();
             }
         }
     }

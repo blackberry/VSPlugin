@@ -40,11 +40,11 @@
             this.txtCertPath = new System.Windows.Forms.TextBox();
             this.txtAuthor = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.bttRefresh = new System.Windows.Forms.Button();
             this.bttBackup = new System.Windows.Forms.Button();
             this.bttRestore = new System.Windows.Forms.Button();
             this.bttNavigate = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.bttRefresh = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -74,6 +74,7 @@
             this.bttUnregister.TabIndex = 3;
             this.bttUnregister.Text = "&Unregister";
             this.bttUnregister.UseVisualStyleBackColor = true;
+            this.bttUnregister.Click += new System.EventHandler(this.bttUnregister_Click);
             // 
             // bttRegister
             // 
@@ -84,6 +85,7 @@
             this.bttRegister.TabIndex = 2;
             this.bttRegister.Text = "&Register";
             this.bttRegister.UseVisualStyleBackColor = true;
+            this.bttRegister.Click += new System.EventHandler(this.bttRegister_Click);
             // 
             // bttDeletePassword
             // 
@@ -92,7 +94,7 @@
             this.bttDeletePassword.Name = "bttDeletePassword";
             this.bttDeletePassword.Size = new System.Drawing.Size(126, 23);
             this.bttDeletePassword.TabIndex = 4;
-            this.bttDeletePassword.Text = "Delete password";
+            this.bttDeletePassword.Text = "Forget password";
             this.bttDeletePassword.UseVisualStyleBackColor = true;
             this.bttDeletePassword.Click += new System.EventHandler(this.bttDeletePassword_Click);
             // 
@@ -123,9 +125,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(6, 22);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(32, 13);
+            this.label2.Size = new System.Drawing.Size(55, 13);
             this.label2.TabIndex = 0;
-            this.label2.Text = "Path:";
+            this.label2.Text = "File name:";
             // 
             // label3
             // 
@@ -175,6 +177,17 @@
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Developer Certificate:";
             // 
+            // bttRefresh
+            // 
+            this.bttRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttRefresh.Location = new System.Drawing.Point(315, 46);
+            this.bttRefresh.Name = "bttRefresh";
+            this.bttRefresh.Size = new System.Drawing.Size(75, 23);
+            this.bttRefresh.TabIndex = 8;
+            this.bttRefresh.Text = "&Refresh...";
+            this.bttRefresh.UseVisualStyleBackColor = true;
+            this.bttRefresh.Click += new System.EventHandler(this.bttRefresh_Click);
+            // 
             // bttBackup
             // 
             this.bttBackup.Location = new System.Drawing.Point(9, 144);
@@ -183,6 +196,7 @@
             this.bttBackup.TabIndex = 6;
             this.bttBackup.Text = "&Backup...";
             this.bttBackup.UseVisualStyleBackColor = true;
+            this.bttBackup.Click += new System.EventHandler(this.bttBackup_Click);
             // 
             // bttRestore
             // 
@@ -192,6 +206,7 @@
             this.bttRestore.TabIndex = 7;
             this.bttRestore.Text = "R&estore...";
             this.bttRestore.UseVisualStyleBackColor = true;
+            this.bttRestore.Click += new System.EventHandler(this.bttRestore_Click);
             // 
             // bttNavigate
             // 
@@ -213,17 +228,6 @@
             this.label4.Size = new System.Drawing.Size(384, 73);
             this.label4.TabIndex = 5;
             this.label4.Text = resources.GetString("label4.Text");
-            // 
-            // bttRefresh
-            // 
-            this.bttRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttRefresh.Location = new System.Drawing.Point(315, 46);
-            this.bttRefresh.Name = "bttRefresh";
-            this.bttRefresh.Size = new System.Drawing.Size(75, 23);
-            this.bttRefresh.TabIndex = 8;
-            this.bttRefresh.Text = "&Refresh...";
-            this.bttRefresh.UseVisualStyleBackColor = true;
-            this.bttRefresh.Click += new System.EventHandler(this.bttRefresh_Click);
             // 
             // SigningOptionControl
             // 
