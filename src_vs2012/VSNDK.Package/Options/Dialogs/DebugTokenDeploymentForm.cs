@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Model;
+using RIM.VSNDK_Package.Model.Integration;
 using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
 
