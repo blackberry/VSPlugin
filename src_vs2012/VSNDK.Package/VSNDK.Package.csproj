@@ -301,7 +301,6 @@
     <Compile Include="Options\Dialogs\DeviceForm.Designer.cs">
       <DependentUpon>DeviceForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\Dialogs\DialogDeviceClass.cs" />
     <Compile Include="Options\Dialogs\InstallNdkForm.cs">
       <SubType>Form</SubType>
     </Compile>

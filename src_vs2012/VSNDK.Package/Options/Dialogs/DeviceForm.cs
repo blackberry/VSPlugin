@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model.Integration;
 using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
 
@@ -12,6 +13,13 @@ namespace RIM.VSNDK_Package.Options.Dialogs
     /// </summary>
     internal partial class DeviceForm : Form
     {
+        enum DialogDeviceClass
+        {
+            WiFiDevice,
+            UsbDevice,
+            Simulator
+        }
+
         private DeviceInfoRunner _runner;
         private ulong _pin;
         private string _loadedDeviceName;
@@ -27,7 +35,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
         #region Properties
 
-        public DialogDeviceClass DeviceClass
+        private DialogDeviceClass DeviceClass
         {
             get { return (DialogDeviceClass) cmbType.SelectedIndex; }
             set { cmbType.SelectedIndex = (int) value; }
