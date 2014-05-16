@@ -69,6 +69,14 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Gets full path to the BlackBerry ID token file (bbidtoken.csk).
+        /// </summary>
+        public string BlackBerryTokenFullPath
+        {
+            get { return Path.Combine(DataPath, DefaultCskName); }
+        }
+
+        /// <summary>
         /// Password set by developer to the certificate.
         /// </summary>
         public string CskPassword
@@ -91,6 +99,14 @@ namespace RIM.VSNDK_Package.ViewModels
         public bool IsRegistered
         {
             get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath); }
+        }
+
+        /// <summary>
+        /// Checks if developer started registration and downloaded token file.
+        /// </summary>
+        public bool HasBlackBerryTokenFile
+        {
+            get { return File.Exists(BlackBerryTokenFullPath); }
         }
 
         #endregion
@@ -497,7 +513,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public void SaveBlackBerryToken(string content)
         {
-            var fileName = Path.Combine(DataPath, DefaultCskName);
+            var fileName = BlackBerryTokenFullPath;
 
             if (File.Exists(fileName))
                 File.Delete(fileName);
@@ -523,6 +539,7 @@ namespace RIM.VSNDK_Package.ViewModels
                     File.Delete(fullName);
             }
 
+            DeleteCertificatePath();
             DeleteCskPassword();
             CertificateFileName = null;
             Name = null;

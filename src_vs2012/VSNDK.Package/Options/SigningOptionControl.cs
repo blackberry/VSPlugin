@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Options.Dialogs;
+using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options
@@ -152,23 +153,72 @@ namespace RIM.VSNDK_Package.Options
         {
             if (MessageBoxHelper.Show("Do you want to unregister and remove the BlackBerry ID Token file?\r\nThis operation can not be reverted. Make sure you have created a backup.", "UNREGISTRATION!!", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
             {
-                // unregister, this is the only place, where doing it synchronously is OK:
+                ///////////////////////
+                // UNREGISTER
+                // this is the only place, where doing it synchronously is OK:
+                var runner = new KeyToolRemoveRunner(RunnerDefaults.ToolsDirectory);
+                var success = runner.Execute();
 
                 // and delete all profile-related files:
                 _vm.Developer.DeleteProfile();
                 UpdateUI();
+
+                // finally, show result message:
+                if (success && string.IsNullOrEmpty(runner.LastError))
+                {
+                    if (!string.IsNullOrEmpty(runner.LastOutput))
+                    {
+                        MessageBoxHelper.Show(runner.LastOutput.Replace("CSK", "BB ID Token"), "Unregistered developer profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(runner.LastError))
+                    {
+                        MessageBoxHelper.Show(runner.LastError, "Failed to remove developer profile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
         }
 
         private void bttRegister_Click(object sender, EventArgs e)
         {
             var form = new LoginForm(null, _vm.Developer);
-            form.ShowDialog();
+            form.ShowDialog(); // this should generate BlackBerry token file
 
-            // call the registration tool:
+            ///////////////////////////////
+            // REGISTER
 
-            // clean-up files, in case something went wrong:
-            _vm.Developer.CleanupProfile();
+            if (!_vm.Developer.IsRegistered && _vm.Developer.HasBlackBerryTokenFile)
+            {
+                var registrationForm = new RegistrationForm();
+
+                if (registrationForm.ShowDialog() == DialogResult.OK)
+                {
+                    var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, registrationForm.AuthorName, registrationForm.AuthorPassword);
+                    var success = runner.Execute();
+
+                    // finally, show result message:
+                    if (success && string.IsNullOrEmpty(runner.LastError))
+                    {
+                        if (!string.IsNullOrEmpty(runner.LastOutput))
+                        {
+                            MessageBoxHelper.Show(runner.LastOutput.Replace("CSK", "BB ID Token"), "Registered developer profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    else
+                    {
+                        // clean-up files, in case something went wrong:
+                        _vm.Developer.CleanupProfile();
+
+                        if (!string.IsNullOrEmpty(runner.LastError))
+                        {
+                            MessageBoxHelper.Show(runner.LastError, "Failed to create developer profile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        }
+                    }
+                }
+            }
+
             UpdateUI();
         }
     }

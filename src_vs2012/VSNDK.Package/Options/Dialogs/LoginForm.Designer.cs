@@ -46,7 +46,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(739, 424);
             this.Controls.Add(this.webBrowser);
-            this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "LoginForm";
             this.ShowIcon = false;

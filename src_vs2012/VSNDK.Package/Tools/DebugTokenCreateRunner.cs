@@ -130,7 +130,7 @@ namespace RIM.VSNDK_Package.Tools
                 {
                     if (line.StartsWith("error:", StringComparison.InvariantCultureIgnoreCase))
                     {
-                        LastError = line.Substring(6).Trim();;
+                        LastError = line.Substring(6).Trim();
                         break;
                     }
                     if (string.Compare("Info: Debug token created.", line, StringComparison.InvariantCultureIgnoreCase) == 0)

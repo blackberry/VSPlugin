@@ -243,7 +243,7 @@
       <DependentUpon>DeRegisterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="..\..\src\VSNDK.Package\Signing\Models\SigningData.cs">
-      <Link>Signing\SigningData.cs</Link>
+      <Link>Signing\Models\SigningData.cs</Link>
     </Compile>
     <Compile Include="..\..\src\VSNDK.Package\Signing\RegistrationWindow.xaml.cs">
       <Link>Signing\RegistrationWindow.xaml.cs</Link>
@@ -320,6 +320,12 @@
     <Compile Include="Options\Dialogs\PinListForm.Designer.cs">
       <DependentUpon>PinListForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Options\Dialogs\RegistrationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\RegistrationForm.Designer.cs">
+      <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -357,6 +363,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Tools\EventDispatcher.cs" />
+    <Compile Include="Tools\KeyToolGenRunner.cs" />
+    <Compile Include="Tools\KeyToolRemoveRunner.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\DeveloperDefinition.cs" />
     <Compile Include="ViewModels\DeviceDefinition.cs" />
@@ -540,6 +548,9 @@
     <EmbeddedResource Include="Options\Dialogs\PinListForm.resx">
       <DependentUpon>PinListForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\RegistrationForm.resx">
+      <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\GeneralOptionControl.resx">
       <DependentUpon>GeneralOptionControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -678,9 +689,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Signing\Models\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>

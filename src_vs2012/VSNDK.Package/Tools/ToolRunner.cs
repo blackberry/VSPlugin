@@ -243,9 +243,9 @@ namespace RIM.VSNDK_Package.Tools
             var lines = error.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             foreach (var line in lines)
             {
-                if (line.StartsWith("error: ", StringComparison.InvariantCultureIgnoreCase))
+                if (line.StartsWith("error:", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    result.AppendLine(line.Substring(7).Trim());
+                    result.AppendLine(line.Substring(6).Trim());
                 }
             }
 
