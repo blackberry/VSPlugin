@@ -36,6 +36,7 @@ using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Model.Integration;
 using RIM.VSNDK_Package.Options;
+using RIM.VSNDK_Package.Options.Dialogs;
 using RIM.VSNDK_Package.UpdateManager.Model;
 using RIM.VSNDK_Package.ViewModels;
 using VSNDK.Parser;
@@ -1118,6 +1119,12 @@ namespace RIM.VSNDK_Package
                     break;
                 case PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource:
                     DialogHelper.StartURL("https://github.com/blackberry");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpAbout:
+                    {
+                        var form = new AboutForm();
+                        form.ShowDialog();
+                    }
                     break;
                 default:
                     TraceLog.WarnLine("Unknown Help item requested");

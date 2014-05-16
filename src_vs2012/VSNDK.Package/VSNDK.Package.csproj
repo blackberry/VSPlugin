@@ -276,6 +276,12 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Options\DialogHelper.cs" />
+    <Compile Include="Options\Dialogs\AboutForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\AboutForm.Designer.cs">
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\Dialogs\AddLocalNdkForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -406,6 +412,7 @@
       <Link>UpdateManager\UpdateManagerDialog.xaml.cs</Link>
       <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
     </Compile>
+    <EmbeddedResource Include="Resources\Logo.png" />
     <None Include="VSNDK.Package.Bitmaps.vsct" />
     <Resource Include="..\..\src\VSNDK.Package\Resources\BlackBerryMessager.bmp">
       <Link>Resources\BlackBerryMessager.bmp</Link>
@@ -526,6 +533,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\ApiLevelOptionControl.resx">
       <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\AboutForm.resx">
+      <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\AddLocalNdkForm.resx">
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
