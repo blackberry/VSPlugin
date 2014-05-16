@@ -250,6 +250,243 @@
       <Link>Signing\SigningDialog.xaml.cs</Link>
       <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Diagnostics\BlackBerryPaneTraceListener.cs">
+      <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Diagnostics\BlackBerryTraceListener.cs">
+      <Link>Diagnostics\BlackBerryTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Diagnostics\TimeTracker.cs">
+      <Link>Diagnostics\TimeTracker.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Diagnostics\TraceLog.cs">
+      <Link>Diagnostics\TraceLog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\MessageBoxHelper.cs">
+      <Link>MessageBoxHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\ApiInfo.cs">
+      <Link>Model\ApiInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\ApiLevelListTypes.cs">
+      <Link>Model\ApiLevelListTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\DebugTokenInfo.cs">
+      <Link>Model\DebugTokenInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\DeviceDebugTokenInfo.cs">
+      <Link>Model\DeviceDebugTokenInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\DeviceInfo.cs">
+      <Link>Model\DeviceInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\DeviceTheme.cs">
+      <Link>Model\DeviceTheme.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\Integration\ComboBoxItem.cs">
+      <Link>Model\Integration\ComboBoxItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\Integration\DynamicMenuCommand.cs">
+      <Link>Model\Integration\DynamicMenuCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\NdkInfo.cs">
+      <Link>Model\NdkInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\ApiLevelOptionControl.cs">
+      <Link>Options\ApiLevelOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\ApiLevelOptionControl.designer.cs">
+      <Link>Options\ApiLevelOptionControl.designer.cs</Link>
+      <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\ApiLevelOptionPage.cs">
+      <Link>Options\ApiLevelOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\DialogHelper.cs">
+      <Link>Options\DialogHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\AboutForm.cs">
+      <Link>Options\Dialogs\AboutForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\AboutForm.designer.cs">
+      <Link>Options\Dialogs\AboutForm.designer.cs</Link>
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\AddLocalNdkForm.cs">
+      <Link>Options\Dialogs\AddLocalNdkForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\AddLocalNdkForm.designer.cs">
+      <Link>Options\Dialogs\AddLocalNdkForm.designer.cs</Link>
+      <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\DebugTokenDeploymentForm.cs">
+      <Link>Options\Dialogs\DebugTokenDeploymentForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\DebugTokenDeploymentForm.designer.cs">
+      <Link>Options\Dialogs\DebugTokenDeploymentForm.designer.cs</Link>
+      <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\DeviceForm.cs">
+      <Link>Options\Dialogs\DeviceForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\DeviceForm.designer.cs">
+      <Link>Options\Dialogs\DeviceForm.designer.cs</Link>
+      <DependentUpon>DeviceForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallNdkForm.cs">
+      <Link>Options\Dialogs\InstallNdkForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallNdkForm.designer.cs">
+      <Link>Options\Dialogs\InstallNdkForm.designer.cs</Link>
+      <DependentUpon>InstallNdkForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\LoginForm.cs">
+      <Link>Options\Dialogs\LoginForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\LoginForm.designer.cs">
+      <Link>Options\Dialogs\LoginForm.designer.cs</Link>
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PasswordForm.cs">
+      <Link>Options\Dialogs\PasswordForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PasswordForm.designer.cs">
+      <Link>Options\Dialogs\PasswordForm.designer.cs</Link>
+      <DependentUpon>PasswordForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PinListForm.cs">
+      <Link>Options\Dialogs\PinListForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PinListForm.designer.cs">
+      <Link>Options\Dialogs\PinListForm.designer.cs</Link>
+      <DependentUpon>PinListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\RegistrationForm.cs">
+      <Link>Options\Dialogs\RegistrationForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\RegistrationForm.designer.cs">
+      <Link>Options\Dialogs\RegistrationForm.designer.cs</Link>
+      <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\GeneralOptionControl.cs">
+      <Link>Options\GeneralOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\GeneralOptionControl.designer.cs">
+      <Link>Options\GeneralOptionControl.designer.cs</Link>
+      <DependentUpon>GeneralOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\GeneralOptionPage.cs">
+      <Link>Options\GeneralOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\LogsOptionControl.cs">
+      <Link>Options\LogsOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\LogsOptionControl.designer.cs">
+      <Link>Options\LogsOptionControl.designer.cs</Link>
+      <DependentUpon>LogsOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\LogsOptionPage.cs">
+      <Link>Options\LogsOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\SigningOptionControl.cs">
+      <Link>Options\SigningOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\SigningOptionControl.designer.cs">
+      <Link>Options\SigningOptionControl.designer.cs</Link>
+      <DependentUpon>SigningOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\SigningOptionPage.cs">
+      <Link>Options\SigningOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\TargetsOptionControl.cs">
+      <Link>Options\TargetsOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\TargetsOptionControl.designer.cs">
+      <Link>Options\TargetsOptionControl.designer.cs</Link>
+      <DependentUpon>TargetsOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\TargetsOptionPage.cs">
+      <Link>Options\TargetsOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ApiLevelListLoadRunner.cs">
+      <Link>Tools\ApiLevelListLoadRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ApplicationRemoveRunner.cs">
+      <Link>Tools\ApplicationRemoveRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\DebugTokenCreateRunner.cs">
+      <Link>Tools\DebugTokenCreateRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\DebugTokenInfoRunner.cs">
+      <Link>Tools\DebugTokenInfoRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\DebugTokenUploadRunner.cs">
+      <Link>Tools\DebugTokenUploadRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\DeviceInfoRunner.cs">
+      <Link>Tools\DeviceInfoRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\EventDispatcher.cs">
+      <Link>Tools\EventDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\KeyToolGenRunner.cs">
+      <Link>Tools\KeyToolGenRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\KeyToolRemoveRunner.cs">
+      <Link>Tools\KeyToolRemoveRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\RunnerDefaults.cs">
+      <Link>Tools\RunnerDefaults.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ToolRunner.cs">
+      <Link>Tools\ToolRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ToolRunnerEventArgs.cs">
+      <Link>Tools\ToolRunnerEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\ApiLevelOptionViewModel.cs">
+      <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\DeveloperDefinition.cs">
+      <Link>ViewModels\DeveloperDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\DeviceDefinition.cs">
+      <Link>ViewModels\DeviceDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\DeviceDefinitionType.cs">
+      <Link>ViewModels\DeviceDefinitionType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\NdkDefinition.cs">
+      <Link>ViewModels\NdkDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\PackageViewModel.cs">
+      <Link>ViewModels\PackageViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\SigningOptionViewModel.cs">
+      <Link>ViewModels\SigningOptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\TargetsOptionViewModel.cs">
+      <Link>ViewModels\TargetsOptionViewModel.cs</Link>
+    </Compile>
     <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
@@ -286,6 +523,71 @@
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="..\..\src_vs2012\VSNDK.Package\VSNDK.Package.Menu.vsct">
+      <Link>VSNDK.Package.Menu.vsct</Link>
+    </None>
+    <None Include="..\..\src_vs2012\VSNDK.Package\VSNDK.Package.Bitmaps.vsct">
+      <Link>VSNDK.Package.Bitmaps.vsct</Link>
+    </None>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\ApiLevelOptionControl.resx">
+      <Link>Options\ApiLevelOptionControl.resx</Link>
+      <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\AboutForm.resx">
+      <Link>Options\Dialogs\AboutForm.resx</Link>
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\AddLocalNdkForm.resx">
+      <Link>Options\Dialogs\AddLocalNdkForm.resx</Link>
+      <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\DebugTokenDeploymentForm.resx">
+      <Link>Options\Dialogs\DebugTokenDeploymentForm.resx</Link>
+      <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\DeviceForm.resx">
+      <Link>Options\Dialogs\DeviceForm.resx</Link>
+      <DependentUpon>DeviceForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallNdkForm.resx">
+      <Link>Options\Dialogs\InstallNdkForm.resx</Link>
+      <DependentUpon>InstallNdkForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\LoginForm.resx">
+      <Link>Options\Dialogs\LoginForm.resx</Link>
+      <DependentUpon>LoginForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PasswordForm.resx">
+      <Link>Options\Dialogs\PasswordForm.resx</Link>
+      <DependentUpon>PasswordForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PinListForm.resx">
+      <Link>Options\Dialogs\PinListForm.resx</Link>
+      <DependentUpon>PinListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\RegistrationForm.resx">
+      <Link>Options\Dialogs\RegistrationForm.resx</Link>
+      <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\GeneralOptionControl.resx">
+      <Link>Options\GeneralOptionControl.resx</Link>
+      <DependentUpon>GeneralOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\LogsOptionControl.resx">
+      <Link>Options\LogsOptionControl.resx</Link>
+      <DependentUpon>LogsOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\SigningOptionControl.resx">
+      <Link>Options\SigningOptionControl.resx</Link>
+      <DependentUpon>SigningOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\TargetsOptionControl.resx">
+      <Link>Options\TargetsOptionControl.resx</Link>
+      <DependentUpon>TargetsOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Resources\Logo.png">
+      <Link>Resources\Logo.png</Link>
+    </EmbeddedResource>
     <Resource Include="..\..\src\VSNDK.Package\Resources\BlackBerryMessager.bmp">
       <Link>Resources\BlackBerryMessager.bmp</Link>
     </Resource>

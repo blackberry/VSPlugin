@@ -32,7 +32,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
+using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model;
+using RIM.VSNDK_Package.Model.Integration;
+using RIM.VSNDK_Package.Options;
+using RIM.VSNDK_Package.Options.Dialogs;
 using RIM.VSNDK_Package.UpdateManager.Model;
+using RIM.VSNDK_Package.ViewModels;
 using VSNDK.Parser;
 
 namespace RIM.VSNDK_Package
@@ -909,11 +915,17 @@ namespace RIM.VSNDK_Package
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
-    [Guid(GuidList.guidVSNDK_PackagePkgString)]
+    [Guid(GuidList.guidVSNDK_PackageString)]
+    [ProvideOptionPage(typeof(GeneralOptionPage), "BlackBerry", "General", 1001, 1002, true)]
+    [ProvideOptionPage(typeof(LogsOptionPage), "BlackBerry", "Logs", 1001, 1003, true)]
+    [ProvideOptionPage(typeof(ApiLevelOptionPage), "BlackBerry", "API Levels", 1001, 1004, true)]
+    [ProvideOptionPage(typeof(TargetsOptionPage), "BlackBerry", "Targets", 1001, 1005, true)]
+    [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
     public sealed class VSNDK_PackagePackage : Package
     {
         #region private member variables
 
+        private BlackBerryPaneTraceListener _traceWindow;
         private DTE _dte;
         private VSNDKCommandEvents _commandEvents;
         private bool _isSimulator;
@@ -951,17 +963,28 @@ namespace RIM.VSNDK_Package
         {
             Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
             base.Initialize();
+            MessageBoxHelper.Initialise(this);
+
+            // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
+            _traceWindow = new BlackBerryPaneTraceListener("BlackBerry", true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceOutputWindowPane);
+            _traceWindow.Activate();
+
+            // and set it to monitor all logs (they have to be marked with 'BlackBerry' category! aka TraceLog.Category):
+            TraceLog.Add(_traceWindow);
+            TraceLog.WriteLine("BlackBerry plugin started");
+
+
+            var options = GetDialogPage(typeof(GeneralOptionPage)) as GeneralOptionPage;
+            var path = options.NdkPath;
+
+            InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
+            TraceLog.WriteLine(" * loaded NDK descriptions");
 
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new EditorFactory(this));
+            TraceLog.WriteLine(" * registered editors");
 
-
-            APITargetListSingleton api = APITargetListSingleton.Instance;
-            InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
-            InstalledNDKListSingleton ndkList = InstalledNDKListSingleton.Instance;
-            SimulatorListSingleton simList = SimulatorListSingleton.Instance;
-            InstalledSimulatorListSingleton installedSimList = InstalledSimulatorListSingleton.Instance;
-
+            
             _dte = (DTE)GetService(typeof(DTE));
 
             if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
@@ -981,34 +1004,134 @@ namespace RIM.VSNDK_Package
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
 
-
+            TraceLog.WriteLine(" * subscribed to IDE events");
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
             if ( null != mcs )
             {
                 // Create the command for the tool window
-                CommandID toolwndCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, (int)PkgCmdIDList.cmdidBlackBerryTools);
+                CommandID toolwndCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTools);
                 MenuCommand menuToolWin = new MenuCommand(ShowToolWindow, toolwndCommandID);
-                mcs.AddCommand( menuToolWin );
+                mcs.AddCommand(menuToolWin);
 
                 // Create the command for the settings window
-                CommandID wndSettingsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, (int)PkgCmdIDList.cmdidBlackBerrySettings);
+                CommandID wndSettingsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerrySettings);
                 MenuCommand menuSettingsWin = new MenuCommand(ShowSettingsWindow, wndSettingsCommandID);
                 mcs.AddCommand(menuSettingsWin);
 
                 // Create the command for the Debug Token window
-                CommandID wndDebugTokenCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, (int)PkgCmdIDList.cmdidBlackBerryDebugToken);
+                CommandID wndDebugTokenCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryDebugToken);
                 MenuCommand menuDebugTokenWin = new MenuCommand(ShowDebugTokenWindow, wndDebugTokenCommandID);
                 mcs.AddCommand(menuDebugTokenWin);
+
+                // Create command for the 'Options...' menu
+                CommandID optionsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryOptions);
+                MenuCommand optionsMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(GeneralOptionPage)), optionsCommandID);
+                mcs.AddCommand(optionsMenu);
+
+                // Create dynamic command for the 'devices-list' menu
+                CommandID devicesCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsDevicesPlaceholder);
+                DynamicMenuCommand devicesMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.TargetDevices,
+                                                                        (cmd, collection, index) =>
+                                                                            {
+                                                                                var item = index >= 0 && index < collection.Count ? ((DeviceDefinition[])collection)[index] : null;
+                                                                                PackageViewModel.Instance.ActiveDevice = item;
+                                                                            },
+                                                                        (cmd, collection, index) =>
+                                                                            {
+                                                                                var item = index >= 0 && index < collection.Count ? ((DeviceDefinition[])collection)[index] : null;
+                                                                                cmd.Checked = item == PackageViewModel.Instance.ActiveDevice || item == PackageViewModel.Instance.ActiveSimulator;
+                                                                                cmd.Text = item != null ? item.ToString() : "-";
+                                                                            },
+                                                                        devicesCommandID);
+                mcs.AddCommand(devicesMenu);
+                // Create dynamic command for the 'api-level-list' menu
+                CommandID apiLevelCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsApiLevelsPlaceholder);
+                DynamicMenuCommand apiLevelMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledNDKs,
+                                                                         (cmd, collection, index) =>
+                                                                             {
+                                                                                 var item = index >= 0 && index < collection.Count ? ((NdkInfo[]) collection)[index] : null;
+                                                                                 PackageViewModel.Instance.ActiveNDK = item;
+                                                                             },
+                                                                         (cmd, collection, index) =>
+                                                                             {
+                                                                                 var item = index >= 0 && index < collection.Count ? ((NdkInfo[]) collection)[index] : null;
+                                                                                 cmd.Checked = item == PackageViewModel.Instance.ActiveNDK;
+                                                                                 cmd.Text = item != null ? item.ToString() : "-";
+                                                                             },
+                                                                         apiLevelCommandID);
+                mcs.AddCommand(apiLevelMenu);
+
+                // Create command for 'Help' menus
+                var helpCmdIDs = new[] {
+                                            PkgCmdIDList.cmdidBlackBerryHelpDocNative, PkgCmdIDList.cmdidBlackBerryHelpDocCascades, PkgCmdIDList.cmdidBlackBerryHelpDocPlayBook,
+                                            PkgCmdIDList.cmdidBlackBerryHelpSamplesNative, PkgCmdIDList.cmdidBlackBerryHelpSamplesCascades, PkgCmdIDList.cmdidBlackBerryHelpSamplesPlayBook, PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource,
+                                            PkgCmdIDList.cmdidBlackBerryHelpAbout
+                                       };
+                foreach (var cmdID in helpCmdIDs)
+                {
+                    CommandID helpCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, cmdID);
+                    MenuCommand helpMenu = new MenuCommand(OpenHelpWebPage, helpCommandID);
+                    mcs.AddCommand(helpMenu);
+                }
+
+                // Create command for 'Configure...' [targets] menu
+                CommandID configureCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsConfigure);
+                MenuCommand configureMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(TargetsOptionPage)), configureCommandID);
+                mcs.AddCommand(configureMenu);
 
                 // Create the command for the menu item.
                 CommandID projCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidfooLocalBox);
                 OleMenuCommand projItem = new OleMenuCommand(MenuItemCallback, projCommandID);
                 mcs.AddCommand(projItem);
+
+                TraceLog.WriteLine(" * initialized menus");
             }
 
+            TraceLog.WriteLine("-------------------- DONE");
         }
+
+        private void OpenHelpWebPage(object sender, EventArgs e)
+        {
+            var menuCommand = sender as MenuCommand;
+            int cmdID = menuCommand != null ? menuCommand.CommandID.ID : 0;
+
+            switch (cmdID)
+            {
+                case PkgCmdIDList.cmdidBlackBerryHelpDocNative:
+                    DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/core/framework.html");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpDocCascades:
+                    DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpDocPlayBook:
+                    DialogHelper.StartURL("http://developer.blackberry.com/playbook/native/documentation/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSamplesNative:
+                    DialogHelper.StartURL("http://developer.blackberry.com/native/sampleapps/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSamplesCascades:
+                    DialogHelper.StartURL("http://developer.blackberry.com/native/sampleapps/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSamplesPlayBook:
+                    DialogHelper.StartURL("http://developer.blackberry.com/playbook/native/sampleapps/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource:
+                    DialogHelper.StartURL("https://github.com/blackberry");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpAbout:
+                    {
+                        var form = new AboutForm();
+                        form.ShowDialog();
+                    }
+                    break;
+                default:
+                    TraceLog.WarnLine("Unknown Help item requested");
+                    break;
+            }
+        }
+
         #endregion
 
         #region private methods
@@ -1490,7 +1613,6 @@ namespace RIM.VSNDK_Package
 
         #endregion
 
-
         #region Event Handlers
 
         /// <summary> 
@@ -1749,6 +1871,5 @@ namespace RIM.VSNDK_Package
         }
         
         #endregion
-
     }
 }

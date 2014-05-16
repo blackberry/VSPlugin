@@ -12,15 +12,13 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-// Guids.cs
-// MUST match guids.h
 using System;
 
 namespace RIM.VSNDK_Package
 {
     static class GuidList
     {
-        public const string guidVSNDK_PackagePkgString = "db9f9c5f-fb27-4297-ab44-fa8774e962ca";
+        public const string guidVSNDK_PackageString = "db9f9c5f-fb27-4297-ab44-fa8774e962ca";
         public const string guidVSNDK_PackageCmdSetString = "d531fe01-f48e-443d-8ea1-1530a352525f";
         public const string guidToolWindowPersistanceString = "87346a4d-fbf2-46ff-8f59-31915e39cfb9";
         public const string guidVSNDK_PackageEditorFactoryString = "9e985c5e-5b53-4cb1-bcd0-40a56f18eb4d";
@@ -32,6 +30,9 @@ namespace RIM.VSNDK_Package
 
         public static readonly Guid guidVSNDK_PackageCmdSet = new Guid(guidVSNDK_PackageCmdSetString);
         public static readonly Guid guidVSNDK_PackageEditorFactory = new Guid(guidVsTemplateDesignerEditorFactoryString);
-        public static readonly Guid guidTest = new Guid(guidVSStd2KString);
+
+        // Guid of the new pane with output messages
+        public const string guidTraceOutputWindowPaneString = "09963e4f-18ea-40e5-ba9e-1bc375ad68d1";
+        public static readonly Guid GUID_TraceOutputWindowPane = new Guid(guidTraceOutputWindowPaneString);
     };
 }
