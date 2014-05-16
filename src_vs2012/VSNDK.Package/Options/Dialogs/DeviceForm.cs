@@ -247,7 +247,10 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             _runner.Finished -= RunnerOnFinished;
             _runner = null;
 
-            bttOK.Enabled = PIN > 0;
+            if (IsDiscoverMode)
+            {
+                bttOK.Enabled = PIN > 0;
+            }
         }
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
