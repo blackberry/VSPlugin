@@ -264,6 +264,7 @@
     <Compile Include="Model\DeviceDebugTokenInfo.cs" />
     <Compile Include="Model\DeviceInfo.cs" />
     <Compile Include="Model\DeviceTheme.cs" />
+    <Compile Include="Model\Integration\ComboBoxItem.cs" />
     <Compile Include="Model\Integration\DynamicMenuCommand.cs" />
     <Compile Include="Model\NdkInfo.cs" />
     <Compile Include="Options\ApiLevelOptionControl.cs">
@@ -288,7 +289,6 @@
     <Compile Include="Options\Dialogs\AddLocalNdkForm.Designer.cs">
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\Dialogs\ComboBoxItem.cs" />
     <Compile Include="Options\Dialogs\DebugTokenDeploymentForm.cs">
       <SubType>Form</SubType>
     </Compile>
