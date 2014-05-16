@@ -411,6 +411,7 @@
       <Link>UpdateManager\UpdateManagerDialog.xaml.cs</Link>
       <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
     </Compile>
+    <None Include="VSNDK.Package.Menu.vsct" />
     <EmbeddedResource Include="Resources\Logo.png" />
     <None Include="VSNDK.Package.Bitmaps.vsct" />
     <Resource Include="..\..\src\VSNDK.Package\Resources\BlackBerryMessager.bmp">
