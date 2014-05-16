@@ -348,6 +348,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             var details = _vm.GetDetails(_device);
 
             cmbDevices.Enabled = completed;
+            bttAdd.Enabled = completed;
             bttDeviceLoad.Enabled = completed && !IsLoadingDeviceInfo;
             bttUpload.Enabled = completed && details != null && _tokenInfo != null /*&& _tokenInfo.ExpiryDate > DateTime.UtcNow && _tokenInfo.Contains(details.PIN) */;
             bttRemove.Enabled = completed && details != null && details.DebugToken != null && _tokenInfo != null && !string.IsNullOrEmpty(_tokenInfo.ID);
