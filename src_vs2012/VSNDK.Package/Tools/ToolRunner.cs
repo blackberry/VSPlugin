@@ -217,6 +217,13 @@ namespace RIM.VSNDK_Package.Tools
             // release process resources:
             _process.Close();
 
+#if DEBUG
+            // print received data:
+            if (!string.IsNullOrEmpty(outputText))
+                TraceLog.WriteLine(outputText.Trim());
+            if (!string.IsNullOrEmpty(errorText))
+                TraceLog.WarnLine(errorText.Trim());
+#endif
             // consume received data:
             ConsumeResults(outputText, errorText);
 
