@@ -183,6 +183,13 @@ namespace RIM.VSNDK_Package.Options
 
         private void bttRegister_Click(object sender, EventArgs e)
         {
+            if (_vm.Developer.IsRegistered)
+            {
+                MessageBoxHelper.Show("You are already registered, please unregister first, if you want to create new BlackBerry ID token!", "Registration",
+                                      MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
             var form = new LoginForm(null, _vm.Developer);
             form.ShowDialog(); // this should generate BlackBerry token file
 
@@ -217,6 +224,10 @@ namespace RIM.VSNDK_Package.Options
                         }
                     }
                 }
+            }
+            else
+            {
+                MessageBoxHelper.Show("Creation of BlackBerry ID token failed. Please try again.", "Registration", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             UpdateUI();
