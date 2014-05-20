@@ -8,9 +8,9 @@ namespace RIM.VSNDK_Package.Tools
     /// <summary>
     /// Class that runs specified executable, captures its output and error messages, then provides to parsers.
     /// </summary>
-    internal class ToolRunner
+    internal class ToolRunner : IDisposable
     {
-        private readonly Process _process;
+        private Process _process;
         private StringBuilder _output;
         private StringBuilder _error;
         private bool _isProcessing;
@@ -31,6 +31,11 @@ namespace RIM.VSNDK_Package.Tools
 
             _process.OutputDataReceived += OutputDataReceived;
             _process.ErrorDataReceived += ErrorDataReceived;
+        }
+
+        ~ToolRunner()
+        {
+            Dispose(false);
         }
 
         /// <summary>
@@ -116,6 +121,8 @@ namespace RIM.VSNDK_Package.Tools
         {
             if (_isProcessing)
                 throw new InvalidOperationException("The process is already running");
+            if (_process == null)
+                throw new ObjectDisposedException("ToolRunner");
             if (string.IsNullOrEmpty(FileName))
                 throw new InvalidOperationException("No executable to start");
 
@@ -148,6 +155,8 @@ namespace RIM.VSNDK_Package.Tools
         {
             if (_isProcessing)
                 throw new InvalidOperationException("The process is already running");
+            if (_process == null)
+                throw new ObjectDisposedException("ToolRunner");
 
             PrepareExecution();
 
@@ -258,5 +267,27 @@ namespace RIM.VSNDK_Package.Tools
 
             return result.ToString();
         }
+
+        #region IDisposable Implementation
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_process != null)
+                {
+                    _process.Dispose();
+                    _process = null;
+                }
+            }
+        }
+
+        #endregion
     }
 }
