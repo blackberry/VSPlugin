@@ -22,7 +22,7 @@ namespace VSNDK.AddIn
     /// <summary> 
     /// Command IDs exposed by VisualStudio. 
     /// </summary>
-    public static class CommandConstants
+    internal static class CommandConstants
     {
         public const int cmdidAddSolutionSCC = 21016;
         public const int cmdidUndoCheckoutSCC = 21009;
