@@ -100,7 +100,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <RegisterOutput>true</RegisterOutput>
+      <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>psapi.lib;$(VSInstallDir)\DIA SDK\lib\diaguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>GDBParser.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>

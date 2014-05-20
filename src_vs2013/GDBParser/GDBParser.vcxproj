@@ -59,6 +59,9 @@
     <ReferencePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ReferencePath)</ReferencePath>
     <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProgramFiles)\Microsoft Visual Studio 12.0\DIA SDK\lib\;$(ProgramFiles)\Microsoft Visual Studio 11.0\DIA SDK\lib\;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>$(ProgramFiles)\Microsoft Visual Studio 12.0\DIA SDK\lib\;$(ProgramFiles)\Microsoft Visual Studio 11.0\DIA SDK\lib\;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
@@ -102,8 +105,8 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <RegisterOutput>true</RegisterOutput>
-      <AdditionalDependencies>psapi.lib;$(VSInstallDir_120)DIA SDK\lib\diaguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <RegisterOutput>false</RegisterOutput>
+      <AdditionalDependencies>psapi.lib;diaguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>GDBParser.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
@@ -115,7 +118,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)Instructions.txt" "$(OutputPath)" /d /y </Command>
+      <Command>xcopy "$(ProjectDir)..\..\src\GDBParser\Instructions.txt" "$(OutputPath)" /d /y </Command>
       <Message>Copying Instructions.txt to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -145,7 +148,9 @@
   <ItemGroup>
     <None Include="GDBParser.def" />
     <None Include="GDBParser.rgs" />
-    <None Include="..\..\src\GDBParser\Instructions.txt" />
+    <None Include="..\..\src\GDBParser\Instructions.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\GDBParser\gdb-connect.h" />

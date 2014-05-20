@@ -47,11 +47,16 @@ src_vs2013/VSNDK.AddIn/VSNDK.AddIn.csproj.user
 src_vs2013/VSNDK.Package/VSNDK.Package.csproj.user
 
 # build temp outputs
+_BuildResults/
+BuildResults/
 src/Debug/
+src/Release/
 src/GDBParser.UnitTests/bin/
 src/GDBParser.UnitTests/obj/
 src/GDBParser/Debug/
+src/GDBParser/Release/
 src/GDBWrapper/Debug/
+src/GDBWrapper/Release/
 src/ipch/
 src/VSNDK.AddIn/bin/
 src/VSNDK.AddIn/obj/
@@ -67,10 +72,13 @@ src/VSNDK.Tasks/bin/
 src/VSNDK.Tasks/obj/
 
 src_vs2012/Debug/
+src_vs2012/Release/
 src_vs2012/GDBParser/Debug/
+src_vs2012/GDBParser/Release/
 src_vs2012/GDBParser.UnitTests/bin/
 src_vs2012/GDBParser.UnitTests/obj/
 src_vs2012/GDBWrapper/Debug/
+src_vs2012/GDBWrapper/Release/
 src_vs2012/ipch/
 src_vs2012/VSNDK.AddIn/bin/
 src_vs2012/VSNDK.AddIn/obj/
@@ -86,10 +94,13 @@ src_vs2012/VSNDK.Tasks/bin/
 src_vs2012/VSNDK.Tasks/obj/
 
 src_vs2013/Debug/
+src_vs2013/Release/
 src_vs2013/GDBParser.UnitTests/bin/
 src_vs2013/GDBParser.UnitTests/obj/
 src_vs2013/GDBParser/Debug/
+src_vs2013/GDBParser/Release/
 src_vs2013/GDBWrapper/Debug/
+src_vs2013/GDBWrapper/Release/
 src_vs2013/ipch/
 src_vs2013/VSNDK.AddIn/bin/
 src_vs2013/VSNDK.AddIn/obj/
