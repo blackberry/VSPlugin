@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if DEBUG
+
+using System;
 using System.Threading;
 using NUnit.Framework;
 using RIM.VSNDK_Package.Model;
@@ -174,3 +176,5 @@ namespace VSNDK.Package.Test
         }
     }
 }
+
+#endif

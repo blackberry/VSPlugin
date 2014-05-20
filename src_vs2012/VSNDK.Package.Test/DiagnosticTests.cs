@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿#if DEBUG
+
+using System.IO;
 using System.Text;
 using NUnit.Framework;
 using RIM.VSNDK_Package.Diagnostics;
@@ -31,3 +33,6 @@ namespace VSNDK.Package.Test
         }
     }
 }
+
+#endif
+

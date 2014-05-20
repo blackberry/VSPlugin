@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if DEBUG
+
+using System;
 using System.Windows;
 using NUnit.Framework;
 using RIM.VSNDK_Package.Model;
@@ -383,3 +385,5 @@ Error: Device is not in the Development Mode. Switch to Development Mode from Se
         }
     }
 }
+
+#endif
