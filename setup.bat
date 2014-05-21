@@ -11,20 +11,25 @@ if "%~1" == "" (
   set ActionVS2012=1
   set ActionVS2013=1
   set ActionUninstall=0
+  set ActionSkipTools=0
 ) else (
   set ActionVS2010=0
   set ActionVS2012=0
   set ActionVS2013=0
   set ActionUninstall=0
+  set ActionSkipTools=0
   for %%a in (%*) do (
-    if /i "%%a" == "/all"        set ActionVS2010=1 && set ActionVS2012=1 && set ActionVS2013=1
-    if /i "%%a" == "/uninstall"  set ActionUninstall=1
-    if /i "%%a" == "/u"          set ActionUninstall=1
-    if /i "%%a" == "/delete"     set ActionUninstall=1
-    if /i "%%a" == "/del"        set ActionUninstall=1
-    if /i "%%a" == "vs2010"      set ActionVS2010=1
-    if /i "%%a" == "vs2012"      set ActionVS2012=1
-    if /i "%%a" == "vs2013"      set ActionVS2013=1
+    if /i "%%a" == "/all"          set ActionVS2010=1 && set ActionVS2012=1 && set ActionVS2013=1
+    if /i "%%a" == "/uninstall"    set ActionUninstall=1
+    if /i "%%a" == "/u"            set ActionUninstall=1
+    if /i "%%a" == "/delete"       set ActionUninstall=1
+    if /i "%%a" == "/del"          set ActionUninstall=1
+    if /i "%%a" == "/skip-tools"   set ActionSkipTools=1
+    if /i "%%a" == "/no-tools"     set ActionSkipTools=1
+    if /i "%%a" == "/notools"      set ActionSkipTools=1
+    if /i "%%a" == "vs2010"        set ActionVS2010=1
+    if /i "%%a" == "vs2012"        set ActionVS2012=1
+    if /i "%%a" == "vs2013"        set ActionVS2013=1
   )
 )
 
@@ -33,14 +38,15 @@ REM Declare Constants
 REM ********************************************************************************************
 set /A actionNo=1
 set thisDir=%~dp0
-set BuildResults=%thisDir%_BuildResults
+set thisDir=%thisDir:~0,-1%
+set BuildResults=%thisDir%\_BuildResults
 
 set ProgFilesRoot=%ProgramFiles(x86)%
 set SystemArch=x64
-if "%ProgFilesRoot%" == "" set ProgFilesRoot=%ProgramFiles% && set SystemArch=x86
+if "%ProgFilesRoot%" == "" set "ProgFilesRoot=%ProgramFiles%" && set SystemArch=x86
 
 set AllUsersRoot=%ALLUSERSPROFILE%
-set PluginRoot=%ProgRoot%\BlackBerry\VSPlugin-NDK
+set PluginRoot=%ProgFilesRoot%\BlackBerry\VSPlugin-NDK
 
 if %ActionUninstall% neq 0 (echo Performing REMOVAL action...) else (echo Performing INSTALLATION action...)
 
@@ -103,12 +109,16 @@ set BuildPath=%BuildResults%\VS%VSYear%
 set VSPluginPath=%ProgFilesRoot%\Microsoft Visual Studio %VSVersion%\Common7\IDE\Extensions\NDK Plugin
 set VSWizardsPath=%ProgFilesRoot%\Microsoft Visual Studio %VSVersion%\VC\VCWizards\CodeWiz
 
-if "%VSSelector%" == "" set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms
-else                    set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\%VSSelector%\Platforms
+set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms
+if not "%VSSelector%" == "" set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\%VSSelector%\Platforms
+
+REM Skip installation of custom tools (in case upgrading only plugin during development)
+if %ActionSkipTools% neq 0 goto skip_tools
+call :processTools "%thisDir%" "%PluginRoot%" "%SystemDrive%"
+:skip_tools
 
 call :processAddIn "%BuildPath%" "%AllUsersRoot%\Microsoft\MSEnvShared\Addins"
 call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%" "%MSBuildTargetPath%" "%VSWizardsPath%"
-call :processTools "%thisDir%" "%PluginRoot%" "%SystemDrive%"
 
 if %ActionUninstall% neq 0 (goto uninstall_reg)
 
@@ -139,6 +149,8 @@ set OutputPath=%~2
 if %ActionUninstall% neq 0 (goto uninstall_AddIn)
 
 REM Install add-in
+echo %actionNo%: Installing Add-in
+mkdir "%OutputPath%
 echo Copy "%InputPath%\VSNDK.AddIn.AddIn" to "%OutputPath%\VSNDK.AddIn.AddIn" 
 copy "%InputPath%\VSNDK.AddIn.AddIn" "%OutputPath%\VSNDK.AddIn.AddIn" 
 echo Copy "%InputPath%\VSNDK.AddIn.dll" to "%OutputPath%\VSNDK.AddIn.dll" 
@@ -147,6 +159,7 @@ goto processAddIn_End
 
 :uninstall_AddIn
 REM Remove add-in
+echo %actionNo%: Removing Add-in
 echo Deleting "%OutputPath%\VSNDK.AddIn.AddIn" 
 del "%OutputPath%\VSNDK.AddIn.AddIn" 
 echo Deleting "%OutputPath%\VSNDK.AddIn.dll" 
@@ -177,6 +190,7 @@ set OutputWizardsPath=%~5
 if %ActionUninstall% neq 0 (goto uninstall_Plugin)
 
 REM Create folders
+echo %actionNo%: Installing plugin binaries
 echo Make Directory "%OutputPluginPath%"
 md "%OutputPluginPath%"
 echo Make Directory "%OutputVsPath%"
@@ -218,6 +232,7 @@ goto processPlugin_End
 :uninstall_Plugin
 
 REM Uninstall
+echo %actionNo%: Removing plugin binaries
 echo Deleting "%OutputVsPath%\GDBParser.dll"
 del "%OutputVsPath%\GDBParser.dll" 
 echo Deleting "%OutputPluginPath%\GDBWrapper.exe"
@@ -229,7 +244,7 @@ del "%OutputPluginPath%\VSNDK.DebugEngine.dll"
 
 REM Uninstall Package Files
 echo Deleting "%OutputVsPath%\extension.vsixmanifest"
-del "%OutputVsPath%\extension.manifest" 
+del "%OutputVsPath%\extension.vsixmanifest" 
 echo Deleting  "%OutputVsPath%\VSNDK.Package.dll"
 del "%OutputVsPath%\VSNDK.Package.dll"
 echo Deleting  "%OutputVsPath%\VSNDK.Package.pkgdef"
@@ -266,22 +281,25 @@ setlocal EnableDelayedExpansion
 
 set InputPath=%~1
 set OutputPath=%~2
-set OutputNdkPath=%~2
+set OutputNdkPath=%~3
 
 if %ActionUninstall% neq 0 (goto uninstall_Tools)
 
 REM Install
+echo %actionNo%: Installing toolset
 echo xcopy "%InputPath%\bbndk_vs" "%OutputNdkPath%\bbndk_vs" /e /i /y
 md "%OutputNdkPath%\bbndk_vs"
-xcopy "%InputPath%bbndk_vs" "%OutputNdkPath%\bbndk_vs" /e /i /y
+xcopy "%InputPath%\bbndk_vs" "%OutputNdkPath%\bbndk_vs" /e /i /y
 
 echo xcopy "%InputPath%\qnxtools" "%OutputPath%\qnxtools" /e /i /y
 md "%OutputPath%\qnxtools"
 xcopy "%InputPath%\qnxtools" "%OutputPath%\qnxtools" /e /i /y
+goto processTools_End
 
 :uninstall_Tools
 
 REM Remove
+echo %actionNo%: Removing toolset
 echo Delete "%OutputNdkPath%\bbndk_vs" directory
 rd "%OutputNdkPath%\bbndk_vs" /s /q
 echo Delete "%OutputPath%\qnxtools" directory

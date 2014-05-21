@@ -119,9 +119,18 @@ REM ****************************************************************************
 if %ActionGenScripts% equ 0 (goto skip_scripts)
 
 echo %actionNo%: Creating installation scripts
+
+if %ActionBuildVS2010% equ 0 (goto skip_vs2010_scripts)
 call :processTemplates 2010 10.0
+:skip_vs2010_scripts
+
+if %ActionBuildVS2012% equ 0 (goto skip_vs2012_scripts)
 call :processTemplates 2012 11.0
+:skip_vs2012_scripts
+
+if %ActionBuildVS2013% equ 0 (goto skip_vs2013_scripts)
 call :processTemplates 2013 12.0
+:skip_vs2013_scripts
 
 echo %actionNo%: Writing - DONE
 set /a actionNo += 1
