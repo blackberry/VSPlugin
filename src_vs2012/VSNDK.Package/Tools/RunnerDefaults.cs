@@ -13,15 +13,26 @@ namespace RIM.VSNDK_Package.Tools
         public static readonly string DataDirectory;
         public static readonly string InstallationConfigDirectory;
         public static readonly string SupplementaryInstallationConfigDirectory;
+        public static readonly string SupplementaryPlayBookInstallationConfigDirectory;
         public static readonly string RegistryPath;
 
         static RunnerDefaults()
         {
             ToolsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
             NdkDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
-            DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Research In Motion");
+            // the base data folder is different for each platform...
+            if (IsWindowsXP)
+            {
+                DataDirectory = Path.Combine(Environment.ExpandEnvironmentVariables("%HomeDrive%"), Environment.ExpandEnvironmentVariables("%HomePath%"), "Local Settings", "Application Data", "Research In Motion");
+            }
+            else
+            {
+                DataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Research In Motion");
+            }
+
             InstallationConfigDirectory = Path.Combine(DataDirectory, "BlackBerry Native SDK", "qconfig");
             SupplementaryInstallationConfigDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs", "..", "qconfig");
+            SupplementaryPlayBookInstallationConfigDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "QNX Software Systems", "qconfig");
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
 
 #if DEBUG
@@ -41,6 +52,30 @@ namespace RIM.VSNDK_Package.Tools
                 throw new ArgumentNullException("fileName");
 
             return Path.Combine(DataDirectory, fileName);
+        }
+
+        /// <summary>
+        /// Gets an indication, if currently running on Windows XP.
+        /// </summary>
+        public static bool IsWindowsXP
+        {
+            get
+            {
+                var os = Environment.OSVersion;
+                return os.Platform == PlatformID.Win32NT && os.Version.Major == 5 && os.Version.Minor == 1;
+            }
+        }
+
+        /// <summary>
+        /// Gets an indication, if currently running on Windows XP, Vista, 7, 8 or newer system.
+        /// </summary>
+        public static bool IsWindowsXPorNewer
+        {
+            get
+            {
+                var os = Environment.OSVersion;
+                return os.Platform == PlatformID.Win32NT && (os.Version.Major > 5 || (os.Version.Major == 5 && os.Version.Minor == 1));
+            }
         }
     }
 }

@@ -63,7 +63,9 @@ namespace RIM.VSNDK_Package.ViewModels
                 if (_installedNDKs == null)
                 {
                     // load info about NDKs from specified locations:
-                    _installedNDKs = NdkInfo.Load(RunnerDefaults.InstallationConfigDirectory, RunnerDefaults.SupplementaryInstallationConfigDirectory);
+                    _installedNDKs = NdkInfo.Load(RunnerDefaults.InstallationConfigDirectory,
+                                                  RunnerDefaults.SupplementaryInstallationConfigDirectory,
+                                                  RunnerDefaults.SupplementaryPlayBookInstallationConfigDirectory);
                 }
 
                 return _installedNDKs;
