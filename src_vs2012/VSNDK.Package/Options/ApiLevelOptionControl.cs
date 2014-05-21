@@ -64,11 +64,16 @@ namespace RIM.VSNDK_Package.Options
                 if (ndk != null)
                 {
                     // save inside 'installation config' directory:
-                    ndk.Save(RunnerDefaults.InstallationConfigDirectory);
-
-                    // reload NDKs
-                    _vm.ReloadAndActivate(ndk);
-                    PopulateNDKs();
+                    if (ndk.Save(RunnerDefaults.InstallationConfigDirectory))
+                    {
+                        // reload NDKs
+                        _vm.ReloadAndActivate(ndk);
+                        PopulateNDKs();
+                    }
+                    else
+                    {
+                        MessageBoxHelper.Show("Unable to save NDK information", "API Level Updater", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
                 }
             }
         }

@@ -499,10 +499,21 @@ namespace RIM.VSNDK_Package.Model
             return new Version(versionString);
         }
 
-        public void Save(string outputDirectory)
+        public bool Save(string outputDirectory)
         {
             if (string.IsNullOrEmpty(outputDirectory))
                 throw new ArgumentNullException("outputDirectory");
+
+            // make sure, the output directory exists:
+            try
+            {
+                Directory.CreateDirectory(outputDirectory);
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to create directory for NDK info cache");
+                return false;
+            }
 
             // normalize file name:
             var fileName = new StringBuilder(string.IsNullOrEmpty(Name) ? "vsplugin_target_" + Version + DateTime.Now.ToString("yyyy-MM-dd_HH_mm_ss") + ".xml" : Name + ".xml");
@@ -553,6 +564,7 @@ namespace RIM.VSNDK_Package.Model
 
             // store it:
             doc.Save(Path.Combine(outputDirectory, fileName.ToString()));
+            return true;
         }
     }
 }

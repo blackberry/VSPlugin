@@ -102,7 +102,7 @@ namespace RIM.VSNDK_Package.ViewModels
             }
             set
             {
-                if (value != null && !value.Matches(_activeNDK))
+                if (value != null && !value.Matches(_activeNDK) && InstalledNDKs.Length > 0)
                 {
                     var index = IndexOfInstalled(value);
                     if (index < 0)
