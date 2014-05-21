@@ -32,8 +32,11 @@ set /A actionNo=1
 set thisDir=%~dp0
 set BuildResults="%thisDir%_BuildResults"
 
+set ProgFilesRoot=%ProgramFiles(x86)%
+if "%ProgFilesRoot%" == "" set ProgFilesRoot=%ProgramFiles%
+
 set MsBuild="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MsBuild.exe"
-set MsBuild2013="C:\Program Files (x86)\MSBuild\12.0\Bin\MsBuild.exe"
+set MsBuild2013="%ProgFilesRoot%\MSBuild\12.0\Bin\MsBuild.exe"
 set MsBuildCmd=%MsBuild% /property:Configuration=Release /target:Rebuild
 set MsBuild2013Cmd=%MsBuild2013% /property:Configuration=Release /target:Rebuild
 
