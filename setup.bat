@@ -63,7 +63,7 @@ REM ****************************************************************************
 if %ActionVS2012% equ 0 (goto skip_vs2012)
 
 echo %actionNo%: Processing Setup for Visual Studio 2012
-call :processSetup 2012 11.0
+call :processSetup 2012 11.0 V110
 if errorlevel 1 ( exit /b %errorlevel% )
 if %ActionUninstall% neq 0 (echo %actionNo%: Removal - DONE) else (echo %actionNo%: Installation - DONE)
 set /a actionNo += 1
@@ -76,7 +76,7 @@ REM ****************************************************************************
 if %ActionVS2013% equ 0 (goto skip_vs2013)
 
 echo %actionNo%: Processing Setup for Visual Studio 2013
-call :processSetup 2013 12.0
+call :processSetup 2013 12.0 V120
 if errorlevel 1 ( exit /b %errorlevel% )
 if %ActionUninstall% neq 0 (echo %actionNo%: Removal - DONE) else (echo %actionNo%: Installation - DONE)
 set /a actionNo += 1
