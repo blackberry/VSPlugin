@@ -212,6 +212,12 @@ namespace RIM.VSNDK_Package.Model
                 {
                     if (!string.IsNullOrEmpty(targetPath) && !string.IsNullOrEmpty(hostPath))
                     {
+                        // is it a PlayBook NDK, which has no 'version' field?
+                        if (version == null && !string.IsNullOrEmpty(name))
+                        {
+                            version = GetVersionFromFolderName(name);
+                        }
+
                         // try to define info about the installation:
                         return new NdkInfo(name, version, hostPath, targetPath);
                     }
@@ -374,9 +380,13 @@ namespace RIM.VSNDK_Package.Model
             var targetDirs = Directory.GetDirectories(folder, "target*");
             if (targetDirs.Length != 0)
             {
-                info = ScanByTargetFolder(targetDirs[0]);
-                if (info != null)
-                    return info;
+                // get the first folder with a descriptor:
+                foreach (var target in targetDirs)
+                {
+                    info = ScanByTargetFolder(target);
+                    if (info != null)
+                        return info;
+                }
             }
 
             // is it a host folder?
@@ -388,7 +398,15 @@ namespace RIM.VSNDK_Package.Model
             if (targetDirs.Length == 0)
                 return null;
 
-            return ScanByTargetFolder(targetDirs[0]);
+            // get first folder with a descriptor:
+            foreach (var target in targetDirs)
+            {
+                info = ScanByTargetFolder(targetDirs[0]);
+                if (info != null)
+                    return info;
+            }
+
+            return null;
         }
 
         private static NdkInfo ScanByTargetFolder(string folder)
@@ -408,10 +426,51 @@ namespace RIM.VSNDK_Package.Model
                 // extract version out of the current folder name
                 var version = GetVersionFromFolderName(Path.GetFileName(folder));
                 if (version == null)
-                    version = new Version(10, 0, 1);
+                {
+                    // is there an installation folder with version (used by PlayBook NDKs)?
+                    var installInfoPath = Path.Combine(folder, "..", "install", "info.txt");
+                    if (File.Exists(installInfoPath))
+                    {
+                        try
+                        {
+                            version = GetVersionFromInstallationInfo(File.ReadAllLines(installInfoPath));
+                        }
+                        catch (Exception ex)
+                        {
+                            TraceLog.WriteException(ex, "Unable to read installation info from file: \"{0}\"", installInfoPath);
+                        }
+                    }
+
+                    if (version == null)
+                        version = new Version(10, 0, 1);
+                }
 
                 return new NdkInfo(string.Concat("BlackBerry Local SDK ", version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
                                    version, Path.Combine(hostDirs[0], "win32", "x86"), Path.Combine(folder, "qnx6"));
+            }
+
+            return null;
+        }
+
+        private static Version GetVersionFromInstallationInfo(string[] lines)
+        {
+            if (lines == null || lines.Length == 0)
+                return null;
+
+            // find the line, that describes the target version:
+            foreach (var line in lines)
+            {
+                if (line.StartsWith("target", StringComparison.OrdinalIgnoreCase))
+                {
+                    var index = line.IndexOf('=');
+                    string versionString;
+                    if (index < 0)
+                        versionString = line.Substring(7).Trim(); // one char after 'target' assumed to be separator
+                    else
+                        versionString = line.Substring(index + 1).Trim();
+
+                    return string.IsNullOrEmpty(versionString) ? null : new Version(versionString);
+                }
             }
 
             return null;
@@ -425,11 +484,11 @@ namespace RIM.VSNDK_Package.Model
             int i = directoryName.Length;
 
             // find the version substring at the end of the name:
-            while (i > 0 && directoryName[i - 1] == '_' || char.IsDigit(directoryName[i - 1]))
+            while (i > 0 && directoryName[i - 1] == '_' || directoryName[i - 1] == '.' || char.IsDigit(directoryName[i - 1]))
                 i--;
 
             // we might read one char too much:
-            if (i < directoryName.Length && directoryName[i] == '_')
+            if (i < directoryName.Length && !char.IsDigit(directoryName[i]))
                 i++;
 
             // parse:
