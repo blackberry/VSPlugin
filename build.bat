@@ -19,6 +19,7 @@ if "%~1" == "" (
   set ActionBuildVS2012=0
   set ActionBuildVS2013=0
   for %%a in (%*) do (
+    if /i "%%a" == "/all"        set ActionBuildVS2010=1 && set ActionBuildVS2012=1 && set ActionBuildVS2013=1
     if /i "%%a" == "/noclean"    set ActionClean=0
     if /i "%%a" == "/no-clean"   set ActionClean=0
     if /i "%%a" == "/scripts"    set ActionGenScripts=1

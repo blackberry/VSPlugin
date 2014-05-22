@@ -5,7 +5,7 @@ REM ****************************************************************************
 REM Allow selective installation/uninstallation
 REM ********************************************************************************************
 
-:: Process parameters, to limit processing
+:: Process parameters, to limit setup activities or directions
 if "%~1" == "" (
   set ActionVS2010=1
   set ActionVS2012=1
