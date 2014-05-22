@@ -1,5 +1,6 @@
 @echo off
-setlocal enableextensions
+echo Starting...
+setlocal EnableExtensions
 
 REM ********************************************************************************************
 REM Allow selective build
@@ -18,25 +19,41 @@ if "%~1" == "" (
   set ActionBuildVS2010=0
   set ActionBuildVS2012=0
   set ActionBuildVS2013=0
-  for %%a in (%*) do (
-    if /i "%%a" == "/all"        set ActionBuildVS2010=1 && set ActionBuildVS2012=1 && set ActionBuildVS2013=1
-    if /i "%%a" == "/noclean"    set ActionClean=0
-    if /i "%%a" == "/no-clean"   set ActionClean=0
-    if /i "%%a" == "/scripts"    set ActionGenScripts=1
-    if /i "%%a" == "/noscripts"  set ActionGenScripts=0
-    if /i "%%a" == "/no-scripts" set ActionGenScripts=0
-    if /i "%%a" == "vs2010"      set ActionBuildVS2010=1 && set ActionGenScripts=1
-    if /i "%%a" == "vs2012"      set ActionBuildVS2012=1 && set ActionGenScripts=1
-    if /i "%%a" == "vs2013"      set ActionBuildVS2013=1 && set ActionGenScripts=1
-  )
 )
+
+:args_parsing
+set arg=%~1
+if "%arg%" == ""               (goto args_parsing_done)
+if /i "%arg%" == "/all"        set ActionBuildVS2010=1 && set ActionBuildVS2012=1 && set ActionBuildVS2013=1
+if /i "%arg%" == "/noclean"    set ActionClean=0
+if /i "%arg%" == "/no-clean"   set ActionClean=0
+if /i "%arg%" == "/scripts"    set ActionGenScripts=2
+if /i "%arg%" == "/noscripts"  set ActionGenScripts=0
+if /i "%arg%" == "/no-scripts" set ActionGenScripts=0
+if /i "%arg%" == "vs2010"      set ActionBuildVS2010=1 && set ActionGenScripts=1
+if /i "%arg%" == "vs2012"      set ActionBuildVS2012=1 && set ActionGenScripts=1
+if /i "%arg%" == "vs2013"      set ActionBuildVS2013=1 && set ActionGenScripts=1
+if /i "%arg:~0,5%" == "/out:"  set CustomOutputDir=%arg:~5%
+
+shift /1
+goto args_parsing
+    
+:args_parsing_done
+set arg=
 
 REM ********************************************************************************************
 REM Declare Constants
 REM ********************************************************************************************
 set /A actionNo=1
 set thisDir=%~dp0
-set BuildResults="%thisDir%_BuildResults"
+set thisDir=%thisDir:~0,-1%
+
+REM Allow to override the BuildReults path, in case someone dislikes the default one
+set BuildResults=%thisDir%\_BuildResults
+if "%CustomOutputDir%" == "" goto skip_buildoutput_override
+  set BuildResults=%CustomOutputDir%
+  if "%BuildResults:~-1%" == "\" set BuildResults=%BuildResults:~0,-1%
+:skip_buildoutput_override
 
 set ProgFilesRoot=%ProgramFiles(x86)%
 if "%ProgFilesRoot%" == "" set ProgFilesRoot=%ProgramFiles%
@@ -50,8 +67,8 @@ set SolutionPath2010="%thisDir%\src\VSNDK.sln"
 set SolutionPath2012="%thisDir%\src_vs2012\VSNDK.sln"
 set SolutionPath2013="%thisDir%\src_vs2013\VSNDK.sln"
 
-echo Starting...
-echo Output folder: %BuildResults%
+echo Current folder: "%thisDir%"
+echo Output folder: "%BuildResults%"
 
 REM ********************************************************************************************
 REM Clean up old bin folder
@@ -81,7 +98,7 @@ REM ****************************************************************************
 if %ActionBuildVS2010% equ 0 (goto skip_vs2010)
 
 echo %actionNo%: Building Solution for Visual Studio 2010
-%MsBuildCmd% %SolutionPath2010% /p:OutputPath="%BuildResults%\VS2010" > %BuildResults%\VS2010_buildlog.txt
+%MsBuildCmd% %SolutionPath2010% /p:OutputPath="%BuildResults%\VS2010" > "%BuildResults%\VS2010_buildlog.txt"
 if errorlevel 1 ( exit /b %errorlevel% )
 echo %actionNo%: Build - DONE
 set /a actionNo += 1
@@ -94,7 +111,7 @@ REM ****************************************************************************
 if %ActionBuildVS2012% equ 0 (goto skip_vs2012)
 
 echo %actionNo%: Building Solution for Visual Studio 2012
-%MsBuildCmd% %SolutionPath2012% /p:OutputPath="%BuildResults%\VS2012" /p:VisualStudioVersion=11.0  > %BuildResults%\VS2012_buildlog.txt
+%MsBuildCmd% %SolutionPath2012% /p:OutputPath="%BuildResults%\VS2012" /p:VisualStudioVersion=11.0  > "%BuildResults%\VS2012_buildlog.txt"
 if errorlevel 1 ( exit /b %errorlevel% )
 echo %actionNo%: Build - DONE
 set /a actionNo += 1
@@ -107,7 +124,7 @@ REM ****************************************************************************
 if %ActionBuildVS2013% equ 0 (goto skip_vs2013)
 
 echo %actionNo%: Building Solution for Visual Studio 2013
-%MsBuild2013Cmd% %SolutionPath2013% /p:OutputPath="%BuildResults%\VS2013" /p:VisualStudioVersion=12.0  > %BuildResults%\VS2013_buildlog.txt
+%MsBuild2013Cmd% %SolutionPath2013% /p:OutputPath="%BuildResults%\VS2013" /p:VisualStudioVersion=12.0  > "%BuildResults%\VS2013_buildlog.txt"
 if errorlevel 1 ( exit /b %errorlevel% )
 echo %actionNo%: Build - DONE
 set /a actionNo += 1
@@ -121,15 +138,15 @@ if %ActionGenScripts% equ 0 (goto skip_scripts)
 
 echo %actionNo%: Creating installation scripts
 
-if %ActionBuildVS2010% equ 0 (goto skip_vs2010_scripts)
+if %ActionBuildVS2010% equ 0 (if %ActionGenScripts% neq 2 (goto skip_vs2010_scripts))
 call :processTemplates 2010 10.0
 :skip_vs2010_scripts
 
-if %ActionBuildVS2012% equ 0 (goto skip_vs2012_scripts)
+if %ActionBuildVS2012% equ 0 (if %ActionGenScripts% neq 2 (goto skip_vs2012_scripts))
 call :processTemplates 2012 11.0
 :skip_vs2012_scripts
 
-if %ActionBuildVS2013% equ 0 (goto skip_vs2013_scripts)
+if %ActionBuildVS2013% equ 0 (if %ActionGenScripts% neq 2 (goto skip_vs2013_scripts))
 call :processTemplates 2013 12.0
 :skip_vs2013_scripts
 
@@ -150,8 +167,8 @@ REM $2 - Visual Studio version (10.0)
 :processTemplates
 setlocal EnableDelayedExpansion
 
-set InstallTemplate="%thisDir%setup_install.template"
-set UninstallTemplate="%thisDir%setup_uninstall.template"
+set InstallTemplate="%thisDir%\setup_install.template"
+set UninstallTemplate="%thisDir%\setup_uninstall.template"
 
 set VSYear=%~1
 set VSVersion=%~2
@@ -197,24 +214,24 @@ set PluginPath=!PluginPath:(=^^(!
 set PluginPath=!PluginPath:)=^^)!
 
 REM Create empty file
-type nul > %OutputFile%
+type nul > "%OutputFile%"
 
-for /f "tokens=* delims=" %%l in (%InputFile%) do (
+for /f "tokens=* delims=" %%l in ("%InputFile%") do (
   set line=%%l
 
   REM Inject empty line, so the sections are easier visible
   set first=!line:~0,1!
-  if "!first!" == "[" echo.>> %OutputFile%
+  if "!first!" == "[" echo.>> "%OutputFile%"
   
   REM Replace markers within the template
   set line=!line:#VSVersion#=%VSVersion%!
   set line=!line:#VSYear#=%VSYear%!
   set line=!line:#PluginRegistryNodeName#=%PluginRegistryNodeName%!
   set line=!line:#PluginPath#=%PluginPath%!
-  echo.!line! >> %OutputFile%
+  echo.!line! >> "%OutputFile%"
 )
-echo.>> %OutputFile%
-echo Completed template "%OutputShortFileName%"
+echo.>> "%OutputFile%"
+echo %actionNo%: Completed template "%OutputShortFileName%"
 
 endlocal
 exit /b
