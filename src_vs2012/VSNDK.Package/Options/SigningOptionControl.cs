@@ -99,7 +99,7 @@ namespace RIM.VSNDK_Package.Options
 
         private void bttDeletePassword_Click(object sender, EventArgs e)
         {
-            if (MessageBoxHelper.Show("Delete stored password?", "BBID Token CSK Password", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (MessageBoxHelper.Show("Are you sure to delete stored certificate password?", null, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 
             _vm.Developer.DeleteCskPassword();

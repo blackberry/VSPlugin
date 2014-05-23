@@ -45,6 +45,7 @@
             this.bttRestore = new System.Windows.Forms.Button();
             this.bttNavigate = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -55,7 +56,6 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.bttUnregister);
             this.groupBox1.Controls.Add(this.bttRegister);
-            this.groupBox1.Controls.Add(this.bttDeletePassword);
             this.groupBox1.Controls.Add(this.lblMore);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
@@ -89,12 +89,12 @@
             // 
             // bttDeletePassword
             // 
-            this.bttDeletePassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttDeletePassword.Location = new System.Drawing.Point(264, 70);
+            this.bttDeletePassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttDeletePassword.Location = new System.Drawing.Point(315, 43);
             this.bttDeletePassword.Name = "bttDeletePassword";
-            this.bttDeletePassword.Size = new System.Drawing.Size(126, 23);
-            this.bttDeletePassword.TabIndex = 4;
-            this.bttDeletePassword.Text = "Forget password";
+            this.bttDeletePassword.Size = new System.Drawing.Size(75, 23);
+            this.bttDeletePassword.TabIndex = 7;
+            this.bttDeletePassword.Text = "Detach";
             this.bttDeletePassword.UseVisualStyleBackColor = true;
             this.bttDeletePassword.Click += new System.EventHandler(this.bttDeletePassword_Click);
             // 
@@ -135,7 +135,7 @@
             this.label3.Location = new System.Drawing.Point(6, 48);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(41, 13);
-            this.label3.TabIndex = 3;
+            this.label3.TabIndex = 4;
             this.label3.Text = "Author:";
             // 
             // txtCertPath
@@ -145,16 +145,18 @@
             this.txtCertPath.Location = new System.Drawing.Point(90, 19);
             this.txtCertPath.Name = "txtCertPath";
             this.txtCertPath.ReadOnly = true;
-            this.txtCertPath.Size = new System.Drawing.Size(219, 20);
+            this.txtCertPath.Size = new System.Drawing.Size(138, 20);
             this.txtCertPath.TabIndex = 1;
             // 
             // txtAuthor
             // 
+            this.txtAuthor.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtAuthor.Location = new System.Drawing.Point(90, 45);
             this.txtAuthor.Name = "txtAuthor";
             this.txtAuthor.ReadOnly = true;
-            this.txtAuthor.Size = new System.Drawing.Size(171, 20);
-            this.txtAuthor.TabIndex = 4;
+            this.txtAuthor.Size = new System.Drawing.Size(138, 20);
+            this.txtAuthor.TabIndex = 5;
             // 
             // groupBox2
             // 
@@ -163,7 +165,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.bttRefresh);
             this.groupBox2.Controls.Add(this.bttBackup);
+            this.groupBox2.Controls.Add(this.bttDeletePassword);
             this.groupBox2.Controls.Add(this.bttRestore);
+            this.groupBox2.Controls.Add(this.button1);
             this.groupBox2.Controls.Add(this.bttNavigate);
             this.groupBox2.Controls.Add(this.txtAuthor);
             this.groupBox2.Controls.Add(this.txtCertPath);
@@ -180,10 +184,10 @@
             // bttRefresh
             // 
             this.bttRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttRefresh.Location = new System.Drawing.Point(315, 46);
+            this.bttRefresh.Location = new System.Drawing.Point(234, 43);
             this.bttRefresh.Name = "bttRefresh";
             this.bttRefresh.Size = new System.Drawing.Size(75, 23);
-            this.bttRefresh.TabIndex = 8;
+            this.bttRefresh.TabIndex = 6;
             this.bttRefresh.Text = "&Refresh...";
             this.bttRefresh.UseVisualStyleBackColor = true;
             this.bttRefresh.Click += new System.EventHandler(this.bttRefresh_Click);
@@ -193,7 +197,7 @@
             this.bttBackup.Location = new System.Drawing.Point(9, 144);
             this.bttBackup.Name = "bttBackup";
             this.bttBackup.Size = new System.Drawing.Size(75, 23);
-            this.bttBackup.TabIndex = 6;
+            this.bttBackup.TabIndex = 9;
             this.bttBackup.Text = "&Backup...";
             this.bttBackup.UseVisualStyleBackColor = true;
             this.bttBackup.Click += new System.EventHandler(this.bttBackup_Click);
@@ -203,7 +207,7 @@
             this.bttRestore.Location = new System.Drawing.Point(90, 144);
             this.bttRestore.Name = "bttRestore";
             this.bttRestore.Size = new System.Drawing.Size(75, 23);
-            this.bttRestore.TabIndex = 7;
+            this.bttRestore.TabIndex = 10;
             this.bttRestore.Text = "R&estore...";
             this.bttRestore.UseVisualStyleBackColor = true;
             this.bttRestore.Click += new System.EventHandler(this.bttRestore_Click);
@@ -211,11 +215,11 @@
             // bttNavigate
             // 
             this.bttNavigate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttNavigate.Location = new System.Drawing.Point(315, 19);
+            this.bttNavigate.Location = new System.Drawing.Point(315, 16);
             this.bttNavigate.Name = "bttNavigate";
             this.bttNavigate.Size = new System.Drawing.Size(75, 23);
-            this.bttNavigate.TabIndex = 2;
-            this.bttNavigate.Text = "&Navigate...";
+            this.bttNavigate.TabIndex = 3;
+            this.bttNavigate.Text = "&Open...";
             this.bttNavigate.UseVisualStyleBackColor = true;
             this.bttNavigate.Click += new System.EventHandler(this.bttNavigate_Click);
             // 
@@ -226,8 +230,19 @@
             this.label4.Location = new System.Drawing.Point(6, 72);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(384, 73);
-            this.label4.TabIndex = 5;
+            this.label4.TabIndex = 8;
             this.label4.Text = resources.GetString("label4.Text");
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(234, 16);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(75, 23);
+            this.button1.TabIndex = 2;
+            this.button1.Text = "&Change...";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.bttNavigate_Click);
             // 
             // SigningOptionControl
             // 
@@ -263,5 +278,6 @@
         private System.Windows.Forms.Button bttBackup;
         private System.Windows.Forms.Button bttRestore;
         private System.Windows.Forms.Button bttRefresh;
+        private System.Windows.Forms.Button button1;
     }
 }
