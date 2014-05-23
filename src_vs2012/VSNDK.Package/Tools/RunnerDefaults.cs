@@ -22,12 +22,16 @@ namespace RIM.VSNDK_Package.Tools
 
         static RunnerDefaults()
         {
-            ToolsDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86), "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
+            var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.IsNullOrEmpty(programFilesX86))
+                programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
+            ToolsDirectory = Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
             NdkDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
             // the base data folder is different for each platform...
             if (IsWindowsXP)
             {
-                DataDirectory = Path.Combine(Environment.ExpandEnvironmentVariables("%HomeDrive%"), Environment.ExpandEnvironmentVariables("%HomePath%"), "Local Settings", "Application Data", "Research In Motion");
+                DataDirectory = Path.Combine(Environment.ExpandEnvironmentVariables("%HomeDrive%%HomePath%"), "Local Settings", "Application Data", "Research In Motion");
             }
             else
             {
