@@ -926,7 +926,7 @@ namespace RIM.VSNDK_Package
         #region private member variables
 
         private BlackBerryPaneTraceListener _traceWindow;
-        private DTE _dte;
+        private DTE2 _dte;
         private VSNDKCommandEvents _commandEvents;
         private bool _isSimulator;
         private BuildEvents _buildEvents;
@@ -985,7 +985,7 @@ namespace RIM.VSNDK_Package
             TraceLog.WriteLine(" * registered editors");
 
             
-            _dte = (DTE)GetService(typeof(DTE));
+            _dte = (DTE2)GetService(typeof(SDTE));
 
             if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
             {
@@ -1067,6 +1067,7 @@ namespace RIM.VSNDK_Package
 
                 // Create command for 'Help' menus
                 var helpCmdIDs = new[] {
+                                            PkgCmdIDList.cmdidBlackBerryHelpWelcomePage, PkgCmdIDList.cmdidBlackBerryHelpSupportForum,
                                             PkgCmdIDList.cmdidBlackBerryHelpDocNative, PkgCmdIDList.cmdidBlackBerryHelpDocCascades, PkgCmdIDList.cmdidBlackBerryHelpDocPlayBook,
                                             PkgCmdIDList.cmdidBlackBerryHelpSamplesNative, PkgCmdIDList.cmdidBlackBerryHelpSamplesCascades, PkgCmdIDList.cmdidBlackBerryHelpSamplesPlayBook, PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource,
                                             PkgCmdIDList.cmdidBlackBerryHelpAbout
@@ -1094,6 +1095,25 @@ namespace RIM.VSNDK_Package
             TraceLog.WriteLine("-------------------- DONE");
         }
 
+        public Window2 OpenWebPageTab(string url)
+        {
+            return (Window2)_dte.ItemOperations.Navigate(url, vsNavigateOptions.vsNavigateOptionsNewWindow);
+        }
+
+        private void OpenUrl(string url)
+        {
+            var options = (GeneralOptionPage)GetDialogPage(typeof(GeneralOptionPage));
+
+            if (options.IsOpeningExternal)
+            {
+                DialogHelper.StartURL(url);
+            }
+            else
+            {
+                OpenWebPageTab(url);
+            }
+        }
+
         private void OpenHelpWebPage(object sender, EventArgs e)
         {
             var menuCommand = sender as MenuCommand;
@@ -1101,26 +1121,32 @@ namespace RIM.VSNDK_Package
 
             switch (cmdID)
             {
+                case PkgCmdIDList.cmdidBlackBerryHelpWelcomePage:
+                    OpenUrl("http://developer.blackberry.com/cascades/momentics/");
+                    break;
+                case PkgCmdIDList.cmdidBlackBerryHelpSupportForum:
+                    OpenUrl("http://supportforums.blackberry.com/t5/Developer-Support-Forums/ct-p/blackberrydev");
+                    break;
                 case PkgCmdIDList.cmdidBlackBerryHelpDocNative:
-                    DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/core/framework.html");
+                    OpenUrl("http://developer.blackberry.com/native/documentation/core/framework.html");
                     break;
                 case PkgCmdIDList.cmdidBlackBerryHelpDocCascades:
-                    DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
+                    OpenUrl("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
                     break;
                 case PkgCmdIDList.cmdidBlackBerryHelpDocPlayBook:
-                    DialogHelper.StartURL("http://developer.blackberry.com/playbook/native/documentation/");
+                    OpenUrl("http://developer.blackberry.com/playbook/native/documentation/");
                     break;
                 case PkgCmdIDList.cmdidBlackBerryHelpSamplesNative:
-                    DialogHelper.StartURL("http://developer.blackberry.com/native/sampleapps/");
+                    OpenUrl("http://developer.blackberry.com/native/sampleapps/");
                     break;
                 case PkgCmdIDList.cmdidBlackBerryHelpSamplesCascades:
-                    DialogHelper.StartURL("http://developer.blackberry.com/native/sampleapps/");
+                    OpenUrl("http://developer.blackberry.com/native/sampleapps/");
                     break;
                 case PkgCmdIDList.cmdidBlackBerryHelpSamplesPlayBook:
-                    DialogHelper.StartURL("http://developer.blackberry.com/playbook/native/sampleapps/");
+                    OpenUrl("http://developer.blackberry.com/playbook/native/sampleapps/");
                     break;
                 case PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource:
-                    DialogHelper.StartURL("https://github.com/blackberry");
+                    OpenUrl("https://github.com/blackberry");
                     break;
                 case PkgCmdIDList.cmdidBlackBerryHelpAbout:
                     {
@@ -1143,7 +1169,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         /// <param name="dte"></param>
         /// <returns></returns>
-        private bool IsBlackBerrySolution(EnvDTE.DTE dte)
+        private bool IsBlackBerrySolution(DTE2 dte)
         {
             bool res = false;
 

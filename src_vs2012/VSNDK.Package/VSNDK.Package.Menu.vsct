@@ -53,13 +53,16 @@
             </Group>
 
             <!-- Help Submenu Groups -->
-            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" priority="0x0100">
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Start" priority="0x0100">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
             </Group>
-            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" priority="0x0200">
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" priority="0x0200">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
             </Group>
-            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_About" priority="0x0300">
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" priority="0x0300">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_About" priority="0x0400">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
             </Group>
 
@@ -135,6 +138,20 @@
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Configuration" />
                 <Strings>
                     <ButtonText>&amp;Configure...</ButtonText>
+                </Strings>
+            </Button>
+
+            <!-- Help Buttons: Help/Start -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpWelcomePage" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Start" />
+                <Strings>
+                    <ButtonText>Open &amp;Welcome Page</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSupportForum" priority="0x0200" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Start" />
+                <Strings>
+                    <ButtonText>Support &amp;Forum</ButtonText>
                 </Strings>
             </Button>
 
@@ -264,9 +281,10 @@
             <IDSymbol name="cmdidBlackBerryTargetsGroup_Configuration" value="0x700" />
 
             <IDSymbol name="BlackBerrySubMenu_Help" value="0x800" />
-            <IDSymbol name="cmdidBlackBerryHelpGroup_Documentation" value="0x900"/>
-            <IDSymbol name="cmdidBlackBerryHelpGroup_Samples" value="0x1000"/>
-            <IDSymbol name="cmdidBlackBerryHelpGroup_About" value="0x1100"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Start" value="0x900"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Documentation" value="0x1000"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Samples" value="0x1100"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_About" value="0x1200"/>
 
             <IDSymbol name="cmdidBlackBerryTools" value="0x0201" />
             <IDSymbol name="cmdidBlackBerrySettings" value="0x0202" />
@@ -277,14 +295,16 @@
             <IDSymbol name="cmdidBlackBerryTargetsApiLevelsPlaceholder" value="0x601" />
             <IDSymbol name="cmdidBlackBerryTargetsConfigure" value="0x701" />
 
-            <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x901" />
-            <IDSymbol name="cmdidBlackBerryHelpDocCascades" value="0x902" />
-            <IDSymbol name="cmdidBlackBerryHelpDocPlayBook" value="0x903" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesNative" value="0x1001" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesCascades" value="0x1002" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesPlayBook" value="0x1003" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesOpenSource" value="0x1004" />
-            <IDSymbol name="cmdidBlackBerryHelpAbout" value="0x1101" />
+            <IDSymbol name="cmdidBlackBerryHelpWelcomePage" value="0x901" />
+            <IDSymbol name="cmdidBlackBerryHelpSupportForum" value="0x902" />
+            <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x1001" />
+            <IDSymbol name="cmdidBlackBerryHelpDocCascades" value="0x1002" />
+            <IDSymbol name="cmdidBlackBerryHelpDocPlayBook" value="0x1003" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesNative" value="0x1101" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesCascades" value="0x1102" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesPlayBook" value="0x1103" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesOpenSource" value="0x1104" />
+            <IDSymbol name="cmdidBlackBerryHelpAbout" value="0x1201" />
 
             <IDSymbol name="cmdidBlackBerryProjectImport" value="0x104" />
             <IDSymbol name="cmdidfooLocalBox" value="0x105" />
