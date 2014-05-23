@@ -61,7 +61,12 @@ namespace RIM.VSNDK_Package.Options
             set { Control.IsOpeningExternal = value; }
         }
 
-
         #endregion
+
+        protected override void OnClosed(System.EventArgs e)
+        {
+            base.OnClosed(e);
+            Control.OnReset();
+        }
     }
 }

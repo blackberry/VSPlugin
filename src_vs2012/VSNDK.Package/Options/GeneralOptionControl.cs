@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.ComponentModel;
+using System.Windows.Forms;
 using RIM.VSNDK_Package.Tools;
 
 namespace RIM.VSNDK_Package.Options
@@ -8,26 +9,26 @@ namespace RIM.VSNDK_Package.Options
         public GeneralOptionControl()
         {
             InitializeComponent();
-
-            txtNdkPath.Text = RunnerDefaults.NdkDirectory;
-            txtToolsPath.Text = RunnerDefaults.ToolsDirectory;
-            txtProfilePath.Text = RunnerDefaults.DataDirectory;
+            OnReset();
         }
 
         #region Properties
 
+        [Browsable(false)]
         public string NdkPath
         {
             get { return txtNdkPath.Text; }
             set { txtNdkPath.Text = value; }
         }
 
+        [Browsable(false)]
         public string ToolsPath
         {
             get { return txtToolsPath.Text; }
             set { txtToolsPath.Text = value; }
         }
 
+        [Browsable(false)]
         public string ProfilePath
         {
             get { return txtProfilePath.Text; }
@@ -58,6 +59,13 @@ namespace RIM.VSNDK_Package.Options
         private void bttOpenProfile_Click(object sender, System.EventArgs e)
         {
             DialogHelper.StartExplorer(ProfilePath);
+        }
+
+        public void OnReset()
+        {
+            txtNdkPath.Text = RunnerDefaults.NdkDirectory;
+            txtToolsPath.Text = RunnerDefaults.ToolsDirectory;
+            txtProfilePath.Text = RunnerDefaults.DataDirectory;
         }
     }
 }
