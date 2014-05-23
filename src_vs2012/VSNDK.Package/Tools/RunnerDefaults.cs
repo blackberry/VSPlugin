@@ -14,6 +14,10 @@ namespace RIM.VSNDK_Package.Tools
         public static readonly string InstallationConfigDirectory;
         public static readonly string SupplementaryInstallationConfigDirectory;
         public static readonly string SupplementaryPlayBookInstallationConfigDirectory;
+        /// <summary>
+        /// Plugin-owned installation cache config directory.
+        /// </summary>
+        public static readonly string PluginInstallationConfigDirectory;
         public static readonly string RegistryPath;
 
         static RunnerDefaults()
@@ -33,6 +37,7 @@ namespace RIM.VSNDK_Package.Tools
             InstallationConfigDirectory = Path.Combine(DataDirectory, "BlackBerry Native SDK", "qconfig");
             SupplementaryInstallationConfigDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs", "..", "qconfig");
             SupplementaryPlayBookInstallationConfigDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "QNX Software Systems", "qconfig");
+            PluginInstallationConfigDirectory = Path.Combine(DataDirectory, "VSPlugin", "qconfig");
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
 
 #if DEBUG

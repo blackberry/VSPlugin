@@ -64,7 +64,7 @@ namespace RIM.VSNDK_Package.Options
                 if (ndk != null)
                 {
                     // save inside 'installation config' directory:
-                    if (ndk.Save(RunnerDefaults.InstallationConfigDirectory))
+                    if (ndk.Save(RunnerDefaults.PluginInstallationConfigDirectory))
                     {
                         // reload NDKs
                         _vm.ReloadAndActivate(ndk);
