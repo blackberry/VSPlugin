@@ -30,15 +30,16 @@
         {
             this.txtNdkPath = new System.Windows.Forms.TextBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.bttOpenProfile = new System.Windows.Forms.Button();
+            this.txtProfilePath = new System.Windows.Forms.TextBox();
+            this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.bttToolsBrowse = new System.Windows.Forms.Button();
             this.bttNdkBrowse = new System.Windows.Forms.Button();
             this.txtToolsPath = new System.Windows.Forms.TextBox();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.txtProfilePath = new System.Windows.Forms.TextBox();
-            this.bttOpenProfile = new System.Windows.Forms.Button();
+            this.chkOpenInExternal = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -71,6 +72,36 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Locations";
+            // 
+            // bttOpenProfile
+            // 
+            this.bttOpenProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttOpenProfile.Location = new System.Drawing.Point(526, 115);
+            this.bttOpenProfile.Name = "bttOpenProfile";
+            this.bttOpenProfile.Size = new System.Drawing.Size(75, 23);
+            this.bttOpenProfile.TabIndex = 9;
+            this.bttOpenProfile.Text = "Open...";
+            this.bttOpenProfile.UseVisualStyleBackColor = true;
+            this.bttOpenProfile.Click += new System.EventHandler(this.bttOpenProfile_Click);
+            // 
+            // txtProfilePath
+            // 
+            this.txtProfilePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtProfilePath.Location = new System.Drawing.Point(91, 115);
+            this.txtProfilePath.Name = "txtProfilePath";
+            this.txtProfilePath.ReadOnly = true;
+            this.txtProfilePath.Size = new System.Drawing.Size(429, 20);
+            this.txtProfilePath.TabIndex = 8;
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(15, 118);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(64, 13);
+            this.label4.TabIndex = 7;
+            this.label4.Text = "Profile Path:";
             // 
             // label3
             // 
@@ -130,46 +161,28 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "NDK Path:";
             // 
-            // label4
+            // chkOpenInExternal
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(15, 118);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(64, 13);
-            this.label4.TabIndex = 7;
-            this.label4.Text = "Profile Path:";
-            // 
-            // txtProfilePath
-            // 
-            this.txtProfilePath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtProfilePath.Location = new System.Drawing.Point(91, 115);
-            this.txtProfilePath.Name = "txtProfilePath";
-            this.txtProfilePath.ReadOnly = true;
-            this.txtProfilePath.Size = new System.Drawing.Size(429, 20);
-            this.txtProfilePath.TabIndex = 8;
-            // 
-            // bttOpenProfile
-            // 
-            this.bttOpenProfile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOpenProfile.Location = new System.Drawing.Point(526, 115);
-            this.bttOpenProfile.Name = "bttOpenProfile";
-            this.bttOpenProfile.Size = new System.Drawing.Size(75, 23);
-            this.bttOpenProfile.TabIndex = 9;
-            this.bttOpenProfile.Text = "Open...";
-            this.bttOpenProfile.UseVisualStyleBackColor = true;
-            this.bttOpenProfile.Click += new System.EventHandler(this.bttOpenProfile_Click);
+            this.chkOpenInExternal.AutoSize = true;
+            this.chkOpenInExternal.Location = new System.Drawing.Point(18, 175);
+            this.chkOpenInExternal.Name = "chkOpenInExternal";
+            this.chkOpenInExternal.Size = new System.Drawing.Size(167, 17);
+            this.chkOpenInExternal.TabIndex = 1;
+            this.chkOpenInExternal.Text = "Open links in external browser";
+            this.chkOpenInExternal.UseVisualStyleBackColor = true;
             // 
             // GeneralOptionControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.chkOpenInExternal);
             this.Controls.Add(this.groupBox1);
             this.Name = "GeneralOptionControl";
             this.Size = new System.Drawing.Size(619, 217);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -186,5 +199,6 @@
         private System.Windows.Forms.TextBox txtProfilePath;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button bttOpenProfile;
+        private System.Windows.Forms.CheckBox chkOpenInExternal;
     }
 }

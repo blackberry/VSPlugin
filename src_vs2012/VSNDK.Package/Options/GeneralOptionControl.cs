@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using System.Windows.Forms;
+﻿using System.Windows.Forms;
 using RIM.VSNDK_Package.Tools;
 
 namespace RIM.VSNDK_Package.Options
@@ -33,6 +32,15 @@ namespace RIM.VSNDK_Package.Options
         {
             get { return txtProfilePath.Text; }
             set { txtProfilePath.Text = value; }
+        }
+
+        /// <summary>
+        /// Checks if open URL links in internal or external browser.
+        /// </summary>
+        public bool IsOpeningExternal
+        {
+            get { return chkOpenInExternal.Checked; }
+            set { chkOpenInExternal.Checked = value; }
         }
 
         #endregion

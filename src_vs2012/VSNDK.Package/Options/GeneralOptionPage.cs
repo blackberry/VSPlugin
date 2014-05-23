@@ -55,11 +55,13 @@ namespace RIM.VSNDK_Package.Options
             set { Control.ToolsPath = value; }
         }
 
-        #endregion
-
-        protected override void OnApply(PageApplyEventArgs e)
+        public bool IsOpeningExternal
         {
-            base.OnApply(e);
+            get { return Control.IsOpeningExternal; }
+            set { Control.IsOpeningExternal = value; }
         }
+
+
+        #endregion
     }
 }
