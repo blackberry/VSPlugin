@@ -84,7 +84,7 @@ namespace RIM.VSNDK_Package.Model.Integration
         {
             var collection = Collection;
 
-            if (collection == null)
+            if (collection == null || collection.Count == 0)
                 return false;
 
             return cmdId >= CommandID.ID && (cmdId - CommandID.ID) < collection.Count;

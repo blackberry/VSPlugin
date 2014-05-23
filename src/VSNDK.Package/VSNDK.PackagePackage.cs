@@ -1041,7 +1041,8 @@ namespace RIM.VSNDK_Package
                                                                         (cmd, collection, index) =>
                                                                             {
                                                                                 var item = index >= 0 && index < collection.Count ? ((DeviceDefinition[])collection)[index] : null;
-                                                                                cmd.Checked = item == PackageViewModel.Instance.ActiveDevice || item == PackageViewModel.Instance.ActiveSimulator;
+                                                                                cmd.Checked = item != null && (item == PackageViewModel.Instance.ActiveDevice || item == PackageViewModel.Instance.ActiveSimulator);
+                                                                                cmd.Visible = item != null;
                                                                                 cmd.Text = item != null ? item.ToString() : "-";
                                                                             },
                                                                         devicesCommandID);
@@ -1057,7 +1058,8 @@ namespace RIM.VSNDK_Package
                                                                          (cmd, collection, index) =>
                                                                              {
                                                                                  var item = index >= 0 && index < collection.Count ? ((NdkInfo[]) collection)[index] : null;
-                                                                                 cmd.Checked = item == PackageViewModel.Instance.ActiveNDK;
+                                                                                 cmd.Checked = item != null && item == PackageViewModel.Instance.ActiveNDK;
+                                                                                 cmd.Visible = item != null;
                                                                                  cmd.Text = item != null ? item.ToString() : "-";
                                                                              },
                                                                          apiLevelCommandID);
