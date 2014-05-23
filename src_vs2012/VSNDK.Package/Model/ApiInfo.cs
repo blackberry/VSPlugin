@@ -7,6 +7,8 @@ namespace RIM.VSNDK_Package.Model
     /// </summary>
     internal class ApiInfo
     {
+        private readonly string _description;
+
         public ApiInfo(string name, Version version)
         {
             if (string.IsNullOrEmpty(name))
@@ -17,6 +19,9 @@ namespace RIM.VSNDK_Package.Model
             Name = name;
             Version = version;
             Level = new Version(version.Major, version.Minor);
+
+            var versionString = Version.ToString();
+            _description = Name.IndexOf(versionString, StringComparison.Ordinal) >= 0 ? Name : string.Concat(Name, " (", versionString, ")");
         }
 
         #region Properties
@@ -43,7 +48,7 @@ namespace RIM.VSNDK_Package.Model
 
         public override string ToString()
         {
-            return string.Concat(Name, " (", Version, ")");
+            return _description;
         }
     }
 }
