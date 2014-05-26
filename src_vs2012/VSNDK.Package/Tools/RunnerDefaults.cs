@@ -14,6 +14,9 @@ namespace RIM.VSNDK_Package.Tools
         public static readonly string InstallationConfigDirectory;
         public static readonly string SupplementaryInstallationConfigDirectory;
         public static readonly string SupplementaryPlayBookInstallationConfigDirectory;
+
+        public static readonly string JavaHome;
+
         /// <summary>
         /// Plugin-owned installation cache config directory.
         /// </summary>
@@ -28,6 +31,8 @@ namespace RIM.VSNDK_Package.Tools
 
             ToolsDirectory = Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
             NdkDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
+            JavaHome = Path.Combine(NdkDirectory, "features", "com.qnx.tools.jre.win32_1.6.0.43", "jre");
+
             // the base data folder is different for each platform...
             if (IsWindowsXP)
             {

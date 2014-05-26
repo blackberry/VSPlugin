@@ -375,6 +375,7 @@
     <Compile Include="Tools\KeyToolGenRunner.cs" />
     <Compile Include="Tools\KeyToolInfoRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
+    <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\DeveloperDefinition.cs" />
     <Compile Include="ViewModels\DeviceDefinition.cs" />

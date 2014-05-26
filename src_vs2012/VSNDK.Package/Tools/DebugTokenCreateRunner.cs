@@ -112,7 +112,7 @@ namespace RIM.VSNDK_Package.Tools
             }
 
             // path to the output .bar file:
-            args.Append(" \"").Append(Environment.ExpandEnvironmentVariables(DebugTokenLocation)).Append("\"");
+            args.Append(" \"").Append(System.Environment.ExpandEnvironmentVariables(DebugTokenLocation)).Append("\"");
 
             Arguments = args.ToString();
         }

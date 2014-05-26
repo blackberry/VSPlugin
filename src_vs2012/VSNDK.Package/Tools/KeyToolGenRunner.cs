@@ -84,7 +84,7 @@ namespace RIM.VSNDK_Package.Tools
         private void UpdateArguments()
         {
             Arguments = string.Format(@"/C blackberry-keytool -genkeypair{0} -author ""{1}"" -storepass ""{2}""",
-                                        string.IsNullOrEmpty(StoreFileName) ? string.Empty : string.Concat(" -keystore \"", StoreFileName, "\""),
+                                        string.IsNullOrEmpty(StoreFileName) ? string.Empty : string.Concat(" -keystore \"", System.Environment.ExpandEnvironmentVariables(StoreFileName), "\""),
                                         Name, Password);
         }
 

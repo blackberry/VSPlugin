@@ -101,7 +101,7 @@ namespace RIM.VSNDK_Package.Tools
 
         private void UpdateArguments()
         {
-            Arguments = string.Format(@"/C blackberry-keytool -list -keystore ""{0}"" -storepass ""{1}"" -verbose", StoreFileName, Password);
+            Arguments = string.Format(@"/C blackberry-keytool -list -keystore ""{0}"" -storepass ""{1}"" -verbose", System.Environment.ExpandEnvironmentVariables(StoreFileName), Password);
         }
 
         protected override void ConsumeResults(string output, string error)

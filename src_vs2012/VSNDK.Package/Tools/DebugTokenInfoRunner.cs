@@ -46,7 +46,7 @@ namespace RIM.VSNDK_Package.Tools
                 if (!string.IsNullOrEmpty(value))
                 {
                     _location = value;
-                    Arguments = string.Format(@"/C blackberry-airpackager.bat -listManifest ""{0}""", Environment.ExpandEnvironmentVariables(value));
+                    Arguments = string.Format(@"/C blackberry-airpackager.bat -listManifest ""{0}""", System.Environment.ExpandEnvironmentVariables(value));
                 }
             }
         }

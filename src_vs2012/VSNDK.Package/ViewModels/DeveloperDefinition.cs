@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Packaging;
-using System.Security.Cryptography.X509Certificates;
 using Microsoft.Win32;
 using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Tools;
@@ -21,6 +20,8 @@ namespace RIM.VSNDK_Package.ViewModels
         private const string FieldCertificateFileName = "certificate";
         private const string FieldCskPassword = "CSKPass";
 
+        private string _name;
+
         public DeveloperDefinition(string dataPath, string certificatePath, string cskPassword)
         {
             if (string.IsNullOrEmpty(dataPath))
@@ -29,9 +30,6 @@ namespace RIM.VSNDK_Package.ViewModels
             DataPath = dataPath;
             CertificateFileName = certificatePath;
             CskPassword = cskPassword;
-
-            // get the author directly from certificate:
-            Name = LoadIssuer(CertificateFullPath, CskPassword);
         }
 
         #region Properties
@@ -41,8 +39,17 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public string Name
         {
-            get;
-            private set;
+            get
+            {
+                if (string.IsNullOrEmpty(_name) && HasPassword)
+                {
+                    // get the author from certificate:
+                    _name = LoadIssuer(CertificateFullPath, CskPassword);
+                }
+
+                return _name;
+            }
+            private set { _name = value; }
         }
 
         /// <summary>
@@ -290,7 +297,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             if (!string.IsNullOrEmpty(folder))
                 throw new ArgumentOutOfRangeException("fileName", "Invalid name, folder is not expected inside, only file name");
-            if (File.Exists(Path.Combine(DataPath, folder)))
+            if (File.Exists(Path.Combine(DataPath, fileName)))
                 throw new ArgumentOutOfRangeException("fileName", "File doesn't existing in designated certificate storage");
 
             ClearPassword();
@@ -564,6 +571,9 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public void SaveBlackBerryToken(string content)
         {
+            if (string.IsNullOrEmpty(content))
+                throw new ArgumentNullException("content");
+
             var fileName = BlackBerryTokenFullPath;
 
             if (File.Exists(fileName))

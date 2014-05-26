@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Text;
 using RIM.VSNDK_Package.Diagnostics;
@@ -15,6 +16,7 @@ namespace RIM.VSNDK_Package.Tools
         private StringBuilder _error;
         private bool _isProcessing;
 
+        public static event EventHandler<ToolRunnerStartupEventArgs> Startup;
         public event EventHandler<ToolRunnerEventArgs> Finished;
 
         /// <summary>
@@ -68,6 +70,11 @@ namespace RIM.VSNDK_Package.Tools
         {
             get { return _process.StartInfo.WorkingDirectory; }
             set { _process.StartInfo.WorkingDirectory = value; }
+        }
+
+        public StringDictionary Environment
+        {
+            get { return _process.StartInfo.EnvironmentVariables; }
         }
 
         public string Arguments
@@ -141,10 +148,9 @@ namespace RIM.VSNDK_Package.Tools
 
                 return exitCode == 0;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Debug.WriteLine(_process.StartInfo.Arguments);
-                Debug.WriteLine(e.Message);
+                TraceLog.WriteException(ex, "Unable to start {0}", GetType().Name);
                 return false;
             }
             finally
@@ -220,6 +226,9 @@ namespace RIM.VSNDK_Package.Tools
             LastError = null;
             _output = new StringBuilder();
             _error = new StringBuilder();
+
+            // allow setup customization by sub-classes:
+            PrepareStartup();
         }
 
         private void CompleteExecution(int exitCode)
@@ -233,12 +242,18 @@ namespace RIM.VSNDK_Package.Tools
             LastError = errorText;
 
 #if DEBUG
+            TraceLog.WriteLine("{0} {1}", _process.StartInfo.FileName, _process.StartInfo.Arguments);
+            TraceLog.WriteLine(" * PATH: {0}", _process.StartInfo.EnvironmentVariables["PATH"]);
+            TraceLog.WriteLine(" * QNX_TARGET: {0}", _process.StartInfo.EnvironmentVariables["QNX_TARGET"]);
+            TraceLog.WriteLine(" * QNX_HOST: {0}", _process.StartInfo.EnvironmentVariables["QNX_HOST"]);
+
             // print received data:
             if (!string.IsNullOrEmpty(outputText))
                 TraceLog.WriteLine(outputText.Trim());
             if (!string.IsNullOrEmpty(errorText))
                 TraceLog.WarnLine(errorText.Trim());
 #endif
+
             // consume received data:
             ConsumeResults(outputText, errorText);
 
@@ -246,6 +261,17 @@ namespace RIM.VSNDK_Package.Tools
             NotifyFinished(exitCode, outputText, errorText);
 
             _isProcessing = false;
+        }
+
+        /// <summary>
+        /// Method executed before starting the tool, to setup the state of the current runner.
+        /// </summary>
+        protected virtual void PrepareStartup()
+        {
+            // this is the place to override and DISABLE running GLOBAL setup:
+            var handler = Startup;
+            if (handler != null)
+                handler(this, new ToolRunnerStartupEventArgs(this));
         }
 
         protected virtual void ConsumeResults(string output, string error)

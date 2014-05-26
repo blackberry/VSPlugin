@@ -98,7 +98,7 @@ namespace RIM.VSNDK_Package.Tools
         private void UpdateArguments()
         {
             Arguments = string.Format(@"/C blackberry-deploy.bat -installDebugToken ""{0}"" -device ""{1}"" -password ""{2}""",
-                                        Environment.ExpandEnvironmentVariables(DebugTokenLocation), IP, Password);
+                                        System.Environment.ExpandEnvironmentVariables(DebugTokenLocation), IP, Password);
         }
 
         protected override void ConsumeResults(string output, string error)

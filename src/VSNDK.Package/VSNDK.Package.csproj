@@ -364,6 +364,9 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ToolRunnerEventArgs.cs">
       <Link>Tools\ToolRunnerEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ToolRunnerStartupEventArgs.cs">
+      <Link>Tools\ToolRunnerStartupEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
     </Compile>

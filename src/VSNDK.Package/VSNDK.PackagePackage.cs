@@ -37,6 +37,7 @@ using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Model.Integration;
 using RIM.VSNDK_Package.Options;
 using RIM.VSNDK_Package.Options.Dialogs;
+using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.UpdateManager.Model;
 using RIM.VSNDK_Package.ViewModels;
 using VSNDK.Parser;
@@ -973,12 +974,26 @@ namespace RIM.VSNDK_Package
             TraceLog.Add(_traceWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
 
-
-            var options = GetDialogPage(typeof(GeneralOptionPage)) as GeneralOptionPage;
-            var path = options.NdkPath;
-
             InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
             TraceLog.WriteLine(" * loaded NDK descriptions");
+
+            // setup called before running any 'tool':
+            ToolRunner.Startup += (s, e) =>
+                {
+                    var ndk = PackageViewModel.Instance.ActiveNDK;
+
+                    if (ndk != null)
+                    {
+                        e["QNX_TARGET"] = ndk.TargetPath;
+                        e["QNX_HOST"] = ndk.HostPath;
+                        e["PATH"] = string.Concat(Path.Combine(ndk.HostPath, "usr", "bin"), ";",
+                                                  Path.Combine(RunnerDefaults.JavaHome, "bin"), ";", e["PATH"]);
+                    }
+                    else
+                    {
+                        e["PATH"] = string.Concat(Path.Combine(RunnerDefaults.JavaHome, "bin"), ";", e["PATH"]);
+                    }
+                };
 
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new EditorFactory(this));
@@ -1229,6 +1244,7 @@ namespace RIM.VSNDK_Package
                     }
                 }
 
+                /* PH: TODO: remove following code as it affects Visual Studio and all tools running by it */
                 string qnx_config = GlobalFunctions.bbndkPathConst + @"\features\com.qnx.tools.jre.win32_1.6.0.43\jre\bin";
 
                 System.Environment.SetEnvironmentVariable("QNX_TARGET", qnx_target);
@@ -1237,7 +1253,7 @@ namespace RIM.VSNDK_Package
                 string ndkpath = string.Format(@"{0}/usr/bin;{1};", qnx_host, qnx_config) +
                     System.Environment.GetEnvironmentVariable("PATH");
                 System.Environment.SetEnvironmentVariable("PATH", ndkpath);
-
+                /* */
 
             }
             catch (Exception ex)
