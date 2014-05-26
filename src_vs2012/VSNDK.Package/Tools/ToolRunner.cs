@@ -314,9 +314,14 @@ namespace RIM.VSNDK_Package.Tools
             {
                 if (_process != null)
                 {
+                    _process.OutputDataReceived -= OutputDataReceived;
+                    _process.ErrorDataReceived -= ErrorDataReceived;
+
                     _process.Dispose();
                     _process = null;
                 }
+
+                Finished = null;
             }
         }
 
