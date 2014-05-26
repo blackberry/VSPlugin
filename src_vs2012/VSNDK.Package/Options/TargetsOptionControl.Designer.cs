@@ -95,7 +95,7 @@
             // columnName
             // 
             this.columnName.Text = "Name";
-            this.columnName.Width = 150;
+            this.columnName.Width = 140;
             // 
             // columnIP
             // 

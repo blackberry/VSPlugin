@@ -57,7 +57,7 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(342, 79);
+            this.groupBox1.Size = new System.Drawing.Size(310, 79);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Input";
@@ -67,9 +67,9 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(20, 50);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(311, 13);
+            this.label2.Size = new System.Drawing.Size(281, 13);
             this.label2.TabIndex = 2;
-            this.label2.Text = "(password set when created the BlackBerry ID token or CSK file)";
+            this.label2.Text = "(password set when the BlackBerry ID token was created)";
             // 
             // txtPassword
             // 
@@ -78,14 +78,14 @@
             this.txtPassword.Location = new System.Drawing.Point(101, 22);
             this.txtPassword.Name = "txtPassword";
             this.txtPassword.PasswordChar = '*';
-            this.txtPassword.Size = new System.Drawing.Size(171, 20);
+            this.txtPassword.Size = new System.Drawing.Size(200, 20);
             this.txtPassword.TabIndex = 1;
             // 
             // bttCancel
             // 
             this.bttCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bttCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.bttCancel.Location = new System.Drawing.Point(279, 97);
+            this.bttCancel.Location = new System.Drawing.Point(247, 97);
             this.bttCancel.Name = "bttCancel";
             this.bttCancel.Size = new System.Drawing.Size(75, 23);
             this.bttCancel.TabIndex = 3;
@@ -95,7 +95,7 @@
             // bttOK
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOK.Location = new System.Drawing.Point(198, 97);
+            this.bttOK.Location = new System.Drawing.Point(166, 97);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
             this.bttOK.TabIndex = 2;
@@ -120,7 +120,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bttCancel;
-            this.ClientSize = new System.Drawing.Size(366, 132);
+            this.ClientSize = new System.Drawing.Size(334, 132);
             this.Controls.Add(this.chkRemember);
             this.Controls.Add(this.bttOK);
             this.Controls.Add(this.bttCancel);

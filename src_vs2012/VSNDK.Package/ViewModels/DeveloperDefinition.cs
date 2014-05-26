@@ -43,6 +43,14 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Gets the indication, if a name was loaded for this developer (publisher) from a certificate.
+        /// </summary>
+        public bool HasName
+        {
+            get { return !string.IsNullOrEmpty(Name); }
+        }
+
+        /// <summary>
         /// Gets the location, where all developer configuration files are stored.
         /// </summary>
         public string DataPath
@@ -189,7 +197,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Removes password stored inside registry and cached in this class.
         /// </summary>
-        public void DeleteCskPassword()
+        public void ClearPassword()
         {
             DeletePassword();
             CskPassword = null;
@@ -271,6 +279,32 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Updates the certificate file name and save it into the registry.
+        /// </summary>
+        public void UpdateCertificate(string fileName)
+        {
+            var folder = Path.GetDirectoryName(fileName);
+
+            if (!string.IsNullOrEmpty(folder))
+                throw new ArgumentOutOfRangeException("fileName", "Invalid name, folder is not expected inside, only file name");
+            if (File.Exists(Path.Combine(DataPath, folder)))
+                throw new ArgumentOutOfRangeException("fileName", "File doesn't existing in designated certificate storage");
+
+            ClearPassword();
+            CertificateFileName = fileName;
+            Name = null;
+
+            if (string.Compare(fileName, DefaultCertificateName, StringComparison.InvariantCultureIgnoreCase) == 0)
+            {
+                DeleteCertificatePath();
+            }
+            else
+            {
+                SaveCertificatePath();
+            }
+        }
+
+        /// <summary>
         /// Creates new developer-definition object based on info read from registry and around.
         /// </summary>
         public static DeveloperDefinition Load(string dataPath)
@@ -342,6 +376,8 @@ namespace RIM.VSNDK_Package.ViewModels
 
                 if (issuer != null && issuer.StartsWith("CN=", StringComparison.InvariantCultureIgnoreCase))
                     issuer = issuer.Substring(3).Trim();
+                if (issuer != null && issuer.StartsWith("CommonName=", StringComparison.InvariantCultureIgnoreCase))
+                    issuer = issuer.Substring(11).Trim();
 
                 return issuer;
             }
@@ -360,7 +396,7 @@ namespace RIM.VSNDK_Package.ViewModels
             return new[] { CertificateFileName, "bbidtoken.csk", "barsigner.db",
                                     "bbsigner.csk", "bb_id_rsa", "bb_id_rsa.pub",
 
-                                    // PH: TODO: but I have also files:
+                                    // PH: TODO: but I have also files: for tablets?
                                     "barsigner.csk", "bbt_id_rsa", "bbt_id_rsa.pub"};
         }
 
@@ -540,7 +576,7 @@ namespace RIM.VSNDK_Package.ViewModels
             }
 
             DeleteCertificatePath();
-            DeleteCskPassword();
+            ClearPassword();
             CertificateFileName = null;
             Name = null;
         }

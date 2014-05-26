@@ -1,96 +1,118 @@
 ﻿using System;
-using System.IO;
-using System.Net;
-using System.Net.Security;
-using System.Security.Cryptography.X509Certificates;
+using System.Collections.Generic;
 using System.Text;
+using System.Web;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.ViewModels;
+using RIM.VSNDK_Package.Model.Integration;
 
 namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    internal partial class LoginForm : Form
+    internal partial class CskRequestForm : Form
     {
-        private DeveloperDefinition _developer;
+        private const string CallbackURL = "http://127.0.0.1:12345/vs-plugin";
 
-        public LoginForm(string title, DeveloperDefinition developer)
+        public CskRequestForm(string title)
         {
-            if (developer == null)
-                throw new ArgumentNullException("developer");
-            _developer = developer;
-            
             // validate certificate by calling a function
-            ServicePointManager.ServerCertificateValidationCallback += ValidateRemoteCertificate;
             InitializeComponent();
 
             if (title != null)
                 Text = title;
 
             // navigate:
-            webBrowser.Navigating += OnBrowserNavigating;
-            webBrowser.Navigate(new Uri("https://developer.blackberry.com/codesigning/", UriKind.Absolute));
+            webBrowser.BeforeNavigating += OnBeforeNavigating;
+            webBrowser.NavigateError += OnNavigatingError;
+        }
+
+        #region Properties
+
+        public int StatusCode
+        {
+            get;
+            private set;
+        }
+
+        public string CskData
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        public void StartRequest(string password)
+        {
+            string headers = "Content-Type: application/x-www-form-urlencoded";
+            string data = "callbackURL=" + HttpUtility.UrlEncode(CallbackURL) + "&cskPassword=" + HttpUtility.UrlEncode(password);
+
+            webBrowser.Navigate(new Uri("https://developer.blackberry.com/bdsc/ndk.pg", UriKind.Absolute), null, Encoding.UTF8.GetBytes(data), headers);
         }
 
         /// <summary>
-        /// Method that handles the Navigating event.
+        /// Method that handles all errors during spot on web-pages.
         /// </summary>
-        public void OnBrowserNavigating(object sender, WebBrowserNavigatingEventArgs e)
+        private void OnNavigatingError(object sender, WebBrowserNavigateErrorEventArgs e)
         {
-            if (e.Url.Segments[e.Url.Segments.Length - 1].EndsWith("csk.pg"))
+            StatusCode = e.StatusCode;
+            e.Cancel = true;
+
+            Invoke(new Action(RequestFailed));
+        }
+
+        /// <summary>
+        /// Method that handles the BeforeNavigating event of the browser.
+        /// </summary>
+        private void OnBeforeNavigating(object sender, WebBrowserBeforeNavigatingEventArgs e)
+        {
+            if (e.Url == CallbackURL)
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(e.Url);
-                request.Referer = ((WebBrowser)sender).Url.ToString();
-                request.CookieContainer = new CookieContainer();
-                string cookie_txt = webBrowser != null && webBrowser.Document != null ? webBrowser.Document.Cookie : string.Empty;
-                string[] cookies = cookie_txt.Split(';');
+                string postData = Encoding.UTF8.GetString(e.PostData);
+                string[] data = postData.Split('&');
 
-                try
-                {
-                    // Copying cookies from WebBrowser to the HttpWebRequest.
-                    foreach (string cookie in cookies)
-                    {
-                        string[] details = cookie.Split('=');
-                        if (details.Length == 2)
-                        {
-                            details[1] = details[1].Replace(",", "%2C");
-                            request.CookieContainer.Add(e.Url, new Cookie(details[0].Trim(), details[1].Trim()));
-                        }
-                    }
+                for (int i = 0; i < data.Length; i++)
+                    data[i] = HttpUtility.UrlDecode(data[i]);
 
-                    request.KeepAlive = true;
+                StatusCode = 200;
+                CskData = FindContentFor(data, "cskData=");
+                e.Cancel = true;
 
-                    // Getting the response
-                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-
-                    // Creating a StreamReader
-                    using (Stream stream = response.GetResponseStream())
-                    {
-                        using (var reader = new StreamReader(stream, Encoding.UTF8))
-                        {
-                            // Save the CSK file.. 
-                            _developer.SaveBlackBerryToken(reader.ReadToEnd());
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    TraceLog.WriteException(ex, "Error while downloading BlackBerry ID token");
-                    MessageBoxHelper.Show(ex.Message, "An error occurred while downloading your signing key.", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
-                Close();
+                // And close the form
+                Invoke(new Action(RequestCompleted));
             }
         }
 
-        /// <summary>
-        /// Callback used to validate the certificate in an SSL conversation
-        /// </summary>
-        private static bool ValidateRemoteCertificate(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors policyErrors)
+        private void RequestFailed()
         {
-            // accept all 'BlackBerry' domains:
-            return cert.Subject.Contains(".blackberry.com");
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
 
+        private void RequestCompleted()
+        {
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        /// <summary>
+        /// Get the rest of the line from specified collection that starts with specified string key.
+        /// </summary>
+        private static string FindContentFor(IEnumerable<string> collection, string key)
+        {
+            if (string.IsNullOrEmpty(key))
+                throw new ArgumentNullException("key");
+
+            if (collection != null)
+            {
+                foreach (var item in collection)
+                {
+                    if (item != null && item.StartsWith(key, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return item.Substring(key.Length);
+                    }
+                }
+            }
+
+            return null;
+        }
     }
 }

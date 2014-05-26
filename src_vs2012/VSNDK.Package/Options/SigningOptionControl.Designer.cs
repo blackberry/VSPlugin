@@ -32,9 +32,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.bttUnregister = new System.Windows.Forms.Button();
             this.bttRegister = new System.Windows.Forms.Button();
-            this.bttDeletePassword = new System.Windows.Forms.Button();
             this.lblMore = new System.Windows.Forms.LinkLabel();
             this.label1 = new System.Windows.Forms.Label();
+            this.bttDeletePassword = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.txtCertPath = new System.Windows.Forms.TextBox();
@@ -43,9 +43,9 @@
             this.bttRefresh = new System.Windows.Forms.Button();
             this.bttBackup = new System.Windows.Forms.Button();
             this.bttRestore = new System.Windows.Forms.Button();
+            this.bttChangeCert = new System.Windows.Forms.Button();
             this.bttNavigate = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -87,17 +87,6 @@
             this.bttRegister.UseVisualStyleBackColor = true;
             this.bttRegister.Click += new System.EventHandler(this.bttRegister_Click);
             // 
-            // bttDeletePassword
-            // 
-            this.bttDeletePassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttDeletePassword.Location = new System.Drawing.Point(315, 43);
-            this.bttDeletePassword.Name = "bttDeletePassword";
-            this.bttDeletePassword.Size = new System.Drawing.Size(75, 23);
-            this.bttDeletePassword.TabIndex = 7;
-            this.bttDeletePassword.Text = "Detach";
-            this.bttDeletePassword.UseVisualStyleBackColor = true;
-            this.bttDeletePassword.Click += new System.EventHandler(this.bttDeletePassword_Click);
-            // 
             // lblMore
             // 
             this.lblMore.AutoSize = true;
@@ -119,6 +108,17 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "You must register with BlackBerry in order to sign applications and create debug " +
     "tokens for your device.";
+            // 
+            // bttDeletePassword
+            // 
+            this.bttDeletePassword.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttDeletePassword.Location = new System.Drawing.Point(315, 43);
+            this.bttDeletePassword.Name = "bttDeletePassword";
+            this.bttDeletePassword.Size = new System.Drawing.Size(75, 23);
+            this.bttDeletePassword.TabIndex = 7;
+            this.bttDeletePassword.Text = "Detach";
+            this.bttDeletePassword.UseVisualStyleBackColor = true;
+            this.bttDeletePassword.Click += new System.EventHandler(this.bttDeletePassword_Click);
             // 
             // label2
             // 
@@ -167,7 +167,7 @@
             this.groupBox2.Controls.Add(this.bttBackup);
             this.groupBox2.Controls.Add(this.bttDeletePassword);
             this.groupBox2.Controls.Add(this.bttRestore);
-            this.groupBox2.Controls.Add(this.button1);
+            this.groupBox2.Controls.Add(this.bttChangeCert);
             this.groupBox2.Controls.Add(this.bttNavigate);
             this.groupBox2.Controls.Add(this.txtAuthor);
             this.groupBox2.Controls.Add(this.txtCertPath);
@@ -212,6 +212,17 @@
             this.bttRestore.UseVisualStyleBackColor = true;
             this.bttRestore.Click += new System.EventHandler(this.bttRestore_Click);
             // 
+            // bttChangeCert
+            // 
+            this.bttChangeCert.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttChangeCert.Location = new System.Drawing.Point(234, 16);
+            this.bttChangeCert.Name = "bttChangeCert";
+            this.bttChangeCert.Size = new System.Drawing.Size(75, 23);
+            this.bttChangeCert.TabIndex = 2;
+            this.bttChangeCert.Text = "&Change...";
+            this.bttChangeCert.UseVisualStyleBackColor = true;
+            this.bttChangeCert.Click += new System.EventHandler(this.bttChangeCert_Click);
+            // 
             // bttNavigate
             // 
             this.bttNavigate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
@@ -232,17 +243,6 @@
             this.label4.Size = new System.Drawing.Size(384, 73);
             this.label4.TabIndex = 8;
             this.label4.Text = resources.GetString("label4.Text");
-            // 
-            // button1
-            // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(234, 16);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 2;
-            this.button1.Text = "&Change...";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.bttNavigate_Click);
             // 
             // SigningOptionControl
             // 
@@ -278,6 +278,6 @@
         private System.Windows.Forms.Button bttBackup;
         private System.Windows.Forms.Button bttRestore;
         private System.Windows.Forms.Button bttRefresh;
-        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button bttChangeCert;
     }
 }

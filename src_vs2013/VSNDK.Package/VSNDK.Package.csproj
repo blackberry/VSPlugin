@@ -93,6 +93,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
@@ -289,6 +290,10 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\Integration\DynamicMenuCommand.cs">
       <Link>Model\Integration\DynamicMenuCommand.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\Integration\WebBrowserTurbo.cs">
+      <Link>Model\Integration\WebBrowserTurbo.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\NdkInfo.cs">
       <Link>Model\NdkInfo.cs</Link>
     </Compile>
@@ -323,6 +328,14 @@
       <Link>Options\Dialogs\AddLocalNdkForm.designer.cs</Link>
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\CskRequestForm.cs">
+      <Link>Options\Dialogs\CskRequestForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\CskRequestForm.designer.cs">
+      <Link>Options\Dialogs\CskRequestForm.designer.cs</Link>
+      <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\DebugTokenDeploymentForm.cs">
       <Link>Options\Dialogs\DebugTokenDeploymentForm.cs</Link>
       <SubType>Form</SubType>
@@ -346,14 +359,6 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallNdkForm.designer.cs">
       <Link>Options\Dialogs\InstallNdkForm.designer.cs</Link>
       <DependentUpon>InstallNdkForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\LoginForm.cs">
-      <Link>Options\Dialogs\LoginForm.cs</Link>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\LoginForm.designer.cs">
-      <Link>Options\Dialogs\LoginForm.designer.cs</Link>
-      <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PasswordForm.cs">
       <Link>Options\Dialogs\PasswordForm.cs</Link>
@@ -541,6 +546,10 @@
       <Link>Options\Dialogs\AddLocalNdkForm.resx</Link>
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\CskRequestForm.resx">
+      <Link>Options\Dialogs\CskRequestForm.resx</Link>
+      <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\DebugTokenDeploymentForm.resx">
       <Link>Options\Dialogs\DebugTokenDeploymentForm.resx</Link>
       <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
@@ -552,10 +561,6 @@
     <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallNdkForm.resx">
       <Link>Options\Dialogs\InstallNdkForm.resx</Link>
       <DependentUpon>InstallNdkForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\LoginForm.resx">
-      <Link>Options\Dialogs\LoginForm.resx</Link>
-      <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PasswordForm.resx">
       <Link>Options\Dialogs\PasswordForm.resx</Link>

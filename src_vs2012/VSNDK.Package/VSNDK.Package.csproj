@@ -96,6 +96,7 @@
     <Reference Include="System.Drawing" />
     <Reference Include="System.Management" />
     <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="PresentationCore" />
@@ -266,6 +267,9 @@
     <Compile Include="Model\DeviceTheme.cs" />
     <Compile Include="Model\Integration\ComboBoxItem.cs" />
     <Compile Include="Model\Integration\DynamicMenuCommand.cs" />
+    <Compile Include="Model\Integration\WebBrowserTurbo.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Model\NdkInfo.cs" />
     <Compile Include="Options\ApiLevelOptionControl.cs">
       <SubType>UserControl</SubType>
@@ -289,6 +293,12 @@
     <Compile Include="Options\Dialogs\AddLocalNdkForm.Designer.cs">
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Options\Dialogs\CskRequestForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\CskRequestForm.Designer.cs">
+      <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\Dialogs\DebugTokenDeploymentForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -306,12 +316,6 @@
     </Compile>
     <Compile Include="Options\Dialogs\InstallNdkForm.Designer.cs">
       <DependentUpon>InstallNdkForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\Dialogs\LoginForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Options\Dialogs\LoginForm.Designer.cs">
-      <DependentUpon>LoginForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\Dialogs\PasswordForm.cs">
       <SubType>Form</SubType>
@@ -412,6 +416,9 @@
       <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
     </Compile>
     <None Include="VSNDK.Package.Menu.vsct" />
+    <EmbeddedResource Include="Options\Dialogs\CskRequestForm.resx">
+      <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources\Logo.png" />
     <None Include="VSNDK.Package.Bitmaps.vsct" />
     <Resource Include="..\..\src\VSNDK.Package\Resources\BlackBerryMessager.bmp">
@@ -548,9 +555,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\InstallNdkForm.resx">
       <DependentUpon>InstallNdkForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\Dialogs\LoginForm.resx">
-      <DependentUpon>LoginForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\PasswordForm.resx">
       <DependentUpon>PasswordForm.cs</DependentUpon>

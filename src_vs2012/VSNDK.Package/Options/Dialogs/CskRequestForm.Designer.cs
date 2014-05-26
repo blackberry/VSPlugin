@@ -1,6 +1,8 @@
-﻿namespace RIM.VSNDK_Package.Options.Dialogs
+﻿using RIM.VSNDK_Package.Model.Integration;
+
+namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    partial class LoginForm
+    partial class CskRequestForm
     {
         /// <summary>
         /// Required designer variable.
@@ -28,7 +30,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.webBrowser = new System.Windows.Forms.WebBrowser();
+            this.webBrowser = new WebBrowserTurbo();
             this.SuspendLayout();
             // 
             // webBrowser
@@ -47,7 +49,7 @@
             this.ClientSize = new System.Drawing.Size(739, 424);
             this.Controls.Add(this.webBrowser);
             this.MinimizeBox = false;
-            this.Name = "LoginForm";
+            this.Name = "CskRequestForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
@@ -58,6 +60,6 @@
 
         #endregion
 
-        private System.Windows.Forms.WebBrowser webBrowser;
+        private WebBrowserTurbo webBrowser;
     }
 }
