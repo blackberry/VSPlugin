@@ -116,7 +116,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public bool IsRegistered
         {
-            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath); }
+            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath) && File.Exists(BlackBerryTokenFullPath); }
         }
 
         /// <summary>
