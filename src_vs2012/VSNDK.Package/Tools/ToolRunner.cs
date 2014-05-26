@@ -127,6 +127,7 @@ namespace RIM.VSNDK_Package.Tools
                 throw new InvalidOperationException("No executable to start");
 
             PrepareExecution();
+            int exitCode = int.MinValue;
 
             try
             {
@@ -136,8 +137,9 @@ namespace RIM.VSNDK_Package.Tools
                 _process.BeginErrorReadLine();
                 _process.BeginOutputReadLine();
                 _process.WaitForExit();
+                exitCode = _process.ExitCode;
 
-                return _process.ExitCode == 0;
+                return exitCode == 0;
             }
             catch (Exception e)
             {
@@ -147,7 +149,10 @@ namespace RIM.VSNDK_Package.Tools
             }
             finally
             {
-                CompleteExecution();
+                // release process resources:
+                _process.Close();
+
+                CompleteExecution(exitCode);
             }
         }
 
@@ -181,8 +186,13 @@ namespace RIM.VSNDK_Package.Tools
 
         private void AsyncProcessExited(object sender, EventArgs e)
         {
+            int exitCode = _process.ExitCode;
             _process.Exited -= AsyncProcessExited;
-            CompleteExecution();
+
+            // release process resources:
+            _process.Close();
+
+            CompleteExecution(exitCode);
         }
 
         private void NotifyFinished(int exitCode, string output, string error)
@@ -212,19 +222,15 @@ namespace RIM.VSNDK_Package.Tools
             _error = new StringBuilder();
         }
 
-        private void CompleteExecution()
+        private void CompleteExecution(int exitCode)
         {
             var outputText = _output.Length > 0 ? _output.ToString() : null;
             var errorText = _error.Length > 0 ? _error.ToString() : null;
-            var exitCode = _process.ExitCode;
 
             _output = null;
             _error = null;
             LastOutput = outputText;
             LastError = errorText;
-
-            // release process resources:
-            _process.Close();
 
 #if DEBUG
             // print received data:
