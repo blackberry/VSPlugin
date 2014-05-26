@@ -496,7 +496,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             UpdateTokenStatusUI(false);
 
             // and create token asynchronously:
-            _tokenCreateRunner = new DebugTokenCreateRunner(RunnerDefaults.ToolsDirectory, fileName, _vm.Developer.CskPassword, devicePins);
+            _tokenCreateRunner = new DebugTokenCreateRunner(RunnerDefaults.ToolsDirectory, fileName, _vm.Developer.CskPassword, devicePins, _vm.Developer.CertificateFullPath);
             _tokenCreateRunner.Dispatcher = EventDispatcher.From(this);
             _tokenCreateRunner.Finished += TokenCreateRunnerOnFinished;
             _tokenCreateRunner.ExecuteAsync();

@@ -112,7 +112,7 @@ namespace VSNDK.Package.Test
         public void CreateDebugTokenInfo()
         {
             string debugToken = RunnerDefaults.DataFileName("debugtoken-new.bar");
-            var runner = new DebugTokenCreateRunner(RunnerDefaults.TestToolsDirectory, debugToken, "test", new[] { 0x1ul, 0x2ul });
+            var runner = new DebugTokenCreateRunner(RunnerDefaults.TestToolsDirectory, debugToken, "test", new[] { 0x1ul, 0x2ul }, null);
             var result = runner.Execute();
 
             Assert.IsTrue(result, "Unable to start the tool");

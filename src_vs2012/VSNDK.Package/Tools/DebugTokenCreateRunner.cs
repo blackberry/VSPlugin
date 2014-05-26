@@ -12,6 +12,7 @@ namespace RIM.VSNDK_Package.Tools
         private string _location;
         private string _password;
         private ulong[] _devices;
+        private string _storeFileName;
 
         /// <summary>
         /// Init constructor.
@@ -20,7 +21,8 @@ namespace RIM.VSNDK_Package.Tools
         /// <param name="debugTokenLocation">File name and directory of the debug-token bar file</param>
         /// <param name="password">Password to the local certificate, specified when registering with the BlackBerry Signing Authority</param>
         /// <param name="devices">List of device PINs</param>
-        public DebugTokenCreateRunner(string workingDirectory, string debugTokenLocation, string password, ulong[] devices)
+        /// <param name="storeFileName">Name of the certificate, where to developer data is stored; if null, 'author.p12' is used</param>
+        public DebugTokenCreateRunner(string workingDirectory, string debugTokenLocation, string password, ulong[] devices, string storeFileName)
             : base("cmd.exe", workingDirectory)
         {
             if (string.IsNullOrEmpty(debugTokenLocation))
@@ -33,6 +35,7 @@ namespace RIM.VSNDK_Package.Tools
             _location = debugTokenLocation;
             _password = password;
             _devices = devices;
+            _storeFileName = storeFileName;
             UpdateArguments();
         }
 
@@ -88,6 +91,19 @@ namespace RIM.VSNDK_Package.Tools
         }
 
         /// <summary>
+        /// Gets or sets the name of the certificate file, where developer (publisher) data is stored.
+        /// </summary>
+        public string StoreFileName
+        {
+            get { return _storeFileName; }
+            set
+            {
+                _storeFileName = value;
+                UpdateArguments();
+            }
+        }
+
+        /// <summary>
         /// Gets and indication, if the debug-token was created successfully.
         /// </summary>
         public bool CreatedSuccessfully
@@ -105,14 +121,19 @@ namespace RIM.VSNDK_Package.Tools
             // password:
             args.Append("-storepass \"").Append(Password).Append("\" ");
 
+            // keystore:
+            if (!string.IsNullOrEmpty(StoreFileName))
+                args.Append("-keystore \"").Append(System.Environment.ExpandEnvironmentVariables(StoreFileName)).Append("\" ");
+
+
             // list of devices:
             foreach (var device in Devices)
             {
-                args.Append(" -devicepin \"").Append(device.ToString("X")).Append('"');
+                args.Append("-devicepin \"").Append(device.ToString("X")).Append("\" ");
             }
 
             // path to the output .bar file:
-            args.Append(" \"").Append(System.Environment.ExpandEnvironmentVariables(DebugTokenLocation)).Append("\"");
+            args.Append('"').Append(System.Environment.ExpandEnvironmentVariables(DebugTokenLocation)).Append('"');
 
             Arguments = args.ToString();
         }
