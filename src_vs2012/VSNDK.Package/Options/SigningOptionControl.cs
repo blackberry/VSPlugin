@@ -296,7 +296,7 @@ namespace RIM.VSNDK_Package.Options
 
                 if (registrationForm.ShowDialog() == DialogResult.OK)
                 {
-                    var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, registrationForm.AuthorName, registrationForm.AuthorPassword);
+                    var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, registrationForm.AuthorName, registrationForm.AuthorPassword, null);
                     var success = runner.Execute();
 
                     // finally, show result message:

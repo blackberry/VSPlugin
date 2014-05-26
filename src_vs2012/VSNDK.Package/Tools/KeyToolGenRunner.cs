@@ -9,6 +9,7 @@ namespace RIM.VSNDK_Package.Tools
     {
         private string _name;
         private string _password;
+        private string _fileName;
 
         /// <summary>
         /// Init constructor.
@@ -16,7 +17,8 @@ namespace RIM.VSNDK_Package.Tools
         /// <param name="workingDirectory">Tools directory</param>
         /// <param name="name">Name of the developer</param>
         /// <param name="password">Password protection, required later to use the keys</param>
-        public KeyToolGenRunner(string workingDirectory, string name, string password)
+        /// <param name="fileName">Name of the certificate, where to store specified data; if null, 'author.p12' is used</param>
+        public KeyToolGenRunner(string workingDirectory, string name, string password, string fileName)
             : base("cmd.exe", workingDirectory)
         {
             if (string.IsNullOrEmpty(name))
@@ -26,6 +28,7 @@ namespace RIM.VSNDK_Package.Tools
 
             _name = name;
             _password = password;
+            _fileName = fileName;
             UpdateArguments();
         }
 
@@ -63,11 +66,26 @@ namespace RIM.VSNDK_Package.Tools
             }
         }
 
+        /// <summary>
+        /// Gets or sets the name of the certificate file, where to store the data.
+        /// </summary>
+        public string FileName
+        {
+            get { return _fileName; }
+            set
+            {
+                _fileName = value;
+                UpdateArguments();
+            }
+        }
+
         #endregion
 
         private void UpdateArguments()
         {
-            Arguments = string.Format(@"/C blackberry-keytool -genkeypair -author ""{1}"" -storepass ""{0}""", Name, Password);
+            Arguments = string.Format(@"/C blackberry-keytool -genkeypair{0} -author ""{1}"" -storepass ""{2}""",
+                                        string.IsNullOrEmpty(FileName) ? string.Empty : string.Concat(" -keystore \"", FileName, "\""),
+                                        Name, Password);
         }
 
         protected override void ConsumeResults(string output, string error)
