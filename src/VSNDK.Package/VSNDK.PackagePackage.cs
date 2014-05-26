@@ -1234,7 +1234,7 @@ namespace RIM.VSNDK_Package
                 System.Environment.SetEnvironmentVariable("QNX_TARGET", qnx_target);
                 System.Environment.SetEnvironmentVariable("QNX_HOST", qnx_host);
 
-                string ndkpath = string.Format(@"{0}/usr/bin;{1}", qnx_host, qnx_config) +
+                string ndkpath = string.Format(@"{0}/usr/bin;{1};", qnx_host, qnx_config) +
                     System.Environment.GetEnvironmentVariable("PATH");
                 System.Environment.SetEnvironmentVariable("PATH", ndkpath);
 
