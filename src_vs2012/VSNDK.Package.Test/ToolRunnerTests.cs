@@ -1,10 +1,12 @@
 ﻿#if DEBUG
 
 using System;
+using System.IO;
 using System.Threading;
 using NUnit.Framework;
 using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
+using RIM.VSNDK_Package.ViewModels;
 
 namespace VSNDK.Package.Test
 {
@@ -173,6 +175,18 @@ namespace VSNDK.Package.Test
 
             Assert.IsNotNull(info);
             Assert.IsTrue(info.Length > 0);
+        }
+
+        [Test]
+        public void LoadInfoAboutCertificate()
+        {
+            var runner = new KeyToolInfoRunner(RunnerDefaults.TestToolsDirectory, Path.Combine(RunnerDefaults.DataDirectory, DeveloperDefinition.DefaultCertificateName), "abcdef");
+            var result = runner.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
+            Assert.IsNotNull(runner.LastOutput);
+            Assert.IsNull(runner.LastError);
+            Assert.IsNotNull(runner.Issuer);
         }
     }
 }

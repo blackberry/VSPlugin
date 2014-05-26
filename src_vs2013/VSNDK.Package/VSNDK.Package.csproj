@@ -456,6 +456,9 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\KeyToolGenRunner.cs">
       <Link>Tools\KeyToolGenRunner.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\KeyToolInfoRunner.cs">
+      <Link>Tools\KeyToolInfoRunner.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\KeyToolRemoveRunner.cs">
       <Link>Tools\KeyToolRemoveRunner.cs</Link>
     </Compile>

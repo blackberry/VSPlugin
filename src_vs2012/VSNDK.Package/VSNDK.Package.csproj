@@ -373,6 +373,7 @@
     </Compile>
     <Compile Include="Tools\EventDispatcher.cs" />
     <Compile Include="Tools\KeyToolGenRunner.cs" />
+    <Compile Include="Tools\KeyToolInfoRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\DeveloperDefinition.cs" />

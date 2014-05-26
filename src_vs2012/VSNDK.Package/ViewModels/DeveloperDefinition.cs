@@ -13,7 +13,10 @@ namespace RIM.VSNDK_Package.ViewModels
     /// </summary>
     internal sealed class DeveloperDefinition
     {
-        private const string DefaultCertificateName = "author.p12";
+        /// <summary>
+        /// Default name of the certificate file.
+        /// </summary>
+        internal const string DefaultCertificateName = "author.p12";
         private const string DefaultCskName = "bbidtoken.csk";
         private const string FieldCertificateFileName = "certificate";
         private const string FieldCskPassword = "CSKPass";
@@ -371,8 +374,20 @@ namespace RIM.VSNDK_Package.ViewModels
                 if (!File.Exists(certificateFileName) || string.IsNullOrEmpty(password))
                     return null;
 
+                /* PH: OK - this did work, but not for WinXP, as this one doesn't support SHA512withECDSA algorithm...
                 var cert = new X509Certificate(certificateFileName, password);
                 var issuer = cert.Issuer;
+                 */
+                string issuer;
+                using (var runner = new KeyToolInfoRunner(RunnerDefaults.ToolsDirectory, certificateFileName, password))
+                {
+                    // invoke
+                    if (!runner.Execute())
+                        return null;
+
+                    // grab results:
+                    issuer = runner.Issuer;
+                }
 
                 if (issuer != null && issuer.StartsWith("CN=", StringComparison.InvariantCultureIgnoreCase))
                     issuer = issuer.Substring(3).Trim();

@@ -9,7 +9,7 @@ namespace RIM.VSNDK_Package.Tools
     {
         private string _name;
         private string _password;
-        private string _fileName;
+        private string _storeFileName;
 
         /// <summary>
         /// Init constructor.
@@ -17,8 +17,8 @@ namespace RIM.VSNDK_Package.Tools
         /// <param name="workingDirectory">Tools directory</param>
         /// <param name="name">Name of the developer</param>
         /// <param name="password">Password protection, required later to use the keys</param>
-        /// <param name="fileName">Name of the certificate, where to store specified data; if null, 'author.p12' is used</param>
-        public KeyToolGenRunner(string workingDirectory, string name, string password, string fileName)
+        /// <param name="storeFileName">Name of the certificate, where to store specified data; if null, 'author.p12' is used</param>
+        public KeyToolGenRunner(string workingDirectory, string name, string password, string storeFileName)
             : base("cmd.exe", workingDirectory)
         {
             if (string.IsNullOrEmpty(name))
@@ -28,7 +28,7 @@ namespace RIM.VSNDK_Package.Tools
 
             _name = name;
             _password = password;
-            _fileName = fileName;
+            _storeFileName = storeFileName;
             UpdateArguments();
         }
 
@@ -69,12 +69,12 @@ namespace RIM.VSNDK_Package.Tools
         /// <summary>
         /// Gets or sets the name of the certificate file, where to store the data.
         /// </summary>
-        public string FileName
+        public string StoreFileName
         {
-            get { return _fileName; }
+            get { return _storeFileName; }
             set
             {
-                _fileName = value;
+                _storeFileName = value;
                 UpdateArguments();
             }
         }
@@ -84,7 +84,7 @@ namespace RIM.VSNDK_Package.Tools
         private void UpdateArguments()
         {
             Arguments = string.Format(@"/C blackberry-keytool -genkeypair{0} -author ""{1}"" -storepass ""{2}""",
-                                        string.IsNullOrEmpty(FileName) ? string.Empty : string.Concat(" -keystore \"", FileName, "\""),
+                                        string.IsNullOrEmpty(StoreFileName) ? string.Empty : string.Concat(" -keystore \"", StoreFileName, "\""),
                                         Name, Password);
         }
 
