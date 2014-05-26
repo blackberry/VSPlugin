@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
 using System.Windows.Forms;
 
 namespace RIM.VSNDK_Package.Options
@@ -31,6 +33,23 @@ namespace RIM.VSNDK_Package.Options
             openFile.InitialDirectory = startupPath;
             openFile.DefaultExt = ".bar";
             openFile.Filter = "Bar files|*.bar|All files|*.*";
+            openFile.FilterIndex = 0;
+            openFile.CheckFileExists = true;
+            openFile.CheckPathExists = true;
+
+            return openFile;
+        }
+
+        /// <summary>
+        /// Returns preconfigured window for opening certificate files.
+        /// </summary>
+        public static OpenFileDialog OpenCertFile(string startupPath)
+        {
+            var openFile = new OpenFileDialog();
+            openFile.Title = "Opening certificate file";
+            openFile.InitialDirectory = startupPath;
+            openFile.DefaultExt = ".p12";
+            openFile.Filter = "Certificate files|*.p12|All files|*.*";
             openFile.FilterIndex = 0;
             openFile.CheckFileExists = true;
             openFile.CheckPathExists = true;
@@ -98,6 +117,17 @@ namespace RIM.VSNDK_Package.Options
             if (string.IsNullOrEmpty(path))
                 return;
 
+            // if specified directory doesn't exist, create it:
+            try
+            {
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+            }
+            catch
+            {
+            }
+
+            // open Explorer window with this folder:
             Process.Start("Explorer.exe", "/e,\"" + path + "\"");
         }
 
@@ -109,6 +139,14 @@ namespace RIM.VSNDK_Package.Options
             if (string.IsNullOrEmpty(path))
                 return;
 
+            // if file doesn't exits, try to open its parent folder:
+            if (!File.Exists(path))
+            {
+                StartExplorer(Path.GetDirectoryName(path));
+                return;
+            }
+
+            // open Explorer window with specified file selected:
             Process.Start("Explorer.exe", "/select,\"" + path + "\"");
         }
 
