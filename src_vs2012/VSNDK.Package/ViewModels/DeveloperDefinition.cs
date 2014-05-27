@@ -297,7 +297,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             if (!string.IsNullOrEmpty(folder))
                 throw new ArgumentOutOfRangeException("fileName", "Invalid name, folder is not expected inside, only file name");
-            if (File.Exists(Path.Combine(DataPath, fileName)))
+            if (!File.Exists(Path.Combine(DataPath, fileName)))
                 throw new ArgumentOutOfRangeException("fileName", "File doesn't existing in designated certificate storage");
 
             ClearPassword();
