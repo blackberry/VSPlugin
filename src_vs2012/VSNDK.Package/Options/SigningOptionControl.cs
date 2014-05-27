@@ -284,44 +284,36 @@ namespace RIM.VSNDK_Package.Options
                 return;
             }
 
-            var form = new CskRequestForm(null);
-            form.ShowDialog(); // this should generate BlackBerry token file
-
             ///////////////////////////////
             // REGISTER
 
-            if (!_vm.Developer.IsRegistered && _vm.Developer.HasBlackBerryTokenFile)
+            var registrationForm = new RegistrationForm();
+
+            if (registrationForm.ShowDialog() == DialogResult.OK)
             {
-                var registrationForm = new RegistrationForm();
+                /*
+                var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, registrationForm.AuthorName, registrationForm.AuthorPassword, null);
+                var success = runner.Execute();
 
-                if (registrationForm.ShowDialog() == DialogResult.OK)
+                // finally, show result message:
+                if (success && string.IsNullOrEmpty(runner.LastError))
                 {
-                    var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, registrationForm.AuthorName, registrationForm.AuthorPassword, null);
-                    var success = runner.Execute();
-
-                    // finally, show result message:
-                    if (success && string.IsNullOrEmpty(runner.LastError))
+                    if (!string.IsNullOrEmpty(runner.LastOutput))
                     {
-                        if (!string.IsNullOrEmpty(runner.LastOutput))
-                        {
-                            MessageBoxHelper.Show(runner.LastOutput.Replace("CSK", "BB ID Token"), "Registered developer profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        }
-                    }
-                    else
-                    {
-                        // clean-up files, in case something went wrong:
-                        _vm.Developer.CleanupProfile();
-
-                        if (!string.IsNullOrEmpty(runner.LastError))
-                        {
-                            MessageBoxHelper.Show(runner.LastError, "Failed to create developer profile", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        }
+                        MessageBoxHelper.Show(runner.LastOutput.Replace("CSK", "BB ID Token"), "Registered developer profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
-            }
-            else
-            {
-                MessageBoxHelper.Show("Creation of BlackBerry ID token failed. Please try again.", "Registration", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                else
+                {
+                    // clean-up files, in case something went wrong:
+                    _vm.Developer.CleanupProfile();
+
+                    if (!string.IsNullOrEmpty(runner.LastError))
+                    {
+                        MessageBoxHelper.Show(runner.LastError, "Failed to create developer profile", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                 */
             }
 
             UpdateUI();

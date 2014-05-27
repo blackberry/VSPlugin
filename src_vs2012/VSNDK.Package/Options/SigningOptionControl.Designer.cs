@@ -116,7 +116,7 @@
             this.bttDeletePassword.Name = "bttDeletePassword";
             this.bttDeletePassword.Size = new System.Drawing.Size(75, 23);
             this.bttDeletePassword.TabIndex = 7;
-            this.bttDeletePassword.Text = "Detach";
+            this.bttDeletePassword.Text = "&Detach";
             this.bttDeletePassword.UseVisualStyleBackColor = true;
             this.bttDeletePassword.Click += new System.EventHandler(this.bttDeletePassword_Click);
             // 
@@ -188,7 +188,7 @@
             this.bttRefresh.Name = "bttRefresh";
             this.bttRefresh.Size = new System.Drawing.Size(75, 23);
             this.bttRefresh.TabIndex = 6;
-            this.bttRefresh.Text = "&Refresh...";
+            this.bttRefresh.Text = "Re&fresh...";
             this.bttRefresh.UseVisualStyleBackColor = true;
             this.bttRefresh.Click += new System.EventHandler(this.bttRefresh_Click);
             // 
@@ -219,7 +219,7 @@
             this.bttChangeCert.Name = "bttChangeCert";
             this.bttChangeCert.Size = new System.Drawing.Size(75, 23);
             this.bttChangeCert.TabIndex = 2;
-            this.bttChangeCert.Text = "&Change...";
+            this.bttChangeCert.Text = "&Select...";
             this.bttChangeCert.UseVisualStyleBackColor = true;
             this.bttChangeCert.Click += new System.EventHandler(this.bttChangeCert_Click);
             // 
@@ -230,7 +230,7 @@
             this.bttNavigate.Name = "bttNavigate";
             this.bttNavigate.Size = new System.Drawing.Size(75, 23);
             this.bttNavigate.TabIndex = 3;
-            this.bttNavigate.Text = "&Open...";
+            this.bttNavigate.Text = "S&how...";
             this.bttNavigate.UseVisualStyleBackColor = true;
             this.bttNavigate.Click += new System.EventHandler(this.bttNavigate_Click);
             // 
