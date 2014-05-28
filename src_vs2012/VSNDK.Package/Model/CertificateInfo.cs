@@ -190,22 +190,55 @@ Found 1 certificate:
             return string.IsNullOrEmpty(result.Issuer) ? null : result;
         }
 
-        private static DateTime ParseDate(string text)
+        /// <summary>
+        /// Parses the date out of given text.
+        /// </summary>
+        internal static DateTime ParseDate(string text)
         {
-            text = RemoveTimeZone(text);
-            if (string.IsNullOrEmpty(text))
-                return DateTime.MinValue.ToUniversalTime();
+            DateTime date;
 
-            var culture = CultureInfo.GetCultureInfo("en-US");
-
-            // Thu Oct 18 22:25:41 2012
-            return DateTime.ParseExact(text,
-                                       new[] { "ddd MMM d HH:mm:ss yyyy", "ddd MMM dd HH:mm:ss yyyy" },
-                                       culture, DateTimeStyles.AssumeLocal).ToUniversalTime();
+            return TryParseDate(text, out date) ? date : date;
         }
 
-        private static string RemoveTimeZone(string text)
+        /// <summary>
+        /// Tries to parse the date from specified string.
+        /// </summary>
+        internal static bool TryParseDate(string text, out DateTime result)
         {
+            string timeZoneName;
+
+            text = RemoveTimeZone(text, out timeZoneName);
+            if (string.IsNullOrEmpty(text))
+            {
+                result = DateTime.MinValue.ToUniversalTime();
+                return false;
+            }
+
+            var culture = CultureInfo.GetCultureInfo("en-US");
+            var timeZoneShift = GetTimeZoneShift(timeZoneName);
+
+            // Thu Oct 18 22:25:41 2012
+            if (!DateTime.TryParseExact(text,
+                                       new[] { "ddd MMM d HH:mm:ss yyyy", "ddd MMM dd HH:mm:ss yyyy" },
+                                       culture, DateTimeStyles.AssumeLocal,
+                                       out result))
+                return false;
+
+            result = result.Subtract(timeZoneShift).ToUniversalTime();
+            return true;
+        }
+
+        private static TimeSpan GetTimeZoneShift(string timeZoneName)
+        {
+            // PH: TODO: implement proper time-zone shift detection
+            // like for CEST -> +2:00
+            // and change the parsing code to use AssumeUniversal instead of AssumeLocal
+            return new TimeSpan(0, 0, 0);
+        }
+
+        private static string RemoveTimeZone(string text, out string timeZoneName)
+        {
+            timeZoneName = null;
             if (string.IsNullOrEmpty(text))
                 return null;
 
@@ -217,6 +250,7 @@ Found 1 certificate:
             if (startIndex < 0)
                 return text;
 
+            timeZoneName = text.Substring(startIndex + 1, endIndex - startIndex - 1);
             return string.Concat(text.Substring(0, startIndex), text.Substring(endIndex));
         }
     }

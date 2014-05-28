@@ -262,6 +262,7 @@
     <Compile Include="Model\ApiInfo.cs" />
     <Compile Include="Model\ApiLevelListTypes.cs" />
     <Compile Include="Model\CertificateInfo.cs" />
+    <Compile Include="Model\CskTokenInfo.cs" />
     <Compile Include="Model\DebugTokenInfo.cs" />
     <Compile Include="Model\DeviceDebugTokenInfo.cs" />
     <Compile Include="Model\DeviceInfo.cs" />

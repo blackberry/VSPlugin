@@ -383,6 +383,24 @@ Error: Device is not in the Development Mode. Switch to Development Mode from Se
             Assert.AreEqual(0x1122, DeviceInfo.ParseDeviceId("0X1122"));
             Assert.AreEqual(1122, DeviceInfo.ParseDeviceId("1122"));
         }
+
+        [Test]
+        public void ParseCskToken()
+        {
+            const string cskTokenData = @"#Do not edit manually. Generated automatically by BlackBerry tools.
+#Mon Sep 02 08:43:07 EDT 2013
+HMAC=111111111111111111111111111\=
+Salt=22222222222\=
+IV=33333333333\=
+Version=3
+Token=44444444444444444444444444\=\=";
+
+            var result = CskTokenInfo.Parse(cskTokenData);
+
+            Assert.IsNotNull(result);
+            Assert.AreEqual(new DateTime(2013, 9, 2, 6, 43, 07, DateTimeKind.Utc), result.CreatedAt);
+            Assert.AreEqual("3", result.Version);
+        }
     }
 }
 
