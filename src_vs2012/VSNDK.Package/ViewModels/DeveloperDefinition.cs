@@ -391,9 +391,11 @@ namespace RIM.VSNDK_Package.ViewModels
                     // invoke
                     if (!runner.Execute())
                         return null;
+                    if (runner.Info == null)
+                        return null;
 
                     // grab results:
-                    issuer = runner.Issuer;
+                    issuer = runner.Info.Issuer;
                 }
 
                 if (issuer != null && issuer.StartsWith("CN=", StringComparison.InvariantCultureIgnoreCase))

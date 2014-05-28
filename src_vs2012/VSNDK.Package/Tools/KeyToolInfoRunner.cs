@@ -1,5 +1,6 @@
 ﻿using System;
 using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model;
 
 namespace RIM.VSNDK_Package.Tools
 {
@@ -61,37 +62,10 @@ namespace RIM.VSNDK_Package.Tools
             }
         }
 
-        public string Alias
-        {
-            get;
-            private set;
-        }
-
-        public string SubjectName
-        {
-            get;
-            private set;
-        }
-
-        public string Issuer
-        {
-            get;
-            private set;
-        }
-
-        public string Algorithm
-        {
-            get;
-            private set;
-        }
-
-        public string FingerprintSHA1
-        {
-            get;
-            private set;
-        }
-
-        public string FingerprintMD5
+        /// <summary>
+        /// Gets the certificate info returned by the keytool.
+        /// </summary>
+        public CertificateInfo Info
         {
             get;
             private set;
@@ -131,57 +105,15 @@ Found 1 certificate:
 	00:11:22:33:44:55:66:77:88:99:00:11:22:33:44:55
              */
 
+            Info = null;
             if (string.IsNullOrEmpty(error) && !string.IsNullOrEmpty(output))
             {
-                var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-                // remove white chars...
-                for (int i = 0; i < lines.Length; i++)
-                {
-                    lines[i] = lines[i].Trim();
-                }
-
-                // do the parsing:
-                //  - assuming that n-line has header and n+1 - data
-                for (int i = 0; i < lines.Length - 1; i++)
-                {
-                    if (string.Compare("alias:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
-                    {
-                        Alias = lines[++i];
-                        continue;
-                    }
-                    if (string.Compare("subject name:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
-                    {
-                        SubjectName = lines[++i];
-                        continue;
-                    }
-                    if (string.Compare("issuer name:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
-                    {
-                        Issuer = lines[++i];
-                        continue;
-                    }
-                    if (string.Compare("signature algorithm:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
-                    {
-                        Algorithm = lines[++i];
-                        continue;
-                    }
-
-                    if (string.Compare("md5 fingerprint:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
-                    {
-                        FingerprintMD5 = lines[++i];
-                        continue;
-                    }
-                    if (string.Compare("sha1 fingerprint:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
-                    {
-                        FingerprintSHA1 = lines[++i];
-                        continue;
-                    }
-                }
+                Info = CertificateInfo.Parse(output);
             }
 
             TraceLog.WriteLine("For certificate: {0}", StoreFileName);
-            TraceLog.WriteLine(" * issuer: {0}", Issuer ?? "- none -");
-            TraceLog.WriteLine(" * algorithm: {0}", Algorithm ?? "- none -");
+            TraceLog.WriteLine(" * issuer: {0}", Info != null ? Info.Issuer : "- none -");
+            TraceLog.WriteLine(" * algorithm: {0}", Info != null ? Info.Algorithm : "- none -");
         }
     }
 }

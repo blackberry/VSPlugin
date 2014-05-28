@@ -180,13 +180,16 @@ namespace VSNDK.Package.Test
         [Test]
         public void LoadInfoAboutCertificate()
         {
-            var runner = new KeyToolInfoRunner(RunnerDefaults.TestToolsDirectory, Path.Combine(RunnerDefaults.DataDirectory, DeveloperDefinition.DefaultCertificateName), "abcdef");
+            var fileName = Path.Combine(RunnerDefaults.DataDirectory, DeveloperDefinition.DefaultCertificateName);
+            var password = "abcdef";
+            var runner = new KeyToolInfoRunner(RunnerDefaults.TestToolsDirectory, fileName, password);
             var result = runner.Execute();
 
             Assert.IsTrue(result, "Unable to start the tool");
             Assert.IsNotNull(runner.LastOutput);
             Assert.IsNull(runner.LastError);
-            Assert.IsNotNull(runner.Issuer);
+            Assert.IsNotNull(runner.Info);
+            Assert.IsNotNull(runner.Info.Issuer);
         }
     }
 }

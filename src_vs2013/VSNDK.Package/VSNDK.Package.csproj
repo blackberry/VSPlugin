@@ -272,6 +272,9 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\ApiLevelListTypes.cs">
       <Link>Model\ApiLevelListTypes.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\CertificateInfo.cs">
+      <Link>Model\CertificateInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\DebugTokenInfo.cs">
       <Link>Model\DebugTokenInfo.cs</Link>
     </Compile>
