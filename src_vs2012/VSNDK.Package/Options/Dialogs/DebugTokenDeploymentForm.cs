@@ -21,12 +21,14 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private DebugTokenInfo _tokenInfo;
         private bool _startup;
 
-        public DebugTokenDeploymentForm()
+        public DebugTokenDeploymentForm(TargetsOptionViewModel vm, DeviceDefinition device)
         {
             InitializeComponent();
 
             ErrorText = string.Empty;
             _startup = true;
+
+            SetVM(vm, device);
         }
 
         protected override void OnShown(EventArgs e)

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Options.Dialogs;
 using RIM.VSNDK_Package.ViewModels;
@@ -35,7 +34,7 @@ namespace RIM.VSNDK_Package.Options
         private void PopulateDevices()
         {
             listTargets.Items.Clear();
-            
+
             foreach (var device in _vm.Devices)
             {
                 var item = new ListViewItem();
@@ -49,6 +48,10 @@ namespace RIM.VSNDK_Package.Options
             }
 
             bttDebugToken.Enabled = _vm.RealDevicesCount > 0;
+
+            // select first item:
+            if (listTargets.Items.Count > 0)
+                listTargets.Items[0].Selected = true;
         }
 
         private void lnkMoreInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -56,7 +59,7 @@ namespace RIM.VSNDK_Package.Options
             DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/cascades/getting_started/setting_up.html");
         }
 
-        private void listTargets_SelectedIndexChanged(object sender, System.EventArgs e)
+        private void listTargets_SelectedIndexChanged(object sender, EventArgs e)
         {
             var device = SelectedDevice;
 
@@ -69,7 +72,7 @@ namespace RIM.VSNDK_Package.Options
             bttDebugToken.Enabled = _vm.RealDevicesCount > 0 && device != null;
         }
 
-        private void listTargets_DoubleClick(object sender, System.EventArgs e)
+        private void listTargets_DoubleClick(object sender, EventArgs e)
         {
             if (SelectedDevice != null)
             {
@@ -77,7 +80,7 @@ namespace RIM.VSNDK_Package.Options
             }
         }
 
-        private void bttAdd_Click(object sender, System.EventArgs e)
+        private void bttAdd_Click(object sender, EventArgs e)
         {
             var form = new DeviceForm("Add new Target Device");
 
@@ -88,7 +91,7 @@ namespace RIM.VSNDK_Package.Options
             }
         }
 
-        private void bttEdit_Click(object sender, System.EventArgs e)
+        private void bttEdit_Click(object sender, EventArgs e)
         {
             var form = new DeviceForm("Edit Target Device");
             var device = SelectedDevice;
@@ -101,13 +104,13 @@ namespace RIM.VSNDK_Package.Options
             }
         }
 
-        private void bttActivate_Click(object sender, System.EventArgs e)
+        private void bttActivate_Click(object sender, EventArgs e)
         {
             _vm.SetActive(SelectedDevice);
             PopulateDevices();
         }
 
-        private void bttRemove_Click(object sender, System.EventArgs e)
+        private void bttRemove_Click(object sender, EventArgs e)
         {
             var device = SelectedDevice;
 
@@ -121,21 +124,26 @@ namespace RIM.VSNDK_Package.Options
             }
         }
 
-        private void bttDebugToken_Click(object sender, System.EventArgs e)
+        private void bttDebugToken_Click(object sender, EventArgs e)
         {
             var device = SelectedDevice ?? _vm.ActiveDevice;
 
             if (device != null && device.Type != DeviceDefinitionType.Device)
                 device = null;
 
-            var form = new DebugTokenDeploymentForm();
-            form.SetVM(_vm, device);
-            form.AskOnStartup = false;
+            if (device != null)
+            {
+                var form = new DebugTokenDeploymentForm(_vm, device);
+                form.AskOnStartup = false;
+                form.ShowDialog();
 
-            form.ShowDialog();
-
-            // refresh the list, as it's possible to add new device from debug-token deployment form:
-            PopulateDevices();
+                // refresh the list, as it's possible to add new device from debug-token deployment form:
+                PopulateDevices();
+            }
+            else
+            {
+                MessageBoxHelper.Show("Please select a device first", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
         }
 
         public void OnApply()
