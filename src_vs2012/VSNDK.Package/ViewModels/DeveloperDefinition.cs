@@ -427,6 +427,7 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             UpdateCertificate(fileName);
             UpdatePassword(password, remember);
+            UpdateName(null);
         }
 
         /// <summary>
