@@ -315,6 +315,9 @@
       <Link>Options\ApiLevelOptionPage.cs</Link>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\CertHelper.cs">
+      <Link>Options\CertHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\DialogHelper.cs">
       <Link>Options\DialogHelper.cs</Link>
     </Compile>
@@ -333,6 +336,14 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\AddLocalNdkForm.designer.cs">
       <Link>Options\Dialogs\AddLocalNdkForm.designer.cs</Link>
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\CertificateDetailsForm.cs">
+      <Link>Options\Dialogs\CertificateDetailsForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\CertificateDetailsForm.designer.cs">
+      <Link>Options\Dialogs\CertificateDetailsForm.designer.cs</Link>
+      <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\CskRequestForm.cs">
       <Link>Options\Dialogs\CskRequestForm.cs</Link>
@@ -465,6 +476,9 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\KeyToolInfoRunner.cs">
       <Link>Tools\KeyToolInfoRunner.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\KeyToolRegisterRunner.cs">
+      <Link>Tools\KeyToolRegisterRunner.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\KeyToolRemoveRunner.cs">
       <Link>Tools\KeyToolRemoveRunner.cs</Link>
     </Compile>
@@ -557,6 +571,10 @@
     <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\AddLocalNdkForm.resx">
       <Link>Options\Dialogs\AddLocalNdkForm.resx</Link>
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\CertificateDetailsForm.resx">
+      <Link>Options\Dialogs\CertificateDetailsForm.resx</Link>
+      <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\CskRequestForm.resx">
       <Link>Options\Dialogs\CskRequestForm.resx</Link>

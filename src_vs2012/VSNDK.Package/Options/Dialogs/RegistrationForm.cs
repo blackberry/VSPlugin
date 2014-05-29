@@ -1,16 +1,17 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    public partial class RegistrationForm : Form
+    internal partial class RegistrationForm : Form
     {
         private const string ValidationCaption = "Validation";
         private readonly DeveloperDefinition _developer;
 
-        internal RegistrationForm(DeveloperDefinition developer)
+        public RegistrationForm(DeveloperDefinition developer)
         {
             if (developer == null)
                 throw new ArgumentNullException("developer");
@@ -18,8 +19,15 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             InitializeComponent();
 
-            Password = _developer.CskPassword;
             AuthorName = _developer.Name;
+            Password = _developer.CskPassword;
+
+            if (_developer.HasCertificate)
+                Log("Found certificate: " + _developer.CertificateFullPath);
+            if (_developer.HasToken)
+                Log("Found BlackBerry 10 token (v: " + _developer.Token.Version + "): \"" + _developer.CskTokenFullPath + "\", from: " + _developer.Token.CreatedAtString);
+            if (_developer.HasTabletToken)
+                Log("Found Tablet token (v: " +_developer.TabletToken.Version + "): \"" + _developer.TabletCskTokenFullPath + "\", from: " + _developer.TabletToken.CreatedAtString);
 
             UpdateUI();
         }
@@ -156,7 +164,21 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             txtCsjPin.Enabled = txtCskPassword.Enabled = txtCskConfirmPassword.Enabled = !tabletRegistered;
 
             // BB10 devices section:
+            bool registered = _developer.IsRegistered;
 
+            lblRegistration.Visible = registered;
+            lblTokenExpiration.Visible = _developer.HasToken;
+            lblTokenExpiration.Text = _developer.HasToken ? "Token expires at: " + _developer.Token.ValidDateString : string.Empty;
+
+            txtCertName.Text = _developer.CertificateFileName;
+            bttCreateCertificate.Enabled = !_developer.HasCertificate;
+        }
+
+        private void UpdateActionButtons(bool enabled)
+        {
+            bttCreateCertificate.Enabled = enabled;
+            bttCreateSigner.Enabled = enabled;
+            bttCreateToken.Enabled = enabled;
         }
 
         private void txtPassword_TextChanged(object sender, EventArgs e)
@@ -199,7 +221,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             {
                 if (form.StatusCode != 0)
                 {
-                    MessageBoxHelper.Show("Failed to obtain the BlackBerry ID token from Security Authority.\r\nPlease check your Internet connection", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBoxHelper.Show("Failed to obtain the BlackBerry ID token.\r\nPlease check your Internet connection", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
@@ -243,6 +265,113 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 return;
             if (!CheckPath(txtPbdtPath, "PBDT path"))
                 return;
+
+            UpdateActionButtons(false);
+            Log("Starting registration..." + Environment.NewLine);
+
+            // create CSK file:
+            bool successful;
+            string certificateFileName;
+            using (var runner = new KeyToolRegisterRunner(RunnerDefaults.ToolsDirectory, txtCsjPin.Text, txtCskPassword.Text, txtRdkPath.Text, txtPbdtPath.Text))
+            {
+                successful = runner.Execute();
+                certificateFileName = runner.CertificateFileName;
+
+                // print results:
+                if (!string.IsNullOrEmpty(runner.LastOutput))
+                    Log(runner.LastOutput);
+            }
+
+            // refresh the UI:
+            Log("Registration finished.");
+            _developer.InvalidateTokens();
+            UpdateUI();
+
+            // and save the password:
+            if (successful)
+            {
+                _developer.UpdateCertificate(certificateFileName, txtCskPassword.Text, true);
+
+                if (_developer.IsTabletRegistered)
+                {
+                    // update the name of the developer (publisher):
+                    txtName.Text = _developer.UpdateName(null);
+                    MessageBoxHelper.Show("You have successfully registered your BlackBerry Tablet Signer", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    MessageBoxHelper.Show("Sorry, something unexpected has happened. Please verify logs, unregister and try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+            else
+            {
+                MessageBoxHelper.Show("Failed to create BlackBerry Tablet Signer. Examine logs for more details.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void bttImportCertificate_Click(object sender, EventArgs e)
+        {
+            if (CertHelper.Import(_developer))
+            {
+                AuthorName = _developer.Name;
+                Password = _developer.CskPassword;
+
+                UpdateUI();
+            }
+        }
+
+        private void bttNavigate_Click(object sender, EventArgs e)
+        {
+            // open the folder, where all the certificates are placed:
+            DialogHelper.StartExplorer(_developer.DataPath);
+        }
+
+        private void bttRefresh_Click(object sender, EventArgs e)
+        {
+            if (CertHelper.ReloadAuthor(_developer))
+            {
+                AuthorName = _developer.Name;
+                Password = _developer.CskPassword;
+            }
+        }
+
+        private void bttCreateCertificate_Click(object sender, EventArgs e)
+        {
+            if (!CheckPassword(txtPassword, txtConfirmPassword, null))
+                return;
+            if (!CheckName(txtName))
+                return;
+
+            using (var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, AuthorName, Password, null))
+            {
+                Log("Started certificate generation..." + Environment.NewLine);
+                var success = runner.Execute();
+
+                // print results:
+                if (!string.IsNullOrEmpty(runner.LastError))
+                    Log(runner.LastError);
+                if (!string.IsNullOrEmpty(runner.LastOutput))
+                    Log(runner.LastOutput);
+
+                Log("Certificate creation finished");
+                // show result message:
+                if (success && string.IsNullOrEmpty(runner.LastError))
+                {
+                    _developer.UpdateCertificate(runner.CertificateFileName, txtCskPassword.Text, true);
+
+                    if (!string.IsNullOrEmpty(runner.LastOutput))
+                    {
+                        MessageBoxHelper.Show("Keystore certificate has been succesfully created", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(runner.LastError))
+                    {
+                        MessageBoxHelper.Show("Failed to create developer profile", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
         }
     }
 }

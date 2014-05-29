@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Tools
 {
@@ -79,30 +81,44 @@ namespace RIM.VSNDK_Package.Tools
             }
         }
 
+        /// <summary>
+        /// Gets the name of the certificate file created (if needed) with info about the developer (publisher).
+        /// </summary>
+        public string CertificateFileName
+        {
+            get
+            {
+                string fileName = null;
+
+                if (!string.IsNullOrEmpty(_storeFileName))
+                {
+                    fileName = Path.GetFileName(_storeFileName);
+                }
+
+                return string.IsNullOrEmpty(fileName) ? DeveloperDefinition.DefaultCertificateName : fileName;
+            }
+        }
+
         #endregion
 
         private void UpdateArguments()
         {
-            Arguments = string.Format(@"/C blackberry-keytool -genkeypair{0} -author ""{1}"" -storepass ""{2}""",
-                                        string.IsNullOrEmpty(StoreFileName) ? string.Empty : string.Concat(" -keystore \"", System.Environment.ExpandEnvironmentVariables(StoreFileName), "\""),
-                                        Name, Password);
+            if (string.IsNullOrEmpty(StoreFileName))
+            {
+                Arguments = string.Format(@"/C blackberry-keytool -genkeypair -author ""{0}"" -storepass ""{1}""", Name, Password);
+            }
+            else
+            {
+                Arguments = string.Format(@"/C blackberry-keytool -genkeypair -author ""{0}"" -storepass ""{1}"" -keystore ""{2}""",
+                                          Name, Password, System.Environment.ExpandEnvironmentVariables(StoreFileName));
+            }
         }
 
         protected override void ConsumeResults(string output, string error)
         {
             if (string.IsNullOrEmpty(error) && !string.IsNullOrEmpty(output))
             {
-                var lines = output.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-
-                // check, if there is any runtime error message:
-                foreach (var line in lines)
-                {
-                    if (line.StartsWith("error:", StringComparison.InvariantCultureIgnoreCase))
-                    {
-                        LastError = line.Substring(6).Trim();
-                        break;
-                    }
-                }
+                LastError = ExtractErrorMessages(output);
             }
         }
     }

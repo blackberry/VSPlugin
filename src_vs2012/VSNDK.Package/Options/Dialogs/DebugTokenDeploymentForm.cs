@@ -604,7 +604,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             // ask where to store the debug-token:
             var startupPath = string.IsNullOrEmpty(DebugTokenPath) ? RunnerDefaults.DataDirectory : Path.GetDirectoryName(DebugTokenPath);
-            var saveFile = DialogHelper.SaveBarFile("Renewed debug token location", startupPath, "debugtoken-" + DateTime.Now.ToString("yyyy-MM-hh") + ".bar");
+            var saveFile = DialogHelper.SaveBarFile("Renewed debug token location", startupPath, "debugtoken-" + DateTime.Now.ToString("yyyy-MM-dd") + ".bar");
 
             if (saveFile.ShowDialog() == DialogResult.OK)
             {

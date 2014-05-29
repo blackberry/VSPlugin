@@ -1,7 +1,5 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Options.Dialogs;
 using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
@@ -59,27 +57,10 @@ namespace RIM.VSNDK_Package.Options
 
         private void ReloadAuthor()
         {
-            // try to reload info with cached password:
-            if (_vm.Developer.HasPassword)
+            if (CertHelper.ReloadAuthor(_vm.Developer))
             {
-                Author = _vm.Developer.UpdateName(null);
                 UpdateUI();
-
-                if (!string.IsNullOrEmpty(Author))
-                    return;
             }
-
-            // if it failed, ask for new password:
-            var form = new PasswordForm();
-            if (form.ShowDialog() != DialogResult.OK)
-                return;
-
-            _vm.Developer.UpdatePassword(form.Password, form.ShouldRemember);
-
-            // try again to reload data from certificate:
-            Author = _vm.Developer.UpdateName(null);
-            UpdateUI();
-            VerifyAuthor(Author);
         }
 
         private void lblMore_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -87,108 +68,18 @@ namespace RIM.VSNDK_Package.Options
             DialogHelper.StartURL("http://www.blackberry.com/go/codesigning/");
         }
 
-        private static void VerifyAuthor(string author)
-        {
-            if (string.IsNullOrEmpty(author))
-            {
-                MessageBoxHelper.Show("Unable to load info about author", "Invalid password or certificate file", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            }
-        }
-
-        internal static void CopyExistingCert(DeveloperDefinition developer)
-        {
-            if (developer == null)
-                throw new ArgumentNullException("developer");
-            if (string.IsNullOrEmpty(developer.DataPath))
-                throw new ArgumentOutOfRangeException("developer");
-
-            // navigate for new certificate:
-            var form = DialogHelper.OpenCertFile(developer.DataPath);
-
-            if (form.ShowDialog() == DialogResult.OK && File.Exists(form.FileName))
-            {
-                // will need to move the file? - ask for confirmation, if one with the same name exists:
-                var srcPath = form.FileName;
-                var fileName = Path.GetFileName(srcPath);
-                var folderName = Path.GetDirectoryName(srcPath);
-
-                if (string.IsNullOrEmpty(fileName) || string.IsNullOrEmpty(folderName))
-                    return;
-
-                // copy the file:
-                if (string.Compare(developer.DataPath, folderName, StringComparison.InvariantCultureIgnoreCase) != 0)
-                {
-                    var destPath = Path.Combine(developer.DataPath, fileName);
-                    if (File.Exists(destPath))
-                    {
-                        var result = MessageBoxHelper.Show("File \"" + fileName + "\" already exists in certificate storage folder.\r\nDo you want to overwrite it?",
-                                                           null, MessageBoxButtons.YesNoCancel, MessageBoxIcon.Exclamation);
-
-                        if (result == DialogResult.Cancel)
-                            return;
-                        if (result == DialogResult.No)
-                        {
-                            // generate new name:
-                            fileName = "author-" + DateTime.Now.ToString("yyyy-MM-dd") + ".p12";
-                            destPath = Path.Combine(developer.DataPath, fileName);
-                        }
-                    }
-
-                    try
-                    {
-                        File.Copy(srcPath, destPath, true);
-                    }
-                    catch (Exception ex)
-                    {
-                        TraceLog.WriteException(ex, "Unable to copy certificate file \"{0}\"", srcPath);
-                        MessageBoxHelper.Show(ex.Message, "Certificate file error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                }
-
-                developer.UpdateCertificate(fileName);
-
-                // ask for password several times:
-                while (true)
-                {
-                    var passForm = new PasswordForm();
-
-                    if (passForm.ShowDialog() == DialogResult.OK)
-                    {
-                        // load info from new certificate:
-                        developer.UpdateName(passForm.Password);
-
-                        // succeeded - yes?
-                        if (developer.HasName)
-                        {
-                            developer.UpdatePassword(passForm.Password, passForm.ShouldRemember);
-                            break;
-                        }
-
-                        // no - display error and ask again:
-                        VerifyAuthor(developer.Name);
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-        }
-
         private void bttChangeCert_Click(object sender, EventArgs e)
         {
-            CopyExistingCert(_vm.Developer);
+            CertHelper.Import(_vm.Developer);
             UpdateUI();
         }
 
         private void bttNavigate_Click(object sender, EventArgs e)
         {
-            var path = _vm.Developer.CertificateFullPath;
-            if (string.IsNullOrEmpty(path))
-                return;
+            var form = new CertificateDetailsForm(_vm.Developer);
+            form.ShowDialog();
 
-            DialogHelper.StartExplorerForFile(path);
+            UpdateUI();
         }
 
         private void bttDeletePassword_Click(object sender, EventArgs e)

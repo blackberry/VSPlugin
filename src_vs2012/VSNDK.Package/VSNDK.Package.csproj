@@ -282,6 +282,7 @@
     <Compile Include="Options\ApiLevelOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Options\CertHelper.cs" />
     <Compile Include="Options\DialogHelper.cs" />
     <Compile Include="Options\Dialogs\AboutForm.cs">
       <SubType>Form</SubType>
@@ -294,6 +295,12 @@
     </Compile>
     <Compile Include="Options\Dialogs\AddLocalNdkForm.Designer.cs">
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Dialogs\CertificateDetailsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\CertificateDetailsForm.Designer.cs">
+      <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\Dialogs\CskRequestForm.cs">
       <SubType>Form</SubType>
@@ -376,6 +383,7 @@
     <Compile Include="Tools\EventDispatcher.cs" />
     <Compile Include="Tools\KeyToolGenRunner.cs" />
     <Compile Include="Tools\KeyToolInfoRunner.cs" />
+    <Compile Include="Tools\KeyToolRegisterRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
@@ -420,6 +428,9 @@
       <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
     </Compile>
     <None Include="VSNDK.Package.Menu.vsct" />
+    <EmbeddedResource Include="Options\Dialogs\CertificateDetailsForm.resx">
+      <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\CskRequestForm.resx">
       <DependentUpon>CskRequestForm.cs</DependentUpon>
     </EmbeddedResource>

@@ -30,6 +30,7 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SigningOptionControl));
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.lblStatus = new System.Windows.Forms.Label();
             this.bttUnregister = new System.Windows.Forms.Button();
             this.bttRegister = new System.Windows.Forms.Button();
             this.lblMore = new System.Windows.Forms.LinkLabel();
@@ -46,7 +47,6 @@
             this.bttChangeCert = new System.Windows.Forms.Button();
             this.bttNavigate = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
-            this.lblStatus = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -66,6 +66,16 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "BlackBerry Signing Authority";
+            // 
+            // lblStatus
+            // 
+            this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblStatus.Location = new System.Drawing.Point(234, 48);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(156, 45);
+            this.lblStatus.TabIndex = 4;
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             // 
             // bttUnregister
             // 
@@ -221,7 +231,7 @@
             this.bttChangeCert.Name = "bttChangeCert";
             this.bttChangeCert.Size = new System.Drawing.Size(75, 23);
             this.bttChangeCert.TabIndex = 2;
-            this.bttChangeCert.Text = "&Select...";
+            this.bttChangeCert.Text = "&Import...";
             this.bttChangeCert.UseVisualStyleBackColor = true;
             this.bttChangeCert.Click += new System.EventHandler(this.bttChangeCert_Click);
             // 
@@ -232,7 +242,7 @@
             this.bttNavigate.Name = "bttNavigate";
             this.bttNavigate.Size = new System.Drawing.Size(75, 23);
             this.bttNavigate.TabIndex = 3;
-            this.bttNavigate.Text = "S&how...";
+            this.bttNavigate.Text = "Detail&s...";
             this.bttNavigate.UseVisualStyleBackColor = true;
             this.bttNavigate.Click += new System.EventHandler(this.bttNavigate_Click);
             // 
@@ -245,16 +255,6 @@
             this.label4.Size = new System.Drawing.Size(384, 73);
             this.label4.TabIndex = 8;
             this.label4.Text = resources.GetString("label4.Text");
-            // 
-            // lblStatus
-            // 
-            this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblStatus.Location = new System.Drawing.Point(234, 48);
-            this.lblStatus.Name = "lblStatus";
-            this.lblStatus.Size = new System.Drawing.Size(156, 45);
-            this.lblStatus.TabIndex = 4;
-            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
             // 
             // SigningOptionControl
             // 

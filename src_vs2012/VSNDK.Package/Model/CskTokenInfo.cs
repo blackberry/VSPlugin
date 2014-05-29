@@ -59,11 +59,19 @@ namespace RIM.VSNDK_Package.Model
         }
 
         /// <summary>
+        /// Gets the string representation of the creation date.
+        /// </summary>
+        public string CreatedAtString
+        {
+            get { return CreatedAt.ToString("yyyy-MM-dd HH:mm:ss"); }
+        }
+
+        /// <summary>
         /// Gets the string representation of the validation date.
         /// </summary>
         public string ValidDateString
         {
-            get { return ValidTo.ToString("dd-MM-yyyy"); }
+            get { return ValidTo.ToString("yyyy-MM-dd"); }
         }
 
         /// <summary>
@@ -96,6 +104,12 @@ namespace RIM.VSNDK_Package.Model
         }
 
         public string Token
+        {
+            get;
+            private set;
+        }
+
+        public string Company
         {
             get;
             private set;
@@ -149,6 +163,7 @@ namespace RIM.VSNDK_Package.Model
                     {
                         result.CreatedAt = date;
                         result.ValidTo = date.Date.AddYears(1); // BBID token is valid only for one year!
+                        continue;
                     }
                 }
 
@@ -156,18 +171,28 @@ namespace RIM.VSNDK_Package.Model
                 if (line.StartsWith("hmac=", StringComparison.InvariantCultureIgnoreCase))
                 {
                     result.HMAC = line.Substring(5).Trim();
+                    continue;
                 }
 
                 // version:
                 if (line.StartsWith("version=", StringComparison.InvariantCultureIgnoreCase))
                 {
                     result.Version = line.Substring(8).Trim();
+                    continue;
                 }
 
                 // token:
                 if (line.StartsWith("token=", StringComparison.InvariantCultureIgnoreCase))
                 {
                     result.Token = line.Substring(6).Trim();
+                    continue;
+                }
+
+                // company:
+                if (line.StartsWith("company=", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    result.Company = line.Substring(8).Trim();
+                    continue;
                 }
             }
 

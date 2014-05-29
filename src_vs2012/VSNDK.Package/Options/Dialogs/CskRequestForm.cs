@@ -70,16 +70,25 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         {
             if (e.Url == CallbackURL)
             {
-                string postData = Encoding.UTF8.GetString(e.PostData);
-                string[] data = postData.Split('&');
+                if (e.PostData == null || e.PostData.Length == 0)
+                {
+                    StatusCode = 404;
+                    Token = new CskTokenInfo(null);
+                }
+                else
+                {
+                    // this seems to be NUL-terminated string...
+                    string postData = Encoding.UTF8.GetString(e.PostData, 0, e.PostData[e.PostData.Length - 1] == 0 ? e.PostData.Length - 1 : e.PostData.Length);
+                    string[] data = postData.Split('&');
 
-                for (int i = 0; i < data.Length; i++)
-                    data[i] = HttpUtility.UrlDecode(data[i]);
+                    for (int i = 0; i < data.Length; i++)
+                        data[i] = HttpUtility.UrlDecode(data[i]);
 
-                StatusCode = 200;
-                Token = new CskTokenInfo(FindContentFor(data, "cskData="));
+                    StatusCode = 200;
+                    Token = new CskTokenInfo(FindContentFor(data, "cskData="));
+                }
+
                 e.Cancel = true;
-
                 // And close the form
                 Invoke(new Action(RequestCompleted));
             }

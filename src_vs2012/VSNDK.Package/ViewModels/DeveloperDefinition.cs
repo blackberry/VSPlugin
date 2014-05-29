@@ -93,6 +93,14 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Gets an indication, if the certificate file exists.
+        /// </summary>
+        public bool HasCertificate
+        {
+            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath); }
+        }
+
+        /// <summary>
         /// Gets full path to the BlackBerry ID token file (bbidtoken.csk).
         /// </summary>
         public string CskTokenFullPath
@@ -184,7 +192,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public bool IsRegistered
         {
-            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath) && File.Exists(CskTokenFullPath); }
+            get { return HasCertificate && File.Exists(CskTokenFullPath); }
         }
 
         /// <summary>
@@ -192,10 +200,31 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public bool IsTabletRegistered
         {
-            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath) && File.Exists(TabletSignerFullPath) && File.Exists(TabletCskTokenFullPath); }
+            get
+            {
+                return HasCertificate
+                       && File.Exists(TabletCskTokenFullPath)
+                       && File.Exists(TabletSignerFullPath) && GetFileSize(TabletSignerFullPath) > 0;
+            }
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets the size of the file.
+        /// </summary>
+        private static long GetFileSize(string path)
+        {
+            try
+            {
+                var info = new FileInfo(path);
+                return info.Length;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
 
         /// <summary>
         /// Invalidates loaded CSK tokens to force them load from disk again.
@@ -389,6 +418,15 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 SaveCertificatePath();
             }
+        }
+
+        /// <summary>
+        /// Updates the certificate file name and password and saves it into registry if required.
+        /// </summary>
+        public void UpdateCertificate(string fileName, string password, bool remember)
+        {
+            UpdateCertificate(fileName);
+            UpdatePassword(password, remember);
         }
 
         /// <summary>
