@@ -145,12 +145,12 @@ Found 1 certificate:
                 }
                 if (string.Compare("subject name:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
                 {
-                    result.SubjectName = lines[++i];
+                    result.SubjectName = GetCommonName(lines[++i]);
                     continue;
                 }
                 if (string.Compare("issuer name:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
                 {
-                    result.Issuer = lines[++i];
+                    result.Issuer = GetCommonName(lines[++i]);
                     continue;
                 }
                 if (string.Compare("valid from:", lines[i], StringComparison.InvariantCultureIgnoreCase) == 0)
@@ -188,6 +188,17 @@ Found 1 certificate:
             // verify if at least some basic fields are set,
             // then return the result, else treat everything as parsing failure:
             return string.IsNullOrEmpty(result.Issuer) ? null : result;
+        }
+
+        private static string GetCommonName(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            if (text.StartsWith("CommonName=", StringComparison.InvariantCultureIgnoreCase))
+                return "CN=" + text.Substring(11);
+
+            return text;
         }
 
         /// <summary>
