@@ -82,7 +82,13 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                     string[] data = postData.Split('&');
 
                     for (int i = 0; i < data.Length; i++)
+                    {
                         data[i] = HttpUtility.UrlDecode(data[i]);
+
+                        // and remove some unwanted chars:
+                        if (data[i] != null)
+                            data[i] = data[i].TrimEnd('\t', ' ');
+                    }
 
                     StatusCode = 200;
                     Token = new CskTokenInfo(FindContentFor(data, "cskData="));
