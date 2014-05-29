@@ -1,6 +1,6 @@
 ﻿namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    partial class PinListForm
+    internal partial class PinListForm
     {
         /// <summary>
         /// Required designer variable.

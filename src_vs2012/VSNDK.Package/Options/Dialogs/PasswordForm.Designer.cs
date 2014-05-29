@@ -1,6 +1,6 @@
 ﻿namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    partial class PasswordForm
+    internal partial class PasswordForm
     {
         /// <summary>
         /// Required designer variable.

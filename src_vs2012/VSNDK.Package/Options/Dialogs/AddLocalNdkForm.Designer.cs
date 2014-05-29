@@ -1,6 +1,6 @@
 ﻿namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    partial class AddLocalNdkForm
+    internal partial class AddLocalNdkForm
     {
         /// <summary>
         /// Required designer variable.

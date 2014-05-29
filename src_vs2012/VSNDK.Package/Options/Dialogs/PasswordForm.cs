@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    public partial class PasswordForm : Form
+    internal partial class PasswordForm : Form
     {
         public PasswordForm()
         {

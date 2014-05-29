@@ -9,7 +9,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
     /// <summary>
     /// Dialog for creating list of device PINs.
     /// </summary>
-    public partial class PinListForm : Form
+    internal partial class PinListForm : Form
     {
         private List<ulong> _pins;
 

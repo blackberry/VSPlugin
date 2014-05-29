@@ -6,7 +6,7 @@ using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options.Dialogs
 {
-    public partial class AddLocalNdkForm : Form
+    internal partial class AddLocalNdkForm : Form
     {
         public AddLocalNdkForm()
         {
