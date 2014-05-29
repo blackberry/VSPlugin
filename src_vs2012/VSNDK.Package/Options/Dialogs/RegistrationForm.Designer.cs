@@ -40,15 +40,16 @@
             this.label5 = new System.Windows.Forms.Label();
             this.bttCreateToken = new System.Windows.Forms.Button();
             this.bttCreateCertificate = new System.Windows.Forms.Button();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.groupBlackBerry10 = new System.Windows.Forms.GroupBox();
             this.lblTokenExpiration = new System.Windows.Forms.Label();
             this.lblRegistration = new System.Windows.Forms.Label();
             this.bttRefresh = new System.Windows.Forms.Button();
             this.txtCertName = new System.Windows.Forms.TextBox();
             this.label6 = new System.Windows.Forms.Label();
             this.bttImportCertificate = new System.Windows.Forms.Button();
+            this.cmbSections = new System.Windows.Forms.ComboBox();
             this.txtLog = new System.Windows.Forms.TextBox();
-            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.groupTablet = new System.Windows.Forms.GroupBox();
             this.lblTabletRegistration = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
             this.lnkMoreInfo = new System.Windows.Forms.LinkLabel();
@@ -67,8 +68,8 @@
             this.label7 = new System.Windows.Forms.Label();
             this.label12 = new System.Windows.Forms.Label();
             this.bttNavigate = new System.Windows.Forms.Button();
-            this.groupBox2.SuspendLayout();
-            this.groupBox3.SuspendLayout();
+            this.groupBlackBerry10.SuspendLayout();
+            this.groupTablet.SuspendLayout();
             this.SuspendLayout();
             // 
             // label1
@@ -129,7 +130,7 @@
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bttOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.bttOK.Location = new System.Drawing.Point(1017, 398);
+            this.bttOK.Location = new System.Drawing.Point(474, 433);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
             this.bttOK.TabIndex = 3;
@@ -167,36 +168,37 @@
             // 
             this.bttCreateCertificate.Location = new System.Drawing.Point(131, 230);
             this.bttCreateCertificate.Name = "bttCreateCertificate";
-            this.bttCreateCertificate.Size = new System.Drawing.Size(110, 23);
+            this.bttCreateCertificate.Size = new System.Drawing.Size(113, 23);
             this.bttCreateCertificate.TabIndex = 12;
             this.bttCreateCertificate.Text = "Create C&ertificate...";
             this.bttCreateCertificate.UseVisualStyleBackColor = true;
             this.bttCreateCertificate.Click += new System.EventHandler(this.bttCreateCertificate_Click);
             // 
-            // groupBox2
+            // groupBlackBerry10
             // 
-            this.groupBox2.Controls.Add(this.lblTokenExpiration);
-            this.groupBox2.Controls.Add(this.lblRegistration);
-            this.groupBox2.Controls.Add(this.bttRefresh);
-            this.groupBox2.Controls.Add(this.label4);
-            this.groupBox2.Controls.Add(this.txtCertName);
-            this.groupBox2.Controls.Add(this.label6);
-            this.groupBox2.Controls.Add(this.bttImportCertificate);
-            this.groupBox2.Controls.Add(this.bttCreateCertificate);
-            this.groupBox2.Controls.Add(this.label2);
-            this.groupBox2.Controls.Add(this.bttCreateToken);
-            this.groupBox2.Controls.Add(this.txtName);
-            this.groupBox2.Controls.Add(this.label3);
-            this.groupBox2.Controls.Add(this.label5);
-            this.groupBox2.Controls.Add(this.txtConfirmPassword);
-            this.groupBox2.Controls.Add(this.txtPassword);
-            this.groupBox2.Controls.Add(this.label1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 12);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(537, 288);
-            this.groupBox2.TabIndex = 0;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "BlackBerry 10 Devices";
+            this.groupBlackBerry10.Controls.Add(this.lblTokenExpiration);
+            this.groupBlackBerry10.Controls.Add(this.lblRegistration);
+            this.groupBlackBerry10.Controls.Add(this.bttRefresh);
+            this.groupBlackBerry10.Controls.Add(this.label4);
+            this.groupBlackBerry10.Controls.Add(this.txtCertName);
+            this.groupBlackBerry10.Controls.Add(this.label6);
+            this.groupBlackBerry10.Controls.Add(this.bttImportCertificate);
+            this.groupBlackBerry10.Controls.Add(this.bttCreateCertificate);
+            this.groupBlackBerry10.Controls.Add(this.label2);
+            this.groupBlackBerry10.Controls.Add(this.bttCreateToken);
+            this.groupBlackBerry10.Controls.Add(this.txtName);
+            this.groupBlackBerry10.Controls.Add(this.label3);
+            this.groupBlackBerry10.Controls.Add(this.label5);
+            this.groupBlackBerry10.Controls.Add(this.txtConfirmPassword);
+            this.groupBlackBerry10.Controls.Add(this.txtPassword);
+            this.groupBlackBerry10.Controls.Add(this.label1);
+            this.groupBlackBerry10.Location = new System.Drawing.Point(12, 12);
+            this.groupBlackBerry10.Name = "groupBlackBerry10";
+            this.groupBlackBerry10.Size = new System.Drawing.Size(537, 288);
+            this.groupBlackBerry10.TabIndex = 0;
+            this.groupBlackBerry10.TabStop = false;
+            this.groupBlackBerry10.Text = "BlackBerry 10 Devices";
+            this.groupBlackBerry10.Visible = false;
             // 
             // lblTokenExpiration
             // 
@@ -210,9 +212,11 @@
             // lblRegistration
             // 
             this.lblRegistration.AutoSize = true;
+            this.lblRegistration.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblRegistration.ForeColor = System.Drawing.Color.Navy;
             this.lblRegistration.Location = new System.Drawing.Point(247, 235);
             this.lblRegistration.Name = "lblRegistration";
-            this.lblRegistration.Size = new System.Drawing.Size(165, 13);
+            this.lblRegistration.Size = new System.Drawing.Size(197, 13);
             this.lblRegistration.TabIndex = 13;
             this.lblRegistration.Text = "Registration has been completed.";
             // 
@@ -247,11 +251,24 @@
             // 
             this.bttImportCertificate.Location = new System.Drawing.Point(131, 259);
             this.bttImportCertificate.Name = "bttImportCertificate";
-            this.bttImportCertificate.Size = new System.Drawing.Size(110, 23);
+            this.bttImportCertificate.Size = new System.Drawing.Size(113, 23);
             this.bttImportCertificate.TabIndex = 12;
             this.bttImportCertificate.Text = "I&mport Certificate...";
             this.bttImportCertificate.UseVisualStyleBackColor = true;
             this.bttImportCertificate.Click += new System.EventHandler(this.bttImportCertificate_Click);
+            // 
+            // cmbSections
+            // 
+            this.cmbSections.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbSections.FormattingEnabled = true;
+            this.cmbSections.Items.AddRange(new object[] {
+            "BlackBerry 10 Devices",
+            "BlackBerry PlayBook Tablet"});
+            this.cmbSections.Location = new System.Drawing.Point(20, 8);
+            this.cmbSections.Name = "cmbSections";
+            this.cmbSections.Size = new System.Drawing.Size(238, 21);
+            this.cmbSections.TabIndex = 16;
+            this.cmbSections.SelectedIndexChanged += new System.EventHandler(this.cmbSections_SelectedIndexChanged);
             // 
             // txtLog
             // 
@@ -263,41 +280,44 @@
             this.txtLog.Name = "txtLog";
             this.txtLog.ReadOnly = true;
             this.txtLog.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtLog.Size = new System.Drawing.Size(1080, 86);
+            this.txtLog.Size = new System.Drawing.Size(537, 121);
             this.txtLog.TabIndex = 2;
             // 
-            // groupBox3
+            // groupTablet
             // 
-            this.groupBox3.Controls.Add(this.lblTabletRegistration);
-            this.groupBox3.Controls.Add(this.label13);
-            this.groupBox3.Controls.Add(this.lnkMoreInfo);
-            this.groupBox3.Controls.Add(this.txtCskConfirmPassword);
-            this.groupBox3.Controls.Add(this.txtCskPassword);
-            this.groupBox3.Controls.Add(this.label11);
-            this.groupBox3.Controls.Add(this.txtCsjPin);
-            this.groupBox3.Controls.Add(this.label10);
-            this.groupBox3.Controls.Add(this.txtPbdtPath);
-            this.groupBox3.Controls.Add(this.label9);
-            this.groupBox3.Controls.Add(this.bttPbdtNavigate);
-            this.groupBox3.Controls.Add(this.bttRdkNavigate);
-            this.groupBox3.Controls.Add(this.bttCreateSigner);
-            this.groupBox3.Controls.Add(this.txtRdkPath);
-            this.groupBox3.Controls.Add(this.label8);
-            this.groupBox3.Controls.Add(this.label7);
-            this.groupBox3.Controls.Add(this.label12);
-            this.groupBox3.Location = new System.Drawing.Point(555, 12);
-            this.groupBox3.Name = "groupBox3";
-            this.groupBox3.Size = new System.Drawing.Size(537, 288);
-            this.groupBox3.TabIndex = 1;
-            this.groupBox3.TabStop = false;
-            this.groupBox3.Text = "BlackBerry Tablet";
+            this.groupTablet.Controls.Add(this.lblTabletRegistration);
+            this.groupTablet.Controls.Add(this.label13);
+            this.groupTablet.Controls.Add(this.lnkMoreInfo);
+            this.groupTablet.Controls.Add(this.txtCskConfirmPassword);
+            this.groupTablet.Controls.Add(this.txtCskPassword);
+            this.groupTablet.Controls.Add(this.label11);
+            this.groupTablet.Controls.Add(this.txtCsjPin);
+            this.groupTablet.Controls.Add(this.label10);
+            this.groupTablet.Controls.Add(this.txtPbdtPath);
+            this.groupTablet.Controls.Add(this.label9);
+            this.groupTablet.Controls.Add(this.bttPbdtNavigate);
+            this.groupTablet.Controls.Add(this.bttRdkNavigate);
+            this.groupTablet.Controls.Add(this.bttCreateSigner);
+            this.groupTablet.Controls.Add(this.txtRdkPath);
+            this.groupTablet.Controls.Add(this.label8);
+            this.groupTablet.Controls.Add(this.label7);
+            this.groupTablet.Controls.Add(this.label12);
+            this.groupTablet.Location = new System.Drawing.Point(12, 12);
+            this.groupTablet.Name = "groupTablet";
+            this.groupTablet.Size = new System.Drawing.Size(537, 288);
+            this.groupTablet.TabIndex = 1;
+            this.groupTablet.TabStop = false;
+            this.groupTablet.Text = "BlackBerry Tablet";
+            this.groupTablet.Visible = false;
             // 
             // lblTabletRegistration
             // 
             this.lblTabletRegistration.AutoSize = true;
+            this.lblTabletRegistration.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(238)));
+            this.lblTabletRegistration.ForeColor = System.Drawing.Color.Navy;
             this.lblTabletRegistration.Location = new System.Drawing.Point(134, 264);
             this.lblTabletRegistration.Name = "lblTabletRegistration";
-            this.lblTabletRegistration.Size = new System.Drawing.Size(165, 13);
+            this.lblTabletRegistration.Size = new System.Drawing.Size(197, 13);
             this.lblTabletRegistration.TabIndex = 16;
             this.lblTabletRegistration.Text = "Registration has been completed.";
             // 
@@ -455,7 +475,8 @@
             // 
             // bttNavigate
             // 
-            this.bttNavigate.Location = new System.Drawing.Point(12, 398);
+            this.bttNavigate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttNavigate.Location = new System.Drawing.Point(12, 433);
             this.bttNavigate.Name = "bttNavigate";
             this.bttNavigate.Size = new System.Drawing.Size(75, 23);
             this.bttNavigate.TabIndex = 4;
@@ -469,12 +490,13 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bttOK;
-            this.ClientSize = new System.Drawing.Size(1104, 433);
+            this.ClientSize = new System.Drawing.Size(561, 468);
+            this.Controls.Add(this.cmbSections);
             this.Controls.Add(this.bttNavigate);
-            this.Controls.Add(this.groupBox3);
             this.Controls.Add(this.txtLog);
-            this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.bttOK);
+            this.Controls.Add(this.groupBlackBerry10);
+            this.Controls.Add(this.groupTablet);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -483,10 +505,10 @@
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Developer Registration";
-            this.groupBox2.ResumeLayout(false);
-            this.groupBox2.PerformLayout();
-            this.groupBox3.ResumeLayout(false);
-            this.groupBox3.PerformLayout();
+            this.groupBlackBerry10.ResumeLayout(false);
+            this.groupBlackBerry10.PerformLayout();
+            this.groupTablet.ResumeLayout(false);
+            this.groupTablet.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -505,11 +527,11 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtConfirmPassword;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.GroupBox groupBlackBerry10;
         private System.Windows.Forms.TextBox txtLog;
         private System.Windows.Forms.TextBox txtCertName;
         private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.GroupBox groupBox3;
+        private System.Windows.Forms.GroupBox groupTablet;
         private System.Windows.Forms.LinkLabel lnkMoreInfo;
         private System.Windows.Forms.TextBox txtCskConfirmPassword;
         private System.Windows.Forms.TextBox txtCskPassword;
@@ -532,5 +554,6 @@
         private System.Windows.Forms.Button bttNavigate;
         private System.Windows.Forms.Label lblTokenExpiration;
         private System.Windows.Forms.Label lblRegistration;
+        private System.Windows.Forms.ComboBox cmbSections;
     }
 }

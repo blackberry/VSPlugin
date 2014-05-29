@@ -181,7 +181,7 @@ namespace RIM.VSNDK_Package.Options
             ///////////////////////////////
             // REGISTER
 
-            var registrationForm = new RegistrationForm(_vm.Developer);
+            var registrationForm = new RegistrationForm(_vm.Developer, 0);
             registrationForm.ShowDialog();
 
             UpdateUI();

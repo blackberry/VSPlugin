@@ -11,7 +11,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private const string ValidationCaption = "Validation";
         private readonly DeveloperDefinition _developer;
 
-        public RegistrationForm(DeveloperDefinition developer)
+        public RegistrationForm(DeveloperDefinition developer, int startupSection)
         {
             if (developer == null)
                 throw new ArgumentNullException("developer");
@@ -23,13 +23,14 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             Password = _developer.CskPassword;
 
             if (_developer.HasCertificate)
-                Log("Found certificate: " + _developer.CertificateFullPath);
+                Log(string.Format("Found certificate:\r\n * \"{0}\"", _developer.CertificateFullPath));
             if (_developer.HasToken)
-                Log("Found BlackBerry 10 token (v: " + _developer.Token.Version + "): \"" + _developer.CskTokenFullPath + "\", from: " + _developer.Token.CreatedAtString);
+                Log(string.Format("Found BlackBerry 10 token:\r\n * \"{0}\"\r\n * version: {1}\r\n * created at: {2}", _developer.CskTokenFullPath, _developer.Token.Version, _developer.Token.CreatedAtString));
             if (_developer.HasTabletToken)
-                Log("Found Tablet token (v: " +_developer.TabletToken.Version + "): \"" + _developer.TabletCskTokenFullPath + "\", from: " + _developer.TabletToken.CreatedAtString);
+                Log(string.Format("Found Tablet token:\r\n * \"{0}\"\r\n * version: {1}\r\n * created at: {2}", _developer.TabletCskTokenFullPath, _developer.TabletToken.Version, _developer.TabletToken.CreatedAtString));
 
             UpdateUI();
+            ActivateSection(startupSection);
         }
 
         #region Properties
@@ -179,6 +180,11 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             bttCreateCertificate.Enabled = enabled;
             bttCreateSigner.Enabled = enabled;
             bttCreateToken.Enabled = enabled;
+        }
+
+        private void ActivateSection(int index)
+        {
+            cmbSections.SelectedIndex = index;
         }
 
         private void txtPassword_TextChanged(object sender, EventArgs e)
@@ -371,6 +377,25 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                         MessageBoxHelper.Show("Failed to create developer profile", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
+            }
+        }
+
+        private void cmbSections_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            switch (cmbSections.SelectedIndex)
+            {
+                case 0:
+                    groupBlackBerry10.Visible = true;
+                    groupTablet.Visible = false;
+                    ActiveControl = txtName;
+                    break;
+                case 1:
+                    groupBlackBerry10.Visible = false;
+                    groupTablet.Visible = true;
+                    ActiveControl = txtRdkPath;
+                    break;
+                default:
+                    throw new InvalidOperationException("Unsupported index to select");
             }
         }
     }
