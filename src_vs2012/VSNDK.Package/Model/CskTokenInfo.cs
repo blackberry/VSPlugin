@@ -33,10 +33,54 @@ namespace RIM.VSNDK_Package.Model
             private set;
         }
 
+        public bool HasContent
+        {
+            get { return !string.IsNullOrEmpty(Content); }
+        }
+
         public DateTime CreatedAt
         {
             get;
             private set;
+        }
+
+        public DateTime ValidTo
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets an indication, if the token is still valid.
+        /// </summary>
+        public bool IsValid
+        {
+            get { return DateTime.UtcNow < ValidTo; }
+        }
+
+        /// <summary>
+        /// Gets the string representation of the validation date.
+        /// </summary>
+        public string ValidDateString
+        {
+            get { return ValidTo.ToString("dd-MM-yyyy"); }
+        }
+
+        /// <summary>
+        /// Gets the number of days passed after the token validation date.
+        /// </summary>
+        public int ExpirationDays
+        {
+            get
+            {
+                if (IsValid)
+                    return 0;
+                if (ValidTo == DateTime.MinValue)
+                    return 365;
+
+                var diff = DateTime.UtcNow - ValidTo;
+                return (int) diff.TotalDays;
+            }
         }
 
         public string HMAC
@@ -104,6 +148,7 @@ namespace RIM.VSNDK_Package.Model
                     if (CertificateInfo.TryParseDate(line.Substring(1), out date))
                     {
                         result.CreatedAt = date;
+                        result.ValidTo = date.Date.AddYears(1); // BBID token is valid only for one year!
                     }
                 }
 

@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label1.Text" xml:space="preserve">
+    <value>To complete the registration both - BlackBerry ID token and developer certificate - are required. However if you created BlackBerry Signer at tablet's section, it can be also used to deploy and debug here.</value>
+  </data>
   <data name="label4.Text" xml:space="preserve">
     <value>Type the password to use with the BlackBerry token. The browser will open and you will be asked to create or login to your BlackBerry ID. Token can be used to sign applications and publish in BlackBerry AppWorld or to create debug-tokens, required for debugging purposes on real devices.</value>
   </data>

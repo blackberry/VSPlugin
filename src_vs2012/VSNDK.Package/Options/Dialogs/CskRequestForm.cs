@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using System.Windows.Forms;
+using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Model.Integration;
 
 namespace RIM.VSNDK_Package.Options.Dialogs
@@ -32,7 +34,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             private set;
         }
 
-        public string CskData
+        public CskTokenInfo Token
         {
             get;
             private set;
@@ -57,6 +59,8 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             e.Cancel = true;
 
             Invoke(new Action(RequestFailed));
+
+            TraceLog.WarnLine("Error {0}, while loading URL: \"{1}\"", e.StatusCode, e.Url);
         }
 
         /// <summary>
@@ -73,7 +77,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                     data[i] = HttpUtility.UrlDecode(data[i]);
 
                 StatusCode = 200;
-                CskData = FindContentFor(data, "cskData=");
+                Token = new CskTokenInfo(FindContentFor(data, "cskData="));
                 e.Cancel = true;
 
                 // And close the form

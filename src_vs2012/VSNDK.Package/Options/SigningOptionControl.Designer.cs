@@ -46,6 +46,7 @@
             this.bttChangeCert = new System.Windows.Forms.Button();
             this.bttNavigate = new System.Windows.Forms.Button();
             this.label4 = new System.Windows.Forms.Label();
+            this.lblStatus = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -54,6 +55,7 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.lblStatus);
             this.groupBox1.Controls.Add(this.bttUnregister);
             this.groupBox1.Controls.Add(this.bttRegister);
             this.groupBox1.Controls.Add(this.lblMore);
@@ -244,6 +246,16 @@
             this.label4.TabIndex = 8;
             this.label4.Text = resources.GetString("label4.Text");
             // 
+            // lblStatus
+            // 
+            this.lblStatus.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblStatus.Location = new System.Drawing.Point(234, 48);
+            this.lblStatus.Name = "lblStatus";
+            this.lblStatus.Size = new System.Drawing.Size(156, 45);
+            this.lblStatus.TabIndex = 4;
+            this.lblStatus.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+            // 
             // SigningOptionControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -279,5 +291,6 @@
         private System.Windows.Forms.Button bttRestore;
         private System.Windows.Forms.Button bttRefresh;
         private System.Windows.Forms.Button bttChangeCert;
+        private System.Windows.Forms.Label lblStatus;
     }
 }

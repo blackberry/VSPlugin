@@ -1,8 +1,10 @@
 ﻿using System;
 using System.IO;
 using System.IO.Packaging;
+using System.Text;
 using Microsoft.Win32;
 using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
 
 namespace RIM.VSNDK_Package.ViewModels
@@ -16,11 +18,15 @@ namespace RIM.VSNDK_Package.ViewModels
         /// Default name of the certificate file.
         /// </summary>
         internal const string DefaultCertificateName = "author.p12";
-        private const string DefaultCskName = "bbidtoken.csk";
+        private const string DefaultCskTokenName = "bbidtoken.csk";
+        private const string DefaultTabletSignerName = "barsigner.db";
+        private const string DefaultTabletCskTokenName = "barsigner.csk";
         private const string FieldCertificateFileName = "certificate";
         private const string FieldCskPassword = "CSKPass";
 
         private string _name;
+        private CskTokenInfo _cskToken;
+        private CskTokenInfo _cskTabletToken;
 
         public DeveloperDefinition(string dataPath, string certificatePath, string cskPassword)
         {
@@ -89,9 +95,71 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Gets full path to the BlackBerry ID token file (bbidtoken.csk).
         /// </summary>
-        public string BlackBerryTokenFullPath
+        public string CskTokenFullPath
         {
-            get { return Path.Combine(DataPath, DefaultCskName); }
+            get { return Path.Combine(DataPath, DefaultCskTokenName); }
+        }
+
+        /// <summary>
+        /// Gets full path do the BlackBerry Tablet Signer Authority file (barsigner.db).
+        /// </summary>
+        public string TabletSignerFullPath
+        {
+            get { return Path.Combine(DataPath, DefaultTabletSignerName); }
+        }
+
+        /// <summary>
+        /// Gets full path to the BlackBerry Tablet CSK token file (barsigner.csk).
+        /// </summary>
+        public string TabletCskTokenFullPath
+        {
+            get { return Path.Combine(DataPath, DefaultTabletCskTokenName); }
+        }
+
+        /// <summary>
+        /// Gets the BlackBerry ID token information.
+        /// </summary>
+        public CskTokenInfo Token
+        {
+            get
+            {
+                if (_cskToken == null)
+                    _cskToken = CskTokenInfo.Load(CskTokenFullPath);
+
+                return _cskToken;
+            }
+            private set { _cskToken = value; }
+        }
+
+        /// <summary>
+        /// Gets the BlackBerry Tablet token information.
+        /// </summary>
+        public CskTokenInfo TabletToken
+        {
+            get
+            {
+                if (_cskTabletToken == null)
+                    _cskTabletToken = CskTokenInfo.Load(TabletCskTokenFullPath);
+
+                return _cskTabletToken;
+            }
+            private set { _cskTabletToken = value; }
+        }
+
+        /// <summary>
+        /// Gets an indication, if BlackBerry ID token exists.
+        /// </summary>
+        public bool HasToken
+        {
+            get { return File.Exists(CskTokenFullPath) && Token != null; }
+        }
+
+        /// <summary>
+        /// Gets an indication, if BlackBerry Tablet token exists.
+        /// </summary>
+        public bool HasTabletToken
+        {
+            get { return File.Exists(TabletCskTokenFullPath) && TabletToken != null; }
         }
 
         /// <summary>
@@ -116,18 +184,27 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public bool IsRegistered
         {
-            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath) && File.Exists(BlackBerryTokenFullPath); }
+            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath) && File.Exists(CskTokenFullPath); }
         }
 
         /// <summary>
-        /// Checks if developer started registration and downloaded token file.
+        /// Checks if developer completed tablet registration.
         /// </summary>
-        public bool HasBlackBerryTokenFile
+        public bool IsTabletRegistered
         {
-            get { return File.Exists(BlackBerryTokenFullPath); }
+            get { return !string.IsNullOrEmpty(CertificateFileName) && File.Exists(CertificateFullPath) && File.Exists(TabletSignerFullPath) && File.Exists(TabletCskTokenFullPath); }
         }
 
         #endregion
+
+        /// <summary>
+        /// Invalidates loaded CSK tokens to force them load from disk again.
+        /// </summary>
+        public void InvalidateTokens()
+        {
+            Token = null;
+            TabletToken = null;
+        }
 
         /// <summary>
         /// Updates stored CSK password to a new value.
@@ -417,11 +494,12 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         private string[] GetProfileFiles()
         {
-            return new[] { CertificateFileName, "bbidtoken.csk", "barsigner.db",
-                                    "bbsigner.csk", "bb_id_rsa", "bb_id_rsa.pub",
+            return new[] { CertificateFileName, DefaultCskTokenName, "bbsigner.csk",
+                                    "bb_id_rsa", "bb_id_rsa.pub",
 
-                                    // PH: TODO: but I have also files: for tablets?
-                                    "barsigner.csk", "bbt_id_rsa", "bbt_id_rsa.pub"};
+                                    // and files for PlayBook tablet:
+                                    DefaultTabletCskTokenName, DefaultTabletSignerName,
+                                    "bbt_id_rsa", "bbt_id_rsa.pub"};
         }
 
         /// <summary>
@@ -505,6 +583,7 @@ namespace RIM.VSNDK_Package.ViewModels
                 {
                     // make the password invalid:
                     DeletePassword();
+                    Token = null;
 
                     // extract all files that are within the backup package:
                     using (var package = Package.Open(inputFile, FileMode.Open, FileAccess.ReadWrite))
@@ -571,19 +650,20 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Writes a BlackBerry ID token file.
         /// </summary>
-        public void SaveBlackBerryToken(string content)
+        public void SaveCskToken(CskTokenInfo token)
         {
-            if (string.IsNullOrEmpty(content))
-                throw new ArgumentNullException("content");
+            // update stored token in memory:
+            Token = token;
 
-            var fileName = BlackBerryTokenFullPath;
+            // and on disk:
+            var fileName = CskTokenFullPath;
 
             if (File.Exists(fileName))
                 File.Delete(fileName);
 
-            if (!string.IsNullOrEmpty(content))
+            if (token.HasContent)
             {
-                File.WriteAllText(fileName, content);
+                File.WriteAllText(fileName, token.Content);
             }
         }
 
@@ -606,6 +686,7 @@ namespace RIM.VSNDK_Package.ViewModels
             ClearPassword();
             CertificateFileName = null;
             Name = null;
+            Token = null;
         }
 
         /// <summary>
@@ -613,10 +694,56 @@ namespace RIM.VSNDK_Package.ViewModels
         /// </summary>
         public void CleanupProfile()
         {
-            if (!IsRegistered)
+            // if there is no certificate file, means all generators failed,
+            // so remove all other remaining files...
+            if (!File.Exists(CertificateFullPath))
             {
                 DeleteProfile();
             }
+        }
+
+        /// <summary>
+        /// Gets long description in human readable format.
+        /// </summary>
+        public string ToLongStatusDescription()
+        {
+             var result = new StringBuilder();
+
+            result.AppendLine("Status:");
+            result.Append(" * BlackBerry 10 - ").AppendLine(IsRegistered ? "registered" : (IsTabletRegistered ? "using tablet certificates" : "not registered"));
+            if (HasToken)
+            {
+                if (Token.IsValid)
+                    result.Append("  > token expires at ").AppendLine(Token.ValidDateString);
+                else
+                    result.Append("  > token expired ").Append(Token.ExpirationDays).AppendLine(" days ago");
+            }
+            result.Append(" * PlayBook - ").AppendLine(IsTabletRegistered ? "registered" : "not registered");
+
+            if (IsPasswordSaved)
+                result.AppendLine(" * password is stored");
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// Gets short description in human readable format.
+        /// </summary>
+        public string ToShortStatusDescription()
+        {
+            var result = new StringBuilder();
+
+            result.Append("BB10: ").AppendLine(IsRegistered ? "registered" : (IsTabletRegistered ? "using tablet certificates" : "not registered"));
+            if (HasToken)
+            {
+                if (Token.IsValid)
+                    result.Append(" (token expires at ").Append(Token.ValidDateString).AppendLine(")");
+                else
+                    result.Append(" (token expired ").Append(Token.ExpirationDays).AppendLine(" days ago)");
+            }
+            result.Append("PlayBook: ").Append(IsTabletRegistered ? "registered" : "not registered");
+
+            return result.ToString();
         }
     }
 }

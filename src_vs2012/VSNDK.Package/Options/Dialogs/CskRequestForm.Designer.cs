@@ -30,7 +30,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         /// </summary>
         private void InitializeComponent()
         {
-            this.webBrowser = new WebBrowserTurbo();
+            this.webBrowser = new RIM.VSNDK_Package.Model.Integration.WebBrowserTurbo();
             this.SuspendLayout();
             // 
             // webBrowser
@@ -42,7 +42,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             this.webBrowser.Size = new System.Drawing.Size(739, 424);
             this.webBrowser.TabIndex = 0;
             // 
-            // LoginForm
+            // CskRequestForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -53,7 +53,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Sign-in to create and download BlackBerry ID token";
+            this.Text = "Request BlackBerry ID token";
             this.ResumeLayout(false);
 
         }

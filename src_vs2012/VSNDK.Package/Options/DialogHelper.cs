@@ -58,6 +58,23 @@ namespace RIM.VSNDK_Package.Options
         }
 
         /// <summary>
+        /// Returns preconfigured window for opening CSJ files.
+        /// </summary>
+        public static OpenFileDialog OpenCsjFile(string startupPath, string title)
+        {
+            var openFile = new OpenFileDialog();
+            openFile.Title = title ?? "Opening CSJ file";
+            openFile.InitialDirectory = startupPath;
+            openFile.DefaultExt = ".csj";
+            openFile.Filter = "Code Signing files|*.csj;*.csk|Certificate files|*.p12|All files|*.*";
+            openFile.FilterIndex = 0;
+            openFile.CheckFileExists = true;
+            openFile.CheckPathExists = true;
+
+            return openFile;
+        }
+
+        /// <summary>
         /// Returns preconfigured window for saving BAR file.
         /// </summary>
         public static SaveFileDialog SaveBarFile(string title, string startupPath, string fileName)

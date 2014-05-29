@@ -39,9 +39,10 @@ namespace RIM.VSNDK_Package.Options
             CertificatePath = _vm.Developer.CertificateFileName;
             Author = _vm.Developer.Name;
 
-            bttRegister.Enabled = !_vm.Developer.IsRegistered;
-            bttUnregister.Enabled = !bttRegister.Enabled;
-            bttBackup.Enabled = bttUnregister.Enabled;
+            //bttRegister.Enabled = !_vm.Developer.IsRegistered;
+            //bttUnregister.Enabled = !bttRegister.Enabled;
+            //bttBackup.Enabled = bttUnregister.Enabled;
+            lblStatus.Text = _vm.Developer.ToShortStatusDescription();
 
             bttNavigate.Enabled = !string.IsNullOrEmpty(CertificatePath);
             bttDeletePassword.Enabled = _vm.Developer.IsPasswordSaved;
@@ -277,44 +278,20 @@ namespace RIM.VSNDK_Package.Options
 
         private void bttRegister_Click(object sender, EventArgs e)
         {
+            /*
             if (_vm.Developer.IsRegistered)
             {
                 MessageBoxHelper.Show("You are already registered, please unregister first, if you want to create new BlackBerry ID token!", "Registration",
                                       MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+             */
 
             ///////////////////////////////
             // REGISTER
 
-            var registrationForm = new RegistrationForm();
-
-            if (registrationForm.ShowDialog() == DialogResult.OK)
-            {
-                /*
-                var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, registrationForm.AuthorName, registrationForm.AuthorPassword, null);
-                var success = runner.Execute();
-
-                // finally, show result message:
-                if (success && string.IsNullOrEmpty(runner.LastError))
-                {
-                    if (!string.IsNullOrEmpty(runner.LastOutput))
-                    {
-                        MessageBoxHelper.Show(runner.LastOutput.Replace("CSK", "BB ID Token"), "Registered developer profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
-                else
-                {
-                    // clean-up files, in case something went wrong:
-                    _vm.Developer.CleanupProfile();
-
-                    if (!string.IsNullOrEmpty(runner.LastError))
-                    {
-                        MessageBoxHelper.Show(runner.LastError, "Failed to create developer profile", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-                 */
-            }
+            var registrationForm = new RegistrationForm(_vm.Developer);
+            registrationForm.ShowDialog();
 
             UpdateUI();
         }
