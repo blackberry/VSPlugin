@@ -172,6 +172,8 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             lblTokenExpiration.Text = _developer.HasToken ? "Token expires at: " + _developer.Token.ValidDateString : string.Empty;
 
             txtCertName.Text = _developer.CertificateFileName;
+            bttCreateToken.Enabled = true;
+            bttImportCertificate.Enabled = true;
             bttCreateCertificate.Enabled = !_developer.HasCertificate;
         }
 
@@ -348,36 +350,40 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             if (!CheckName(txtName))
                 return;
 
+            UpdateActionButtons(false);
+
             using (var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, AuthorName, Password, null))
             {
                 Log("Started certificate generation..." + Environment.NewLine);
                 var success = runner.Execute();
 
                 // print results:
+                if (runner.ExitCode != 0)
+                    Log("Exit code: " + runner.ExitCode);
                 if (!string.IsNullOrEmpty(runner.LastError))
                     Log(runner.LastError);
                 if (!string.IsNullOrEmpty(runner.LastOutput))
                     Log(runner.LastOutput);
 
                 Log("Certificate creation finished");
+
                 // show result message:
                 if (success && string.IsNullOrEmpty(runner.LastError))
                 {
                     _developer.UpdateCertificate(runner.CertificateFileName, txtCskPassword.Text, true);
 
-                    if (!string.IsNullOrEmpty(runner.LastOutput))
-                    {
-                        MessageBoxHelper.Show("Keystore certificate has been succesfully created", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
+                    MessageBoxHelper.Show("Keystore certificate has been succesfully created", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {
                     if (!string.IsNullOrEmpty(runner.LastError))
                     {
-                        MessageBoxHelper.Show("Failed to create developer profile", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBoxHelper.Show("Failed to create developer certificate", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
+
+            UpdateUI();
         }
 
         private void cmbSections_SelectedIndexChanged(object sender, EventArgs e)

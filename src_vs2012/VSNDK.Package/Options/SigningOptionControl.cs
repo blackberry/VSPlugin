@@ -154,7 +154,7 @@ namespace RIM.VSNDK_Package.Options
                 {
                     if (!string.IsNullOrEmpty(runner.LastOutput))
                     {
-                        MessageBoxHelper.Show(runner.LastOutput.Replace("CSK", "BB ID Token"), "Unregistered developer profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        MessageBoxHelper.Show(runner.LastOutput.Replace("CSK", "BlackBerry ID token"), "Unregistered developer profile", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                 }
                 else
