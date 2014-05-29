@@ -88,6 +88,12 @@ namespace RIM.VSNDK_Package.Tools
             get { return _isProcessing; } // using custom variable instead of _process.HasExited, as 'data processing' after tool termination should also indicate that state
         }
 
+        public int ExitCode
+        {
+            get;
+            private set;
+        }
+
         public string LastOutput
         {
             get;
@@ -134,7 +140,7 @@ namespace RIM.VSNDK_Package.Tools
                 throw new InvalidOperationException("No executable to start");
 
             PrepareExecution();
-            int exitCode = int.MinValue;
+            ExitCode = int.MinValue;
 
             try
             {
@@ -144,9 +150,9 @@ namespace RIM.VSNDK_Package.Tools
                 _process.BeginErrorReadLine();
                 _process.BeginOutputReadLine();
                 _process.WaitForExit();
-                exitCode = _process.ExitCode;
+                ExitCode = _process.ExitCode;
 
-                return exitCode == 0;
+                return ExitCode == 0;
             }
             catch (Exception ex)
             {
@@ -158,7 +164,7 @@ namespace RIM.VSNDK_Package.Tools
                 // release process resources:
                 _process.Close();
 
-                CompleteExecution(exitCode);
+                CompleteExecution();
             }
         }
 
@@ -170,6 +176,7 @@ namespace RIM.VSNDK_Package.Tools
                 throw new ObjectDisposedException("ToolRunner");
 
             PrepareExecution();
+            ExitCode = int.MinValue;
 
             try
             {
@@ -192,13 +199,13 @@ namespace RIM.VSNDK_Package.Tools
 
         private void AsyncProcessExited(object sender, EventArgs e)
         {
-            int exitCode = _process.ExitCode;
+            ExitCode = _process.ExitCode;
             _process.Exited -= AsyncProcessExited;
 
             // release process resources:
             _process.Close();
 
-            CompleteExecution(exitCode);
+            CompleteExecution();
         }
 
         private void NotifyFinished(int exitCode, string output, string error)
@@ -231,7 +238,7 @@ namespace RIM.VSNDK_Package.Tools
             PrepareStartup();
         }
 
-        private void CompleteExecution(int exitCode)
+        private void CompleteExecution()
         {
             var outputText = _output.Length > 0 ? _output.ToString() : null;
             var errorText = _error.Length > 0 ? _error.ToString() : null;
@@ -258,7 +265,7 @@ namespace RIM.VSNDK_Package.Tools
             ConsumeResults(outputText, errorText);
 
             // notify other listeners, in case they want to get something extra:
-            NotifyFinished(exitCode, outputText, errorText);
+            NotifyFinished(ExitCode, outputText, errorText);
 
             _isProcessing = false;
         }
