@@ -139,6 +139,7 @@ if %ActionGenScripts% equ 0 (goto skip_scripts)
 echo %actionNo%: Creating installation scripts
 
 if %ActionBuildVS2010% equ 0 (if %ActionGenScripts% neq 2 (goto skip_vs2010_scripts))
+echo Template...
 call :processTemplates 2010 10.0
 :skip_vs2010_scripts
 
@@ -216,7 +217,7 @@ set PluginPath=!PluginPath:)=^^)!
 REM Create empty file
 type nul > "%OutputFile%"
 
-for /f "tokens=* delims=" %%l in ("%InputFile%") do (
+for /f "tokens=* delims=" %%l in (%InputFile%) do (
   set line=%%l
 
   REM Inject empty line, so the sections are easier visible
