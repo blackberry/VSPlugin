@@ -21,6 +21,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <OutDir Condition="'$(OutDir)'=='' AND '$(SolutionDir)' == ''">$(IntDir)</OutDir>
   </PropertyGroup>
   
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Common.props" />
+  <Import Condition="Exists('$(VCTargetsPath)\Microsoft.Cpp.Common.props')"
+          Project="$(VCTargetsPath)\Microsoft.Cpp.Common.props" />
   
 </Project>
