@@ -95,6 +95,7 @@ namespace RIM.VSNDK_Package.Model.Integration
             var command = (DynamicMenuCommand)sender;
 
             int index = command.MatchedCommandId == 0 ? 0 : command.MatchedCommandId - command.CommandID.ID;
+            command.MatchedCommandId = 0;
 
             // and ask for further status update:
             command._processedQueryStatus(command, command.Collection, index);
@@ -105,6 +106,7 @@ namespace RIM.VSNDK_Package.Model.Integration
             var command = (DynamicMenuCommand) sender;
 
             int index = command.MatchedCommandId == 0 ? 0 : command.MatchedCommandId - command.CommandID.ID;
+            command.MatchedCommandId = 0;
 
             // and notify about selection made:
             if (command._invokeHandler != null)
