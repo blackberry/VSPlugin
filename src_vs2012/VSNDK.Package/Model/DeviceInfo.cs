@@ -223,7 +223,7 @@ namespace RIM.VSNDK_Package.Model
                                     if (string.IsNullOrEmpty(result.ModelName))
                                         result.ModelName = "PlayBook";
                                     if (string.IsNullOrEmpty(result.ModelNumber))
-                                        result.ModelNumber = "STL100-0";
+                                        result.ModelNumber = "STL100-0"; // copied from Z10
                                     if (result.ScreenDPI == 0)
                                         result.ScreenDPI = 167;
                                     if (result.ScreenResolution.IsEmpty)

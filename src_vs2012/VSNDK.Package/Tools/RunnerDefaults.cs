@@ -31,11 +31,14 @@ namespace RIM.VSNDK_Package.Tools
 
             ToolsDirectory = Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
             NdkDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
+            // this would probably be much safer, when enumerating all folders and finding one with 'java.exe' or 'jre' in the name
             JavaHome = Path.Combine(NdkDirectory, "features", "com.qnx.tools.jre.win32_1.6.0.43", "jre");
 
             // the base data folder is different for each platform...
             if (IsWindowsXP)
             {
+                // HINT: in general LocalApplicationData should point to similar path...
+                // but if you use localized version of Windows XP, the folder is different ;)
                 DataDirectory = Path.Combine(Environment.ExpandEnvironmentVariables("%HomeDrive%%HomePath%"), "Local Settings", "Application Data", "Research In Motion");
             }
             else
