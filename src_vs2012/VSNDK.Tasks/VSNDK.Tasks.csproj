@@ -147,33 +147,43 @@
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.default.props">
       <Link>BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.default.props</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets">
       <Link>BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.props">
       <Link>BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.props</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.targets">
       <Link>BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets">
       <Link>BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerry\Microsoft.Cpp.BlackBerry.default.props">
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.default.props</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerry\Microsoft.Cpp.BlackBerry.props">
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.props</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerry\Microsoft.Cpp.BlackBerry.targets">
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="..\..\src\VSNDK.Tasks\BlackBerry\Microsoft.CppBuild.BlackBerry.targets">
       <Link>BlackBerry\Microsoft.CppBuild.BlackBerry.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props">
       <SubType>Designer</SubType>
@@ -196,57 +206,75 @@
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\debugger_ndk.xml">
       <Link>BlackBerrySimulator\Rules\debugger_ndk.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml">
       <Link>BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\ndk_directories.xml">
       <Link>BlackBerrySimulator\Rules\ndk_directories.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\ndk_general.xml">
       <Link>BlackBerrySimulator\Rules\ndk_general.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\ndk_general_ps.xml">
       <Link>BlackBerrySimulator\Rules\ndk_general_ps.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\packager.xml">
       <Link>BlackBerrySimulator\Rules\packager.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\qcc_cl.xml">
       <Link>BlackBerrySimulator\Rules\qcc_cl.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\qcc_lib.xml">
       <Link>BlackBerrySimulator\Rules\qcc_lib.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerrySimulator\Rules\qcc_link.xml">
       <Link>BlackBerrySimulator\Rules\qcc_link.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\debugger_ndk.xml">
       <Link>BlackBerry\Rules\debugger_ndk.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\ndkProjectItemsSchema.xml">
       <Link>BlackBerry\Rules\ndkProjectItemsSchema.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\ndk_directories.xml">
       <Link>BlackBerry\Rules\ndk_directories.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\ndk_general.xml">
       <Link>BlackBerry\Rules\ndk_general.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\ndk_general_ps.xml">
       <Link>BlackBerry\Rules\ndk_general_ps.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\packager.xml">
       <Link>BlackBerry\Rules\packager.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\qcc_cl.xml">
       <Link>BlackBerry\Rules\qcc_cl.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\qcc_lib.xml">
       <Link>BlackBerry\Rules\qcc_lib.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src\VSNDK.Tasks\BlackBerry\Rules\qcc_link.xml">
       <Link>BlackBerry\Rules\qcc_link.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
