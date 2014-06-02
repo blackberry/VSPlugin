@@ -326,6 +326,12 @@
     <Compile Include="Options\Dialogs\InstallNdkForm.Designer.cs">
       <DependentUpon>InstallNdkForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Options\Dialogs\InstallSimulatorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\InstallSimulatorForm.Designer.cs">
+      <DependentUpon>InstallSimulatorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\Dialogs\PasswordForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -433,6 +439,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\CskRequestForm.resx">
       <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\InstallSimulatorForm.resx">
+      <DependentUpon>InstallSimulatorForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Logo.png" />
     <None Include="VSNDK.Package.Bitmaps.vsct" />

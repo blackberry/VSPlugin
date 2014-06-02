@@ -34,6 +34,7 @@
             this.bttAddLocal = new System.Windows.Forms.Button();
             this.bttInstallNew = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
+            this.bttNewSimulator = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // txtDescription
@@ -74,7 +75,7 @@
             // bttAddLocal
             // 
             this.bttAddLocal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttAddLocal.Location = new System.Drawing.Point(292, 284);
+            this.bttAddLocal.Location = new System.Drawing.Point(168, 284);
             this.bttAddLocal.Name = "bttAddLocal";
             this.bttAddLocal.Size = new System.Drawing.Size(118, 23);
             this.bttAddLocal.TabIndex = 4;
@@ -85,11 +86,11 @@
             // bttInstallNew
             // 
             this.bttInstallNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttInstallNew.Location = new System.Drawing.Point(416, 284);
+            this.bttInstallNew.Location = new System.Drawing.Point(292, 284);
             this.bttInstallNew.Name = "bttInstallNew";
             this.bttInstallNew.Size = new System.Drawing.Size(118, 23);
             this.bttInstallNew.TabIndex = 5;
-            this.bttInstallNew.Text = "&Install New...";
+            this.bttInstallNew.Text = "Install &NDK...";
             this.bttInstallNew.UseVisualStyleBackColor = true;
             this.bttInstallNew.Click += new System.EventHandler(this.bttInstallNew_Click);
             // 
@@ -102,6 +103,17 @@
             this.label2.TabIndex = 0;
             this.label2.Text = "Select the API Level that your application supports.";
             // 
+            // bttNewSimulator
+            // 
+            this.bttNewSimulator.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttNewSimulator.Location = new System.Drawing.Point(416, 284);
+            this.bttNewSimulator.Name = "bttNewSimulator";
+            this.bttNewSimulator.Size = new System.Drawing.Size(118, 23);
+            this.bttNewSimulator.TabIndex = 5;
+            this.bttNewSimulator.Text = "Install &Simulator...";
+            this.bttNewSimulator.UseVisualStyleBackColor = true;
+            this.bttNewSimulator.Click += new System.EventHandler(this.bttNewSimulator_Click);
+            // 
             // ApiLevelOptionControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -111,6 +123,7 @@
             this.Controls.Add(this.cmbNDKs);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.bttAddLocal);
+            this.Controls.Add(this.bttNewSimulator);
             this.Controls.Add(this.bttInstallNew);
             this.Name = "ApiLevelOptionControl";
             this.Size = new System.Drawing.Size(537, 310);
@@ -127,5 +140,6 @@
         private System.Windows.Forms.Button bttAddLocal;
         private System.Windows.Forms.Button bttInstallNew;
         private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Button bttNewSimulator;
     }
 }
