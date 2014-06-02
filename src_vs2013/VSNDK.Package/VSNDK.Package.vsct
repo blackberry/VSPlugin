@@ -1,39 +1,32 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <!--  This is the file that defines the actual layout and type of the commands.
+    <!--  This is the file that defines the actual layout and type of the commands.
         It is divided in different sections (e.g. command definition, command
         placement, ...), with each defining a specific set of properties.
         See the comment before each section for more details about how to
         use it. -->
 
-  <!--  The VSCT compiler (the tool that translates this file into the binary 
+    <!--  The VSCT compiler (the tool that translates this file into the binary 
         format that VisualStudio will consume) has the ability to run a preprocessor 
         on the vsct file; this preprocessor is (usually) the C++ preprocessor, so 
         it is possible to define includes and macros with the same syntax used 
         in C++ files. Using this ability of the compiler here, we include some files 
         defining some of the constants that we will use inside the file. -->
 
-  <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
-  <Extern href="stdidcmd.h" />
+    <Extern href="stdidcmd.h" />
+    <Extern href="vsshlids.h" />
 
-  <!--This header contains the command ids for the menus provided by the shell. -->
-  <Extern href="vsshlids.h" />
+    <!--Defines VK_INSERT -->
+    <Extern href="virtkeys.h" />
 
-  <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
-  <!--<Extern href="msobtnid.h" xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" />-->
+    <Include href="../../src_vs2012/VSNDK.Package/VSNDK.Package.Bitmaps.vsct"/>
+    <Include href="../../src_vs2012/VSNDK.Package/VSNDK.Package.Menu.vsct"/>
 
-
-  <!--Defines VK_INSERT -->
-  <Extern href="virtkeys.h" />
-  
-
-
-
-  <!--The Commands section is where we the commands, menus and menu groups are defined.
+    <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
-  <Commands package="guidVSNDK_PackagePkg">
-    <!-- Inside this section we have different sub-sections: one for the menus, another  
+    <Commands package="guidVSNDK_PackageString">
+        <!-- Inside this section we have different sub-sections: one for the menus, another  
     for the menu groups, one for the buttons (the actual commands), one for the combos 
     and the last one for the bitmaps used. Each element is identified by a command id that  
     is a unique pair of guid and numeric identifier; the guid part of the identifier is usually  
@@ -41,112 +34,21 @@
     group; your package should define its own command set in order to avoid collisions  
     with command ids defined by other packages. -->
 
-    <!--This is the sub-section that defines the menus and toolbars.-->
-    <Menus>
-      <!--  To define an element in this group you need an ID, a parent group, a display priority,
-            a menu type, a name and a default text. -->
-      <!-- BlackBerry Top menu-->
-      <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" priority="0x0000" type="Menu">
-        <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
-        <Strings>
-          <ButtonText>BlackBerry</ButtonText>
-          <CommandName>BlackBerry</CommandName>
-        </Strings>
-      </Menu> 
-      
-    </Menus>
-    
-    <!-- In this section you can define new menu groups. A menu group is a container for 
-         other menus or buttons (commands); from a visual point of view you can see the 
-         group as the part of a menu contained between two lines. The parent of a group 
-         must be a menu. -->
-    <Groups>
+        <!--This is the sub-section that defines the menus and toolbars.-->
+        <Menus>
+            <!-- BlackBerry Top Menu -->
+            <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" priority="0x0000" type="Menu">
+                <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+                <Strings>
+                    <ButtonText>&amp;BlackBerry</ButtonText>
+                </Strings>
+            </Menu>
 
-      <Group guid="guidVSNDK_PackageCmdSet" id="BlackBerryMenuGroup" priority="0x0600">
-        <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" />
-      </Group>
+        </Menus>
 
-      <Group guid="guidVSNDK_PackageCmdSet" id="BlackBerryContextMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
-      </Group>
+    </Commands>
 
-    </Groups>
-    
-    <!--Buttons section. -->
-    <!--This section defines the elements the user can interact with, like a menu command or a button 
-        or combo box in a toolbar. -->
-    <Buttons>
-      <!--To define a menu group you have to specify its ID, the parent menu and its display priority. 
-          The command is visible and enabled by default. If you need to change the visibility, status, etc, you can use
-          the CommandFlag node.
-          You can add more than one CommandFlag node e.g.:
-              <CommandFlag>DefaultInvisible</CommandFlag>
-              <CommandFlag>DynamicVisibility</CommandFlag>
-          If you do not want an image next to your command, remove the Icon node or set it to <Icon guid="guidOfficeIcon" id="msotcidNoIcon" /> -->
-
-      <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTools" priority="0x0100" type="Button">
-        <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryMenuGroup" />
-        <Strings>
-          <CommandName>cmdidBlackBerryTools</CommandName>
-          <ButtonText>Signing</ButtonText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerrySettings" priority="0x0101" type="Button">
-        <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryMenuGroup" />
-        <Strings>
-          <CommandName>cmdidBlackBerrySettings</CommandName>
-          <ButtonText>Settings</ButtonText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryDebugToken" priority="0x0103" type="Button">
-        <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryMenuGroup" />
-        <Strings>
-          <CommandName>cmdidBlackBerryDebugToken</CommandName>
-          <ButtonText>Debug Tokens</ButtonText>
-        </Strings>
-      </Button>
-
-      <Button guid="guidVSNDK_PackageCmdSet" id="cmdidfooLocalBox" priority="0x0100" type="Button">
-        <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryContextMenuGroup" />
-        <!-- <Icon guid="guidImages" id="bmpPic1" /> -->
-        <CommandFlag>DynamicVisibility</CommandFlag>
-        <Strings>
-          <CommandName>cmdidfooLocalBox</CommandName>
-          <ButtonText>Import BlackBerry Core Native Project</ButtonText>
-        </Strings>
-      </Button>
-    </Buttons>
-   
-    <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
-    <Bitmaps>
-      <!--  The bitmap id is defined in a way that is a little bit different from the others: 
-            the declaration starts with a guid for the bitmap strip, then there is the resource id of the 
-            bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
-            inside a button definition. An important aspect of this declaration is that the element id 
-            must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="..\..\src\VSNDK.Package\Resources\Images_32bit.bmp" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows" />
-
-    </Bitmaps>
- 
-  </Commands>
-
-
-  <!--  Within this section you can specify the set of commands defined somewhere else that your  
-        packages uses; for instance if your package uses the standard ‘Copy’ command, you don’t  
-        need to define it, because it is defined by the shell, but you have to use this section  
-        of the VSCT file to notify the shell that your package uses it using this section. -->
-  <!--  Note that with combo boxes we have effectively two commands in one. Below 
-        we have two pairs of commands; 1st pair commandIDFontName and commandIDFontNameHandler, 
-        2nd pair commandIDFontSize and commandIDFontSizeHandler. Note that: 
-        
-        - commandIDFontName and commandIDFontSize handle the displaying and setting of the font 
-          name and font size respectively 
-        - commandIDFontNameHandler and commandIDFontSizeHandler fill the drop down menus 
-          with the available font names and font sizes respectively 
-     -->
-  <!-- Note also that VS will call QueryStatus only on commandIDFontName and  
+    <!-- Note also that VS will call QueryStatus only on commandIDFontName and  
        commandIDFontSize, but not on cmdFontNameHandler and commandIDFontSizeHandler whereas 
        Exec will be called on all four commands. 
        Note also that Exec will be called for commandIDFontName and commandIDFontSize for 
@@ -155,48 +57,22 @@
        commandIDFontSizeHandler always have the same meaning - fill the drop down menu. 
        Finally, note that placement for the combo boxes is defined in the combo 
        section below by the priority and not in the CommandPlacements section. -->
-  <UsedCommands>
-    <UsedCommand guid="guidVSStd97" id="cmdidBold" />
-    <UsedCommand guid="guidVSStd97" id="cmdidItalic" />
-    <UsedCommand guid="guidVSStd97" id="cmdidUnderline" />
-    <UsedCommand guid="guidVSStd97" id="cmdidJustifyLeft" />
-    <UsedCommand guid="guidVSStd97" id="cmdidJustifyCenter" />
-    <UsedCommand guid="guidVSStd97" id="cmdidJustifyRight" />
-    <UsedCommand guid="guidVSStd97" id="cmdidFontName" />
-    <UsedCommand guid="guidVSStd97" id="cmdidFontSize" />
-    <UsedCommand guid="guidVSStd97" id="cmdidCut" />
-    <UsedCommand guid="guidVSStd97" id="cmdidCopy" />
-    <UsedCommand guid="guidVSStd97" id="cmdidPaste" />
-    <UsedCommand guid="guidVSStd97" id="cmdidDelete" />
-    <UsedCommand guid="guidVSStd2K" id="ECMD_INSERT" />
-    <UsedCommand guid="guidVSStd2K" id="ECMD_BULLETEDLIST" />
-  </UsedCommands>
-
-  <Symbols>
-    <!-- This is the package guid. -->
-    <GuidSymbol name="guidVSNDK_PackagePkg" value="{db9f9c5f-fb27-4297-ab44-fa8774e962ca}" />
-    
-    <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidVSNDK_PackageCmdSet" value="{d531fe01-f48e-443d-8ea1-1530a352525f}">
-      <IDSymbol name="BlackBerryMenuGroup" value="0x1020" />
-      <IDSymbol name="cmdidBlackBerryTools" value="0x0100" />
-      <IDSymbol name="cmdidBlackBerrySettings" value="0x0101" />
-      <IDSymbol name="cmdidBlackBerryDebugToken" value="0x0103" />
-      <IDSymbol name="cmdidBlackBerryProjectImport" value="0x0104" />
-      <IDSymbol name="BlackBerryTopMenu" value="0x0105" />
-      <IDSymbol name="cmdidfooLocalBox" value="0x0200" />
-      <IDSymbol name="BlackBerryContextMenuGroup" value="0x0106" />
-    </GuidSymbol>
-    
-    <GuidSymbol name="guidVSNDK_PackageEditorFactory" value="{9e985c5e-5b53-4cb1-bcd0-40a56f18eb4d}" />
-    
-    <GuidSymbol name="guidImages" value="{0dba7f01-b9d0-4ad4-bcf6-8e5151b9d84b}">
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-    </GuidSymbol>
-  </Symbols>
+    <UsedCommands>
+        <UsedCommand guid="guidVSStd97" id="cmdidBold" />
+        <UsedCommand guid="guidVSStd97" id="cmdidItalic" />
+        <UsedCommand guid="guidVSStd97" id="cmdidUnderline" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyLeft" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyCenter" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyRight" />
+        <UsedCommand guid="guidVSStd97" id="cmdidFontName" />
+        <UsedCommand guid="guidVSStd97" id="cmdidFontSize" />
+        <UsedCommand guid="guidVSStd97" id="cmdidCut" />
+        <UsedCommand guid="guidVSStd97" id="cmdidCopy" />
+        <UsedCommand guid="guidVSStd97" id="cmdidPaste" />
+        <UsedCommand guid="guidVSStd97" id="cmdidDelete" />
+        <UsedCommand guid="guidVSStd2K" id="ECMD_INSERT" />
+        <UsedCommand guid="guidVSStd2K" id="ECMD_BULLETEDLIST" />
+    </UsedCommands>
 
 </CommandTable>
+

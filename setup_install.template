@@ -1,9 +1,9 @@
 REGEDIT4
 
-[HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin]
-"device_password"="AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA7fSRRS7m1Em+yoK0ioAYhwQAAAACAAAAAAADZgAAwAAAABAAAAAb9QNNQPNG1qB5uDOFabBjAAAAAASAAACgAAAAEAAAAOu49T6nbn0mHnBMoGvre5cIAAAA2NG7RxOCGYgUAAAAi84MGQ9ELFYdXZ5pOhVSayDK2V4="
+[HKEY_CURRENT_USER\SOFTWARE\BlackBerry\#PluginRegistryNodeName#]
+"device_password"=""
 "device_IP"="169.254.0.1"
-"simulator_password"="AQAAANCMnd8BFdERjHoAwE/Cl+sBAAAA7fSRRS7m1Em+yoK0ioAYhwQAAAACAAAAAAADZgAAwAAAABAAAAAb9QNNQPNG1qB5uDOFabBjAAAAAASAAACgAAAAEAAAAOu49T6nbn0mHnBMoGvre5cIAAAA2NG7RxOCGYgUAAAAi84MGQ9ELFYdXZ5pOhVSayDK2V4="
+"simulator_password"=""
 "simulator_IP"=""
 "NDKHostPath"=""
 "NDKTargetPath"=""
@@ -27,34 +27,34 @@ REGEDIT4
 "guidCOMPlusOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
 "guidCOMPlusNativeEng"="{92EF0900-2251-11D2-B72E-0000F87572EF}"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\CLSID\{AD06FD46-C790-4D5C-A274-8815DF9511B8}]
-"CodeBase"="C:\\Program Files (x86)\\BlackBerry\\VSPlugin-NDK\\VSNDK.DebugEngine.dll"
-"InprocServer32"="c:\\windows\\system32\\mscoree.dll"
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\CLSID\{AD06FD46-C790-4D5C-A274-8815DF9511B8}]
+"CodeBase"="#PluginPath#\\VSNDK.DebugEngine.dll"
+"InprocServer32"="C:\\Windows\\System32\\mscoree.dll"
 "Class"="VSNDK.DebugEngine.AD7ProgramProvider"
 "Assembly"="VSNDK.DebugEngine"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\CLSID\{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}]
-"CodeBase"="C:\\Program Files (x86)\\BlackBerry\\VSPlugin-NDK\\VSNDK.DebugEngine.dll"
-"InprocServer32"="c:\\windows\\system32\\mscoree.dll"
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\CLSID\{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}]
+"CodeBase"="#PluginPath#\\VSNDK.DebugEngine.dll"
+"InprocServer32"="C:\\Windows\\System32\\mscoree.dll"
 "Class"="VSNDK.DebugEngine.AD7Engine"
 "Assembly"="VSNDK.DebugEngine"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\CLSID\{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\CLSID\{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}]
 @="BlackBerrySupplier"
 "Assembly"="VSNDK.DebugEngine"
 "Class"="VSNDK.DebugEngine.AD7PortSupplier"
-"InprocServer32"="c:\\windows\\system32\\mscoree.dll"
-"CodeBase"="C:\\Program Files (x86)\\BlackBerry\\VSPlugin-NDK\\VSNDK.DebugEngine.dll"
+"InprocServer32"="C:\\Windows\\System32\\mscoree.dll"
+"CodeBase"="#PluginPath#\\VSNDK.DebugEngine.dll"
 "ThreadingModel"="Free"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\AD7Metrics\PortSupplier\{92A2B753-00BD-40FF-9964-6AB64A1D6C9F}]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\PortSupplier\{92A2B753-00BD-40FF-9964-6AB64A1D6C9F}]
 "Name"="BlackBerry"
 "DisallowUserEnteredPorts"=dword:00000000
 "CLSID"="{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}"
 @="Visual Studio Plug-in for BlackBerry"
 "PortPickerCLSID"="{3FAA02D6-72D8-4F69-A1E6-BB05ECB4E37A}"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}]
 "AlwaysLoadLocal"="1"
 "PortSupplier"="{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}"
 "Name"="VSNDK Debug Engine"
@@ -66,25 +66,25 @@ REGEDIT4
 "CLSID"="{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}"
 @="guidDebuggingSampleEngine"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}\IncompatibleList]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}\IncompatibleList]
 "guidScriptEng"="{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}"
 "guidNativeOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
 "guidCOMPlusOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
 "guidCOMPlusNativeEng"="{92EF0900-2251-11D2-B72E-0000F87572EF}"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\12.0\CLSID\{AD06FD46-C790-4D5C-A274-8815DF9511B8}]
-"CodeBase"="C:\\Program Files (x86)\\BlackBerry\\VSPlugin-NDK\\VSNDK.DebugEngine.dll"
-"InprocServer32"="c:\\windows\\system32\\mscoree.dll"
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\#VSVersion#\CLSID\{AD06FD46-C790-4D5C-A274-8815DF9511B8}]
+"CodeBase"="#PluginPath#\\VSNDK.DebugEngine.dll"
+"InprocServer32"="C:\\Windows\\System32\\mscoree.dll"
 "Class"="VSNDK.DebugEngine.AD7ProgramProvider"
 "Assembly"="VSNDK.DebugEngine"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\12.0\CLSID\{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}]
-"CodeBase"="C:\\Program Files (x86)\\BlackBerry\\VSPlugin-NDK\\VSNDK.DebugEngine.dll"
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\#VSVersion#\CLSID\{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}]
+"CodeBase"="#PluginPath#\\VSNDK.DebugEngine.dll"
 "Assembly"="VSNDK.DebugEngine"
 "Class"="VSNDK.DebugEngine.AD7Engine"
-"InprocServer32"="c:\\windows\\system32\\mscoree.dll"
+"InprocServer32"="C:\\Windows\\System32\\mscoree.dll"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}]
 "Attach"=dword:00000001
 "ProgramProvider"="{AD06FD46-C790-4D5C-A274-8815DF9511B8}"
 "CLSID"="{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}"
@@ -96,7 +96,7 @@ REGEDIT4
 "CallstackBP"=dword:00000001
 "AddressBP"=dword:00000000
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\12.0\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}\IncompatibleList]
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}\IncompatibleList]
 "guidNativeOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
 "guidCOMPlusOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
 "guidScriptEng"="{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}"

@@ -103,7 +103,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <RegisterOutput>true</RegisterOutput>
+      <RegisterOutput>false</RegisterOutput>
       <AdditionalDependencies>psapi.lib;$(VSInstallDir)\DIA SDK\lib\diaguids.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>GDBParser.def</ModuleDefinitionFile>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -116,7 +116,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(ProjectDir)Instructions.txt" "$(OutputPath)" /d /y </Command>
+      <Command>xcopy "$(ProjectDir)..\..\src\GDBParser\Instructions.txt" "$(OutputPath)" /d /y </Command>
       <Message>Copying Instructions.txt to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -146,7 +146,9 @@
   <ItemGroup>
     <None Include="GDBParser.def" />
     <None Include="GDBParser.rgs" />
-    <None Include="..\..\src\GDBParser\Instructions.txt" />
+    <None Include="..\..\src\GDBParser\Instructions.txt">
+      <DeploymentContent>false</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\GDBParser\ComponentException.h" />

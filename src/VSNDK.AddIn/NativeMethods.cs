@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 
 namespace Microsoft.VisualStudio.Project
 {
-	public static class NativeMethods
+    internal static class NativeMethods
 	{
 		// IIDS
 		public static readonly Guid IID_IUnknown = new Guid("{00000000-0000-0000-C000-000000000046}");
