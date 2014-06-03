@@ -95,7 +95,7 @@ namespace RIM.VSNDK_Package.Model
         /// </summary>
         public static ApiInfo CreateTabletInfo()
         {
-            return new ApiInfo("BlackBerry Native SDK for Tablet OS 2.1.0", new Version(2, 1, 0));
+            return new ApiInfo("BlackBerry Native SDK for Tablet OS 2.1.0", new Version(2, 1, 0, 1032));
         }
     }
 }
