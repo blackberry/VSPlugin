@@ -10,7 +10,7 @@ namespace RIM.VSNDK_Package.Model
     /// <summary>
     /// Descriptor of a locally installed NDK.
     /// </summary>
-    internal sealed class NdkInfo : ApiInfo, IComparable<NdkInfo>
+    internal sealed class NdkInfo : ApiInfo
     {
         private const string DescriptorFileName = "blackberry-sdk-descriptor.xml";
 
@@ -91,22 +91,22 @@ namespace RIM.VSNDK_Package.Model
             private set;
         }
 
-        #endregion
-
-        /// <summary>
-        /// Checks if given NDK is really available.
-        /// </summary>
-        public bool Exists()
+        public override bool IsInstalled
         {
-            try
+            get
             {
-                return Directory.Exists(HostPath) && Directory.Exists(TargetPath);
-            }
-            catch
-            {
-                return false;
+                try
+                {
+                    return Directory.Exists(HostPath) && Directory.Exists(TargetPath);
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Compares two paths, if they are identical.
@@ -290,7 +290,7 @@ namespace RIM.VSNDK_Package.Model
                                     using (var reader = XmlReader.Create(fileReader))
                                     {
                                         var info = Load(file, reader);
-                                        if (info != null && info.Exists())
+                                        if (info != null && info.IsInstalled)
                                         {
                                             var existingIndex = IndexOf(result, info);
 
@@ -336,7 +336,7 @@ namespace RIM.VSNDK_Package.Model
         /// </summary>
         public static int IndexOf(IEnumerable<NdkInfo> list, NdkInfo info)
         {
-            if (info != null)
+            if (info != null && list != null)
             {
                 int i = 0;
                 foreach (var item in list)
@@ -350,22 +350,25 @@ namespace RIM.VSNDK_Package.Model
         }
 
         /// <summary>
-        /// Compares the current object with another object of the same type.
+        /// Returns an index of NdkInfo inside a collection that has the same version.
         /// </summary>
-        /// <returns>
-        /// A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
-        /// </returns>
-        /// <param name="other">An object to compare with this object.</param>
-        public int CompareTo(NdkInfo other)
+        public static int IndexOf(IEnumerable<NdkInfo> list, Version version)
         {
-            if (other == null)
-                return 1;
+            if (version == null)
+                throw new ArgumentNullException("version");
 
-            int cmp = Version.CompareTo(other.Version);
-            if (cmp != 0)
-                return cmp;
+            if (list != null)
+            {
+                int i = 0;
+                foreach (var item in list)
+                {
+                    if (item.Version == version)
+                        return i;
+                    i++;
+                }
+            }
 
-            return string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
+            return -1;
         }
 
         /// <summary>
