@@ -164,5 +164,18 @@ namespace RIM.VSNDK_Package.ViewModels
 
             PackageViewModel.Instance.UpdateManager.Request(UpdateActions.Install, UpdateActionTargets.NDK, info.Version);
         }
+
+        /// <summary>
+        /// Removes the reference, created by developer some time ago.
+        /// </summary>
+        public void Forget(ApiInfo info)
+        {
+            var ndkInfo = info as NdkInfo;
+
+            if (ndkInfo != null)
+            {
+                PackageViewModel.Instance.Forget(ndkInfo);
+            }
+        }
     }
 }

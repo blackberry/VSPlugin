@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Tools;
@@ -130,12 +131,21 @@ namespace RIM.VSNDK_Package.ViewModels
                 if (value != null && !value.Matches(_activeNDK) && InstalledNDKs.Length > 0)
                 {
                     var index = IndexOfInstalled(value);
-                    if (index < 0)
-                        throw new ArgumentOutOfRangeException("value", "Invalid value set, it must belong to the InstalledNDKs first");
-
-                    _activeNDK = _installedNDKs[index];
-                    TraceLog.WriteLine("Changed active NDK to: \"{0}\"", _activeNDK);
-                    SaveActiveNDK();
+                    if (index >= 0)
+                    {
+                        _activeNDK = _installedNDKs[index];
+                        TraceLog.WriteLine("Changed active NDK to: \"{0}\"", _activeNDK);
+                        SaveActiveNDK();
+                    }
+                    else
+                    {
+                        if (_activeNDK != null)
+                        {
+                            TraceLog.WriteLine("Removed active NDK: \"{0}\"", _activeNDK);
+                            _activeNDK = null;
+                            SaveActiveNDK();
+                        }
+                    }
                 }
             }
         }
@@ -267,6 +277,7 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             if (_activeNDK == null || !_activeNDK.IsInstalled)
             {
+                NdkDefinition.Delete();
                 TraceLog.WarnLine("Invalid NDK to set as active!");
                 return;
             }
@@ -304,6 +315,28 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             _installedNDKs = null;
             _activeNDK = null;
+        }
+
+        /// <summary>
+        /// Removes custom reference to existing NDK, created by developer some time ago.
+        /// </summary>
+        public void Forget(NdkInfo info)
+        {
+            if (info == null)
+                throw new ArgumentNullException("info");
+            if (string.IsNullOrEmpty(info.FilePath))
+                return;
+
+            try
+            {
+                if (File.Exists(info.FilePath))
+                    File.Delete(info.FilePath);
+                ResetNDKs();
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Problem removing file: \"{0}\"", info.FilePath);
+            }
         }
     }
 }
