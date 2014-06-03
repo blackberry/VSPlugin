@@ -118,7 +118,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             }
 
             // create result
-            NewNdk = new NdkInfo(NdkName, NdkVersion, NdkHostPath, NdkTargetPath);
+            NewNdk = new NdkInfo(null, NdkName, NdkVersion, NdkHostPath, NdkTargetPath);
             var existingIndex = PackageViewModel.Instance.IndexOfInstalled(NewNdk);
             var existingNDK = existingIndex >= 0 ? PackageViewModel.Instance.InstalledNDKs[existingIndex] : null;
 

@@ -14,7 +14,7 @@ namespace RIM.VSNDK_Package.Model
     {
         private const string DescriptorFileName = "blackberry-sdk-descriptor.xml";
 
-        public NdkInfo(string name, Version version, string hostPath, string targetPath, DeviceInfo[] devices)
+        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath, DeviceInfo[] devices)
             : base(name, version)
         {
             if (string.IsNullOrEmpty(hostPath))
@@ -24,12 +24,13 @@ namespace RIM.VSNDK_Package.Model
             if (devices == null)
                 throw new ArgumentNullException("devices");
 
+            FilePath = filePath;
             HostPath = hostPath;
             TargetPath = targetPath;
             Devices = devices;
         }
 
-        public NdkInfo(string name, Version version, string hostPath, string targetPath)
+        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath)
             : base(name, version)
         {
             if (string.IsNullOrEmpty(hostPath))
@@ -37,6 +38,7 @@ namespace RIM.VSNDK_Package.Model
             if (string.IsNullOrEmpty(targetPath))
                 throw new ArgumentNullException("targetPath");
 
+            FilePath = filePath;
             HostPath = hostPath;
             TargetPath = targetPath;
 
@@ -64,6 +66,12 @@ namespace RIM.VSNDK_Package.Model
         }
 
         #region Properties
+
+        public string FilePath
+        {
+            get;
+            private set;
+        }
 
         public string HostPath
         {
@@ -177,7 +185,7 @@ namespace RIM.VSNDK_Package.Model
         /// <summary>
         /// Loads info about a single NDK from specific config file, given as XML.
         /// </summary>
-        public static NdkInfo Load(XmlReader reader)
+        public static NdkInfo Load(string fileName, XmlReader reader)
         {
             if (reader == null)
                 return null;
@@ -219,7 +227,7 @@ namespace RIM.VSNDK_Package.Model
                         }
 
                         // try to define info about the installation:
-                        return new NdkInfo(name, version, hostPath, targetPath);
+                        return new NdkInfo(fileName, name, version, hostPath, targetPath);
                     }
 
                     return null;
@@ -281,7 +289,7 @@ namespace RIM.VSNDK_Package.Model
                                 {
                                     using (var reader = XmlReader.Create(fileReader))
                                     {
-                                        var info = Load(reader);
+                                        var info = Load(file, reader);
                                         if (info != null && info.Exists())
                                         {
                                             var existingIndex = IndexOf(result, info);
@@ -445,7 +453,7 @@ namespace RIM.VSNDK_Package.Model
                         version = new Version(10, 0, 1);
                 }
 
-                return new NdkInfo(string.Concat("BlackBerry Local SDK ", version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
+                return new NdkInfo(null, string.Concat("BlackBerry Local SDK ", version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
                                    version, Path.Combine(hostDirs[0], "win32", "x86"), Path.Combine(folder, "qnx6"));
             }
 
@@ -563,7 +571,9 @@ namespace RIM.VSNDK_Package.Model
             }
 
             // store it:
-            doc.Save(Path.Combine(outputDirectory, fileName.ToString()));
+            var fullFilePath = Path.Combine(outputDirectory, fileName.ToString());
+            doc.Save(fullFilePath);
+            FilePath = fullFilePath;
             return true;
         }
     }
