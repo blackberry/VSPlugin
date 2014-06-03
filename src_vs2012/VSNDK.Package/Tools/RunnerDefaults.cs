@@ -55,7 +55,7 @@ namespace RIM.VSNDK_Package.Tools
 #if DEBUG
             // TODO: PH: 2014-05-08: for now hardcoded my repository path:
             TestToolsDirectory = @"S:\vs-plugin\qnxtools\bin";
-            TestNdkDirectory = @"S:\vs-plugin\bbndk_vs";
+            TestNdkDirectory = NdkDirectory; // @"S:\vs-plugin\bbndk_vs";
             ToolsDirectory = TestToolsDirectory;
 #endif
         }
