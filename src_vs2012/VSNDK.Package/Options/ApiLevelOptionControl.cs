@@ -84,11 +84,5 @@ namespace RIM.VSNDK_Package.Options
             var form = new InstallNdkForm(_vm);
             form.ShowDialog();
         }
-
-        private void bttNewSimulator_Click(object sender, EventArgs e)
-        {
-            var form = new InstallSimulatorForm();
-            form.ShowDialog();
-        }
     }
 }
