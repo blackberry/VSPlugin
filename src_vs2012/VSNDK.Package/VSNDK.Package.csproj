@@ -327,17 +327,11 @@
     <Compile Include="Options\Dialogs\InstallConfirmationForm.Designer.cs">
       <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\Dialogs\InstallNdkForm.cs">
+    <Compile Include="Options\Dialogs\InstallForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Options\Dialogs\InstallNdkForm.Designer.cs">
-      <DependentUpon>InstallNdkForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Options\Dialogs\InstallSimulatorForm.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Options\Dialogs\InstallSimulatorForm.Designer.cs">
-      <DependentUpon>InstallSimulatorForm.cs</DependentUpon>
+    <Compile Include="Options\Dialogs\InstallForm.Designer.cs">
+      <DependentUpon>InstallForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\Dialogs\ListItemControl.cs">
       <SubType>UserControl</SubType>
@@ -460,8 +454,8 @@
     <EmbeddedResource Include="Options\Dialogs\InstallConfirmationForm.resx">
       <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Options\Dialogs\InstallSimulatorForm.resx">
-      <DependentUpon>InstallSimulatorForm.cs</DependentUpon>
+    <EmbeddedResource Include="Options\Dialogs\InstallForm.resx">
+      <DependentUpon>InstallForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\ListItemControl.resx">
       <DependentUpon>ListItemControl.cs</DependentUpon>
@@ -599,9 +593,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\DeviceForm.resx">
       <DependentUpon>DeviceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\Dialogs\InstallNdkForm.resx">
-      <DependentUpon>InstallNdkForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\PasswordForm.resx">
       <DependentUpon>PasswordForm.cs</DependentUpon>
