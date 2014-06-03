@@ -10,7 +10,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
     /// </summary>
     internal partial class InstallConfirmationForm : Form
     {
-        public InstallConfirmationForm(string nameOverride, IEnumerable<ApiInfo> items, Func<ApiInfo, bool> installationCheckHandler, Func<ApiInfo, bool> pendingCheckHandler)
+        public InstallConfirmationForm(string nameOverride, IEnumerable<ApiInfo> items, Func<ApiInfo, bool> installationCheckHandler, Func<ApiInfo, bool> processingCheckHandler)
         {
             if (items == null)
                 throw new ArgumentNullException("items");
@@ -25,9 +25,9 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 i.SubItems.Add(item.Version.ToString());
 
                 // display status, if it's installed or is still under processing:
-                if (pendingCheckHandler != null && pendingCheckHandler(item))
+                if (processingCheckHandler != null && processingCheckHandler(item))
                 {
-                    i.SubItems.Add("Pending...");
+                    i.SubItems.Add("Processing...");
                 }
                 else
                 {
