@@ -7,7 +7,7 @@ namespace RIM.VSNDK_Package.Model
     /// <summary>
     /// Wrapper class for array of API info that belong to the same API Level.
     /// </summary>
-    internal sealed class ApiInfoArray : ApiInfo, IEnumerable<ApiInfo>
+    internal sealed class ApiInfoArray : ApiInfo
     {
         public ApiInfoArray(string name, Version version, ApiInfo[] items)
             : base(name, version)
@@ -32,15 +32,5 @@ namespace RIM.VSNDK_Package.Model
         }
 
         #endregion
-
-        public IEnumerator<ApiInfo> GetEnumerator()
-        {
-            return (IEnumerator<ApiInfo>)Items.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
     }
 }

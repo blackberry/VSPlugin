@@ -60,7 +60,7 @@ namespace RIM.VSNDK_Package.ViewModels
                 return ApiLevelActionType.Hide;
 
             // check, if it exists on disk:
-            bool isInstalled = PackageViewModel.Instance.IndexOfInstalled(definition.Version) >= 0;
+            bool isInstalled = PackageViewModel.Instance.IndexOfInstalled(definition.Version) >= 0 || AreItemsInstalled(definition as ApiInfoArray);
             var ndkInfo = definition as NdkInfo;
 
             if (ndkInfo != null)
@@ -90,6 +90,23 @@ namespace RIM.VSNDK_Package.ViewModels
 
             // by default, check, if it can be installed, or it's not owned by the pluign:
             return isInstalled ? ApiLevelActionType.Nothing : ApiLevelActionType.Install;
+        }
+
+        /// <summary>
+        /// Checks, if all items owned by an array are already installed.
+        /// </summary>
+        private static bool AreItemsInstalled(ApiInfoArray definition)
+        {
+            if (definition == null)
+                return false;
+
+            foreach (var item in definition.Items)
+            {
+                if (PackageViewModel.Instance.IndexOfInstalled(item.Version) < 0)
+                    return false;
+            }
+
+            return true;
         }
 
         public bool LoadNDKs(bool reload)
