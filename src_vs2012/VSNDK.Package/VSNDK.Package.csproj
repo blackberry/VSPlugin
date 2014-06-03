@@ -332,6 +332,12 @@
     <Compile Include="Options\Dialogs\InstallSimulatorForm.Designer.cs">
       <DependentUpon>InstallSimulatorForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Options\Dialogs\ListItemControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\ListItemControl.Designer.cs">
+      <DependentUpon>ListItemControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\Dialogs\PasswordForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -392,6 +398,7 @@
     <Compile Include="Tools\KeyToolRegisterRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
+    <Compile Include="ViewModels\ApiLevelActionType.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\DeveloperDefinition.cs" />
     <Compile Include="ViewModels\DeviceDefinition.cs" />
@@ -442,6 +449,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\InstallSimulatorForm.resx">
       <DependentUpon>InstallSimulatorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\ListItemControl.resx">
+      <DependentUpon>ListItemControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Logo.png" />
     <None Include="VSNDK.Package.Bitmaps.vsct" />

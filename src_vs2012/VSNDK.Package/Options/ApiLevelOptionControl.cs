@@ -15,6 +15,7 @@ namespace RIM.VSNDK_Package.Options
         {
             InitializeComponent();
 
+            _vm.Dispatcher = EventDispatcher.From(this);
             PopulateNDKs();
         }
 
@@ -80,7 +81,7 @@ namespace RIM.VSNDK_Package.Options
 
         private void bttInstallNew_Click(object sender, EventArgs e)
         {
-            var form = new InstallNdkForm();
+            var form = new InstallNdkForm(_vm);
             form.ShowDialog();
         }
 
