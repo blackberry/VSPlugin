@@ -7,7 +7,7 @@ using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options
 {
-    public partial class ApiLevelOptionControl : UserControl
+    internal partial class ApiLevelOptionControl : UserControl
     {
         private readonly ApiLevelOptionViewModel _vm = new ApiLevelOptionViewModel();
 
@@ -16,17 +16,23 @@ namespace RIM.VSNDK_Package.Options
             InitializeComponent();
 
             _vm.Dispatcher = EventDispatcher.From(this);
-            PopulateNDKs();
+            PopulateNDKs(true);
         }
 
-        private void PopulateNDKs()
+        private void PopulateNDKs(bool ignoreCurrentSelection)
         {
+            var currentlySelected = ignoreCurrentSelection ? _vm.ActiveNDK : SelectedNDK;
+
+            txtDescription.Text = string.Empty;
             cmbNDKs.Items.Clear();
 
             foreach (var ndk in _vm.InstalledNDKs)
+            {
                 cmbNDKs.Items.Add(ndk);
+            }
 
-            cmbNDKs.SelectedItem = _vm.ActiveNDK;
+            _vm.ActiveNDK = currentlySelected;      // here the currentlySelected will cause a match-by-folders-search
+            cmbNDKs.SelectedItem = _vm.ActiveNDK;   // and _vm.ActiveNDK != currentlySelected instances
         }
 
         private void cmbNDKs_SelectedIndexChanged(object sender, EventArgs e)
@@ -43,16 +49,22 @@ namespace RIM.VSNDK_Package.Options
             get { return cmbNDKs.SelectedItem != null; }
         }
 
+        public NdkInfo SelectedNDK
+        {
+            get { return cmbNDKs.SelectedItem as NdkInfo; }
+            set { cmbNDKs.SelectedItem = value; }
+        }
+
         #endregion
 
         internal void OnApply()
         {
-            _vm.ActiveNDK = cmbNDKs.SelectedItem as NdkInfo;
+            _vm.ActiveNDK = SelectedNDK;
         }
 
         public void OnClosed()
         {
-            PopulateNDKs();
+            PopulateNDKs(true);
         }
 
         private void bttAddLocal_Click(object sender, EventArgs e)
@@ -69,7 +81,7 @@ namespace RIM.VSNDK_Package.Options
                     {
                         // reload NDKs
                         _vm.ReloadAndActivate(ndk);
-                        PopulateNDKs();
+                        PopulateNDKs(true);
                     }
                     else
                     {
@@ -83,6 +95,7 @@ namespace RIM.VSNDK_Package.Options
         {
             var form = new InstallNdkForm(_vm);
             form.ShowDialog();
+            PopulateNDKs(false);
         }
     }
 }

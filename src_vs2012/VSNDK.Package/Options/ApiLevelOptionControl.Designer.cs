@@ -1,6 +1,6 @@
 ﻿namespace RIM.VSNDK_Package.Options
 {
-    partial class ApiLevelOptionControl
+    internal partial class ApiLevelOptionControl
     {
         /// <summary> 
         /// Required designer variable.
@@ -75,10 +75,10 @@
             // bttAddLocal
             // 
             this.bttAddLocal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttAddLocal.Location = new System.Drawing.Point(378, 284);
+            this.bttAddLocal.Location = new System.Drawing.Point(459, 284);
             this.bttAddLocal.Name = "bttAddLocal";
             this.bttAddLocal.Size = new System.Drawing.Size(75, 23);
-            this.bttAddLocal.TabIndex = 4;
+            this.bttAddLocal.TabIndex = 6;
             this.bttAddLocal.Text = "&Add...";
             this.bttAddLocal.UseVisualStyleBackColor = true;
             this.bttAddLocal.Click += new System.EventHandler(this.bttAddLocal_Click);
@@ -86,7 +86,7 @@
             // bttInstallNew
             // 
             this.bttInstallNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttInstallNew.Location = new System.Drawing.Point(459, 284);
+            this.bttInstallNew.Location = new System.Drawing.Point(378, 284);
             this.bttInstallNew.Name = "bttInstallNew";
             this.bttInstallNew.Size = new System.Drawing.Size(75, 23);
             this.bttInstallNew.TabIndex = 5;
@@ -109,7 +109,7 @@
             this.bttStatus.Location = new System.Drawing.Point(6, 284);
             this.bttStatus.Name = "bttStatus";
             this.bttStatus.Size = new System.Drawing.Size(75, 23);
-            this.bttStatus.TabIndex = 6;
+            this.bttStatus.TabIndex = 4;
             this.bttStatus.Text = "&Status...";
             this.bttStatus.UseVisualStyleBackColor = true;
             // 
