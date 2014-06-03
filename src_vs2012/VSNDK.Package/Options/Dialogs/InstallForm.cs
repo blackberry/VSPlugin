@@ -41,6 +41,11 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             _vm = vm;
             _vm.NdkListLoaded += NdkListLoaded;
 
+            UpdateUI();
+        }
+
+        private void UpdateUI()
+        {
             PopulateList(panelInstalled, _vm.InstalledNDKs, info => _vm.GetActionForNDK(info), "No installed Native SDK found", ApiLevelActionType.Hide);
             LoadNDKs(false);
         }
@@ -134,6 +139,13 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                         break;
                     case ApiLevelActionType.Refresh:
                         LoadNDKs(true);
+                        break;
+                    case ApiLevelActionType.Forget:
+                        if (MessageBoxHelper.Show(definition.ToString(), "Remove own reference to existing NDK?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                        {
+                            _vm.Forget(definition);
+                            UpdateUI();
+                        }
                         break;
                 }
             }
