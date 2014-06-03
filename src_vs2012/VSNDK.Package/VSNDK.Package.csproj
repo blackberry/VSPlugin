@@ -260,6 +260,7 @@
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
     <Compile Include="MessageBoxHelper.cs" />
     <Compile Include="Model\ApiInfo.cs" />
+    <Compile Include="Model\ApiInfoArray.cs" />
     <Compile Include="Model\ApiLevelListTypes.cs" />
     <Compile Include="Model\CertificateInfo.cs" />
     <Compile Include="Model\CskTokenInfo.cs" />
@@ -319,6 +320,12 @@
     </Compile>
     <Compile Include="Options\Dialogs\DeviceForm.Designer.cs">
       <DependentUpon>DeviceForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Dialogs\InstallConfirmationForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\InstallConfirmationForm.Designer.cs">
+      <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\Dialogs\InstallNdkForm.cs">
       <SubType>Form</SubType>
@@ -416,6 +423,9 @@
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
+    <Compile Include="ViewModels\UpdateActions.cs" />
+    <Compile Include="ViewModels\UpdateActionTargets.cs" />
+    <Compile Include="ViewModels\UpdateManager.cs" />
     <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
@@ -446,6 +456,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\CskRequestForm.resx">
       <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\InstallConfirmationForm.resx">
+      <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\InstallSimulatorForm.resx">
       <DependentUpon>InstallSimulatorForm.cs</DependentUpon>

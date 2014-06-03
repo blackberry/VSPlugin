@@ -28,6 +28,10 @@
         /// <summary>
         /// No action is allowed to be performed.
         /// </summary>
-        Hide
+        Hide,
+        /// <summary>
+        /// Data is out-dated and needs to be reloaded.
+        /// </summary>
+        Refresh
     }
 }

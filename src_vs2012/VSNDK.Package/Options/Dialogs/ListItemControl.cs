@@ -6,7 +6,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 {
     internal partial class ListItemControl : UserControl
     {
-        public EventHandler ExecuteAction;
+        public event EventHandler ExecuteAction;
 
         private ApiLevelActionType _action;
 
@@ -14,7 +14,8 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         {
             InitializeComponent();
 
-            Action = ApiLevelActionType.Nothing;
+            Action = ApiLevelActionType.Hide;
+            OnActionChanged();
         }
 
         #region Properties
@@ -42,36 +43,47 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             get { return _action; }
             set
             {
-                _action = value;
-                bttAction.Enabled = true;
-                bttAction.Visible = true;
-
-                switch (_action)
+                if (_action != value)
                 {
-                    case ApiLevelActionType.Hide:
-                        ActionName = string.Empty;
-                        bttAction.Visible = false;
-                        break;
-                    case ApiLevelActionType.Nothing:
-                        ActionName = "Locked";
-                        bttAction.Enabled = false;
-                        break;
-                    case ApiLevelActionType.Install:
-                        ActionName = "Install";
-                        break;
-                    case ApiLevelActionType.InstallManually:
-                        ActionName = "Download...";
-                        break;
-                    case ApiLevelActionType.Uninstall:
-                        ActionName = "Uninstall";
-                        break;
-                    case ApiLevelActionType.Forget:
-                        ActionName = "Forget";
-                        break;
-
-                    default:
-                        throw new ArgumentOutOfRangeException("Specified action is not supported");
+                    _action = value;
+                    OnActionChanged();
                 }
+            }
+        }
+
+        private void OnActionChanged()
+        {
+            bttAction.Enabled = true;
+            bttAction.Visible = true;
+
+            switch (_action)
+            {
+                case ApiLevelActionType.Hide:
+                    ActionName = string.Empty;
+                    bttAction.Visible = false;
+                    break;
+                case ApiLevelActionType.Nothing:
+                    ActionName = "Locked";
+                    bttAction.Enabled = false;
+                    break;
+                case ApiLevelActionType.Install:
+                    ActionName = "Install";
+                    break;
+                case ApiLevelActionType.InstallManually:
+                    ActionName = "Download...";
+                    break;
+                case ApiLevelActionType.Uninstall:
+                    ActionName = "Uninstall";
+                    break;
+                case ApiLevelActionType.Forget:
+                    ActionName = "Forget";
+                    break;
+                case ApiLevelActionType.Refresh:
+                    ActionName = "Reload";
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException("Specified action is not supported");
             }
         }
 

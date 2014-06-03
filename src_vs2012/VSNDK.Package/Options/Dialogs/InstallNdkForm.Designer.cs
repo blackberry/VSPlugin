@@ -91,10 +91,13 @@
             this.panelAvailable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.panelAvailable.AutoScroll = true;
+            this.panelAvailable.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.panelAvailable.Location = new System.Drawing.Point(6, 19);
             this.panelAvailable.Name = "panelAvailable";
             this.panelAvailable.Size = new System.Drawing.Size(535, 172);
             this.panelAvailable.TabIndex = 0;
+            this.panelAvailable.WrapContents = false;
             // 
             // InstallNdkForm
             // 

@@ -31,6 +31,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
         private DeveloperDefinition _developer;
         private NdkInfo[] _installedNDKs;
+        private ApiInfoArray[] _remoteNDKs;
         private NdkInfo _activeNDK;
         private DeviceDefinition[] _targetDevices;
         private DeviceDefinition _activeDevice;
@@ -38,6 +39,8 @@ namespace RIM.VSNDK_Package.ViewModels
 
         public PackageViewModel()
         {
+            _remoteNDKs = new ApiInfoArray[0];
+            UpdateManager = new UpdateManager(this);
         }
 
         #region Properties
@@ -56,6 +59,15 @@ namespace RIM.VSNDK_Package.ViewModels
             }
         }
 
+        public UpdateManager UpdateManager
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the list of installed NDKs on the machine.
+        /// </summary>
         public NdkInfo[] InstalledNDKs
         {
             get
@@ -70,6 +82,18 @@ namespace RIM.VSNDK_Package.ViewModels
                 }
 
                 return _installedNDKs;
+            }
+        }
+
+        /// <summary>
+        /// Gets the cached list of NDKs available on-line to install.
+        /// </summary>
+        public ApiInfoArray[] RemoteNDKs
+        {
+            get { return _remoteNDKs; }
+            set
+            {
+                _remoteNDKs = value ?? new ApiInfoArray[0];
             }
         }
 
@@ -229,11 +253,19 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Gets an index of installed NDK with identical version.
+        /// </summary>
+        public int IndexOfInstalled(Version version)
+        {
+            return NdkInfo.IndexOf(InstalledNDKs, version);
+        }
+
+        /// <summary>
         /// Persists info about currently selected NDK into the registry.
         /// </summary>
         private void SaveActiveNDK()
         {
-            if (_activeNDK == null || !_activeNDK.Exists())
+            if (_activeNDK == null || !_activeNDK.IsInstalled)
             {
                 TraceLog.WarnLine("Invalid NDK to set as active!");
                 return;
