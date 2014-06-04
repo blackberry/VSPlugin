@@ -357,6 +357,12 @@
     <Compile Include="Options\Dialogs\RegistrationForm.Designer.cs">
       <DependentUpon>RegistrationForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Options\Dialogs\UpdateManagerStatusForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\UpdateManagerStatusForm.Designer.cs">
+      <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -459,6 +465,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\ListItemControl.resx">
       <DependentUpon>ListItemControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\UpdateManagerStatusForm.resx">
+      <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Logo.png" />
     <None Include="VSNDK.Package.Bitmaps.vsct" />

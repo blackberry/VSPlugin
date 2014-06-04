@@ -97,5 +97,11 @@ namespace RIM.VSNDK_Package.Options
             form.ShowDialog();
             PopulateNDKs(false);
         }
+
+        private void bttStatus_Click(object sender, EventArgs e)
+        {
+            var form = new UpdateManagerStatusForm();
+            form.ShowDialog();
+        }
     }
 }

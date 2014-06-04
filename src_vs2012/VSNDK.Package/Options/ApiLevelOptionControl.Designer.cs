@@ -112,6 +112,7 @@
             this.bttStatus.TabIndex = 4;
             this.bttStatus.Text = "&Status...";
             this.bttStatus.UseVisualStyleBackColor = true;
+            this.bttStatus.Click += new System.EventHandler(this.bttStatus_Click);
             // 
             // ApiLevelOptionControl
             // 
