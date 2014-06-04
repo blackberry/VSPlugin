@@ -33,6 +33,7 @@ namespace RIM.VSNDK_Package.ViewModels
         private DeveloperDefinition _developer;
         private NdkInfo[] _installedNDKs;
         private ApiInfoArray[] _remoteNDKs;
+        private ApiInfoArray[] _remoteSimulators;
         private NdkInfo _activeNDK;
         private DeviceDefinition[] _targetDevices;
         private DeviceDefinition _activeDevice;
@@ -41,11 +42,15 @@ namespace RIM.VSNDK_Package.ViewModels
         public PackageViewModel()
         {
             _remoteNDKs = new ApiInfoArray[0];
+            _remoteSimulators = new ApiInfoArray[0];
             UpdateManager = new UpdateManager(this);
         }
 
         #region Properties
 
+        /// <summary>
+        /// Gets the description of current developer (publisher).
+        /// </summary>
         public DeveloperDefinition Developer
         {
             get
@@ -60,6 +65,9 @@ namespace RIM.VSNDK_Package.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gets the reference to the UpdateManager, responsible for adding and removing features (like install new NDK, simulator or runtime)
+        /// </summary>
         public UpdateManager UpdateManager
         {
             get;
