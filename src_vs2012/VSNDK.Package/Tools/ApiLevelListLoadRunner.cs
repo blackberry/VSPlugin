@@ -77,6 +77,9 @@ namespace RIM.VSNDK_Package.Tools
                 case ApiLevelListTypes.Simulators:
                     args += " --list-all --simulator";
                     break;
+                case ApiLevelListTypes.Runtimes:
+                    args += " --list-all --runtime";
+                    break;
                 default:
                     throw new InvalidOperationException("Specified list type is unsupported");
             }
