@@ -128,11 +128,15 @@ namespace RIM.VSNDK_Package.Tools
 
                         if (name.EndsWith("(SIMULATOR)", StringComparison.InvariantCultureIgnoreCase))
                         {
-                            name = name.Substring(0, name.Length - 11);
+                            name = name.Substring(0, name.Length - 11).Replace("10 Native SDK", "Simulator").Replace("Native SDK", "Simulator");
                         }
                         if (name.EndsWith("(EXTERNAL_NDK)", StringComparison.InvariantCultureIgnoreCase))
                         {
                             name = name.Substring(0, name.Length - 14);
+                        }
+                        if (name.EndsWith("(RUNTIME)", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            name = name.Substring(0, name.Length - 9).Replace("10 Native SDK", "Runtime Libraries").Replace("Native SDK", "Runtime Libraries");
                         }
 
                         result.Add(new ApiInfo(name.Trim(), new Version(version)));
@@ -144,19 +148,22 @@ namespace RIM.VSNDK_Package.Tools
             }
 
             // group the received list by level:
-            ApiLevels = GroupList(APIs);
+            ApiLevels = GroupList(APIs, Type != ApiLevelListTypes.Simulators && Type != ApiLevelListTypes.Runtimes);
         }
 
-        private static ApiInfoArray[] GroupList(ApiInfo[] list)
+        private static ApiInfoArray[] GroupList(ApiInfo[] list, bool injectPlayBook)
         {
             if (list == null || list.Length == 0)
                 return new ApiInfoArray[0];
 
             var groups = new List<List<ApiInfo>>();
 
-            // inject info about tablet NDK:
-            Add(groups, ApiInfo.CreateTabletInfo());
-            
+            if (injectPlayBook)
+            {
+                // inject info about tablet NDK:
+                Add(groups, ApiInfo.CreateTabletInfo());
+            }
+
             // group BlackBerry 10 items together:
             foreach (var item in list)
             {
