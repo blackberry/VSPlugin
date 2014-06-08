@@ -32,8 +32,11 @@ namespace RIM.VSNDK_Package.ViewModels
 
         private DeveloperDefinition _developer;
         private NdkInfo[] _installedNDKs;
+        private SimulatorInfo[] _installedSimulators;
+        private RuntimeInfo[] _installedRuntimes;
         private ApiInfoArray[] _remoteNDKs;
         private ApiInfoArray[] _remoteSimulators;
+        private ApiInfoArray[] _remoteRuntimes;
         private NdkInfo _activeNDK;
         private DeviceDefinition[] _targetDevices;
         private DeviceDefinition _activeDevice;
@@ -43,6 +46,7 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             _remoteNDKs = new ApiInfoArray[0];
             _remoteSimulators = new ApiInfoArray[0];
+            _remoteRuntimes = new ApiInfoArray[0];
             UpdateManager = new UpdateManager(this);
         }
 
@@ -100,10 +104,59 @@ namespace RIM.VSNDK_Package.ViewModels
         public ApiInfoArray[] RemoteNDKs
         {
             get { return _remoteNDKs; }
-            set
+            set { _remoteNDKs = value ?? new ApiInfoArray[0]; }
+        }
+
+        /// <summary>
+        /// Gets the list of installed simulators.
+        /// </summary>
+        public SimulatorInfo[] InstalledSimulators
+        {
+            get
             {
-                _remoteNDKs = value ?? new ApiInfoArray[0];
+                if (_installedSimulators == null)
+                {
+                    // load info about simulators from specified locations:
+                    _installedSimulators = SimulatorInfo.Load(RunnerDefaults.NdkDirectory);
+                }
+
+                return _installedSimulators;
             }
+        }
+
+        /// <summary>
+        /// Gets the cached list of simulators available on-line to install.
+        /// </summary>
+        public ApiInfoArray[] RemoteSimulators
+        {
+            get { return _remoteSimulators; }
+            set { _remoteSimulators = value ?? new ApiInfoArray[0]; }
+        }
+
+        /// <summary>
+        /// Gets the list of installed runtimes.
+        /// </summary>
+        public RuntimeInfo[] InstalledRuntimes
+        {
+            get
+            {
+                if (_installedRuntimes == null)
+                {
+                    // load info about runtimes from specified locations:
+                    _installedRuntimes = RuntimeInfo.Load(RunnerDefaults.NdkDirectory);
+                }
+
+                return _installedRuntimes;
+            }
+        }
+
+        /// <summary>
+        /// Gets the cached list of runtimes available on-line to install.
+        /// </summary>
+        public ApiInfoArray[] RemoteRuntimes
+        {
+            get { return _remoteRuntimes; }
+            set { _remoteRuntimes = value ?? new ApiInfoArray[0]; }
         }
 
         /// <summary>
@@ -273,9 +326,25 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Gets an index of installed NDK with identical version.
         /// </summary>
-        public int IndexOfInstalled(Version version)
+        public int IndexOfInstalledNDK(Version version)
         {
-            return NdkInfo.IndexOf(InstalledNDKs, version);
+            return ApiInfo.IndexOf(InstalledNDKs, version);
+        }
+
+        /// <summary>
+        /// Gets an index of installed simulator with identical version.
+        /// </summary>
+        public int IndexOfInstalledSimulator(Version version)
+        {
+            return ApiInfo.IndexOf(InstalledSimulators, version);
+        }
+
+        /// <summary>
+        /// Gets an index of installed runtime with identical version.
+        /// </summary>
+        public int IndexOfInstalledRuntime(Version version)
+        {
+            return ApiInfo.IndexOf(InstalledRuntimes, version);
         }
 
         /// <summary>
@@ -323,6 +392,22 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             _installedNDKs = null;
             _activeNDK = null;
+        }
+
+        /// <summary>
+        /// Resets the cached list of simulators, allowing to reload them again.
+        /// </summary>
+        public void ResetSimulators()
+        {
+            _installedSimulators = null;
+        }
+
+        /// <summary>
+        /// Resets the cached list of runtimes, allowing to reload them again.
+        /// </summary>
+        public void ResetRuntimes()
+        {
+            _installedRuntimes = null;
         }
 
         /// <summary>

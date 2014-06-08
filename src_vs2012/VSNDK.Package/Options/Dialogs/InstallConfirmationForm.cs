@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Model;
+using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options.Dialogs
 {
@@ -10,7 +11,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
     /// </summary>
     internal partial class InstallConfirmationForm : Form
     {
-        public InstallConfirmationForm(string nameOverride, IEnumerable<ApiInfo> items, Func<ApiInfo, bool> installationCheckHandler, Func<ApiInfo, bool> processingCheckHandler)
+        public InstallConfirmationForm(string nameOverride, IEnumerable<ApiInfo> items, UpdateActionTargets target, Func<ApiInfo, UpdateActionTargets, bool> installationCheckHandler, Func<ApiInfo, UpdateActionTargets, bool> processingCheckHandler)
         {
             if (items == null)
                 throw new ArgumentNullException("items");
@@ -25,13 +26,13 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 i.SubItems.Add(item.Version.ToString());
 
                 // display status, if it's installed or is still under processing:
-                if (processingCheckHandler != null && processingCheckHandler(item))
+                if (processingCheckHandler != null && processingCheckHandler(item, target))
                 {
                     i.SubItems.Add("Processing...");
                 }
                 else
                 {
-                    if (installationCheckHandler != null && installationCheckHandler(item))
+                    if (installationCheckHandler != null && installationCheckHandler(item, target))
                         i.SubItems.Add("Installed");
                 }
 

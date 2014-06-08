@@ -51,6 +51,18 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             }
         }
 
+        public UpdateActionTargets Target
+        {
+            get;
+            set;
+        }
+
+        public Panel ParentPanel
+        {
+            get;
+            set;
+        }
+
         private void OnActionChanged()
         {
             bttAction.Enabled = true;

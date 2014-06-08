@@ -93,7 +93,7 @@ namespace RIM.VSNDK_Package.Options
 
         private void bttInstallNew_Click(object sender, EventArgs e)
         {
-            var form = new InstallNdkForm(_vm);
+            var form = new InstallForm(_vm);
             form.ShowDialog();
             PopulateNDKs(false);
         }

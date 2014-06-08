@@ -81,14 +81,14 @@ namespace RIM.VSNDK_Package.ViewModels
             _actions.Add(action);
         }
 
-        public bool IsProcessingNDK(Version version)
+        public bool IsProcessing(Version version, UpdateActionTargets target)
         {
             if (version == null)
                 return false;
 
             foreach (var action in _actions)
             {
-                if (action.Target == UpdateActionTargets.NDK && action.Version == version)
+                if (action.Target == target && action.Version == version)
                     return true;
             }
 
