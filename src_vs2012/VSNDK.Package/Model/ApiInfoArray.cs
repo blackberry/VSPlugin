@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace RIM.VSNDK_Package.Model
 {
@@ -32,5 +30,17 @@ namespace RIM.VSNDK_Package.Model
         }
 
         #endregion
+
+        public override bool IsInstalled
+        {
+            get
+            {
+                foreach (var item in Items)
+                    if (!item.IsInstalled)
+                        return false;
+
+                return true;
+            }
+        }
     }
 }

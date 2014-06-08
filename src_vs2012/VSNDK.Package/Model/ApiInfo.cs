@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace RIM.VSNDK_Package.Model
 {
@@ -45,6 +46,15 @@ namespace RIM.VSNDK_Package.Model
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets the optional description of this API Level.
+        /// </summary>
+        public string Details
+        {
+            get;
+            protected set;
         }
 
         /// <summary>
@@ -96,6 +106,54 @@ namespace RIM.VSNDK_Package.Model
         public static ApiInfo CreateTabletInfo()
         {
             return new ApiInfo("BlackBerry Native SDK for Tablet OS 2.1.0", new Version(2, 1, 0, 1032));
+        }
+
+        /// <summary>
+        /// Returns an index of NdkInfo inside a collection that has the same version.
+        /// </summary>
+        public static int IndexOf(IEnumerable<ApiInfo> list, Version version)
+        {
+            if (version == null)
+                throw new ArgumentNullException("version");
+
+            if (list != null)
+            {
+                int i = 0;
+                foreach (var item in list)
+                {
+                    if (item.Version == version)
+                        return i;
+                    i++;
+                }
+            }
+
+            return -1;
+        }
+
+        /// <summary>
+        /// Extracts the 'version' fragment out of the given directory name. Or returns 'null' in case of any problems.
+        /// </summary>
+        protected static Version GetVersionFromFolderName(string directoryName)
+        {
+            if (string.IsNullOrEmpty(directoryName))
+                return null;
+
+            int i = directoryName.Length;
+
+            // find the version substring at the end of the name:
+            while (i > 0 && directoryName[i - 1] == '_' || directoryName[i - 1] == '.' || char.IsDigit(directoryName[i - 1]))
+                i--;
+
+            // we might read one char too much:
+            if (i < directoryName.Length && !char.IsDigit(directoryName[i]))
+                i++;
+
+            // parse:
+            var versionString = directoryName.Substring(i).Trim().Replace('_', '.');
+            if (string.IsNullOrEmpty(versionString) || versionString.IndexOf('.') < 0)
+                return null;
+
+            return new Version(versionString);
         }
     }
 }

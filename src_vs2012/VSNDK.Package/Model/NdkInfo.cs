@@ -63,6 +63,7 @@ namespace RIM.VSNDK_Package.Model
 
             // OK, give up, and say it's unknown:
             Devices = devices ?? new DeviceInfo[0];
+            Details = ToShortDeviceDescription();
         }
 
         #region Properties
@@ -116,7 +117,7 @@ namespace RIM.VSNDK_Package.Model
             if (string.IsNullOrEmpty(pathA) && string.IsNullOrEmpty(pathB))
                 return true;
 
-            // assuming that paths we aquired by Path.GetFullPath(...)
+            // assuming that paths we acquired by Path.GetFullPath(...)
             return string.Compare(pathA, pathB, StringComparison.InvariantCultureIgnoreCase) == 0;
         }
 
@@ -178,6 +179,25 @@ namespace RIM.VSNDK_Package.Model
             result.AppendLine("Paths:");
             result.Append(" - host: ").AppendLine(HostPath);
             result.Append(" - target: ").AppendLine(TargetPath);
+
+            return result.ToString();
+        }
+
+        private string ToShortDeviceDescription()
+        {
+            if (Devices == null || Devices.Length == 0)
+                return "Device support unknown";
+
+            var result = new StringBuilder("Supports ");
+            int i = 0;
+
+            foreach (var device in Devices)
+            {
+                if (i > 0)
+                    result.Append(", ");
+                result.Append(device.ModelFullName);
+                i++;
+            }
 
             return result.ToString();
         }
@@ -350,28 +370,6 @@ namespace RIM.VSNDK_Package.Model
         }
 
         /// <summary>
-        /// Returns an index of NdkInfo inside a collection that has the same version.
-        /// </summary>
-        public static int IndexOf(IEnumerable<NdkInfo> list, Version version)
-        {
-            if (version == null)
-                throw new ArgumentNullException("version");
-
-            if (list != null)
-            {
-                int i = 0;
-                foreach (var item in list)
-                {
-                    if (item.Version == version)
-                        return i;
-                    i++;
-                }
-            }
-
-            return -1;
-        }
-
-        /// <summary>
         /// Try to find an NDK definition somewhere in specified folder or around.
         /// </summary>
         public static NdkInfo Scan(string folder)
@@ -485,29 +483,6 @@ namespace RIM.VSNDK_Package.Model
             }
 
             return null;
-        }
-
-        private static Version GetVersionFromFolderName(string directoryName)
-        {
-            if (string.IsNullOrEmpty(directoryName))
-                return null;
-
-            int i = directoryName.Length;
-
-            // find the version substring at the end of the name:
-            while (i > 0 && directoryName[i - 1] == '_' || directoryName[i - 1] == '.' || char.IsDigit(directoryName[i - 1]))
-                i--;
-
-            // we might read one char too much:
-            if (i < directoryName.Length && !char.IsDigit(directoryName[i]))
-                i++;
-
-            // parse:
-            var versionString = directoryName.Substring(i).Trim().Replace('_', '.');
-            if (string.IsNullOrEmpty(versionString) || versionString.IndexOf('.') < 0)
-                return null;
-
-            return new Version(versionString);
         }
 
         public bool Save(string outputDirectory)
