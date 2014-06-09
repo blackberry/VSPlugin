@@ -47,7 +47,7 @@ namespace RIM.VSNDK_Package.ViewModels
             _remoteNDKs = new ApiInfoArray[0];
             _remoteSimulators = new ApiInfoArray[0];
             _remoteRuntimes = new ApiInfoArray[0];
-            UpdateManager = new UpdateManager(this);
+            UpdateManager = new UpdateManager(this, RunnerDefaults.NdkDirectory);
         }
 
         #region Properties

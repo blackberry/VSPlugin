@@ -192,7 +192,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             public override bool IsProcessing(ApiInfo info)
             {
-                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(info.Version, UpdateActionTargets.NDK);
+                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(UpdateActionTargets.NDK, info.Version);
             }
 
             /// <summary>
@@ -264,7 +264,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             public override bool IsProcessing(ApiInfo info)
             {
-                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(info.Version, UpdateActionTargets.Simulator);
+                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(UpdateActionTargets.Simulator, info.Version);
             }
 
             public override void Reset()
@@ -319,7 +319,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             public override bool IsProcessing(ApiInfo info)
             {
-                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(info.Version, UpdateActionTargets.Runtime);
+                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(UpdateActionTargets.Runtime, info.Version);
             }
 
             public override void Reset()
@@ -404,6 +404,11 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             get;
             set;
+        }
+
+        public UpdateManager UpdateManager
+        {
+            get { return PackageViewModel.Instance.UpdateManager; }
         }
 
         public void Reset(UpdateActionTargets target)
@@ -529,7 +534,7 @@ namespace RIM.VSNDK_Package.ViewModels
             if (info == null)
                 throw new ArgumentNullException("info");
 
-            PackageViewModel.Instance.UpdateManager.Request(UpdateActions.Install, target, info.Version);
+            PackageViewModel.Instance.UpdateManager.Request(UpdateActions.Install, target, info.Name, info.Version);
         }
 
         /// <summary>
@@ -540,7 +545,7 @@ namespace RIM.VSNDK_Package.ViewModels
             if (info == null)
                 throw new ArgumentNullException("info");
 
-            PackageViewModel.Instance.UpdateManager.Request(UpdateActions.Uninstall, target, info.Version);
+            PackageViewModel.Instance.UpdateManager.Request(UpdateActions.Uninstall, target, info.Name, info.Version);
         }
 
         /// <summary>

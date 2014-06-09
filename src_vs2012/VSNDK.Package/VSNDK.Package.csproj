@@ -407,8 +407,10 @@
     <Compile Include="Tools\KeyToolRegisterRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
-    <Compile Include="ViewModels\ApiLevelActionType.cs" />
+    <Compile Include="ViewModels\ApiLevelAction.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
+    <Compile Include="ViewModels\ApiLevelTarget.cs" />
+    <Compile Include="ViewModels\ApiLevelTask.cs" />
     <Compile Include="ViewModels\DeveloperDefinition.cs" />
     <Compile Include="ViewModels\DeviceDefinition.cs" />
     <Compile Include="ViewModels\DeviceDefinitionType.cs" />
@@ -425,8 +427,6 @@
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
-    <Compile Include="ViewModels\UpdateActions.cs" />
-    <Compile Include="ViewModels\UpdateActionTargets.cs" />
     <Compile Include="ViewModels\UpdateManager.cs" />
     <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>

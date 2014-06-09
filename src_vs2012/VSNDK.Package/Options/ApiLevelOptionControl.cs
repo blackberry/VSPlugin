@@ -76,7 +76,7 @@ namespace RIM.VSNDK_Package.Options
 
         private void bttStatus_Click(object sender, EventArgs e)
         {
-            var form = new UpdateManagerStatusForm();
+            var form = new UpdateManagerStatusForm(_vm);
             form.ShowDialog();
         }
     }

@@ -30,13 +30,13 @@
         {
             this.bttClose = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.bttAbort = new System.Windows.Forms.Button();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.progressBar = new System.Windows.Forms.ProgressBar();
+            this.lblActionLog2 = new System.Windows.Forms.Label();
+            this.lblActionLog1 = new System.Windows.Forms.Label();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.bttDelete = new System.Windows.Forms.Button();
+            this.listActions = new System.Windows.Forms.ListBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -57,9 +57,9 @@
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.bttAbort);
-            this.groupBox1.Controls.Add(this.progressBar1);
-            this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.progressBar);
+            this.groupBox1.Controls.Add(this.lblActionLog2);
+            this.groupBox1.Controls.Add(this.lblActionLog1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(567, 122);
@@ -67,50 +67,10 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Current";
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(9, 25);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(35, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "label1";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(9, 49);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(35, 13);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "label2";
-            // 
-            // progressBar1
-            // 
-            this.progressBar1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.progressBar1.Location = new System.Drawing.Point(12, 78);
-            this.progressBar1.Name = "progressBar1";
-            this.progressBar1.Size = new System.Drawing.Size(468, 23);
-            this.progressBar1.TabIndex = 2;
-            // 
-            // groupBox2
-            // 
-            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox2.Controls.Add(this.bttDelete);
-            this.groupBox2.Controls.Add(this.listBox1);
-            this.groupBox2.Location = new System.Drawing.Point(12, 140);
-            this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(567, 170);
-            this.groupBox2.TabIndex = 2;
-            this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Pending";
-            // 
             // bttAbort
             // 
             this.bttAbort.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttAbort.Enabled = false;
             this.bttAbort.Location = new System.Drawing.Point(486, 78);
             this.bttAbort.Name = "bttAbort";
             this.bttAbort.Size = new System.Drawing.Size(75, 23);
@@ -118,26 +78,73 @@
             this.bttAbort.Text = "&Abort";
             this.bttAbort.UseVisualStyleBackColor = true;
             // 
-            // listBox1
+            // progressBar
             // 
-            this.listBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.progressBar.Location = new System.Drawing.Point(12, 78);
+            this.progressBar.Name = "progressBar";
+            this.progressBar.Size = new System.Drawing.Size(468, 23);
+            this.progressBar.TabIndex = 2;
+            // 
+            // lblActionLog2
+            // 
+            this.lblActionLog2.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblActionLog2.AutoEllipsis = true;
+            this.lblActionLog2.Location = new System.Drawing.Point(9, 49);
+            this.lblActionLog2.Name = "lblActionLog2";
+            this.lblActionLog2.Size = new System.Drawing.Size(552, 13);
+            this.lblActionLog2.TabIndex = 1;
+            this.lblActionLog2.Text = "-";
+            // 
+            // lblActionLog1
+            // 
+            this.lblActionLog1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblActionLog1.AutoEllipsis = true;
+            this.lblActionLog1.Location = new System.Drawing.Point(9, 25);
+            this.lblActionLog1.Name = "lblActionLog1";
+            this.lblActionLog1.Size = new System.Drawing.Size(552, 13);
+            this.lblActionLog1.TabIndex = 0;
+            this.lblActionLog1.Text = "-";
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.Location = new System.Drawing.Point(12, 25);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(468, 134);
-            this.listBox1.TabIndex = 0;
+            this.groupBox2.Controls.Add(this.bttDelete);
+            this.groupBox2.Controls.Add(this.listActions);
+            this.groupBox2.Location = new System.Drawing.Point(12, 140);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(567, 170);
+            this.groupBox2.TabIndex = 2;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Pending";
             // 
             // bttDelete
             // 
             this.bttDelete.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttDelete.Enabled = false;
             this.bttDelete.Location = new System.Drawing.Point(486, 25);
             this.bttDelete.Name = "bttDelete";
             this.bttDelete.Size = new System.Drawing.Size(75, 23);
             this.bttDelete.TabIndex = 1;
             this.bttDelete.Text = "&Delete";
             this.bttDelete.UseVisualStyleBackColor = true;
+            // 
+            // listActions
+            // 
+            this.listActions.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.listActions.FormattingEnabled = true;
+            this.listActions.Location = new System.Drawing.Point(12, 25);
+            this.listActions.Name = "listActions";
+            this.listActions.Size = new System.Drawing.Size(468, 134);
+            this.listActions.TabIndex = 0;
+            this.listActions.SelectedIndexChanged += new System.EventHandler(this.listActions_SelectedIndexChanged);
             // 
             // UpdateManagerStatusForm
             // 
@@ -157,7 +164,6 @@
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Installation Status";
             this.groupBox1.ResumeLayout(false);
-            this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
             this.ResumeLayout(false);
 
@@ -168,11 +174,11 @@
         private System.Windows.Forms.Button bttClose;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.Button bttAbort;
-        private System.Windows.Forms.ProgressBar progressBar1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ProgressBar progressBar;
+        private System.Windows.Forms.Label lblActionLog2;
+        private System.Windows.Forms.Label lblActionLog1;
         private System.Windows.Forms.GroupBox groupBox2;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox listActions;
         private System.Windows.Forms.Button bttDelete;
     }
 }
