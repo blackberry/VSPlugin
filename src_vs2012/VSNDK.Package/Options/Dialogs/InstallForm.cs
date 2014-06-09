@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows.Forms;
 using RIM.VSNDK_Package.Model;
+using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
 
 namespace RIM.VSNDK_Package.Options.Dialogs
@@ -186,6 +187,9 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                     case ApiLevelActionType.InstallManually:
                         DialogHelper.StartURL((string)argument);
                         break;
+                    case ApiLevelActionType.AddExisting:
+                        AddExistingNDK();
+                        break;
                     case ApiLevelActionType.Forget:
                         if (MessageBoxHelper.Show(definition.ToString(), "Remove own reference to existing NDK?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                         {
@@ -211,6 +215,30 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 case ApiLevelActionType.Refresh:
                     LoadList(panel, actionTarget, true);
                     break;
+            }
+        }
+
+        private void AddExistingNDK()
+        {
+            var form = new AddLocalNdkForm();
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                var ndk = form.NewNdk;
+                if (ndk != null)
+                {
+                    // save inside 'installation config' directory:
+                    if (ndk.Save(RunnerDefaults.PluginInstallationConfigDirectory))
+                    {
+                        // reload NDKs
+                        _vm.Reset(UpdateActionTargets.NDK);
+                        UpdateUI();
+                    }
+                    else
+                    {
+                        MessageBoxHelper.Show("Unable to save NDK information", "Update Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
             }
         }
     }

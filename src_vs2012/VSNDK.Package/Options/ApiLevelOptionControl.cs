@@ -67,30 +67,6 @@ namespace RIM.VSNDK_Package.Options
             PopulateNDKs(true);
         }
 
-        private void bttAddLocal_Click(object sender, EventArgs e)
-        {
-            var form = new AddLocalNdkForm();
-
-            if (form.ShowDialog() == DialogResult.OK)
-            {
-                var ndk = form.NewNdk;
-                if (ndk != null)
-                {
-                    // save inside 'installation config' directory:
-                    if (ndk.Save(RunnerDefaults.PluginInstallationConfigDirectory))
-                    {
-                        // reload NDKs
-                        _vm.ReloadAndActivate(ndk);
-                        PopulateNDKs(true);
-                    }
-                    else
-                    {
-                        MessageBoxHelper.Show("Unable to save NDK information", "API Level Updater", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    }
-                }
-            }
-        }
-
         private void bttInstallNew_Click(object sender, EventArgs e)
         {
             var form = new InstallForm(_vm);

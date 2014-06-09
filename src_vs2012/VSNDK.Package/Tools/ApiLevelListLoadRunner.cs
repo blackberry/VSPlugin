@@ -162,6 +162,9 @@ namespace RIM.VSNDK_Package.Tools
             {
                 // inject info about tablet NDK:
                 Add(groups, ApiInfo.CreateTabletInfo());
+
+                // inject info about 'custom NDK':
+                Add(groups, ApiInfo.CreateAddCustomInfo());
             }
 
             // group BlackBerry 10 items together:

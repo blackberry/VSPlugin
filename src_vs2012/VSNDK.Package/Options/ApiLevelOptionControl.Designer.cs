@@ -31,7 +31,6 @@
             this.txtDescription = new System.Windows.Forms.TextBox();
             this.cmbNDKs = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
-            this.bttAddLocal = new System.Windows.Forms.Button();
             this.bttInstallNew = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.bttStatus = new System.Windows.Forms.Button();
@@ -72,21 +71,10 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "Current API Level:";
             // 
-            // bttAddLocal
-            // 
-            this.bttAddLocal.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttAddLocal.Location = new System.Drawing.Point(459, 284);
-            this.bttAddLocal.Name = "bttAddLocal";
-            this.bttAddLocal.Size = new System.Drawing.Size(75, 23);
-            this.bttAddLocal.TabIndex = 6;
-            this.bttAddLocal.Text = "&Add...";
-            this.bttAddLocal.UseVisualStyleBackColor = true;
-            this.bttAddLocal.Click += new System.EventHandler(this.bttAddLocal_Click);
-            // 
             // bttInstallNew
             // 
             this.bttInstallNew.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttInstallNew.Location = new System.Drawing.Point(378, 284);
+            this.bttInstallNew.Location = new System.Drawing.Point(459, 284);
             this.bttInstallNew.Name = "bttInstallNew";
             this.bttInstallNew.Size = new System.Drawing.Size(75, 23);
             this.bttInstallNew.TabIndex = 5;
@@ -123,7 +111,6 @@
             this.Controls.Add(this.txtDescription);
             this.Controls.Add(this.cmbNDKs);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.bttAddLocal);
             this.Controls.Add(this.bttInstallNew);
             this.Name = "ApiLevelOptionControl";
             this.Size = new System.Drawing.Size(537, 310);
@@ -137,7 +124,6 @@
         private System.Windows.Forms.TextBox txtDescription;
         private System.Windows.Forms.ComboBox cmbNDKs;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button bttAddLocal;
         private System.Windows.Forms.Button bttInstallNew;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button bttStatus;

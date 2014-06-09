@@ -14,9 +14,13 @@
         /// </summary>
         Install,
         /// <summary>
-        /// Installation  of the API Level must be done manually (specified URL should be opened in a browser).
+        /// Installation of the API Level must be done manually (specified URL should be opened in a browser).
         /// </summary>
         InstallManually,
+        /// <summary>
+        /// Installation of the API Level was already done, but not detected automatically.
+        /// </summary>
+        AddExisting,
         /// <summary>
         /// Installed API Level, owned by the plugin, can be removed.
         /// </summary>

@@ -109,6 +109,14 @@ namespace RIM.VSNDK_Package.Model
         }
 
         /// <summary>
+        /// Creates an instance of the API to allow custom NDK insertion.
+        /// </summary>
+        public static ApiInfo CreateAddCustomInfo()
+        {
+            return new ApiInfo("Add Custom NDK", new Version());
+        }
+
+        /// <summary>
         /// Returns an index of NdkInfo inside a collection that has the same version.
         /// </summary>
         public static int IndexOf(IEnumerable<ApiInfo> list, Version version)

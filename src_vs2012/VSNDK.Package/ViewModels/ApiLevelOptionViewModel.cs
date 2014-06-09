@@ -86,6 +86,8 @@ namespace RIM.VSNDK_Package.ViewModels
 
             public abstract bool IsProcessing(ApiInfo info);
 
+            public abstract void Reset();
+
             #region IDisposable Implementation
 
             public void Dispose()
@@ -162,6 +164,13 @@ namespace RIM.VSNDK_Package.ViewModels
                     }
                 }
 
+                // is it an option to manually add NDK?
+                if (info.Version.Major == 0 && info.Version.Minor == 0)
+                {
+                    argument = RunnerDefaults.NdkDirectory;
+                    return ApiLevelActionType.AddExisting;
+                }
+
                 // is it a PlayBook NDK?
                 if (info.Version <= LastPlayBookVersion)
                 {
@@ -203,10 +212,9 @@ namespace RIM.VSNDK_Package.ViewModels
                 return true;
             }
 
-            public void ReloadAndActivate(NdkInfo ndk)
+            public override void Reset()
             {
                 PackageViewModel.Instance.ResetNDKs();
-                Active = ndk;
             }
         }
 
@@ -258,6 +266,11 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(info.Version, UpdateActionTargets.Simulator);
             }
+
+            public override void Reset()
+            {
+                PackageViewModel.Instance.ResetSimulators();
+            }
         }
 
         private sealed class RuntimeLoaderViewModel : LoaderViewModel
@@ -307,6 +320,11 @@ namespace RIM.VSNDK_Package.ViewModels
             public override bool IsProcessing(ApiInfo info)
             {
                 return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(info.Version, UpdateActionTargets.Runtime);
+            }
+
+            public override void Reset()
+            {
+                PackageViewModel.Instance.ResetRuntimes();
             }
         }
 
@@ -388,9 +406,20 @@ namespace RIM.VSNDK_Package.ViewModels
             set;
         }
 
-        public void ReloadAndActivate(NdkInfo ndk)
+        public void Reset(UpdateActionTargets target)
         {
-            _ndk.ReloadAndActivate(ndk);
+            switch (target)
+            {
+                case UpdateActionTargets.NDK:
+                    _ndk.Reset();
+                    break;
+                case UpdateActionTargets.Simulator:
+                    _simulator.Reset();
+                    break;
+                case UpdateActionTargets.Runtime:
+                    _runtime.Reset();
+                    break;
+            }
         }
 
         public ApiLevelActionType GetAction(ApiInfo info, UpdateActionTargets target)

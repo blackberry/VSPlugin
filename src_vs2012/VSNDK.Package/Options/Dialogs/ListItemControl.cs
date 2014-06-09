@@ -84,6 +84,9 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 case ApiLevelActionType.InstallManually:
                     ActionName = "Download...";
                     break;
+                case ApiLevelActionType.AddExisting:
+                    ActionName = "Add...";
+                    break;
                 case ApiLevelActionType.Uninstall:
                     ActionName = "Uninstall";
                     break;
