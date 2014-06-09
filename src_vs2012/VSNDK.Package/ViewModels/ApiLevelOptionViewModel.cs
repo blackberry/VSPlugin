@@ -74,13 +74,13 @@ namespace RIM.VSNDK_Package.ViewModels
                     handler(this, EventArgs.Empty);
             }
 
-            public ApiLevelActionType GetAction(ApiInfo info)
+            public ApiLevelTask GetTask(ApiInfo info)
             {
                 object argument;
-                return GetAction(info, out argument);
+                return GetTask(info, out argument);
             }
 
-            public abstract ApiLevelActionType GetAction(ApiInfo info, out object argument);
+            public abstract ApiLevelTask GetTask(ApiInfo info, out object argument);
 
             public abstract bool IsInstalled(ApiInfo info);
 
@@ -137,13 +137,13 @@ namespace RIM.VSNDK_Package.ViewModels
                 set { PackageViewModel.Instance.ActiveNDK = value; }
             }
 
-            public override ApiLevelActionType GetAction(ApiInfo info, out object argument)
+            public override ApiLevelTask GetTask(ApiInfo info, out object argument)
             {
                 argument = null;
 
                 // nothing should be displayed for not defined NDK:
                 if (info == null)
-                    return ApiLevelActionType.Hide;
+                    return ApiLevelTask.Hide;
 
                 // check, if it exists on disk:
                 bool isInstalled = IsInstalled(info) || AreItemsInstalled(info as ApiInfoArray);
@@ -154,13 +154,13 @@ namespace RIM.VSNDK_Package.ViewModels
                     // is it NDK owned by the plugin itself?
                     if (isInstalled && ndkInfo.TargetPath != null && ndkInfo.TargetPath.StartsWith(RunnerDefaults.NdkDirectory, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        return IsProcessing(info) ? ApiLevelActionType.Nothing : ApiLevelActionType.Uninstall;
+                        return IsProcessing(info) ? ApiLevelTask.Nothing : ApiLevelTask.Uninstall;
                     }
 
                     // is it a custom definition added?
                     if (ndkInfo.FilePath != null && ndkInfo.FilePath.StartsWith(RunnerDefaults.PluginInstallationConfigDirectory, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        return ApiLevelActionType.Forget;
+                        return ApiLevelTask.Forget;
                     }
                 }
 
@@ -168,21 +168,21 @@ namespace RIM.VSNDK_Package.ViewModels
                 if (info.Version.Major == 0 && info.Version.Minor == 0)
                 {
                     argument = RunnerDefaults.NdkDirectory;
-                    return ApiLevelActionType.AddExisting;
+                    return ApiLevelTask.AddExisting;
                 }
 
                 // is it a PlayBook NDK?
                 if (info.Version <= LastPlayBookVersion)
                 {
                     if (isInstalled)
-                        return ApiLevelActionType.Nothing;
+                        return ApiLevelTask.Nothing;
 
                     argument = "http://developer.blackberry.com/playbook/native/download/";
-                    return ApiLevelActionType.InstallManually;
+                    return ApiLevelTask.InstallManually;
                 }
 
                 // by default, check, if it can be installed, or it's not owned by the plugin:
-                return isInstalled ? ApiLevelActionType.Nothing : ApiLevelActionType.Install;
+                return isInstalled ? ApiLevelTask.Nothing : ApiLevelTask.Install;
             }
 
             public override bool IsInstalled(ApiInfo info)
@@ -192,7 +192,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             public override bool IsProcessing(ApiInfo info)
             {
-                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(UpdateActionTargets.NDK, info.Version);
+                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(ApiLevelTarget.NDK, info.Version);
             }
 
             /// <summary>
@@ -236,13 +236,13 @@ namespace RIM.VSNDK_Package.ViewModels
                 get { return PackageViewModel.Instance.InstalledSimulators; }
             }
 
-            public override ApiLevelActionType GetAction(ApiInfo info, out object argument)
+            public override ApiLevelTask GetTask(ApiInfo info, out object argument)
             {
                 argument = null;
 
                 // nothing should be displayed for invalid simulator:
                 if (info == null)
-                    return ApiLevelActionType.Hide;
+                    return ApiLevelTask.Hide;
 
                 // check, if it exists on disk:
                 var infoArray = info as ApiInfoArray;
@@ -251,10 +251,10 @@ namespace RIM.VSNDK_Package.ViewModels
 
                 if (simulatorInfo != null)
                 {
-                    return isInstalled && !IsProcessing(info) ? ApiLevelActionType.Uninstall : ApiLevelActionType.Nothing;
+                    return isInstalled && !IsProcessing(info) ? ApiLevelTask.Uninstall : ApiLevelTask.Nothing;
                 }
 
-                return isInstalled ? ApiLevelActionType.Nothing : ApiLevelActionType.Install;
+                return isInstalled ? ApiLevelTask.Nothing : ApiLevelTask.Install;
             }
 
             public override bool IsInstalled(ApiInfo info)
@@ -264,7 +264,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             public override bool IsProcessing(ApiInfo info)
             {
-                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(UpdateActionTargets.Simulator, info.Version);
+                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(ApiLevelTarget.Simulator, info.Version);
             }
 
             public override void Reset()
@@ -291,13 +291,13 @@ namespace RIM.VSNDK_Package.ViewModels
                 get { return PackageViewModel.Instance.InstalledRuntimes; }
             }
 
-            public override ApiLevelActionType GetAction(ApiInfo info, out object argument)
+            public override ApiLevelTask GetTask(ApiInfo info, out object argument)
             {
                 argument = null;
 
                 // nothing should be displayed for invalid runtime libraries:
                 if (info == null)
-                    return ApiLevelActionType.Hide;
+                    return ApiLevelTask.Hide;
 
                 // check, if it exists on disk:
                 var infoArray = info as ApiInfoArray;
@@ -306,10 +306,10 @@ namespace RIM.VSNDK_Package.ViewModels
 
                 if (runtimeInfo != null)
                 {
-                    return isInstalled && !IsProcessing(info) ? ApiLevelActionType.Uninstall : ApiLevelActionType.Nothing;
+                    return isInstalled && !IsProcessing(info) ? ApiLevelTask.Uninstall : ApiLevelTask.Nothing;
                 }
 
-                return isInstalled ? ApiLevelActionType.Nothing : ApiLevelActionType.Install;
+                return isInstalled ? ApiLevelTask.Nothing : ApiLevelTask.Install;
             }
 
             public override bool IsInstalled(ApiInfo info)
@@ -319,7 +319,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             public override bool IsProcessing(ApiInfo info)
             {
-                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(UpdateActionTargets.Runtime, info.Version);
+                return info != null && PackageViewModel.Instance.UpdateManager.IsProcessing(ApiLevelTarget.Runtime, info.Version);
             }
 
             public override void Reset()
@@ -411,47 +411,47 @@ namespace RIM.VSNDK_Package.ViewModels
             get { return PackageViewModel.Instance.UpdateManager; }
         }
 
-        public void Reset(UpdateActionTargets target)
+        public void Reset(ApiLevelTarget target)
         {
             switch (target)
             {
-                case UpdateActionTargets.NDK:
+                case ApiLevelTarget.NDK:
                     _ndk.Reset();
                     break;
-                case UpdateActionTargets.Simulator:
+                case ApiLevelTarget.Simulator:
                     _simulator.Reset();
                     break;
-                case UpdateActionTargets.Runtime:
+                case ApiLevelTarget.Runtime:
                     _runtime.Reset();
                     break;
             }
         }
 
-        public ApiLevelActionType GetAction(ApiInfo info, UpdateActionTargets target)
+        public ApiLevelTask GetTask(ApiInfo info, ApiLevelTarget target)
         {
             switch (target)
             {
-                case UpdateActionTargets.NDK:
-                    return _ndk.GetAction(info);
-                case UpdateActionTargets.Simulator:
-                    return _simulator.GetAction(info);
-                case UpdateActionTargets.Runtime:
-                    return _runtime.GetAction(info);
+                case ApiLevelTarget.NDK:
+                    return _ndk.GetTask(info);
+                case ApiLevelTarget.Simulator:
+                    return _simulator.GetTask(info);
+                case ApiLevelTarget.Runtime:
+                    return _runtime.GetTask(info);
                 default:
                     throw new ArgumentOutOfRangeException("target");
             }
         }
 
-        public ApiLevelActionType GetAction(ApiInfo info, UpdateActionTargets target, out object argument)
+        public ApiLevelTask GetTask(ApiInfo info, ApiLevelTarget target, out object argument)
         {
             switch (target)
             {
-                case UpdateActionTargets.NDK:
-                    return _ndk.GetAction(info, out argument);
-                case UpdateActionTargets.Simulator:
-                    return _simulator.GetAction(info, out argument);
-                case UpdateActionTargets.Runtime:
-                    return _runtime.GetAction(info, out argument);
+                case ApiLevelTarget.NDK:
+                    return _ndk.GetTask(info, out argument);
+                case ApiLevelTarget.Simulator:
+                    return _simulator.GetTask(info, out argument);
+                case ApiLevelTarget.Runtime:
+                    return _runtime.GetTask(info, out argument);
                 default:
                     throw new ArgumentOutOfRangeException("target");
             }
@@ -461,15 +461,15 @@ namespace RIM.VSNDK_Package.ViewModels
         /// Loads the list of remote NDKs.
         /// If data is already available this method will return 'false'. 'True', if loading in progress.
         /// </summary>
-        public bool Load(UpdateActionTargets target, bool reload)
+        public bool Load(ApiLevelTarget target, bool reload)
         {
             switch (target)
             {
-                case UpdateActionTargets.NDK:
+                case ApiLevelTarget.NDK:
                     return _ndk.Load(reload, Dispatcher);
-                case UpdateActionTargets.Simulator:
+                case ApiLevelTarget.Simulator:
                     return _simulator.Load(reload, Dispatcher);
-                case UpdateActionTargets.Runtime:
+                case ApiLevelTarget.Runtime:
                     return _runtime.Load(reload, Dispatcher);
                 default:
                     throw new ArgumentOutOfRangeException("target");
@@ -496,30 +496,30 @@ namespace RIM.VSNDK_Package.ViewModels
 
         #endregion
 
-        public bool CheckIfInstalled(ApiInfo info, UpdateActionTargets target)
+        public bool CheckIfInstalled(ApiInfo info, ApiLevelTarget target)
         {
             switch (target)
             {
-                case UpdateActionTargets.NDK:
+                case ApiLevelTarget.NDK:
                     return _ndk.IsInstalled(info);
-                case UpdateActionTargets.Simulator:
+                case ApiLevelTarget.Simulator:
                     return _simulator.IsInstalled(info);
-                case UpdateActionTargets.Runtime:
+                case ApiLevelTarget.Runtime:
                     return _runtime.IsInstalled(info);
                 default:
                     throw new ArgumentOutOfRangeException("target");
             }
         }
 
-        public bool IsProcessing(ApiInfo info, UpdateActionTargets target)
+        public bool IsProcessing(ApiInfo info, ApiLevelTarget target)
         {
             switch (target)
             {
-                case UpdateActionTargets.NDK:
+                case ApiLevelTarget.NDK:
                     return _ndk.IsProcessing(info);
-                case UpdateActionTargets.Simulator:
+                case ApiLevelTarget.Simulator:
                     return _simulator.IsProcessing(info);
-                case UpdateActionTargets.Runtime:
+                case ApiLevelTarget.Runtime:
                     return _runtime.IsProcessing(info);
                 default:
                     throw new ArgumentOutOfRangeException("target");
@@ -529,23 +529,23 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Requests to download and install something.
         /// </summary>
-        public void RequestInstall(ApiInfo info, UpdateActionTargets target)
+        public void RequestInstall(ApiInfo info, ApiLevelTarget target)
         {
             if (info == null)
                 throw new ArgumentNullException("info");
 
-            PackageViewModel.Instance.UpdateManager.Request(UpdateActions.Install, target, info.Name, info.Version);
+            PackageViewModel.Instance.UpdateManager.Request(ApiLevelAction.Install, target, info.Name, info.Version);
         }
 
         /// <summary>
         /// Requests to uninstall and remove something.
         /// </summary>
-        public void RequestRemoval(ApiInfo info, UpdateActionTargets target)
+        public void RequestRemoval(ApiInfo info, ApiLevelTarget target)
         {
             if (info == null)
                 throw new ArgumentNullException("info");
 
-            PackageViewModel.Instance.UpdateManager.Request(UpdateActions.Uninstall, target, info.Name, info.Version);
+            PackageViewModel.Instance.UpdateManager.Request(ApiLevelAction.Uninstall, target, info.Name, info.Version);
         }
 
         /// <summary>

@@ -3,7 +3,7 @@
     /// <summary>
     /// Targets processed by Update Manager
     /// </summary>
-    internal enum UpdateActionTargets
+    internal enum ApiLevelTarget
     {
         NDK,
         Simulator,

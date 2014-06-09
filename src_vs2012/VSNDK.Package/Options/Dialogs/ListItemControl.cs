@@ -8,13 +8,13 @@ namespace RIM.VSNDK_Package.Options.Dialogs
     {
         public event EventHandler ExecuteAction;
 
-        private ApiLevelActionType _action;
+        private ApiLevelTask _action;
 
         public ListItemControl()
         {
             InitializeComponent();
 
-            Action = ApiLevelActionType.Hide;
+            Action = ApiLevelTask.Hide;
             OnActionChanged();
         }
 
@@ -38,7 +38,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             set { bttAction.Text = value; }
         }
 
-        public ApiLevelActionType Action
+        public ApiLevelTask Action
         {
             get { return _action; }
             set
@@ -51,7 +51,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             }
         }
 
-        public UpdateActionTargets Target
+        public ApiLevelTarget Target
         {
             get;
             set;
@@ -70,30 +70,30 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
             switch (_action)
             {
-                case ApiLevelActionType.Hide:
+                case ApiLevelTask.Hide:
                     ActionName = string.Empty;
                     bttAction.Visible = false;
                     break;
-                case ApiLevelActionType.Nothing:
+                case ApiLevelTask.Nothing:
                     ActionName = "Locked";
                     bttAction.Enabled = false;
                     break;
-                case ApiLevelActionType.Install:
+                case ApiLevelTask.Install:
                     ActionName = "Install";
                     break;
-                case ApiLevelActionType.InstallManually:
+                case ApiLevelTask.InstallManually:
                     ActionName = "Download...";
                     break;
-                case ApiLevelActionType.AddExisting:
+                case ApiLevelTask.AddExisting:
                     ActionName = "Add...";
                     break;
-                case ApiLevelActionType.Uninstall:
+                case ApiLevelTask.Uninstall:
                     ActionName = "Uninstall";
                     break;
-                case ApiLevelActionType.Forget:
+                case ApiLevelTask.Forget:
                     ActionName = "Forget";
                     break;
-                case ApiLevelActionType.Refresh:
+                case ApiLevelTask.Refresh:
                     ActionName = "Reload";
                     break;
 

@@ -3,7 +3,7 @@
     /// <summary>
     /// Enumeration describing, what action can be performed over specified API Level.
     /// </summary>
-    internal enum ApiLevelActionType
+    internal enum ApiLevelTask
     {
         /// <summary>
         /// Nothing can be done with this API Level (it was installed separatelly and just detected).

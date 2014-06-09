@@ -16,7 +16,7 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             #region Properties
 
-            internal ActionData(UpdateManager manager, UpdateActions action, UpdateActionTargets target, string name, Version version)
+            internal ActionData(UpdateManager manager, ApiLevelAction action, ApiLevelTarget target, string name, Version version)
             {
                 if (manager == null)
                     throw new ArgumentNullException("manager");
@@ -43,13 +43,13 @@ namespace RIM.VSNDK_Package.ViewModels
                 get { return true; }
             }
 
-            public UpdateActions Action
+            public ApiLevelAction Action
             {
                 get;
                 private set;
             }
 
-            public UpdateActionTargets Target
+            public ApiLevelTarget Target
             {
                 get;
                 private set;
@@ -139,7 +139,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Requests installation or removal over specified item and version.
         /// </summary>
-        public void Request(UpdateActions action, UpdateActionTargets target, string name, Version version)
+        public void Request(ApiLevelAction action, ApiLevelTarget target, string name, Version version)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
@@ -191,7 +191,7 @@ namespace RIM.VSNDK_Package.ViewModels
         /// <summary>
         /// Checks, if there exists scheduled action for specified item.
         /// </summary>
-        public bool IsProcessing(UpdateActionTargets target, Version version)
+        public bool IsProcessing(ApiLevelTarget target, Version version)
         {
             if (version == null)
                 return false;

@@ -11,7 +11,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
     /// </summary>
     internal partial class InstallConfirmationForm : Form
     {
-        public InstallConfirmationForm(string nameOverride, IEnumerable<ApiInfo> items, UpdateActionTargets target, Func<ApiInfo, UpdateActionTargets, bool> installationCheckHandler, Func<ApiInfo, UpdateActionTargets, bool> processingCheckHandler)
+        public InstallConfirmationForm(string nameOverride, IEnumerable<ApiInfo> items, ApiLevelTarget target, Func<ApiInfo, ApiLevelTarget, bool> installationCheckHandler, Func<ApiInfo, ApiLevelTarget, bool> processingCheckHandler)
         {
             if (items == null)
                 throw new ArgumentNullException("items");
