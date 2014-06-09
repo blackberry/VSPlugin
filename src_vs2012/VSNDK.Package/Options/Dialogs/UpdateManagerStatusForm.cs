@@ -20,20 +20,22 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             UpdateUI();
 
             _dispatcher = _vm.Dispatcher ?? EventDispatcher.From(this);
-            _vm.UpdateManager.Completed += OnActionCompleted;
+            _vm.UpdateManager.Started += OnActionChanged;
+            _vm.UpdateManager.Completed += OnActionChanged;
             _vm.UpdateManager.Log += OnLog; // this will cause the last message to be sent again...
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            _vm.UpdateManager.Completed -= OnActionCompleted;
+            _vm.UpdateManager.Started -= OnActionChanged;
+            _vm.UpdateManager.Completed -= OnActionChanged;
             _vm.UpdateManager.Log -= OnLog;
             base.OnClosed(e);
         }
 
-        private void OnActionCompleted(object sender, EventArgs e)
+        private void OnActionChanged(object sender, EventArgs e)
         {
-            _dispatcher.Invoke(UpdateUI, (object)null);
+            _dispatcher.Invoke(UpdateUI);
         }
 
         private void OnLog(object sender, ApiLevelUpdateLogEventArgs e)
@@ -41,12 +43,13 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             _dispatcher.Invoke(UpdateLog, e);
         }
 
-        private void UpdateUI(object sender)
+        private void UpdateUI()
         {
-            UpdateUI();
+            UpdateList();
+            UpdateLog(_vm.UpdateManager.CurrentAction);
         }
 
-        private void UpdateUI()
+        private void UpdateList()
         {
             listActions.Items.Clear();
             foreach (var item in _vm.UpdateManager.Actions)
@@ -54,7 +57,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 listActions.Items.Add(item);
             }
 
-            UpdateLog(_vm.UpdateManager.CurrentAction);
+            listActions_SelectedIndexChanged(null, EventArgs.Empty);
         }
 
         private void UpdateLog(ViewModels.UpdateManager.ActionData action)
@@ -107,7 +110,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                 if (MessageBoxHelper.Show(action.ToString(), "Do you want to delete this step?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
                     action.Delete();
-                    UpdateUI();
+                    UpdateList();
                 }
             }
         }

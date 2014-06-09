@@ -43,9 +43,11 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             _vm.NdkListLoaded += NdkListLoaded;
             _vm.SimulatorListLoaded += SimulatorListLoaded;
             _vm.RuntimeListLoaded += RuntimeListLoaded;
+            _vm.UpdateManager.Completed += ApiLevelChanged;
 
             UpdateUI();
         }
+
 
         #region Properties
 
@@ -84,6 +86,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             _vm.NdkListLoaded -= NdkListLoaded;
             _vm.SimulatorListLoaded -= SimulatorListLoaded;
             _vm.RuntimeListLoaded -= RuntimeListLoaded;
+            _vm.UpdateManager.Completed -= ApiLevelChanged;
             base.OnClosed(e);
         }
 
@@ -109,6 +112,11 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             Array.Sort(suggested, new DescApiComparer());
 
             PopulateList(panelAvailableRuntimes, suggested, ApiLevelTarget.Runtime, (info, target) => _vm.GetTask(info, target), "There was an error, while loading list of Runtime Libraries", ApiLevelTask.Refresh);
+        }
+
+        private void ApiLevelChanged(object sender, EventArgs e)
+        {
+            _vm.Dispatcher.Invoke(UpdateUI);
         }
 
         private void PopulateList(Panel panel, IEnumerable<ApiInfo> items, ApiLevelTarget target, Func<ApiInfo, ApiLevelTarget, ApiLevelTask> actionEvaluation, string missingItemsMessage, ApiLevelTask missingItemsAction)
@@ -179,7 +187,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
                                 var info = form.SelectedItem;
                                 _vm.RequestInstall(info, actionTarget);
 
-                                MessageBoxHelper.Show("Scheduled \"" + info + "\" for installation. Please be patient, this might take some time.",
+                                MessageBoxHelper.Show("Scheduled \"" + info + "\" for installation. Please be patient, this might take some time.\r\n\r\nProgress can be monitored in Status window.",
                                                       "Update Manager", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                         }

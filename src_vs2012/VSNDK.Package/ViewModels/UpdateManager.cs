@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows.Forms;
 using RIM.VSNDK_Package.Diagnostics;
 using RIM.VSNDK_Package.Tools;
 
@@ -170,11 +171,15 @@ namespace RIM.VSNDK_Package.ViewModels
             remove { HiddenLog -= value; }
         }
 
+        private const int DelayInterval = 30000; // in milisec
+
+        public event EventHandler Started;
         public event EventHandler Completed;
 
         private readonly PackageViewModel _vm;
         private ApiLevelUpdateLogEventArgs _lastLog;
         private readonly List<ActionData> _actions;
+        private Timer _timer;
 
         public UpdateManager(PackageViewModel vm, string folder)
         {
@@ -316,20 +321,24 @@ namespace RIM.VSNDK_Package.ViewModels
             if (CurrentAction != null)
                 return;
 
-            try
-            {
-                SyncFile = new StreamWriter(File.Open(SyncFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None));
-            }
-            catch (Exception)
-            {
-                // ok, probably occupied by another instance of Visual Studio... retry in some time...
-                return;
-            }
-
             lock (GetType())
             {
                 if (_actions.Count == 0)
                     return;
+                if (SyncFile != null)
+                    return;
+
+                try
+                {
+                    SyncFile = new StreamWriter(File.Open(SyncFilePath, FileMode.Create, FileAccess.ReadWrite, FileShare.None));
+                    SyncFile.Write(System.Diagnostics.Process.GetCurrentProcess().Id);
+                }
+                catch (Exception)
+                {
+                    // ok, probably occupied by another instance of Visual Studio... retry in some time...
+                    StartLater();
+                    return;
+                }
 
                 CurrentAction = _actions[0];
                 _actions.RemoveAt(0);
@@ -339,10 +348,34 @@ namespace RIM.VSNDK_Package.ViewModels
                 NotifyLog(new ApiLevelUpdateLogEventArgs("Starting..."));
                 CurrentAction.Start();
             }
+
+            NotifyStarted();
+        }
+
+        private void StartLater()
+        {
+            if (_timer == null)
+            {
+                _timer = new Timer();
+                _timer.Interval = DelayInterval; // in milisec
+                _timer.Tick += TimerOnTick;
+                _timer.Start();
+            }
+        }
+
+        private void TimerOnTick(object sender, EventArgs e)
+        {
+            _timer.Dispose();
+            _timer = null;
+
+            Start();
         }
 
         private void Finished(ActionData action)
         {
+            if (SyncFile == null)
+                return;
+
             bool completed = false;
 
             lock (GetType())
@@ -355,6 +388,9 @@ namespace RIM.VSNDK_Package.ViewModels
                     // and now reload underlying stored lists:
                     _vm.Reset(action.Target);
                     completed = true;
+
+                    SyncFile.Close();
+                    SyncFile = null;
                 }
             }
 
@@ -396,6 +432,14 @@ namespace RIM.VSNDK_Package.ViewModels
                 handler(this, e);
         }
 
+        private void NotifyStarted()
+        {
+            var handler = Started;
+
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
         private void NotifyCompleted()
         {
             var handler = Completed;
@@ -416,8 +460,6 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             if (disposing)
             {
-                ActionData[] copiedActions;
-
                 lock (GetType())
                 {
                     if (SyncFile != null)
@@ -426,15 +468,21 @@ namespace RIM.VSNDK_Package.ViewModels
                         SyncFile = null;
                     }
 
-                    copiedActions = Actions;
-                    _actions.Clear();
+                    ActionData[] copiedActions = Actions;
                     Actions = new ActionData[0];
+                    _actions.Clear();
 
                     // and abort all actions:
                     foreach (var action in copiedActions)
                     {
                         action.Abort();
                     }
+                }
+
+                if (_timer != null)
+                {
+                    _timer.Dispose();
+                    _timer = null;
                 }
             }
         }

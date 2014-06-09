@@ -16,7 +16,13 @@ namespace RIM.VSNDK_Package.Options
             InitializeComponent();
 
             _vm.Dispatcher = EventDispatcher.From(this);
+            _vm.UpdateManager.Completed += OnApiLevelChanged;
             PopulateNDKs(true);
+        }
+
+        private void OnApiLevelChanged(object sender, EventArgs e)
+        {
+            PopulateNDKs(false);
         }
 
         private void PopulateNDKs(bool ignoreCurrentSelection)
