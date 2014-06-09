@@ -401,6 +401,10 @@
     <Compile Include="Options\TargetsOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
+    <Compile Include="Tools\ApiLevelUpdateRunner.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tools\EventDispatcher.cs" />
     <Compile Include="Tools\KeyToolGenRunner.cs" />
     <Compile Include="Tools\KeyToolInfoRunner.cs" />

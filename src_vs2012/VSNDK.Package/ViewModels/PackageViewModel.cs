@@ -411,6 +411,27 @@ namespace RIM.VSNDK_Package.ViewModels
         }
 
         /// <summary>
+        /// Resets the cached list of given type.
+        /// </summary>
+        public void Reset(ApiLevelTarget target)
+        {
+            switch (target)
+            {
+                case ApiLevelTarget.NDK:
+                    ResetNDKs();
+                    break;
+                case ApiLevelTarget.Simulator:
+                    ResetSimulators();
+                    break;
+                case ApiLevelTarget.Runtime:
+                    ResetRuntimes();
+                    break;
+                default:
+                    throw new InvalidOperationException("Unsupported target type (" + target + ")");
+            }
+        }
+
+        /// <summary>
         /// Removes custom reference to existing NDK, created by developer some time ago.
         /// </summary>
         public void Forget(NdkInfo info)

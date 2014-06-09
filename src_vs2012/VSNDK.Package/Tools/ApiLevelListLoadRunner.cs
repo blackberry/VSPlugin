@@ -81,7 +81,7 @@ namespace RIM.VSNDK_Package.Tools
                     args += " --list-all --runtime";
                     break;
                 default:
-                    throw new InvalidOperationException("Specified list type is unsupported");
+                    throw new InvalidOperationException("Specified list type is unsupported (" + Type + ")");
             }
 
             Arguments = args;

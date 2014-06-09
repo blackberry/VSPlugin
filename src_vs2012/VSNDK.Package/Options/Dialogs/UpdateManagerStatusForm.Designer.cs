@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.bttClose = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.bttAbort = new System.Windows.Forms.Button();
@@ -37,6 +38,7 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.bttDelete = new System.Windows.Forms.Button();
             this.listActions = new System.Windows.Forms.ListBox();
+            this.toolTip = new System.Windows.Forms.ToolTip(this.components);
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -77,6 +79,7 @@
             this.bttAbort.TabIndex = 3;
             this.bttAbort.Text = "&Abort";
             this.bttAbort.UseVisualStyleBackColor = true;
+            this.bttAbort.Click += new System.EventHandler(this.bttAbort_Click);
             // 
             // progressBar
             // 
@@ -133,6 +136,7 @@
             this.bttDelete.TabIndex = 1;
             this.bttDelete.Text = "&Delete";
             this.bttDelete.UseVisualStyleBackColor = true;
+            this.bttDelete.Click += new System.EventHandler(this.bttDelete_Click);
             // 
             // listActions
             // 
@@ -156,6 +160,7 @@
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.bttClose);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "UpdateManagerStatusForm";
@@ -180,5 +185,6 @@
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.ListBox listActions;
         private System.Windows.Forms.Button bttDelete;
+        private System.Windows.Forms.ToolTip toolTip;
     }
 }

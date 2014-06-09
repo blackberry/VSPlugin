@@ -114,11 +114,21 @@ namespace RIM.VSNDK_Package.Tools
 
         #endregion
 
+        protected virtual void ProcessOutputLine(string text)
+        {
+            _output.AppendLine(text);
+        }
+
+        protected virtual void ProcessErrorLine(string text)
+        {
+            _error.AppendLine(text);
+        }
+
         private void OutputDataReceived(object sender, DataReceivedEventArgs e)
         {
             if (e.Data != null)
             {
-                _output.AppendLine(e.Data);
+                ProcessOutputLine(e.Data);
             }
         }
 
@@ -126,7 +136,7 @@ namespace RIM.VSNDK_Package.Tools
         {
             if (e.Data != null)
             {
-                _error.AppendLine(e.Data);
+                ProcessErrorLine(e.Data);
             }
         }
 
@@ -149,6 +159,8 @@ namespace RIM.VSNDK_Package.Tools
 
                 _process.BeginErrorReadLine();
                 _process.BeginOutputReadLine();
+
+                PrepareStarted(_process.Id);
                 _process.WaitForExit();
                 ExitCode = _process.ExitCode;
 
@@ -186,6 +198,8 @@ namespace RIM.VSNDK_Package.Tools
                 _process.Start();
                 _process.BeginErrorReadLine();
                 _process.BeginOutputReadLine();
+
+                PrepareStarted(_process.Id);
             }
             catch (Exception ex)
             {
@@ -281,6 +295,13 @@ namespace RIM.VSNDK_Package.Tools
                 handler(this, new ToolRunnerStartupEventArgs(this));
         }
 
+        /// <summary>
+        /// Method executed just after staring the tool, to setup extra behavior of the runner.
+        /// </summary>
+        protected virtual void PrepareStarted(int pid)
+        {
+        }
+
         protected virtual void ConsumeResults(string output, string error)
         {
             // do nothing, subclasses should handle parsing output
@@ -317,19 +338,16 @@ namespace RIM.VSNDK_Package.Tools
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            if (_process != null)
             {
-                if (_process != null)
-                {
-                    _process.OutputDataReceived -= OutputDataReceived;
-                    _process.ErrorDataReceived -= ErrorDataReceived;
+                _process.OutputDataReceived -= OutputDataReceived;
+                _process.ErrorDataReceived -= ErrorDataReceived;
 
-                    _process.Dispose();
-                    _process = null;
-                }
-
-                Finished = null;
+                _process.Dispose();
+                _process = null;
             }
+
+            Finished = null;
         }
 
         #endregion
