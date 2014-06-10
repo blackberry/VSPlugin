@@ -60,9 +60,15 @@ namespace RIM.VSNDK_Package.ViewModels
                 set;
             }
 
+            public bool IsRunning
+            {
+                get { return _runner != null; }
+            }
+
             public bool CanAbort
             {
-                get { return true; }
+                get;
+                private set;
             }
 
             public ApiLevelAction Action
@@ -102,7 +108,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
                 lock (GetType())
                 {
-                    if (_runner != null)
+                    if (_runner != null && CanAbort)
                     {
                         aborted = _runner.Abort();
                     }
@@ -118,8 +124,8 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 lock (GetType())
                 {
-                    // already running?
-                    if (_runner != null)
+                    // do nothing if already running
+                    if (IsRunning)
                         return;
 
                     _runner = new ApiLevelUpdateRunner(RunnerDefaults.NdkDirectory, Action, Target, Version);
@@ -131,6 +137,11 @@ namespace RIM.VSNDK_Package.ViewModels
 
             private void OnLog(object sender, ApiLevelUpdateLogEventArgs e)
             {
+                if (e != null)
+                {
+                    CanAbort = e.CanAbort;
+                }
+
                 UpdateManager.NotifyLog(e);
             }
 
@@ -148,6 +159,10 @@ namespace RIM.VSNDK_Package.ViewModels
 
             public void Delete()
             {
+                // don't allow deletion, if already running:
+                if (IsRunning)
+                    return;
+
                 UpdateManager.Remove(this);
             }
         }
@@ -356,6 +371,9 @@ namespace RIM.VSNDK_Package.ViewModels
         {
             if (_timer == null)
             {
+                NotifyLog(new ApiLevelUpdateLogEventArgs("Another instance of Visual Studio is already performing an update. Waiting...", 0, true));
+                TraceLog.WriteLine("Another instance of Visual Studio occupies the UpdateManager. Waiting for own time slot...");
+
                 _timer = new Timer();
                 _timer.Interval = DelayInterval; // in milisec
                 _timer.Tick += TimerOnTick;
