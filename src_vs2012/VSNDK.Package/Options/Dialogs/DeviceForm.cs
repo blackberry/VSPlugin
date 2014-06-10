@@ -126,6 +126,9 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             return new DeviceDefinition(DeviceName, DeviceIP, DevicePassword, DeviceClass == DialogDeviceClass.Simulator ? DeviceDefinitionType.Simulator : DeviceDefinitionType.Device);
         }
 
+        /// <summary>
+        /// Fills the fields of the form based on the given device.
+        /// </summary>
         public void FromDevice(DeviceDefinition device)
         {
             if (device == null)
@@ -143,6 +146,10 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             DevicePassword = device.Password;
         }
 
+        /// <summary>
+        /// Switches the default to PIN-discover mode.
+        /// In this mode name field is hidden, instead the combo-box with known devices along with PIN field are shown.
+        /// </summary>
         public void SetDiscoverMode(IEnumerable<DeviceDefinition> devices)
         {
             cmbType.Enabled = false;

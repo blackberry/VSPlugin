@@ -345,6 +345,8 @@ namespace RIM.VSNDK_Package.Model
             // PH: no reason, but sometimes boolean field is presented as JSON (especially debug-token-valid field)...
             if (string.CompareOrdinal(text, "{}") == 0)
                 return false;
+            if (string.CompareOrdinal(text, "null") == 0)
+                return false;
 
             throw new FormatException("Invalid boolean value");
         }

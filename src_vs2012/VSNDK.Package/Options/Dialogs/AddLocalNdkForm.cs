@@ -73,23 +73,27 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         private void UpdateByPathSelection(TextBox sourceControl)
         {
             var folder = DialogHelper.BrowseForFolder(null, "Specify target-path, host-path or the root folder of those two");
-            var ndk = NdkInfo.Scan(folder);
 
-            if (ndk == null)
+            if (!string.IsNullOrEmpty(folder))
             {
-                MessageBoxHelper.Show("Specified folder is not a valid NDK root", folder ?? string.Empty, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                sourceControl.Text = folder;
-            }
-            else
-            {
-                if (string.IsNullOrEmpty(NdkName))
-                    NdkName = ndk.Name;
-                if (string.IsNullOrEmpty(NdkHostPath))
-                    NdkHostPath = ndk.HostPath;
-                if (string.IsNullOrEmpty(NdkTargetPath))
-                    NdkTargetPath = ndk.TargetPath;
-                if (string.IsNullOrEmpty(txtVersion.Text))
-                    NdkVersion = ndk.Version;
+                var ndk = NdkInfo.Scan(folder);
+
+                if (ndk == null)
+                {
+                    MessageBoxHelper.Show("Specified folder is not a valid NDK root", folder, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    sourceControl.Text = folder;
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(NdkName))
+                        NdkName = ndk.Name;
+                    if (string.IsNullOrEmpty(NdkHostPath))
+                        NdkHostPath = ndk.HostPath;
+                    if (string.IsNullOrEmpty(NdkTargetPath))
+                        NdkTargetPath = ndk.TargetPath;
+                    if (string.IsNullOrEmpty(txtVersion.Text))
+                        NdkVersion = ndk.Version;
+                }
             }
         }
 
@@ -118,7 +122,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             }
 
             // create result
-            NewNdk = new NdkInfo(NdkName, NdkVersion, NdkHostPath, NdkTargetPath);
+            NewNdk = new NdkInfo(null, NdkName, NdkVersion, NdkHostPath, NdkTargetPath);
             var existingIndex = PackageViewModel.Instance.IndexOfInstalled(NewNdk);
             var existingNDK = existingIndex >= 0 ? PackageViewModel.Instance.InstalledNDKs[existingIndex] : null;
 

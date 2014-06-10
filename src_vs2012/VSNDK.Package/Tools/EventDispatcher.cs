@@ -11,6 +11,7 @@ namespace RIM.VSNDK_Package.Tools
     internal interface IEventDispatcher
     {
         void Invoke<T>(EventHandler<T> eventHandler, object sender, T e) where T : EventArgs;
+        void Invoke(Action action);
         void Invoke<T>(Action<T> action, T e);
     }
 
@@ -49,6 +50,21 @@ namespace RIM.VSNDK_Package.Tools
                 }
             }
 
+            public void Invoke(Action action)
+            {
+                if (action != null)
+                {
+                    if (_control.InvokeRequired)
+                    {
+                        _control.Invoke(action);
+                    }
+                    else
+                    {
+                        action();
+                    }
+                }
+            }
+
             public void Invoke<T>(Action<T> action, T e)
             {
                 if (action != null)
@@ -83,6 +99,14 @@ namespace RIM.VSNDK_Package.Tools
                 if (eventHandler != null)
                 {
                     eventHandler(sender, e);
+                }
+            }
+
+            public void Invoke(Action action)
+            {
+                if (action != null)
+                {
+                    action();
                 }
             }
 
@@ -135,6 +159,21 @@ namespace RIM.VSNDK_Package.Tools
                     else
                     {
                         _dispacher.BeginInvoke(eventHandler, sender, e);
+                    }
+                }
+            }
+
+            public void Invoke(Action action)
+            {
+                if (action != null)
+                {
+                    if (_dispacher.CheckAccess())
+                    {
+                        action();
+                    }
+                    else
+                    {
+                        _dispacher.BeginInvoke(action);
                     }
                 }
             }
