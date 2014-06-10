@@ -133,9 +133,9 @@ namespace RIM.VSNDK_Package.Tools
                     var overallProgress = 10 + (int)((CalculateDownloadProgress() * 70d)); // expected from 10-80%
                     if (file != null)
                     {
-                        const double MegaByte = 1024d * 1024d;
-                        double dProgress = file.Read / MegaByte;
-                        double dSize = (file.Size / MegaByte);
+                        const double megaByte = 1024d * 1024d;
+                        double dProgress = file.Read / megaByte;
+                        double dSize = (file.Size / megaByte);
                         if (dSize < 1) // just a guard, to make it look like, there is always something to download
                             dSize = 1;
 
@@ -182,7 +182,6 @@ namespace RIM.VSNDK_Package.Tools
                 {
                     State = LogState.Completed;
                     Notify(line, 100, false);
-                    return;
                 }
             }
 
@@ -297,7 +296,7 @@ namespace RIM.VSNDK_Package.Tools
                 return 0;
             }
 
-            private static LogFetchFile Find(string text, IReadOnlyCollection<LogFetchFile> files)
+            private static LogFetchFile Find(string text, ICollection<LogFetchFile> files)
             {
                 if (string.IsNullOrEmpty(text) || files == null || files.Count == 0)
                     return null;
@@ -311,7 +310,7 @@ namespace RIM.VSNDK_Package.Tools
                 return null;
             }
 
-            private static LogFetchFile Get(string text, IReadOnlyCollection<LogFetchFile> files)
+            private static LogFetchFile Get(string text, ICollection<LogFetchFile> files)
             {
                 if (string.IsNullOrEmpty(text) || files == null || files.Count == 0)
                     return null;
@@ -323,11 +322,6 @@ namespace RIM.VSNDK_Package.Tools
                 }
 
                 return null;
-            }
-
-            private void Notify(string message)
-            {
-                Notify(message, -1, true);
             }
 
             private void Notify(string message, int progress, bool canAbort)
@@ -502,7 +496,6 @@ namespace RIM.VSNDK_Package.Tools
                     TraceLog.WriteException(ex, "Unable to acquire installation process-id");
                 }
             }
-
         }
 
         protected override void ProcessOutputLine(string text)
