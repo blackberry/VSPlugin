@@ -58,5 +58,14 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         {
             bttInstall.Enabled = listView.SelectedIndices.Count > 0 && listView.SelectedItems[0].SubItems.Count <= 2;
         }
+
+        private void listView_DoubleClick(object sender, EventArgs e)
+        {
+            if (bttInstall.Enabled && SelectedItem != null)
+            {
+                DialogResult = bttInstall.DialogResult;
+                Close();
+            }
+        }
     }
 }
