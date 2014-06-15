@@ -193,9 +193,6 @@
     <Compile Include="..\..\src\VSNDK.Package\IViewModel.cs">
       <Link>IViewModel.cs</Link>
     </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Logger.cs">
-      <Link>Logger.cs</Link>
-    </Compile>
     <Compile Include="..\..\src\VSNDK.Package\NameValueCollectionHelper.cs">
       <Link>NameValueCollectionHelper.cs</Link>
     </Compile>
