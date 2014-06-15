@@ -20,16 +20,6 @@ using System.Text;
 namespace Microsoft.VisualStudio.Project
 {
 	/// <summary>
-	/// Replacement type
-	/// </summary>
-	public enum TokenReplaceType
-	{
-		ReplaceString,
-		ReplaceNumber,
-		ReplaceCode
-	}
-
-	/// <summary>
 	/// Contain a number of functions that handle token replacement
 	/// </summary>
 	public class TokenProcessor

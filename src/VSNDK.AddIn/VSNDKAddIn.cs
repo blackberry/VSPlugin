@@ -25,7 +25,6 @@ using System.IO;
 
 namespace VSNDK.AddIn
 {
-    
     public class configtableentry
     {
         public string config;
@@ -38,9 +37,7 @@ namespace VSNDK.AddIn
     /// </summary>
     public class VSNDKAddIn
     {
-        private VSNDKCommandEvents _commandEvents;
-        private DTE2 _applicationObject; 
-        private EnvDTE.AddIn _addInInstance;
+        private DTE2 _applicationObject;
         private TokenProcessor _tokenProcessor;
 
         private List<configtableentry> _configTable;
@@ -53,31 +50,28 @@ namespace VSNDK.AddIn
         private const string SOLUTION_PLATFORMS = "Solution Platforms";
         private const string BAR_DESCRIPTOR = "bar-descriptor.xml";
         private const string BAR_DESCRIPTOR_PATH = @"\..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033\";
-        
-        public static bool isDebugEngineRunning = false;
 
         /// <summary> 
         /// Run initialization code on first connection of the AddIn. 
         /// </summary>
         /// <param name="appObj"> Application Object. </param>
-        /// <param name="addin"> Add In Object. </param>
-        public void Connect(DTE2 appObj, EnvDTE.AddIn addin)
+        public void Connect(DTE2 appObj)
         {
+            if (appObj == null)
+                throw new ArgumentNullException("appObj");
+
             // Initialize External and Internal Variables.
             _applicationObject = appObj;
-            _addInInstance = addin;
 
             _configTable = new List<configtableentry>();
 
             // Register Command Events
-            _commandEvents = new VSNDKCommandEvents(appObj);
-            _commandEvents.RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
-            _commandEvents.RegisterCommand(GuidList.guidVSDebugGroup, CommandConstants.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
+            RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
+            RegisterCommand(GuidList.guidVSDebugGroup, CommandConstants.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
 
             DisableIntelliSenseErrorReport(true);
             CheckSolutionPlatformCommand();
         }
-
 
         /// <summary> 
         /// Terminate the AddIn. 
@@ -87,6 +81,19 @@ namespace VSNDK.AddIn
             DisableIntelliSenseErrorReport(false);
         }
 
+        private void RegisterCommand(string commandGuid, int commandId, _dispCommandEvents_AfterExecuteEventHandler afterHandler,
+            _dispCommandEvents_BeforeExecuteEventHandler beforeHandler)
+        {
+            if (_applicationObject.Events == null)
+                throw new InvalidOperationException("Invalid Events object");
+
+            var commandEvents = _applicationObject.Events.CommandEvents[commandGuid, commandId];
+            if (commandEvents != null)
+            {
+                commandEvents.BeforeExecute += beforeHandler;
+                commandEvents.AfterExecute += afterHandler;
+            }
+        }
 
         /// <summary> 
         /// Solution Platform command is shown in the Standard toolbar by default with Visual C++ settings. Add the 
@@ -119,7 +126,6 @@ namespace VSNDK.AddIn
                 sp.AddControl(standardCommandBar, pos + 1);
         }
 
-
         /// <summary> 
         /// Set the DisableErrorReporting property value. 
         /// </summary>
@@ -133,7 +139,6 @@ namespace VSNDK.AddIn
                 prop.Value = disable;
         }
 
-        
         /// <summary> 
         /// New Platform Before Execution Event Handler. 
         /// </summary>
@@ -147,7 +152,6 @@ namespace VSNDK.AddIn
             GetSolutionPlarformConfig();
         }
 
-        
         /// <summary> 
         /// New Platform After Execution Event Handler. 
         /// </summary>
@@ -161,7 +165,6 @@ namespace VSNDK.AddIn
             AddBarDescriptor();
         }
 
-
         /// <summary> 
         /// New Function Breakpoint Before Execution Event Handler. 
         /// </summary>
@@ -174,7 +177,6 @@ namespace VSNDK.AddIn
         {
             // Add Code Here
         }
-
 
         /// <summary> 
         /// New Function Breakpoint After Execution Event Handler. 
@@ -230,7 +232,6 @@ namespace VSNDK.AddIn
 
                 }
             }
-
         }
 
         /// <summary>
@@ -261,9 +262,7 @@ namespace VSNDK.AddIn
                     _configTable.Add(c);
                 }
             }
-
         }
-
 
         /// <summary> 
         /// Add Bar Descriptor to each project. 
@@ -356,6 +355,5 @@ namespace VSNDK.AddIn
                 Debug.WriteLine(e.Message);
             }
         }
-
     }
 }

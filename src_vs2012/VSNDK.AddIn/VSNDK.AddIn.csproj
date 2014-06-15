@@ -98,9 +98,6 @@
     <Compile Include="..\..\src\VSNDK.AddIn\Guids.cs">
       <Link>Guids.cs</Link>
     </Compile>
-    <Compile Include="..\..\src\VSNDK.AddIn\NameValueCollectionHelper.cs">
-      <Link>NameValueCollectionHelper.cs</Link>
-    </Compile>
     <Compile Include="..\..\src\VSNDK.AddIn\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
@@ -112,9 +109,6 @@
     </Compile>
     <Compile Include="..\..\src\VSNDK.AddIn\VSNDKAddIn.cs">
       <Link>VSNDKAddIn.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.AddIn\VSNDKCommandEvents.cs">
-      <Link>VSNDKCommandEvents.cs</Link>
     </Compile>
     <Compile Include="..\..\src\VSNDK.AddIn\VSNDKConstants.cs">
       <Link>VSNDKConstants.cs</Link>

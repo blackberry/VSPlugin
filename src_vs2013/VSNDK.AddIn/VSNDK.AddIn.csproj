@@ -165,9 +165,6 @@
     <Compile Include="..\..\src\VSNDK.AddIn\VSNDKAddIn.cs">
       <Link>VSNDKAddIn.cs</Link>
     </Compile>
-    <Compile Include="..\..\src\VSNDK.AddIn\VSNDKCommandEvents.cs">
-      <Link>VSNDKCommandEvents.cs</Link>
-    </Compile>
     <Compile Include="..\..\src\VSNDK.AddIn\VSNDKConstants.cs">
       <Link>VSNDKConstants.cs</Link>
     </Compile>

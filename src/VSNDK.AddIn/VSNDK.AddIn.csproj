@@ -86,7 +86,6 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="TokenProcessor.cs" />
     <Compile Include="VSNDKAddIn.cs" />
-    <Compile Include="VSNDKCommandEvents.cs" />
     <Compile Include="VSNDKConstants.cs" />
   </ItemGroup>
   <ItemGroup>
