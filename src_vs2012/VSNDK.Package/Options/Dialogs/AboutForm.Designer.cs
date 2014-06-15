@@ -75,7 +75,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(453, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "NDK Visual Studio Plugin";
+            this.label1.Text = "Native Plugin for Visual Studio";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // pictureLogo
@@ -130,7 +130,7 @@
             // linkBugTracker
             // 
             this.linkBugTracker.AutoSize = true;
-            this.linkBugTracker.Location = new System.Drawing.Point(223, 59);
+            this.linkBugTracker.Location = new System.Drawing.Point(219, 59);
             this.linkBugTracker.Name = "linkBugTracker";
             this.linkBugTracker.Size = new System.Drawing.Size(74, 13);
             this.linkBugTracker.TabIndex = 2;
@@ -141,7 +141,7 @@
             // linkSourceCode
             // 
             this.linkSourceCode.AutoSize = true;
-            this.linkSourceCode.Location = new System.Drawing.Point(177, 83);
+            this.linkSourceCode.Location = new System.Drawing.Point(174, 83);
             this.linkSourceCode.Name = "linkSourceCode";
             this.linkSourceCode.Size = new System.Drawing.Size(31, 13);
             this.linkSourceCode.TabIndex = 4;
