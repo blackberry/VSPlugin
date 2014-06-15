@@ -16,9 +16,6 @@ namespace RIM.VSNDK_Package
 {
     internal static class PkgCmdIDList
     {
-        public const int cmdidBlackBerryTools = 0x201;
-        public const int cmdidBlackBerrySettings = 0x202;
-        public const int cmdidBlackBerryDebugToken = 0x203;
         public const int cmdidBlackBerryOptions = 0x301;
         public const int cmdidBlackBerryTargetsDevicesPlaceholder = 0x501;
         public const int cmdidBlackBerryTargetsApiLevelsPlaceholder = 0x601;

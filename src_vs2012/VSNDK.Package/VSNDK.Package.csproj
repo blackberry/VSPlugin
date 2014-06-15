@@ -168,13 +168,6 @@
     <Compile Include="..\..\src\VSNDK.Package\ControlDebugEngine.cs">
       <Link>ControlDebugEngine.cs</Link>
     </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\DebugToken\DebugTokenDialog.xaml.cs">
-      <Link>DebugToken\DebugTokenDialog.xaml.cs</Link>
-      <DependentUpon>DebugTokenDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\DebugToken\Model\DebugTokenData.cs">
-      <Link>DebugToken\Model\DebugTokenData.cs</Link>
-    </Compile>
     <Compile Include="..\..\src\VSNDK.Package\EditorFactory.cs">
       <Link>EditorFactory.cs</Link>
     </Compile>
@@ -223,36 +216,6 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Settings\Model\SettingsData.cs">
-      <Link>Settings\Model\SettingsData.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Settings\SettingsDialog.xaml.cs">
-      <Link>Settings\SettingsDialog.xaml.cs</Link>
-      <DependentUpon>SettingsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Signing\Browser.cs">
-      <Link>Signing\Browser.cs</Link>
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Signing\Browser.designer.cs">
-      <Link>Signing\Browser.designer.cs</Link>
-      <DependentUpon>Browser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Signing\DeRegisterWindow.xaml.cs">
-      <Link>Signing\DeRegisterWindow.xaml.cs</Link>
-      <DependentUpon>DeRegisterWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Signing\Models\SigningData.cs">
-      <Link>Signing\Models\SigningData.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Signing\RegistrationWindow.xaml.cs">
-      <Link>Signing\RegistrationWindow.xaml.cs</Link>
-      <DependentUpon>RegistrationWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\Signing\SigningDialog.xaml.cs">
-      <Link>Signing\SigningDialog.xaml.cs</Link>
-      <DependentUpon>SigningDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />
@@ -441,21 +404,6 @@
       <Link>Templates\bar-descriptor.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="..\..\src\VSNDK.Package\UpdateManager\Model\UpdateManagerData.cs">
-      <Link>UpdateManager\Model\UpdateManagerData.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\UpdateManager\SimulatorManager.xaml.cs">
-      <Link>UpdateManager\SimulatorManager.xaml.cs</Link>
-      <DependentUpon>SimulatorManager.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\UpdateManager\UpdateManager.xaml.cs">
-      <Link>UpdateManager\UpdateManager.xaml.cs</Link>
-      <DependentUpon>UpdateManager.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\UpdateManager\UpdateManagerDialog.xaml.cs">
-      <Link>UpdateManager\UpdateManagerDialog.xaml.cs</Link>
-      <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
-    </Compile>
     <None Include="VSNDK.Package.Menu.vsct" />
     <EmbeddedResource Include="Options\Dialogs\CertificateDetailsForm.resx">
       <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
@@ -584,10 +532,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src\VSNDK.Package\Signing\Browser.resx">
-      <Link>Signing\Browser.resx</Link>
-      <DependentUpon>Browser.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="..\..\src\VSNDK.Package\VSPackage.resx">
       <Link>VSPackage.resx</Link>
       <MergeWithCTO>true</MergeWithCTO>
@@ -663,48 +607,8 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\..\src\VSNDK.Package\DebugToken\DebugTokenDialog.xaml">
-      <Link>DebugToken\DebugTokenDialog.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="..\..\src\VSNDK.Package\Import\Import.xaml">
       <Link>Import\Import.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\..\src\VSNDK.Package\Settings\SettingsDialog.xaml">
-      <Link>Settings\SettingsDialog.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\..\src\VSNDK.Package\Signing\DeRegisterWindow.xaml">
-      <Link>Signing\DeRegisterWindow.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\..\src\VSNDK.Package\Signing\RegistrationWindow.xaml">
-      <Link>Signing\RegistrationWindow.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\..\src\VSNDK.Package\Signing\SigningDialog.xaml">
-      <Link>Signing\SigningDialog.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\..\src\VSNDK.Package\UpdateManager\SimulatorManager.xaml">
-      <Link>UpdateManager\SimulatorManager.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\..\src\VSNDK.Package\UpdateManager\UpdateManager.xaml">
-      <Link>UpdateManager\UpdateManager.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="..\..\src\VSNDK.Package\UpdateManager\UpdateManagerDialog.xaml">
-      <Link>UpdateManager\UpdateManagerDialog.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

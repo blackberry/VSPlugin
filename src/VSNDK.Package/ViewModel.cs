@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.ComponentModel;
 using Microsoft.VisualStudio.Package;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
@@ -32,8 +31,6 @@ using Microsoft.VisualStudio.Shell;
 using System.Collections;
 using System.IO;
 using System.Windows.Data;
-using System.Collections.ObjectModel;
-using RIM.VSNDK_Package.Settings.Models;
 using EnvDTE;
 
 namespace RIM.VSNDK_Package
@@ -526,10 +523,12 @@ namespace RIM.VSNDK_Package
         /// </summary>
         private void LoadPermissions()
         {
-            SettingsData settingsData = new SettingsData();
             bool oldListMethod = true;
             XmlNodeList pList = null;
 
+            // PH: FIXME: add loading of permissions into NdkInfo class..
+            /*
+            SettingsData settingsData = new SettingsData();
             if (settingsData.TargetPath != "")
             {
                 XmlDocument xmlDoc = new XmlDocument();
@@ -537,6 +536,7 @@ namespace RIM.VSNDK_Package
                 pList = xmlDoc.GetElementsByTagName("permission");
                 oldListMethod = false;
             }
+             */
 
             if (_permissionList == null)
             {
@@ -948,6 +948,8 @@ namespace RIM.VSNDK_Package
         /// </summary>
         public void setAuthorInfo()
         {
+            // PH: FIXME: add loading author info from debug-token...
+            /*
             if (!File.Exists(_localRIMFolder + "DebugToken.bar"))
             {
                 // Create the dialog instance without Help support.
@@ -956,6 +958,7 @@ namespace RIM.VSNDK_Package
                 if (!DebugTokenDialog.IsClosing)
                     DebugTokenDialog.ShowDialog();
             }
+             */
 
             System.Diagnostics.Process p = new System.Diagnostics.Process();
             System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;

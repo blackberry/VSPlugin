@@ -76,29 +76,6 @@
         <Buttons>
 
             <!-- Common Action Buttons -->
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTools" priority="0x0100" type="Button">
-                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
-                <Strings>
-                    <CommandName>cmdidBlackBerryTools</CommandName>
-                    <ButtonText>Signing</ButtonText>
-                </Strings>
-            </Button>
-
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerrySettings" priority="0x0101" type="Button">
-                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
-                <Strings>
-                    <CommandName>cmdidBlackBerrySettings</CommandName>
-                    <ButtonText>Settings</ButtonText>
-                </Strings>
-            </Button>
-
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryDebugToken" priority="0x0103" type="Button">
-                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
-                <Strings>
-                    <CommandName>cmdidBlackBerryDebugToken</CommandName>
-                    <ButtonText>Debug Tokens</ButtonText>
-                </Strings>
-            </Button>
 
             <!-- Settings Action Buttons -->
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryOptions" priority="0x0100" type="Button">
@@ -285,10 +262,6 @@
             <IDSymbol name="cmdidBlackBerryHelpGroup_Documentation" value="0x1000"/>
             <IDSymbol name="cmdidBlackBerryHelpGroup_Samples" value="0x1100"/>
             <IDSymbol name="cmdidBlackBerryHelpGroup_About" value="0x1200"/>
-
-            <IDSymbol name="cmdidBlackBerryTools" value="0x0201" />
-            <IDSymbol name="cmdidBlackBerrySettings" value="0x0202" />
-            <IDSymbol name="cmdidBlackBerryDebugToken" value="0x0203" />
 
             <IDSymbol name="cmdidBlackBerryOptions" value="0x0301" />
             <IDSymbol name="cmdidBlackBerryTargetsDevicesPlaceholder" value="0x501" />

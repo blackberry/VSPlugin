@@ -427,6 +427,16 @@
             <param name="CustomIn">Custom IN Object. </param>
             <param name="CustomOut">Custom OUT Object. </param>
         </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.SolutionPlarformConfig">
+            <summary>
+            Set solution config after edit
+            </summary>
+        </member>
+        <member name="M:VSNDK.AddIn.VSNDKAddIn.GetSolutionPlarformConfig">
+            <summary>
+            Get solution configuration before edit
+            </summary>
+        </member>
         <member name="M:VSNDK.AddIn.VSNDKAddIn.AddBarDescriptor">
             <summary> 
             Add Bar Descriptor to each project. 

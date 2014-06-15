@@ -58,20 +58,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src\VSNDK.Package.Test\DebugTokenDataTestClass.cs">
-      <Link>DebugTokenDataTestClass.cs</Link>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package.Test\DiagnosticTests.cs">
+      <Link>DiagnosticTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package.Test\ParserTests.cs">
+      <Link>ParserTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package.Test\ToolRunnerTests.cs">
+      <Link>ToolRunnerTests.cs</Link>
     </Compile>
     <Compile Include="..\..\src\VSNDK.Package.Test\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package.Test\SettingsDataTests.cs">
-      <Link>SettingsDataTests.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package.Test\SigningDataTestClass.cs">
-      <Link>SigningDataTestClass.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package.Test\UpdateManagerDataTestClass.cs">
-      <Link>UpdateManagerDataTestClass.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -464,10 +464,6 @@
     </Compile>
     <Compile Include="bar-descriptor.cs" />
     <Compile Include="ControlDebugEngine.cs" />
-    <Compile Include="DebugToken\DebugTokenDialog.xaml.cs">
-      <DependentUpon>DebugTokenDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="DebugToken\Model\DebugTokenData.cs" />
     <Compile Include="EditorFactory.cs" />
     <Compile Include="EditorFactoryNotifyForProject.cs" />
     <Compile Include="EditorPane.cs" />
@@ -478,37 +474,7 @@
     </Compile>
     <Compile Include="IViewModel.cs" />
     <Compile Include="NameValueCollectionHelper.cs" />
-    <Compile Include="Settings\Model\SettingsData.cs" />
-    <Compile Include="Settings\SettingsDialog.xaml.cs">
-      <DependentUpon>SettingsDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Signing\Browser.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Signing\Browser.Designer.cs">
-      <DependentUpon>Browser.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Signing\DeRegisterWindow.xaml.cs">
-      <DependentUpon>DeRegisterWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Signing\Models\SigningData.cs" />
-    <Compile Include="Signing\RegistrationWindow.xaml.cs">
-      <DependentUpon>RegistrationWindow.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Signing\SigningDialog.xaml.cs">
-      <DependentUpon>SigningDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="NativeMethods.cs" />
-    <Compile Include="UpdateManager\SimulatorManager.xaml.cs">
-      <DependentUpon>SimulatorManager.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UpdateManager\UpdateManagerDialog.xaml.cs">
-      <DependentUpon>UpdateManagerDialog.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UpdateManager\Model\UpdateManagerData.cs" />
-    <Compile Include="UpdateManager\UpdateManager.xaml.cs">
-      <DependentUpon>UpdateManager.xaml</DependentUpon>
-    </Compile>
     <Compile Include="ViewModel.cs" />
     <Compile Include="VsDesignerControl.xaml.cs">
       <DependentUpon>VsDesignerControl.xaml</DependentUpon>
@@ -652,9 +618,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="Signing\Browser.resx">
-      <DependentUpon>Browser.cs</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="VSPackage.resx">
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>VSPackage</ManifestResourceName>
@@ -690,39 +653,7 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="DebugToken\DebugTokenDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Import\Import.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Settings\SettingsDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Signing\DeRegisterWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Signing\RegistrationWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Signing\SigningDialog.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UpdateManager\SimulatorManager.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UpdateManager\UpdateManagerDialog.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UpdateManager\UpdateManager.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

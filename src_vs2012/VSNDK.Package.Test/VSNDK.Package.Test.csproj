@@ -58,20 +58,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src\VSNDK.Package.Test\DebugTokenDataTestClass.cs">
-      <Link>DebugTokenDataTestClass.cs</Link>
-    </Compile>
     <Compile Include="..\..\src\VSNDK.Package.Test\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package.Test\SettingsDataTests.cs">
-      <Link>SettingsDataTests.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package.Test\SigningDataTestClass.cs">
-      <Link>SigningDataTestClass.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package.Test\UpdateManagerDataTestClass.cs">
-      <Link>UpdateManagerDataTestClass.cs</Link>
     </Compile>
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="ParserTests.cs" />
