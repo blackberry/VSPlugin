@@ -117,7 +117,6 @@ if %ActionSkipTools% neq 0 goto skip_tools
 call :processTools "%thisDir%" "%PluginRoot%" "%SystemDrive%"
 :skip_tools
 
-call :processAddIn "%BuildPath%" "%AllUsersRoot%\Microsoft\MSEnvShared\Addins"
 call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%" "%MSBuildTargetPath%" "%VSWizardsPath%"
 
 if %ActionUninstall% neq 0 (goto uninstall_reg)
@@ -134,41 +133,6 @@ REGEDIT.EXE /S "%BuildResults%\setup_VS%VSYear%_uninstall.reg"
 :processSetup_End
 endlocal
 exit /b
-
-REM ********************************************************************************************
-REM Setup AddIn Files
-REM ********************************************************************************************
-REM $1 - from
-REM $2 - to
-:processAddIn
-setlocal EnableDelayedExpansion
-
-set InputPath=%~1
-set OutputPath=%~2
-
-if %ActionUninstall% neq 0 (goto uninstall_AddIn)
-
-REM Install add-in
-echo %actionNo%: Installing Add-in
-mkdir "%OutputPath%
-echo Copy "%InputPath%\VSNDK.AddIn.AddIn" to "%OutputPath%\VSNDK.AddIn.AddIn" 
-copy "%InputPath%\VSNDK.AddIn.AddIn" "%OutputPath%\VSNDK.AddIn.AddIn" 
-echo Copy "%InputPath%\VSNDK.AddIn.dll" to "%OutputPath%\VSNDK.AddIn.dll" 
-copy "%InputPath%\VSNDK.AddIn.dll" "%OutputPath%\VSNDK.AddIn.dll" 
-goto processAddIn_End
-
-:uninstall_AddIn
-REM Remove add-in
-echo %actionNo%: Removing Add-in
-echo Deleting "%OutputPath%\VSNDK.AddIn.AddIn" 
-del "%OutputPath%\VSNDK.AddIn.AddIn" 
-echo Deleting "%OutputPath%\VSNDK.AddIn.dll" 
-del "%OutputPath%\VSNDK.AddIn.dll" 
-
-:processAddIn_End
-endlocal
-exit /b
-
 
 REM ********************************************************************************************
 REM Copy GDBParser and DebugEngine Files
