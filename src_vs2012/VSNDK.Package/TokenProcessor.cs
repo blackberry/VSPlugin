@@ -15,6 +15,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Microsoft.VisualStudio.Project
@@ -23,9 +24,21 @@ namespace Microsoft.VisualStudio.Project
 	/// Contain a number of functions that handle token replacement
 	/// </summary>
 	public class TokenProcessor
-	{
-		#region fields
-		// Internal fields
+    {
+        #region Externals
+        /// <summary>
+        /// Indicates whether the file type is binary or not
+        /// </summary>
+        /// <param name="lpApplicationName">Full path to the file to check</param>
+        /// <param name="lpBinaryType">If file is binary the bitness of the app is indicated by lpBinaryType value.</param>
+        /// <returns>True if the file is binary false otherwise</returns>
+        [DllImport("kernel32.dll")]
+        public static extern bool GetBinaryType([MarshalAs(UnmanagedType.LPWStr)]string lpApplicationName, out uint lpBinaryType);
+
+        #endregion
+
+        #region fields
+        // Internal fields
 		private ArrayList tokenlist;
 
 
@@ -108,7 +121,7 @@ namespace Microsoft.VisualStudio.Project
 			// any other type of binary file.
 
 			uint binaryType;
-			if(!NativeMethods.GetBinaryType(source, out binaryType))
+			if(!GetBinaryType(source, out binaryType))
 			{
 				Encoding encoding = Encoding.Default;
 				string buffer = null;

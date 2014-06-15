@@ -22,6 +22,8 @@ using System.Diagnostics;
 using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.Project;
 using System.IO;
+using RIM.VSNDK_Package;
+using RIM.VSNDK_Package.Helpers;
 
 namespace VSNDK.AddIn
 {
@@ -66,8 +68,8 @@ namespace VSNDK.AddIn
             _configTable = new List<configtableentry>();
 
             // Register Command Events
-            RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
-            RegisterCommand(GuidList.guidVSDebugGroup, CommandConstants.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
+            CommandHelper.Register(_applicationObject, GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
+            CommandHelper.Register(_applicationObject, GuidList.guidVSDebugGroup, CommandConstants.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
 
             DisableIntelliSenseErrorReport(true);
             CheckSolutionPlatformCommand();
@@ -79,20 +81,6 @@ namespace VSNDK.AddIn
         public void Disconnect()
         {
             DisableIntelliSenseErrorReport(false);
-        }
-
-        private void RegisterCommand(string commandGuid, int commandId, _dispCommandEvents_AfterExecuteEventHandler afterHandler,
-            _dispCommandEvents_BeforeExecuteEventHandler beforeHandler)
-        {
-            if (_applicationObject.Events == null)
-                throw new InvalidOperationException("Invalid Events object");
-
-            var commandEvents = _applicationObject.Events.CommandEvents[commandGuid, commandId];
-            if (commandEvents != null)
-            {
-                commandEvents.BeforeExecute += beforeHandler;
-                commandEvents.AfterExecute += afterHandler;
-            }
         }
 
         /// <summary> 

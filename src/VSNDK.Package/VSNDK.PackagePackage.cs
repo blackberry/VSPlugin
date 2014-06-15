@@ -32,12 +32,14 @@ using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using RIM.VSNDK_Package.Diagnostics;
+using RIM.VSNDK_Package.Helpers;
 using RIM.VSNDK_Package.Model;
 using RIM.VSNDK_Package.Model.Integration;
 using RIM.VSNDK_Package.Options;
 using RIM.VSNDK_Package.Options.Dialogs;
 using RIM.VSNDK_Package.Tools;
 using RIM.VSNDK_Package.ViewModels;
+using VSNDK.AddIn;
 using VSNDK.Parser;
 
 namespace RIM.VSNDK_Package
@@ -88,7 +90,7 @@ namespace RIM.VSNDK_Package
 
         private BlackBerryPaneTraceListener _traceWindow;
         private DTE2 _dte;
-        private VSNDKCommandEvents _commandEvents;
+        private VSNDKAddIn _addIn;
         private bool _isSimulator;
         private BuildEvents _buildEvents;
         private List<string[]> _targetDir;
@@ -172,10 +174,12 @@ namespace RIM.VSNDK_Package
 
             SetNDKPath();
 
-            _commandEvents = new VSNDKCommandEvents((DTE2)_dte);
-            _commandEvents.RegisterCommand(GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
-            _commandEvents.RegisterCommand(GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
-            _commandEvents.RegisterCommand(GuidList.guidVSStd2KString, CommandConstants.cmdidStartDebugContext, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            _addIn = new VSNDKAddIn();
+            _addIn.Connect(_dte);
+
+            CommandHelper.Register(_dte, GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            CommandHelper.Register(_dte, GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, CommandConstants.cmdidStartDebugContext, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
@@ -254,6 +258,20 @@ namespace RIM.VSNDK_Package
             }
 
             TraceLog.WriteLine("-------------------- DONE");
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_addIn != null)
+                {
+                    _addIn.Disconnect();
+                    _addIn = null;
+                }
+            }
+
+            base.Dispose(disposing);
         }
 
         public Window2 OpenWebPageTab(string url)

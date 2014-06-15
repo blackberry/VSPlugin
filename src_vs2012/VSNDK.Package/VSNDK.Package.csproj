@@ -221,6 +221,7 @@
     <Compile Include="Diagnostics\TimeTracker.cs" />
     <Compile Include="Diagnostics\TraceLog.cs" />
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
+    <Compile Include="Helpers\CommandHelper.cs" />
     <Compile Include="MessageBoxHelper.cs" />
     <Compile Include="Model\ApiInfo.cs" />
     <Compile Include="Model\ApiInfoArray.cs" />
@@ -364,6 +365,7 @@
     <Compile Include="Options\TargetsOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="TokenProcessor.cs" />
     <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
     <Compile Include="Tools\ApiLevelUpdateRunner.cs">
       <SubType>Code</SubType>
@@ -395,6 +397,7 @@
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
     <Compile Include="ViewModels\UpdateManager.cs" />
+    <Compile Include="VSNDKAddIn.cs" />
     <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
@@ -515,9 +518,6 @@
     </Compile>
     <Compile Include="..\..\src\VSNDK.Package\VSNDK.PackagePackage.cs">
       <Link>VSNDK.PackagePackage.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src\VSNDK.Package\VSNDKCommandEvents.cs">
-      <Link>VSNDKCommandEvents.cs</Link>
     </Compile>
     <Compile Include="..\..\src\VSNDK.Package\VSNDKConstants.cs">
       <Link>VSNDKConstants.cs</Link>
