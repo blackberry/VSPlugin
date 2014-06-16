@@ -589,7 +589,7 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Package.resx">
-      <Link>Package.resx</Link>
+      <Link>Resources\Package.resx</Link>
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>Package</ManifestResourceName>
       <SubType>Designer</SubType>
