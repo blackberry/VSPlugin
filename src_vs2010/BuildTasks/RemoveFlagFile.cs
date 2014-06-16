@@ -13,17 +13,12 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
-using System.Collections;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
-
     /// <summary>
     /// MSBuild Task for reading in the flag file from the start debugging button.
     /// </summary>

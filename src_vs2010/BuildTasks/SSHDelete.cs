@@ -12,18 +12,12 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.CPPTasks;
-using System.Resources;
-using System.Reflection;
 using System.Collections;
+using BlackBerry.BuildTasks.Properties;
+using Microsoft.Build.CPPTasks;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     public class SSHDelete : TrackedVCToolTask
     {
@@ -41,7 +35,7 @@ namespace VSNDK.Tasks
         /// SSHDelete Constructor
         /// </summary>
         public SSHDelete()
-            : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
+            : base(Resources.ResourceManager)
         {
             this.switchOrderList = new ArrayList();
             this.switchOrderList.Add(PRIVATE_KEY_PATH);
@@ -96,7 +90,7 @@ namespace VSNDK.Tasks
         /// <summary>
         /// Getter/Setter for the TrackedInputFiles string
         /// </summary>
-        protected override Microsoft.Build.Framework.ITaskItem[] TrackedInputFiles
+        protected override ITaskItem[] TrackedInputFiles
         {
             get
             {

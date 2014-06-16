@@ -13,14 +13,14 @@
 //* limitations under the License.
 
 using System;
-using System.Text;
-using System.Runtime.InteropServices;
-using System.IO;
 using System.Diagnostics;
-using Microsoft.Build.Framework;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Text.RegularExpressions;
+using Microsoft.Build.Framework;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     /// <summary>
     /// Cancelabe MSBuild Task for Running the Make file for the build.

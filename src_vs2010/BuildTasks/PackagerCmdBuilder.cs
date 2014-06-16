@@ -12,17 +12,12 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.Build.Utilities;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     class PackagerCmdBuilder : CommandLineBuilder
     {
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -34,8 +29,6 @@ namespace VSNDK.Tasks
         /// <summary>
         /// Override of IsQuotingRequired function.  Always return true.
         /// </summary>
-        /// <param name="parameter"></param>
-        /// <returns></returns>
         protected override bool IsQuotingRequired(string parameter)
         {
             return true;

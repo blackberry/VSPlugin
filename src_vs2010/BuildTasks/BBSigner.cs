@@ -13,19 +13,14 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Resources;
-using Microsoft.Build.CPPTasks;
 using System.Collections;
-using Microsoft.Build.Framework;
-using System.IO;
-using Microsoft.Build.Utilities;
 using System.Security.Cryptography;
+using System.Text;
+using BlackBerry.BuildTasks.Properties;
+using Microsoft.Build.CPPTasks;
+using Microsoft.Build.Framework;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     /// <summary>
     /// MSBuild Task responsible for the signing of the BlackBerry Bar files 
@@ -48,7 +43,7 @@ namespace VSNDK.Tasks
         /// BBSigner Constructor Fuction
         /// </summary>
         public BBSigner()
-            : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
+            : base(Resources.ResourceManager)
         {
             this.switchOrderList = new ArrayList();
             this.switchOrderList.Add("AlwaysAppend");

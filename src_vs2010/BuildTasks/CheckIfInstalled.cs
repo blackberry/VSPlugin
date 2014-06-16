@@ -17,7 +17,7 @@ using System.IO;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     /// <summary>
     /// MSBuild Task to check to see if the application was previously installed.

@@ -12,17 +12,15 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Collections;
 using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using System.Runtime.InteropServices;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     /// <summary>
     /// MSBuild Task for generating a make file for packaging the bar file. 

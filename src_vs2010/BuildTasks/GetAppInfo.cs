@@ -12,16 +12,12 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 using System.Xml;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     /// <summary>
     /// MSBuid Task to retrieve the application info

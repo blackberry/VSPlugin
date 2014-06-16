@@ -12,19 +12,12 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
-using System.Resources;
-using System.Reflection;
-using Microsoft.Build.Framework;
 using System.Collections;
-using Microsoft.Build.Utilities;
-using System.IO;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     public class QccLink : VSNDKTasks
     {
@@ -46,7 +39,7 @@ namespace VSNDK.Tasks
         /// QccLink Constructor
         /// </summary>
         public QccLink()
-            : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
+            : base(Resources.ResourceManager)
         {
             this.switchOrderList.Add(ADDITIONAL_DEPENDENCIES);
             this.switchOrderList.Add(LINK_ERROR_REPORTING);

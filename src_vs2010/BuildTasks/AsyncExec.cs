@@ -13,14 +13,14 @@
 //* limitations under the License.
 
 using System;
-using System.Text;
-using Microsoft.Build.Tasks;
-using System.Diagnostics;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Security.Cryptography;
+using System.Text;
+using Microsoft.Build.Tasks;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     // This task overrides Exec in order to run commands such as blackberry-connect asynchronously.
     public class AsyncExec : Exec

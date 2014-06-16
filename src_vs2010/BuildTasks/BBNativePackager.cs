@@ -13,24 +13,20 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Resources;
-using Microsoft.Build.CPPTasks;
 using System.Collections;
-using Microsoft.Build.Framework;
 using System.IO;
+using BlackBerry.BuildTasks.Properties;
+using Microsoft.Build.CPPTasks;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     public class BBNativePackager : TrackedVCToolTask
     {
         #region Member Variable and Constant Declarations
         protected ArrayList switchOrderList;
-        private static BarDescriptor.qnx _descriptor = null;
+        private static BarDescriptor.qnx _descriptor;
         private string _projDir;
         private string _appName;
         private string _barDescriptorPath = "";
@@ -52,7 +48,7 @@ namespace VSNDK.Tasks
         /// BBNativePackager Constructor
         /// </summary>
         public BBNativePackager()
-            : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
+            : base(Resources.ResourceManager)
         {
             this.switchOrderList = new ArrayList();
             this.switchOrderList.Add(TARGET_FORMAT);
@@ -155,57 +151,53 @@ namespace VSNDK.Tasks
             // don't have anything to do with the configuration name.  I've based the config names on the platform
             // + configuration combination, not the output directory.
             BarDescriptor.qnxConfiguration[] configs = _descriptor.configurations;
-            foreach (BarDescriptor.qnxConfiguration config in configs)
+            foreach (var config in configs)
             {
                 if (Configuration == "Debug" && Platform == "BlackBerry" && config.name == "Device-Debug")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                else if (Configuration == "Release" && Platform == "BlackBerry" && config.name == "Device-Release")
+                if (Configuration == "Release" && Platform == "BlackBerry" && config.name == "Device-Release")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                else if (Configuration == "Profile" && Platform == "BlackBerry" && config.name == "Device-Profile")
+                if (Configuration == "Profile" && Platform == "BlackBerry" && config.name == "Device-Profile")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                else if (Configuration == "Coverage" && Platform == "BlackBerry" && config.name == "Device-Coverage")
+                if (Configuration == "Coverage" && Platform == "BlackBerry" && config.name == "Device-Coverage")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                else if (Configuration == "Debug" && Platform == "BlackBerrySimulator" && (config.name == "Simulator" || config.name == "Simulator-Debug"))
+                if (Configuration == "Debug" && Platform == "BlackBerrySimulator" && (config.name == "Simulator" || config.name == "Simulator-Debug"))
                 {
                     configAssets = config.asset;
                     break;
                 }
-                else if (Configuration == "Profile" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Profile")
+                if (Configuration == "Profile" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Profile")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                else if (Configuration == "Coverage" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Coverage")
+                if (Configuration == "Coverage" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Coverage")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                else if (Configuration == "Release" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Release")
+                if (Configuration == "Release" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Release")
                 {
                     configAssets = config.asset;
                     break;
                 }
             }
-            
-            ITaskItem[] items = null;
-
 
             int clen = (configAssets == null) ? 0 : configAssets.Length;
             int glen = (globalAssets == null) ? 0 : globalAssets.Length;
-
-            items = new ITaskItem[glen + clen];
+            var items = new ITaskItem[glen + clen];
 
             for (int i = 0; i < glen; i++)
             {
@@ -257,7 +249,7 @@ namespace VSNDK.Tasks
         /// </summary>
         protected override string[] ReadTLogNames
         {
-            get { return new string[] { "BBNativePackager.read.1.tlog", "BBNativePackager.*.read.1.tlog" }; }
+            get { return new[] { "BBNativePackager.read.1.tlog", "BBNativePackager.*.read.1.tlog" }; }
         }
 
         /// <summary>
@@ -267,7 +259,7 @@ namespace VSNDK.Tasks
         {
             get
             {
-                return new string[] { "BBNativePackager.write.1.tlog", "BBNativePackager.*.write.1.tlog" };
+                return new[] { "BBNativePackager.write.1.tlog", "BBNativePackager.*.write.1.tlog" };
             }
         }
 

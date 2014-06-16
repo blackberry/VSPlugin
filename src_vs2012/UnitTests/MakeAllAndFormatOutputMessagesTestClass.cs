@@ -12,8 +12,8 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+using BlackBerry.BuildTasks;
 using NUnit.Framework;
-using VSNDK.Tasks;
 
 namespace UnitTests
 {

@@ -12,16 +12,11 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
-using System.Resources;
-using System.Reflection;
 using System.Collections;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     public class QccLib : VSNDKTasks
     {
@@ -37,7 +32,7 @@ namespace VSNDK.Tasks
         /// QccLib Constructor
         /// </summary>
         public QccLib()
-            : base(new ResourceManager("VSNDK.Tasks.Properties.Resources", Assembly.GetExecutingAssembly()))
+            : base(Resources.ResourceManager)
         {
             this.switchOrderList.Add(ADDITIONAL_DEPENDENCIES);
             this.switchOrderList.Add(ADDITIONAL_LIB_DIR);

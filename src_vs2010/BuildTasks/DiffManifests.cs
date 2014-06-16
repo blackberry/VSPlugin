@@ -12,16 +12,14 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.IO;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     /// <summary>
     /// MSBuild task to compare the manifest file from the bar file being uploaded against the one already installed on the device.

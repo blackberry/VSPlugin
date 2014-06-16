@@ -13,15 +13,12 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
-using System.Diagnostics;
 
-namespace VSNDK.Tasks.BarDescriptor
+namespace BlackBerry.BuildTasks.BarDescriptor
 {
     public class Parser
     {
@@ -30,7 +27,7 @@ namespace VSNDK.Tasks.BarDescriptor
         /// </summary>
         /// <param name="filename">Path to the bar-descriptor.xml file</param>
         /// <returns>BarDescriptor.qnx object containing the deserialized data from the bar-descriptor.</returns>
-        public static  BarDescriptor.qnx Load(string filename)
+        public static qnx Load(string filename)
         {
             if (!string.IsNullOrEmpty(filename))
             {
@@ -39,8 +36,8 @@ namespace VSNDK.Tasks.BarDescriptor
                     using (FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read))
                     {
                         XmlTextReader reader = new XmlTextReader(fs);
-                        XmlSerializer serializer = new XmlSerializer(typeof(BarDescriptor.qnx));
-                        return serializer.Deserialize(reader) as BarDescriptor.qnx;
+                        XmlSerializer serializer = new XmlSerializer(typeof(qnx));
+                        return serializer.Deserialize(reader) as qnx;
                     }
                 }
                 catch (Exception ex)

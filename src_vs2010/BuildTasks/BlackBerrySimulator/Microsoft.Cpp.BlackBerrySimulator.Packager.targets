@@ -15,16 +15,16 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <UsingTask TaskName="BBNativePackager"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="BBDeploy"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="BBSigner"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="DiffManifests"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="AsyncExec"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="SSHDelete"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="GetAppInfo"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
-  <UsingTask TaskName="CheckIfInstalled"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="BBNativePackager"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="BBDeploy"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="BBSigner"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="DiffManifests"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="AsyncExec"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="SSHDelete"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="GetAppInfo"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="CheckIfInstalled"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="VCMessage" AssemblyName="Microsoft.Build.CppTasks.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
-  <UsingTask TaskName="RemoveFlagFile"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\VSNDK.Tasks.dll" />
+  <UsingTask TaskName="RemoveFlagFile"  AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
 
   <PropertyGroup  Condition="$(Configuration.Contains('Release'))">
     <RunBuildBar>true</RunBuildBar>

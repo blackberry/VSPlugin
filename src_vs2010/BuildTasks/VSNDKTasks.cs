@@ -13,18 +13,12 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Microsoft.Build.Utilities;
-using Microsoft.Build.CPPTasks;
-using System.Resources;
-using System.Reflection;
-using Microsoft.Build.Framework;
 using System.Collections;
-using System.IO;
+using System.Resources;
+using Microsoft.Build.CPPTasks;
+using Microsoft.Build.Framework;
 
-namespace VSNDK.Tasks
+namespace BlackBerry.BuildTasks
 {
     public abstract class VSNDKTasks : TrackedVCToolTask
     {
