@@ -3,10 +3,9 @@ using System.IO;
 using System.Windows.Forms;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
-using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Options.Dialogs;
 
-namespace BlackBerry.Package.Options
+namespace BlackBerry.Package.Helpers
 {
     internal static class CertHelper
     {
