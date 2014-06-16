@@ -36,6 +36,7 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ext\NUnit\nunit.framework.dll</HintPath>
@@ -52,24 +53,38 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\VSNDK.Package\VSNDK.Package.csproj">
-      <Project>{3d6effaf-ff39-497d-b6f8-0b6169e90c6d}</Project>
-      <Name>VSNDK.Package</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="..\..\src_vs2012\VSNDK.Package.Test\DiagnosticTests.cs">
+    <Compile Include="..\..\src_vs2012\UnitTests\DiagnosticTests.cs">
       <Link>DiagnosticTests.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\VSNDK.Package.Test\ParserTests.cs">
+    <Compile Include="..\..\src_vs2012\UnitTests\GDBParserTests.cs">
+      <Link>GDBParserTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\MakeAllAndFormatOutputMessagesTestClass.cs">
+      <Link>MakeAllAndFormatOutputMessagesTestClass.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ParserTests.cs">
       <Link>ParserTests.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\VSNDK.Package.Test\ToolRunnerTests.cs">
+    <Compile Include="..\..\src_vs2012\UnitTests\ToolRunnerTests.cs">
       <Link>ToolRunnerTests.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.Package.Test\Properties\AssemblyInfo.cs">
+    <Compile Include="..\..\src_vs2012\UnitTests\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BuildTasks\BlackBerry.BuildTasks.csproj">
+      <Project>{328CAD98-F4E5-444A-B5DF-AD102C67BA3C}</Project>
+      <Name>BlackBerry.BuildTasks</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
+      <Project>{cc7b28e0-cb31-44f7-a380-e7072f670f38}</Project>
+      <Name>GDBParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
+      <Project>{3d6effaf-ff39-497d-b6f8-0b6169e90c6d}</Project>
+      <Name>BlackBerry.Package</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

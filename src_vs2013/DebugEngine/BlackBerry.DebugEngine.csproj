@@ -74,88 +74,88 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Definitions\AD7Enums.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Definitions\AD7Enums.cs">
       <Link>AD7.Definitions\AD7Enums.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Definitions\AD7Guids.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Definitions\AD7Guids.cs">
       <Link>AD7.Definitions\AD7Guids.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Definitions\AD7Hresult.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Definitions\AD7Hresult.cs">
       <Link>AD7.Definitions\AD7Hresult.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7BoundBreakpoint.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7BoundBreakpoint.cs">
       <Link>AD7.Impl\AD7BoundBreakpoint.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7BreakpointResolution.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7BreakpointResolution.cs">
       <Link>AD7.Impl\AD7BreakpointResolution.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7DocumentContext.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7DocumentContext.cs">
       <Link>AD7.Impl\AD7DocumentContext.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Engine.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Engine.cs">
       <Link>AD7.Impl\AD7Engine.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Enums.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Enums.cs">
       <Link>AD7.Impl\AD7Enums.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Events.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Events.cs">
       <Link>AD7.Impl\AD7Events.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Expression.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Expression.cs">
       <Link>AD7.Impl\AD7Expression.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7MemoryAddress.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7MemoryAddress.cs">
       <Link>AD7.Impl\AD7MemoryAddress.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Module.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Module.cs">
       <Link>AD7.Impl\AD7Module.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7PendingBreakpoint.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7PendingBreakpoint.cs">
       <Link>AD7.Impl\AD7PendingBreakpoint.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Port.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Port.cs">
       <Link>AD7.Impl\AD7Port.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7PortRequest.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7PortRequest.cs">
       <Link>AD7.Impl\AD7PortRequest.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7PortSupplier.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7PortSupplier.cs">
       <Link>AD7.Impl\AD7PortSupplier.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Process.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Process.cs">
       <Link>AD7.Impl\AD7Process.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7ProgramNode.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7ProgramNode.cs">
       <Link>AD7.Impl\AD7ProgramNode.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7ProgramNodeAttach.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7ProgramNodeAttach.cs">
       <Link>AD7.Impl\AD7ProgramNodeAttach.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7ProgramProvider.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7ProgramProvider.cs">
       <Link>AD7.Impl\AD7ProgramProvider.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Property.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Property.cs">
       <Link>AD7.Impl\AD7Property.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7StackFrame.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7StackFrame.cs">
       <Link>AD7.Impl\AD7StackFrame.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\AD7.Impl\AD7Thread.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Thread.cs">
       <Link>AD7.Impl\AD7Thread.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\Engine.Impl\BreakpointManager.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\BreakpointManager.cs">
       <Link>Engine.Impl\BreakpointManager.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\Engine.Impl\EngineCallback.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\EngineCallback.cs">
       <Link>Engine.Impl\EngineCallback.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\Engine.Impl\EngineUtils.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\EngineUtils.cs">
       <Link>Engine.Impl\EngineUtils.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\Engine.Impl\EventDispatcher.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\EventDispatcher.cs">
       <Link>Engine.Impl\EventDispatcher.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\VSNDK.DebugEngine\Properties\AssemblyInfo.cs">
+    <Compile Include="..\..\src_vs2010\DebugEngine\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
@@ -164,9 +164,9 @@
       <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
       <Name>GDBParser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VSNDK.Package\VSNDK.Package.csproj">
+    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
       <Project>{3d6effaf-ff39-497d-b6f8-0b6169e90c6d}</Project>
-      <Name>VSNDK.Package</Name>
+      <Name>BlackBerry.Package</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -63,9 +63,9 @@ set MsBuild2013="%ProgFilesRoot%\MSBuild\12.0\Bin\MsBuild.exe"
 set MsBuildCmd=%MsBuild% /property:Configuration=Release /target:Rebuild
 set MsBuild2013Cmd=%MsBuild2013% /property:Configuration=Release /target:Rebuild
 
-set SolutionPath2010="%thisDir%\src_vs2010\VSNDK.sln"
-set SolutionPath2012="%thisDir%\src_vs2012\VSNDK.sln"
-set SolutionPath2013="%thisDir%\src_vs2013\VSNDK.sln"
+set SolutionPath2010="%thisDir%\src_vs2010\BlackBerry.NativePlugin.sln"
+set SolutionPath2012="%thisDir%\src_vs2012\BlackBerry.NativePlugin.sln"
+set SolutionPath2013="%thisDir%\src_vs2013\BlackBerry.NativePlugin.sln"
 
 echo Current folder: "%thisDir%"
 echo Output folder: "%BuildResults%"

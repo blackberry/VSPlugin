@@ -102,9 +102,9 @@
       <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
       <Name>GDBParser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\VSNDK.Package\VSNDK.Package.csproj">
+    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
       <Project>{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}</Project>
-      <Name>VSNDK.Package</Name>
+      <Name>BlackBerry.Package</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
