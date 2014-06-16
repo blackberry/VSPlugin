@@ -74,7 +74,7 @@ namespace BlackBerry.Package
 
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", "1.0", IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", VersionString, IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
@@ -87,6 +87,8 @@ namespace BlackBerry.Package
     [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
     public sealed class VSNDK_PackagePackage : Microsoft.VisualStudio.Shell.Package
     {
+        public const string VersionString = "2.1.2014.0616";
+
         #region private member variables
 
         private BlackBerryPaneTraceListener _traceWindow;
@@ -993,7 +995,7 @@ namespace BlackBerry.Package
         /// </summary>
         /// <param name="Scope"> Represents the scope of the build. </param>
         /// <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
-        public void OnBuildBegin(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
+        public void OnBuildBegin(vsBuildScope Scope, vsBuildAction Action)
         {
             // PH: FIXME: implement using new APIs
             /*
