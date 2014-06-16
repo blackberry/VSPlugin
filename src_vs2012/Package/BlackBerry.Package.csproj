@@ -9,8 +9,8 @@
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RIM.VSNDK_Package</RootNamespace>
-    <AssemblyName>VSNDK.Package</AssemblyName>
+    <RootNamespace>BlackBerry.Package</RootNamespace>
+    <AssemblyName>BlackBerry.Package</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
@@ -43,7 +43,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2012</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunRegRiched>true</RunRegRiched>
@@ -55,7 +55,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;PLATFORM_VS2012;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
@@ -208,11 +208,11 @@
     <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\Resources.Designer.cs">
-      <Link>Resources.Designer.cs</Link>
+    <Compile Include="..\..\src_vs2010\Package\Resources\Strings.Designer.cs">
+      <Link>Resources\Strings.Designer.cs</Link>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
+      <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />
@@ -404,7 +404,7 @@
       <Link>Templates\bar-descriptor.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="VSNDK.Package.Menu.vsct" />
+    <None Include="Resources\Package.Menu.vsct" />
     <EmbeddedResource Include="Options\Dialogs\CertificateDetailsForm.resx">
       <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -424,7 +424,7 @@
       <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Logo.png" />
-    <None Include="VSNDK.Package.Bitmaps.vsct" />
+    <None Include="Resources\Package.Bitmaps.vsct" />
     <Resource Include="..\..\src_vs2010\Package\Resources\BlackBerryMessager.bmp">
       <Link>Resources\BlackBerryMessager.bmp</Link>
     </Resource>
@@ -524,15 +524,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\src_vs2010\Package\Resources.resx">
-      <Link>Resources.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Strings.resx">
+      <Link>Resources\Strings.resx</Link>
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2010\Package\VSPackage.resx">
-      <Link>VSPackage.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Package.resx">
+      <Link>Package.resx</Link>
       <MergeWithCTO>true</MergeWithCTO>
-      <ManifestResourceName>VSPackage</ManifestResourceName>
+      <ManifestResourceName>Package</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\ApiLevelOptionControl.resx">
@@ -587,7 +587,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="VSNDK.Package.vsct">
+    <VSCTCompile Include="Resources\Package.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>

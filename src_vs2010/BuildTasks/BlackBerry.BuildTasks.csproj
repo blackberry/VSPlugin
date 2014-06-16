@@ -8,8 +8,8 @@
     <ProjectGuid>{328CAD98-F4E5-444A-B5DF-AD102C67BA3C}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>VSNDK.Tasks</RootNamespace>
-    <AssemblyName>VSNDK.Tasks</AssemblyName>
+    <RootNamespace>BlackBerry.BuildTasks</RootNamespace>
+    <AssemblyName>BlackBerry.BuildTasks</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PublishUrl>publish\</PublishUrl>

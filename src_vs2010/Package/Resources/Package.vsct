@@ -21,8 +21,8 @@
     <!--Defines VK_INSERT -->
     <Extern href="virtkeys.h"/>
 
-    <Include href="../../src_vs2012/Package/VSNDK.Package.Bitmaps.vsct"/>
-    <Include href="../../src_vs2012/Package/VSNDK.Package.Menu.vsct"/>
+    <Include href="../../../src_vs2012/Package/Resources/Package.Bitmaps.vsct"/>
+    <Include href="../../../src_vs2012/Package/Resources/Package.Menu.vsct"/>
 
     <!--The Commands section is where we the commands, menus and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->

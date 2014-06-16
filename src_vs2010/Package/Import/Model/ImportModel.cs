@@ -19,7 +19,6 @@ using System.Text;
 using System.ComponentModel;
 using System.Collections;
 using Microsoft.Win32;
-using PkgResources = RIM.VSNDK_Package.Resources;
 using System.Xml;
 using System.Security.Cryptography;
 using System.IO;

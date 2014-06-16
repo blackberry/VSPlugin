@@ -9,8 +9,8 @@
     <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RIM.VSNDK_Package</RootNamespace>
-    <AssemblyName>VSNDK.Package</AssemblyName>
+    <RootNamespace>BlackBerry.Package</RootNamespace>
+    <AssemblyName>BlackBerry.Package</AssemblyName>
     <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>
     </AssemblyOriginatorKeyFile>
@@ -43,7 +43,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2013</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunRegRiched>true</RunRegRiched>
@@ -54,7 +54,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;PLATFORM_VS2013;CODE_ANALYSIS</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
@@ -205,11 +205,11 @@
     <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\Resources.Designer.cs">
-      <Link>Resources.Designer.cs</Link>
+    <Compile Include="..\..\src_vs2010\Package\Resources\Strings.Designer.cs">
+      <Link>Resources\Strings.Designer.cs</Link>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
+      <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
@@ -264,6 +264,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\Integration\WebBrowserTurbo.cs">
       <Link>Model\Integration\WebBrowserTurbo.cs</Link>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\NdkInfo.cs">
       <Link>Model\NdkInfo.cs</Link>
@@ -276,6 +277,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.cs">
       <Link>Options\ApiLevelOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.designer.cs">
       <Link>Options\ApiLevelOptionControl.designer.cs</Link>
@@ -283,6 +285,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionPage.cs">
       <Link>Options\ApiLevelOptionPage.cs</Link>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\CertHelper.cs">
       <Link>Options\CertHelper.cs</Link>
@@ -292,6 +295,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AboutForm.cs">
       <Link>Options\Dialogs\AboutForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AboutForm.designer.cs">
       <Link>Options\Dialogs\AboutForm.designer.cs</Link>
@@ -299,6 +303,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AddLocalNdkForm.cs">
       <Link>Options\Dialogs\AddLocalNdkForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AddLocalNdkForm.designer.cs">
       <Link>Options\Dialogs\AddLocalNdkForm.designer.cs</Link>
@@ -306,6 +311,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\CertificateDetailsForm.cs">
       <Link>Options\Dialogs\CertificateDetailsForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\CertificateDetailsForm.designer.cs">
       <Link>Options\Dialogs\CertificateDetailsForm.designer.cs</Link>
@@ -313,6 +319,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\CskRequestForm.cs">
       <Link>Options\Dialogs\CskRequestForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\CskRequestForm.designer.cs">
       <Link>Options\Dialogs\CskRequestForm.designer.cs</Link>
@@ -320,6 +327,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\DebugTokenDeploymentForm.cs">
       <Link>Options\Dialogs\DebugTokenDeploymentForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\DebugTokenDeploymentForm.designer.cs">
       <Link>Options\Dialogs\DebugTokenDeploymentForm.designer.cs</Link>
@@ -327,6 +335,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\DeviceForm.cs">
       <Link>Options\Dialogs\DeviceForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\DeviceForm.designer.cs">
       <Link>Options\Dialogs\DeviceForm.designer.cs</Link>
@@ -334,6 +343,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\InstallConfirmationForm.cs">
       <Link>Options\Dialogs\InstallConfirmationForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\InstallConfirmationForm.designer.cs">
       <Link>Options\Dialogs\InstallConfirmationForm.designer.cs</Link>
@@ -341,6 +351,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\InstallForm.cs">
       <Link>Options\Dialogs\InstallForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\InstallForm.designer.cs">
       <Link>Options\Dialogs\InstallForm.designer.cs</Link>
@@ -348,6 +359,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\ListItemControl.cs">
       <Link>Options\Dialogs\ListItemControl.cs</Link>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\ListItemControl.designer.cs">
       <Link>Options\Dialogs\ListItemControl.designer.cs</Link>
@@ -355,6 +367,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\PasswordForm.cs">
       <Link>Options\Dialogs\PasswordForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\PasswordForm.designer.cs">
       <Link>Options\Dialogs\PasswordForm.designer.cs</Link>
@@ -362,6 +375,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\PinListForm.cs">
       <Link>Options\Dialogs\PinListForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\PinListForm.designer.cs">
       <Link>Options\Dialogs\PinListForm.designer.cs</Link>
@@ -369,6 +383,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\RegistrationForm.cs">
       <Link>Options\Dialogs\RegistrationForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\RegistrationForm.designer.cs">
       <Link>Options\Dialogs\RegistrationForm.designer.cs</Link>
@@ -376,6 +391,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\UpdateManagerStatusForm.cs">
       <Link>Options\Dialogs\UpdateManagerStatusForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\UpdateManagerStatusForm.designer.cs">
       <Link>Options\Dialogs\UpdateManagerStatusForm.designer.cs</Link>
@@ -383,6 +399,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.cs">
       <Link>Options\GeneralOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.designer.cs">
       <Link>Options\GeneralOptionControl.designer.cs</Link>
@@ -390,9 +407,11 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionPage.cs">
       <Link>Options\GeneralOptionPage.cs</Link>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\LogsOptionControl.cs">
       <Link>Options\LogsOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\LogsOptionControl.designer.cs">
       <Link>Options\LogsOptionControl.designer.cs</Link>
@@ -400,9 +419,11 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\LogsOptionPage.cs">
       <Link>Options\LogsOptionPage.cs</Link>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\SigningOptionControl.cs">
       <Link>Options\SigningOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\SigningOptionControl.designer.cs">
       <Link>Options\SigningOptionControl.designer.cs</Link>
@@ -410,9 +431,11 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\SigningOptionPage.cs">
       <Link>Options\SigningOptionPage.cs</Link>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\TargetsOptionControl.cs">
       <Link>Options\TargetsOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\TargetsOptionControl.designer.cs">
       <Link>Options\TargetsOptionControl.designer.cs</Link>
@@ -420,6 +443,7 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\TargetsOptionPage.cs">
       <Link>Options\TargetsOptionPage.cs</Link>
+      <SubType>Component</SubType>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\TokenProcessor.cs">
       <Link>TokenProcessor.cs</Link>
@@ -535,11 +559,11 @@
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <None Include="..\..\src_vs2012\Package\VSNDK.Package.Menu.vsct">
-      <Link>VSNDK.Package.Menu.vsct</Link>
+    <None Include="..\..\src_vs2012\Package\Resources\Package.Menu.vsct">
+      <Link>Resources\Package.Menu.vsct</Link>
     </None>
-    <None Include="..\..\src_vs2012\Package\VSNDK.Package.Bitmaps.vsct">
-      <Link>VSNDK.Package.Bitmaps.vsct</Link>
+    <None Include="..\..\src_vs2012\Package\Resources\Package.Bitmaps.vsct">
+      <Link>Resources\Package.Bitmaps.vsct</Link>
     </None>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.resx">
       <Link>Options\ApiLevelOptionControl.resx</Link>
@@ -718,15 +742,15 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\src_vs2010\Package\Resources.resx">
-      <Link>Resources.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Strings.resx">
+      <Link>Resources\Strings.resx</Link>
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2010\Package\VSPackage.resx">
-      <Link>VSPackage.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Package.resx">
+      <Link>Package.resx</Link>
       <MergeWithCTO>true</MergeWithCTO>
-      <ManifestResourceName>VSPackage</ManifestResourceName>
+      <ManifestResourceName>Package</ManifestResourceName>
       <SubType>Designer</SubType>
     </EmbeddedResource>
   </ItemGroup>
@@ -742,7 +766,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <VSCTCompile Include="VSNDK.Package.vsct">
+    <VSCTCompile Include="Resources\Package.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
     </VSCTCompile>

@@ -28,8 +28,8 @@
     <Extern href="virtkeys.h" />
 
 
-    <Include href="VSNDK.Package.Bitmaps.vsct"/>
-    <Include href="VSNDK.Package.Menu.vsct"/>
+    <Include href="Package.Bitmaps.vsct"/>
+    <Include href="Package.Menu.vsct"/>
 
 
     <!--The Commands section is where we the commands, menus and menu groups are defined.

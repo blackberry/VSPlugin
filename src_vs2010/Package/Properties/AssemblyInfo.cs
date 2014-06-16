@@ -21,12 +21,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("VSNDK.Package")]
+[assembly: AssemblyTitle("BlackBerry Native SDK Plugin for Visual Studio")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("BlackBerry")]
-[assembly: AssemblyProduct("VSNDK.Package")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyProduct("BlackBerry.Package")]
+[assembly: AssemblyCopyright("Copyright © BlackBerry 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]   
 [assembly: ComVisible(false)]     
@@ -43,10 +43,10 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
 
-[assembly: AssemblyVersion("2.1.2014.0516")]
-[assembly: AssemblyFileVersion("2.1.2014.0516")]
+[assembly: AssemblyVersion("2.1.2014.0616")]
+[assembly: AssemblyFileVersion("2.1.2014.0616")]
 
 #if DEBUG
-[assembly: InternalsVisibleTo("VSNDK.Package.IntegrationTest")]
-[assembly: InternalsVisibleTo("VSNDK.Package.Test")]
+[assembly: InternalsVisibleTo("IntegrationTests")]
+[assembly: InternalsVisibleTo("UnitTests")]
 #endif

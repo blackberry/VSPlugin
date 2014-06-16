@@ -13,18 +13,17 @@
 //* limitations under the License.
 
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("VSNDK.DebugEngine")]
+[assembly: AssemblyTitle("BlackBerry DebugEngine")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("BlackBerry")]
-[assembly: AssemblyProduct("VSNDK.DebugEngine")]
-[assembly: AssemblyCopyright("Copyright © Research In Motion 2012")]
+[assembly: AssemblyProduct("BlackBerry.DebugEngine")]
+[assembly: AssemblyCopyright("Copyright © BlackBerry 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

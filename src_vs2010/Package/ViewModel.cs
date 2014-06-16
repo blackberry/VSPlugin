@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.ComponentModel;
+using BlackBerry.Package.Resources;
 using Microsoft.VisualStudio.Package;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using Microsoft.VisualStudio;
@@ -616,7 +617,7 @@ namespace RIM.VSNDK_Package
                     //If there is contention, give the preference to the designer.
                     if (DesignerDirty)
                     {
-                        SaveModelToXmlModel(Resources.SynchronizeBuffer);
+                        SaveModelToXmlModel(Strings.SynchronizeBuffer);
                         //We don't do any merging, so just overwrite whatever was in the buffer.
                         BufferDirty = false;
                     }
@@ -706,9 +707,9 @@ namespace RIM.VSNDK_Package
                 langsvc.IsParsing = true; // lock out the background parse thread.
 
                 // Wrap the buffer sync and the formatting in one undo unit.
-                using (CompoundAction ca = new CompoundAction(src, Resources.SynchronizeBuffer))
+                using (CompoundAction ca = new CompoundAction(src, Strings.SynchronizeBuffer))
                 {
-                    using (XmlEditingScope scope = _xmlStore.BeginEditingScope(Resources.SynchronizeBuffer, this))
+                    using (XmlEditingScope scope = _xmlStore.BeginEditingScope(Strings.SynchronizeBuffer, this))
                     {
                         //Replace the existing XDocument with the new one we just generated.
                         document.Root.ReplaceWith(documentFromDesignerState.Root);
@@ -738,7 +739,7 @@ namespace RIM.VSNDK_Package
         /// </summary>
         void FormatBuffer(Source src)
         {
-            using (EditArray edits = new EditArray(src, null, false, Resources.ReformatBuffer))
+            using (EditArray edits = new EditArray(src, null, false, Strings.ReformatBuffer))
             {
                 TextSpan span = src.GetDocumentSpan();
                 src.ReformatSpan(edits, span);
@@ -858,15 +859,15 @@ namespace RIM.VSNDK_Package
 
                 if (_qnxSchema == null)
                 {
-                    throw new Exception(Resources.InvalidVsTemplateData);
+                    throw new Exception(Strings.InvalidVsTemplateData);
                 }
             }
             catch (Exception e)
             {
                 //Display error message
                 ErrorHandler.ThrowOnFailure(VsShellUtilities.ShowMessageBox(_serviceProvider,
-                    Resources.InvalidVsTemplateData + e.Message,
-                    Resources.ErrorMessageBoxTitle,
+                    Strings.InvalidVsTemplateData + e.Message,
+                    Strings.ErrorMessageBoxTitle,
                     OLEMSGICON.OLEMSGICON_CRITICAL,
                     OLEMSGBUTTON.OLEMSGBUTTON_OK,
                     OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST));

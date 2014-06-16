@@ -29,7 +29,6 @@ using Microsoft.Win32;
 using System.IO;
 using System.Xml;
 using System.Windows.Forms;
-using PkgResources = RIM.VSNDK_Package.Resources;
 using RIM.VSNDK_Package.Import.Model;
 using EnvDTE;
 

@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBerry.BuildTasks", "Bu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests", "UnitTests\UnitTests.csproj", "{EA581F35-1EE6-4C7B-89FF-C3C7D886869D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBerry.NativeCore", "NativeCore\BlackBerry.NativeCore.csproj", "{AE6BEE3E-3273-4214-A215-2924E33246CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -85,6 +87,16 @@ Global
 		{EA581F35-1EE6-4C7B-89FF-C3C7D886869D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{EA581F35-1EE6-4C7B-89FF-C3C7D886869D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{EA581F35-1EE6-4C7B-89FF-C3C7D886869D}.Release|Win32.ActiveCfg = Release|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Debug|Win32.ActiveCfg = Debug|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{AE6BEE3E-3273-4214-A215-2924E33246CA}.Release|Win32.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
