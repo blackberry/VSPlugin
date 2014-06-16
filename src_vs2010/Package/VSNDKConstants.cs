@@ -12,12 +12,7 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary> 
     /// Command IDs exposed by VisualStudio. 

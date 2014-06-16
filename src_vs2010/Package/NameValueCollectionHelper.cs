@@ -13,12 +13,10 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Collections.Specialized;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary>
     /// 
@@ -40,7 +38,6 @@ namespace RIM.VSNDK_Package
             }
             return xSB.ToString();
         }
-
 
         /// <summary>
         /// 

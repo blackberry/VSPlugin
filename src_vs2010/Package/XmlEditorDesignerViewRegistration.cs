@@ -13,14 +13,11 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.Shell;
 using System.IO;
 using Microsoft.VisualStudio;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary>
     /// Register our bardescriptor.xml custom editor

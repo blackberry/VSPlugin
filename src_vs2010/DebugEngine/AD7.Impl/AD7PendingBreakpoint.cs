@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using BlackBerry.Package;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Text;
@@ -170,7 +171,7 @@ namespace BlackBerry.DebugEngine
                     // Visual Studio returns a start position that is one less than it actually is
                     xBBP = new AD7BoundBreakpoint(m_engine, m_bpRequestInfo, this);
 
-                    if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning == false)
+                    if (ControlDebugEngine.isDebugEngineRunning == false)
                     {
                         return VSConstants.S_FALSE;
                     }

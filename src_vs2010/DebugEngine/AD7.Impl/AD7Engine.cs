@@ -14,12 +14,11 @@
 
 using System;
 using System.Runtime.InteropServices;
+using BlackBerry.Package;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
-using RIM.VSNDK_Package;
-using VSNDK.Package;
 using VSNDK.Parser;
 using NameValueCollection = System.Collections.Specialized.NameValueCollection;
 using System.Windows.Forms;

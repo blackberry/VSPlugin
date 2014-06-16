@@ -362,12 +362,10 @@
     </Compile>
     <Compile Include="IViewModel.cs" />
     <Compile Include="NameValueCollectionHelper.cs" />
-    <Compile Include="NativeMethods.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="VsDesignerControl.xaml.cs">
       <DependentUpon>VsDesignerControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="VSMacroRecorder.cs" />
     <Compile Include="VSNDKConstants.cs" />
     <Compile Include="XmlEditorDesignerViewRegistration.cs" />
     <VSCTCompile Include="Resources\Package.vsct">

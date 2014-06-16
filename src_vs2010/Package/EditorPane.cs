@@ -13,7 +13,6 @@
 //* limitations under the License.
 
 using System;
-using BlackBerry.Package;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -24,7 +23,7 @@ using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
 using System.Security.Permissions;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary>
     /// This control hosts the editor and is responsible for

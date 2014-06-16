@@ -20,7 +20,7 @@ using EnvDTE;
 using Microsoft.VisualStudio.Shell;
 using System.IO;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary>
     /// Interaction logic for VsDesignerControl.xaml

@@ -14,10 +14,7 @@
 
 using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.InteropServices;
-using System.Security.Permissions;
-using BlackBerry.Package;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -26,7 +23,7 @@ using Microsoft.VisualStudio.OLE.Interop;
 
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary>
     /// Factory for creating the bar-descriptor editor

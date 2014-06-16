@@ -184,9 +184,6 @@
     <Compile Include="..\..\src_vs2010\Package\NameValueCollectionHelper.cs">
       <Link>NameValueCollectionHelper.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\NativeMethods.cs">
-      <Link>NativeMethods.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\PkgCmdID.cs">
       <Link>PkgCmdID.cs</Link>
     </Compile>
@@ -453,9 +450,6 @@
       <Link>VsDesignerControl.xaml.cs</Link>
       <DependentUpon>VsDesignerControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\VSMacroRecorder.cs">
-      <Link>VSMacroRecorder.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\VSNDK.PackagePackage.cs">
       <Link>VSNDK.PackagePackage.cs</Link>
     </Compile>
@@ -473,7 +467,7 @@
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Package.resx">
-      <Link>Package.resx</Link>
+      <Link>Resources\Package.resx</Link>
       <MergeWithCTO>true</MergeWithCTO>
       <ManifestResourceName>Package</ManifestResourceName>
       <SubType>Designer</SubType>

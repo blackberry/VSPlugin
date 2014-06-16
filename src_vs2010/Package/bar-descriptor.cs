@@ -12,17 +12,15 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
-    using System.Xml.Serialization;
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     
     
     /// <remarks/>
     [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.1")]
-    [System.SerializableAttribute()]
+    [SerializableAttribute]
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
     [System.Xml.Serialization.XmlTypeAttribute(AnonymousType=true, Namespace="http://www.qnx.com/schemas/application/1.0")]

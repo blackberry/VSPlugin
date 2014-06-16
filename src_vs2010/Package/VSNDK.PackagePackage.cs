@@ -870,7 +870,7 @@ namespace BlackBerry.Package
 
             Debug.WriteLine("Before Start Debug");
 
-            if (VSNDK.Package.ControlDebugEngine.isDebugEngineRunning || !bbPlatform)
+            if (ControlDebugEngine.isDebugEngineRunning || !bbPlatform)
             {
                 // Disable the override of F5 (this allows the debugged process to continue execution)
                 CancelDefault = false;

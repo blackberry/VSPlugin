@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.ComponentModel;
+using System.Linq;
 using BlackBerry.Package.Resources;
 using Microsoft.VisualStudio.Package;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
@@ -34,7 +34,7 @@ using System.IO;
 using System.Windows.Data;
 using EnvDTE;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     public class OrientationItemClass
     {
@@ -251,7 +251,7 @@ namespace RIM.VSNDK_Package
         private PermissionItemClass _permission;
         private DTE _dte;
         private string _activeProjectDirectory;
-        private Package _pkg;
+        private Microsoft.VisualStudio.Shell.Package _pkg;
 
         long _dirtyTime;
         LanguageService _xmlLanguageService;
@@ -276,7 +276,7 @@ namespace RIM.VSNDK_Package
         /// <param name="xmlModel"></param>
         /// <param name="provider"></param>
         /// <param name="buffer"></param>
-        public ViewModel(Package pkg, XmlStore xmlStore, XmlModel xmlModel, IServiceProvider provider, IVsTextLines buffer)
+        public ViewModel(Microsoft.VisualStudio.Shell.Package pkg, XmlStore xmlStore, XmlModel xmlModel, IServiceProvider provider, IVsTextLines buffer)
         {
             _pkg = pkg;
             /// Initialize Asset Type List

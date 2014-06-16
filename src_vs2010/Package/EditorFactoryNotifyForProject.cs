@@ -16,7 +16,7 @@ using System;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary>
     /// This attribute adds a File Extension for a Project System so that the Project

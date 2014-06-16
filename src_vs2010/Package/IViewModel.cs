@@ -14,14 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.XmlEditor;
-using System.ComponentModel;
-using System.Windows.Data;
 using System.IO;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary>
     /// Implementation of the IViewModel interface

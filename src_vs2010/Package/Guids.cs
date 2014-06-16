@@ -14,7 +14,7 @@
 
 using System;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     static class GuidList
     {
