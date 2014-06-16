@@ -121,9 +121,12 @@ namespace BlackBerry.Package
         {
             DTE dte = _applicationObject as DTE;
             var txtEdCpp = dte.get_Properties("TextEditor", "C/C++ Specific");
-            var prop = txtEdCpp.Item("DisableErrorReporting");
-            if (prop != null)
-                prop.Value = disable;
+            if (txtEdCpp != null)
+            {
+                var prop = txtEdCpp.Item("DisableErrorReporting");
+                if (prop != null)
+                    prop.Value = disable;
+            }
         }
 
         /// <summary> 
