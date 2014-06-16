@@ -147,8 +147,14 @@
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\CertHelper.cs">
+      <Link>Helpers\CertHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\CommandHelper.cs">
       <Link>Helpers\CommandHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\DialogHelper.cs">
+      <Link>Helpers\DialogHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
@@ -174,12 +180,6 @@
     <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionPage.cs">
       <Link>Options\ApiLevelOptionPage.cs</Link>
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\CertHelper.cs">
-      <Link>Options\CertHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\DialogHelper.cs">
-      <Link>Options\DialogHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AboutForm.cs">
       <Link>Options\Dialogs\AboutForm.cs</Link>
