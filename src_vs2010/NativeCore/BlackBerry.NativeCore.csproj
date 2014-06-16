@@ -113,6 +113,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Model\NdkInfo.cs">
       <Link>Model\NdkInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\PermissionInfo.cs">
+      <Link>Model\PermissionInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\RuntimeInfo.cs">
       <Link>Model\RuntimeInfo.cs</Link>
     </Compile>

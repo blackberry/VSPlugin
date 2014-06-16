@@ -65,6 +65,7 @@
     <Compile Include="Model\DeviceTheme.cs" />
     <Compile Include="Model\NdkDefinition.cs" />
     <Compile Include="Model\NdkInfo.cs" />
+    <Compile Include="Model\PermissionInfo.cs" />
     <Compile Include="Model\RuntimeInfo.cs" />
     <Compile Include="Model\SimulatorInfo.cs" />
     <Compile Include="Model\Size.cs" />

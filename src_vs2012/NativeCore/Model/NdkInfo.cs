@@ -14,7 +14,7 @@ namespace BlackBerry.NativeCore.Model
     {
         private const string DescriptorFileName = "blackberry-sdk-descriptor.xml";
 
-        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath, DeviceInfo[] devices)
+        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath, DeviceInfo[] devices, PermissionInfo[] permissions)
             : base(name, version)
         {
             if (string.IsNullOrEmpty(hostPath))
@@ -23,11 +23,14 @@ namespace BlackBerry.NativeCore.Model
                 throw new ArgumentNullException("targetPath");
             if (devices == null)
                 throw new ArgumentNullException("devices");
+            if (permissions == null)
+                throw new ArgumentNullException("");
 
             FilePath = filePath;
             HostPath = hostPath;
             TargetPath = targetPath;
             Devices = devices;
+            Permissions = permissions;
         }
 
         public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath)
@@ -61,7 +64,7 @@ namespace BlackBerry.NativeCore.Model
                 devices = LoadDevices(ndkDescriptor);
             }
 
-            // OK, give up, and say it's unknown:
+            // OK, give up, and say it's unknown, if still null:
             Devices = devices ?? new DeviceInfo[0];
             Details = ToShortDeviceDescription();
         }
@@ -87,6 +90,12 @@ namespace BlackBerry.NativeCore.Model
         }
 
         public DeviceInfo[] Devices
+        {
+            get;
+            private set;
+        }
+
+        public PermissionInfo[] Permissions
         {
             get;
             private set;
