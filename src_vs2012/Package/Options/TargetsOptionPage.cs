@@ -1,11 +1,11 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell;
 
-namespace RIM.VSNDK_Package.Options
+namespace BlackBerry.Package.Options
 {
     /// <summary>
     /// Option page to manage list of targets and debug-tokens.

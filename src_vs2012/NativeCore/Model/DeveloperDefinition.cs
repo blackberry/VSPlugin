@@ -2,22 +2,22 @@
 using System.IO;
 using System.IO.Packaging;
 using System.Text;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Helpers;
+using BlackBerry.NativeCore.Tools;
 using Microsoft.Win32;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Tools;
 
-namespace RIM.VSNDK_Package.ViewModels
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Short settings about developer doing the development.
     /// </summary>
-    internal sealed class DeveloperDefinition
+    public sealed class DeveloperDefinition
     {
         /// <summary>
         /// Default name of the certificate file.
         /// </summary>
-        internal const string DefaultCertificateName = "author.p12";
+        public const string DefaultCertificateName = "author.p12";
         private const string DefaultCskTokenName = "bbidtoken.csk";
         private const string DefaultTabletSignerName = "barsigner.db";
         private const string DefaultTabletCskTokenName = "barsigner.csk";
@@ -270,7 +270,7 @@ namespace RIM.VSNDK_Package.ViewModels
                 if (CskPassword == null)
                     CskPassword = string.Empty;
 
-                settings.SetValue(FieldCskPassword, GlobalFunctions.Encrypt(CskPassword));
+                settings.SetValue(FieldCskPassword, GlobalHelper.Encrypt(CskPassword));
             }
             finally
             {
@@ -475,7 +475,7 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 object xPassword = settings.GetValue(FieldCskPassword);
                 if (xPassword != null)
-                    cskPassword = GlobalFunctions.Decrypt(xPassword.ToString());
+                    cskPassword = GlobalHelper.Decrypt(xPassword.ToString());
             }
             catch
             {
@@ -580,9 +580,12 @@ namespace RIM.VSNDK_Package.ViewModels
                 Uri uri = PackUriHelper.CreatePartUri(new Uri(name, UriKind.Relative));
                 PackagePart part = package.CreatePart(uri, string.Empty);
 
-                using (var fileStream = new FileStream(fullPathName, FileMode.Open, FileAccess.Read))
+                if (part != null)
                 {
-                    CopyStream(fileStream, part.GetStream());
+                    using (var fileStream = new FileStream(fullPathName, FileMode.Open, FileAccess.Read))
+                    {
+                        CopyStream(fileStream, part.GetStream());
+                    }
                 }
             }
         }

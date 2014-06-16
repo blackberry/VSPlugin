@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.ViewModels
+namespace BlackBerry.Package.ViewModels
 {
     internal sealed class SigningOptionViewModel
     {

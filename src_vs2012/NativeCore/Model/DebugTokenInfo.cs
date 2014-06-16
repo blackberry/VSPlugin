@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Model data describing info about debug token.
     /// </summary>
-    internal sealed class DebugTokenInfo
+    public sealed class DebugTokenInfo
     {
         private string _description;
 
@@ -87,7 +87,7 @@ namespace RIM.VSNDK_Package.Model
         #endregion
 
         /// <summary>
-        /// Checks, whether this debug token is build agains specified device.
+        /// Checks, whether this debug token is build against specified device.
         /// </summary>
         public bool Contains(ulong device)
         {

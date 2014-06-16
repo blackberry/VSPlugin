@@ -2,7 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 
-namespace RIM.VSNDK_Package.Options
+namespace BlackBerry.Package.Options
 {
     internal static class DialogHelper
     {

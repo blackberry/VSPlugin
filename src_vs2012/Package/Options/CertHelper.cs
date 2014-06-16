@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Options.Dialogs;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.Options.Dialogs;
 
-namespace RIM.VSNDK_Package.Options
+namespace BlackBerry.Package.Options
 {
     internal static class CertHelper
     {

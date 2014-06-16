@@ -12,27 +12,13 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using BlackBerry.Package.Import.Model;
 using Microsoft.VisualStudio.PlatformUI;
-using Microsoft.Win32;
 using System.IO;
-using System.Xml;
-using System.Windows.Forms;
-using RIM.VSNDK_Package.Import.Model;
 using EnvDTE;
 
-namespace RIM.VSNDK_Package.Import
+namespace BlackBerry.Package.Import
 {
     /// <summary>
     /// Interaction logic for Window1.xaml

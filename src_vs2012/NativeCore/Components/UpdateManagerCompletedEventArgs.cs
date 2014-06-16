@@ -1,7 +1,7 @@
 ﻿using System;
 using BlackBerry.NativeCore.Model;
 
-namespace BlackBerry.NativeCore
+namespace BlackBerry.NativeCore.Components
 {
     /// <summary>
     /// Arguments passed along with Completed event of UpdateManager.

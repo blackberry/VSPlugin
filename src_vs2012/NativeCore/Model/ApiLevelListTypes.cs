@@ -1,9 +1,9 @@
-﻿namespace RIM.VSNDK_Package.Model
+﻿namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Available lists of NDKs.
     /// </summary>
-    internal enum ApiLevelListTypes
+    public enum ApiLevelListTypes
     {
         Default,
         Full,

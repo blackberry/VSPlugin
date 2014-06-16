@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
-using RIM.VSNDK_Package.Diagnostics;
+using BlackBerry.NativeCore.Diagnostics;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Class describing BlackBerry ID token.
     /// </summary>
-    internal sealed class CskTokenInfo
+    public sealed class CskTokenInfo
     {
         private CskTokenInfo()
         {

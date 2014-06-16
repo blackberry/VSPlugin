@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using Microsoft.VisualStudio.Shell;
 
-namespace RIM.VSNDK_Package.Options
+namespace BlackBerry.Package.Options
 {
     /// <summary>
     /// Option page to manage log settings.
@@ -68,10 +68,5 @@ namespace RIM.VSNDK_Package.Options
         }
 
         #endregion
-
-        public override void SaveSettingsToStorage()
-        {
-            base.SaveSettingsToStorage();
-        }
     }
 }

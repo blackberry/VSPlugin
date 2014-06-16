@@ -77,9 +77,9 @@
       <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
       <Name>GDBParser</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
-      <Project>{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}</Project>
-      <Name>BlackBerry.Package</Name>
+    <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
+      <Project>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</Project>
+      <Name>BlackBerry.NativeCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

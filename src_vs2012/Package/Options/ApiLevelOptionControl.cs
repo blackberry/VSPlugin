@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Options.Dialogs;
-using RIM.VSNDK_Package.Tools;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.Package.Options.Dialogs;
+using BlackBerry.Package.ViewModels;
+using BlackBerry.NativeCore.Tools;
 
-namespace RIM.VSNDK_Package.Options
+namespace BlackBerry.Package.Options
 {
     internal partial class ApiLevelOptionControl : UserControl
     {
@@ -20,7 +22,7 @@ namespace RIM.VSNDK_Package.Options
             PopulateNDKs(true);
         }
 
-        private void OnApiLevelChanged(object sender, EventArgs e)
+        private void OnApiLevelChanged(object sender, UpdateManagerCompletedEventArgs e)
         {
             PopulateNDKs(false);
         }

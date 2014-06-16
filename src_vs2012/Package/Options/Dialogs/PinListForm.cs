@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.Package.Helpers;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     /// <summary>
     /// Dialog for creating list of device PINs.

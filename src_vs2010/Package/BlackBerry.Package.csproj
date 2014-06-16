@@ -147,47 +147,11 @@
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryTraceListener.cs">
-      <Link>Diagnostics\BlackBerryTraceListener.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Diagnostics\TimeTracker.cs">
-      <Link>Diagnostics\TimeTracker.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Diagnostics\TraceLog.cs">
-      <Link>Diagnostics\TraceLog.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\CommandHelper.cs">
       <Link>Helpers\CommandHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\ApiInfo.cs">
-      <Link>Model\ApiInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\ApiInfoArray.cs">
-      <Link>Model\ApiInfoArray.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\ApiLevelListTypes.cs">
-      <Link>Model\ApiLevelListTypes.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\CertificateInfo.cs">
-      <Link>Model\CertificateInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\CskTokenInfo.cs">
-      <Link>Model\CskTokenInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\DebugTokenInfo.cs">
-      <Link>Model\DebugTokenInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\DeviceDebugTokenInfo.cs">
-      <Link>Model\DeviceDebugTokenInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\DeviceInfo.cs">
-      <Link>Model\DeviceInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\DeviceTheme.cs">
-      <Link>Model\DeviceTheme.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\Integration\ComboBoxItem.cs">
       <Link>Model\Integration\ComboBoxItem.cs</Link>
@@ -198,15 +162,6 @@
     <Compile Include="..\..\src_vs2012\Package\Model\Integration\WebBrowserTurbo.cs">
       <Link>Model\Integration\WebBrowserTurbo.cs</Link>
       <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\NdkInfo.cs">
-      <Link>Model\NdkInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\RuntimeInfo.cs">
-      <Link>Model\RuntimeInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Model\SimulatorInfo.cs">
-      <Link>Model\SimulatorInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.cs">
       <Link>Options\ApiLevelOptionControl.cs</Link>
@@ -381,92 +336,17 @@
     <Compile Include="..\..\src_vs2012\Package\TokenProcessor.cs">
       <Link>TokenProcessor.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\ApiLevelListLoadRunner.cs">
-      <Link>Tools\ApiLevelListLoadRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\ApiLevelUpdateLogEventArgs.cs">
-      <Link>Tools\ApiLevelUpdateLogEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\ApiLevelUpdateRunner.cs">
-      <Link>Tools\ApiLevelUpdateRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\ApplicationRemoveRunner.cs">
-      <Link>Tools\ApplicationRemoveRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\DebugTokenCreateRunner.cs">
-      <Link>Tools\DebugTokenCreateRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\DebugTokenInfoRunner.cs">
-      <Link>Tools\DebugTokenInfoRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\DebugTokenUploadRunner.cs">
-      <Link>Tools\DebugTokenUploadRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\DeviceInfoRunner.cs">
-      <Link>Tools\DeviceInfoRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\EventDispatcher.cs">
-      <Link>Tools\EventDispatcher.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\KeyToolGenRunner.cs">
-      <Link>Tools\KeyToolGenRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\KeyToolInfoRunner.cs">
-      <Link>Tools\KeyToolInfoRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\KeyToolRegisterRunner.cs">
-      <Link>Tools\KeyToolRegisterRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\KeyToolRemoveRunner.cs">
-      <Link>Tools\KeyToolRemoveRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\RunnerDefaults.cs">
-      <Link>Tools\RunnerDefaults.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\ToolRunner.cs">
-      <Link>Tools\ToolRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\ToolRunnerEventArgs.cs">
-      <Link>Tools\ToolRunnerEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Tools\ToolRunnerStartupEventArgs.cs">
-      <Link>Tools\ToolRunnerStartupEventArgs.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelAction.cs">
-      <Link>ViewModels\ApiLevelAction.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelTarget.cs">
-      <Link>ViewModels\ApiLevelTarget.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelTask.cs">
-      <Link>ViewModels\ApiLevelTask.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\DeveloperDefinition.cs">
-      <Link>ViewModels\DeveloperDefinition.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\DeviceDefinition.cs">
-      <Link>ViewModels\DeviceDefinition.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\DeviceDefinitionType.cs">
-      <Link>ViewModels\DeviceDefinitionType.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\NdkDefinition.cs">
-      <Link>ViewModels\NdkDefinition.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageViewModel.cs">
-      <Link>ViewModels\PackageViewModel.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageOptionViewModel.cs">
+      <Link>ViewModels\PackageOptionViewModel.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\SigningOptionViewModel.cs">
       <Link>ViewModels\SigningOptionViewModel.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\UpdateManager.cs">
-      <Link>ViewModels\UpdateManager.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\VSNDKAddIn.cs">
       <Link>VSNDKAddIn.cs</Link>
@@ -476,7 +356,6 @@
     <Compile Include="EditorFactory.cs" />
     <Compile Include="EditorFactoryNotifyForProject.cs" />
     <Compile Include="EditorPane.cs" />
-    <Compile Include="GlobalFunctions.cs" />
     <Compile Include="Import\Model\ImportModel.cs" />
     <Compile Include="Import\Import.xaml.cs">
       <DependentUpon>Import.xaml</DependentUpon>
@@ -697,6 +576,10 @@
       <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
       <Name>GDBParser</Name>
       <Private>False</Private>
+    </ProjectReference>
+    <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
+      <Project>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</Project>
+      <Name>BlackBerry.NativeCore</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Globalization;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Class describing developer's certificate.
     /// </summary>
-    internal sealed class CertificateInfo
+    public sealed class CertificateInfo
     {
         private CertificateInfo()
         {

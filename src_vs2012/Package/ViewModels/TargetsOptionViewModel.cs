@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using RIM.VSNDK_Package.Model;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.ViewModels
+namespace BlackBerry.Package.ViewModels
 {
     /// <summary>
     /// View model for editing list of target devices.

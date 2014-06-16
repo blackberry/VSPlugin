@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Arguments passes along with ToolRunner events.
     /// </summary>
-    internal sealed class ToolRunnerEventArgs : EventArgs
+    public sealed class ToolRunnerEventArgs : EventArgs
     {
         #region Properties
 

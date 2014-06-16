@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Wrapper class for array of API info that belong to the same API Level.
     /// </summary>
-    internal sealed class ApiInfoArray : ApiInfo
+    public sealed class ApiInfoArray : ApiInfo
     {
         public ApiInfoArray(string name, Version version, ApiInfo[] items)
             : base(name, version)

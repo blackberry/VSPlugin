@@ -2,14 +2,14 @@
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Text;
-using RIM.VSNDK_Package.Diagnostics;
+using BlackBerry.NativeCore.Diagnostics;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Class that runs specified executable, captures its output and error messages, then provides to parsers.
     /// </summary>
-    internal class ToolRunner : IDisposable
+    public class ToolRunner : IDisposable
     {
         private Process _process;
         private StringBuilder _output;

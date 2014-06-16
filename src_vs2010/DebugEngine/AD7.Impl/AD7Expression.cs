@@ -13,12 +13,8 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using VSNDK.Parser;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Collections;
 using System.Threading;
 
 namespace VSNDK.DebugEngine

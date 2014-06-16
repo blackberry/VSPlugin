@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Tools;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
 
-namespace RIM.VSNDK_Package.ViewModels
+namespace BlackBerry.NativeCore.Components
 {
-    internal sealed class UpdateManager : IDisposable
+    public sealed class UpdateManager : IDisposable
     {
         #region Internal Classes
 
@@ -102,7 +103,7 @@ namespace RIM.VSNDK_Package.ViewModels
                 return _description;
             }
 
-            internal void Abort()
+            public void Abort()
             {
                 bool aborted = false;
 
@@ -189,21 +190,17 @@ namespace RIM.VSNDK_Package.ViewModels
         private const int DelayInterval = 30000; // in milisec
 
         public event EventHandler Started;
-        public event EventHandler Completed;
+        public event EventHandler<UpdateManagerCompletedEventArgs> Completed;
 
-        private readonly PackageViewModel _vm;
         private ApiLevelUpdateLogEventArgs _lastLog;
         private readonly List<ActionData> _actions;
         private Timer _timer;
 
-        public UpdateManager(PackageViewModel vm, string folder)
+        public UpdateManager(string folder)
         {
-            if (vm == null)
-                throw new ArgumentNullException("vm");
             if (string.IsNullOrEmpty(folder))
                 throw new ArgumentNullException("folder");
 
-            _vm = vm;
             Folder = folder;
             SyncFilePath = Path.Combine(Folder, "vsplugin.lock");
             _actions = new List<ActionData>();
@@ -403,8 +400,6 @@ namespace RIM.VSNDK_Package.ViewModels
                     CurrentAction = null;
                     _lastLog = null;
 
-                    // and now reload underlying stored lists:
-                    _vm.Reset(action.Target);
                     completed = true;
 
                     SyncFile.Close();
@@ -414,7 +409,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
             if (completed)
             {
-                NotifyCompleted();
+                NotifyCompleted(action);
             }
 
             // and start the next action from the queue:
@@ -458,12 +453,12 @@ namespace RIM.VSNDK_Package.ViewModels
                 handler(this, EventArgs.Empty);
         }
 
-        private void NotifyCompleted()
+        private void NotifyCompleted(ActionData action)
         {
             var handler = Completed;
 
             if (handler != null)
-                handler(this, EventArgs.Empty);
+                handler(this, new UpdateManagerCompletedEventArgs(action.Target));
         }
 
         #region IDisposable Implementation

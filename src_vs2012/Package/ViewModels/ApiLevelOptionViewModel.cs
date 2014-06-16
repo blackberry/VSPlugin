@@ -1,8 +1,10 @@
 ﻿using System;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Tools;
+using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
 
-namespace RIM.VSNDK_Package.ViewModels
+namespace BlackBerry.Package.ViewModels
 {
     internal sealed class ApiLevelOptionViewModel : IDisposable
     {

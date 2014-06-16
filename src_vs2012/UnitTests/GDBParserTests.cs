@@ -1,11 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using VSNDK.Parser;
 using NUnit.Framework;
+using VSNDK.Parser;
 
-namespace GDBParser_UnitTests
+namespace UnitTests
 {
     public class UnitTests
     {

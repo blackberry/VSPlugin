@@ -17,6 +17,15 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Diagnostics;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.Model.Integration;
+using BlackBerry.Package.Options;
+using BlackBerry.Package.Options.Dialogs;
+using BlackBerry.Package.ViewModels;
 using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -31,18 +40,10 @@ using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Helpers;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Model.Integration;
-using RIM.VSNDK_Package.Options;
-using RIM.VSNDK_Package.Options.Dialogs;
-using RIM.VSNDK_Package.Tools;
-using RIM.VSNDK_Package.ViewModels;
-using VSNDK.AddIn;
+using RIM.VSNDK_Package;
 using VSNDK.Parser;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -84,7 +85,7 @@ namespace RIM.VSNDK_Package
     [ProvideOptionPage(typeof(ApiLevelOptionPage), "BlackBerry", "API Levels", 1001, 1004, true)]
     [ProvideOptionPage(typeof(TargetsOptionPage), "BlackBerry", "Targets", 1001, 1005, true)]
     [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
-    public sealed class VSNDK_PackagePackage : Package
+    public sealed class VSNDK_PackagePackage : Microsoft.VisualStudio.Shell.Package
     {
         #region private member variables
 
@@ -408,7 +409,8 @@ namespace RIM.VSNDK_Package
                     }
                 }
 
-                /* PH: TODO: remove following code as it affects Visual Studio and all tools running by it */
+                /* PH: FIXME: TODO: remove following code as it affects Visual Studio and all tools running by it */
+                /*
                 string qnx_config = GlobalFunctions.bbndkPathConst + @"\features\com.qnx.tools.jre.win32_1.6.0.43\jre\bin";
 
                 System.Environment.SetEnvironmentVariable("QNX_TARGET", qnx_target);
@@ -417,7 +419,7 @@ namespace RIM.VSNDK_Package
                 string ndkpath = string.Format(@"{0}/usr/bin;{1};", qnx_host, qnx_config) +
                     System.Environment.GetEnvironmentVariable("PATH");
                 System.Environment.SetEnvironmentVariable("PATH", ndkpath);
-                /* */
+                */
 
             }
             catch (Exception ex)

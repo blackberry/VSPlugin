@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Options.Dialogs;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.Options.Dialogs;
+using BlackBerry.Package.ViewModels;
 
-namespace RIM.VSNDK_Package.Options
+namespace BlackBerry.Package.Options
 {
     public partial class TargetsOptionControl : UserControl
     {

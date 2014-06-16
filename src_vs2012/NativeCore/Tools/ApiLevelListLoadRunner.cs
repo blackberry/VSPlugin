@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using RIM.VSNDK_Package.Model;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to list available NDKs or simulator versions.
     /// </summary>
-    internal sealed class ApiLevelListLoadRunner : ToolRunner
+    public sealed class ApiLevelListLoadRunner : ToolRunner
     {
         private ApiLevelListTypes _type;
 

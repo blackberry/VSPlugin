@@ -1,9 +1,9 @@
 ﻿using System;
 using System.IO;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
-    internal static class RunnerDefaults
+    public static class RunnerDefaults
     {
         public static readonly string TestToolsDirectory;
         public static readonly string TestNdkDirectory;

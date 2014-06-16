@@ -1,18 +1,18 @@
 ﻿using System;
-using RIM.VSNDK_Package.Model;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to get information about specified device.
     /// </summary>
-    internal sealed class DeviceInfoRunner : ToolRunner
+    public sealed class DeviceInfoRunner : ToolRunner
     {
         private string _ip;
         private string _password;
 
         /// <summary>
-        /// Init consturctor.
+        /// Init constructor.
         /// </summary>
         /// <param name="workingDirectory">Tools directory</param>
         /// <param name="ip">Device IP</param>

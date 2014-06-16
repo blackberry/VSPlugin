@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using BlackBerry.NativeCore.Helpers;
+using BlackBerry.NativeCore.Tools;
 using Microsoft.Win32;
-using RIM.VSNDK_Package.Tools;
 
-namespace RIM.VSNDK_Package.ViewModels
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Short definition of the device used during development.
     /// </summary>
-    internal sealed class DeviceDefinition : IComparable<DeviceDefinition>
+    public sealed class DeviceDefinition : IComparable<DeviceDefinition>
     {
         private const string FieldDeviceName = "device_name";
         private const string FieldDeviceIP = "device_IP";
@@ -209,7 +210,7 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 object xPassword = settings.GetValue(type == DeviceDefinitionType.Device ? FieldDevicePassword : FieldSimulatorPassword);
                 if (xPassword != null)
-                    password = GlobalFunctions.Decrypt(xPassword.ToString());
+                    password = GlobalHelper.Decrypt(xPassword.ToString());
             }
             catch
             {
@@ -274,7 +275,7 @@ namespace RIM.VSNDK_Package.ViewModels
 
                 settings.SetValue(Type == DeviceDefinitionType.Device ? FieldDeviceName : FieldSimulatorName, Name);
                 settings.SetValue(Type == DeviceDefinitionType.Device ? FieldDeviceIP : FieldSimulatorIP, IP);
-                settings.SetValue(Type == DeviceDefinitionType.Device ? FieldDevicePassword : FieldSimulatorPassword, GlobalFunctions.Encrypt(Password));
+                settings.SetValue(Type == DeviceDefinitionType.Device ? FieldDevicePassword : FieldSimulatorPassword, GlobalHelper.Encrypt(Password));
             }
             finally
             {
@@ -346,7 +347,7 @@ namespace RIM.VSNDK_Package.ViewModels
             for (int i = 0; i < values.Length; i += 4)
             {
                 var device = new DeviceDefinition(string.IsNullOrEmpty(values[i]) ? null : values[i],
-                                                  values[i + 2], GlobalFunctions.Decrypt(values[i + 3]),
+                                                  values[i + 2], GlobalHelper.Decrypt(values[i + 3]),
                                                   values[i + 1] == "S" ? DeviceDefinitionType.Simulator : DeviceDefinitionType.Device);
                 result.Add(device);
             }
@@ -365,7 +366,7 @@ namespace RIM.VSNDK_Package.ViewModels
                     result.Add(device.Name ?? string.Empty);
                     result.Add(device.Type == DeviceDefinitionType.Device ? "D" : "S");
                     result.Add(device.IP);
-                    result.Add(GlobalFunctions.Encrypt(device.Password));
+                    result.Add(GlobalHelper.Encrypt(device.Password));
                 }
             }
 

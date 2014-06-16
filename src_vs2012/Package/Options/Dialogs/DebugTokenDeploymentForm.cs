@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Model.Integration;
-using RIM.VSNDK_Package.Tools;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.Model.Integration;
+using BlackBerry.Package.ViewModels;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     internal partial class DebugTokenDeploymentForm : Form
     {

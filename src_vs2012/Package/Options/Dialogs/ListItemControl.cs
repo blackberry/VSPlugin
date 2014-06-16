@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     internal partial class ListItemControl : UserControl
     {

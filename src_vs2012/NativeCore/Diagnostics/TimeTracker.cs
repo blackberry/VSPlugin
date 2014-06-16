@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 
-namespace RIM.VSNDK_Package.Diagnostics
+namespace BlackBerry.NativeCore.Diagnostics
 {
     /// <summary>
     /// Helper class for managing the 'time' part of the trace-log messages.
     /// </summary>
-    internal sealed class TimeTracker
+    public sealed class TimeTracker
     {
         private readonly char[] _time;
         private int _messagePart;

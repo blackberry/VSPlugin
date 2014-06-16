@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Tools;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.ViewModels;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     internal partial class UpdateManagerStatusForm : Form
     {
@@ -60,7 +63,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
             listActions_SelectedIndexChanged(null, EventArgs.Empty);
         }
 
-        private void UpdateLog(ViewModels.UpdateManager.ActionData action)
+        private void UpdateLog(UpdateManager.ActionData action)
         {
             lblActionLog1.Text = action != null ? string.Concat("Processing ", action.Name, "...") : "Nothing is currently executing";
             lblActionLog2.Text = "-";
@@ -103,7 +106,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
 
         private void bttDelete_Click(object sender, EventArgs e)
         {
-            var action = listActions.SelectedItem as ViewModels.UpdateManager.ActionData;
+            var action = listActions.SelectedItem as UpdateManager.ActionData;
 
             if (action != null)
             {

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using BlackBerry.NativeCore.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace RIM.VSNDK_Package.Diagnostics
+namespace BlackBerry.Package.Diagnostics
 {
     /// <summary>
     /// Pane panel, that listens for BlackBerry-only trace log messages and displays on UI.

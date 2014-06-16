@@ -2,7 +2,7 @@
 using EnvDTE;
 using EnvDTE80;
 
-namespace RIM.VSNDK_Package.Helpers
+namespace BlackBerry.Package.Helpers
 {
     internal sealed class CommandHelper
     {

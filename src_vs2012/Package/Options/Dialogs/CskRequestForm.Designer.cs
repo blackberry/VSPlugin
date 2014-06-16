@@ -1,6 +1,6 @@
-﻿using RIM.VSNDK_Package.Model.Integration;
+﻿using BlackBerry.Package.Model.Integration;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     partial class CskRequestForm
     {
@@ -30,7 +30,7 @@ namespace RIM.VSNDK_Package.Options.Dialogs
         /// </summary>
         private void InitializeComponent()
         {
-            this.webBrowser = new RIM.VSNDK_Package.Model.Integration.WebBrowserTurbo();
+            this.webBrowser = new WebBrowserTurbo();
             this.SuspendLayout();
             // 
             // webBrowser

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Tools;
+using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
 
-namespace RIM.VSNDK_Package.ViewModels
+namespace BlackBerry.Package.ViewModels
 {
     /// <summary>
     /// This is a global view-model, that keeps track and caches all the data.
@@ -47,7 +49,8 @@ namespace RIM.VSNDK_Package.ViewModels
             _remoteNDKs = new ApiInfoArray[0];
             _remoteSimulators = new ApiInfoArray[0];
             _remoteRuntimes = new ApiInfoArray[0];
-            UpdateManager = new UpdateManager(this, RunnerDefaults.NdkDirectory);
+            UpdateManager = new UpdateManager(RunnerDefaults.NdkDirectory);
+            UpdateManager.Completed += UpdateManagerOnCompleted;
         }
 
         #region Properties
@@ -451,6 +454,11 @@ namespace RIM.VSNDK_Package.ViewModels
             {
                 TraceLog.WriteException(ex, "Problem removing file: \"{0}\"", info.FilePath);
             }
+        }
+
+        private void UpdateManagerOnCompleted(object sender, UpdateManagerCompletedEventArgs e)
+        {
+            Reset(e.Target);
         }
     }
 }

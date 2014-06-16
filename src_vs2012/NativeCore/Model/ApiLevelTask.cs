@@ -1,9 +1,9 @@
-﻿namespace RIM.VSNDK_Package.ViewModels
+﻿namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Enumeration describing, what action can be performed over specified API Level.
     /// </summary>
-    internal enum ApiLevelTask
+    public enum ApiLevelTask
     {
         /// <summary>
         /// Nothing can be done with this API Level (it was installed separatelly and just detected).

@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Description of the debug-token stored on the device.
     /// </summary>
-    internal sealed class DeviceDebugTokenInfo
+    public sealed class DeviceDebugTokenInfo
     {
         private string _description;
 

@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Arguments passed along with 'Log' event.
     /// </summary>
-    internal class ApiLevelUpdateLogEventArgs : EventArgs
+    public class ApiLevelUpdateLogEventArgs : EventArgs
     {
         public ApiLevelUpdateLogEventArgs(string message, int progress, bool canAbort)
         {

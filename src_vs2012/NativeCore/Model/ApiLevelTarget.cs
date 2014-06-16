@@ -1,9 +1,9 @@
-﻿namespace RIM.VSNDK_Package.ViewModels
+﻿namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Targets processed by Update Manager
     /// </summary>
-    internal enum ApiLevelTarget
+    public enum ApiLevelTarget
     {
         NDK,
         Simulator,

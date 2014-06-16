@@ -1,12 +1,12 @@
 ﻿using System;
-using RIM.VSNDK_Package.Model;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to get debug-token information.
     /// </summary>
-    internal sealed class DebugTokenInfoRunner : ToolRunner
+    public sealed class DebugTokenInfoRunner : ToolRunner
     {
         private string _location;
 

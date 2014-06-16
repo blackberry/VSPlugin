@@ -2,12 +2,12 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace RIM.VSNDK_Package.Diagnostics
+namespace BlackBerry.NativeCore.Diagnostics
 {
     /// <summary>
     /// Helper class for printing trace log messages.
     /// </summary>
-    internal static class TraceLog
+    public static class TraceLog
     {
         public const string Category = "BlackBerry";
 

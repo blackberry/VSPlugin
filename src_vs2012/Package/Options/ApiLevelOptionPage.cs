@@ -1,12 +1,13 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.ViewModels;
 using Microsoft.VisualStudio.Shell;
-using RIM.VSNDK_Package.ViewModels;
 
-namespace RIM.VSNDK_Package.Options
+namespace BlackBerry.Package.Options
 {
     /// <summary>
     /// Option page to manage API levels.

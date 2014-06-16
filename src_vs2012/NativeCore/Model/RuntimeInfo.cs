@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using RIM.VSNDK_Package.Diagnostics;
+using BlackBerry.NativeCore.Diagnostics;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Description of locally installed runtime libraries.
     /// </summary>
-    internal sealed class RuntimeInfo : ApiInfo
+    public sealed class RuntimeInfo : ApiInfo
     {
         public RuntimeInfo(string folder, string name, Version version)
             : base(name, version)

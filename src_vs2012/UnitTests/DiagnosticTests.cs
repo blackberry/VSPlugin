@@ -1,11 +1,9 @@
-﻿#if DEBUG
-
-using System.IO;
+﻿using System.IO;
 using System.Text;
+using BlackBerry.NativeCore.Diagnostics;
 using NUnit.Framework;
-using RIM.VSNDK_Package.Diagnostics;
 
-namespace VSNDK.Package.Test
+namespace UnitTests
 {
     [TestFixture]
     public sealed class DiagnosticTests
@@ -33,6 +31,3 @@ namespace VSNDK.Package.Test
         }
     }
 }
-
-#endif
-

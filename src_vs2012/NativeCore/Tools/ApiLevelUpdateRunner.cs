@@ -5,15 +5,15 @@ using System.Globalization;
 using System.IO;
 using System.Management;
 using System.Text;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to update specified target within the NDK (new API Level, new simulator or runtime).
     /// </summary>
-    internal sealed class ApiLevelUpdateRunner : ToolRunner
+    public sealed class ApiLevelUpdateRunner : ToolRunner
     {
         #region Internal Classes
 

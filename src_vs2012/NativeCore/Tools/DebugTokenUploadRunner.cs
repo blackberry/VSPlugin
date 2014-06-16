@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to upload debug-token onto the device.
     /// </summary>
-    internal sealed class DebugTokenUploadRunner : ToolRunner
+    public sealed class DebugTokenUploadRunner : ToolRunner
     {
         private string _location;
         private string _ip;

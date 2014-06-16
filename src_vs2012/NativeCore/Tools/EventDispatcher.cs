@@ -3,22 +3,12 @@ using System.Windows;
 using System.Windows.Forms;
 using System.Windows.Threading;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
-    /// <summary>
-    /// Interface simplifying events invocations.
-    /// </summary>
-    internal interface IEventDispatcher
-    {
-        void Invoke<T>(EventHandler<T> eventHandler, object sender, T e) where T : EventArgs;
-        void Invoke(Action action);
-        void Invoke<T>(Action<T> action, T e);
-    }
-
     /// <summary>
     /// Helper class for creating cross-thread event dispatchers.
     /// </summary>
-    internal static class EventDispatcher
+    public static class EventDispatcher
     {
         #region Windows Forms
 

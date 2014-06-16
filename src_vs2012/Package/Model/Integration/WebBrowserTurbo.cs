@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
-namespace RIM.VSNDK_Package.Model.Integration
+namespace BlackBerry.Package.Model.Integration
 {
     /// <summary>
     /// Extended version of WebBrowser to return more data, when navigating over URLs and notify about errors.

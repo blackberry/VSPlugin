@@ -3,7 +3,7 @@ using System.Windows.Forms;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package.Helpers
 {
     public static class MessageBoxHelper
     {

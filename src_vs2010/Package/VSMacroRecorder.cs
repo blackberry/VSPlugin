@@ -53,16 +53,6 @@ namespace RIM.VSNDK_Package
         BackspaceWord
     }
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1027:MarkEnumsWithFlags")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1008:EnumsShouldHaveZeroValue")]
-    public enum MoveScope
-	{
-        Character = tom.tomConstants.tomCharacter,
-        Word = tom.tomConstants.tomWord,
-        Line = tom.tomConstants.tomLine,
-        Paragraph = tom.tomConstants.tomParagraph
-	}
-
 	/// <summary>
     /// The VSMacroRecorder class implementation and the IVsMacroRecorder Interface definition
     /// were included here in this seperate class because they were not included in the 

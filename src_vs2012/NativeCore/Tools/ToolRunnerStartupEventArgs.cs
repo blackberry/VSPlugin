@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Specialized;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Arguments passed along with Startup event of the ToolRunner class.
     /// </summary>
-    internal sealed class ToolRunnerStartupEventArgs : EventArgs
+    public sealed class ToolRunnerStartupEventArgs : EventArgs
     {
         private readonly ToolRunner _runner;
 

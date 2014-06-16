@@ -1,6 +1,6 @@
-﻿namespace RIM.VSNDK_Package.ViewModels
+﻿namespace BlackBerry.NativeCore.Model
 {
-    internal enum DeviceDefinitionType
+    public enum DeviceDefinitionType
     {
         Device,
         Simulator

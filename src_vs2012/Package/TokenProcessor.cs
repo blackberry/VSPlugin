@@ -11,14 +11,13 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 using System;
 using System.Collections;
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Microsoft.VisualStudio.Project
+namespace BlackBerry.Package
 {
 	/// <summary>
 	/// Contain a number of functions that handle token replacement

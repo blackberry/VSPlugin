@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Descriptor of a available remotely NDK.
     /// </summary>
-    internal class ApiInfo : IComparable<ApiInfo>
+    public class ApiInfo : IComparable<ApiInfo>
     {
         private readonly string _description;
 

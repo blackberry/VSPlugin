@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Tools;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.ViewModels;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     internal partial class InstallForm : Form
     {

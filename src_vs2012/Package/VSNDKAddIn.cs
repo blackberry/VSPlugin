@@ -14,18 +14,17 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using EnvDTE80;
-using EnvDTE;
-using Microsoft.VisualStudio.VCProjectEngine;
 using System.Diagnostics;
-using Microsoft.VisualStudio.CommandBars;
-using Microsoft.VisualStudio.Project;
 using System.IO;
+using System.Linq;
+using BlackBerry.Package.Helpers;
+using EnvDTE;
+using EnvDTE80;
+using Microsoft.VisualStudio.CommandBars;
+using Microsoft.VisualStudio.VCProjectEngine;
 using RIM.VSNDK_Package;
-using RIM.VSNDK_Package.Helpers;
 
-namespace VSNDK.AddIn
+namespace BlackBerry.Package
 {
     public class configtableentry
     {

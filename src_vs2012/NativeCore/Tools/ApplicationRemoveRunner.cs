@@ -1,11 +1,11 @@
 ﻿using System;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to remove installed application from the device.
     /// </summary>
-    internal sealed class ApplicationRemoveRunner : ToolRunner
+    public sealed class ApplicationRemoveRunner : ToolRunner
     {
         private string _packageID;
         private string _ip;

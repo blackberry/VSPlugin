@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Web;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Model.Integration;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.Package.Model.Integration;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     internal partial class CskRequestForm : Form
     {

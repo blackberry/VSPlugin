@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IO;
+using BlackBerry.NativeCore.Tools;
 using Microsoft.Win32;
-using RIM.VSNDK_Package.Tools;
 
-namespace RIM.VSNDK_Package.ViewModels
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Short definition of the NDK used during development.
     /// </summary>
-    internal sealed class NdkDefinition
+    public sealed class NdkDefinition
     {
         private const string FieldHostPath = "NDKHostPath";
         private const string FieldTargetPath = "NDKTargetPath";

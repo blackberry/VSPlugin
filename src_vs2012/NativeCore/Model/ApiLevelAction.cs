@@ -1,9 +1,9 @@
-﻿namespace RIM.VSNDK_Package.ViewModels
+﻿namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Actions to perform by Update Manager.
     /// </summary>
-    internal enum ApiLevelAction
+    public enum ApiLevelAction
     {
         Install,
         Uninstall

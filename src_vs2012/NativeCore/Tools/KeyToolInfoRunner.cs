@@ -1,13 +1,13 @@
 ﻿using System;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Model;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to load info about developer's signing keys.
     /// </summary>
-    internal sealed class KeyToolInfoRunner : ToolRunner
+    public sealed class KeyToolInfoRunner : ToolRunner
     {
         private string _password;
         private string _storeFileName;

@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
-using System.Windows;
 using System.Globalization;
+using System.Text;
 using System.Xml;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Detailed info about a physical device received from BlackBerry tools and services.
     /// </summary>
-    internal sealed class DeviceInfo
+    public sealed class DeviceInfo
     {
         public DeviceInfo()
         {
@@ -125,8 +124,8 @@ namespace RIM.VSNDK_Package.Model
             result.Append("Model: ").Append(ModelName).Append(" (").Append(ModelNumber).AppendLine(")");
             result.Append("Model Family: ").AppendLine(ModelFamily);
             result.Append("System: ").Append(SystemName).Append(" (").Append(SystemVersion).AppendLine(")");
-            result.Append("Resolution: ").Append((uint) ScreenResolution.Width).Append("x").Append((uint) ScreenResolution.Height).Append(" (").Append(ScreenDPI).AppendLine("dpi)");
-            result.Append("Theme: ").Append(DefaultTheme.ToString());
+            result.Append("Resolution: ").Append(ScreenResolution.Width).Append("x").Append(ScreenResolution.Height).Append(" (").Append(ScreenDPI).AppendLine("dpi)");
+            result.Append("Theme: ").Append(DefaultTheme);
 
             return result.ToString();
         }
@@ -360,12 +359,12 @@ namespace RIM.VSNDK_Package.Model
             if (separatorIndex < 0)
                 return Size.Empty;
 
-            int width;
-            int height;
+            uint width;
+            uint height;
 
-            if (!int.TryParse(text.Substring(0, separatorIndex), out width))
+            if (!uint.TryParse(text.Substring(0, separatorIndex), out width))
                 width = 0;
-            if (!int.TryParse(text.Substring(separatorIndex + 1), out height))
+            if (!uint.TryParse(text.Substring(separatorIndex + 1), out height))
                 height = 0;
 
             return new Size(width, height);
@@ -380,7 +379,7 @@ namespace RIM.VSNDK_Package.Model
         /// <summary>
         /// Converts string representation of PIN into a number.
         /// </summary>
-        internal static ulong ParseDeviceId(string text)
+        public static ulong ParseDeviceId(string text)
         {
             if (string.IsNullOrEmpty(text))
                 return 0;
@@ -558,18 +557,18 @@ namespace RIM.VSNDK_Package.Model
             return result.ToArray();
         }
 
-        private static Size UpdateWidth(string width, double height)
+        private static Size UpdateWidth(string width, uint height)
         {
             var value = GetNumber(width);
 
-            return new Size(value, height < 0 ? 0 : height);
+            return new Size(value, height);
         }
 
-        private static Size UpdateHeight(double width, string height)
+        private static Size UpdateHeight(uint width, string height)
         {
             var value = GetNumber(height);
 
-            return new Size(width < 0 ? 0 : width, value);
+            return new Size(width, value);
         }
     }
 }

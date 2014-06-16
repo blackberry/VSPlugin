@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     /// <summary>
     /// Dialog to show and select list of available versions per particular API Level.

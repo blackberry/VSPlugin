@@ -13,11 +13,9 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
 using VSNDK.Parser;
 using System.Runtime.InteropServices;
 using System.Collections;

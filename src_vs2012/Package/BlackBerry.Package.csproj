@@ -90,11 +90,8 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Design" />
     <Reference Include="System.Drawing" />
-    <Reference Include="System.Management" />
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
@@ -151,15 +148,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
-    <COMReference Include="stdole">
-      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\src_vs2010\Package\bar-descriptor.cs">
@@ -176,9 +164,6 @@
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\EditorPane.cs">
       <Link>EditorPane.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\GlobalFunctions.cs">
-      <Link>GlobalFunctions.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
@@ -214,29 +199,14 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
-    <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
-    <Compile Include="Diagnostics\TimeTracker.cs" />
-    <Compile Include="Diagnostics\TraceLog.cs" />
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
     <Compile Include="Helpers\CommandHelper.cs" />
     <Compile Include="Helpers\MessageBoxHelper.cs" />
-    <Compile Include="Model\ApiInfo.cs" />
-    <Compile Include="Model\ApiInfoArray.cs" />
-    <Compile Include="Model\ApiLevelListTypes.cs" />
-    <Compile Include="Model\CertificateInfo.cs" />
-    <Compile Include="Model\CskTokenInfo.cs" />
-    <Compile Include="Model\DebugTokenInfo.cs" />
-    <Compile Include="Model\DeviceDebugTokenInfo.cs" />
-    <Compile Include="Model\DeviceInfo.cs" />
-    <Compile Include="Model\DeviceTheme.cs" />
     <Compile Include="Model\Integration\ComboBoxItem.cs" />
     <Compile Include="Model\Integration\DynamicMenuCommand.cs" />
     <Compile Include="Model\Integration\WebBrowserTurbo.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Model\NdkInfo.cs" />
-    <Compile Include="Model\RuntimeInfo.cs" />
-    <Compile Include="Model\SimulatorInfo.cs" />
     <Compile Include="Options\ApiLevelOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -363,37 +333,10 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="TokenProcessor.cs" />
-    <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
-    <Compile Include="Tools\ApiLevelUpdateRunner.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Tools\EventDispatcher.cs" />
-    <Compile Include="Tools\KeyToolGenRunner.cs" />
-    <Compile Include="Tools\KeyToolInfoRunner.cs" />
-    <Compile Include="Tools\KeyToolRegisterRunner.cs" />
-    <Compile Include="Tools\KeyToolRemoveRunner.cs" />
-    <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
-    <Compile Include="ViewModels\ApiLevelAction.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
-    <Compile Include="ViewModels\ApiLevelTarget.cs" />
-    <Compile Include="ViewModels\ApiLevelTask.cs" />
-    <Compile Include="ViewModels\DeveloperDefinition.cs" />
-    <Compile Include="ViewModels\DeviceDefinition.cs" />
-    <Compile Include="ViewModels\DeviceDefinitionType.cs" />
-    <Compile Include="ViewModels\NdkDefinition.cs" />
-    <Compile Include="ViewModels\PackageViewModel.cs" />
-    <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
-    <Compile Include="Tools\ApplicationRemoveRunner.cs" />
-    <Compile Include="Tools\DebugTokenCreateRunner.cs" />
-    <Compile Include="Tools\DebugTokenInfoRunner.cs" />
-    <Compile Include="Tools\DebugTokenUploadRunner.cs" />
-    <Compile Include="Tools\DeviceInfoRunner.cs" />
-    <Compile Include="Tools\RunnerDefaults.cs" />
-    <Compile Include="Tools\ToolRunner.cs" />
-    <Compile Include="Tools\ToolRunnerEventArgs.cs" />
+    <Compile Include="ViewModels\PackageOptionViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
-    <Compile Include="ViewModels\UpdateManager.cs" />
     <Compile Include="VSNDKAddIn.cs" />
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
@@ -641,6 +584,10 @@
     <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
       <Project>{cc7b28e0-cb31-44f7-a380-e7072f670f38}</Project>
       <Name>GDBParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
+      <Project>{faddd789-6cb5-4f9d-8481-1c0c72e5f19f}</Project>
+      <Name>BlackBerry.NativeCore</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

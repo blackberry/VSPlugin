@@ -1,13 +1,13 @@
 ﻿using System;
 using System.IO;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to create a pair of signing keys for developer of specified name.
     /// </summary>
-    internal sealed class KeyToolGenRunner : ToolRunner
+    public sealed class KeyToolGenRunner : ToolRunner
     {
         private string _name;
         private string _password;

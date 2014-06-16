@@ -1,12 +1,12 @@
 ﻿using System;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Model;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to register Signing Authority based on CSJ files.
     /// </summary>
-    internal sealed class KeyToolRegisterRunner : ToolRunner
+    public sealed class KeyToolRegisterRunner : ToolRunner
     {
         private string _pin;
         private string _password;

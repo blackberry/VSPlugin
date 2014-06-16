@@ -1,4 +1,4 @@
-﻿namespace RIM.VSNDK_Package.Model.Integration
+﻿namespace BlackBerry.Package.Model.Integration
 {
     /// <summary>
     /// Item class to feed Windows Forms ComboBox.

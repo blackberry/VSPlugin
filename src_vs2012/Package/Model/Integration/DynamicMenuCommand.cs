@@ -3,7 +3,7 @@ using System.Collections;
 using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
 
-namespace RIM.VSNDK_Package.Model.Integration
+namespace BlackBerry.Package.Model.Integration
 {
     /// <summary>
     /// Encapsulates displaying a collection of items as multiple menu items within Visual Studio.

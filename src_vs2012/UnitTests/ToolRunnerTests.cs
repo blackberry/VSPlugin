@@ -1,13 +1,11 @@
-﻿#if DEBUG
+﻿using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
 using System;
 using System.IO;
 using System.Threading;
 using NUnit.Framework;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.Tools;
-using RIM.VSNDK_Package.ViewModels;
 
-namespace VSNDK.Package.Test
+namespace UnitTests
 {
     [TestFixture]
     public class ToolRunnerTests
@@ -192,6 +190,7 @@ namespace VSNDK.Package.Test
         }
 
         [Test]
+        [Ignore]
         public void InstallSimulator()
         {
             var runner = new ApiLevelUpdateRunner(RunnerDefaults.NdkDirectory, ApiLevelAction.Install, ApiLevelTarget.Simulator, new Version(10, 1, 0, 2354));
@@ -202,5 +201,3 @@ namespace VSNDK.Package.Test
         }
     }
 }
-
-#endif

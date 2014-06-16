@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Text;
 
-namespace RIM.VSNDK_Package.Tools
+namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to create debug-token .bar file on disk.
     /// If a file exists at specified file location, it will be overwritten.
     /// </summary>
-    internal sealed class DebugTokenCreateRunner : ToolRunner
+    public sealed class DebugTokenCreateRunner : ToolRunner
     {
         private string _location;
         private string _password;

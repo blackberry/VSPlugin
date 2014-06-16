@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Diagnostics;
-using RIM.VSNDK_Package.Model.Integration;
-using RIM.VSNDK_Package.Tools;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.Model.Integration;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     /// <summary>
     /// Internal dialog for adding and testing target device.

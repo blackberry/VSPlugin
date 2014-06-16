@@ -14,20 +14,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.ComponentModel;
-using System.Collections;
-using Microsoft.Win32;
-using System.Xml;
-using System.Security.Cryptography;
 using System.IO;
 using System.Windows.Data;
 using EnvDTE;
 using Microsoft.VisualStudio.VCProjectEngine;
 using System.Diagnostics;
 
-namespace RIM.VSNDK_Package.Import.Model
+namespace BlackBerry.Package.Import.Model
 {
     /// <summary>
     /// DataModel Class for the Import Dialog

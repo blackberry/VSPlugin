@@ -1,4 +1,4 @@
-﻿namespace RIM.VSNDK_Package.Options
+﻿namespace BlackBerry.Package.Options
 {
     internal partial class ApiLevelOptionControl
     {

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
+using BlackBerry.Package.Helpers;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     internal partial class PasswordForm : Form
     {

@@ -1,4 +1,4 @@
-﻿namespace RIM.VSNDK_Package.Model
+﻿namespace BlackBerry.NativeCore.Model
 {
     public enum DeviceTheme
     {

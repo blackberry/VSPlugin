@@ -3,12 +3,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 
-namespace RIM.VSNDK_Package.Diagnostics
+namespace BlackBerry.NativeCore.Diagnostics
 {
     /// <summary>
     /// Trace listener, that writes BlackBerry-only messages into the file.
     /// </summary>
-    internal sealed class BlackBerryTraceListener : TraceListener
+    public sealed class BlackBerryTraceListener : TraceListener
     {
         public const string SName = "Persistent BlackBerry Trace Listener";
 

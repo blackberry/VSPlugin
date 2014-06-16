@@ -1,11 +1,8 @@
-﻿#if DEBUG
-
-using System;
-using System.Windows;
+﻿using System;
+using BlackBerry.NativeCore.Model;
 using NUnit.Framework;
-using RIM.VSNDK_Package.Model;
 
-namespace VSNDK.Package.Test
+namespace UnitTests
 {
     [TestFixture]
     public sealed class ParserTests
@@ -387,8 +384,8 @@ Error: Device is not in the Development Mode. Switch to Development Mode from Se
         [Test]
         public void ParseCskToken()
         {
-            const string cskTokenData = "#Do not edit manually. Generated automatically by BlackBerry tools." +
-@"#Mon Sep 02 08:43:07 EDT 2013
+            const string cskTokenData = @"#Do not edit manually. Generated automatically by BlackBerry tools.
+#Mon Sep 02 08:43:07 EDT 2013
 HMAC=111111111111111111111111111\=
 Salt=22222222222\=
 IV=33333333333\=
@@ -403,5 +400,3 @@ Token=44444444444444444444444444\=\=";
         }
     }
 }
-
-#endif

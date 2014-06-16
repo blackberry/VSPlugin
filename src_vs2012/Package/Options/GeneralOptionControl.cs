@@ -1,8 +1,8 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Tools;
+using BlackBerry.NativeCore.Tools;
 
-namespace RIM.VSNDK_Package.Options
+namespace BlackBerry.Package.Options
 {
     public partial class GeneralOptionControl : UserControl
     {

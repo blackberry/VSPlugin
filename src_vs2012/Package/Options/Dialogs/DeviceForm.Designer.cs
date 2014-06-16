@@ -1,4 +1,4 @@
-﻿namespace RIM.VSNDK_Package.Options.Dialogs
+﻿namespace BlackBerry.Package.Options.Dialogs
 {
     partial class DeviceForm
     {

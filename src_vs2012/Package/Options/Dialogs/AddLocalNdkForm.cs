@@ -1,10 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using RIM.VSNDK_Package.Model;
-using RIM.VSNDK_Package.ViewModels;
+using BlackBerry.NativeCore.Model;
+using BlackBerry.Package.Helpers;
+using BlackBerry.Package.ViewModels;
 
-namespace RIM.VSNDK_Package.Options.Dialogs
+namespace BlackBerry.Package.Options.Dialogs
 {
     internal partial class AddLocalNdkForm : Form
     {

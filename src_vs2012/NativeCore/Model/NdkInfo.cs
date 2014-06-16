@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Xml;
-using RIM.VSNDK_Package.Diagnostics;
+using BlackBerry.NativeCore.Diagnostics;
 
-namespace RIM.VSNDK_Package.Model
+namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Descriptor of a locally installed NDK.
     /// </summary>
-    internal sealed class NdkInfo : ApiInfo
+    public sealed class NdkInfo : ApiInfo
     {
         private const string DescriptorFileName = "blackberry-sdk-descriptor.xml";
 

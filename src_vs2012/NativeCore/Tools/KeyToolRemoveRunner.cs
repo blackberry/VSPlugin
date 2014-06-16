@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace RIM.VSNDK_Package.Tools
+﻿namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
     /// Runner, that calls specific tool to remove instaled pair of signing keys.
     /// </summary>
-    internal sealed class KeyToolRemoveRunner : ToolRunner
+    public sealed class KeyToolRemoveRunner : ToolRunner
     {
         /// <summary>
         /// Init constructor.
