@@ -14,13 +14,12 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Text;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
 
     /// <summary>

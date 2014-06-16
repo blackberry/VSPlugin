@@ -15,12 +15,7 @@
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// This class describes a port. This description is used to add the port to a port supplier.

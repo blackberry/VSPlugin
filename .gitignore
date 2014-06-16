@@ -22,6 +22,7 @@ src_vs2010/BlackBerry.NativePlugin.suo
 src_vs2010/GDBParser/GDBParser.vcxproj.user
 src_vs2010/GDBWrapper/GDBWrapper.vcxproj.user
 src_vs2010/DebugEngine/BlackBerry.DebugEngine.csproj.user
+src_vs2010/DebugEngine/BlackBerry.DebugEngine.csproj.DotSettings
 src_vs2010/NativeCore/BlackBerry.NativeCore.csproj.user
 src_vs2010/Package/BlackBerry.Package.csproj.user
 src_vs2010/Tasks/BlackBerry.Tasks.csproj.user

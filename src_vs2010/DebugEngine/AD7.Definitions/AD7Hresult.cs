@@ -12,7 +12,7 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary> 
     /// These are managed definitions of the well-known AD7 HRESULTS. Defined in msdbg.idl. 

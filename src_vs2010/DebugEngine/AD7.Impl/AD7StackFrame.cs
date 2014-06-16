@@ -18,7 +18,7 @@ using Microsoft.VisualStudio;
 using VSNDK.Parser;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// This class contains all information about a variable / expression.

@@ -17,7 +17,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Collections;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// An implementation of IDebugProperty2. (http://msdn.microsoft.com/en-ca/library/bb161287.aspx)

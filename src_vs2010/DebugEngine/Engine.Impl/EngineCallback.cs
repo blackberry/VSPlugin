@@ -14,12 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.

@@ -15,15 +15,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Runtime.InteropServices.ComTypes;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Shell;
 using VSNDK.Parser;
 using System.Windows.Forms;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// This class implements a port.

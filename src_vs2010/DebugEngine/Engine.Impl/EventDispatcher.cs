@@ -20,7 +20,7 @@ using VSNDK.Parser;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {    
     /// <summary>
     /// This class manages debug events for the debug engine.
@@ -1634,7 +1634,7 @@ namespace VSNDK.DebugEngine
                                 if (m_error == "Cannot find bounds of current function")
                                 {
                                     // We don't have symbols for this function so further stepping won't be possible. Return from this function.
-                                    VSNDK.DebugEngine.EventDispatcher.m_unknownCode = true;
+                                    EventDispatcher.m_unknownCode = true;
                                     m_eventDispatcher.engine.Step(m_eventDispatcher.engine.CurrentThread(), enum_STEPKIND.STEP_OUT, enum_STEPUNIT.STEP_LINE);
                                 }
                             }

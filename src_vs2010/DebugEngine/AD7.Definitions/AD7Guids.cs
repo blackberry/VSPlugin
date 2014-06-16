@@ -13,10 +13,8 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary> 
     /// These are well-known guids in AD7. Most of these are used to specify filters in what the debugger UI is requesting.

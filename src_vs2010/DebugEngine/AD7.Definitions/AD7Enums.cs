@@ -13,7 +13,7 @@
 //* limitations under the License.
 
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary> 
     /// Flags passed by the debugger to the engine to describe the desired format and execution options for properties 

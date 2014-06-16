@@ -19,11 +19,12 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
 using RIM.VSNDK_Package;
+using VSNDK.Package;
 using VSNDK.Parser;
 using NameValueCollection = System.Collections.Specialized.NameValueCollection;
 using System.Windows.Forms;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     
     /// <summary>
@@ -224,7 +225,7 @@ namespace VSNDK.DebugEngine
                 // by LaunchSuspended and ResumeProcess methods when debugging an open project.
                 if (m_engineCallback == null) 
                 {
-                    Package.ControlDebugEngine.isDebugEngineRunning = true;
+                    ControlDebugEngine.isDebugEngineRunning = true;
                     m_engineCallback = new EngineCallback(this, ad7Callback);
 
                     AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
@@ -279,7 +280,7 @@ namespace VSNDK.DebugEngine
                     else
                     {
                         GDBParser.exitGDB();
-                        Package.ControlDebugEngine.isDebugEngineRunning = false;
+                        ControlDebugEngine.isDebugEngineRunning = false;
                         return VSConstants.E_FAIL;
                     }
                 }
@@ -327,12 +328,12 @@ namespace VSNDK.DebugEngine
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
                     GDBParser.addGDBCommand(@"-exec-interrupt");
 
-                    // Ensure the process is interrupted before returning                
+                    // Ensure the process is interrupted before returning
                     HandleProcessExecution.m_mre.WaitOne(1000);
 
                     m_running.Set();
 
-                    if (Package.ControlDebugEngine.isDebugEngineRunning)
+                    if (ControlDebugEngine.isDebugEngineRunning)
                         HandleProcessExecution.m_mre.Reset();
                 }
             }
@@ -566,7 +567,7 @@ namespace VSNDK.DebugEngine
 
             try
             {
-                Package.ControlDebugEngine.isDebugEngineRunning = true;
+                ControlDebugEngine.isDebugEngineRunning = true;
                 m_engineCallback = new EngineCallback(this, ad7Callback);
 
                 // Read arguments back from the args string
@@ -602,7 +603,7 @@ namespace VSNDK.DebugEngine
                 else
                 {
                     GDBParser.exitGDB();
-                    Package.ControlDebugEngine.isDebugEngineRunning = false;
+                    ControlDebugEngine.isDebugEngineRunning = false;
                     return VSConstants.E_FAIL;
                 }
             }
@@ -984,7 +985,7 @@ namespace VSNDK.DebugEngine
         public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step)
         {
             // Don't allow stepping through unknown code because it can lead to future problems with stepping and break-all.
-            if (VSNDK.DebugEngine.EventDispatcher.m_unknownCode)
+            if (EventDispatcher.m_unknownCode)
             {
                 m_state = AD7Engine.DE_STATE.STEP_MODE;
                 m_eventDispatcher.continueExecution();                

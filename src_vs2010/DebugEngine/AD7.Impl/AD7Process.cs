@@ -18,7 +18,7 @@ using System.Linq;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// This class represents a process running on a port. If the port is the local port, then IDebugProcess2 usually represents a 

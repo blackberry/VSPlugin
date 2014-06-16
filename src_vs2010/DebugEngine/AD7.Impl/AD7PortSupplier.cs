@@ -22,11 +22,9 @@ using Microsoft.VisualStudio;
 using Microsoft.Win32;
 using System.Windows.Forms;
 using System.Security.Cryptography;
-using System.Runtime.InteropServices.ComTypes;
-using Microsoft.VisualStudio.Shell;
 using VSNDK.Parser;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// This class supplies ports to the Session Debug Manager (SDM).

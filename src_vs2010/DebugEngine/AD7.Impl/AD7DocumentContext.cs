@@ -13,14 +13,12 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// This class represents a document context to the debugger. A document context represents a location within a source file. 

@@ -13,13 +13,11 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// This class implements IDebugProgramNode2. (http://msdn.microsoft.com/en-ca/library/bb146735.aspx)

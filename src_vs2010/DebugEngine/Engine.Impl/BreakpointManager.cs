@@ -15,7 +15,7 @@
 using System.Collections.Generic;
 using Microsoft.VisualStudio.Debugger.Interop;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// This class manages breakpoints for the engine. 

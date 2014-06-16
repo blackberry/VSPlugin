@@ -13,8 +13,6 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -25,7 +23,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 // AD7SynchronousStoppingEvent. Each of them implements the IDebugEvent2.GetAttributes method for the type of event they represent. 
 // Most events sent by the debugger are asynchronous ones.
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     #region Event base classes
 

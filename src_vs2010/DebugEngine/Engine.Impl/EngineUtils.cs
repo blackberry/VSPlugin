@@ -13,14 +13,10 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
-using System.Globalization;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
     /// <summary>
     /// Some utilities used in VSNDK debug engine projects.

@@ -20,7 +20,7 @@ using VSNDK.Parser;
 using System.Runtime.InteropServices;
 using System.Collections;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
 
     /// <summary>

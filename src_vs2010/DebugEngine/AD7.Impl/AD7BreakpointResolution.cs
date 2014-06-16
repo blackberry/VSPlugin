@@ -13,15 +13,13 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
 
 // TODO: Change to take filename and line number instead of an address?
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
 
     /// <summary>

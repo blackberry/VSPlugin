@@ -13,17 +13,11 @@
 //* limitations under the License.
 
 using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
-using System.Threading;
 
-namespace VSNDK.DebugEngine
+namespace BlackBerry.DebugEngine
 {
-
     /// <summary>
     /// This class represents a module loaded in the debuggee process to the debugger. Not implemented, yet.
     ///
