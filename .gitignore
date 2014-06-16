@@ -14,17 +14,17 @@ samples/HelloWorldDisplay/HelloWorldDisplay/Simulator-Debug/
 
 
 # user configuration files
-src/VSNDK.opensdf
-src/VSNDK.sdf
-src/VSNDK.sln.DotSettings
-src/VSNDK.sln.DotSettings.user
-src/VSNDK.suo
-src/GDBParser/GDBParser.vcxproj.user
-src/GDBWrapper/GDBWrapper.vcxproj.user
-src/VSNDK.AddIn/VSNDK.AddIn.csproj.user
-src/VSNDK.DebugEngine/VSNDK.DebugEngine.csproj.user
-src/VSNDK.Package/VSNDK.Package.csproj.user
-src/VSNDK.Tasks/VSNDK.Tasks.csproj.user
+src_vs2010/VSNDK.opensdf
+src_vs2010/VSNDK.sdf
+src_vs2010/VSNDK.sln.DotSettings
+src_vs2010/VSNDK.sln.DotSettings.user
+src_vs2010/VSNDK.suo
+src_vs2010/GDBParser/GDBParser.vcxproj.user
+src_vs2010/GDBWrapper/GDBWrapper.vcxproj.user
+src_vs2010/VSNDK.AddIn/VSNDK.AddIn.csproj.user
+src_vs2010/VSNDK.DebugEngine/VSNDK.DebugEngine.csproj.user
+src_vs2010/VSNDK.Package/VSNDK.Package.csproj.user
+src_vs2010/VSNDK.Tasks/VSNDK.Tasks.csproj.user
 
 src_vs2012/VSNDK.sdf
 src_vs2012/VSNDK.opensdf
@@ -49,27 +49,27 @@ src_vs2013/VSNDK.Package/VSNDK.Package.csproj.user
 # build temp outputs
 _BuildResults/
 BuildResults/
-src/Debug/
-src/Release/
-src/GDBParser.UnitTests/bin/
-src/GDBParser.UnitTests/obj/
-src/GDBParser/Debug/
-src/GDBParser/Release/
-src/GDBWrapper/Debug/
-src/GDBWrapper/Release/
-src/ipch/
-src/VSNDK.AddIn/bin/
-src/VSNDK.AddIn/obj/
-src/VSNDK.DebugEngine/bin/
-src/VSNDK.DebugEngine/obj/
-src/VSNDK.Package.Test/bin/
-src/VSNDK.Package.Test/obj/
-src/VSNDK.Package/bin/
-src/VSNDK.Package/obj/
-src/VSNDK.Tasks.Test/bin/
-src/VSNDK.Tasks.Test/obj/
-src/VSNDK.Tasks/bin/
-src/VSNDK.Tasks/obj/
+src_vs2010/Debug/
+src_vs2010/Release/
+src_vs2010/GDBParser.UnitTests/bin/
+src_vs2010/GDBParser.UnitTests/obj/
+src_vs2010/GDBParser/Debug/
+src_vs2010/GDBParser/Release/
+src_vs2010/GDBWrapper/Debug/
+src_vs2010/GDBWrapper/Release/
+src_vs2010/ipch/
+src_vs2010/VSNDK.AddIn/bin/
+src_vs2010/VSNDK.AddIn/obj/
+src_vs2010/VSNDK.DebugEngine/bin/
+src_vs2010/VSNDK.DebugEngine/obj/
+src_vs2010/VSNDK.Package.Test/bin/
+src_vs2010/VSNDK.Package.Test/obj/
+src_vs2010/VSNDK.Package/bin/
+src_vs2010/VSNDK.Package/obj/
+src_vs2010/VSNDK.Tasks.Test/bin/
+src_vs2010/VSNDK.Tasks.Test/obj/
+src_vs2010/VSNDK.Tasks/bin/
+src_vs2010/VSNDK.Tasks/obj/
 
 src_vs2012/Debug/
 src_vs2012/Release/

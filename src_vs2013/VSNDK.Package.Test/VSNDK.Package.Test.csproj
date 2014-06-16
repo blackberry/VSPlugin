@@ -67,7 +67,7 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package.Test\ToolRunnerTests.cs">
       <Link>ToolRunnerTests.cs</Link>
     </Compile>
-    <Compile Include="..\..\src\VSNDK.Package.Test\Properties\AssemblyInfo.cs">
+    <Compile Include="..\..\src_vs2010\VSNDK.Package.Test\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
   </ItemGroup>
