@@ -35,17 +35,7 @@ namespace BlackBerry.Package
         public const string DefaultExtension = ".xml";
 
         // Private Member Variables
-        private readonly BlackBerryPackage _package;
         private ServiceProvider _vsServiceProvider;
-
-        /// <summary>
-        /// Init constructor.
-        /// </summary>
-        public EditorFactory(BlackBerryPackage package)
-        {
-            // Set internal member variables
-            _package = package;
-        }
 
         /// <summary>
         /// Close the factory
@@ -141,7 +131,7 @@ namespace BlackBerry.Package
             }
 
             // Create the Document (editor)
-            EditorPane NewEditor = new EditorPane(_vsServiceProvider, _package, pszMkDocument, textBuffer);
+            EditorPane NewEditor = new EditorPane(_vsServiceProvider, pszMkDocument, textBuffer);
             ppunkDocView = Marshal.GetIUnknownForObject(NewEditor);
             ppunkDocData = Marshal.GetIUnknownForObject(textBuffer);
             pbstrEditorCaption = "";

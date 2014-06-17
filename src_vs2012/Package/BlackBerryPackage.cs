@@ -156,7 +156,7 @@ namespace BlackBerry.Package
                 };
 
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
-            RegisterEditorFactory(new EditorFactory(this));
+            RegisterEditorFactory(new EditorFactory());
             TraceLog.WriteLine(" * registered editors");
 
             

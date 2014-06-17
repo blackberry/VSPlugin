@@ -244,14 +244,12 @@ namespace BlackBerry.Package
         private OrientationItemClass _orientationItem;
         private CollectionView _iconImageList;
         private CollectionView _splashScreenImageList;
-        private CollectionView _assetTypeList;
-        private CollectionView _permissionList = null;
+        private CollectionView _permissionList;
         private CollectionView _configurationList;
         private ConfigurationItemClass _config;
         private PermissionItemClass _permission;
         private DTE _dte;
         private string _activeProjectDirectory;
-        private Microsoft.VisualStudio.Shell.Package _pkg;
 
         long _dirtyTime;
         LanguageService _xmlLanguageService;
@@ -276,9 +274,8 @@ namespace BlackBerry.Package
         /// <param name="xmlModel"></param>
         /// <param name="provider"></param>
         /// <param name="buffer"></param>
-        public ViewModel(Microsoft.VisualStudio.Shell.Package pkg, XmlStore xmlStore, XmlModel xmlModel, IServiceProvider provider, IVsTextLines buffer)
+        public ViewModel(XmlStore xmlStore, XmlModel xmlModel, IServiceProvider provider, IVsTextLines buffer)
         {
-            _pkg = pkg;
             /// Initialize Asset Type List
             IList<AssetTypeItemClass> AssetTypeListItem = new List<AssetTypeItemClass>();
             AssetTypeItemClass assetType = new AssetTypeItemClass("Other");
@@ -289,7 +286,6 @@ namespace BlackBerry.Package
             AssetTypeListItem.Add(assetType);
             assetType = new AssetTypeItemClass("Executable");
             AssetTypeListItem.Add(assetType);
-            _assetTypeList = new CollectionView(AssetTypeListItem);
 
             if (xmlModel == null)
                 throw new ArgumentNullException("xmlModel");

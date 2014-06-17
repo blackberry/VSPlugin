@@ -34,7 +34,6 @@ namespace BlackBerry.Package
     public sealed class EditorPane : WindowPane, IOleComponent, IVsDeferredDocView, IVsLinkedUndoClient
     {
         #region Fields
-        private readonly BlackBerryPackage _package;
         private readonly ServiceProvider _service;
         private readonly string _fileName;
         private VsDesignerControl _vsDesignerControl;
@@ -46,15 +45,14 @@ namespace BlackBerry.Package
         #endregion
 
         #region "Window.Pane Overrides"
+
         /// <summary>
         /// Constructor that calls the Microsoft.VisualStudio.Shell.WindowPane constructor then
         /// our initialization functions.
         /// </summary>
-        /// <param name="package">Our Package instance.</param>
-        public EditorPane(ServiceProvider service, BlackBerryPackage package, string fileName, IVsTextLines textBuffer)
+        public EditorPane(ServiceProvider service, string fileName, IVsTextLines textBuffer)
             : base(null)
         {
-            _package = package;
             _fileName = fileName;
             _textBuffer = textBuffer;
             _service = service;
@@ -153,7 +151,7 @@ namespace BlackBerry.Package
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
-            _vsDesignerControl = new VsDesignerControl(_service, new ViewModel(_package, _store, _model, this, _textBuffer));
+            _vsDesignerControl = new VsDesignerControl(_service, new ViewModel(_store, _model, this, _textBuffer));
             base.Content = _vsDesignerControl;
 
             RegisterIndependentView(true);
@@ -306,9 +304,9 @@ namespace BlackBerry.Package
             {
                 throw new InvalidOperationException("Could not get SVsResourceManager service. Make sure the package is Sited before calling this method");
             }
-            Guid packageGuid = _package.GetType().GUID;
+            Guid packageGuid = new Guid(GuidList.guidVSNDK_PackageString);
             int hr = resourceManager.LoadResourceString(ref packageGuid, -1, resourceName, out resourceValue);
-            Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hr);
+            ErrorHandler.ThrowOnFailure(hr);
             return resourceValue;
         }
 
