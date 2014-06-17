@@ -14,6 +14,7 @@
 
 using System;
 using System.Runtime.InteropServices;
+using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -230,7 +231,7 @@ namespace BlackBerry.DebugEngine
                     AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
                     m_process = pnt.m_process;
                     AD7Port port = pnt.m_process._portAttach;
-                    string publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
+                    string publicKeyPath = RunnerDefaults.SshPublicKeyPath;
                     string progName = pnt.m_programName.Substring(pnt.m_programName.LastIndexOf('/') + 1);
 
                     string exePath;

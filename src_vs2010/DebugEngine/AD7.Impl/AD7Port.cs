@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BlackBerry.NativeCore.Tools;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
 using VSNDK.Parser;
@@ -136,7 +137,7 @@ namespace BlackBerry.DebugEngine
                 m_processes.Clear();
             }
 
-            string publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
+            string publicKeyPath = RunnerDefaults.SshPublicKeyPath;
 
             string response = GDBParser.GetPIDsThroughGDB(m_IP, m_password, m_isSimulator, m_toolsPath, publicKeyPath, 12);
 

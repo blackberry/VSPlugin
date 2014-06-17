@@ -625,7 +625,7 @@ namespace BlackBerry.Package
 
             executablePath = currentPath + _processName; // The executable path
             executablePath = executablePath.Replace('\\', '/');
-            publicKeyPath = Environment.GetEnvironmentVariable("AppData") + @"\BlackBerry\bbt_id_rsa.pub";
+            publicKeyPath = RunnerDefaults.SshPublicKeyPath;
             publicKeyPath = publicKeyPath.Replace('\\', '/');
 
             try
