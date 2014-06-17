@@ -75,7 +75,7 @@ namespace BlackBerry.Package.Components
         /// </summary>
         public void Close()
         {
-            DisableIntelliSenseErrorReport(false);
+            //DisableIntelliSenseErrorReport(false);
         }
 
         /// <summary> 
