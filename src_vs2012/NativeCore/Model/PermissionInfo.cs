@@ -1,13 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Xml;
 
 namespace BlackBerry.NativeCore.Model
 {
     /// <summary>
     /// Descriptor of permissions, that are allowed to be set by the application compiled against specified NDK.
     /// </summary>
+    [DebuggerDisplay("{ID}: {Description}")]
     public sealed class PermissionInfo
     {
+        private PermissionInfo()
+        {
+        }
+
         public PermissionInfo(string id, string name, string description)
         {
             if (string.IsNullOrEmpty(id))
@@ -99,6 +106,72 @@ namespace BlackBerry.NativeCore.Model
             result.Add(new PermissionInfo("post_notification", "Post Notification", "Post a notification to the notifications area of the screen."));
             result.Add(new PermissionInfo("set_audio_volume", "Set Audio Volume", "Change the volume of an audio stream being played."));
             result.Add(new PermissionInfo("read_device_identifying_information", "Device Identifying Information", "Access unique device identifying information (e.g. PIN)."));
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Loads info about permissions from XML file, given by the reader.
+        /// It supports only one format - the one from NDK descriptor.
+        /// </summary>
+        public static PermissionInfo[] Load(XmlReader reader)
+        {
+            if (reader == null)
+                throw new ArgumentNullException("reader");
+
+            var result = new List<PermissionInfo>();
+            PermissionInfo info = null;
+            bool canRead = false;
+
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    switch (reader.Name)
+                    {
+                        case "permissions":
+                            canRead = true;
+                            break;
+                        case "permission":
+                            if (canRead)
+                                info = new PermissionInfo();
+                            break;
+                        case "id":
+                            if (info != null)
+                                info.ID = reader.ReadString();
+                            break;
+                        case "name":
+                            if (info != null)
+                                info.Name = reader.ReadString();
+                            break;
+                        case "description":
+                            if (info != null)
+                                info.Description = reader.ReadString();
+                            break;
+
+                        // ignore all the other fields, if given
+                    }
+                }
+
+                if (reader.NodeType == XmlNodeType.EndElement)
+                {
+                    // ok, got full info about the device:
+                    if (reader.Name == "permission")
+                    {
+                        if (info != null && !string.IsNullOrEmpty(info.ID))
+                        {
+                            result.Add(info);
+                            info = null;
+                        }
+
+                        continue;
+                    }
+
+                    // interesting section has been read, no need to parse further:
+                    if (reader.Name == "permissions")
+                        break;
+                }
+            }
 
             return result.ToArray();
         }

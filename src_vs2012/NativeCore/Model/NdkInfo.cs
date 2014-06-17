@@ -64,6 +64,25 @@ namespace BlackBerry.NativeCore.Model
                 devices = LoadDevices(ndkDescriptor);
             }
 
+            // load permissions from the same descriptor file as devices were stored in:
+            if (devices != null)
+            {
+                if (devices.Length == 0)
+                {
+                    // found descriptor file, but was empty... heuristics says - it's a PlayBook
+                    Permissions = PermissionInfo.CreatePlayBookList();
+                }
+                else
+                {
+                    Permissions = LoadPermissions(ndkDescriptor);
+                }
+            }
+            else
+            {
+                // in case no descriptor file was found, use a default list:
+                Permissions = PermissionInfo.CreateDefaultList();
+            }
+
             // OK, give up, and say it's unknown, if still null:
             Devices = devices ?? new DeviceInfo[0];
             Details = ToShortDeviceDescription();
@@ -164,8 +183,8 @@ namespace BlackBerry.NativeCore.Model
             result.AppendLine(Name).AppendLine();
             result.AppendLine("Version:");
             result.Append(" - ").AppendLine(Version.ToString());
+            
             result.AppendLine();
-
             result.AppendLine("Devices:");
             if (Devices.Length > 0)
             {
@@ -184,10 +203,25 @@ namespace BlackBerry.NativeCore.Model
             {
                 result.AppendLine(" No supported device information found.");
             }
+
             result.AppendLine();
             result.AppendLine("Paths:");
             result.Append(" - host: ").AppendLine(HostPath);
             result.Append(" - target: ").AppendLine(TargetPath);
+
+            result.AppendLine();
+            result.AppendLine("Permissions:");
+            if (Permissions.Length > 0)
+            {
+                foreach (var permission in Permissions)
+                {
+                    result.Append(" - ").Append(permission.Name).Append(" (").Append(permission.ID).AppendLine(")");
+                }
+            }
+            else
+            {
+                result.AppendLine(" No available application permissions found.");
+            }
 
             return result.ToString();
         }
@@ -284,8 +318,31 @@ namespace BlackBerry.NativeCore.Model
             }
             catch (Exception ex)
             {
-                TraceLog.WriteException(ex, "Unable to load NDK descriptor file: \"{0}\"", ndkDescriptorFileName);
+                TraceLog.WriteException(ex, "Unable to load device list from NDK descriptor file: \"{0}\"", ndkDescriptorFileName);
+                return null;
+            }
+        }
 
+        private static PermissionInfo[] LoadPermissions(string ndkDescriptorFileName)
+        {
+            try
+            {
+                if (!File.Exists(ndkDescriptorFileName))
+                    return null;
+
+                // try to load info about application permissions from the NDK:
+                using (var fileReader = new StreamReader(ndkDescriptorFileName, Encoding.UTF8))
+                {
+                    using (var descReader = XmlReader.Create(fileReader))
+                    {
+                        return PermissionInfo.Load(descReader);
+                    }
+                }
+
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to load permissions from NDK descriptor file: \"{0}\"", ndkDescriptorFileName);
                 return null;
             }
         }
