@@ -167,23 +167,23 @@
                                         <DataGridTemplateColumn Width="20">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <CheckBox Background="#FFF0F0F0" IsChecked="{Binding IsChecked}" Click="CheckBox_Click" />
+                                                    <CheckBox Background="#FFF0F0F0" IsChecked="{Binding IsChecked, Mode=OneWay}" Click="CheckBox_Click" />
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
                                         <DataGridTemplateColumn Width="20">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <Image Height="20" Width="20" Source="{Binding Path=PermissionImagePath}"/>
+                                                    <Image Height="20" Width="20" Source="{Binding PermissionImagePath, Mode=OneWay}" Stretch="None"/>
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
-                                        <DataGridTextColumn Header="Permission" Width="160" Binding="{Binding Permission, Mode=TwoWay}"/>
-                                        <DataGridTextColumn Header="Identifier" Width="160" Binding="{Binding Identifier, Mode=TwoWay}" />
+                                        <DataGridTextColumn Header="Permission" Width="160" Binding="{Binding Permission, Mode=OneWay}" />
+                                        <DataGridTextColumn Header="Identifier" Width="160" Binding="{Binding Identifier, Mode=OneWay}" />
                                         <DataGridTemplateColumn Width="400" Header="Description">
                                             <DataGridTemplateColumn.CellTemplate>
                                                 <DataTemplate>
-                                                    <TextBox IsReadOnly="True" ToolTip="{Binding Description, Mode=TwoWay}" Text="{Binding Description, Mode=TwoWay}" VerticalAlignment="Top"  Width="350" BorderThickness="0" />
+                                                    <TextBox IsReadOnly="True" ToolTip="{Binding Description, Mode=OneWay}" Text="{Binding Description, Mode=OneWay}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" BorderThickness="0" />
                                                 </DataTemplate>
                                             </DataGridTemplateColumn.CellTemplate>
                                         </DataGridTemplateColumn>
