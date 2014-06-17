@@ -116,12 +116,14 @@ namespace BlackBerry.NativeCore.Tools
 
         protected virtual void ProcessOutputLine(string text)
         {
-            _output.AppendLine(text);
+            if (_output != null && text != null)
+                _output.AppendLine(text);
         }
 
         protected virtual void ProcessErrorLine(string text)
         {
-            _error.AppendLine(text);
+            if (_error != null && text != null)
+                _error.AppendLine(text);
         }
 
         private void OutputDataReceived(object sender, DataReceivedEventArgs e)
@@ -169,6 +171,7 @@ namespace BlackBerry.NativeCore.Tools
             catch (Exception ex)
             {
                 TraceLog.WriteException(ex, "Unable to start {0}", GetType().Name);
+                ProcessErrorLine(ex.Message);
                 return false;
             }
             finally
@@ -207,6 +210,8 @@ namespace BlackBerry.NativeCore.Tools
                 TraceLog.WriteException(ex, "Unable to start {0}", GetType().Name);
 
                 _process.Close();
+
+                ProcessErrorLine(ex.Message);
                 NotifyFinished(-1, null, null);
             }
         }
@@ -254,8 +259,8 @@ namespace BlackBerry.NativeCore.Tools
 
         private void CompleteExecution()
         {
-            var outputText = _output.Length > 0 ? _output.ToString() : null;
-            var errorText = _error.Length > 0 ? _error.ToString() : null;
+            var outputText = _output != null && _output.Length > 0 ? _output.ToString() : null;
+            var errorText = _error != null && _error.Length > 0 ? _error.ToString() : null;
 
             _output = null;
             _error = null;
