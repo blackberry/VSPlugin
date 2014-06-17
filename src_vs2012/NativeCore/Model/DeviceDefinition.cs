@@ -107,7 +107,7 @@ namespace BlackBerry.NativeCore.Model
         {
             if (string.IsNullOrEmpty(Name))
             {
-                return string.Concat(IP, "/", Type == DeviceDefinitionType.Device ? "device" : "simulator", "/");
+                return string.Concat(IP, " (", Type == DeviceDefinitionType.Device ? "device" : "simulator", ")");
             }
 
             return string.Concat(Name, " (", IP, ", ", Type == DeviceDefinitionType.Device ? "device" : "simulator", ")");
