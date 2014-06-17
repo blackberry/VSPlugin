@@ -39,6 +39,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src_vs2012\NativeCore\Components\TokenProcessor.cs">
+      <Link>Components\TokenProcessor.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Components\UpdateManager.cs">
       <Link>Components\UpdateManager.cs</Link>
     </Compile>

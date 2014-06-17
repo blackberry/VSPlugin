@@ -345,9 +345,6 @@
     <Compile Include="..\..\src_vs2012\Package\StandardCommands.cs">
       <Link>StandardCommands.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\TokenProcessor.cs">
-      <Link>TokenProcessor.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
     </Compile>

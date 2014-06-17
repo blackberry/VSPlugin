@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.Package.Helpers;
 using EnvDTE;
 using EnvDTE80;

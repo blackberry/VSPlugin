@@ -61,6 +61,9 @@
     <Compile Include="..\..\src_vs2012\UnitTests\ParserTests.cs">
       <Link>ParserTests.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\TokenProcessorTests.cs">
+      <Link>TokenProcessorTests.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\ToolRunnerTests.cs">
       <Link>ToolRunnerTests.cs</Link>
     </Compile>

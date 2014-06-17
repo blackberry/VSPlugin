@@ -58,6 +58,7 @@
     <Compile Include="MakeAllAndFormatOutputMessagesTestClass.cs" />
     <Compile Include="ParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TokenProcessorTests.cs" />
     <Compile Include="ToolRunnerTests.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -72,6 +73,10 @@
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{faddd789-6cb5-4f9d-8481-1c0c72e5f19f}</Project>
       <Name>BlackBerry.NativeCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
+      <Project>{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}</Project>
+      <Name>BlackBerry.Package</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

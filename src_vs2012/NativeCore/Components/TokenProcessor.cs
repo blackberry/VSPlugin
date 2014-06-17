@@ -17,7 +17,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace BlackBerry.Package
+namespace BlackBerry.NativeCore.Components
 {
     /// <summary>
     /// Contain a number of functions that handle token replacement

@@ -330,7 +330,6 @@
     </Compile>
     <Compile Include="PackageCommands.cs" />
     <Compile Include="StandardCommands.cs" />
-    <Compile Include="TokenProcessor.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\PackageOptionViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
