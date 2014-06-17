@@ -103,6 +103,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <PropertyGroup>
       <BuildBar_MinimalRebuildFromTracking Condition="'$(BuildType)' != 'Build' or '$(ForceRebuild)' == 'true'">false</BuildBar_MinimalRebuildFromTracking>
       <BuildBar_MinimalRebuildFromTracking Condition="'$(BuildBar_MinimalRebuildFromTracking)' == ''">true</BuildBar_MinimalRebuildFromTracking>
+      <BuildBar_DisableOptimizedDeploy>$(IsAppInstalled)</BuildBar_DisableOptimizedDeploy>
+      <BuildBar_DisableOptimizedDeploy Condition="%(BuildBar.DisableOptimizedDeploy) == 'true'">false</BuildBar_DisableOptimizedDeploy>
     </PropertyGroup>
 
     <BBNativePackager  Condition="'$(RunBuildBar)' == 'true'and ('$(CompileRan)' == 'true' or '$(IsAppInstalled)' == 'true')"
@@ -117,7 +119,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@device_password)"
         BarDeploy                      ="%(BuildBar.BarDeploy)"
         DevMode                        ="%(BuildBar.DevMode)"
-        PackageManifestOnly            ="$(IsAppInstalled)"
+        PackageManifestOnly            ="$(BuildBar_DisableOptimizedDeploy)"
         DebugToken                     ="%(BuildBar.DebugToken)"
         TargetFormat                   ="%(BuildBar.TargetFormat)"
         OutputFile                     ="%(BuildBar.OutputFile)"
@@ -205,8 +207,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
           Command ="$(SSHKeygenToolExe) -t rsa -b 4096 -f %22$(SSHPrivateKeyPath)%22 -N ''" />
 
     <CallTarget Targets="_BuildBar" />
-    <CallTarget Targets="FirstDeploy" Condition="$(IsAppInstalled) == 'false' OR %(BuildBar.DevMode) == 'false'" />
-    <CallTarget Targets="OptimizedDeploy" Condition="$(IsAppInstalled) == 'true'" />
+    <CallTarget Targets="FirstDeploy" Condition="%(BuildBar.DisableOptimizedDeploy) == 'true' OR $(IsAppInstalled) == 'false' OR %(BuildBar.DevMode) == 'false'" />
+    <CallTarget Targets="OptimizedDeploy" Condition="%(BuildBar.DisableOptimizedDeploy) != 'true' AND $(IsAppInstalled) == 'true'" />
 
     <!-- Remove the -debugNative flag if it was set. -->
     <RemoveFlagFile Condition="Exists('$(AppDataPath)\Research In Motion\vsndk-debugNative.txt')"

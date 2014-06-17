@@ -10,7 +10,7 @@
     <DataSource Persistence="ProjectFile" ItemType="BuildBar" Label="" HasConfigurationCondition="true" />
   </Rule.DataSource>
   <EnumProperty Name="TargetFormat" DisplayName="Target format" 
-    Description="Specify a target format (bar or bar-debug )"
+    Description="Specify a target format (bar or bar-debug)"
     Category="General" F1Keyword="VC.Project.BBPackager.TargetFormat" >
     <EnumValue Name="bar" Switch="target bar" DisplayName="bar"></EnumValue>
     <EnumValue Name="bar-debug" Switch="target bar-debug" DisplayName="bar-debug"></EnumValue>
@@ -26,6 +26,10 @@
   <BoolProperty Name="PackageManifestOnly" DisplayName="Package manifest only"
       Description="Package only a project's manifest in order to support optimized deployment."
       Category="General" Switch="PackageManifestOnly" F1Keyword="" >
+  </BoolProperty>
+  <BoolProperty Name="DisableOptimizedDeploy" DisplayName="Disable optimized deploy"
+      Description="PlayBook development dedicated switch. Leave it off for BlackBerry 10 devices. It disables optimized bar-file deployment feature, that updates the device with only changed files from the project, since is not supported on PlayBook at all. Otherwise strange build errors might occur."
+      Category="General" Switch="DisableOptimizedDeploy" F1Keyword="" >
   </BoolProperty>
   <!-- output-->
   <StringProperty Subtype="file" Name="OutputFile" DisplayName="Output bar File" Description="Specifies the name of the bar file" 

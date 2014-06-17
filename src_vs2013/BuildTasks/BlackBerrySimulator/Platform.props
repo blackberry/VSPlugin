@@ -139,6 +139,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <OutputFile Condition="'%(BuildBar.OutputFile)' == ''">$(OutDir)$(TargetName).bar</OutputFile>
       <PackageManifestOnly Condition="Exists('%(BuildBar.OutputFile)')">true</PackageManifestOnly>
       <PackageManifestOnly Condition="!Exists('%(BuildBar.OutputFile)')">false</PackageManifestOnly>
+      <DisableOptimizedDeploy>false</DisableOptimizedDeploy>
       <TargetFormat Condition="$(Configuration.Contains('Debug'))">bar-debug</TargetFormat>
       <TargetFormat Condition="$(Configuration.Contains('Release'))">bar</TargetFormat>
       <DevMode Condition="$(Configuration.Contains('Debug'))">true</DevMode>
