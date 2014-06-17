@@ -12,9 +12,9 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-namespace RIM.VSNDK_Package
+namespace BlackBerry.Package
 {
-    internal static class PkgCmdIDList
+    internal static class PackageCommands
     {
         public const int cmdidBlackBerryOptions = 0x301;
         public const int cmdidBlackBerryTargetsDevicesPlaceholder = 0x501;

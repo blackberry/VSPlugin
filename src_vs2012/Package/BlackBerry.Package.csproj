@@ -184,9 +184,6 @@
     <Compile Include="..\..\src_vs2010\Package\NameValueCollectionHelper.cs">
       <Link>NameValueCollectionHelper.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\PkgCmdID.cs">
-      <Link>PkgCmdID.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
@@ -196,6 +193,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
     </Compile>
+    <Compile Include="BlackBerryPackage.cs" />
+    <Compile Include="Components\BuildPlatformsManager.cs" />
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
     <Compile Include="Helpers\CertHelper.cs" />
     <Compile Include="Helpers\CommandHelper.cs" />
@@ -329,12 +328,13 @@
     <Compile Include="Options\TargetsOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="PackageCommands.cs" />
+    <Compile Include="StandardCommands.cs" />
     <Compile Include="TokenProcessor.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\PackageOptionViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
-    <Compile Include="VSNDKAddIn.cs" />
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
@@ -449,12 +449,6 @@
     <Compile Include="..\..\src_vs2010\Package\VsDesignerControl.xaml.cs">
       <Link>VsDesignerControl.xaml.cs</Link>
       <DependentUpon>VsDesignerControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\VSNDK.PackagePackage.cs">
-      <Link>VSNDK.PackagePackage.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\VSNDKConstants.cs">
-      <Link>VSNDKConstants.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\XmlEditorDesignerViewRegistration.cs">
       <Link>XmlEditorDesignerViewRegistration.cs</Link>

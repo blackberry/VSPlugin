@@ -31,14 +31,14 @@ namespace BlackBerry.Package
     /// </summary>
 
     [ComVisible(true)]
-    public sealed class EditorPane : Microsoft.VisualStudio.Shell.WindowPane, IOleComponent, IVsDeferredDocView, IVsLinkedUndoClient
+    public sealed class EditorPane : WindowPane, IOleComponent, IVsDeferredDocView, IVsLinkedUndoClient
     {
         #region Fields
-        private VSNDK_PackagePackage _thisPackage;
-        private ServiceProvider _service;
-        private string _fileName = string.Empty;
+        private readonly BlackBerryPackage _package;
+        private readonly ServiceProvider _service;
+        private readonly string _fileName;
         private VsDesignerControl _vsDesignerControl;
-        private IVsTextLines _textBuffer;
+        private readonly IVsTextLines _textBuffer;
         private uint _componentId;
         private IOleUndoManager _undoManager;
         private XmlStore _store;
@@ -51,10 +51,10 @@ namespace BlackBerry.Package
         /// our initialization functions.
         /// </summary>
         /// <param name="package">Our Package instance.</param>
-        public EditorPane(ServiceProvider service, VSNDK_PackagePackage package, string fileName, IVsTextLines textBuffer)
+        public EditorPane(ServiceProvider service, BlackBerryPackage package, string fileName, IVsTextLines textBuffer)
             : base(null)
         {
-            _thisPackage = package;
+            _package = package;
             _fileName = fileName;
             _textBuffer = textBuffer;
             _service = service;
@@ -153,7 +153,7 @@ namespace BlackBerry.Package
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
-            _vsDesignerControl = new VsDesignerControl(_service, new ViewModel(_thisPackage, _store, _model, this, _textBuffer));
+            _vsDesignerControl = new VsDesignerControl(_service, new ViewModel(_package, _store, _model, this, _textBuffer));
             base.Content = _vsDesignerControl;
 
             RegisterIndependentView(true);
@@ -306,7 +306,7 @@ namespace BlackBerry.Package
             {
                 throw new InvalidOperationException("Could not get SVsResourceManager service. Make sure the package is Sited before calling this method");
             }
-            Guid packageGuid = _thisPackage.GetType().GUID;
+            Guid packageGuid = _package.GetType().GUID;
             int hr = resourceManager.LoadResourceString(ref packageGuid, -1, resourceName, out resourceValue);
             Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(hr);
             return resourceValue;

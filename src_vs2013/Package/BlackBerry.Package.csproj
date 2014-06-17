@@ -163,9 +163,6 @@
     <Compile Include="..\..\src_vs2010\Package\NameValueCollectionHelper.cs">
       <Link>NameValueCollectionHelper.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\PkgCmdID.cs">
-      <Link>PkgCmdID.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
@@ -174,6 +171,12 @@
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\BlackBerryPackage.cs">
+      <Link>BlackBerryPackage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\BuildPlatformsManager.cs">
+      <Link>Components\BuildPlatformsManager.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
@@ -364,6 +367,12 @@
       <Link>Options\TargetsOptionPage.cs</Link>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\PackageCommands.cs">
+      <Link>PackageCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\StandardCommands.cs">
+      <Link>StandardCommands.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\TokenProcessor.cs">
       <Link>TokenProcessor.cs</Link>
     </Compile>
@@ -378,9 +387,6 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\VSNDKAddIn.cs">
-      <Link>VSNDKAddIn.cs</Link>
     </Compile>
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
@@ -572,12 +578,6 @@
       <Link>VsDesignerControl.xaml.cs</Link>
       <DependentUpon>VsDesignerControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\VSNDK.PackagePackage.cs">
-      <Link>VSNDK.PackagePackage.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\VSNDKConstants.cs">
-      <Link>VSNDKConstants.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\XmlEditorDesignerViewRegistration.cs">
       <Link>XmlEditorDesignerViewRegistration.cs</Link>
     </Compile>
@@ -667,6 +667,7 @@
       <Name>BlackBerry.NativeCore</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <UseCodebase>true</UseCodebase>
   </PropertyGroup>

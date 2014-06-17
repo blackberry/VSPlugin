@@ -20,6 +20,7 @@ using System.ComponentModel.Design;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Components;
 using BlackBerry.Package.Diagnostics;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
@@ -40,7 +41,6 @@ using System.Text.RegularExpressions;
 using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
-using RIM.VSNDK_Package;
 using VSNDK.Parser;
 
 namespace BlackBerry.Package
@@ -55,22 +55,15 @@ namespace BlackBerry.Package
     /// IVsPackage interface and uses the registration attributes defined in the framework to 
     /// register itself and its components with the shell.
     /// </summary>
-    // This attribute tells the PkgDef creation utility (CreatePkgDef.exe) that this class is
-    // a package.
     [PackageRegistration(UseManagedResourcesOnly = true)]
-
-    ///Register the editor factory
-    [XmlEditorDesignerViewRegistration("XML", "xml", LogicalViewID.Designer, 0x60,
-    DesignerLogicalViewEditor = typeof(EditorFactory),
-    Namespace = "http://www.qnx.com/schemas/application/1.0",
-    MatchExtensionAndNamespace = true)]
+    // Register the editor factory
+    [XmlEditorDesignerViewRegistration("XML", "xml", LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(EditorFactory), Namespace = "http://www.qnx.com/schemas/application/1.0", MatchExtensionAndNamespace = true)]
     // And which type of files we want to handle
-    [ProvideEditorExtension(typeof(EditorFactory), EditorFactory.defaultExtension, 0x40, NameResourceID = 106)]
+    [ProvideEditorExtension(typeof(EditorFactory), EditorFactory.DefaultExtension, 0x40, NameResourceID = 106)]
     // We register that our editor supports LOGVIEWID_Designer logical view
     [ProvideEditorLogicalView(typeof(EditorFactory), LogicalViewID.Designer)]
-
     // Microsoft Visual C# Project
-    [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", EditorFactory.defaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
+    [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", EditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
@@ -80,12 +73,15 @@ namespace BlackBerry.Package
     // This attribute registers a tool window exposed by this package.
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackageString)]
+
+    // This attribute defines set of settings pages provided by this package.
+    // They are automatically instantiated and displayed inside [Visual Studio -> Tools -> Options...] dialog.
     [ProvideOptionPage(typeof(GeneralOptionPage), "BlackBerry", "General", 1001, 1002, true)]
     [ProvideOptionPage(typeof(LogsOptionPage), "BlackBerry", "Logs", 1001, 1003, true)]
     [ProvideOptionPage(typeof(ApiLevelOptionPage), "BlackBerry", "API Levels", 1001, 1004, true)]
     [ProvideOptionPage(typeof(TargetsOptionPage), "BlackBerry", "Targets", 1001, 1005, true)]
     [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
-    public sealed class VSNDK_PackagePackage : Microsoft.VisualStudio.Shell.Package
+    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package
     {
         public const string VersionString = "2.1.2014.0616";
 
@@ -93,7 +89,7 @@ namespace BlackBerry.Package
 
         private BlackBerryPaneTraceListener _traceWindow;
         private DTE2 _dte;
-        private VSNDKAddIn _addIn;
+        private BuildPlatformsManager _buildPlatformsManager;
         private bool _isSimulator;
         private BuildEvents _buildEvents;
         private List<string[]> _targetDir;
@@ -116,7 +112,7 @@ namespace BlackBerry.Package
         /// not sited yet inside Visual Studio environment. The place to do all the other 
         /// initialization is the Initialize method.
         /// </summary>
-        public VSNDK_PackagePackage()
+        public BlackBerryPackage()
         {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", ToString()));
         }
@@ -177,12 +173,11 @@ namespace BlackBerry.Package
 
             SetNDKPath();
 
-            _addIn = new VSNDKAddIn();
-            _addIn.Connect(_dte);
+            _buildPlatformsManager = new BuildPlatformsManager(_dte);
 
-            CommandHelper.Register(_dte, GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
-            CommandHelper.Register(_dte, GuidList.guidVSStd97String, CommandConstants.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
-            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, CommandConstants.cmdidStartDebugContext, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
@@ -194,12 +189,12 @@ namespace BlackBerry.Package
             if ( null != mcs )
             {
                 // Create command for the 'Options...' menu
-                CommandID optionsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryOptions);
+                CommandID optionsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryOptions);
                 MenuCommand optionsMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(GeneralOptionPage)), optionsCommandID);
                 mcs.AddCommand(optionsMenu);
 
                 // Create dynamic command for the 'devices-list' menu
-                CommandID devicesCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsDevicesPlaceholder);
+                CommandID devicesCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryTargetsDevicesPlaceholder);
                 DynamicMenuCommand devicesMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.TargetDevices,
                                                                         (cmd, collection, index) =>
                                                                             {
@@ -216,7 +211,7 @@ namespace BlackBerry.Package
                                                                         devicesCommandID);
                 mcs.AddCommand(devicesMenu);
                 // Create dynamic command for the 'api-level-list' menu
-                CommandID apiLevelCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsApiLevelsPlaceholder);
+                CommandID apiLevelCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryTargetsApiLevelsPlaceholder);
                 DynamicMenuCommand apiLevelMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledNDKs,
                                                                          (cmd, collection, index) =>
                                                                              {
@@ -235,10 +230,10 @@ namespace BlackBerry.Package
 
                 // Create command for 'Help' menus
                 var helpCmdIDs = new[] {
-                                            PkgCmdIDList.cmdidBlackBerryHelpWelcomePage, PkgCmdIDList.cmdidBlackBerryHelpSupportForum,
-                                            PkgCmdIDList.cmdidBlackBerryHelpDocNative, PkgCmdIDList.cmdidBlackBerryHelpDocCascades, PkgCmdIDList.cmdidBlackBerryHelpDocPlayBook,
-                                            PkgCmdIDList.cmdidBlackBerryHelpSamplesNative, PkgCmdIDList.cmdidBlackBerryHelpSamplesCascades, PkgCmdIDList.cmdidBlackBerryHelpSamplesPlayBook, PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource,
-                                            PkgCmdIDList.cmdidBlackBerryHelpAbout
+                                            PackageCommands.cmdidBlackBerryHelpWelcomePage, PackageCommands.cmdidBlackBerryHelpSupportForum,
+                                            PackageCommands.cmdidBlackBerryHelpDocNative, PackageCommands.cmdidBlackBerryHelpDocCascades, PackageCommands.cmdidBlackBerryHelpDocPlayBook,
+                                            PackageCommands.cmdidBlackBerryHelpSamplesNative, PackageCommands.cmdidBlackBerryHelpSamplesCascades, PackageCommands.cmdidBlackBerryHelpSamplesPlayBook, PackageCommands.cmdidBlackBerryHelpSamplesOpenSource,
+                                            PackageCommands.cmdidBlackBerryHelpAbout
                                        };
                 foreach (var cmdID in helpCmdIDs)
                 {
@@ -248,12 +243,12 @@ namespace BlackBerry.Package
                 }
 
                 // Create command for 'Configure...' [targets] menu
-                CommandID configureCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidBlackBerryTargetsConfigure);
+                CommandID configureCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryTargetsConfigure);
                 MenuCommand configureMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(TargetsOptionPage)), configureCommandID);
                 mcs.AddCommand(configureMenu);
 
                 // Create the command for the menu item.
-                CommandID projCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PkgCmdIDList.cmdidfooLocalBox);
+                CommandID projCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidfooLocalBox);
                 OleMenuCommand projItem = new OleMenuCommand(MenuItemCallback, projCommandID);
                 mcs.AddCommand(projItem);
 
@@ -267,10 +262,10 @@ namespace BlackBerry.Package
         {
             if (disposing)
             {
-                if (_addIn != null)
+                if (_buildPlatformsManager != null)
                 {
-                    _addIn.Disconnect();
-                    _addIn = null;
+                    _buildPlatformsManager.Close();
+                    _buildPlatformsManager = null;
                 }
             }
 
@@ -303,34 +298,34 @@ namespace BlackBerry.Package
 
             switch (cmdID)
             {
-                case PkgCmdIDList.cmdidBlackBerryHelpWelcomePage:
+                case PackageCommands.cmdidBlackBerryHelpWelcomePage:
                     OpenUrl("http://developer.blackberry.com/cascades/momentics/");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpSupportForum:
+                case PackageCommands.cmdidBlackBerryHelpSupportForum:
                     OpenUrl("http://supportforums.blackberry.com/t5/Developer-Support-Forums/ct-p/blackberrydev");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpDocNative:
+                case PackageCommands.cmdidBlackBerryHelpDocNative:
                     OpenUrl("http://developer.blackberry.com/native/documentation/core/framework.html");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpDocCascades:
+                case PackageCommands.cmdidBlackBerryHelpDocCascades:
                     OpenUrl("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpDocPlayBook:
+                case PackageCommands.cmdidBlackBerryHelpDocPlayBook:
                     OpenUrl("http://developer.blackberry.com/playbook/native/documentation/");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpSamplesNative:
+                case PackageCommands.cmdidBlackBerryHelpSamplesNative:
                     OpenUrl("http://developer.blackberry.com/native/sampleapps/");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpSamplesCascades:
+                case PackageCommands.cmdidBlackBerryHelpSamplesCascades:
                     OpenUrl("http://developer.blackberry.com/native/sampleapps/");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpSamplesPlayBook:
+                case PackageCommands.cmdidBlackBerryHelpSamplesPlayBook:
                     OpenUrl("http://developer.blackberry.com/playbook/native/sampleapps/");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpSamplesOpenSource:
+                case PackageCommands.cmdidBlackBerryHelpSamplesOpenSource:
                     OpenUrl("https://github.com/blackberry");
                     break;
-                case PkgCmdIDList.cmdidBlackBerryHelpAbout:
+                case PackageCommands.cmdidBlackBerryHelpAbout:
                     {
                         var form = new AboutForm();
                         form.ShowDialog();

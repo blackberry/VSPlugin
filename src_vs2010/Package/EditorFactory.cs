@@ -32,26 +32,24 @@ namespace BlackBerry.Package
     public sealed class EditorFactory : IVsEditorFactory, IDisposable
     {
         /// Declare Constants
-        public const string defaultExtension = ".xml";
+        public const string DefaultExtension = ".xml";
 
-        /// Private Member Variables
-        private VSNDK_PackagePackage editorPackage;
-        private ServiceProvider vsServiceProvider;
+        // Private Member Variables
+        private readonly BlackBerryPackage _package;
+        private ServiceProvider _vsServiceProvider;
 
         /// <summary>
-        /// Constructor
+        /// Init constructor.
         /// </summary>
-        /// <param name="package"></param>
-        public EditorFactory(VSNDK_PackagePackage package)
+        public EditorFactory(BlackBerryPackage package)
         {
-            /// Set internal member variables
-            this.editorPackage = package;
+            // Set internal member variables
+            _package = package;
         }
 
         /// <summary>
         /// Close the factory
         /// </summary>
-        /// <returns></returns>
         public int Close()
         {
             return VSConstants.S_OK;
@@ -74,7 +72,7 @@ namespace BlackBerry.Package
         /// <returns></returns>
         public int CreateEditorInstance(uint grfCreateDoc, string pszMkDocument, string pszPhysicalView, IVsHierarchy pvHier, uint itemid, IntPtr punkDocDataExisting, out IntPtr ppunkDocView, out IntPtr ppunkDocData, out string pbstrEditorCaption, out Guid pguidCmdUI, out int pgrfCDW)
         {
-            /// Initialize variables.
+            // Initialize variables.
             ppunkDocView = IntPtr.Zero;
             ppunkDocData = IntPtr.Zero;
             pguidCmdUI = GuidList.guidVSNDK_PackageEditorFactory;
@@ -82,22 +80,25 @@ namespace BlackBerry.Package
             pbstrEditorCaption = null;
             IVsTextLines textBuffer = null;
 
-            /// Validate Inputs
+            // Validate Inputs
             if ((grfCreateDoc & (VSConstants.CEF_OPENFILE | VSConstants.CEF_SILENT)) == 0)
             {
                 return VSConstants.E_INVALIDARG;
             }
 
             if (punkDocDataExisting == IntPtr.Zero)
-            { /// File is not open yet.  Create a new text buffer object.
+            {
+                // File is not open yet.  Create a new text buffer object.
 
-                /// get the ILocalRegistry interface so we can use it to
-                /// create the text buffer from the shell's local registry
+                // get the ILocalRegistry interface so we can use it to
+                // create the text buffer from the shell's local registry
                 try
                 {
                     ILocalRegistry localRegistry = (ILocalRegistry)GetService(typeof(SLocalRegistry));
                     if (localRegistry != null)
-                    { /// Successfully created
+                    {
+                        // Successfully created
+
                         IntPtr ptr;
                         Guid iid = typeof(IVsTextLines).GUID;
                         Guid CLSID_VsTextBuffer = typeof(VsTextBufferClass).GUID;
@@ -127,10 +128,11 @@ namespace BlackBerry.Package
                 }
             }
             else
-            { /// File is already open.  Verify open document is a Text Buffer
+            {
+                // File is already open.  Verify open document is a Text Buffer
                
 
-                /// QI existing buffer for text lines
+                // QI existing buffer for text lines
                 textBuffer = Marshal.GetObjectForIUnknown(punkDocDataExisting) as IVsTextLines;
                 if (textBuffer == null)
                 {
@@ -138,8 +140,8 @@ namespace BlackBerry.Package
                 }
             }
 
-            /// Create the Document (editor)
-            EditorPane NewEditor = new EditorPane(vsServiceProvider, editorPackage, pszMkDocument, textBuffer);
+            // Create the Document (editor)
+            EditorPane NewEditor = new EditorPane(_vsServiceProvider, _package, pszMkDocument, textBuffer);
             ppunkDocView = Marshal.GetIUnknownForObject(NewEditor);
             ppunkDocData = Marshal.GetIUnknownForObject(textBuffer);
             pbstrEditorCaption = "";
@@ -150,10 +152,9 @@ namespace BlackBerry.Package
         /// Private function to return the required service.
         /// </summary>
         /// <param name="type">Service Type</param>
-        /// <returns></returns>
         public object GetService(Type serviceType)
         {
-            return vsServiceProvider.GetService(serviceType);
+            return _vsServiceProvider.GetService(serviceType);
         }
 
         /// <summary>
@@ -166,16 +167,18 @@ namespace BlackBerry.Package
         /// <returns></returns>
         public int MapLogicalView(ref Guid rguidLogicalView, out string pbstrPhysicalView)
         {
-            /// Initialize our parameter
-            pbstrPhysicalView = null;    
+            // Initialize our parameter
+            pbstrPhysicalView = null;
 
-            /// we support only a single physical view
+            // we support only a single physical view
             if (VSConstants.LOGVIEWID_Primary == rguidLogicalView)
-            { /// primary view uses NULL as pbstrPhysicalView
+            {
+                // primary view uses NULL as pbstrPhysicalView
                 return VSConstants.S_OK;        
             }
             else
-            { /// you must return E_NOTIMPL for any unrecognized rguidLogicalView values
+            {
+                // you must return E_NOTIMPL for any unrecognized rguidLogicalView values
                 return VSConstants.E_NOTIMPL;
             } 
         }
@@ -184,10 +187,9 @@ namespace BlackBerry.Package
         /// Used for initialization of the editor in the environment
         /// </summary>
         /// <param name="psp">pointer to the service provider. Can be used to obtain instances of other interfaces</param>
-        /// <returns></returns>
         public int SetSite(IOleServiceProvider psp)
         {
-            vsServiceProvider = new ServiceProvider(psp);
+            _vsServiceProvider = new ServiceProvider(psp);
             return VSConstants.S_OK;
         }
 
@@ -209,10 +211,10 @@ namespace BlackBerry.Package
             {
                 if (disposing)
                 { ///dispose all managed and unmanaged resources
-                    if (vsServiceProvider != null)
+                    if (_vsServiceProvider != null)
                     {
-                        vsServiceProvider.Dispose();
-                        vsServiceProvider = null;
+                        _vsServiceProvider.Dispose();
+                        _vsServiceProvider = null;
                     }
                 }
             }

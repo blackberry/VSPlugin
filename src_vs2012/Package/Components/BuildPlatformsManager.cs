@@ -22,27 +22,28 @@ using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.VCProjectEngine;
-using RIM.VSNDK_Package;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.Components
 {
-    public class configtableentry
-    {
-        public string config;
-        public string platform;
-        public bool deployable;
-    }
-
     /// <summary>
     /// 
     /// </summary>
-    public class VSNDKAddIn
+    internal sealed class BuildPlatformsManager
     {
-        private DTE2 _applicationObject;
+        #region Internal Classes
+
+        sealed class ConfigTableEntry
+        {
+            public string config;
+            public string platform;
+            public bool deployable;
+        }
+
+        #endregion
+
+        private readonly DTE2 _dte;
         private TokenProcessor _tokenProcessor;
-
-        private List<configtableentry> _configTable;
-
+        private readonly List<ConfigTableEntry> _configTable;
 
         private const string BLACKBERRY = "BlackBerry";
         private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
@@ -52,32 +53,27 @@ namespace BlackBerry.Package
         private const string BAR_DESCRIPTOR = "bar-descriptor.xml";
         private const string BAR_DESCRIPTOR_PATH = @"\..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033\";
 
-        /// <summary> 
-        /// Run initialization code on first connection of the AddIn. 
-        /// </summary>
-        /// <param name="appObj"> Application Object. </param>
-        public void Connect(DTE2 appObj)
+        public BuildPlatformsManager(DTE2 dte)
         {
-            if (appObj == null)
-                throw new ArgumentNullException("appObj");
+            if (dte == null)
+                throw new ArgumentNullException("dte");
 
-            // Initialize External and Internal Variables.
-            _applicationObject = appObj;
+            // initialize variables:
+            _dte = dte;
+            _configTable = new List<ConfigTableEntry>();
 
-            _configTable = new List<configtableentry>();
-
-            // Register Command Events
-            CommandHelper.Register(_applicationObject, GuidList.guidVSStd2KString, CommandConstants.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
-            CommandHelper.Register(_applicationObject, GuidList.guidVSDebugGroup, CommandConstants.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
+            // register for command events, when accessing build platforms:
+            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidSolutionPlatform, cmdNewPlatform_afterExec, cmdNewPlatform_beforeExec);
+            CommandHelper.Register(_dte, GuidList.guidVSDebugGroup, StandardCommands.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_afterExec, cmdNewFunctionBreakpoint_beforeExec);
 
             DisableIntelliSenseErrorReport(true);
             CheckSolutionPlatformCommand();
         }
 
         /// <summary> 
-        /// Terminate the AddIn. 
+        /// Terminate the manager.
         /// </summary>
-        public void Disconnect()
+        public void Close()
         {
             DisableIntelliSenseErrorReport(false);
         }
@@ -88,7 +84,7 @@ namespace BlackBerry.Package
         /// </summary>
         private void CheckSolutionPlatformCommand()
         {
-            DTE dte = (DTE)_applicationObject;
+            DTE dte = (DTE)_dte;
             CommandBars commandBars = (CommandBars)dte.CommandBars;
             CommandBar standardCommandBar = commandBars[STANDARD_TOOL_BAR];
             int pos = 0;
@@ -103,7 +99,7 @@ namespace BlackBerry.Package
             Command sp = null;
             foreach (Command c in dte.Commands)
             {
-                if (c.Guid == GuidList.guidVSStd2KString && c.ID == CommandConstants.cmdidSolutionPlatform)
+                if (c.Guid == GuidList.guidVSStd2KString && c.ID == StandardCommands.cmdidSolutionPlatform)
                 {
                     sp = c;
                     break;
@@ -119,7 +115,7 @@ namespace BlackBerry.Package
         /// <param name="disable"> The property value to set. </param>
         private void DisableIntelliSenseErrorReport(bool disable)
         {
-            DTE dte = _applicationObject as DTE;
+            DTE dte = _dte as DTE;
             var txtEdCpp = dte.get_Properties("TextEditor", "C/C++ Specific");
             if (txtEdCpp != null)
             {
@@ -177,7 +173,7 @@ namespace BlackBerry.Package
         /// <param name="CustomOut">Custom OUT Object. </param>
         private void cmdNewFunctionBreakpoint_afterExec(string Guid, int ID, object CustomIn, object CustomOut)
         {
-            Breakpoint functionBP = _applicationObject.Debugger.Breakpoints.Item(_applicationObject.Debugger.Breakpoints.Count);
+            Breakpoint functionBP = _dte.Debugger.Breakpoints.Item(_dte.Debugger.Breakpoints.Count);
 
             if (functionBP != null)
             {
@@ -194,7 +190,7 @@ namespace BlackBerry.Package
         /// </summary>
         private void SolutionPlarformConfig()
         {
-            DTE dte = _applicationObject as DTE;
+            DTE dte = _dte as DTE;
 
             SolutionConfigurations SGS = dte.Solution.SolutionBuild.SolutionConfigurations;
 
@@ -209,7 +205,7 @@ namespace BlackBerry.Package
                     string pname = SC.PlatformName;
                     string prname = SC.ProjectName;
 
-                    configtableentry e = _configTable.Find(i => (i.config == cname) && (i.platform == pname));
+                    ConfigTableEntry e = _configTable.Find(i => (i.config == cname) && (i.platform == pname));
 
                     if (e != null)
                     {
@@ -229,7 +225,7 @@ namespace BlackBerry.Package
         /// </summary>
         private void GetSolutionPlarformConfig()
         {
-            DTE dte = _applicationObject as DTE;
+            DTE dte = _dte as DTE;
 
             SolutionConfigurations SGS = dte.Solution.SolutionBuild.SolutionConfigurations;
 
@@ -244,7 +240,7 @@ namespace BlackBerry.Package
                     string pname = SC.PlatformName;
                     string prname = SC.ProjectName;
 
-                    configtableentry c = new configtableentry();
+                    ConfigTableEntry c = new ConfigTableEntry();
                     c.platform = pname;
                     c.config = cname;
                     c.deployable = SC.ShouldDeploy;
@@ -261,7 +257,7 @@ namespace BlackBerry.Package
         {
             try
             {
-                DTE dte = _applicationObject as DTE;
+                DTE dte = _dte as DTE;
                 Projects projs = dte.Solution.Projects;
 
 

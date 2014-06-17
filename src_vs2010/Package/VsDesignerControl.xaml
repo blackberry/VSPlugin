@@ -3,9 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:data="clr-namespace:RIM.VSNDK_Package"
-             xmlns:vstd="clr-namespace:RIM.VSNDK_Package"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"             
              mc:Ignorable="d" 
              d:DesignHeight="800" d:DesignWidth="800">
     <ScrollViewer CanContentScroll="True" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >

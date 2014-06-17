@@ -17,7 +17,7 @@ namespace BlackBerry.Package
     /// <summary> 
     /// Command IDs exposed by VisualStudio. 
     /// </summary>
-    public static class CommandConstants
+    internal static class StandardCommands
     {
         public const int cmdidAddSolutionSCC = 21016;
         public const int cmdidUndoCheckoutSCC = 21009;
