@@ -115,9 +115,11 @@ if not "%VSSelector%" == "" set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Micros
 REM Skip installation of custom tools (in case upgrading only plugin during development)
 if %ActionSkipTools% neq 0 goto skip_tools
 call :processTools "%thisDir%" "%PluginRoot%" "%SystemDrive%"
+set /a actionNo += 1
 :skip_tools
 
 call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%" "%MSBuildTargetPath%" "%VSWizardsPath%"
+set /a actionNo += 1
 
 if %ActionUninstall% neq 0 (goto uninstall_reg)
 
@@ -173,6 +175,8 @@ copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputPluginPath%\BlackBerry.Deb
 REM Install Package Files
 echo "%InputPath%\extension.vsixmanifest" to "%OutputVsPath%\extension.vsixmanifest"
 copy "%InputPath%\extension.vsixmanifest" "%OutputVsPath%\extension.vsixmanifest" 
+echo "%InputPath%\BlackBerry.NativeCore.dll" to "%OutputVsPath%\BlackBerry.NativeCore.dll"
+copy "%InputPath%\BlackBerry.NativeCore.dll" "%OutputVsPath%\BlackBerry.NativeCore.dll"
 echo "%InputPath%\BlackBerry.Package.dll" to "%OutputVsPath%\BlackBerry.Package.dll"
 copy "%InputPath%\BlackBerry.Package.dll" "%OutputVsPath%\BlackBerry.Package.dll"
 echo "%InputPath%\BlackBerry.Package.pkgdef" to "%OutputVsPath%\BlackBerry.Package.pkgdef"
@@ -209,6 +213,8 @@ del "%OutputPluginPath%\BlackBerry.DebugEngine.dll"
 REM Uninstall Package Files
 echo Deleting "%OutputVsPath%\extension.vsixmanifest"
 del "%OutputVsPath%\extension.vsixmanifest" 
+echo Deleting  "%OutputVsPath%\BlackBerry.NativeCore.dll"
+del "%OutputVsPath%\BlackBerry.NativeCore.dll"
 echo Deleting  "%OutputVsPath%\BlackBerry.Package.dll"
 del "%OutputVsPath%\BlackBerry.Package.dll"
 echo Deleting  "%OutputVsPath%\BlackBerry.Package.pkgdef"
