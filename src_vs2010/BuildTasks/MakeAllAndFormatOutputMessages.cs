@@ -227,9 +227,14 @@ namespace BlackBerry.BuildTasks
                 }
 
 
-                BuildMessageEventArgs taskEvent = new BuildMessageEventArgs(outputText, "", "", MessageImportance.High);
-                BuildEngine.LogMessageEvent(taskEvent);
-
+                try
+                {
+                    BuildMessageEventArgs taskEvent = new BuildMessageEventArgs(outputText, "", "", MessageImportance.High);
+                    BuildEngine.LogMessageEvent(taskEvent);
+                }
+                catch
+                {
+                }
             }
         }
 
