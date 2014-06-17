@@ -183,10 +183,10 @@ echo "%InputPath%\BlackBerry.Package.pkgdef" to "%OutputVsPath%\BlackBerry.Packa
 copy "%InputPath%\BlackBerry.Package.pkgdef" "%OutputVsPath%\BlackBerry.Package.pkgdef" 
 
 REM MSBuild Files
-echo Copy BlackBerry MSBuild directory
+echo Copy BlackBerry MSBuild directory [%OutputMsBuildTargetsPath%]
 xcopy "%InputPath%\BlackBerry" "%OutputMsBuildTargetsPath%\BlackBerry" /e /i /y
 copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerry\BlackBerry.BuildTasks.dll"
-echo Copy BlackBerrySimulator MSBuild directory
+echo Copy BlackBerrySimulator MSBuild directory [%OutputMsBuildTargetsPath%]
 xcopy "%InputPath%\BlackBerrySimulator" "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /e /i /y
 copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerrySimulator\BlackBerry.BuildTasks.dll"
 
