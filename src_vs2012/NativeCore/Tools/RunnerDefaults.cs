@@ -17,6 +17,7 @@ namespace BlackBerry.NativeCore.Tools
 
         public static readonly string JavaHome;
         public static readonly string SshPublicKeyPath;
+        public static readonly string BuildDebugNativePath;
 
         /// <summary>
         /// Plugin-owned installation cache config directory.
@@ -53,6 +54,7 @@ namespace BlackBerry.NativeCore.Tools
             PluginInstallationConfigDirectory = Path.Combine(DataDirectory, "VSPlugin", "qconfig");
 
             SshPublicKeyPath = Path.Combine(DataDirectory, "bbt_id_rsa.pub");
+            BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
 
 #if DEBUG

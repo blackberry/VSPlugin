@@ -483,18 +483,18 @@ namespace BlackBerry.Package
             _owP.TextDocument.Selection.SelectAll();
             outputText = _owP.TextDocument.Selection.Text;
 
-            if ((outputText == "") || (System.Text.RegularExpressions.Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
+            if ((outputText == "") || (Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
             {
                 if (_isDebugConfiguration)
                 {
                     // Write file to flag the deploy task that it should use the -debugNative option
                     string fileContent = "Use -debugNative.\r\n";
-                    string appData = Environment.GetEnvironmentVariable("AppData");
-                    System.IO.StreamWriter file = new System.IO.StreamWriter(appData + @"\BlackBerry\vsndk-debugNative.txt");
-                    file.WriteLine(fileContent);
-                    file.Close();
+                    using (var file = new StreamWriter(RunnerDefaults.BuildDebugNativePath))
+                    {
+                        file.WriteLine(fileContent);
+                    }
 
-                    _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+                    _buildEvents.OnBuildDone += OnBuildDone;
                 }
 
                 foreach (String startupProject in (Array)_dte.Solution.SolutionBuild.StartupProjects)
