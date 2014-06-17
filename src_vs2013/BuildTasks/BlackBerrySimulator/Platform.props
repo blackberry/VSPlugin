@@ -126,7 +126,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Librarian defaults -->
   <ItemDefinitionGroup>
     <Lib>
-      <OutputFile                 Condition="'%(Lib.OutputFile)'                    == ''">$(OutDir)$(LibPrefix)$(TargetName)$(TargetExt)</OutputFile>
+      <OutputFile Condition="'%(Lib.OutputFile)' == ''">$(OutDir)$(LibPrefix)$(TargetName)$(TargetExt)</OutputFile>
       <LinkStatic Condition="'%(Lib.LinkStatic)' == ''">false</LinkStatic>
     </Lib>
   </ItemDefinitionGroup>
@@ -134,9 +134,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- Packager defaults -->
   <ItemDefinitionGroup>
     <BuildBar>
-      <TrackerLogDirectory         Condition="'%(BuilBar.TrackerLogDirectory)'         == ''">$(IntDir)</TrackerLogDirectory>
-      <MinimalRebuildFromTracking  Condition="'%(BuildBar.MinimalRebuildFromTracking)'  == ''">true</MinimalRebuildFromTracking>
-      <OutputFile   Condition="'%(BuildBar.OutputFile)' == ''">$(OutDir)$(TargetName).bar</OutputFile>
+      <TrackerLogDirectory Condition="'%(BuilBar.TrackerLogDirectory)' == ''">$(IntDir)</TrackerLogDirectory>
+      <MinimalRebuildFromTracking Condition="'%(BuildBar.MinimalRebuildFromTracking)' == ''">true</MinimalRebuildFromTracking>
+      <OutputFile Condition="'%(BuildBar.OutputFile)' == ''">$(OutDir)$(TargetName).bar</OutputFile>
       <PackageManifestOnly Condition="Exists('%(BuildBar.OutputFile)')">true</PackageManifestOnly>
       <PackageManifestOnly Condition="!Exists('%(BuildBar.OutputFile)')">false</PackageManifestOnly>
       <TargetFormat Condition="$(Configuration.Contains('Debug'))">bar-debug</TargetFormat>
@@ -154,7 +154,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Device Condition="'$(Device)' == ''">169.254.0.1</Device>
     <DevicePassword Condition="'$(DevicePassword)' == ''"></DevicePassword>
     <ApplicationDescriptorXml  Condition="'$(ApplicationDescriptorXml)' == ''">bar-descriptor.xml</ApplicationDescriptorXml>    
-    <AppDataPath>$(AppData)</AppDataPath>
   </PropertyGroup>
   
   <Import Project="$(VCTargetsPath)\Platforms\BlackBerrySimulator\ImportAfter\*.props" Condition="Exists('$(VCTargetsPath)\Platforms\BlackBerrySimulator\ImportAfter')" />

@@ -201,8 +201,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <CallTarget Targets="OptimizedDeploy" Condition="$(IsAppInstalled) == 'true'" />
 
     <!-- Remove the -debugNative flag if it was set. -->
-    <RemoveFlagFile
-        FlagFile="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
+    <RemoveFlagFile Condition="Exists('$(AppDataPath)\Research In Motion\vsndk-debugNative.txt')"
+        FlagFile="$(AppDataPath)\Research In Motion\vsndk-debugNative.txt"
       />
   </Target>
 
@@ -219,7 +219,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Package           ="$(ProjectDir)%(BuildBar.OutputFile)"
         InstallApp        ="true"
         LaunchApp         ="true"
-        FlagFile          ="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
+        FlagFile          ="$(AppDataPath)\Research In Motion\vsndk-debugNative.txt"
         DebugNative       ="false"
       />
   </Target>
@@ -326,7 +326,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
         Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
         LaunchApp         ="true"
-        FlagFile          ="$(AppDataPath)\BlackBerry\vsndk-debugNative.txt"
+        FlagFile          ="$(AppDataPath)\Research In Motion\vsndk-debugNative.txt"
         DebugNative       ="false"
       />
 

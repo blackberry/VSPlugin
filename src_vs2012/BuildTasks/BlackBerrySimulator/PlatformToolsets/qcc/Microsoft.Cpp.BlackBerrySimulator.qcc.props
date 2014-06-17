@@ -24,8 +24,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <CompilerTarget>gcc_ntox86</CompilerTarget>
     <QccLibPath>$(QNX_TARGET)\$(CPUVARDIR)\lib</QccLibPath>
     <AppDataPath>$(AppData)</AppDataPath>
-    <SSHPublicKeyPath>$(AppDataPath)/BlackBerry/bbt_id_rsa.pub</SSHPublicKeyPath>
-    <SSHPrivateKeyPath>$(AppDataPath)/BlackBerry/bbt_id_rsa</SSHPrivateKeyPath>
+      
+    <!-- for Windows XP the AppDataPath is different! -->
+    <OSVersion>$(registry:HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion@CurrentVersion)</OSVersion>
+    <AppDataPath Condition="$(OSVersion) == '5.1'">$(HomeDrive)$(HomePath)\Local Settings\Application Data</AppDataPath>
+
+    <SSHPublicKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa.pub</SSHPublicKeyPath>
+    <SSHPrivateKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa</SSHPrivateKeyPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Platform)'=='BlackBerrySimulator'">
