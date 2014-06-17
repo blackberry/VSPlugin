@@ -150,26 +150,11 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src_vs2010\Package\bar-descriptor.cs">
-      <Link>bar-descriptor.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\ControlDebugEngine.cs">
       <Link>ControlDebugEngine.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\EditorFactory.cs">
-      <Link>EditorFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\EditorFactoryNotifyForProject.cs">
-      <Link>EditorFactoryNotifyForProject.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\EditorPane.cs">
-      <Link>EditorPane.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\Guids.cs">
-      <Link>Guids.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\Import\Import.xaml.cs">
       <Link>Import\Import.xaml.cs</Link>
@@ -177,12 +162,6 @@
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\Import\Model\ImportModel.cs">
       <Link>Import\Model\ImportModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\IViewModel.cs">
-      <Link>IViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\NameValueCollectionHelper.cs">
-      <Link>NameValueCollectionHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
@@ -196,10 +175,20 @@
     <Compile Include="BlackBerryPackage.cs" />
     <Compile Include="Components\BuildPlatformsManager.cs" />
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
+    <Compile Include="Editors\BarDescriptionEditorControl.xaml.cs">
+      <DependentUpon>BarDescriptionEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Editors\BarDescriptionEditorFactory.cs" />
+    <Compile Include="Editors\BarDescriptionEditorPane.cs" />
+    <Compile Include="Editors\EditorFactoryNotifyForProject.cs" />
+    <Compile Include="Editors\XmlEditorDesignerViewRegistration.cs" />
+    <Compile Include="GuidList.cs" />
     <Compile Include="Helpers\CertHelper.cs" />
     <Compile Include="Helpers\CommandHelper.cs" />
     <Compile Include="Helpers\DialogHelper.cs" />
     <Compile Include="Helpers\MessageBoxHelper.cs" />
+    <Compile Include="Helpers\NameValueCollectionHelper.cs" />
+    <Compile Include="Model\bar-descriptor.cs" />
     <Compile Include="Model\Integration\ComboBoxItem.cs" />
     <Compile Include="Model\Integration\DynamicMenuCommand.cs" />
     <Compile Include="Model\Integration\WebBrowserTurbo.cs">
@@ -331,16 +320,14 @@
     <Compile Include="PackageCommands.cs" />
     <Compile Include="StandardCommands.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
+    <Compile Include="ViewModels\BarEditorViewModel.cs" />
+    <Compile Include="ViewModels\IBarEditorViewModel.cs" />
     <Compile Include="ViewModels\PackageOptionViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\Package\Templates\bar-descriptor.cs">
-      <Link>Templates\bar-descriptor.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\Package.Menu.vsct" />
@@ -442,16 +429,6 @@
     <Resource Include="..\..\src_vs2010\Package\Resources\TextMessages.bmp">
       <Link>Resources\TextMessages.bmp</Link>
     </Resource>
-    <Compile Include="..\..\src_vs2010\Package\ViewModel.cs">
-      <Link>ViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\VsDesignerControl.xaml.cs">
-      <Link>VsDesignerControl.xaml.cs</Link>
-      <DependentUpon>VsDesignerControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\XmlEditorDesignerViewRegistration.cs">
-      <Link>XmlEditorDesignerViewRegistration.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Strings.resx">
@@ -539,8 +516,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\..\src_vs2010\Package\VsDesignerControl.xaml">
-      <Link>VsDesignerControl.xaml</Link>
+    <Page Include="Editors\BarDescriptionEditorControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

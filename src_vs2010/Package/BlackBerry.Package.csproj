@@ -153,6 +153,25 @@
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorControl.xaml.cs">
+      <Link>Editors\BarDescriptionEditorControl.xaml.cs</Link>
+      <DependentUpon>BarDescriptionEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorFactory.cs">
+      <Link>Editors\BarDescriptionEditorFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorPane.cs">
+      <Link>Editors\BarDescriptionEditorPane.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\EditorFactoryNotifyForProject.cs">
+      <Link>Editors\EditorFactoryNotifyForProject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\XmlEditorDesignerViewRegistration.cs">
+      <Link>Editors\XmlEditorDesignerViewRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\GuidList.cs">
+      <Link>GuidList.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\CertHelper.cs">
       <Link>Helpers\CertHelper.cs</Link>
     </Compile>
@@ -164,6 +183,12 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\NameValueCollectionHelper.cs">
+      <Link>Helpers\NameValueCollectionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
+      <Link>Model\bar-descriptor.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\Integration\ComboBoxItem.cs">
       <Link>Model\Integration\ComboBoxItem.cs</Link>
@@ -348,6 +373,12 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\BarEditorViewModel.cs">
+      <Link>ViewModels\BarEditorViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\IBarEditorViewModel.cs">
+      <Link>ViewModels\IBarEditorViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageOptionViewModel.cs">
       <Link>ViewModels\PackageOptionViewModel.cs</Link>
     </Compile>
@@ -357,22 +388,11 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
     </Compile>
-    <Compile Include="bar-descriptor.cs" />
     <Compile Include="ControlDebugEngine.cs" />
-    <Compile Include="EditorFactory.cs" />
-    <Compile Include="EditorFactoryNotifyForProject.cs" />
-    <Compile Include="EditorPane.cs" />
     <Compile Include="Import\Model\ImportModel.cs" />
     <Compile Include="Import\Import.xaml.cs">
       <DependentUpon>Import.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IViewModel.cs" />
-    <Compile Include="NameValueCollectionHelper.cs" />
-    <Compile Include="ViewModel.cs" />
-    <Compile Include="VsDesignerControl.xaml.cs">
-      <DependentUpon>VsDesignerControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="XmlEditorDesignerViewRegistration.cs" />
     <VSCTCompile Include="Resources\Package.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
       <SubType>Designer</SubType>
@@ -491,7 +511,6 @@
     <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Compile Include="Guids.cs" />
     <Compile Include="Resources\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -541,11 +560,12 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Import\Import.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorControl.xaml">
+      <Link>Editors\BarDescriptionEditorControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
-    <Page Include="VsDesignerControl.xaml">
+    <Page Include="Import\Import.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

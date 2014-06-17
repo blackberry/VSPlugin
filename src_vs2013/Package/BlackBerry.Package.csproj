@@ -66,12 +66,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Package.LanguageService.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Shell.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Shell.10.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
-    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
@@ -129,26 +127,11 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src_vs2010\Package\bar-descriptor.cs">
-      <Link>bar-descriptor.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\ControlDebugEngine.cs">
       <Link>ControlDebugEngine.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\EditorFactory.cs">
-      <Link>EditorFactory.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\EditorFactoryNotifyForProject.cs">
-      <Link>EditorFactoryNotifyForProject.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\EditorPane.cs">
-      <Link>EditorPane.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\Guids.cs">
-      <Link>Guids.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\Import\Import.xaml.cs">
       <Link>Import\Import.xaml.cs</Link>
@@ -156,12 +139,6 @@
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\Import\Model\ImportModel.cs">
       <Link>Import\Model\ImportModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\IViewModel.cs">
-      <Link>IViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\NameValueCollectionHelper.cs">
-      <Link>NameValueCollectionHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
@@ -181,6 +158,25 @@
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorControl.xaml.cs">
+      <Link>Editors\BarDescriptionEditorControl.xaml.cs</Link>
+      <DependentUpon>BarDescriptionEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorFactory.cs">
+      <Link>Editors\BarDescriptionEditorFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorPane.cs">
+      <Link>Editors\BarDescriptionEditorPane.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\EditorFactoryNotifyForProject.cs">
+      <Link>Editors\EditorFactoryNotifyForProject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\XmlEditorDesignerViewRegistration.cs">
+      <Link>Editors\XmlEditorDesignerViewRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\GuidList.cs">
+      <Link>GuidList.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\CertHelper.cs">
       <Link>Helpers\CertHelper.cs</Link>
     </Compile>
@@ -192,6 +188,12 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\NameValueCollectionHelper.cs">
+      <Link>Helpers\NameValueCollectionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
+      <Link>Model\bar-descriptor.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\Integration\ComboBoxItem.cs">
       <Link>Model\Integration\ComboBoxItem.cs</Link>
@@ -376,6 +378,12 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\BarEditorViewModel.cs">
+      <Link>ViewModels\BarEditorViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\IBarEditorViewModel.cs">
+      <Link>ViewModels\IBarEditorViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageOptionViewModel.cs">
       <Link>ViewModels\PackageOptionViewModel.cs</Link>
     </Compile>
@@ -401,6 +409,7 @@
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
@@ -487,6 +496,12 @@
     <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Logo.png">
       <Link>Resources\Logo.png</Link>
     </EmbeddedResource>
+    <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsc">
+      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+    </None>
+    <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xss">
+      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+    </None>
     <Resource Include="..\..\src_vs2010\Package\Resources\BlackBerryMessager.bmp">
       <Link>Resources\BlackBerryMessager.bmp</Link>
     </Resource>
@@ -568,16 +583,6 @@
     <Resource Include="..\..\src_vs2010\Package\Resources\TextMessages.bmp">
       <Link>Resources\TextMessages.bmp</Link>
     </Resource>
-    <Compile Include="..\..\src_vs2010\Package\ViewModel.cs">
-      <Link>ViewModel.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\VsDesignerControl.xaml.cs">
-      <Link>VsDesignerControl.xaml.cs</Link>
-      <DependentUpon>VsDesignerControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\XmlEditorDesignerViewRegistration.cs">
-      <Link>XmlEditorDesignerViewRegistration.cs</Link>
-    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Strings.resx">
@@ -626,8 +631,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="..\..\src_vs2010\Package\VsDesignerControl.xaml">
-      <Link>VsDesignerControl.xaml</Link>
+    <Page Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorControl.xaml">
+      <Link>Editors\BarDescriptionEditorControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
