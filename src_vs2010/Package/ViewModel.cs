@@ -452,67 +452,67 @@ namespace BlackBerry.Package
             switch (ID)
             {
                 case "bbm_connect":
-                    retVal = "/VSNDK.Package;component/Resources/BlackBerryMessager.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/BlackBerryMessager.bmp";
                     break;
                 case "access_pimdomain_calendars":
-                    retVal = "/VSNDK.Package;component/Resources/Calendar.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Calendar.bmp";
                     break;
                 case "use_camera":
-                    retVal = "/VSNDK.Package;component/Resources/Camera.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Camera.bmp";
                     break;
                 case "access_pimdomain_contacts":
-                    retVal = "/VSNDK.Package;component/Resources/Contacts.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Contacts.bmp";
                     break;
                 case "read_device_identifying_information":
-                    retVal = "/VSNDK.Package;component/Resources/DeviceIdentifyingInfo.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/DeviceIdentifyingInfo.bmp";
                     break;
                 case "access_pimdomain_messages":
-                    retVal = "/VSNDK.Package;component/Resources/EmailPINMessages.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/EmailPINMessages.bmp";
                     break;
                 case "access_internet":
-                    retVal = "/VSNDK.Package;component/Resources/Internet.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Internet.bmp";
                     break;
                 case "read_geolocation":
-                    retVal = "/VSNDK.Package;component/Resources/GPSLocation.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/GPSLocation.bmp";
                     break;
                 case "access_location_services":
-                    retVal = "/VSNDK.Package;component/Resources/Location.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Location.bmp";
                     break;
                 case "record_audio":
-                    retVal = "/VSNDK.Package;component/Resources/Mircrophone.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Mircrophone.bmp";
                     break;
                 case "access_pimdomain_notebooks":
-                    retVal = "/VSNDK.Package;component/Resources/Notebooks.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Notebooks.bmp";
                     break;
                 case "post_notification":
-                    retVal = "/VSNDK.Package;component/Resources/PostNotifications.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/PostNotifications.bmp";
                     break;
                 case "run_when_backgrounded":
-                    retVal = "/VSNDK.Package;component/Resources/RunBackgrounded.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/RunBackgrounded.bmp";
                     break;
                 case "access_shared":
-                    retVal = "/VSNDK.Package;component/Resources/SharedFiles.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/SharedFiles.bmp";
                     break;
                 case "access_sms_mms":
-                    retVal = "/VSNDK.Package;component/Resources/TextMessages.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/TextMessages.bmp";
                     break;
                 case "read_personally_identifiable_information":
-                    retVal = "/VSNDK.Package;component/Resources/MyContactInfo.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/MyContactInfo.bmp";
                     break;
                 case "access_phone":
-                    retVal = "/VSNDK.Package;component/Resources/Phone.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Phone.bmp";
                     break;
                 case "control_phone":
-                    retVal = "/VSNDK.Package;component/Resources/PhoneControl.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/PhoneControl.bmp";
                     break;
                 case "_sys_use_consumer_push":
-                    retVal = "/VSNDK.Package;component/Resources/Push.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Push.bmp";
                     break;
                 case "use_camera_desktop":
-                    retVal = "/VSNDK.Package;component/Resources/CaptureScreen.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/CaptureScreen.bmp";
                     break;
                 case "use_gamepad":
-                    retVal = "/VSNDK.Package;component/Resources/Gamepad.bmp";
+                    retVal = "/BlackBerry.Package;component/Resources/Gamepad.bmp";
                     break;
             }
 
