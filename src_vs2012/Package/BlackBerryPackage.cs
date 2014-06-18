@@ -126,7 +126,9 @@ namespace BlackBerry.Package
         {
             Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
             base.Initialize();
+
             MessageBoxHelper.Initialise(this);
+            _dte = (DTE2)GetService(typeof(SDTE));
 
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
             _traceWindow = new BlackBerryPaneTraceListener("BlackBerry", true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceOutputWindowPane);
@@ -160,20 +162,7 @@ namespace BlackBerry.Package
             RegisterEditorFactory(new BarDescriptorEditorFactory());
             TraceLog.WriteLine(" * registered editors");
 
-            
-            _dte = (DTE2)GetService(typeof(SDTE));
-
-            // PH: FIXME: introduce this functionality using new APIs
-            /*
-            if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
-            {
-                UpdateManager.UpdateManagerDialog ud = new UpdateManager.UpdateManagerDialog("Please choose your default API Level to be used by the Visual Studio Plug-in.", "default", false, false);
-                ud.ShowDialog();
-            }
-            */
-
             EnsureActiveNDK();
-
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
 
             CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
@@ -258,6 +247,15 @@ namespace BlackBerry.Package
             }
 
             TraceLog.WriteLine("-------------------- DONE");
+
+            // make sure there is an NDK selected and developer knows about it:
+            if (IsBlackBerrySolution(_dte) && GetInstalledNdkCount() == 0)
+            {
+                var form = new MissingNdkInstalledForm();
+                form.ShowDialog();
+
+                EnsureActiveNDK();
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -355,6 +353,14 @@ namespace BlackBerry.Package
             }
 
             return false;
+        }
+
+        /// <summary>
+        /// Gets the number of installed NDKs.
+        /// </summary>
+        private int GetInstalledNdkCount()
+        {
+            return PackageViewModel.Instance.InstalledNDKs.Length;
         }
 
         /// <summary>
@@ -849,11 +855,10 @@ namespace BlackBerry.Package
                 _owP = ow.OutputWindowPanes.Item("Build");
                 _owP.Activate();
 
-
-                // PH: FIXME: implement using new APIs
-                /*
                 if (_isDebugConfiguration)
                 {
+                    /*
+                     PH: FIXME: update API Level vs current project verification...
                     UpdateManagerData upData;
                     if (_targetDir.Count > 0)
                         upData = new UpdateManagerData(_targetDir[0][1]);
@@ -862,20 +867,20 @@ namespace BlackBerry.Package
 
                     if (!upData.validateDeviceVersion(_isSimulator))
                     {
-                        CancelDefault = true;
+                        cancelDefault = true;
                     }
                     else
                     {
                         BuildBar();
-                        CancelDefault = true;
+                        cancelDefault = true;
                     }
+                     */
                 }
                 else
                 {
                     BuildBar();
-                    CancelDefault = true;
+                    cancelDefault = true;
                 }
-                 */
             }
         }
 
