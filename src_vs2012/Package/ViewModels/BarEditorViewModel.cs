@@ -213,7 +213,7 @@ namespace BlackBerry.Package.ViewModels
     /// The View binds the various designer controls to the methods derived from IViewModel that get and set values in the XmlModel.
     /// The ViewModel and an underlying XmlModel manage how an IVsTextBuffer is shared between the designer and the XML editor (if opened).
     /// </summary>
-    public class BarEditorViewModel : IBarEditorViewModel, IDataErrorInfo, INotifyPropertyChanged
+    public class BarEditorViewModel : IDataErrorInfo, INotifyPropertyChanged
     {
         private static string _tmpAuthor = "";
         private static string _tmpAuthorID = "";
@@ -860,7 +860,7 @@ namespace BlackBerry.Package.ViewModels
         /// <summary>
         /// Read the author information from the debug token and update the appropriate boxes.
         /// </summary>
-        public void setAuthorInfo()
+        public void SetAuthorInfoFrom(string debugTokenFileName)
         {
             // PH: FIXME: add loading author info from debug-token...
             /*

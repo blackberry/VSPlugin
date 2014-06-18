@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;

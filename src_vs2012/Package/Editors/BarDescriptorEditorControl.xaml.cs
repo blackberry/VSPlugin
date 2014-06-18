@@ -16,11 +16,17 @@ using System;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Input;
+using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model;
 using BlackBerry.Package.ViewModels;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
+using CheckBox = System.Windows.Controls.CheckBox;
+using ComboBox = System.Windows.Controls.ComboBox;
+using UserControl = System.Windows.Controls.UserControl;
 
 namespace BlackBerry.Package.Editors
 {
@@ -42,7 +48,7 @@ namespace BlackBerry.Package.Editors
         /// Overloaded Constructor
         /// </summary>
         /// <param name="viewModel"></param>
-        public BarDescriptorEditorControl(ServiceProvider serviceProvider, IBarEditorViewModel viewModel)
+        public BarDescriptorEditorControl(ServiceProvider serviceProvider, BarEditorViewModel viewModel)
         {
             _serviceProvider = serviceProvider; 
             DataContext = viewModel;
@@ -52,9 +58,9 @@ namespace BlackBerry.Package.Editors
             viewModel.ViewModelChanged += ViewModelChanged;
         }
 
-        public IBarEditorViewModel ViewModel
+        public BarEditorViewModel ViewModel
         {
-            get { return DataContext as IBarEditorViewModel; }
+            get { return DataContext as BarEditorViewModel; }
         }
 
         internal void DoIdle()
@@ -88,12 +94,17 @@ namespace BlackBerry.Package.Editors
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        private Boolean IsTextAllowed(String text) 
-        { 
-            return Array.TrueForAll(text.ToCharArray(), 
-                delegate(Char c) { return Char.IsDigit(c) || Char.IsControl(c); }); 
-        }     
-        
+        private Boolean IsTextAllowed(String text)
+        {
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (!char.IsDigit(text[i]) && !char.IsControl(text[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
         /// <summary>
         /// Use the PreviewTextInputHandler to respond to key presses
         /// </summary>
@@ -131,7 +142,11 @@ namespace BlackBerry.Package.Editors
 
             if (viewModel != null)
             {
-                viewModel.setAuthorInfo();
+                var form = DialogHelper.OpenBarFile("Select debug token", RunnerDefaults.DataDirectory);
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    viewModel.SetAuthorInfoFrom(form.FileName);
+                }
             }
         }
 

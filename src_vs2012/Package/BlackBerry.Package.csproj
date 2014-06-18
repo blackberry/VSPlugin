@@ -321,7 +321,6 @@
     <Compile Include="StandardCommands.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\BarEditorViewModel.cs" />
-    <Compile Include="ViewModels\IBarEditorViewModel.cs" />
     <Compile Include="ViewModels\PackageOptionViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
