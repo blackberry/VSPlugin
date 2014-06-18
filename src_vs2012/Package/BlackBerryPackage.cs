@@ -32,7 +32,6 @@ using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
-using System.Xml;
 using System.IO;
 using System.Collections.Generic;
 using EnvDTE;
@@ -58,7 +57,8 @@ namespace BlackBerry.Package
     /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // Register the editor factory
-    [XmlEditorDesignerViewRegistration("XML", "xml", LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(BarDescriptorEditorFactory), Namespace = "http://www.qnx.com/schemas/application/1.0", MatchExtensionAndNamespace = true)]
+    [XmlEditorDesignerViewRegistration("XML", "xml", LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(BarDescriptorEditorFactory),
+        Namespace = "http://www.qnx.com/schemas/application/1.0", MatchExtensionAndNamespace = true)]
     // And which type of files we want to handle
     [ProvideEditorExtension(typeof(BarDescriptorEditorFactory), BarDescriptorEditorFactory.DefaultExtension, 0x40, NameResourceID = 106)]
     // We register that our editor supports LOGVIEWID_Designer logical view
@@ -120,7 +120,7 @@ namespace BlackBerry.Package
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
-        /// where you can put all the initilaization code that rely on services provided by VisualStudio.
+        /// where you can put all the initialization code that rely on services provided by VisualStudio.
         /// </summary>
         protected override void Initialize()
         {
@@ -176,9 +176,9 @@ namespace BlackBerry.Package
 
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
 
-            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
-            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
-            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
+            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
+            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
             TraceLog.WriteLine(" * registered build-platforms manager");
 
             _buildEvents = _dte.Events.BuildEvents;
@@ -250,9 +250,9 @@ namespace BlackBerry.Package
                 mcs.AddCommand(configureMenu);
 
                 // Create the command for the menu item.
-                CommandID projCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidfooLocalBox);
-                OleMenuCommand projItem = new OleMenuCommand(MenuItemCallback, projCommandID);
-                mcs.AddCommand(projItem);
+                CommandID projectCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidfooLocalBox);
+                OleMenuCommand projectItem = new OleMenuCommand(MenuItemCallback, projectCommandID);
+                mcs.AddCommand(projectItem);
 
                 TraceLog.WriteLine(" * initialized menus");
             }
@@ -346,27 +346,15 @@ namespace BlackBerry.Package
         /// <summary>
         /// Check to see if current solution is configured with a BlackBerry Configuration.
         /// </summary>
-        /// <param name="dte"></param>
-        /// <returns></returns>
         private bool IsBlackBerrySolution(DTE2 dte)
         {
-            bool res = false;
-
             if (dte.Solution.FullName != "")
             {
                 string fileText = File.ReadAllText(dte.Solution.FullName);
-
-                if (fileText.Contains("Debug|BlackBerry"))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                return fileText.Contains("Debug|BlackBerry");
             }
 
-            return res;
+            return false;
         }
 
         /// <summary>
@@ -388,20 +376,19 @@ namespace BlackBerry.Package
             {
                 if (_buildThese.Count != 0)
                 {
-                    Microsoft.Win32.RegistryKey key;
-                    key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("VSNDK");
+                    RegistryKey key = Registry.CurrentUser.CreateSubKey("VSNDK");
                     key.SetValue("Run", "True");
                     key.Close();
 
-                    _buildEvents.OnBuildDone += new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+                    _buildEvents.OnBuildDone += OnBuildDone;
 
                     try
                     {
-                        Solution2 soln = (Solution2)_dte.Solution;
+                        Solution2 solution = (Solution2)_dte.Solution;
                         _hitPlay = true;
                         _amountOfProjects = _buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
                         foreach (string projectName in _buildThese)
-                            soln.SolutionBuild.BuildProject("Debug", projectName, false);
+                            solution.SolutionBuild.BuildProject("Debug", projectName, false);
                     }
                     catch (Exception ex)
                     {
@@ -427,10 +414,8 @@ namespace BlackBerry.Package
         /// </summary>
         private void Built()
         {
-            string outputText = "";
-
             _owP.TextDocument.Selection.SelectAll();
-            outputText = _owP.TextDocument.Selection.Text;
+            string outputText = _owP.TextDocument.Selection.Text;
 
             if ((outputText == "") || (Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
             {
@@ -466,12 +451,11 @@ namespace BlackBerry.Package
         }
 
         /// <summary> 
-        /// Get the process ID and launch an executable using the VSNDK debug engine. 
+        /// Get the process ID and launch an executable using the BlackBerry debug engine. 
         /// </summary>
         private void Deployed()
         {
-            Microsoft.Win32.RegistryKey key;
-            key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey("VSNDK");
+            RegistryKey key = Registry.CurrentUser.CreateSubKey("VSNDK");
             key.SetValue("Run", "False");
             key.Close();
 
@@ -481,7 +465,7 @@ namespace BlackBerry.Package
             string targetIP = "";
             string password = "";
             string executablePath = "";
-            if (GetProcessInfo((DTE2)_dte, ref pidString, ref toolsPath, ref publicKeyPath, ref targetIP, ref password, ref executablePath))
+            if (GetProcessInfo(_dte, ref pidString, ref toolsPath, ref publicKeyPath, ref targetIP, ref password, ref executablePath))
             {
                 bool CancelDefault = LaunchDebugTarget(pidString, toolsPath, publicKeyPath, targetIP, password, executablePath);
             }
@@ -492,21 +476,18 @@ namespace BlackBerry.Package
         }
 
         /// <summary> 
-        /// Launch an executable using the VSNDK debug engine. 
+        /// Launch an executable using the BlackBerry debug engine. 
         /// </summary>
         /// <param name="pidString"> Process ID in string format. </param>
         /// <returns> TRUE if successful, False if not. </returns>
         private bool LaunchDebugTarget(string pidString, string toolsPath, string publicKeyPath, string targetIP, string password, string executablePath)
         {
-            Microsoft.VisualStudio.Shell.ServiceProvider sp =
-                 new Microsoft.VisualStudio.Shell.ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
-
+            ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
             IVsDebugger dbg = (IVsDebugger)sp.GetService(typeof(SVsShellDebugger));
-
             VsDebugTargetInfo info = new VsDebugTargetInfo();
 
-            info.cbSize = (uint)System.Runtime.InteropServices.Marshal.SizeOf(info);
-            info.dlo = Microsoft.VisualStudio.Shell.Interop.DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
+            info.cbSize = (uint)Marshal.SizeOf(info);
+            info.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
 
             // Store all debugger arguments in a string
             var nvc = new NameValueCollection();
@@ -522,7 +503,7 @@ namespace BlackBerry.Package
 
             info.bstrRemoteMachine = null; // debug locally
             info.fSendStdoutToOutputWindow = 0; // Let stdout stay with the application.
-            info.clsidCustom = new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}"); // Set the launching engine the VSNDK engine guid
+            info.clsidCustom = new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}"); // Set the launching engine as the BlackBerry debug-engine
             info.grfLaunch = 0;
 
             IntPtr pInfo = Marshal.AllocCoTaskMem((int)info.cbSize);
@@ -608,7 +589,7 @@ namespace BlackBerry.Package
                 MessageBox.Show(ex.Message, "Microsoft Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            pidString = getPIDfromGDB(_processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
+            pidString = GetPIDfromGDB(_processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
 
             if (pidString == "")
             {
@@ -648,16 +629,15 @@ namespace BlackBerry.Package
             if (pidString != "")
             {
 
-                // Store proccess name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
+                // Store process name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
                 // source code for a running process.
                 // First read the file.
-                _processName += "_" + _isSimulator.ToString();
+                _processName += "_" + _isSimulator;
 
                 string processesPaths;
-                StreamReader readProcessesPathsFile;
                 try
                 {
-                    readProcessesPathsFile = new StreamReader(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
+                    StreamReader readProcessesPathsFile = new StreamReader(Path.Combine(RunnerDefaults.DataDirectory, "ProcessesPath.txt"));
                     processesPaths = readProcessesPathsFile.ReadToEnd();
                     readProcessesPathsFile.Close();
                 }
@@ -667,12 +647,12 @@ namespace BlackBerry.Package
                 }
 
                 // Updating the contents.
-                int begin = processesPaths.IndexOf(_processName + ":>");
+                int begin = processesPaths.IndexOf(_processName + ":>", StringComparison.Ordinal);
 
                 if (begin != -1)
                 {
                     begin += _processName.Length + 2;
-                    int end = processesPaths.IndexOf("\r\n", begin);
+                    int end = processesPaths.IndexOf("\r\n", begin, System.StringComparison.Ordinal);
                     processesPaths = processesPaths.Substring(0, begin) + currentPath + processesPaths.Substring(end);
                 }
                 else
@@ -681,10 +661,9 @@ namespace BlackBerry.Package
                 }
 
                 // Writing contents to file.
-                StreamWriter writeProcessesPathsFile;
                 try
                 {
-                    writeProcessesPathsFile = new StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt", false);
+                    StreamWriter writeProcessesPathsFile = new StreamWriter(Path.Combine(RunnerDefaults.DataDirectory, "ProcessesPath.txt"), false);
                     writeProcessesPathsFile.Write(processesPaths);
                     writeProcessesPathsFile.Close();
                 }
@@ -697,12 +676,12 @@ namespace BlackBerry.Package
             return false;
         }
 
-        private string getPIDfromGDB(string processName, string IP, string password, bool isSimulator, string toolsPath, string publicKeyPath)
+        private string GetPIDfromGDB(string processName, string ip, string password, bool isSimulator, string toolsPath, string publicKeyPath)
         {
-            string PID = "";
-            string response = GDBParser.GetPIDsThroughGDB(IP, password, isSimulator, toolsPath, publicKeyPath, 7);
+            string pid = "";
+            string response = GDBParser.GetPIDsThroughGDB(ip, password, isSimulator, toolsPath, publicKeyPath, 7);
 
-            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
+            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0, StringComparison.Ordinal) != -1)) //found an error
             {
                 if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
                 {
@@ -712,7 +691,7 @@ namespace BlackBerry.Package
                     if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
                     {
                         string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
-                        string caption = "";
+                        string caption;
                         if (txt.IndexOf("The requested address is not valid in its context.") != -1)
                         {
                             txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
@@ -725,18 +704,17 @@ namespace BlackBerry.Package
                         }
                         MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     }
-                response = "";
             }
             else if (response.Contains("^done"))
             {
-                int i = response.IndexOf(processName + " - ");
+                int i = response.IndexOf(processName + " - ", StringComparison.Ordinal);
                 if (i != -1)
                 {
                     i += processName.Length + 3;
-                    PID = response.Substring(i, response.IndexOf('/', i) - i);
+                    pid = response.Substring(i, response.IndexOf('/', i) - i);
                 }
             }
-            return PID;
+            return pid;
         }
 
 
@@ -744,22 +722,19 @@ namespace BlackBerry.Package
         /// Verify if the app configuration is Debug.
         /// </summary>
         /// <returns> True if Debug configuration; False otherwise. </returns>
-        private bool checkDebugConfiguration()
+        private bool CheckDebugConfiguration()
         {
-            Solution2 soln = (Solution2)_dte.Solution;
-            foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
+            Solution2 solution = (Solution2)_dte.Solution;
+            foreach (String startupProject in (Array)solution.SolutionBuild.StartupProjects)
             {
-                foreach (Project p1 in soln.Projects)
+                foreach (Project p1 in solution.Projects)
                 {
                     if (p1.UniqueName == startupProject)
                     {
                         ConfigurationManager config = p1.ConfigurationManager;
                         Configuration active = config.ActiveConfiguration;
 
-                        if (active.ConfigurationName.ToUpper() == "DEBUG")
-                            return (true);
-                        else
-                            return (false);
+                        return active.ConfigurationName.ToUpper() == "DEBUG";
                     }
                 }
             }
@@ -774,11 +749,11 @@ namespace BlackBerry.Package
         /// <summary> 
         /// New Start Debug Command Events After Execution Event Handler. 
         /// </summary>
-        /// <param name="Guid">Command GUID. </param>
-        /// <param name="ID">Command ID. </param>
-        /// <param name="CustomIn">Custom IN Object. </param>
-        /// <param name="CustomOut">Custom OUT Object. </param>
-        private void startDebugCommandEvents_AfterExecute(string Guid, int ID, object CustomIn, object CustomOut)
+        /// <param name="guid">Command GUID. </param>
+        /// <param name="id">Command ID. </param>
+        /// <param name="customIn">Custom IN Object. </param>
+        /// <param name="customOut">Custom OUT Object. </param>
+        private void StartDebugCommandEvents_AfterExecute(string guid, int id, object customIn, object customOut)
         {
             Debug.WriteLine("After Start Debug");
         }
@@ -786,18 +761,17 @@ namespace BlackBerry.Package
         /// <summary> 
         /// New Start Debug Command Events Before Execution Event Handler. Call the method responsible for building the app. 
         /// </summary>
-        /// <param name="Guid"> Command GUID. </param>
-        /// <param name="ID"> Command ID. </param>
-        /// <param name="CustomIn"> Custom IN Object. </param>
-        /// <param name="CustomOut"> Custom OUT Object. </param>
-        /// <param name="CancelDefault"> Cancel the default execution of the command. </param>
-        private void startDebugCommandEvents_BeforeExecute(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
+        /// <param name="guid"> Command GUID. </param>
+        /// <param name="id"> Command ID. </param>
+        /// <param name="customIn"> Custom IN Object. </param>
+        /// <param name="customOut"> Custom OUT Object. </param>
+        /// <param name="cancelDefault"> Cancel the default execution of the command. </param>
+        private void StartDebugCommandEvents_BeforeExecute(string guid, int id, object customIn, object customOut, ref bool cancelDefault)
         {
-
             bool bbPlatform = false;
             if (_dte.Solution.SolutionBuild.ActiveConfiguration != null)
             {
-                _isDebugConfiguration = checkDebugConfiguration();
+                _isDebugConfiguration = CheckDebugConfiguration();
 
                 SolutionContexts scCollection = _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts;
                 foreach (SolutionContext sc in scCollection)
@@ -805,10 +779,7 @@ namespace BlackBerry.Package
                     if (sc.PlatformName == "BlackBerry" || sc.PlatformName == "BlackBerrySimulator")
                     {
                         bbPlatform = true;
-                        if (sc.PlatformName == "BlackBerrySimulator")
-                            _isSimulator = true;
-                        else
-                            _isSimulator = false;
+                        _isSimulator = sc.PlatformName == "BlackBerrySimulator";
                     }
                 }
             }
@@ -818,19 +789,19 @@ namespace BlackBerry.Package
             if (ControlDebugEngine.isDebugEngineRunning || !bbPlatform)
             {
                 // Disable the override of F5 (this allows the debugged process to continue execution)
-                CancelDefault = false;
+                cancelDefault = false;
             }
             else
             {
                 try
                 {
-                    Solution2 soln = (Solution2)_dte.Solution;
+                    Solution2 solution = (Solution2)_dte.Solution;
                     _buildThese = new List<String>();
                     _targetDir = new List<string[]>();
 
-                    foreach (String startupProject in (Array)soln.SolutionBuild.StartupProjects)
+                    foreach (String startupProject in (Array)solution.SolutionBuild.StartupProjects)
                     {
-                        foreach (Project p1 in soln.Projects)
+                        foreach (Project p1 in solution.Projects)
                         {
                             if (p1.UniqueName == startupProject)
                             {
@@ -872,7 +843,7 @@ namespace BlackBerry.Package
                 // Create a reference to the Output window.
                 // Create a tool window reference for the Output window
                 // and window pane.
-                OutputWindow ow = ((DTE2)_dte).ToolWindows.OutputWindow;
+                OutputWindow ow = _dte.ToolWindows.OutputWindow;
 
                 // Select the Build pane in the Output window.
                 _owP = ow.OutputWindowPanes.Item("Build");
@@ -912,22 +883,22 @@ namespace BlackBerry.Package
         /// <summary> 
         /// This event is fired only when the build/rebuild/clean process ends. 
         /// </summary>
-        /// <param name="Scope"> Represents the scope of the build. </param>
-        /// <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
-        public void OnBuildDone(EnvDTE.vsBuildScope Scope, EnvDTE.vsBuildAction Action)
+        /// <param name="scope"> Represents the scope of the build. </param>
+        /// <param name="action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
+        private void OnBuildDone(vsBuildScope scope, vsBuildAction action)
         {
-            if (Action == vsBuildAction.vsBuildActionBuild)
+            if (action == vsBuildAction.vsBuildActionBuild)
             {
                 _amountOfProjects -= 1;
                 if (_amountOfProjects == 0)
                 {
-                    _buildEvents.OnBuildDone -= new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+                    _buildEvents.OnBuildDone -= OnBuildDone;
                     Built();
                 }
             }
-            else if (Action == vsBuildAction.vsBuildActionDeploy)
+            else if (action == vsBuildAction.vsBuildActionDeploy)
             {
-                _buildEvents.OnBuildDone -= new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+                _buildEvents.OnBuildDone -= OnBuildDone;
                 _isDeploying = false;
                 Deployed();
             }
@@ -938,7 +909,7 @@ namespace BlackBerry.Package
         /// </summary>
         /// <param name="Scope"> Represents the scope of the build. </param>
         /// <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
-        public void OnBuildBegin(vsBuildScope Scope, vsBuildAction Action)
+        private void OnBuildBegin(vsBuildScope scope, vsBuildAction action)
         {
             // PH: FIXME: implement using new APIs
             /*
@@ -949,7 +920,7 @@ namespace BlackBerry.Package
                 ud.ShowDialog();
             }
 
-            if ((Action == vsBuildAction.vsBuildActionBuild) || (Action == vsBuildAction.vsBuildActionRebuildAll))
+            if ((action == vsBuildAction.vsBuildActionBuild) || (action == vsBuildAction.vsBuildActionRebuildAll))
             {
                 if ((_hitPlay == false) && (_isDeploying == false)) // means that the "play" building and deploying process was cancelled before, so we have to disable the 
                 // OnBuildDone event to avoid deploying in case user only wants to build.
@@ -963,10 +934,6 @@ namespace BlackBerry.Package
 
         private void MenuItemCallback(object sender, EventArgs e)
         {
-            string filename = "";
-            string folderName = "";
-            string name = "";
-
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
             dlg.DefaultExt = ".cproject"; // Default file extension
             dlg.Filter = "Native Core Application Project Files (*.cproject, *.project)|*.cproject;*.project;";
@@ -978,17 +945,17 @@ namespace BlackBerry.Package
             bool? result = dlg.ShowDialog();
             if (result == true)
             {
-                filename = dlg.FileName;
+                string filename = dlg.FileName;
                 FileInfo fi = new FileInfo(filename);
-                folderName = fi.DirectoryName;
+                string folderName = fi.DirectoryName;
 
-                Array projs = (Array)_dte.ActiveSolutionProjects;
-                Project project = (Project)projs.GetValue(0);
-                name = project.FullName;
+                Array projects = (Array)_dte.ActiveSolutionProjects;
+                Project project = (Project)projects.GetValue(0);
+                string name = project.FullName;
 
                 // Create the dialog instance without Help support.
-                var ImportSummary = new Import.Import(project, folderName, name);
-                ImportSummary.ShowModel2();
+                var importSummary = new Import.Import(project, folderName, name);
+                importSummary.ShowModel2();
             }
         }
         
