@@ -175,11 +175,11 @@
     <Compile Include="BlackBerryPackage.cs" />
     <Compile Include="Components\BuildPlatformsManager.cs" />
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
-    <Compile Include="Editors\BarDescriptionEditorControl.xaml.cs">
-      <DependentUpon>BarDescriptionEditorControl.xaml</DependentUpon>
+    <Compile Include="Editors\BarDescriptorEditorControl.xaml.cs">
+      <DependentUpon>BarDescriptorEditorControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Editors\BarDescriptionEditorFactory.cs" />
-    <Compile Include="Editors\BarDescriptionEditorPane.cs" />
+    <Compile Include="Editors\BarDescriptorEditorFactory.cs" />
+    <Compile Include="Editors\BarDescriptorEditorPane.cs" />
     <Compile Include="Editors\EditorFactoryNotifyForProject.cs" />
     <Compile Include="Editors\XmlEditorDesignerViewRegistration.cs" />
     <Compile Include="GuidList.cs" />
@@ -516,7 +516,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Editors\BarDescriptionEditorControl.xaml">
+    <Page Include="Editors\BarDescriptorEditorControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

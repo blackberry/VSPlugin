@@ -153,15 +153,15 @@
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorControl.xaml.cs">
-      <Link>Editors\BarDescriptionEditorControl.xaml.cs</Link>
-      <DependentUpon>BarDescriptionEditorControl.xaml</DependentUpon>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml.cs">
+      <Link>Editors\BarDescriptorEditorControl.xaml.cs</Link>
+      <DependentUpon>BarDescriptorEditorControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorFactory.cs">
-      <Link>Editors\BarDescriptionEditorFactory.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorFactory.cs">
+      <Link>Editors\BarDescriptorEditorFactory.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorPane.cs">
-      <Link>Editors\BarDescriptionEditorPane.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorPane.cs">
+      <Link>Editors\BarDescriptorEditorPane.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Editors\EditorFactoryNotifyForProject.cs">
       <Link>Editors\EditorFactoryNotifyForProject.cs</Link>
@@ -560,8 +560,8 @@
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\..\src_vs2012\Package\Editors\BarDescriptionEditorControl.xaml">
-      <Link>Editors\BarDescriptionEditorControl.xaml</Link>
+    <Page Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml">
+      <Link>Editors\BarDescriptorEditorControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
