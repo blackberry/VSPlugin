@@ -916,25 +916,22 @@ namespace BlackBerry.Package
         /// <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
         private void OnBuildBegin(vsBuildScope scope, vsBuildAction action)
         {
-            // PH: FIXME: implement using new APIs
-            /*
-            InstalledAPIListSingleton apiList = InstalledAPIListSingleton.Instance;
-            if ((IsBlackBerrySolution(_dte)) && (apiList._installedAPIList.Count == 0))
+            if (IsBlackBerrySolution(_dte) && GetInstalledNdkCount() == 0)
             {
-                UpdateManager.UpdateManagerDialog ud = new UpdateManager.UpdateManagerDialog("Please choose your default API Level to be used by the Visual Studio Plug-in.", "default", false, false);
-                ud.ShowDialog();
+                var form = new MissingNdkInstalledForm();
+                form.ShowDialog();
             }
 
-            if ((action == vsBuildAction.vsBuildActionBuild) || (action == vsBuildAction.vsBuildActionRebuildAll))
+            if (action == vsBuildAction.vsBuildActionBuild || action == vsBuildAction.vsBuildActionRebuildAll)
             {
-                if ((_hitPlay == false) && (_isDeploying == false)) // means that the "play" building and deploying process was cancelled before, so we have to disable the 
-                // OnBuildDone event to avoid deploying in case user only wants to build.
+                if (!_hitPlay && !_isDeploying)
                 {
-                    _buildEvents.OnBuildDone -= new _dispBuildEvents_OnBuildDoneEventHandler(this.OnBuildDone);
+                    // means that the "play" building and deploying process was cancelled before, so we have to disable the 
+                    // OnBuildDone event to avoid deploying in case user only wants to build.
+                    _buildEvents.OnBuildDone -= OnBuildDone;
                 }
                 _hitPlay = false;
             }
-             */
         }
 
         private void MenuItemCallback(object sender, EventArgs e)
