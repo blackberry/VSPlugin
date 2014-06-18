@@ -145,9 +145,14 @@ namespace BlackBerry.Package.Editors
                 var form = DialogHelper.OpenBarFile("Select debug token", RunnerDefaults.DataDirectory);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    viewModel.SetAuthorInfoFrom(form.FileName);
+                    viewModel.SetAuthorInfoFrom(form.FileName, EventDispatcher.From(this), OnLoadingDebugInfoFailed);
                 }
             }
+        }
+
+        private void OnLoadingDebugInfoFailed(object sender, EventArgs eventArgs)
+        {
+            MessageBoxHelper.Show("Unable to load info about the Author from given debug token. Please try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnAddIC_Click(object sender, RoutedEventArgs e)

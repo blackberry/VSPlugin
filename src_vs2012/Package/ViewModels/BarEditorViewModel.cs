@@ -198,7 +198,7 @@ namespace BlackBerry.Package.ViewModels
             try
             {
                 System.Drawing.Image objImage = System.Drawing.Image.FromFile(_imagePath);
-                _imageSize = objImage.Width.ToString() + "X" + objImage.Height.ToString();
+                _imageSize = objImage.Width + "x" + objImage.Height;
             }
             catch
             {
@@ -213,10 +213,8 @@ namespace BlackBerry.Package.ViewModels
     /// The View binds the various designer controls to the methods derived from IViewModel that get and set values in the XmlModel.
     /// The ViewModel and an underlying XmlModel manage how an IVsTextBuffer is shared between the designer and the XML editor (if opened).
     /// </summary>
-    public class BarEditorViewModel : IDataErrorInfo, INotifyPropertyChanged
+    public sealed class BarEditorViewModel : IDataErrorInfo, INotifyPropertyChanged, IDisposable
     {
-        private static string _tmpAuthor = "";
-        private static string _tmpAuthorID = "";
         private readonly CollectionView _orientationList;
         private OrientationItemClass _orientationItem;
         private CollectionView _iconImageList;
@@ -225,7 +223,6 @@ namespace BlackBerry.Package.ViewModels
         private readonly CollectionView _configurationList;
         private ConfigurationItemClass _config;
         private PermissionItemClass _permission;
-        private DTE _dte;
         private readonly string _activeProjectDirectory;
 
         private long _dirtyTime;
@@ -239,6 +236,8 @@ namespace BlackBerry.Package.ViewModels
 
         private bool? _canEditFile;
         private bool _gettingCheckoutStatus;
+
+        private DebugTokenInfoRunner _debugTokenInfoRunner;
 
         private readonly EventHandler<XmlEditingScopeEventArgs> _editingScopeCompletedHandler;
         private readonly EventHandler<XmlEditingScopeEventArgs> _undoRedoCompletedHandler;
@@ -279,8 +278,8 @@ namespace BlackBerry.Package.ViewModels
             _serviceProvider = provider;
             _buffer = buffer;
 
-            _dte = (DTE)_serviceProvider.GetService(typeof(DTE));
-            Array activeProjects = (Array)_dte.ActiveSolutionProjects;
+            DTE dte = (DTE)_serviceProvider.GetService(typeof(DTE));
+            Array activeProjects = (Array)dte.ActiveSolutionProjects;
             Project activeProject = (Project)activeProjects.GetValue(0);
             FileInfo activeProjectFileInfo = new FileInfo(activeProject.FullName);
             _activeProjectDirectory = activeProjectFileInfo.DirectoryName;
@@ -377,6 +376,11 @@ namespace BlackBerry.Package.ViewModels
             }
 
             _orientationList = new CollectionView(orientationList);
+        }
+
+        ~BarEditorViewModel()
+        {
+            Dispose(false);
         }
 
         private string GetImagePath(string imgName)
@@ -860,79 +864,45 @@ namespace BlackBerry.Package.ViewModels
         /// <summary>
         /// Read the author information from the debug token and update the appropriate boxes.
         /// </summary>
-        public void SetAuthorInfoFrom(string debugTokenFileName)
+        public void SetAuthorInfoFrom(string debugTokenFileName, IEventDispatcher dispatcher,  EventHandler failHandler)
         {
-            // PH: FIXME: add loading author info from debug-token...
-            /*
-            if (!File.Exists(_localRIMFolder + "DebugToken.bar"))
+            if (string.IsNullOrEmpty(debugTokenFileName))
+                throw new ArgumentNullException("debugTokenFileName");
+
+            // is running...
+            if (_debugTokenInfoRunner != null)
+                return;
+
+            if (!File.Exists(debugTokenFileName))
             {
-                // Create the dialog instance without Help support.
-                var DebugTokenDialog = new DebugToken.DebugTokenDialog();
-                // Show the dialog.
-                if (!DebugTokenDialog.IsClosing)
-                    DebugTokenDialog.ShowDialog();
+                if (failHandler != null)
+                    failHandler(this, EventArgs.Empty);
+                return;
             }
-             */
 
-            System.Diagnostics.Process p = new System.Diagnostics.Process();
-            System.Diagnostics.ProcessStartInfo startInfo = p.StartInfo;
-            startInfo.UseShellExecute = false;
-            startInfo.CreateNoWindow = true;
-            startInfo.RedirectStandardError = true;
-            startInfo.RedirectStandardOutput = true;
-            p.OutputDataReceived += p_OutputDataReceived;
-
-
-            // Get Device PIN
-            startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-airpackager.bat -listManifest ""{0}""", RunnerDefaults.DataDirectory + "DebugToken.bar");
-
-            try
-            {
-                p.Start();
-                p.BeginErrorReadLine();
-                p.BeginOutputReadLine();
-                p.WaitForExit();
-                p.Close();
-            }
-            catch (Exception e)
-            {
-                System.Diagnostics.Debug.WriteLine(startInfo.Arguments);
-                System.Diagnostics.Debug.WriteLine(e.Message);
-            }
+            _debugTokenInfoRunner = new DebugTokenInfoRunner(RunnerDefaults.ToolsDirectory, debugTokenFileName);
+            _debugTokenInfoRunner.Tag = failHandler;
+            _debugTokenInfoRunner.Dispatcher = dispatcher;
+            _debugTokenInfoRunner.Finished += DebugTokenInfoLoaded;
+            _debugTokenInfoRunner.ExecuteAsync();
         }
 
-        /// <summary>
-        /// Get the author ID
-        /// </summary>
-        /// <returns>Returns the author ID</returns>
-        public string GetAuthorID()
+        private void DebugTokenInfoLoaded(object sender, ToolRunnerEventArgs e)
         {
-            return _tmpAuthorID;
-        }
+            var debugToken = _debugTokenInfoRunner.DebugToken;
+            _debugTokenInfoRunner = null;
 
-        /// <summary>
-        /// Get the author ID
-        /// </summary>
-        /// <returns>Returns the author ID</returns>
-        public string GetAuthor()
-        {
-           return _tmpAuthor;
-        }
-
-        /// <summary>
-        /// On Data Received event handler
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void p_OutputDataReceived(object sender, System.Diagnostics.DataReceivedEventArgs e)
-        {
-            if (e.Data != null)
+            if (e.IsSuccessfull && debugToken != null)
             {
-                if (e.Data.Contains("Package-Author-Id:"))
-                    AuthorID = e.Data.Substring(e.Data.LastIndexOf(": ") + 2);
-                else if (e.Data.Contains("Package-Author:"))
-                    Author = e.Data.Substring(e.Data.LastIndexOf(": ") + 2);
+                AuthorID = debugToken.AuthorID;
+                Author = debugToken.Author;
+            }
+            else
+            {
+                // notify about the error:
+                var failHandler = e.Tag as EventHandler;
+                if (failHandler != null)
+                    failHandler(this, EventArgs.Empty);
             }
         }
 
@@ -1611,7 +1581,7 @@ namespace BlackBerry.Package.ViewModels
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        protected void NotifyPropertyChanged(string propertyName)
+        private void NotifyPropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
             {
@@ -1650,5 +1620,26 @@ namespace BlackBerry.Package.ViewModels
 
         #endregion
 
+        #region IDisposable Implementation
+
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            Dispose(true);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_debugTokenInfoRunner != null)
+                {
+                    _debugTokenInfoRunner.Dispose();
+                    _debugTokenInfoRunner = null;
+                }
+            }
+        }
+
+        #endregion
     }
 }
