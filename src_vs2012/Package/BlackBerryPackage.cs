@@ -172,13 +172,14 @@ namespace BlackBerry.Package
             }
             */
 
-            SetNDKPath();
+            EnsureActiveNDK();
 
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
 
             CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
             CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
             CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, startDebugCommandEvents_AfterExecute, startDebugCommandEvents_BeforeExecute);
+            TraceLog.WriteLine(" * registered build-platforms manager");
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
@@ -353,7 +354,7 @@ namespace BlackBerry.Package
 
             if (dte.Solution.FullName != "")
             {
-                string fileText = System.IO.File.ReadAllText(dte.Solution.FullName);
+                string fileText = File.ReadAllText(dte.Solution.FullName);
 
                 if (fileText.Contains("Debug|BlackBerry"))
                 {
@@ -369,64 +370,11 @@ namespace BlackBerry.Package
         }
 
         /// <summary>
-        /// Set the NDK path into the registry if not already set.
+        /// Makes sure the NDK is selected and its paths are stored inside registry for build toolset.
         /// </summary>
-        private void SetNDKPath()
+        private void EnsureActiveNDK()
         {
-            //Initialize NDK if possible.  
-            RegistryKey rkHKCU = Registry.CurrentUser;
-            RegistryKey rkNDKPath = null;
-            string qnx_target = "";
-            string qnx_host = "";
-
-            try
-            {
-
-                rkNDKPath = rkHKCU.CreateSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                qnx_host = rkNDKPath.GetValue("NDKHostPath").ToString();
-                qnx_target = rkNDKPath.GetValue("NDKHostPath").ToString();
-
-                if (qnx_host == "")
-                {
-                    string[] filePaths = Directory.GetFiles(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\BlackBerry Native SDK\qconfig\", "*.xml");
-
-                    if (filePaths.Length >= 1)
-                    {
-                        XmlDocument xmlDoc = new XmlDocument();
-                        xmlDoc.Load(filePaths[0]);
-                        XmlNodeList name = xmlDoc.GetElementsByTagName("name");
-                        XmlNodeList hostpath = xmlDoc.GetElementsByTagName("host");
-                        XmlNodeList targetpath = xmlDoc.GetElementsByTagName("target");
-
-                        qnx_target = targetpath[0].InnerText;
-                        qnx_host = hostpath[0].InnerText;
-
-                        rkNDKPath.SetValue("NDKHostPath", qnx_host);
-                        rkNDKPath.SetValue("NDKTargetPath", qnx_target);
-
-                    }
-                }
-
-                /* PH: FIXME: TODO: remove following code as it affects Visual Studio and all tools running by it */
-                /*
-                string qnx_config = GlobalFunctions.bbndkPathConst + @"\features\com.qnx.tools.jre.win32_1.6.0.43\jre\bin";
-
-                System.Environment.SetEnvironmentVariable("QNX_TARGET", qnx_target);
-                System.Environment.SetEnvironmentVariable("QNX_HOST", qnx_host);
-
-                string ndkpath = string.Format(@"{0}/usr/bin;{1};", qnx_host, qnx_config) +
-                    System.Environment.GetEnvironmentVariable("PATH");
-                System.Environment.SetEnvironmentVariable("PATH", ndkpath);
-                */
-
-            }
-            catch (Exception ex)
-            {
-                string e = ex.ToString();
-            }
-
-            rkNDKPath.Close();
-            rkHKCU.Close();
+            PackageViewModel.Instance.EnsureActiveNDK();
         }
 
         /// <summary> 
@@ -834,7 +782,6 @@ namespace BlackBerry.Package
         {
             Debug.WriteLine("After Start Debug");
         }
-
 
         /// <summary> 
         /// New Start Debug Command Events Before Execution Event Handler. Call the method responsible for building the app. 

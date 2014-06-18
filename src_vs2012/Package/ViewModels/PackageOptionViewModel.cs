@@ -459,5 +459,37 @@ namespace BlackBerry.Package.ViewModels
         {
             Reset(e.Target);
         }
+
+        /// <summary>
+        /// Makes sure any BlackBerry 10 NDK is selected and its paths are stored inside registry.
+        /// </summary>
+        public void EnsureActiveNDK()
+        {
+            // need to select anything?
+            if (ActiveNDK == null)
+            {
+                ActiveNDK = GetLatestNDK();
+            }
+            else
+            {
+                // make sure invalid info from registry is removed:
+                NdkDefinition.Delete();
+            }
+        }
+
+        /// <summary>
+        /// Gets the reference to the latest version of the NDK installed locally.
+        /// </summary>
+        private NdkInfo GetLatestNDK()
+        {
+            // get the last one, as this list is already sorted by version:
+            int length = InstalledNDKs.Length;
+            if (length > 0)
+            {
+                return InstalledNDKs[length - 1];
+            }
+
+            return null;
+        }
     }
 }
