@@ -9,11 +9,12 @@ namespace BlackBerry.NativeCore.Tools
     {
         #region Properties
 
-        public ToolRunnerEventArgs(int exitCode, string output, string error)
+        public ToolRunnerEventArgs(int exitCode, string output, string error, object tag)
         {
             ExitCode = exitCode;
             Output = output;
             Error = error;
+            Tag = tag;
         }
 
         public int ExitCode
@@ -37,6 +38,12 @@ namespace BlackBerry.NativeCore.Tools
         public bool IsSuccessfull
         {
             get { return string.IsNullOrEmpty(Error); }
+        }
+
+        public object Tag
+        {
+            get;
+            private set;
         }
 
         #endregion

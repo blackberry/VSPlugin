@@ -236,11 +236,11 @@ namespace BlackBerry.NativeCore.Tools
                 // perform a cross-thread notification (in case we want to update UI directly from the handler)
                 if (Dispatcher != null)
                 {
-                    Dispatcher.Invoke(finishedHandler, this, new ToolRunnerEventArgs(exitCode, output, error));
+                    Dispatcher.Invoke(finishedHandler, this, new ToolRunnerEventArgs(exitCode, output, error, Tag));
                 }
                 else
                 {
-                    finishedHandler(this, new ToolRunnerEventArgs(exitCode, output, error));
+                    finishedHandler(this, new ToolRunnerEventArgs(exitCode, output, error, Tag));
                 }
             }
         }
