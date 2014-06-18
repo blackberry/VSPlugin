@@ -101,23 +101,25 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <PropertyGroup>
       <BuildBar_MinimalRebuildFromTracking Condition="'$(BuildType)' != 'Build' or '$(ForceRebuild)' == 'true'">false</BuildBar_MinimalRebuildFromTracking>
       <BuildBar_MinimalRebuildFromTracking Condition="'$(BuildBar_MinimalRebuildFromTracking)' == ''">true</BuildBar_MinimalRebuildFromTracking>
-      <BuildBar_DisableOptimizedDeploy>$(IsAppInstalled)</BuildBar_DisableOptimizedDeploy>
-      <BuildBar_DisableOptimizedDeploy Condition="%(BuildBar.DisableOptimizedDeploy) == 'true'">false</BuildBar_DisableOptimizedDeploy>
+      <BuildBar_OptimizedDeploy>$(IsAppInstalled)</BuildBar_OptimizedDeploy>
+      <BuildBar_OptimizedDeploy Condition="%(BuildBar.DisableOptimizedDeploy) == 'true' or $(QNX_FAMILY) == 'tablet'">false</BuildBar_OptimizedDeploy>
     </PropertyGroup>
+
+    <Message Text="Optimized deploy is disabled" Condition="$(BuildBar_OptimizedDeploy) == 'false'" Importance="high" />
 
     <BBNativePackager  Condition="'$(RunBuildBar)' == 'true'"
         Sources                        ="@(BuildBar)"
         Platform                       ="$(Platform)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
-        AppName                        = "$(ProjectName)"
+        AppName                        ="$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
-        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device                         ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
+        Password                       ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
         BarDeploy                      ="%(BuildBar.BarDeploy)"
         DevMode                        ="%(BuildBar.DevMode)"
-        PackageManifestOnly            ="$(BuildBar_DisableOptimizedDeploy)"
+        PackageManifestOnly            ="$(BuildBar_OptimizedDeploy)"
         DebugToken                     ="%(BuildBar.DebugToken)"
         TargetFormat                   ="%(BuildBar.TargetFormat)"
         OutputFile                     ="%(BuildBar.OutputFile)"
@@ -198,9 +200,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Exec Condition="!Exists('$(SSHPrivateKeyPath)') or !Exists('$(SSHPublicKeyPath)')"
           Command ="$(SSHKeygenToolExe) -t rsa -b 4096 -f %22$(SSHPrivateKeyPath)%22 -N ''" />
 
+    <PropertyGroup>
+      <BuildBar_OptimizedDeploy>true</BuildBar_OptimizedDeploy>
+      <BuildBar_OptimizedDeploy Condition="%(BuildBar.DisableOptimizedDeploy) == 'true' or $(QNX_FAMILY) == 'tablet'">false</BuildBar_OptimizedDeploy>
+    </PropertyGroup>
+
     <CallTarget Targets="_BuildBar" />
-    <CallTarget Targets="FirstDeploy" Condition="%(BuildBar.DisableOptimizedDeploy) == 'true' OR $(IsAppInstalled) == 'false' OR %(BuildBar.DevMode) == 'false'" />
-    <CallTarget Targets="OptimizedDeploy" Condition="%(BuildBar.DisableOptimizedDeploy) != 'true' $(IsAppInstalled) == 'true'" />
+    <CallTarget Targets="FirstDeploy" Condition="$(BuildBar_OptimizedDeploy) == 'false' OR $(IsAppInstalled) == 'false' OR %(BuildBar.DevMode) == 'false'" />
+    <CallTarget Targets="OptimizedDeploy" Condition="$(BuildBar_OptimizedDeploy) == 'true' $(IsAppInstalled) == 'true'" />
 
     <!-- Remove the -debugNative flag if it was set. -->
     <RemoveFlagFile Condition="Exists('$(AppDataPath)\Research In Motion\vsndk-debugNative.txt')"
@@ -237,11 +244,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Platform                       ="$(Platform)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
-        AppName                        = "$(ProjectName)"
+        AppName                        ="$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
-        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device                         ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
+        Password                       ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
         BarDeploy                      ="%(BuildBar.BarDeploy)"
         DevMode                        ="%(BuildBar.DevMode)"
         DebugToken                     ="%(BuildBar.DebugToken)"
