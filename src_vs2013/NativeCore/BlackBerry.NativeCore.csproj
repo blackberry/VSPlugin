@@ -99,6 +99,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceDefinitionType.cs">
       <Link>Model\DeviceDefinitionType.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceFamilyType.cs">
+      <Link>Model\DeviceFamilyType.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceInfo.cs">
       <Link>Model\DeviceInfo.cs</Link>
     </Compile>

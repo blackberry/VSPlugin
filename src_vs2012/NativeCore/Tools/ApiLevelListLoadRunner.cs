@@ -139,7 +139,8 @@ namespace BlackBerry.NativeCore.Tools
                             name = name.Substring(0, name.Length - 9).Replace("10 Native SDK", "Runtime Libraries").Replace("Native SDK", "Runtime Libraries");
                         }
 
-                        result.Add(new ApiInfo(name.Trim(), new Version(version)));
+                        // PH: TODO: there is no way to load list of tablet NDKs from server, so mark all of them as 'phone'...
+                        result.Add(new ApiInfo(name.Trim(), new Version(version), DeviceFamilyType.Phone));
                     }
                 }
 

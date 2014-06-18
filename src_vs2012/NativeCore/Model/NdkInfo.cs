@@ -14,8 +14,8 @@ namespace BlackBerry.NativeCore.Model
     {
         private const string DescriptorFileName = "blackberry-sdk-descriptor.xml";
 
-        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath, DeviceInfo[] devices, PermissionInfo[] permissions)
-            : base(name, version)
+        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath, DeviceFamilyType type, DeviceInfo[] devices, PermissionInfo[] permissions)
+            : base(name, version, type)
         {
             if (string.IsNullOrEmpty(hostPath))
                 throw new ArgumentNullException("hostPath");
@@ -33,8 +33,8 @@ namespace BlackBerry.NativeCore.Model
             Permissions = permissions;
         }
 
-        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath)
-            : base(name, version)
+        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath, DeviceFamilyType type)
+            : base(name, version, type)
         {
             if (string.IsNullOrEmpty(hostPath))
                 throw new ArgumentNullException("hostPath");
@@ -70,7 +70,10 @@ namespace BlackBerry.NativeCore.Model
                 if (devices.Length == 0)
                 {
                     // found descriptor file, but was empty... heuristics says - it's a PlayBook
+                    // then even override type, what caller provided
+                    //  - there is one case when it can happen - when developer added custom NDK to tablet - and there is no other way to distinguish phone-tablet
                     Permissions = PermissionInfo.CreatePlayBookList();
+                    Type = DeviceFamilyType.Tablet;
                 }
                 else
                 {
@@ -183,6 +186,7 @@ namespace BlackBerry.NativeCore.Model
             result.AppendLine(Name).AppendLine();
             result.AppendLine("Version:");
             result.Append(" - ").AppendLine(Version.ToString());
+            result.Append(" - ").AppendLine(Type.ToString());
             
             result.AppendLine();
             result.AppendLine("Devices:");
@@ -208,6 +212,9 @@ namespace BlackBerry.NativeCore.Model
             result.AppendLine("Paths:");
             result.Append(" - host: ").AppendLine(HostPath);
             result.Append(" - target: ").AppendLine(TargetPath);
+#if DEBUG
+            result.Append(" - descriptor: ").AppendLine(FilePath);
+#endif
 
             result.AppendLine();
             result.AppendLine("Permissions:");
@@ -257,6 +264,7 @@ namespace BlackBerry.NativeCore.Model
             Version version = null;
             string hostPath = null;
             string targetPath = null;
+            DeviceFamilyType type = DeviceFamilyType.Phone;
 
             while (reader.Read())
             {
@@ -286,11 +294,37 @@ namespace BlackBerry.NativeCore.Model
                         // is it a PlayBook NDK, which has no 'version' field?
                         if (version == null && !string.IsNullOrEmpty(name))
                         {
-                            version = GetVersionFromFolderName(name);
+                            type = DeviceFamilyType.Tablet;
+
+                            // try first to load info about installation:
+                            var installInfoPath = Path.Combine(targetPath, "..", "..", "install", "info.txt");
+                            if (File.Exists(installInfoPath))
+                            {
+                                try
+                                {
+                                    version = GetVersionFromInstallationInfo(File.ReadAllLines(installInfoPath));
+                                }
+                                catch (Exception ex)
+                                {
+                                    TraceLog.WriteException(ex, "Unable to read installation info from file: \"{0}\"", installInfoPath);
+                                }
+                            }
+
+                            // if that failed, maybe there is a version inside the folder?
+                            if (version == null)
+                            {
+                                version = GetVersionFromFolderName(name);
+                            }
+
+                            // ok, give up, assign anything:
+                            if (version == null)
+                            {
+                                version = CreateTabletInfo().Version;
+                            }
                         }
 
                         // try to define info about the installation:
-                        return new NdkInfo(fileName, name, version, hostPath, targetPath);
+                        return new NdkInfo(fileName, name, version, hostPath, targetPath, type);
                     }
 
                     return null;
@@ -381,7 +415,7 @@ namespace BlackBerry.NativeCore.Model
                                             var existingIndex = IndexOf(result, info);
 
                                             // and store only unique ones:
-                                            // (if NDK info exist with exacly the same paths, prefer to keep the one with longer name)
+                                            // (if NDK info exist with exactly the same paths, prefer to keep the one with longer name)
                                             if (existingIndex >= 0)
                                             {
                                                 var existingItem = result[existingIndex];
@@ -500,6 +534,8 @@ namespace BlackBerry.NativeCore.Model
 
                 // extract version out of the current folder name
                 var version = GetVersionFromFolderName(Path.GetFileName(folder));
+                var type = DeviceFamilyType.Phone;
+
                 if (version == null)
                 {
                     // is there an installation folder with version (used by PlayBook NDKs)?
@@ -509,9 +545,11 @@ namespace BlackBerry.NativeCore.Model
                         try
                         {
                             version = GetVersionFromInstallationInfo(File.ReadAllLines(installInfoPath));
+                            type = DeviceFamilyType.Tablet;
                         }
                         catch (Exception ex)
                         {
+                            type = DeviceFamilyType.Unknown;
                             TraceLog.WriteException(ex, "Unable to read installation info from file: \"{0}\"", installInfoPath);
                         }
                     }
@@ -520,8 +558,9 @@ namespace BlackBerry.NativeCore.Model
                         version = new Version(10, 0, 1);
                 }
 
-                return new NdkInfo(null, string.Concat("BlackBerry Local SDK ", version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
-                                   version, Path.Combine(hostDirs[0], "win32", "x86"), Path.Combine(folder, "qnx6"));
+                var prefix = type == DeviceFamilyType.Tablet ? "BlackBerry Native SDK for Tablet OS " : "BlackBerry Local SDK ";
+                return new NdkInfo(null, string.Concat(prefix, version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
+                                   version, Path.Combine(hostDirs[0], "win32", "x86"), Path.Combine(folder, "qnx6"), type);
             }
 
             return null;

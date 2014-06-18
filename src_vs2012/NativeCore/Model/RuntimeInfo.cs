@@ -11,7 +11,7 @@ namespace BlackBerry.NativeCore.Model
     public sealed class RuntimeInfo : ApiInfo
     {
         public RuntimeInfo(string folder, string name, Version version)
-            : base(name, version)
+            : base(name, version, DeviceFamilyType.Phone)
         {
             Folder = folder;
             Details = Version.ToString();

@@ -12,10 +12,11 @@ namespace BlackBerry.NativeCore.Model
     {
         private const string FieldHostPath = "NDKHostPath";
         private const string FieldTargetPath = "NDKTargetPath";
+        private const string FieldFamilyType = "NDKFamilyType";
 
         #region Properties
 
-        public NdkDefinition(string hostPath, string targetPath)
+        public NdkDefinition(string hostPath, string targetPath, DeviceFamilyType type)
         {
             if (string.IsNullOrEmpty(hostPath))
                 throw new ArgumentNullException("hostPath");
@@ -24,6 +25,7 @@ namespace BlackBerry.NativeCore.Model
 
             HostPath = hostPath;
             TargetPath = targetPath;
+            Type = type;
         }
 
         public string HostPath
@@ -33,6 +35,12 @@ namespace BlackBerry.NativeCore.Model
         }
 
         public string TargetPath
+        {
+            get;
+            private set;
+        }
+
+        public DeviceFamilyType Type
         {
             get;
             private set;
@@ -50,6 +58,7 @@ namespace BlackBerry.NativeCore.Model
 
             string hostPath = null;
             string targetPath = null;
+            DeviceFamilyType type = DeviceFamilyType.Phone;
 
             try
             {
@@ -83,6 +92,16 @@ namespace BlackBerry.NativeCore.Model
             {
             }
 
+            try
+            {
+                var xType = settings.GetValue(FieldFamilyType);
+                if (xType != null)
+                    type = GetTypeFromString(xType.ToString());
+            }
+            catch
+            {
+            }
+
             settings.Close();
             registry.Close();
 
@@ -90,7 +109,7 @@ namespace BlackBerry.NativeCore.Model
             if (string.IsNullOrEmpty(hostPath) || string.IsNullOrEmpty(targetPath))
                 return null;
 
-            return new NdkDefinition(hostPath, targetPath);
+            return new NdkDefinition(hostPath, targetPath, type);
         }
 
         /// <summary>
@@ -109,6 +128,7 @@ namespace BlackBerry.NativeCore.Model
 
                 settings.DeleteValue(FieldHostPath, false);
                 settings.DeleteValue(FieldTargetPath, false);
+                settings.DeleteValue(FieldFamilyType, false);
             }
             finally
             {
@@ -134,6 +154,7 @@ namespace BlackBerry.NativeCore.Model
 
                 settings.SetValue(FieldHostPath, HostPath);
                 settings.SetValue(FieldTargetPath, TargetPath);
+                settings.SetValue(FieldFamilyType, GetTypeToString(Type));
             }
             finally
             {
@@ -141,6 +162,33 @@ namespace BlackBerry.NativeCore.Model
                     settings.Close();
                 registry.Close();
             }
+        }
+
+        /// <summary>
+        /// Gets the string representation of the DeviceFamilyType.
+        /// </summary>
+        private static string GetTypeToString(DeviceFamilyType type)
+        {
+            switch (type)
+            {
+                case DeviceFamilyType.Phone:
+                    return "phone";
+                case DeviceFamilyType.Tablet:
+                    return "tablet";
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
+        }
+
+        private static DeviceFamilyType GetTypeFromString(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return DeviceFamilyType.Phone;
+
+            if (string.Compare("tablet", name, StringComparison.OrdinalIgnoreCase) == 0)
+                return DeviceFamilyType.Tablet;
+
+            return DeviceFamilyType.Phone;
         }
     }
 }

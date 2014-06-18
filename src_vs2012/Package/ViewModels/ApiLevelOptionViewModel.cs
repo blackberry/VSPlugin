@@ -1,5 +1,4 @@
 ﻿using System;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -115,8 +114,6 @@ namespace BlackBerry.Package.ViewModels
 
         private sealed class NdkLoaderViewModel : LoaderViewModel
         {
-            private readonly static Version LastPlayBookVersion = new Version(9, 99, 0, 0);
-
             public NdkLoaderViewModel()
                 : base(ApiLevelListTypes.Full)
             {
@@ -174,7 +171,7 @@ namespace BlackBerry.Package.ViewModels
                 }
 
                 // is it a PlayBook NDK?
-                if (info.Version <= LastPlayBookVersion)
+                if (info.Type == DeviceFamilyType.Tablet)
                 {
                     if (isInstalled)
                         return ApiLevelTask.Nothing;

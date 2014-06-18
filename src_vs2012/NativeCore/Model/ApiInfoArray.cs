@@ -8,7 +8,7 @@ namespace BlackBerry.NativeCore.Model
     public sealed class ApiInfoArray : ApiInfo
     {
         public ApiInfoArray(string name, Version version, ApiInfo[] items)
-            : base(name, version)
+            : base(name, version, DeviceFamilyType.Unknown)
         {
             Items = items ?? new ApiInfo[0];
         }

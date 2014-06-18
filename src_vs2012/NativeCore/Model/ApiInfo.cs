@@ -10,7 +10,7 @@ namespace BlackBerry.NativeCore.Model
     {
         private readonly string _description;
 
-        public ApiInfo(string name, Version version)
+        public ApiInfo(string name, Version version, DeviceFamilyType type)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
@@ -19,10 +19,11 @@ namespace BlackBerry.NativeCore.Model
 
             Name = name;
             Version = version;
+            Type = type;
             Level = new Version(version.Major, version.Minor);
 
             var versionString = Version.ToString();
-            _description = Name.IndexOf(versionString, StringComparison.Ordinal) >= 0 ? Name : string.Concat(Name, " (", versionString, ")");
+            _description = Name.IndexOf(versionString, StringComparison.Ordinal) >= 0 || type == DeviceFamilyType.Tablet ? Name : string.Concat(Name, " (", versionString, ")");
 
             IsBeta = !string.IsNullOrEmpty(Name)
                      && (Name.IndexOf("beta", StringComparison.OrdinalIgnoreCase) >= 0 || Name.IndexOf("alpha", StringComparison.InvariantCultureIgnoreCase) >= 0);
@@ -46,6 +47,12 @@ namespace BlackBerry.NativeCore.Model
         {
             get;
             private set;
+        }
+
+        public DeviceFamilyType Type
+        {
+            get;
+            protected set;
         }
 
         /// <summary>
@@ -88,7 +95,11 @@ namespace BlackBerry.NativeCore.Model
             if (other == null)
                 return 1;
 
-            int cmp = Version.CompareTo(other.Version);
+            int cmp = Type.CompareTo(other.Type);
+            if (cmp != 0)
+                return cmp;
+
+            cmp = Version.CompareTo(other.Version);
             if (cmp != 0)
                 return cmp;
 
@@ -105,7 +116,7 @@ namespace BlackBerry.NativeCore.Model
         /// </summary>
         public static ApiInfo CreateTabletInfo()
         {
-            return new ApiInfo("BlackBerry Native SDK for Tablet OS 2.1.0", new Version(2, 1, 0, 1032));
+            return new ApiInfo("BlackBerry Native SDK for Tablet OS 2.1.0", new Version(2, 1, 0, 1032), DeviceFamilyType.Tablet);
         }
 
         /// <summary>
@@ -113,7 +124,7 @@ namespace BlackBerry.NativeCore.Model
         /// </summary>
         public static ApiInfo CreateAddCustomInfo()
         {
-            return new ApiInfo("Add Custom NDK", new Version());
+            return new ApiInfo("Add Custom NDK", new Version(), DeviceFamilyType.Unknown);
         }
 
         /// <summary>

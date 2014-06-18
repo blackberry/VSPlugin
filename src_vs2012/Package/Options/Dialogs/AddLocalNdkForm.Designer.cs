@@ -31,6 +31,8 @@
             this.bttCancel = new System.Windows.Forms.Button();
             this.bttOK = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.cmbFamilyType = new System.Windows.Forms.ComboBox();
             this.bttBrowseTarget = new System.Windows.Forms.Button();
             this.bttBrowseHost = new System.Windows.Forms.Button();
             this.txtVersion = new System.Windows.Forms.TextBox();
@@ -42,6 +44,7 @@
             this.label3 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.bttClear = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -49,20 +52,20 @@
             // 
             this.bttCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bttCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.bttCancel.Location = new System.Drawing.Point(587, 211);
+            this.bttCancel.Location = new System.Drawing.Point(587, 240);
             this.bttCancel.Name = "bttCancel";
             this.bttCancel.Size = new System.Drawing.Size(75, 23);
-            this.bttCancel.TabIndex = 2;
+            this.bttCancel.TabIndex = 3;
             this.bttCancel.Text = "&Cancel";
             this.bttCancel.UseVisualStyleBackColor = true;
             // 
             // bttOK
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOK.Location = new System.Drawing.Point(506, 211);
+            this.bttOK.Location = new System.Drawing.Point(506, 240);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
-            this.bttOK.TabIndex = 1;
+            this.bttOK.TabIndex = 2;
             this.bttOK.Text = "&OK";
             this.bttOK.UseVisualStyleBackColor = true;
             this.bttOK.Click += new System.EventHandler(this.bttOK_Click);
@@ -72,6 +75,8 @@
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.label6);
+            this.groupBox1.Controls.Add(this.cmbFamilyType);
             this.groupBox1.Controls.Add(this.bttBrowseTarget);
             this.groupBox1.Controls.Add(this.bttBrowseHost);
             this.groupBox1.Controls.Add(this.txtVersion);
@@ -85,10 +90,28 @@
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(650, 193);
+            this.groupBox1.Size = new System.Drawing.Size(650, 222);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Properties";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(18, 182);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(34, 13);
+            this.label6.TabIndex = 11;
+            this.label6.Text = "Type:";
+            // 
+            // cmbFamilyType
+            // 
+            this.cmbFamilyType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbFamilyType.FormattingEnabled = true;
+            this.cmbFamilyType.Location = new System.Drawing.Point(106, 179);
+            this.cmbFamilyType.Name = "cmbFamilyType";
+            this.cmbFamilyType.Size = new System.Drawing.Size(121, 21);
+            this.cmbFamilyType.TabIndex = 12;
             // 
             // bttBrowseTarget
             // 
@@ -186,13 +209,24 @@
             this.label1.Text = "Specify the location of a local NDK and name it uniquely. Use Browse buttons belo" +
     "w, to automate the whole process.";
             // 
+            // bttClear
+            // 
+            this.bttClear.Location = new System.Drawing.Point(12, 240);
+            this.bttClear.Name = "bttClear";
+            this.bttClear.Size = new System.Drawing.Size(75, 23);
+            this.bttClear.TabIndex = 1;
+            this.bttClear.Text = "&Clear";
+            this.bttClear.UseVisualStyleBackColor = true;
+            this.bttClear.Click += new System.EventHandler(this.bttClear_Click);
+            // 
             // AddLocalNdkForm
             // 
             this.AcceptButton = this.bttOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bttCancel;
-            this.ClientSize = new System.Drawing.Size(674, 246);
+            this.ClientSize = new System.Drawing.Size(674, 275);
+            this.Controls.Add(this.bttClear);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.bttOK);
             this.Controls.Add(this.bttCancel);
@@ -226,5 +260,8 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ComboBox cmbFamilyType;
+        private System.Windows.Forms.Button bttClear;
     }
 }

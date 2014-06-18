@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Helpers;
+using BlackBerry.Package.Model.Integration;
 using BlackBerry.Package.ViewModels;
 
 namespace BlackBerry.Package.Options.Dialogs
@@ -12,6 +13,12 @@ namespace BlackBerry.Package.Options.Dialogs
         public AddLocalNdkForm()
         {
             InitializeComponent();
+
+            // fill in the combo-box with types:
+            cmbFamilyType.Items.Clear();
+            AddItem(DeviceFamilyType.Tablet);
+            AddItem(DeviceFamilyType.Phone);
+            cmbFamilyType.SelectedIndex = 1;
         }
 
         #region Properties
@@ -53,6 +60,12 @@ namespace BlackBerry.Package.Options.Dialogs
             set { txtVersion.Text = value != null ? value.ToString() : string.Empty; }
         }
 
+        public DeviceFamilyType NdkType
+        {
+            get { return cmbFamilyType.SelectedIndex == 0 ? DeviceFamilyType.Tablet : DeviceFamilyType.Phone; }
+            set { cmbFamilyType.SelectedIndex = value == DeviceFamilyType.Tablet ? 0 : 1; }
+        }
+
         internal NdkInfo NewNdk
         {
             get;
@@ -60,6 +73,11 @@ namespace BlackBerry.Package.Options.Dialogs
         }
 
         #endregion
+
+        private void AddItem(DeviceFamilyType type)
+        {
+            cmbFamilyType.Items.Add(new ComboBoxItem(type.ToString(), type));
+        }
 
         private void bttBrowseHost_Click(object sender, EventArgs e)
         {
@@ -94,6 +112,7 @@ namespace BlackBerry.Package.Options.Dialogs
                         NdkTargetPath = ndk.TargetPath;
                     if (string.IsNullOrEmpty(txtVersion.Text))
                         NdkVersion = ndk.Version;
+                    NdkType = ndk.Type;
                 }
             }
         }
@@ -123,7 +142,7 @@ namespace BlackBerry.Package.Options.Dialogs
             }
 
             // create result
-            NewNdk = new NdkInfo(null, NdkName, NdkVersion, NdkHostPath, NdkTargetPath);
+            NewNdk = new NdkInfo(null, NdkName, NdkVersion, NdkHostPath, NdkTargetPath, NdkType);
             var existingIndex = PackageViewModel.Instance.IndexOfInstalled(NewNdk);
             var existingNDK = existingIndex >= 0 ? PackageViewModel.Instance.InstalledNDKs[existingIndex] : null;
 
@@ -140,6 +159,15 @@ namespace BlackBerry.Package.Options.Dialogs
 
             DialogResult = DialogResult.OK;
             Close();
+        }
+
+        private void bttClear_Click(object sender, EventArgs e)
+        {
+            NdkName = string.Empty;
+            NdkHostPath = string.Empty;
+            NdkTargetPath = string.Empty;
+            NdkVersion = null;
+            NdkType = DeviceFamilyType.Phone;
         }
     }
 }
