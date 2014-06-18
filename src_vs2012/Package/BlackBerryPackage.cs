@@ -22,6 +22,7 @@ using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Components;
 using BlackBerry.Package.Diagnostics;
+using BlackBerry.Package.Editors;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
 using BlackBerry.Package.Options;
@@ -57,13 +58,13 @@ namespace BlackBerry.Package
     /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // Register the editor factory
-    [XmlEditorDesignerViewRegistration("XML", "xml", LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(EditorFactory), Namespace = "http://www.qnx.com/schemas/application/1.0", MatchExtensionAndNamespace = true)]
+    [XmlEditorDesignerViewRegistration("XML", "xml", LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(BarDescriptorEditorFactory), Namespace = "http://www.qnx.com/schemas/application/1.0", MatchExtensionAndNamespace = true)]
     // And which type of files we want to handle
-    [ProvideEditorExtension(typeof(EditorFactory), EditorFactory.DefaultExtension, 0x40, NameResourceID = 106)]
+    [ProvideEditorExtension(typeof(BarDescriptorEditorFactory), BarDescriptorEditorFactory.DefaultExtension, 0x40, NameResourceID = 106)]
     // We register that our editor supports LOGVIEWID_Designer logical view
-    [ProvideEditorLogicalView(typeof(EditorFactory), LogicalViewID.Designer)]
+    [ProvideEditorLogicalView(typeof(BarDescriptorEditorFactory), LogicalViewID.Designer)]
     // Microsoft Visual C# Project
-    [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", EditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
+    [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", BarDescriptorEditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
@@ -156,7 +157,7 @@ namespace BlackBerry.Package
                 };
 
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
-            RegisterEditorFactory(new EditorFactory());
+            RegisterEditorFactory(new BarDescriptorEditorFactory());
             TraceLog.WriteLine(" * registered editors");
 
             

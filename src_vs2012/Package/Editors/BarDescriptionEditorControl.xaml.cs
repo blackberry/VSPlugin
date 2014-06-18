@@ -13,25 +13,27 @@
 //* limitations under the License.
 
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using BlackBerry.Package.Model;
+using BlackBerry.Package.ViewModels;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
-using System.IO;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.Editors
 {
     /// <summary>
-    /// Interaction logic for VsDesignerControl.xaml
+    /// Interaction logic for BarDescription editor control.
     /// </summary>
-    public partial class VsDesignerControl : UserControl
+    public partial class BarDescriptorEditorControl : UserControl
     {
         private readonly ServiceProvider _serviceProvider;
         /// <summary>
         /// Primary Constructor
         /// </summary>
-        public VsDesignerControl()
+        public BarDescriptorEditorControl()
         {
             InitializeComponent();
         }
@@ -40,13 +42,19 @@ namespace BlackBerry.Package
         /// Overloaded Constructor
         /// </summary>
         /// <param name="viewModel"></param>
-        public VsDesignerControl(ServiceProvider serviceProvider, IViewModel viewModel)
+        public BarDescriptorEditorControl(ServiceProvider serviceProvider, IBarEditorViewModel viewModel)
         {
             _serviceProvider = serviceProvider; 
             DataContext = viewModel;
             InitializeComponent();
+
             // wait until we're initialized to handle events
             viewModel.ViewModelChanged += ViewModelChanged;
+        }
+
+        public IBarEditorViewModel ViewModel
+        {
+            get { return DataContext as IBarEditorViewModel; }
         }
 
         internal void DoIdle()
@@ -54,7 +62,7 @@ namespace BlackBerry.Package
             // only call the view model DoIdle if this control has focus
             // otherwise, we should skip and this will be called again
             // once focus is regained
-            IViewModel viewModel = DataContext as IViewModel;
+            var viewModel = ViewModel;
             if (viewModel != null && IsKeyboardFocusWithin)
             {
                 viewModel.DoIdle();
@@ -70,7 +78,7 @@ namespace BlackBerry.Package
         {
             // this gets called when the view model is updated because the Xml Document was updated
             // since we don't get individual PropertyChanged events, just re-set the DataContext
-            IViewModel viewModel = DataContext as IViewModel;
+            var viewModel = ViewModel;
             DataContext = null; // first, set to null so that we see the change and rebind
             DataContext = viewModel;
         }
@@ -119,8 +127,12 @@ namespace BlackBerry.Package
         /// <param name="e"></param>
         private void btGetAuthor_Click(object sender, RoutedEventArgs e)
         {
-            IViewModel viewModel = DataContext as IViewModel;
-            viewModel.setAuthorInfo();
+            var viewModel = ViewModel;
+
+            if (viewModel != null)
+            {
+                viewModel.setAuthorInfo();
+            }
         }
 
         private void btnAddIC_Click(object sender, RoutedEventArgs e)
@@ -136,7 +148,7 @@ namespace BlackBerry.Package
 
                 AddIconToProject(filename);
 
-                IViewModel viewModel = DataContext as IViewModel;
+                var viewModel = ViewModel;
                 if (viewModel != null)
                 {
                     FileInfo fileInfo = new FileInfo(filename);
@@ -156,7 +168,7 @@ namespace BlackBerry.Package
                 Projects projs = dte.Solution.Projects;
                 foreach (Project proj in projs)
                 {
-                    IViewModel viewModel = DataContext as IViewModel;
+                    var viewModel = ViewModel;
                     if (viewModel != null)
                     {
 
@@ -182,7 +194,7 @@ namespace BlackBerry.Package
         {
             if (grdIcon.SelectedItem != null)
             {
-                IViewModel viewModel = DataContext as IViewModel;
+                var viewModel = ViewModel;
                 if (viewModel != null)
                 {
                     viewModel.DeleteIcon(grdIcon.SelectedItem);
@@ -204,7 +216,7 @@ namespace BlackBerry.Package
 
                 AddIconToProject(filename);
 
-                IViewModel viewModel = DataContext as IViewModel;
+                var viewModel = ViewModel;
                 if (viewModel != null)
                 {
                     FileInfo fileInfo = new FileInfo(filename);
@@ -218,7 +230,7 @@ namespace BlackBerry.Package
         {
             if (grdSplashScreen.SelectedItem != null)
             {
-                IViewModel viewModel = DataContext as IViewModel;
+                var viewModel = ViewModel;
                 if (viewModel != null)
                 {
                     viewModel.DeleteSplashScreen(grdSplashScreen.SelectedItem);
@@ -230,7 +242,7 @@ namespace BlackBerry.Package
         {
             if ((sender as CheckBox).IsChecked == true)
             {
-                IViewModel viewModel = DataContext as IViewModel;
+                var viewModel = ViewModel;
                 if (viewModel != null)
                 {
                     viewModel.CheckPermission((grdPermissions.SelectedItem as PermissionItemClass).Identifier);
@@ -238,7 +250,7 @@ namespace BlackBerry.Package
             }
             else
             {
-                IViewModel viewModel = DataContext as IViewModel;
+                var viewModel = ViewModel;
                 if (viewModel != null)
                 {
                     viewModel.UnCheckPermission((grdPermissions.SelectedItem as PermissionItemClass).Identifier);
@@ -257,21 +269,19 @@ namespace BlackBerry.Package
             {
                 filename = dlg.FileName;
 
-
-                IViewModel viewModel = DataContext as IViewModel;
+                var viewModel = ViewModel;
                 if (viewModel != null)
                 {
                     viewModel.AddLocalAsset(filename);
                 }
             }
-
         }
 
         private void btnRemoveAsset_Click(object sender, RoutedEventArgs e)
         {
             if (grdAssets.SelectedItem != null)
             {
-                IViewModel viewModel = DataContext as IViewModel;
+                var viewModel = ViewModel;
                 if (viewModel != null)
                 {
                     viewModel.DeleteLocalAsset(grdAssets.SelectedItem);
@@ -281,7 +291,7 @@ namespace BlackBerry.Package
 
         private void CheckBox_Click_1(object sender, RoutedEventArgs e)
         {
-            IViewModel viewModel = DataContext as IViewModel;
+            var viewModel = ViewModel;
             if (viewModel != null)
             {
                 bool isPublic = (sender as CheckBox).IsChecked == true;
@@ -297,7 +307,7 @@ namespace BlackBerry.Package
             {
                 if (grdAssets.SelectedItems.Count != 0)
                 {
-                    IViewModel viewModel = DataContext as IViewModel;
+                    var viewModel = ViewModel;
                     if (viewModel != null)
                     {
                         assetType = (sender as ComboBox).SelectedValue.ToString();
@@ -306,7 +316,5 @@ namespace BlackBerry.Package
                 }
             }
         }
-
-
     }
 }

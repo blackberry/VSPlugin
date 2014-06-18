@@ -17,8 +17,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Model;
 using BlackBerry.Package.Resources;
-using BlackBerry.Package.ViewModels;
 using Microsoft.VisualStudio.Package;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 using Microsoft.VisualStudio;
@@ -36,7 +37,7 @@ using System.IO;
 using System.Windows.Data;
 using EnvDTE;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.ViewModels
 {
     public class OrientationItemClass
     {
@@ -89,7 +90,7 @@ namespace BlackBerry.Package
     public class PermissionItemClass : INotifyPropertyChanged
     {
         private readonly PermissionInfo _info;
-        private readonly ViewModel _viewModel;
+        private readonly BarEditorViewModel _viewModel;
 
         public bool IsChecked
         {
@@ -118,7 +119,7 @@ namespace BlackBerry.Package
 
         public string PermissionImagePath
         {
-            get { return ViewModel.GetPermissionIcon(_info.ID); }
+            get { return BarEditorViewModel.GetPermissionIcon(_info.ID); }
         }
 
         public string Identifier
@@ -131,7 +132,7 @@ namespace BlackBerry.Package
             get { return _info.Description; }
         }
 
-        public PermissionItemClass(PermissionInfo info, ViewModel vm)
+        public PermissionItemClass(PermissionInfo info, BarEditorViewModel vm)
         {
             if (info == null)
                 throw new ArgumentNullException("info");
@@ -212,9 +213,8 @@ namespace BlackBerry.Package
     /// The View binds the various designer controls to the methods derived from IViewModel that get and set values in the XmlModel.
     /// The ViewModel and an underlying XmlModel manage how an IVsTextBuffer is shared between the designer and the XML editor (if opened).
     /// </summary>
-    public class ViewModel : IViewModel, IDataErrorInfo, INotifyPropertyChanged
+    public class BarEditorViewModel : IBarEditorViewModel, IDataErrorInfo, INotifyPropertyChanged
     {
-        private static string _localRIMFolder;
         private static string _tmpAuthor = "";
         private static string _tmpAuthorID = "";
         private readonly CollectionView _orientationList;
@@ -222,27 +222,27 @@ namespace BlackBerry.Package
         private CollectionView _iconImageList;
         private CollectionView _splashScreenImageList;
         private CollectionView _permissionList;
-        private CollectionView _configurationList;
+        private readonly CollectionView _configurationList;
         private ConfigurationItemClass _config;
         private PermissionItemClass _permission;
         private DTE _dte;
-        private string _activeProjectDirectory;
+        private readonly string _activeProjectDirectory;
 
-        long _dirtyTime;
-        LanguageService _xmlLanguageService;
-        IServiceProvider _serviceProvider;
-        qnx _qnxSchema;
-        bool _synchronizing;
-        XmlModel _xmlModel;
-        XmlStore _xmlStore;
-        IVsTextLines _buffer;
+        private long _dirtyTime;
+        private LanguageService _xmlLanguageService;
+        private IServiceProvider _serviceProvider;
+        private qnx _qnxSchema;
+        private bool _synchronizing;
+        private XmlModel _xmlModel;
+        private XmlStore _xmlStore;
+        private IVsTextLines _buffer;
 
-        bool? _canEditFile;
-        bool _gettingCheckoutStatus;
+        private bool? _canEditFile;
+        private bool _gettingCheckoutStatus;
 
-        EventHandler<XmlEditingScopeEventArgs> _editingScopeCompletedHandler;
-        EventHandler<XmlEditingScopeEventArgs> _undoRedoCompletedHandler;
-        EventHandler _bufferReloadedHandler;
+        private readonly EventHandler<XmlEditingScopeEventArgs> _editingScopeCompletedHandler;
+        private readonly EventHandler<XmlEditingScopeEventArgs> _undoRedoCompletedHandler;
+        private readonly EventHandler _bufferReloadedHandler;
 
         /// <summary>
         /// Constructor
@@ -251,18 +251,18 @@ namespace BlackBerry.Package
         /// <param name="xmlModel"></param>
         /// <param name="provider"></param>
         /// <param name="buffer"></param>
-        public ViewModel(XmlStore xmlStore, XmlModel xmlModel, IServiceProvider provider, IVsTextLines buffer)
+        public BarEditorViewModel(XmlStore xmlStore, XmlModel xmlModel, IServiceProvider provider, IVsTextLines buffer)
         {
-            /// Initialize Asset Type List
-            IList<AssetTypeItemClass> AssetTypeListItem = new List<AssetTypeItemClass>();
+            // Initialize Asset Type List
+            IList<AssetTypeItemClass> assetTypeListItem = new List<AssetTypeItemClass>();
             AssetTypeItemClass assetType = new AssetTypeItemClass("Other");
-            AssetTypeListItem.Add(assetType);
+            assetTypeListItem.Add(assetType);
             assetType = new AssetTypeItemClass("Entry-point");
-            AssetTypeListItem.Add(assetType);
+            assetTypeListItem.Add(assetType);
             assetType = new AssetTypeItemClass("Library");
-            AssetTypeListItem.Add(assetType);
+            assetTypeListItem.Add(assetType);
             assetType = new AssetTypeItemClass("Executable");
-            AssetTypeListItem.Add(assetType);
+            assetTypeListItem.Add(assetType);
 
             if (xmlModel == null)
                 throw new ArgumentNullException("xmlModel");
@@ -273,11 +273,11 @@ namespace BlackBerry.Package
             if (buffer == null)
                 throw new ArgumentNullException("buffer");
 
-            this.BufferDirty = false;
-            this.DesignerDirty = false;
+            BufferDirty = false;
+            DesignerDirty = false;
 
-            this._serviceProvider = provider;
-            this._buffer = buffer;
+            _serviceProvider = provider;
+            _buffer = buffer;
 
             _dte = (DTE)_serviceProvider.GetService(typeof(DTE));
             Array activeProjects = (Array)_dte.ActiveSolutionProjects;
@@ -285,103 +285,101 @@ namespace BlackBerry.Package
             FileInfo activeProjectFileInfo = new FileInfo(activeProject.FullName);
             _activeProjectDirectory = activeProjectFileInfo.DirectoryName;
 
-            this._xmlStore = xmlStore;
+            _xmlStore = xmlStore;
             // OnUnderlyingEditCompleted
-            _editingScopeCompletedHandler = new EventHandler<XmlEditingScopeEventArgs>(OnUnderlyingEditCompleted);
-            this._xmlStore.EditingScopeCompleted += _editingScopeCompletedHandler;
+            _editingScopeCompletedHandler = OnUnderlyingEditCompleted;
+            _xmlStore.EditingScopeCompleted += _editingScopeCompletedHandler;
             // OnUndoRedoCompleted
-            _undoRedoCompletedHandler = new EventHandler<XmlEditingScopeEventArgs>(OnUndoRedoCompleted);
-            this._xmlStore.UndoRedoCompleted += _undoRedoCompletedHandler;
+            _undoRedoCompletedHandler = OnUndoRedoCompleted;
+            _xmlStore.UndoRedoCompleted += _undoRedoCompletedHandler;
 
-            this._xmlModel = xmlModel;
+            _xmlModel = xmlModel;
             // BufferReloaded
-            _bufferReloadedHandler += new EventHandler(BufferReloaded);
-            this._xmlModel.BufferReloaded += _bufferReloadedHandler;
-
-            _localRIMFolder = System.Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\";
+            _bufferReloadedHandler += BufferReloaded;
+            _xmlModel.BufferReloaded += _bufferReloadedHandler;
 
             LoadModelFromXmlModel();
 
-            IList<ImageItemClass> IconImageList = new List<ImageItemClass>();
+            IList<ImageItemClass> iconImageList = new List<ImageItemClass>();
             if ((_qnxSchema.icon != null) && (_qnxSchema.icon.image != null))
             {
-                string iconPNG_Path = "";  //added to avoid duplication. That's because I didn't find the template to remove teh ICON.PNG.
+                string iconPngPath = "";  //added to avoid duplication. That's because I didn't find the template to remove teh ICON.PNG.
                 foreach (string iconImage in _qnxSchema.icon.image)
                 {
-                    ImageItemClass imageItem = new ImageItemClass(iconImage, getImagePath(iconImage), _activeProjectDirectory);
+                    ImageItemClass imageItem = new ImageItemClass(iconImage, GetImagePath(iconImage), _activeProjectDirectory);
                     if (imageItem.ImageName != null) //added because I didn't find the template to remove teh ICON.PNG.
                         if (imageItem.ImageName == "icon.png")
                         {
-                            if (iconPNG_Path != imageItem.ImagePath) //added because I didn't find the template to remove teh ICON.PNG.
+                            if (iconPngPath != imageItem.ImagePath) //added because I didn't find the template to remove teh ICON.PNG.
                             {
-                                IconImageList.Add(imageItem);
-                                iconPNG_Path = imageItem.ImagePath;
+                                iconImageList.Add(imageItem);
+                                iconPngPath = imageItem.ImagePath;
                             }
                         }
                         else
-                            IconImageList.Add(imageItem);
+                            iconImageList.Add(imageItem);
 
                 }
             }
-            _iconImageList = new CollectionView(IconImageList);
+            _iconImageList = new CollectionView(iconImageList);
 
             LoadPermissions();
 
-            IList<ImageItemClass> SplashScreenImageList = new List<ImageItemClass>();
+            IList<ImageItemClass> splashScreenImageList = new List<ImageItemClass>();
             if ((_qnxSchema.splashScreens != null) && (_qnxSchema.splashScreens.image != null))
             {
                 foreach (string splashScreenImage in _qnxSchema.splashScreens.image)
                 {
-                    ImageItemClass imageItem = new ImageItemClass(splashScreenImage, getImagePath(splashScreenImage), _activeProjectDirectory);
-                    SplashScreenImageList.Add(imageItem);
+                    ImageItemClass imageItem = new ImageItemClass(splashScreenImage, GetImagePath(splashScreenImage), _activeProjectDirectory);
+                    splashScreenImageList.Add(imageItem);
                 }
             }
-            _splashScreenImageList = new CollectionView(SplashScreenImageList);
+            _splashScreenImageList = new CollectionView(splashScreenImageList);
 
-            IList<ConfigurationItemClass> ConfigurationList = new List<ConfigurationItemClass>();
+            IList<ConfigurationItemClass> configurationList = new List<ConfigurationItemClass>();
             ConfigurationItemClass configItem = new ConfigurationItemClass("All Configurations");
-            ConfigurationList.Add(configItem);
+            configurationList.Add(configItem);
             foreach (qnxConfiguration config in _qnxSchema.configuration)
             {
                 configItem = new ConfigurationItemClass(config.name);
-                ConfigurationList.Add(configItem);
+                configurationList.Add(configItem);
             }
-            _configurationList = new CollectionView(ConfigurationList);
+            _configurationList = new CollectionView(configurationList);
 
-            IList<OrientationItemClass> OrientationList = new List<OrientationItemClass>();
-            OrientationItemClass OrientationItem = new OrientationItemClass("Default");
-            OrientationList.Add(OrientationItem);
+            IList<OrientationItemClass> orientationList = new List<OrientationItemClass>();
+            OrientationItemClass orientationItem = new OrientationItemClass("Default");
+            orientationList.Add(orientationItem);
             if (_qnxSchema.initialWindow.autoOrients == "") 
             {
-                _orientationItem = OrientationItem;
+                _orientationItem = orientationItem;
             }            
 
-            OrientationItem = new OrientationItemClass("Auto-orient");
-            OrientationList.Add(OrientationItem);
+            orientationItem = new OrientationItemClass("Auto-orient");
+            orientationList.Add(orientationItem);
             if (_qnxSchema.initialWindow.autoOrients == "true") 
             {
-                _orientationItem = OrientationItem;
+                _orientationItem = orientationItem;
             }
 
 
-            OrientationItem = new OrientationItemClass("Landscape");
-            OrientationList.Add(OrientationItem);
+            orientationItem = new OrientationItemClass("Landscape");
+            orientationList.Add(orientationItem);
             if (_qnxSchema.initialWindow.aspectRatio == "landscape") 
             {
-                _orientationItem = OrientationItem;
+                _orientationItem = orientationItem;
             }
 
-            OrientationItem = new OrientationItemClass("Portrait");
-            OrientationList.Add(OrientationItem);
+            orientationItem = new OrientationItemClass("Portrait");
+            orientationList.Add(orientationItem);
             if (_qnxSchema.initialWindow.aspectRatio == "portrait")
             {
-                _orientationItem = OrientationItem;
+                _orientationItem = orientationItem;
             }
 
-            _orientationList = new CollectionView(OrientationList);
+            _orientationList = new CollectionView(orientationList);
         }
 
-        private string getImagePath(string imgName)
+        private string GetImagePath(string imgName)
         {
             string imagePath = "";
 
@@ -404,12 +402,12 @@ namespace BlackBerry.Package
             //Unhook the events from the underlying XmlStore/XmlModel
             if (_xmlStore != null)
             {
-                this._xmlStore.EditingScopeCompleted -= _editingScopeCompletedHandler;
-                this._xmlStore.UndoRedoCompleted -= _undoRedoCompletedHandler;
+                _xmlStore.EditingScopeCompleted -= _editingScopeCompletedHandler;
+                _xmlStore.UndoRedoCompleted -= _undoRedoCompletedHandler;
             }
-            if (this._xmlModel != null)
+            if (_xmlModel != null)
             {
-                this._xmlModel.BufferReloaded -= _bufferReloadedHandler;
+                _xmlModel.BufferReloaded -= _bufferReloadedHandler;
             }
         }
 
@@ -518,14 +516,14 @@ namespace BlackBerry.Package
         {
             if (BufferDirty || DesignerDirty)
             {
-                int delay = 100;
+                const int delay = 100;
 
                 if ((Environment.TickCount - _dirtyTime) > delay)
                 {
                     // Must not try and sync while XML editor is parsing otherwise we just confuse matters.
                     if (IsXmlEditorParsing)
                     {
-                        _dirtyTime = System.Environment.TickCount;
+                        _dirtyTime = Environment.TickCount;
                         return;
                     }
 
@@ -681,7 +679,7 @@ namespace BlackBerry.Package
         /// </summary>
         XDocument GetParseTree()
         {
-            LanguageService langsvc = this.GetXmlLanguageService();
+            LanguageService langsvc = GetXmlLanguageService();
 
             // don't crash if the language service is not available
             if (langsvc != null)
@@ -882,12 +880,12 @@ namespace BlackBerry.Package
             startInfo.CreateNoWindow = true;
             startInfo.RedirectStandardError = true;
             startInfo.RedirectStandardOutput = true;
-            p.OutputDataReceived += new System.Diagnostics.DataReceivedEventHandler(p_OutputDataReceived);
+            p.OutputDataReceived += p_OutputDataReceived;
 
 
-            /// Get Device PIN
+            // Get Device PIN
             startInfo.FileName = "cmd.exe";
-            startInfo.Arguments = string.Format(@"/C blackberry-airpackager.bat -listManifest ""{0}""", _localRIMFolder + "DebugToken.bar");
+            startInfo.Arguments = string.Format(@"/C blackberry-airpackager.bat -listManifest ""{0}""", RunnerDefaults.DataDirectory + "DebugToken.bar");
 
             try
             {
@@ -907,8 +905,8 @@ namespace BlackBerry.Package
         /// <summary>
         /// Get the author ID
         /// </summary>
-        /// <returns>REturns the author ID</returns>
-        public string getAuthorID()
+        /// <returns>Returns the author ID</returns>
+        public string GetAuthorID()
         {
             return _tmpAuthorID;
         }
@@ -916,8 +914,8 @@ namespace BlackBerry.Package
         /// <summary>
         /// Get the author ID
         /// </summary>
-        /// <returns>REturns the author ID</returns>
-        public string getAuthor()
+        /// <returns>Returns the author ID</returns>
+        public string GetAuthor()
         {
            return _tmpAuthor;
         }

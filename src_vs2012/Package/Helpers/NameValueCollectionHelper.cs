@@ -16,7 +16,7 @@ using System;
 using System.Text;
 using System.Collections.Specialized;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.Helpers
 {
     /// <summary>
     /// 

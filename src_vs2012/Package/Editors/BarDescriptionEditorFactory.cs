@@ -23,13 +23,13 @@ using Microsoft.VisualStudio.OLE.Interop;
 
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.Editors
 {
     /// <summary>
     /// Factory for creating the bar-descriptor editor
     /// </summary>
     [Guid(GuidList.guidVSNDK_PackageEditorFactoryString)]
-    public sealed class EditorFactory : IVsEditorFactory, IDisposable
+    public sealed class BarDescriptorEditorFactory : IVsEditorFactory, IDisposable
     {
         /// Declare Constants
         public const string DefaultExtension = ".xml";
@@ -131,8 +131,8 @@ namespace BlackBerry.Package
             }
 
             // Create the Document (editor)
-            EditorPane NewEditor = new EditorPane(_vsServiceProvider, pszMkDocument, textBuffer);
-            ppunkDocView = Marshal.GetIUnknownForObject(NewEditor);
+            var newEditor = new BarDescriptorEditorPane(_vsServiceProvider, pszMkDocument, textBuffer);
+            ppunkDocView = Marshal.GetIUnknownForObject(newEditor);
             ppunkDocData = Marshal.GetIUnknownForObject(textBuffer);
             pbstrEditorCaption = "";
             return VSConstants.S_OK;

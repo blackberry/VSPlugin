@@ -16,6 +16,7 @@ using System;
 using System.Runtime.InteropServices;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package;
+using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;

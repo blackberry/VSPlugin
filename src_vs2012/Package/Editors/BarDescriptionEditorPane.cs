@@ -13,6 +13,7 @@
 //* limitations under the License.
 
 using System;
+using BlackBerry.Package.ViewModels;
 using Microsoft.VisualStudio.OLE.Interop;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.TextManager.Interop;
@@ -23,20 +24,19 @@ using System.ComponentModel.Design;
 using Microsoft.VisualStudio.Shell;
 using System.Security.Permissions;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.Editors
 {
     /// <summary>
     /// This control hosts the editor and is responsible for
     /// handling the commands targeted to the editor 
     /// </summary>
-
     [ComVisible(true)]
-    public sealed class EditorPane : WindowPane, IOleComponent, IVsDeferredDocView, IVsLinkedUndoClient
+    public sealed class BarDescriptorEditorPane : WindowPane, IOleComponent, IVsDeferredDocView, IVsLinkedUndoClient
     {
         #region Fields
         private readonly ServiceProvider _service;
         private readonly string _fileName;
-        private VsDesignerControl _vsDesignerControl;
+        private BarDescriptorEditorControl _vsDesignerControl;
         private readonly IVsTextLines _textBuffer;
         private uint _componentId;
         private IOleUndoManager _undoManager;
@@ -50,7 +50,7 @@ namespace BlackBerry.Package
         /// Constructor that calls the Microsoft.VisualStudio.Shell.WindowPane constructor then
         /// our initialization functions.
         /// </summary>
-        public EditorPane(ServiceProvider service, string fileName, IVsTextLines textBuffer)
+        public BarDescriptorEditorPane(ServiceProvider service, string fileName, IVsTextLines textBuffer)
             : base(null)
         {
             _fileName = fileName;
@@ -116,7 +116,7 @@ namespace BlackBerry.Package
             }
             #endregion
 
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EditorPane));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(BarDescriptorEditorPane));
 
             #region Hook Undo Manager
             // Attach an IOleUndoManager to our WindowFrame. Merely calling QueryService 
@@ -151,7 +151,7 @@ namespace BlackBerry.Package
             // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
             // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on 
             // the object returned by the Content property.
-            _vsDesignerControl = new VsDesignerControl(_service, new ViewModel(_store, _model, this, _textBuffer));
+            _vsDesignerControl = new BarDescriptorEditorControl(_service, new BarEditorViewModel(_store, _model, this, _textBuffer));
             base.Content = _vsDesignerControl;
 
             RegisterIndependentView(true);

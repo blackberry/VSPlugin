@@ -14,15 +14,16 @@
 
 using System;
 using System.Collections.Generic;
+using BlackBerry.Package.Model;
 using Microsoft.VisualStudio.XmlEditor;
 using System.IO;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.ViewModels
 {
     /// <summary>
     /// Implementation of the IViewModel interface
     /// </summary>
-    public interface IViewModel
+    public interface IBarEditorViewModel
     {
         /// <summary>
         /// Form Properties
