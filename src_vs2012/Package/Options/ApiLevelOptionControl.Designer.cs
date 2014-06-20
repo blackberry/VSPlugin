@@ -17,6 +17,14 @@
             {
                 components.Dispose();
             }
+            if (disposing)
+            {
+                if (_vm != null)
+                {
+                    _vm.Dispose();
+                }
+            }
+
             base.Dispose(disposing);
         }
 

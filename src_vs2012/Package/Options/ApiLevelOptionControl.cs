@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Options.Dialogs;
