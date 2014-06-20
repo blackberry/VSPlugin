@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.Model
 {
@@ -265,6 +266,7 @@ namespace BlackBerry.NativeCore.Model
             string hostPath = null;
             string targetPath = null;
             DeviceFamilyType type = DeviceFamilyType.Phone;
+            bool allowTypeOverride = true;
 
             while (reader.Read())
             {
@@ -284,6 +286,10 @@ namespace BlackBerry.NativeCore.Model
                         case "target":
                             targetPath = Path.GetFullPath(reader.ReadString());
                             break;
+                        case "edition":
+                            type = DeviceFamilyHelper.GetTypeFromString(reader.ReadString());
+                            allowTypeOverride = false;
+                            break;
                     }
                 }
 
@@ -294,7 +300,10 @@ namespace BlackBerry.NativeCore.Model
                         // is it a PlayBook NDK, which has no 'version' field?
                         if (version == null && !string.IsNullOrEmpty(name))
                         {
-                            type = DeviceFamilyType.Tablet;
+                            if (allowTypeOverride)
+                            {
+                                type = DeviceFamilyType.Tablet;
+                            }
 
                             // try first to load info about installation:
                             var installInfoPath = Path.Combine(targetPath, "..", "..", "install", "info.txt");
@@ -626,6 +635,7 @@ namespace BlackBerry.NativeCore.Model
     <version>{1}</version>
     <host>{2}</host>
     <target>{3}</target>
+    <edition>{4}</edition>
     <annotation>
       <appInfo source=""Custom SDK""/>
     </annotation>
@@ -647,6 +657,7 @@ namespace BlackBerry.NativeCore.Model
                 inst["version"].InnerText = version;
                 inst["host"].InnerText = hostPath;
                 inst["target"].InnerText = targetPath;
+                inst["edition"].InnerText = DeviceFamilyHelper.GetTypeToString(Type);
             }
             else
             {

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Tools;
 using Microsoft.Win32;
 
@@ -96,7 +97,7 @@ namespace BlackBerry.NativeCore.Model
             {
                 var xType = settings.GetValue(FieldFamilyType);
                 if (xType != null)
-                    type = GetTypeFromString(xType.ToString());
+                    type = DeviceFamilyHelper.GetTypeFromString(xType.ToString());
             }
             catch
             {
@@ -154,7 +155,7 @@ namespace BlackBerry.NativeCore.Model
 
                 settings.SetValue(FieldHostPath, HostPath);
                 settings.SetValue(FieldTargetPath, TargetPath);
-                settings.SetValue(FieldFamilyType, GetTypeToString(Type));
+                settings.SetValue(FieldFamilyType, DeviceFamilyHelper.GetTypeToString(Type));
             }
             finally
             {
@@ -162,33 +163,6 @@ namespace BlackBerry.NativeCore.Model
                     settings.Close();
                 registry.Close();
             }
-        }
-
-        /// <summary>
-        /// Gets the string representation of the DeviceFamilyType.
-        /// </summary>
-        private static string GetTypeToString(DeviceFamilyType type)
-        {
-            switch (type)
-            {
-                case DeviceFamilyType.Phone:
-                    return "phone";
-                case DeviceFamilyType.Tablet:
-                    return "tablet";
-                default:
-                    throw new ArgumentOutOfRangeException("type");
-            }
-        }
-
-        private static DeviceFamilyType GetTypeFromString(string name)
-        {
-            if (string.IsNullOrEmpty(name))
-                return DeviceFamilyType.Phone;
-
-            if (string.Compare("tablet", name, StringComparison.OrdinalIgnoreCase) == 0)
-                return DeviceFamilyType.Tablet;
-
-            return DeviceFamilyType.Phone;
         }
     }
 }

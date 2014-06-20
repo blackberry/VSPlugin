@@ -62,6 +62,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\TraceLog.cs">
       <Link>Diagnostics\TraceLog.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\DeviceFamilyHelper.cs">
+      <Link>Helpers\DeviceFamilyHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Helpers\GlobalHelper.cs">
       <Link>Helpers\GlobalHelper.cs</Link>
     </Compile>
