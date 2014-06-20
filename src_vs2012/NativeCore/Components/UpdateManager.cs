@@ -15,7 +15,7 @@ namespace BlackBerry.NativeCore.Components
         /// <summary>
         /// Description of actions scheduled to execution by UpdateManager.
         /// </summary>
-        public sealed class ActionData
+        public sealed class ActionData : IDisposable
         {
             private readonly string _description;
             private ApiLevelUpdateRunner _runner;
@@ -40,6 +40,11 @@ namespace BlackBerry.NativeCore.Components
                 _description = Name.Contains(Version.ToString())
                                     ? string.Concat(GetActionName(Action), " ", Name)
                                     : string.Concat(GetActionName(Action), " ", Name, " (", Version, ")");
+            }
+
+            ~ActionData()
+            {
+                Dispose(false);
             }
 
             private static string GetActionName(ApiLevelAction action)
@@ -107,7 +112,7 @@ namespace BlackBerry.NativeCore.Components
             {
                 bool aborted = false;
 
-                lock (GetType())
+                lock (UpdateManager.SyncObject)
                 {
                     if (_runner != null && CanAbort)
                     {
@@ -123,7 +128,7 @@ namespace BlackBerry.NativeCore.Components
 
             public void Start()
             {
-                lock (GetType())
+                lock (UpdateManager.SyncObject)
                 {
                     // do nothing if already running
                     if (IsRunning)
@@ -148,7 +153,7 @@ namespace BlackBerry.NativeCore.Components
 
             private void OnFinished(object sender, ToolRunnerEventArgs e)
             {
-                lock (GetType())
+                lock (UpdateManager.SyncObject)
                 {
                     _runner.Finished -= OnFinished;
                     _runner.Log -= OnLog;
@@ -166,6 +171,28 @@ namespace BlackBerry.NativeCore.Components
 
                 UpdateManager.Remove(this);
             }
+
+            #region IDisposable Implementation
+
+            public void Dispose()
+            {
+                GC.SuppressFinalize(this);
+                Dispose(true);
+            }
+
+            private void Dispose(bool dispose)
+            {
+                if (dispose)
+                {
+                    if (_runner != null)
+                    {
+                        _runner.Dispose();
+                        _runner = null;
+                    }
+                }
+            }
+
+            #endregion
         }
 
         #endregion
@@ -192,6 +219,8 @@ namespace BlackBerry.NativeCore.Components
         public event EventHandler Started;
         public event EventHandler<UpdateManagerCompletedEventArgs> Completed;
 
+        private readonly object _sync;
+        private readonly string _syncPath;
         private ApiLevelUpdateLogEventArgs _lastLog;
         private readonly List<ActionData> _actions;
         private Timer _timer;
@@ -202,7 +231,8 @@ namespace BlackBerry.NativeCore.Components
                 throw new ArgumentNullException("folder");
 
             Folder = folder;
-            SyncFilePath = Path.Combine(Folder, "vsplugin.lock");
+            _sync = new object();
+            _syncPath = Path.Combine(Folder, "vsplugin.lock");
             _actions = new List<ActionData>();
             Actions = new ActionData[0];
         }
@@ -247,10 +277,14 @@ namespace BlackBerry.NativeCore.Components
             set;
         }
 
+        private object SyncObject
+        {
+            get { return _sync; }
+        }
+
         private string SyncFilePath
         {
-            get;
-            set;
+            get { return _syncPath; }
         }
 
         #endregion
@@ -273,7 +307,7 @@ namespace BlackBerry.NativeCore.Components
             if (action == null)
                 throw new ArgumentNullException("action");
 
-            lock (GetType())
+            lock (_sync)
             {
                 TraceLog.WriteLine("Scheduled: {0}", action);
 
@@ -291,7 +325,7 @@ namespace BlackBerry.NativeCore.Components
             if (action == null)
                 throw new ArgumentNullException("action");
 
-            lock (GetType())
+            lock (_sync)
             {
                 TraceLog.WarnLine("Removed: {0}", action);
 
@@ -333,7 +367,7 @@ namespace BlackBerry.NativeCore.Components
             if (CurrentAction != null)
                 return;
 
-            lock (GetType())
+            lock (_sync)
             {
                 if (_actions.Count == 0)
                     return;
@@ -393,7 +427,7 @@ namespace BlackBerry.NativeCore.Components
 
             bool completed = false;
 
-            lock (GetType())
+            lock (_sync)
             {
                 if (CurrentAction == action)
                 {
@@ -473,7 +507,7 @@ namespace BlackBerry.NativeCore.Components
         {
             if (disposing)
             {
-                lock (GetType())
+                lock (_sync)
                 {
                     if (SyncFile != null)
                     {
