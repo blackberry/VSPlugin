@@ -82,7 +82,7 @@ namespace BlackBerry.Package
     [ProvideOptionPage(typeof(ApiLevelOptionPage), "BlackBerry", "API Levels", 1001, 1004, true)]
     [ProvideOptionPage(typeof(TargetsOptionPage), "BlackBerry", "Targets", 1001, 1005, true)]
     [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
-    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package
+    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable
     {
         public const string VersionString = "2.1.2014.0616";
 
@@ -116,6 +116,11 @@ namespace BlackBerry.Package
         public BlackBerryPackage()
         {
             Trace.WriteLine(string.Format(CultureInfo.CurrentCulture, "Entering constructor for: {0}", ToString()));
+        }
+
+        ~BlackBerryPackage()
+        {
+            Dispose(false);
         }
 
         /// <summary>
@@ -262,6 +267,12 @@ namespace BlackBerry.Package
         {
             if (disposing)
             {
+                if (_traceWindow != null)
+                {
+                    _traceWindow.Dispose();
+                    _traceWindow = null;
+                }
+
                 if (_buildPlatformsManager != null)
                 {
                     _buildPlatformsManager.Close();
@@ -747,6 +758,20 @@ namespace BlackBerry.Package
             return (false);
         }
 
+
+        #endregion
+
+        #region IDisposable Implementation
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            GC.SuppressFinalize(this);
+            Dispose(true);
+        }
 
         #endregion
 

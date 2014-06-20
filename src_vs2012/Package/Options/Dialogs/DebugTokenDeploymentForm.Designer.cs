@@ -17,6 +17,35 @@
             {
                 components.Dispose();
             }
+
+            if (disposing)
+            {
+                if (_deviceInfoRunner != null)
+                {
+                    _deviceInfoRunner.Dispose();
+                    _deviceInfoRunner = null;
+                }
+                if (_tokenCreateRunner != null)
+                {
+                    _tokenCreateRunner.Dispose();
+                    _tokenCreateRunner = null;
+                }
+                if (_tokenInfoRunner != null)
+                {
+                    _tokenInfoRunner.Dispose();
+                    _tokenInfoRunner = null;
+                }
+                if (_tokenRemoveRunner != null)
+                {
+                    _tokenRemoveRunner.Dispose();
+                    _tokenRemoveRunner = null;
+                }
+                if (_tokenUploadRunner != null)
+                {
+                    _tokenUploadRunner.Dispose();
+                    _tokenUploadRunner = null;
+                }
+            }
             base.Dispose(disposing);
         }
 

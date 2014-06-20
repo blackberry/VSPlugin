@@ -17,6 +17,14 @@
             {
                 components.Dispose();
             }
+            if (disposing)
+            {
+                if (_runner != null)
+                {
+                    _runner.Dispose();
+                    _runner = null;
+                }
+            }
             base.Dispose(disposing);
         }
 

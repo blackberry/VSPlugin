@@ -96,7 +96,7 @@ namespace BlackBerry.Package.Editors
 
         /// <summary>
         /// Called after the WindowPane has been sited with an IServiceProvider from the environment
-        /// 
+        /// </summary>
         protected override void Initialize()
         {
             base.Initialize();
