@@ -1554,10 +1554,7 @@ namespace BlackBerry.Package.ViewModels
         /// </summary>
         public string Error
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            get { return string.Empty; }
         }
 
         /// <summary>
