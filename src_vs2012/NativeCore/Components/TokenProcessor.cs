@@ -13,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 
@@ -24,19 +23,6 @@ namespace BlackBerry.NativeCore.Components
     /// </summary>
     public sealed class TokenProcessor
     {
-        #region Externals
-
-        /// <summary>
-        /// Indicates whether the file type is binary or not.
-        /// </summary>
-        /// <param name="applicationName">Full path to the file to check</param>
-        /// <param name="binaryType">If file is binary the bitness of the app is indicated by lpBinaryType value.</param>
-        /// <returns>True if the file is binary false otherwise</returns>
-        [DllImport("kernel32.dll")]
-        private static extern bool GetBinaryType([MarshalAs(UnmanagedType.LPWStr)] string applicationName, out uint binaryType);
-
-        #endregion
-
         #region Token Classes
 
         private abstract class ActionToken
@@ -276,7 +262,7 @@ namespace BlackBerry.NativeCore.Components
             // any other type of binary file.
 
             uint binaryType;
-            if (!GetBinaryType(source, out binaryType))
+            if (!NativeMethods.GetBinaryType(source, out binaryType))
             {
                 Encoding encoding;
                 StringBuilder buffer;

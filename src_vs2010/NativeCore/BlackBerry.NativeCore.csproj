@@ -131,6 +131,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Model\Size.cs">
       <Link>Model\Size.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
