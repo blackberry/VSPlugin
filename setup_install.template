@@ -9,7 +9,7 @@ REGEDIT4
 "NDKTargetPath"=""
 "NDKRemotePath"=""
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}]
+[#DebuggerRegistryRoot#\Microsoft\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}]
 "AddressBP"=dword:00000000
 "AutoSelectPriority"=dword:00000004
 "CallstackBP"=dword:00000001
@@ -21,25 +21,25 @@ REGEDIT4
 "Name"="BlackBerry Native SDK Debug Engine"
 @="guidDebuggingSampleEngine"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}\IncompatibleList]
+[#DebuggerRegistryRoot#\Microsoft\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}\IncompatibleList]
 "guidScriptEng"="{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}"
 "guidNativeOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
 "guidCOMPlusOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
 "guidCOMPlusNativeEng"="{92EF0900-2251-11D2-B72E-0000F87572EF}"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\CLSID\{AD06FD46-C790-4D5C-A274-8815DF9511B8}]
+[#DebuggerRegistryRoot#\Microsoft\VisualStudio\#VSVersion#\CLSID\{AD06FD46-C790-4D5C-A274-8815DF9511B8}]
 "CodeBase"="#PluginPath#\\BlackBerry.DebugEngine.dll"
 "InprocServer32"="C:\\Windows\\System32\\mscoree.dll"
 "Class"="BlackBerry.DebugEngine.AD7ProgramProvider"
 "Assembly"="BlackBerry.DebugEngine"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\CLSID\{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}]
+[#DebuggerRegistryRoot#\Microsoft\VisualStudio\#VSVersion#\CLSID\{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}]
 "CodeBase"="#PluginPath#\\BlackBerry.DebugEngine.dll"
 "InprocServer32"="C:\\Windows\\System32\\mscoree.dll"
 "Class"="BlackBerry.DebugEngine.AD7Engine"
 "Assembly"="BlackBerry.DebugEngine"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\CLSID\{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}]
+[#DebuggerRegistryRoot#\Microsoft\VisualStudio\#VSVersion#\CLSID\{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}]
 @="BlackBerrySupplier"
 "Assembly"="BlackBerry.DebugEngine"
 "Class"="BlackBerry.DebugEngine.AD7PortSupplier"
@@ -47,14 +47,14 @@ REGEDIT4
 "CodeBase"="#PluginPath#\\BlackBerry.DebugEngine.dll"
 "ThreadingModel"="Free"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\PortSupplier\{92A2B753-00BD-40FF-9964-6AB64A1D6C9F}]
+[#DebuggerRegistryRoot#\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\PortSupplier\{92A2B753-00BD-40FF-9964-6AB64A1D6C9F}]
 "Name"="BlackBerry"
 "DisallowUserEnteredPorts"=dword:00000000
 "CLSID"="{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}"
 @="BlackBerry Native SDK"
 "PortPickerCLSID"="{3FAA02D6-72D8-4F69-A1E6-BB05ECB4E37A}"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}]
+[#DebuggerRegistryRoot#\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}]
 "AlwaysLoadLocal"="1"
 "PortSupplier"="{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}"
 "Name"="BlackBerry Native SDK Debug Engine"
@@ -66,7 +66,7 @@ REGEDIT4
 "CLSID"="{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}"
 @="guidDebuggingSampleEngine"
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}\IncompatibleList]
+[#DebuggerRegistryRoot#\Microsoft\VisualStudio\#VSVersion#\AD7Metrics\Engine\{E5A37609-2F43-4830-AA85-D94CFA035DD2}\IncompatibleList]
 "guidScriptEng"="{F200A7E7-DEA5-11D0-B854-00A0244A1DE2}"
 "guidNativeOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"
 "guidCOMPlusOnlyEng"="{449EC4CC-30D2-4032-9256-EE18EB41B62B}"

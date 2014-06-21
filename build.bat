@@ -175,15 +175,17 @@ set VSVersion=%~2
 set PluginRegistryNodeName=BlackBerryVSPlugin
 set PluginPathX86="C:\Program Files\BlackBerry\VSPlugin-NDK"
 set PluginPathX64="C:\Program Files (x86)\BlackBerry\VSPlugin-NDK"
+set DebuggerRegistryNodeX86="HKEY_LOCAL_MACHINE\SOFTWARE"
+set DebuggerRegistryNodeX64="HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node"
 
 set InstallOutputFileX86="%BuildResults%\setup_VS%VSYear%_install_x86.reg"
 set InstallOutputFileX64="%BuildResults%\setup_VS%VSYear%_install_x64.reg"
 set UninstallOutputFile="%BuildResults%\setup_VS%VSYear%_uninstall.reg"
 
-call :processTemplate %InstallTemplate% %InstallOutputFileX86% %VSYear% %VSVersion% %PluginRegistryNodeName% %PluginPathX86%
-call :processTemplate %InstallTemplate% %InstallOutputFileX64% %VSYear% %VSVersion% %PluginRegistryNodeName% %PluginPathX64%
+call :processTemplate %InstallTemplate% %InstallOutputFileX86% %VSYear% %VSVersion% %PluginRegistryNodeName% %PluginPathX86% %DebuggerRegistryNodeX86%
+call :processTemplate %InstallTemplate% %InstallOutputFileX64% %VSYear% %VSVersion% %PluginRegistryNodeName% %PluginPathX64% %DebuggerRegistryNodeX64%
 
-call :processTemplate %UninstallTemplate% %UninstallOutputFile% %VSYear% %VSVersion% %PluginRegistryNodeName% ""
+call :processTemplate %UninstallTemplate% %UninstallOutputFile% %VSYear% %VSVersion% %PluginRegistryNodeName% "" ""
 
 endlocal
 exit /b
@@ -196,6 +198,7 @@ REM $3 - Visual Studio number (2010)
 REM $4 - Visual Studio version (10.0)
 REM $5 - registry node name of the plugin (BlackBerryVSPlugin)
 REM $6 - plugin installation directory (C:\Program Files (x86)\BlackBerry\VSPlugin-NDK)
+REM $7 - registry root node for debugger info (HKEY_LOCAL_MACHINE\SOFTWARE or HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node)
 :processTemplate
 setlocal EnableDelayedExpansion
 
@@ -206,6 +209,7 @@ set VSYear=%~3
 set VSVersion=%~4
 set PluginRegistryNodeName=%~5
 set PluginPath=%~6
+set DebuggerRegistryRoot=%~7
 
 REM Tweak a bit the path, to be better consumed by delayed evaluation
 REM and printed correctly into output (preserve parenthesis and double path-chars)
@@ -228,6 +232,7 @@ for /f "tokens=* delims=" %%l in (%InputFile%) do (
   set line=!line:#VSYear#=%VSYear%!
   set line=!line:#PluginRegistryNodeName#=%PluginRegistryNodeName%!
   set line=!line:#PluginPath#=%PluginPath%!
+  set line=!line:#DebuggerRegistryRoot#=%DebuggerRegistryRoot%!
   echo.!line! >> "%OutputFile%"
 )
 echo.>> "%OutputFile%"
