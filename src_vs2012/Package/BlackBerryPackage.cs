@@ -283,6 +283,30 @@ namespace BlackBerry.Package
             base.Dispose(disposing);
         }
 
+        protected override int QueryClose(out bool canClose)
+        {
+            var updateManager = PackageViewModel.Instance.UpdateManager;
+
+            if (updateManager.IsRunning)
+            {
+                canClose = false;
+
+                if (MessageBoxHelper.Show("Do you want to abort it and exit?",
+                    "There are still some jobs running by BlackBerry Native Plugin (i.e. new NDK, simulator or runtime downloads).",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Exclamation) == DialogResult.Yes)
+                {
+                    canClose = true;
+                    updateManager.CancelAll();
+                }
+            }
+            else
+            {
+                canClose = true;
+            }
+
+            return VSConstants.S_OK;
+        }
+
         public Window2 OpenWebPageTab(string url)
         {
             return (Window2)_dte.ItemOperations.Navigate(url, vsNavigateOptions.vsNavigateOptionsNewWindow);

@@ -287,6 +287,14 @@ namespace BlackBerry.NativeCore.Components
             get { return _syncPath; }
         }
 
+        /// <summary>
+        /// Gets and indication, if anything is currently being processed or scheduled.
+        /// </summary>
+        public bool IsRunning
+        {
+            get { return CurrentAction != null || Actions.Length > 0; }
+        }
+
         #endregion
 
         /// <summary>
@@ -507,6 +515,22 @@ namespace BlackBerry.NativeCore.Components
         {
             if (disposing)
             {
+                CancelAll();
+            }
+        }
+
+        #endregion
+
+        public void CancelAll()
+        {
+            lock (_sync)
+            {
+                if (_timer != null)
+                {
+                    _timer.Dispose();
+                    _timer = null;
+                }
+
                 lock (_sync)
                 {
                     if (SyncFile != null)
@@ -525,15 +549,7 @@ namespace BlackBerry.NativeCore.Components
                         action.Abort();
                     }
                 }
-
-                if (_timer != null)
-                {
-                    _timer.Dispose();
-                    _timer = null;
-                }
             }
         }
-
-        #endregion
     }
 }

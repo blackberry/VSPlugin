@@ -188,8 +188,8 @@ namespace BlackBerry.Package.Options.Dialogs
                                 var info = form.SelectedItem;
                                 _vm.RequestInstall(info, actionTarget);
 
-                                MessageBoxHelper.Show("Scheduled \"" + info + "\" for installation. Please be patient, this might take some time.\r\n\r\nProgress can be monitored in Status window.",
-                                                      "Update Manager", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                MessageBoxHelper.Show("Scheduled \"" + info + "\" for installation. Please be patient, this might take some time.\r\n\r\nProgress can be monitored in Status window available at Settings -> API-Level tab.",
+                                                      null, MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                         }
                         break;
@@ -213,7 +213,7 @@ namespace BlackBerry.Package.Options.Dialogs
                             UpdateUI();
 
                             MessageBoxHelper.Show("Scheduled \"" + definition + "\" for removal. Please be patient, this might take some time.",
-                                "Update Manager", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                null, MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         break;
                 }
@@ -245,7 +245,7 @@ namespace BlackBerry.Package.Options.Dialogs
                     }
                     else
                     {
-                        MessageBoxHelper.Show("Unable to save NDK information", "Update Manager", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBoxHelper.Show("Unable to save NDK information", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
             }
