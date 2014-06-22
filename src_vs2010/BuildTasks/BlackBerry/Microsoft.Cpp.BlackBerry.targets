@@ -49,17 +49,17 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <SetEnv Name   ="QNX_HOST"
             Value  ="$(QNX_HOST)"
-            Prefix ="false" >
+            Prefix ="false">
       <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_HOST"/>
     </SetEnv>
     <SetEnv Name   ="QNX_TARGET"
             Value  ="$(QNX_TARGET)"
-            Prefix ="false" >
+            Prefix ="false">
       <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_TARGET"/>
     </SetEnv>
     <SetEnv Name   ="QCC_CONF_PATH"
             Value  ="$(QCC_CONF_PATH)"
-            Prefix ="false" >
+            Prefix ="false">
       <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QCC_CONF_PATH"/>
     </SetEnv>
   </Target>
@@ -83,25 +83,25 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       TargetName      ="$(TargetName)"
       TargetExtension ="$(TargetExt)"
       CompileItems    ="@(ClCompile)"
-      LinkItems		  ="@(Lib)"
+      LinkItems       ="@(Lib)"
       ProjectDir      ="$(ProjectDir)"
-      IntDir		  ="$(IntDir)"
-      OutDir		  ="$(OutDir)"
+      IntDir          ="$(IntDir)"
+      OutDir          ="$(OutDir)"
       CompilerVersion ="$(CompilerVersion)"
       Platform        ="$(Platform)"
       AdditionalIncludeDirectories ="$(IncludePath)"
       AdditionalLibraryDirectories ="$(LibraryPath)"
       ExcludeDirectories ="$(ExcludePath)"
-      ConfigurationType ="$(ConfigurationType)"
+      ConfigurationType  ="$(ConfigurationType)"
       />
     
     <MakeAllAndFormatOutputMessages
         ProjectDir      ="$(ProjectDir)"
-        OutDir		  ="$(IntDir)"      
-        ToolsPath ="$(BuildBarToolPath)"
+        OutDir          ="$(IntDir)"
+        ToolsPath       ="$(BuildBarToolPath)"
         CompileItems    ="@(ClCompile)"
       >
-    </MakeAllAndFormatOutputMessages >
+    </MakeAllAndFormatOutputMessages>
     
   </Target>
 
@@ -133,25 +133,25 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       TargetName      ="$(TargetName)"
       TargetExtension ="$(TargetExt)"
       CompileItems    ="@(ClCompile)"
-      LinkItems		  ="@(Link)"
+      LinkItems       ="@(Link)"
       ProjectDir      ="$(ProjectDir)"
-      IntDir		  ="$(IntDir)"
-      OutDir		  ="$(OutDir)"
+      IntDir          ="$(IntDir)"
+      OutDir          ="$(OutDir)"
       CompilerVersion ="$(CompilerVersion)"
       Platform        ="$(Platform)"
       AdditionalIncludeDirectories ="$(IncludePath)"
       AdditionalLibraryDirectories ="$(LibraryPath)"
       ExcludeDirectories ="$(ExcludePath)"
-      ConfigurationType ="$(ConfigurationType)"
+      ConfigurationType  ="$(ConfigurationType)"
       />
 
     <MakeAllAndFormatOutputMessages
         ProjectDir      ="$(ProjectDir)"
-        OutDir		  ="$(IntDir)"      
-        ToolsPath ="$(BuildBarToolPath)"
+        OutDir          ="$(IntDir)"
+        ToolsPath       ="$(BuildBarToolPath)"
         CompileItems    ="@(ClCompile)">
-    </MakeAllAndFormatOutputMessages >
-  
+    </MakeAllAndFormatOutputMessages>
+
 </Target>
 
   <PropertyGroup>
@@ -162,6 +162,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </PropertyGroup>
   
   <Target Name="MakeClean">
+    <Error Condition="$(QNX_HOST) == ''" Text="The NDK is not selected properly, unable to build as toolset is missing, QNX_HOST and QNX_TARGET are undefined." />
     <Exec Command="$(QccToolsPath)\make clean" WorkingDirectory="$(IntDir)" Condition="Exists('$(IntDir)makefile')" />
     <Message Text="Nothing to clean. $(IntDir)makefile does not exist." Condition="!Exists('$(IntDir)makefile')" />
   </Target>
