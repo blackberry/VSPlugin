@@ -468,12 +468,11 @@ namespace BlackBerry.Package.ViewModels
             // need to select anything?
             if (ActiveNDK == null)
             {
-                ActiveNDK = GetLatestNDK();
-            }
-            else
-            {
                 // make sure invalid info from registry is removed:
                 NdkDefinition.Delete();
+
+                // then select correct NDK:
+                ActiveNDK = GetLatestNDK();
             }
         }
 

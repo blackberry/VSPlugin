@@ -84,7 +84,7 @@ namespace BlackBerry.Package
     [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable
     {
-        public const string VersionString = "2.1.2014.0616";
+        public const string VersionString = "2.1.2014.0622";
 
         #region private member variables
 
@@ -166,8 +166,6 @@ namespace BlackBerry.Package
             //Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new BarDescriptorEditorFactory());
             TraceLog.WriteLine(" * registered editors");
-
-            EnsureActiveNDK();
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
 
             CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
@@ -251,14 +249,14 @@ namespace BlackBerry.Package
                 TraceLog.WriteLine(" * initialized menus");
             }
 
-            TraceLog.WriteLine("-------------------- DONE");
+            TraceLog.WriteLine("-------------------- DONE ({0})", VersionString);
 
             // make sure there is an NDK selected and developer knows about it:
-            if (IsBlackBerrySolution(_dte) && GetInstalledNdkCount() == 0)
+            EnsureActiveNDK();
+            if (!HasActiveNDK)
             {
                 var form = new MissingNdkInstalledForm();
                 form.ShowDialog();
-
                 EnsureActiveNDK();
             }
         }
@@ -381,10 +379,18 @@ namespace BlackBerry.Package
         /// </summary>
         private bool IsBlackBerrySolution(DTE2 dte)
         {
-            if (dte.Solution.FullName != "")
+            if (dte.Solution != null)
             {
-                string fileText = File.ReadAllText(dte.Solution.FullName);
-                return fileText.Contains("Debug|BlackBerry");
+                var projects = dte.Solution.Projects;
+                if (projects != null)
+                {
+                    foreach (Project project in projects)
+                    {
+                        var platformName = project.ConfigurationManager != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
+                        if (platformName == "BlackBerry" || platformName == "BlackBerrySimulator")
+                            return true;
+                    }
+                }
             }
 
             return false;
@@ -397,6 +403,28 @@ namespace BlackBerry.Package
         {
             return PackageViewModel.Instance.InstalledNDKs.Length;
         }
+
+        /// <summary>
+        /// Gets the currently selected NDK to build against.
+        /// </summary>
+        private NdkInfo ActiveNDK
+        {
+            get { return PackageViewModel.Instance.ActiveNDK; }
+        }
+
+        public bool HasActiveNDK
+        {
+            get
+            {
+#if DEBUG
+                TraceLog.WriteLine("Is BlackBerry solution: {0}\r\nNDK count: {1}\r\nActive NDK: {2}",
+                    IsBlackBerrySolution(_dte), GetInstalledNdkCount(),
+                    ActiveNDK != null ? ActiveNDK.ToString() : "(none)");
+#endif
+                return !IsBlackBerrySolution(_dte) || ActiveNDK != null;
+            }
+        }
+
 
         /// <summary>
         /// Makes sure the NDK is selected and its paths are stored inside registry for build toolset.
@@ -451,7 +479,7 @@ namespace BlackBerry.Package
         }
 
         /// <summary> 
-        /// Verify if the build process was successful. If so, start deploying the app. 
+        /// Verify if the build process was successful. If so, start deploying the app.
         /// </summary>
         private void Built()
         {
@@ -965,10 +993,11 @@ namespace BlackBerry.Package
         /// <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
         private void OnBuildBegin(vsBuildScope scope, vsBuildAction action)
         {
-            if (IsBlackBerrySolution(_dte) && GetInstalledNdkCount() == 0)
+            if (!HasActiveNDK)
             {
                 var form = new MissingNdkInstalledForm();
                 form.ShowDialog();
+                return;
             }
 
             if (action == vsBuildAction.vsBuildActionBuild || action == vsBuildAction.vsBuildActionRebuildAll)

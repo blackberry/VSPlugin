@@ -657,7 +657,7 @@ namespace BlackBerry.NativeCore.Model
                 inst["version"].InnerText = version;
                 inst["host"].InnerText = hostPath;
                 inst["target"].InnerText = targetPath;
-                inst["edition"].InnerText = DeviceFamilyHelper.GetTypeToString(Type);
+                inst["edition"].InnerText = DeviceFamilyHelper.GetTypeToString(Type); // VS-Plugin extension
             }
             else
             {
