@@ -216,115 +216,116 @@
       <Link>Options\ApiLevelOptionPage.cs</Link>
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AboutForm.cs">
-      <Link>Options\Dialogs\AboutForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\AboutForm.cs">
+      <Link>Dialogs\AboutForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AboutForm.designer.cs">
-      <Link>Options\Dialogs\AboutForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\AboutForm.designer.cs">
+      <Link>Dialogs\AboutForm.designer.cs</Link>
       <DependentUpon>AboutForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AddLocalNdkForm.cs">
-      <Link>Options\Dialogs\AddLocalNdkForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\AddLocalNdkForm.cs">
+      <Link>Dialogs\AddLocalNdkForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\AddLocalNdkForm.designer.cs">
-      <Link>Options\Dialogs\AddLocalNdkForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\AddLocalNdkForm.designer.cs">
+      <Link>Dialogs\AddLocalNdkForm.designer.cs</Link>
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\CertificateDetailsForm.cs">
-      <Link>Options\Dialogs\CertificateDetailsForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CertificateDetailsForm.cs">
+      <Link>Dialogs\CertificateDetailsForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\CertificateDetailsForm.designer.cs">
-      <Link>Options\Dialogs\CertificateDetailsForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CertificateDetailsForm.designer.cs">
+      <Link>Dialogs\CertificateDetailsForm.designer.cs</Link>
       <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\CskRequestForm.cs">
-      <Link>Options\Dialogs\CskRequestForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CskRequestForm.cs">
+      <Link>Dialogs\CskRequestForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\CskRequestForm.designer.cs">
-      <Link>Options\Dialogs\CskRequestForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CskRequestForm.designer.cs">
+      <Link>Dialogs\CskRequestForm.designer.cs</Link>
       <DependentUpon>CskRequestForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\DebugTokenDeploymentForm.cs">
-      <Link>Options\Dialogs\DebugTokenDeploymentForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\DebugTokenDeploymentForm.cs">
+      <Link>Dialogs\DebugTokenDeploymentForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\DebugTokenDeploymentForm.designer.cs">
-      <Link>Options\Dialogs\DebugTokenDeploymentForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\DebugTokenDeploymentForm.designer.cs">
+      <Link>Dialogs\DebugTokenDeploymentForm.designer.cs</Link>
       <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\DeviceForm.cs">
-      <Link>Options\Dialogs\DeviceForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\DeviceForm.cs">
+      <Link>Dialogs\DeviceForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\DeviceForm.designer.cs">
-      <Link>Options\Dialogs\DeviceForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\DeviceForm.designer.cs">
+      <Link>Dialogs\DeviceForm.designer.cs</Link>
       <DependentUpon>DeviceForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\InstallConfirmationForm.cs">
-      <Link>Options\Dialogs\InstallConfirmationForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\InstallConfirmationForm.cs">
+      <Link>Dialogs\InstallConfirmationForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\InstallConfirmationForm.designer.cs">
-      <Link>Options\Dialogs\InstallConfirmationForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\InstallConfirmationForm.designer.cs">
+      <Link>Dialogs\InstallConfirmationForm.designer.cs</Link>
       <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\InstallForm.cs">
-      <Link>Options\Dialogs\InstallForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\InstallForm.cs">
+      <Link>Dialogs\InstallForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\InstallForm.designer.cs">
-      <Link>Options\Dialogs\InstallForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\InstallForm.designer.cs">
+      <Link>Dialogs\InstallForm.designer.cs</Link>
       <DependentUpon>InstallForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\ListItemControl.cs">
-      <Link>Options\Dialogs\ListItemControl.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\ListItemControl.cs">
+      <Link>Dialogs\ListItemControl.cs</Link>
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\ListItemControl.designer.cs">
-      <Link>Options\Dialogs\ListItemControl.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\ListItemControl.designer.cs">
+      <Link>Dialogs\ListItemControl.designer.cs</Link>
       <DependentUpon>ListItemControl.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\MissingNdkInstalledForm.cs">
-      <Link>Options\Dialogs\MissingNdkInstalledForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\MissingNdkInstalledForm.cs">
+      <Link>Dialogs\MissingNdkInstalledForm.cs</Link>
+      <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\MissingNdkInstalledForm.designer.cs">
-      <Link>Options\Dialogs\MissingNdkInstalledForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\MissingNdkInstalledForm.designer.cs">
+      <Link>Dialogs\MissingNdkInstalledForm.designer.cs</Link>
       <DependentUpon>MissingNdkInstalledForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\PasswordForm.cs">
-      <Link>Options\Dialogs\PasswordForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\PasswordForm.cs">
+      <Link>Dialogs\PasswordForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\PasswordForm.designer.cs">
-      <Link>Options\Dialogs\PasswordForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\PasswordForm.designer.cs">
+      <Link>Dialogs\PasswordForm.designer.cs</Link>
       <DependentUpon>PasswordForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\PinListForm.cs">
-      <Link>Options\Dialogs\PinListForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\PinListForm.cs">
+      <Link>Dialogs\PinListForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\PinListForm.designer.cs">
-      <Link>Options\Dialogs\PinListForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\PinListForm.designer.cs">
+      <Link>Dialogs\PinListForm.designer.cs</Link>
       <DependentUpon>PinListForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\RegistrationForm.cs">
-      <Link>Options\Dialogs\RegistrationForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\RegistrationForm.cs">
+      <Link>Dialogs\RegistrationForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\RegistrationForm.designer.cs">
-      <Link>Options\Dialogs\RegistrationForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\RegistrationForm.designer.cs">
+      <Link>Dialogs\RegistrationForm.designer.cs</Link>
       <DependentUpon>RegistrationForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\UpdateManagerStatusForm.cs">
-      <Link>Options\Dialogs\UpdateManagerStatusForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\UpdateManagerStatusForm.cs">
+      <Link>Dialogs\UpdateManagerStatusForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Options\Dialogs\UpdateManagerStatusForm.designer.cs">
-      <Link>Options\Dialogs\UpdateManagerStatusForm.designer.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\UpdateManagerStatusForm.designer.cs">
+      <Link>Dialogs\UpdateManagerStatusForm.designer.cs</Link>
       <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.cs">
@@ -428,60 +429,60 @@
       <Link>Options\ApiLevelOptionControl.resx</Link>
       <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\AboutForm.resx">
-      <Link>Options\Dialogs\AboutForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\AboutForm.resx">
+      <Link>Dialogs\AboutForm.resx</Link>
       <DependentUpon>AboutForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\AddLocalNdkForm.resx">
-      <Link>Options\Dialogs\AddLocalNdkForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\AddLocalNdkForm.resx">
+      <Link>Dialogs\AddLocalNdkForm.resx</Link>
       <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\CertificateDetailsForm.resx">
-      <Link>Options\Dialogs\CertificateDetailsForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CertificateDetailsForm.resx">
+      <Link>Dialogs\CertificateDetailsForm.resx</Link>
       <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\CskRequestForm.resx">
-      <Link>Options\Dialogs\CskRequestForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CskRequestForm.resx">
+      <Link>Dialogs\CskRequestForm.resx</Link>
       <DependentUpon>CskRequestForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\DebugTokenDeploymentForm.resx">
-      <Link>Options\Dialogs\DebugTokenDeploymentForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\DebugTokenDeploymentForm.resx">
+      <Link>Dialogs\DebugTokenDeploymentForm.resx</Link>
       <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\DeviceForm.resx">
-      <Link>Options\Dialogs\DeviceForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\DeviceForm.resx">
+      <Link>Dialogs\DeviceForm.resx</Link>
       <DependentUpon>DeviceForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\InstallConfirmationForm.resx">
-      <Link>Options\Dialogs\InstallConfirmationForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\InstallConfirmationForm.resx">
+      <Link>Dialogs\InstallConfirmationForm.resx</Link>
       <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\InstallForm.resx">
-      <Link>Options\Dialogs\InstallForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\InstallForm.resx">
+      <Link>Dialogs\InstallForm.resx</Link>
       <DependentUpon>InstallForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\ListItemControl.resx">
-      <Link>Options\Dialogs\ListItemControl.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\ListItemControl.resx">
+      <Link>Dialogs\ListItemControl.resx</Link>
       <DependentUpon>ListItemControl.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\MissingNdkInstalledForm.resx">
-      <Link>Options\Dialogs\MissingNdkInstalledForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\MissingNdkInstalledForm.resx">
+      <Link>Dialogs\MissingNdkInstalledForm.resx</Link>
       <DependentUpon>MissingNdkInstalledForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\PasswordForm.resx">
-      <Link>Options\Dialogs\PasswordForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\PasswordForm.resx">
+      <Link>Dialogs\PasswordForm.resx</Link>
       <DependentUpon>PasswordForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\PinListForm.resx">
-      <Link>Options\Dialogs\PinListForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\PinListForm.resx">
+      <Link>Dialogs\PinListForm.resx</Link>
       <DependentUpon>PinListForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\RegistrationForm.resx">
-      <Link>Options\Dialogs\RegistrationForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\RegistrationForm.resx">
+      <Link>Dialogs\RegistrationForm.resx</Link>
       <DependentUpon>RegistrationForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\Dialogs\UpdateManagerStatusForm.resx">
-      <Link>Options\Dialogs\UpdateManagerStatusForm.resx</Link>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\UpdateManagerStatusForm.resx">
+      <Link>Dialogs\UpdateManagerStatusForm.resx</Link>
       <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.resx">
