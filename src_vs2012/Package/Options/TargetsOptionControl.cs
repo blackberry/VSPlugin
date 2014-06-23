@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.Package.Dialogs;
 using BlackBerry.Package.Helpers;
-using BlackBerry.Package.Options.Dialogs;
 using BlackBerry.Package.ViewModels;
 
 namespace BlackBerry.Package.Options

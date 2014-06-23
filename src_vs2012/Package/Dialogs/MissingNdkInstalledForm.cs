@@ -1,7 +1,7 @@
 ﻿using System.Windows.Forms;
 using BlackBerry.Package.ViewModels;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     internal partial class MissingNdkInstalledForm : Form
     {

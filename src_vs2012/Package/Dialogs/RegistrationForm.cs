@@ -6,7 +6,7 @@ using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     internal partial class RegistrationForm : Form
     {

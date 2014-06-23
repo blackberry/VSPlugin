@@ -1,4 +1,4 @@
-﻿namespace BlackBerry.Package.Options.Dialogs
+﻿namespace BlackBerry.Package.Dialogs
 {
     internal partial class InstallForm
     {

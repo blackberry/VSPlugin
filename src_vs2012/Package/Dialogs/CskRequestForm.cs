@@ -7,7 +7,7 @@ using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Model.Integration;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     internal partial class CskRequestForm : Form
     {

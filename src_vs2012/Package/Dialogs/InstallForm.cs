@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Model;
-using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.ViewModels;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     internal partial class InstallForm : Form
     {

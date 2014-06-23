@@ -3,7 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
-using BlackBerry.Package.Options.Dialogs;
+using BlackBerry.Package.Dialogs;
 
 namespace BlackBerry.Package.Helpers
 {

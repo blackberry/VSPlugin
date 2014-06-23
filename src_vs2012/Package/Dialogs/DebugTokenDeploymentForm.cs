@@ -9,7 +9,7 @@ using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
 using BlackBerry.Package.ViewModels;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     internal partial class DebugTokenDeploymentForm : Form
     {

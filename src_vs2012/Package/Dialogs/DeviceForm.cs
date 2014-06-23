@@ -8,7 +8,7 @@ using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     /// <summary>
     /// Internal dialog for adding and testing target device.

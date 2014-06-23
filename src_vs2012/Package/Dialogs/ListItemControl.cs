@@ -2,7 +2,7 @@
 using System.Windows.Forms;
 using BlackBerry.NativeCore.Model;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     internal partial class ListItemControl : UserControl
     {

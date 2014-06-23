@@ -1,6 +1,6 @@
 ﻿using BlackBerry.Package.Model.Integration;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     partial class CskRequestForm
     {

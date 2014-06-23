@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Helpers;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     /// <summary>
     /// Dialog for creating list of device PINs.

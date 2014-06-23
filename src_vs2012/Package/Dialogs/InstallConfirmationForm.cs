@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Windows.Forms;
 using BlackBerry.NativeCore.Model;
 
-namespace BlackBerry.Package.Options.Dialogs
+namespace BlackBerry.Package.Dialogs
 {
     /// <summary>
     /// Dialog to show and select list of available versions per particular API Level.
