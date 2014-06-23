@@ -4,7 +4,6 @@ using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
-using BlackBerry.NativeCore.Tools;
 
 namespace BlackBerry.Package.ViewModels
 {
@@ -473,14 +472,14 @@ namespace BlackBerry.Package.ViewModels
                 NdkDefinition.Delete();
 
                 // then select correct NDK:
-                ActiveNDK = GetLatestNDK();
+                ActiveNDK = GetLatestInstalledNDK();
             }
         }
 
         /// <summary>
         /// Gets the reference to the latest version of the NDK installed locally.
         /// </summary>
-        private NdkInfo GetLatestNDK()
+        public NdkInfo GetLatestInstalledNDK()
         {
             // get the last one, as this list is already sorted by version:
             int length = InstalledNDKs.Length;

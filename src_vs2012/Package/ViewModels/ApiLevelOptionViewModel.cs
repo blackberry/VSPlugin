@@ -560,5 +560,13 @@ namespace BlackBerry.Package.ViewModels
                 PackageViewModel.Instance.Forget(ndkInfo);
             }
         }
+
+        /// <summary>
+        /// Gets the instance of the latest available NDK.
+        /// </summary>
+        public NdkInfo GetLatestInstalledNDK()
+        {
+            return PackageViewModel.Instance.GetLatestInstalledNDK();
+        }
     }
 }
