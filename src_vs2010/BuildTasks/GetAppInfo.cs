@@ -22,7 +22,7 @@ namespace BlackBerry.BuildTasks
     /// <summary>
     /// MSBuid Task to retrieve the application info
     /// </summary>
-    public class GetAppInfo : Task
+    public sealed class GetAppInfo : Task
     {
         #region Member Variables and Constants
         private string _projectDir;
@@ -34,7 +34,6 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Execute the MSBuild Task
         /// </summary>
-        /// <returns></returns>
         public override bool Execute()
         {
             string rootedOutDir = (Path.IsPathRooted(_barDescriptorPath)) ? _barDescriptorPath : _projectDir + _barDescriptorPath;
@@ -50,13 +49,13 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string ApplicationDescriptorXml
         {
-            set 
+            set
             {
                 _barDescriptorPath = value;
             }
-            get 
+            get
             {
-                return _barDescriptorPath; 
+                return _barDescriptorPath;
             }
         }
 

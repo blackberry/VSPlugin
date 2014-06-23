@@ -72,6 +72,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
+      <Link>ConfigDefaults.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\GlobalHelper.cs">
+      <Link>Helpers\GlobalHelper.cs</Link>
+    </Compile>
     <Compile Include="BarDescriptor\Parser.cs" />
     <Compile Include="BarDescriptor\Schema\bar-descriptor.cs">
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
@@ -80,6 +86,8 @@
     <Compile Include="BBDeploy.cs" />
     <Compile Include="BBNativePackager.cs" />
     <Compile Include="BBSigner.cs" />
+    <Compile Include="BBTask.cs" />
+    <Compile Include="NativeMethods.cs" />
     <Compile Include="RemoveFlagFile.cs" />
     <Compile Include="MakeAllAndFormatOutputMessages.cs" />
     <Compile Include="CheckIfInstalled.cs" />
@@ -88,7 +96,6 @@
     <Compile Include="GetAppInfo.cs" />
     <Compile Include="PackagerCmdBuilder.cs" />
     <Compile Include="SSHDelete.cs" />
-    <Compile Include="VSNDKTasks.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

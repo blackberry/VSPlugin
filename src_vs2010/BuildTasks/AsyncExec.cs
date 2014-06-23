@@ -12,18 +12,16 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections;
-using System.Collections.Specialized;
 using System.Diagnostics;
-using System.Security.Cryptography;
-using System.Text;
+using System.IO;
+using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Helpers;
 using Microsoft.Build.Tasks;
 
 namespace BlackBerry.BuildTasks
 {
     // This task overrides Exec in order to run commands such as blackberry-connect asynchronously.
-    public class AsyncExec : Exec
+    public sealed class AsyncExec : Exec
     {
         private int _processId;
 
@@ -33,14 +31,12 @@ namespace BlackBerry.BuildTasks
         /// <param name="pathToTool">Path of executable to be run.</param>
         /// <param name="responseFileCommands">Response file commands</param>
         /// <param name="commandLineCommands">Command Line Arguments</param>
-        /// <returns></returns>
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
-            string comm = "/Q /C " + Command + " -password " + Decrypt(Password);
+            string comm = "/Q /C " + Command + " -password " + GlobalHelper.Decrypt(Password);
 
             Process process = new Process();
             process.StartInfo = GetProcessStartInfo(pathToTool, comm);
-            process.StartInfo.UseShellExecute = false;
             process.Start();
             _processId = process.Id;
             return 0;
@@ -51,63 +47,54 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         /// <param name="executable">Path of executable to be run.</param>
         /// <param name="arguments">Command Line Arguments</param>
-        /// <returns></returns>
-        protected virtual ProcessStartInfo GetProcessStartInfo(string executable, string arguments)
+        private ProcessStartInfo GetProcessStartInfo(string executable, string arguments)
         {
             if (arguments.Length > 0x7d00)
             {
-                this.Log.LogWarningWithCodeFromResources("ToolTask.CommandTooLong", new object[] { base.GetType().Name });
+                Log.LogWarningWithCodeFromResources("ToolTask.CommandTooLong", new object[] { GetType().Name });
             }
 
-            ProcessStartInfo startInfo = new ProcessStartInfo(executable, arguments);
+            var startInfo = new ProcessStartInfo(executable, arguments);
             startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.CreateNoWindow = true;
-            startInfo.UseShellExecute = true;
+            startInfo.UseShellExecute = false;
 
-            string workingDirectory = this.GetWorkingDirectory();
+            string workingDirectory = GetWorkingDirectory();
             if (workingDirectory != null)
             {
                 startInfo.WorkingDirectory = workingDirectory;
             }
 
-            StringDictionary environmentOverride = EnvironmentOverride;
-            if (environmentOverride != null)
+            var env = startInfo.EnvironmentVariables;
+            env["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", env["PATH"]);
+
+            if (EnvironmentVariables != null)
             {
-                foreach (DictionaryEntry entry in environmentOverride)
+                foreach (var item in EnvironmentVariables)
                 {
-                    startInfo.EnvironmentVariables.Remove(entry.Key.ToString());
-                    startInfo.EnvironmentVariables.Add(entry.Key.ToString(), entry.Value.ToString());
+                    int separatorIndex = item.IndexOf('=');
+                    if (separatorIndex >= 0)
+                    {
+                        var name = item.Substring(0, separatorIndex).Trim();
+                        var value = item.Substring(separatorIndex + 1).Trim();
+
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            env[name] = value;
+                        }
+                    }
                 }
             }
-            
             return startInfo;
         }
 
         /// <summary>
         /// Getter/Setter for Password Property
         /// </summary>
-        public virtual string Password
+        public string Password
         {
             set;
             get;
-        }
-
-        /// <summary>
-        /// Helper Function to Decrypt Password
-        /// </summary>
-        /// <param name="cipher"></param>
-        /// <returns></returns>
-        public string Decrypt(string cipher)
-        {
-            if (cipher == null) throw new ArgumentNullException("cipher");
-
-            //parse base64 string
-            byte[] data = Convert.FromBase64String(cipher);
-
-            //decrypt data
-            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-
-            return Encoding.Unicode.GetString(decrypted);
         }
     }
 }

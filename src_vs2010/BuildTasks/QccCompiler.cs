@@ -20,11 +20,12 @@ using System.Collections;
 
 namespace BlackBerry.BuildTasks
 {
-    public class QccCompiler : VSNDKTasks
+    public sealed class QccCompiler : QccTask
     {
-        #region fields
+        #region Fields
+
         // Fields
-        private ITaskItem[] preprocessOutput;
+        private ITaskItem[] _preprocessOutput;
 
         //constant fields
         private const string ADDITIONAL_INCLUDEDIRECTORIES = "AdditionalIncludeDirectories";
@@ -36,27 +37,30 @@ namespace BlackBerry.BuildTasks
         private const string RUNTIME_TYPE_INFO = "RuntimeTypeInfo";
         private const string OBJECT_FILE_NAME = "ObjectFileName";
         private const string ANSI = "Ansi";
+
         #endregion
 
-        #region ctors
+        /// <summary>
+        /// QccCompiler default constructor
+        /// </summary>
         public QccCompiler()
             : base(Resources.ResourceManager)
         {
-            this.preprocessOutput = new ITaskItem[0];
-            this.switchOrderList.Add(ADDITIONAL_INCLUDEDIRECTORIES);
-            this.switchOrderList.Add(ANSI);
-            this.switchOrderList.Add(PREPROCESSOR_DEFINITIONS);
-            this.switchOrderList.Add(UNDEFINE_PREPROCESSOR_DEFINITION);
-            this.switchOrderList.Add(PREPROCESS_TO_FILE);
-            this.switchOrderList.Add(PREPROCESS_TO_STDOUT);
-            this.switchOrderList.Add(PREPROCESS_KEEP_COMMENTS);
-            this.switchOrderList.Add(RUNTIME_TYPE_INFO);
-            this.switchOrderList.Add(OBJECT_FILE_NAME);
-            this.switchOrderList.Add(SOURCES);
+            _preprocessOutput = new ITaskItem[0];
+            _switchOrderList.Add(ADDITIONAL_INCLUDEDIRECTORIES);
+            _switchOrderList.Add(ANSI);
+            _switchOrderList.Add(PREPROCESSOR_DEFINITIONS);
+            _switchOrderList.Add(UNDEFINE_PREPROCESSOR_DEFINITION);
+            _switchOrderList.Add(PREPROCESS_TO_FILE);
+            _switchOrderList.Add(PREPROCESS_TO_STDOUT);
+            _switchOrderList.Add(PREPROCESS_KEEP_COMMENTS);
+            _switchOrderList.Add(RUNTIME_TYPE_INFO);
+            _switchOrderList.Add(OBJECT_FILE_NAME);
+            _switchOrderList.Add(SOURCES);
         }
-        #endregion
 
-        #region overrides
+        #region Overrides
+
         /// <summary>
         /// Getter/Setter for the AlwaysAppend property
         /// </summary>
@@ -82,7 +86,7 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Getter/Setter for the TrackedInputFiles property
         /// </summary>
-        protected override Microsoft.Build.Framework.ITaskItem[] TrackedInputFiles
+        protected override ITaskItem[] TrackedInputFiles
         {
             get
             {
@@ -99,7 +103,7 @@ namespace BlackBerry.BuildTasks
         /// <returns></returns>
         protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
-            foreach (ITaskItem item in this.Sources)
+            foreach (ITaskItem item in Sources)
             {
                 string source = item.ItemSpec;
                 base.LogEventsFromTextOutput(source, MessageImportance.High);
@@ -114,7 +118,7 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return new string[] { "qcc_compiler.write.1.tlog", "qcc_compiler.*.write.1.tlog" };
+                return new[] { "qcc_compiler.write.1.tlog", "qcc_compiler.*.write.1.tlog" };
             }
         }
 
@@ -136,12 +140,12 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return new string[] { "qcc_compiler.read.1.tlog", "qcc_compiler.*.read.1.tlog" };
+                return new[] { "qcc_compiler.read.1.tlog", "qcc_compiler.*.read.1.tlog" };
             }
         }
-        #endregion //override
+        #endregion
 
-        #region properties
+        #region Properties
 
         /// <summary>
         /// GetterSetter for the AdditionalIncludeDirectories property.
@@ -150,15 +154,15 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (base.IsPropertySet(ADDITIONAL_INCLUDEDIRECTORIES))
+                if (IsPropertySet(ADDITIONAL_INCLUDEDIRECTORIES))
                 {
-                    return base.ActiveToolSwitches[ADDITIONAL_INCLUDEDIRECTORIES].StringList;
+                    return ActiveToolSwitches[ADDITIONAL_INCLUDEDIRECTORIES].StringList;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(ADDITIONAL_INCLUDEDIRECTORIES);
+                ActiveToolSwitches.Remove(ADDITIONAL_INCLUDEDIRECTORIES);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.StringArray)
                 {
                     DisplayName = "Additional Include Directories",
@@ -168,8 +172,8 @@ namespace BlackBerry.BuildTasks
                     Name = ADDITIONAL_INCLUDEDIRECTORIES,
                     StringList = value
                 };
-                base.ActiveToolSwitches.Add(ADDITIONAL_INCLUDEDIRECTORIES, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(ADDITIONAL_INCLUDEDIRECTORIES, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -180,11 +184,11 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return (base.IsPropertySet(ANSI) && base.ActiveToolSwitches[ANSI].BooleanValue);
+                return (IsPropertySet(ANSI) && ActiveToolSwitches[ANSI].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(ANSI);
+                ActiveToolSwitches.Remove(ANSI);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Compile ANSI code",
@@ -194,23 +198,23 @@ namespace BlackBerry.BuildTasks
                     Name = ANSI,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(ANSI, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(ANSI, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the MinimalRebuild property
         /// </summary>
-        public virtual bool MinimalRebuild
+        public bool MinimalRebuild
         {
             get
             {
-                return (base.IsPropertySet("MinimalRebuild") && base.ActiveToolSwitches["MinimalRebuild"].BooleanValue);
+                return (IsPropertySet("MinimalRebuild") && ActiveToolSwitches["MinimalRebuild"].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove("MinimalRebuild");
+                ActiveToolSwitches.Remove("MinimalRebuild");
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Enable Minimal Rebuild",
@@ -221,8 +225,8 @@ namespace BlackBerry.BuildTasks
                     Name = "MinimalRebuild",
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add("MinimalRebuild", switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add("MinimalRebuild", switch2);
+                AddActiveSwitchToolValue(switch2);
                 switch2.Overrides.AddLast(new KeyValuePair<string, string>("Gm", "Gm-"));
                 switch2.Overrides.AddLast(new KeyValuePair<string, string>("Gm-", "Gm"));
             }
@@ -235,15 +239,15 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (base.IsPropertySet(OBJECT_FILE_NAME))
+                if (IsPropertySet(OBJECT_FILE_NAME))
                 {
-                    return base.ActiveToolSwitches[OBJECT_FILE_NAME].Value;
+                    return ActiveToolSwitches[OBJECT_FILE_NAME].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(OBJECT_FILE_NAME);
+                ActiveToolSwitches.Remove(OBJECT_FILE_NAME);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
                     DisplayName = "Object File Name",
@@ -253,8 +257,8 @@ namespace BlackBerry.BuildTasks
                     Name = OBJECT_FILE_NAME,
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(OBJECT_FILE_NAME, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(OBJECT_FILE_NAME, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -265,11 +269,11 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return (base.IsPropertySet("ExpandAttributedSource") && base.ActiveToolSwitches["ExpandAttributedSource"].BooleanValue);
+                return (IsPropertySet("ExpandAttributedSource") && ActiveToolSwitches["ExpandAttributedSource"].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove("ExpandAttributedSource");
+                ActiveToolSwitches.Remove("ExpandAttributedSource");
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Expand Attributed Source",
@@ -279,8 +283,8 @@ namespace BlackBerry.BuildTasks
                     Name = "ExpandAttributedSource",
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add("ExpandAttributedSource", switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add("ExpandAttributedSource", switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -291,28 +295,33 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (base.IsPropertySet("FavorSizeOrSpeed"))
+                if (IsPropertySet("FavorSizeOrSpeed"))
                 {
-                    return base.ActiveToolSwitches["FavorSizeOrSpeed"].Value;
+                    return ActiveToolSwitches["FavorSizeOrSpeed"].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove("FavorSizeOrSpeed");
+                ActiveToolSwitches.Remove("FavorSizeOrSpeed");
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.String)
                 {
                     DisplayName = "Favor Size Or Speed",
                     Description = "Whether to favor code size or code speed; 'Global Optimization' must be turned on.     (/Ot, /Os)",
                     ArgumentRelationList = new ArrayList()
                 };
-                string[][] switchMap = new string[][] { new string[] { "Size", "/Os" }, new string[] { "Speed", "/Ot" }, new string[] { "Neither", "" } };
-                switch2.SwitchValue = base.ReadSwitchMap("FavorSizeOrSpeed", switchMap, value);
+                string[][] switchMap =
+                {
+                    new[] { "Size", "/Os" },
+                    new[] { "Speed", "/Ot" },
+                    new[] { "Neither", "" }
+                };
+                switch2.SwitchValue = ReadSwitchMap("FavorSizeOrSpeed", switchMap, value);
                 switch2.Name = "FavorSizeOrSpeed";
                 switch2.Value = value;
                 switch2.MultipleValues = true;
-                base.ActiveToolSwitches.Add("FavorSizeOrSpeed", switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add("FavorSizeOrSpeed", switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -323,11 +332,11 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return (base.IsPropertySet(PREPROCESS_KEEP_COMMENTS) && base.ActiveToolSwitches[PREPROCESS_KEEP_COMMENTS].BooleanValue);
+                return (IsPropertySet(PREPROCESS_KEEP_COMMENTS) && ActiveToolSwitches[PREPROCESS_KEEP_COMMENTS].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PREPROCESS_KEEP_COMMENTS);
+                ActiveToolSwitches.Remove(PREPROCESS_KEEP_COMMENTS);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Keep Comments",
@@ -337,8 +346,8 @@ namespace BlackBerry.BuildTasks
                     Name = PREPROCESS_KEEP_COMMENTS,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(PREPROCESS_KEEP_COMMENTS, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(PREPROCESS_KEEP_COMMENTS, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -349,15 +358,15 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (base.IsPropertySet(PREPROCESSOR_DEFINITIONS))
+                if (IsPropertySet(PREPROCESSOR_DEFINITIONS))
                 {
-                    return base.ActiveToolSwitches[PREPROCESSOR_DEFINITIONS].StringList;
+                    return ActiveToolSwitches[PREPROCESSOR_DEFINITIONS].StringList;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PREPROCESSOR_DEFINITIONS);
+                ActiveToolSwitches.Remove(PREPROCESSOR_DEFINITIONS);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.StringArray)
                 {
                     DisplayName = "Preprocessor Definitions",
@@ -367,8 +376,8 @@ namespace BlackBerry.BuildTasks
                     Name = PREPROCESSOR_DEFINITIONS,
                     StringList = value
                 };
-                base.ActiveToolSwitches.Add(PREPROCESSOR_DEFINITIONS, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(PREPROCESSOR_DEFINITIONS, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -380,11 +389,11 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return this.preprocessOutput;
+                return _preprocessOutput;
             }
             set
             {
-                this.preprocessOutput = value;
+                _preprocessOutput = value;
             }
         }
 
@@ -395,26 +404,26 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (base.IsPropertySet(PREPROCESS_TO_STDOUT))
+                if (IsPropertySet(PREPROCESS_TO_STDOUT))
                 {
-                    return base.ActiveToolSwitches[PREPROCESS_TO_STDOUT].Value;
+                    return ActiveToolSwitches[PREPROCESS_TO_STDOUT].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PREPROCESS_TO_STDOUT);
+                ActiveToolSwitches.Remove(PREPROCESS_TO_STDOUT);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.String)
                 {
                     DisplayName = "Preprocess Output Path",
-                    Description = "Specify the output path for the preprocesser. The default location is the same as the source file(s).",
+                    Description = "Specify the output path for the preprocessor. The default location is the same as the source file(s).",
                     ArgumentRelationList = new ArrayList(),
                     Name = PREPROCESS_TO_STDOUT,
                     Value = value,
                     SwitchValue = "E"
                 };
-                base.ActiveToolSwitches.Add(PREPROCESS_TO_STDOUT, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(PREPROCESS_TO_STDOUT, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -425,11 +434,11 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return (base.IsPropertySet("PreprocessSuppressLineNumbers") && base.ActiveToolSwitches["PreprocessSuppressLineNumbers"].BooleanValue);
+                return (IsPropertySet("PreprocessSuppressLineNumbers") && ActiveToolSwitches["PreprocessSuppressLineNumbers"].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove("PreprocessSuppressLineNumbers");
+                ActiveToolSwitches.Remove("PreprocessSuppressLineNumbers");
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Preprocess Suppress Line Numbers",
@@ -439,8 +448,8 @@ namespace BlackBerry.BuildTasks
                     Name = "PreprocessSuppressLineNumbers",
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add("PreprocessSuppressLineNumbers", switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add("PreprocessSuppressLineNumbers", switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -451,11 +460,11 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return (base.IsPropertySet(PREPROCESS_TO_FILE) && base.ActiveToolSwitches[PREPROCESS_TO_FILE].BooleanValue);
+                return (IsPropertySet(PREPROCESS_TO_FILE) && ActiveToolSwitches[PREPROCESS_TO_FILE].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PREPROCESS_TO_FILE);
+                ActiveToolSwitches.Remove(PREPROCESS_TO_FILE);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Preprocess to a File",
@@ -465,8 +474,8 @@ namespace BlackBerry.BuildTasks
                     Name = PREPROCESS_TO_FILE,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(PREPROCESS_TO_FILE, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(PREPROCESS_TO_FILE, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -477,15 +486,15 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (base.IsPropertySet(UNDEFINE_PREPROCESSOR_DEFINITION))
+                if (IsPropertySet(UNDEFINE_PREPROCESSOR_DEFINITION))
                 {
-                    return base.ActiveToolSwitches[UNDEFINE_PREPROCESSOR_DEFINITION].StringList;
+                    return ActiveToolSwitches[UNDEFINE_PREPROCESSOR_DEFINITION].StringList;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(UNDEFINE_PREPROCESSOR_DEFINITION);
+                ActiveToolSwitches.Remove(UNDEFINE_PREPROCESSOR_DEFINITION);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.StringArray)
                 {
                     DisplayName = "Undefine Preprocessor Definitions",
@@ -495,13 +504,14 @@ namespace BlackBerry.BuildTasks
                     Name = UNDEFINE_PREPROCESSOR_DEFINITION,
                     StringList = value
                 };
-                base.ActiveToolSwitches.Add(UNDEFINE_PREPROCESSOR_DEFINITION, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(UNDEFINE_PREPROCESSOR_DEFINITION, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         public bool RuntimeTypeInfo { get; set; }
         public bool ShortEnums { get; set; }
-        #endregion //properties
+
+        #endregion
     }
 }

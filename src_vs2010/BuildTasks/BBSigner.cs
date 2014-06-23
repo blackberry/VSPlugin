@@ -12,10 +12,7 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
 using System.Collections;
-using System.Security.Cryptography;
-using System.Text;
 using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
 using Microsoft.Build.Framework;
@@ -26,10 +23,12 @@ namespace BlackBerry.BuildTasks
     /// MSBuild Task responsible for the signing of the BlackBerry Bar files 
     /// for deploy to a secure device not in development mode. 
     /// </summary>
-    public class BBSigner : TrackedVCToolTask
+    public sealed class BBSigner : BBTask
     {
         #region Member Variables and Constants Declaration
-        protected ArrayList switchOrderList;
+
+        private readonly ArrayList _switchOrderList;
+
         private const string REGISTER = "Register";
         private const string KEYSTOREPASSWORD = "KeyStorePassword";
         private const string CSJPIN = "CSJPin";
@@ -37,33 +36,31 @@ namespace BlackBerry.BuildTasks
         private const string SOURCES = "Sources";
         private const string OUTPUT_FILE = "OutputFiles";
         private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
+
         #endregion
 
         /// <summary>
-        /// BBSigner Constructor Fuction
+        /// BBSigner default constructor
         /// </summary>
         public BBSigner()
             : base(Resources.ResourceManager)
         {
-            this.switchOrderList = new ArrayList();
-            this.switchOrderList.Add("AlwaysAppend");
-            this.switchOrderList.Add(REGISTER);
-            this.switchOrderList.Add(CSJPIN);
-            this.switchOrderList.Add(KEYSTOREPASSWORD);
-            this.switchOrderList.Add(CSJFILES);
-            this.switchOrderList.Add(OUTPUT_FILE);
-            this.switchOrderList.Add(TRACKER_LOG_DIRECTORY);
+            _switchOrderList = new ArrayList();
+            _switchOrderList.Add("AlwaysAppend");
+            _switchOrderList.Add(REGISTER);
+            _switchOrderList.Add(CSJPIN);
+            _switchOrderList.Add(KEYSTOREPASSWORD);
+            _switchOrderList.Add(CSJFILES);
+            _switchOrderList.Add(OUTPUT_FILE);
+            _switchOrderList.Add(TRACKER_LOG_DIRECTORY);
         }
 
-        
-        #region overrides
+        #region Overrides
 
         /// <summary>
         /// Return the GetResposeFile Switch
         /// Note: don't use response file for msbuild because it is removed before qcc to run GCC compiler 
         /// </summary>
-        /// <param name="responseFilePath"></param>
-        /// <returns></returns>
         protected override string GetResponseFileSwitch(string responseFilePath)
         {
             return string.Empty;
@@ -87,12 +84,12 @@ namespace BlackBerry.BuildTasks
         {
             if (!Register)
             {
-                switchOrderList.Remove(REGISTER);
-                switchOrderList.Remove(CSJPIN);
-                switchOrderList.Remove(CSJFILES);
+                _switchOrderList.Remove(REGISTER);
+                _switchOrderList.Remove(CSJPIN);
+                _switchOrderList.Remove(CSJFILES);
             }
             else
-                switchOrderList.Remove(OUTPUT_FILE);
+                _switchOrderList.Remove(OUTPUT_FILE);
             return base.GenerateResponseFileCommands();
         }
 
@@ -103,7 +100,7 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return this.switchOrderList;
+                return _switchOrderList;
             }
         }
 
@@ -120,13 +117,13 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string[] ReadTLogNames
         {
-            get { return new string[] { "BBSigner.read.1.tlog", "BBSigner.*.read.1.tlog" }; }
+            get { return new[] { "BBSigner.read.1.tlog", "BBSigner.*.read.1.tlog" }; }
         }
         protected override string[] WriteTLogNames
         {
             get
             {
-                return new string[] { "BBSigner.write.1.tlog", "BBSigner.*.write.1.tlog" };
+                return new[] { "BBSigner.write.1.tlog", "BBSigner.*.write.1.tlog" };
             }
         }
 
@@ -148,9 +145,9 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (this.TrackerLogDirectory != null)
+                if (TrackerLogDirectory != null)
                 {
-                    return this.TrackerLogDirectory;
+                    return TrackerLogDirectory;
                 }
                 return string.Empty;
             }
@@ -164,23 +161,23 @@ namespace BlackBerry.BuildTasks
             get { return Sources; }
         }
 
-        #endregion overrides
+        #endregion
 
-        #region properties
+        #region Properties
 
         /// <summary>
         /// Getter/Setter for the Register property
         /// </summary>
         [Required]
-        public virtual bool Register
+        public bool Register
         {
             get
             {
-                return (base.IsPropertySet(REGISTER) && base.ActiveToolSwitches[REGISTER].BooleanValue);
+                return (IsPropertySet(REGISTER) && ActiveToolSwitches[REGISTER].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(REGISTER);
+                ActiveToolSwitches.Remove(REGISTER);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Register",
@@ -190,8 +187,8 @@ namespace BlackBerry.BuildTasks
                     Name = REGISTER,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(REGISTER, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(REGISTER, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -199,19 +196,19 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for the Sources property
         /// </summary>
         [Required]
-        public virtual ITaskItem[] Sources
+        public ITaskItem[] Sources
         {
             get
             {
-                if (base.IsPropertySet(SOURCES))
+                if (IsPropertySet(SOURCES))
                 {
-                    return base.ActiveToolSwitches[SOURCES].TaskItemArray;
+                    return ActiveToolSwitches[SOURCES].TaskItemArray;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(SOURCES);
+                ActiveToolSwitches.Remove(SOURCES);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.ITaskItemArray)
                 {
                     Separator = " ",
@@ -219,27 +216,27 @@ namespace BlackBerry.BuildTasks
                     ArgumentRelationList = new ArrayList(),
                     TaskItemArray = value
                 };
-                base.ActiveToolSwitches.Add(SOURCES, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(SOURCES, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the CSJFiles property
         /// </summary>
-        public virtual ITaskItem[] CSJFiles
+        public ITaskItem[] CSJFiles
         {
             get
             {
-                if (base.IsPropertySet(CSJFILES))
+                if (IsPropertySet(CSJFILES))
                 {
-                    return base.ActiveToolSwitches[CSJFILES].TaskItemArray;
+                    return ActiveToolSwitches[CSJFILES].TaskItemArray;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(CSJFILES);
+                ActiveToolSwitches.Remove(CSJFILES);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.ITaskItemArray)
                 {
                     Separator = " ",
@@ -248,27 +245,27 @@ namespace BlackBerry.BuildTasks
                     Name = CSJFILES,
                     TaskItemArray = value
                 };
-                base.ActiveToolSwitches.Add(CSJFILES, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(CSJFILES, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the KeyStorePassword property
         /// </summary>
-        public virtual string KeyStorePassword
+        public string KeyStorePassword
         {
             get
             {
-                if (base.IsPropertySet(KEYSTOREPASSWORD))
+                if (IsPropertySet(KEYSTOREPASSWORD))
                 {
-                    return base.ActiveToolSwitches[KEYSTOREPASSWORD].Value;
+                    return ActiveToolSwitches[KEYSTOREPASSWORD].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(KEYSTOREPASSWORD);
+                ActiveToolSwitches.Remove(KEYSTOREPASSWORD);
 
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
@@ -277,55 +274,30 @@ namespace BlackBerry.BuildTasks
                     ArgumentRelationList = new ArrayList(),
                     SwitchValue = "-storepass ",
                     Name = KEYSTOREPASSWORD,
-                    Value = Decrypt(value)
+                    Value = DecryptPassword(value)
                 };
 
-                base.ActiveToolSwitches.Add(KEYSTOREPASSWORD, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(KEYSTOREPASSWORD, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
-        }
-
-        /// <summary>
-        /// Decrypts a given string.
-        /// </summary>
-        /// <param name="cipher">A base64 encoded string that was created
-        /// through the <see cref="Encrypt(string)"/> or
-        /// <see cref="Encrypt(SecureString)"/> extension methods.</param>
-        /// <returns>The decrypted string.</returns>
-        /// <remarks>Keep in mind that the decrypted string remains in memory
-        /// and makes your application vulnerable per se. If runtime protection
-        /// is essential, <see cref="SecureString"/> should be used.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="cipher"/>
-        /// is a null reference.</exception>
-        public string Decrypt(string cipher)
-        {
-            if (cipher == null) throw new ArgumentNullException("cipher");
-
-            //parse base64 string
-            byte[] data = Convert.FromBase64String(cipher);
-
-            //decrypt data
-            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-
-            return Encoding.Unicode.GetString(decrypted);
         }
 
         /// <summary>
         /// Getter/Setter for the CSJPin property
         /// </summary>
-        public virtual string CSJPin
+        public string CSJPin
         {
             get
             {
-                if (base.IsPropertySet(CSJPIN))
+                if (IsPropertySet(CSJPIN))
                 {
-                    return base.ActiveToolSwitches[CSJPIN].Value;
+                    return ActiveToolSwitches[CSJPIN].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(CSJPIN);
+                ActiveToolSwitches.Remove(CSJPIN);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
                     DisplayName = "Keystore password",
@@ -335,8 +307,8 @@ namespace BlackBerry.BuildTasks
                     Name = CSJPIN,
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(CSJPIN, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(CSJPIN, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
@@ -345,19 +317,19 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         [Required]
         [Output]
-        public virtual string OutputFile
+        public string OutputFile
         {
             get
             {
-                if (base.IsPropertySet(OUTPUT_FILE))
+                if (IsPropertySet(OUTPUT_FILE))
                 {
-                    return base.ActiveToolSwitches[OUTPUT_FILE].Value;
+                    return ActiveToolSwitches[OUTPUT_FILE].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(OUTPUT_FILE);
+                ActiveToolSwitches.Remove(OUTPUT_FILE);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
                     DisplayName = "Output bar file name to be signed",
@@ -366,41 +338,40 @@ namespace BlackBerry.BuildTasks
                     Name = OUTPUT_FILE,
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(OUTPUT_FILE, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(OUTPUT_FILE, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the TrackerLogDirectory property
         /// </summary>
-        public virtual string TrackerLogDirectory
+        public string TrackerLogDirectory
         {
             get
             {
-                if (base.IsPropertySet(TRACKER_LOG_DIRECTORY))
+                if (IsPropertySet(TRACKER_LOG_DIRECTORY))
                 {
-                    return base.ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
+                    return ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
+                ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Directory)
                 {
                     DisplayName = "Tracker Log Directory",
                     Description = "Tracker Log Directory.",
                     ArgumentRelationList = new ArrayList(),
-                    Value = VCToolTask.EnsureTrailingSlash(value)
+                    Value = EnsureTrailingSlash(value)
                 };
-                base.ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
-        #endregion properties
-
+        #endregion
     }
 }
  

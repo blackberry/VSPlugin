@@ -19,9 +19,10 @@ using System.Collections;
 
 namespace BlackBerry.BuildTasks
 {
-    public class QccLink : VSNDKTasks
+    public sealed class QccLink : QccTask
     {
         #region Member Variables and Constants
+
         private const string ADDITIONAL_DEPENDENCIES = "AdditionalDependencies";
         private const string LINK_ERROR_REPORTING = "LinkErrorReporting";
         private const string ADDITIONAL_LIB_DIR = "AdditionalLibraryDirectories";        
@@ -33,29 +34,30 @@ namespace BlackBerry.BuildTasks
         private const string LINK_LIB_DEP = "LinkLibraryDependencies";
         private const string OUTPUT_FILE = "OutputFile";
         private const string TREAT_LINK_WARNING_AS_ERR = "TreatLinkerWarningAsErrors";
+
         #endregion
 
         /// <summary>
-        /// QccLink Constructor
+        /// QccLink default constructor
         /// </summary>
         public QccLink()
             : base(Resources.ResourceManager)
         {
-            this.switchOrderList.Add(ADDITIONAL_DEPENDENCIES);
-            this.switchOrderList.Add(LINK_ERROR_REPORTING);
-            this.switchOrderList.Add(ADDITIONAL_LIB_DIR);
-            this.switchOrderList.Add(GENERATE_MAP_FILE);
-            this.switchOrderList.Add(IGNORE_ALL_DEFAULT_LIB);
-            this.switchOrderList.Add(IGNOR_ALL_DEFAULT_CPP_LIB);
-            this.switchOrderList.Add(LINK_INCREMENTAL);
-            this.switchOrderList.Add(LINK_STATUS);
-            this.switchOrderList.Add(LINK_LIB_DEP);
-            this.switchOrderList.Add(OUTPUT_FILE);
-            this.switchOrderList.Add(TREAT_LINK_WARNING_AS_ERR);
-            this.switchOrderList.Add(SOURCES);
+            _switchOrderList.Add(ADDITIONAL_DEPENDENCIES);
+            _switchOrderList.Add(LINK_ERROR_REPORTING);
+            _switchOrderList.Add(ADDITIONAL_LIB_DIR);
+            _switchOrderList.Add(GENERATE_MAP_FILE);
+            _switchOrderList.Add(IGNORE_ALL_DEFAULT_LIB);
+            _switchOrderList.Add(IGNOR_ALL_DEFAULT_CPP_LIB);
+            _switchOrderList.Add(LINK_INCREMENTAL);
+            _switchOrderList.Add(LINK_STATUS);
+            _switchOrderList.Add(LINK_LIB_DEP);
+            _switchOrderList.Add(OUTPUT_FILE);
+            _switchOrderList.Add(TREAT_LINK_WARNING_AS_ERR);
+            _switchOrderList.Add(SOURCES);
         }
 
-        #region overrides
+        #region Overrides
 
         /// <summary>
         /// Getter/Setter for AlwaysAppend property
@@ -81,7 +83,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string[] ReadTLogNames
         {
-            get { return new string[] { "qcc_linker.read.1.tlog", "qcc_linker.*.read.1.tlog" }; }
+            get { return new[] { "qcc_linker.read.1.tlog", "qcc_linker.*.read.1.tlog" }; }
         }
 
         /// <summary>
@@ -91,38 +93,37 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return new string[] { "qcc_linker.write.1.tlog", "qcc_linker.*.write.1.tlog" };
+                return new[] { "qcc_linker.write.1.tlog", "qcc_linker.*.write.1.tlog" };
             }
         }
 
         /// <summary>
         /// Function to return the Enhanced Security value.
         /// </summary>
-        /// <returns></returns>
         protected override string GetEnhancedSecuritySwitchValue()
         {
             return "-Wl,-z,relro -Wl,-z,now";
         }
         #endregion
 
-        #region properties
+        #region Properties
 
         /// <summary>
         /// Getter/Setter for the AdditionalDependencies property
         /// </summary>
-        public virtual string[] AdditionalDependencies
+        public string[] AdditionalDependencies
         {
             get
             {
-                if (base.IsPropertySet(ADDITIONAL_DEPENDENCIES))
+                if (IsPropertySet(ADDITIONAL_DEPENDENCIES))
                 {
-                    return base.ActiveToolSwitches[ADDITIONAL_DEPENDENCIES].StringList;
+                    return ActiveToolSwitches[ADDITIONAL_DEPENDENCIES].StringList;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(ADDITIONAL_DEPENDENCIES);
+                ActiveToolSwitches.Remove(ADDITIONAL_DEPENDENCIES);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.StringArray)
                 {
                     DisplayName = "Additional Dependencies",
@@ -132,27 +133,27 @@ namespace BlackBerry.BuildTasks
                     Name = ADDITIONAL_DEPENDENCIES,
                     StringList = value
                 };
-                base.ActiveToolSwitches.Add(ADDITIONAL_DEPENDENCIES, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(ADDITIONAL_DEPENDENCIES, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the AdditionalLibraryDirectories property
         /// </summary>
-        public virtual string[] AdditionalLibraryDirectories
+        public string[] AdditionalLibraryDirectories
         {
             get
             {
-                if (base.IsPropertySet(ADDITIONAL_LIB_DIR))
+                if (IsPropertySet(ADDITIONAL_LIB_DIR))
                 {
-                    return base.ActiveToolSwitches[ADDITIONAL_LIB_DIR].StringList;
+                    return ActiveToolSwitches[ADDITIONAL_LIB_DIR].StringList;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(ADDITIONAL_LIB_DIR);
+                ActiveToolSwitches.Remove(ADDITIONAL_LIB_DIR);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.StringArray)
                 {
                     DisplayName = "Additional Library Directories",
@@ -162,23 +163,23 @@ namespace BlackBerry.BuildTasks
                     Name = ADDITIONAL_LIB_DIR,
                     StringList = value
                 };
-                base.ActiveToolSwitches.Add(ADDITIONAL_LIB_DIR, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(ADDITIONAL_LIB_DIR, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the GenerateMapFile property
         /// </summary>
-        public virtual bool GenerateMapFile
+        public bool GenerateMapFile
         {
             get
             {
-                return (base.IsPropertySet(GENERATE_MAP_FILE) && base.ActiveToolSwitches[GENERATE_MAP_FILE].BooleanValue);
+                return (IsPropertySet(GENERATE_MAP_FILE) && ActiveToolSwitches[GENERATE_MAP_FILE].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(GENERATE_MAP_FILE);
+                ActiveToolSwitches.Remove(GENERATE_MAP_FILE);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Generate Map File",
@@ -189,23 +190,23 @@ namespace BlackBerry.BuildTasks
                 switch2.SwitchValue = "-M";
                 switch2.Name = GENERATE_MAP_FILE;
                 switch2.BooleanValue = value;
-                base.ActiveToolSwitches.Add(GENERATE_MAP_FILE, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(GENERATE_MAP_FILE, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the IgnoreAllDefaultLibraries
         /// </summary>
-        public virtual bool IgnoreAllDefaultLibraries
+        public bool IgnoreAllDefaultLibraries
         {
             get
             {
-                return (base.IsPropertySet(IGNORE_ALL_DEFAULT_LIB) && base.ActiveToolSwitches[IGNORE_ALL_DEFAULT_LIB].BooleanValue);
+                return (IsPropertySet(IGNORE_ALL_DEFAULT_LIB) && ActiveToolSwitches[IGNORE_ALL_DEFAULT_LIB].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(IGNORE_ALL_DEFAULT_LIB);
+                ActiveToolSwitches.Remove(IGNORE_ALL_DEFAULT_LIB);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Ignore All Default Libraries",
@@ -215,23 +216,23 @@ namespace BlackBerry.BuildTasks
                     Name = IGNORE_ALL_DEFAULT_LIB,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(IGNORE_ALL_DEFAULT_LIB, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(IGNORE_ALL_DEFAULT_LIB, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the IgnoreAllDefaultCppLibraries property
         /// </summary>
-        public virtual bool IgnoreAllDefaultCppLibraries
+        public bool IgnoreAllDefaultCppLibraries
         {
             get
             {
-                return (base.IsPropertySet(IGNOR_ALL_DEFAULT_CPP_LIB) && base.ActiveToolSwitches[IGNOR_ALL_DEFAULT_CPP_LIB].BooleanValue);
+                return (IsPropertySet(IGNOR_ALL_DEFAULT_CPP_LIB) && ActiveToolSwitches[IGNOR_ALL_DEFAULT_CPP_LIB].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(IGNOR_ALL_DEFAULT_CPP_LIB);
+                ActiveToolSwitches.Remove(IGNOR_ALL_DEFAULT_CPP_LIB);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Ignore All Default C++ Libraries",
@@ -241,23 +242,23 @@ namespace BlackBerry.BuildTasks
                     Name = IGNOR_ALL_DEFAULT_CPP_LIB,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(IGNOR_ALL_DEFAULT_CPP_LIB, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(IGNOR_ALL_DEFAULT_CPP_LIB, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the LinkIncremental Property
         /// </summary>
-        public virtual bool LinkIncremental
+        public bool LinkIncremental
         {
             get
             {
-                return (base.IsPropertySet(LINK_INCREMENTAL) && base.ActiveToolSwitches[LINK_INCREMENTAL].BooleanValue);
+                return (IsPropertySet(LINK_INCREMENTAL) && ActiveToolSwitches[LINK_INCREMENTAL].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(LINK_INCREMENTAL);
+                ActiveToolSwitches.Remove(LINK_INCREMENTAL);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Enable Incremental Linking",
@@ -268,8 +269,8 @@ namespace BlackBerry.BuildTasks
                     Name = LINK_INCREMENTAL,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(LINK_INCREMENTAL, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(LINK_INCREMENTAL, switch2);
+                AddActiveSwitchToolValue(switch2);
                 switch2.Overrides.AddLast(new KeyValuePair<string, string>("INCREMENTAL", "INCREMENTAL:NO"));
                 switch2.Overrides.AddLast(new KeyValuePair<string, string>("INCREMENTAL:NO", "INCREMENTAL"));
             }
@@ -278,15 +279,15 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Getter/Setter for the LinkStatus property
         /// </summary>
-        public virtual bool LinkStatus
+        public bool LinkStatus
         {
             get
             {
-                return (base.IsPropertySet(LINK_STATUS) && base.ActiveToolSwitches[LINK_STATUS].BooleanValue);
+                return (IsPropertySet(LINK_STATUS) && ActiveToolSwitches[LINK_STATUS].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(LINK_STATUS);
+                ActiveToolSwitches.Remove(LINK_STATUS);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Link Status",
@@ -297,8 +298,8 @@ namespace BlackBerry.BuildTasks
                     Name = LINK_STATUS,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(LINK_STATUS, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(LINK_STATUS, switch2);
+                AddActiveSwitchToolValue(switch2);
                 switch2.Overrides.AddLast(new KeyValuePair<string, string>("LTCG:STATUS", "LTCG:NOSTATUS"));
                 switch2.Overrides.AddLast(new KeyValuePair<string, string>("LTCG:NOSTATUS", "LTCG:STATUS"));
             }
@@ -307,15 +308,15 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Getter/Setter for the LinkLibraryDependencies
         /// </summary>
-        public virtual bool LinkLibraryDependencies
+        public bool LinkLibraryDependencies
         {
             get
             {
-                return (base.IsPropertySet(LINK_LIB_DEP) && base.ActiveToolSwitches[LINK_LIB_DEP].BooleanValue);
+                return (IsPropertySet(LINK_LIB_DEP) && ActiveToolSwitches[LINK_LIB_DEP].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(LINK_LIB_DEP);
+                ActiveToolSwitches.Remove(LINK_LIB_DEP);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Link Library Dependencies",
@@ -324,27 +325,27 @@ namespace BlackBerry.BuildTasks
                     Name = LINK_LIB_DEP,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(LINK_LIB_DEP, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(LINK_LIB_DEP, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the OutputFile property
         /// </summary>
-        public virtual string OutputFile
+        public string OutputFile
         {
             get
             {
-                if (base.IsPropertySet(OUTPUT_FILE))
+                if (IsPropertySet(OUTPUT_FILE))
                 {
-                    return base.ActiveToolSwitches[OUTPUT_FILE].Value;
+                    return ActiveToolSwitches[OUTPUT_FILE].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(OUTPUT_FILE);
+                ActiveToolSwitches.Remove(OUTPUT_FILE);
 
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
                 {
@@ -355,23 +356,23 @@ namespace BlackBerry.BuildTasks
                     Name = OUTPUT_FILE,
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(OUTPUT_FILE, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(OUTPUT_FILE, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the TreatLinkerWarningAsErrors property.
         /// </summary>
-        public virtual bool TreatLinkerWarningAsErrors
+        public bool TreatLinkerWarningAsErrors
         {
             get
             {
-                return (base.IsPropertySet(TREAT_LINK_WARNING_AS_ERR) && base.ActiveToolSwitches[TREAT_LINK_WARNING_AS_ERR].BooleanValue);
+                return (IsPropertySet(TREAT_LINK_WARNING_AS_ERR) && ActiveToolSwitches[TREAT_LINK_WARNING_AS_ERR].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(TREAT_LINK_WARNING_AS_ERR);
+                ActiveToolSwitches.Remove(TREAT_LINK_WARNING_AS_ERR);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Treat Linker Warning As Errors",
@@ -382,13 +383,13 @@ namespace BlackBerry.BuildTasks
                     Name = TREAT_LINK_WARNING_AS_ERR,
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(TREAT_LINK_WARNING_AS_ERR, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(TREAT_LINK_WARNING_AS_ERR, switch2);
+                AddActiveSwitchToolValue(switch2);
                 switch2.Overrides.AddLast(new KeyValuePair<string, string>("WX", "WX:NO"));
                 switch2.Overrides.AddLast(new KeyValuePair<string, string>("WX:NO", "WX"));
             }
         }
-        #endregion
 
+        #endregion
     }
 }

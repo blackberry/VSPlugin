@@ -15,7 +15,6 @@
 using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Build.Framework;
@@ -25,7 +24,7 @@ namespace BlackBerry.BuildTasks
     /// <summary>
     /// Cancelabe MSBuild Task for Running the Make file for the build.
     /// </summary>
-    public class MakeAllAndFormatOutputMessages : ICancelableTask
+    public sealed class MakeAllAndFormatOutputMessages : ICancelableTask
     {
         #region Member Variables and Constants
 
@@ -35,7 +34,7 @@ namespace BlackBerry.BuildTasks
         private static StringBuilder _stdOutput;
         private static StringBuilder _errorOutput;
         private IBuildEngine _buildEngine;
-        private Process _proc;
+        private Process _process;
         private ITaskHost _hostObject;
 
         private string _numProcessors;
@@ -106,39 +105,39 @@ namespace BlackBerry.BuildTasks
                 else
                     pArgs = "/c " + ToolsPath + @"\make all";
 
-                System.Diagnostics.ProcessStartInfo procStartInfo = new System.Diagnostics.ProcessStartInfo(pCommand, pArgs);
+                ProcessStartInfo startInfo = new ProcessStartInfo(pCommand, pArgs);
 
                 // Set UseShellExecute to false for redirection.
-                procStartInfo.UseShellExecute = false;
+                startInfo.UseShellExecute = false;
 
                 // The following commands are needed to redirect the standard and error outputs.
                 // These streams are read asynchronously using an event handler.
-                procStartInfo.RedirectStandardOutput = true;
-                _stdOutput = new StringBuilder("");
-                procStartInfo.RedirectStandardError = true;
-                _errorOutput = new StringBuilder("");
+                startInfo.RedirectStandardOutput = true;
+                startInfo.RedirectStandardError = true;
+                _stdOutput = new StringBuilder();
+                _errorOutput = new StringBuilder();
 
                 // Setting the work directory.
-                string rootedOutDir = (Path.IsPathRooted(OutDir)) ? OutDir : ProjectDir + OutDir;
-                procStartInfo.WorkingDirectory = rootedOutDir;
+                string rootedOutDir = Path.IsPathRooted(OutDir) ? OutDir : ProjectDir + OutDir;
+                startInfo.WorkingDirectory = rootedOutDir;
 
                 // Do not create the black window.
-                procStartInfo.CreateNoWindow = true;
+                startInfo.CreateNoWindow = true;
 
                 // Create a process and assign its ProcessStartInfo
-                _proc = new Process();
-                _proc.StartInfo = procStartInfo;
+                _process = new Process();
+                _process.StartInfo = startInfo;
 
                 // Set ours events handlers to asynchronously read the standard and error outputs.
-                _proc.OutputDataReceived += StdOutputHandler;
-                _proc.ErrorDataReceived += ErrorOutputHandler;
+                _process.OutputDataReceived += StdOutputHandler;
+                _process.ErrorDataReceived += ErrorOutputHandler;
 
                 // Start the process
-                _proc.Start();
+                _process.Start();
 
                 // Start the asynchronous read of the standard and error output stream.
-                _proc.BeginOutputReadLine();
-                _proc.BeginErrorReadLine();
+                _process.BeginOutputReadLine();
+                _process.BeginErrorReadLine();
 
                 do
                 {
@@ -146,7 +145,7 @@ namespace BlackBerry.BuildTasks
                     // This code is correct, don't remove it. WaitForExit freezes the IDE while waiting for the end of the build process.
                     // With this loop and the time out, the IDE won't be frozen enabling the build process to be cancelled.
                 }
-                while (!_proc.WaitForExit(1000));
+                while (!_process.WaitForExit(1000));
 
             }
             catch (Exception e)
@@ -160,12 +159,10 @@ namespace BlackBerry.BuildTasks
                 int pos = _errorOutput.ToString().LastIndexOf("\\make:");
                 if (pos == -1)
                     return true;
-                else
-                {
-                    pos = _errorOutput.ToString().IndexOf("Error ", pos);
-                    if (pos == -1)
-                        return true;
-                }
+
+                pos = _errorOutput.ToString().IndexOf("Error ", pos);
+                if (pos == -1)
+                    return true;
             }
 
             return false;
@@ -179,11 +176,11 @@ namespace BlackBerry.BuildTasks
         /// <param name="outLine">Output Text</param>
         private void StdOutputHandler(object sendingProcess, DataReceivedEventArgs outLine)
         {
-            if (!String.IsNullOrEmpty(outLine.Data))
+            if (!string.IsNullOrEmpty(outLine.Data))
             {
                 string outputText = outLine.Data;
 
-                int tilde = outputText.IndexOf("~");
+                int tilde = outputText.IndexOf("~", StringComparison.InvariantCulture);
                 while (tilde != -1)
                 {
                     int end = outputText.IndexOf(':', tilde);
@@ -205,10 +202,9 @@ namespace BlackBerry.BuildTasks
                     int begin1 = outputText.LastIndexOf(' ', tilde) + 1;
                     if (begin < begin1)
                         begin = begin1;
-                    StringBuilder longPathName = new StringBuilder(1024);
                     string shortPathName = outputText.Substring(begin, end - begin);
-                    GetLongPathName(shortPathName, longPathName, longPathName.Capacity);
-                    if (longPathName.ToString() == "")
+                    var longPathName = NativeMethods.GetLongPathName(shortPathName);
+                    if (string.IsNullOrEmpty(longPathName))
                     {
                         int sep = shortPathName.LastIndexOf('/');
                         int sep2 = shortPathName.LastIndexOf('\\');
@@ -217,24 +213,16 @@ namespace BlackBerry.BuildTasks
                         if (sep != -1)
                         {
                             shortPathName = shortPathName.Remove(sep + 1);
-                            GetLongPathName(shortPathName, longPathName, longPathName.Capacity);
+                            longPathName = NativeMethods.GetLongPathName(shortPathName);
                         }
                     }
-                    if (longPathName.ToString() != "")
-                        outputText = outputText.Replace(shortPathName, longPathName.ToString());
+                    if (!string.IsNullOrEmpty(longPathName))
+                        outputText = outputText.Replace(shortPathName, longPathName);
 
-                    tilde = outputText.IndexOf("~", tilde + 1);
+                    tilde = outputText.IndexOf("~", tilde + 1, StringComparison.InvariantCulture);
                 }
 
-
-                try
-                {
-                    BuildMessageEventArgs taskEvent = new BuildMessageEventArgs(outputText, "", "", MessageImportance.High);
-                    BuildEngine.LogMessageEvent(taskEvent);
-                }
-                catch
-                {
-                }
+                NotifyMessage(new BuildMessageEventArgs(outputText, "", "", MessageImportance.High));
             }
         }
 
@@ -285,10 +273,9 @@ namespace BlackBerry.BuildTasks
                                 tilde = newPath.IndexOf("~");
                                 if (tilde != -1)
                                 {
-                                    StringBuilder longPathName = new StringBuilder(1024);
                                     string shortPathName = newPath.Substring(0, end);
-                                    GetLongPathName(shortPathName, longPathName, longPathName.Capacity);
-                                    newPath = longPathName.ToString() + newPath.Substring(end);
+                                    var longPathName = NativeMethods.GetLongPathName(shortPathName);
+                                    newPath = longPathName + newPath.Substring(end);
                                 }
 
                                 diff += (newPath.Length - oldPath.Length);
@@ -333,9 +320,8 @@ namespace BlackBerry.BuildTasks
                                 tilde = newPath.IndexOf("~");
                                 if (tilde != -1)
                                 {
-                                    StringBuilder longPathName = new StringBuilder(1024);
                                     string shortPathName = newPath.Substring(0, end);
-                                    GetLongPathName(shortPathName, longPathName, longPathName.Capacity);
+                                    var longPathName = NativeMethods.GetLongPathName(shortPathName);
                                     newPath = longPathName + newPath.Substring(end);
                                 }
 
@@ -369,10 +355,9 @@ namespace BlackBerry.BuildTasks
                     int begin1 = outputText.LastIndexOf(' ', tilde) + 1;
                     if (begin < begin1)
                         begin = begin1;
-                    StringBuilder longPathName = new StringBuilder(1024);
                     string shortPathName = outputText.Substring(begin, end - begin);
-                    GetLongPathName(shortPathName, longPathName, longPathName.Capacity);
-                    if (longPathName.ToString() == "")
+                    var longPathName = NativeMethods.GetLongPathName(shortPathName);
+                    if (string.IsNullOrEmpty(longPathName))
                     {
                         int sep = shortPathName.LastIndexOf('/');
                         int sep2 = shortPathName.LastIndexOf('\\');
@@ -381,11 +366,11 @@ namespace BlackBerry.BuildTasks
                         if (sep != -1)
                         {
                             shortPathName = shortPathName.Remove(sep + 1);
-                            GetLongPathName(shortPathName, longPathName, longPathName.Capacity);
+                            longPathName = NativeMethods.GetLongPathName(shortPathName);
                         }
                     }
-                    if (longPathName.ToString() != "")
-                        outputText = outputText.Replace(shortPathName, longPathName.ToString());
+                    if (!string.IsNullOrEmpty(longPathName))
+                        outputText = outputText.Replace(shortPathName, longPathName);
 
                     tilde = outputText.IndexOf("~", tilde + 1);
                 }
@@ -420,8 +405,7 @@ namespace BlackBerry.BuildTasks
                     int colNum = 0;
                     string messageErr = outputText.Substring(outputText.IndexOf(": error:") + 9);
                     fileName = fileName.Substring(0, fileName.IndexOf('('));
-                    BuildErrorEventArgs errorEvent = new BuildErrorEventArgs("", "", fileName, lineNum, colNum, 0, 0, messageErr, "", "");
-                    BuildEngine.LogErrorEvent(errorEvent);
+                    NotifyError(new BuildErrorEventArgs("", "", fileName, lineNum, colNum, 0, 0, messageErr, "", ""));
                 }
                 else if (outputText.IndexOf(": warning:") > 0)
                 {
@@ -451,8 +435,7 @@ namespace BlackBerry.BuildTasks
                     int colNum = 0; 
                     string messageErr = outputText.Substring(outputText.IndexOf(": warning:") + 11);
                     fileName = fileName.Substring(0, fileName.IndexOf('('));
-                    BuildWarningEventArgs warningEvent = new BuildWarningEventArgs("", "", fileName, lineNum, colNum, 0, 0, messageErr, "", "");
-                    BuildEngine.LogWarningEvent(warningEvent);
+                    NotifyWarning(new BuildWarningEventArgs("", "", fileName, lineNum, colNum, 0, 0, messageErr, "", ""));
                 }
                 else if (outputText.Contains("undefined reference"))
                 {
@@ -482,13 +465,11 @@ namespace BlackBerry.BuildTasks
                         message = outputText.Substring(outputText.LastIndexOf(':') + 1).Trim();
                     }
 
-                    BuildErrorEventArgs errorEvent = new BuildErrorEventArgs("", "", fileName, lineNum, 1, 0, 0, message, "", "");
-                    BuildEngine.LogErrorEvent(errorEvent);
+                    NotifyError(new BuildErrorEventArgs("", "", fileName, lineNum, 1, 0, 0, message, "", ""));
                 }
                 else
                 {
-                    BuildMessageEventArgs taskEvent = new BuildMessageEventArgs(outputText, "", "", MessageImportance.High);
-                    BuildEngine.LogMessageEvent(taskEvent);
+                    NotifyMessage(new BuildMessageEventArgs(outputText, "", "", MessageImportance.High));
                 }
 
                 // Add the text to the collected output. 
@@ -496,21 +477,59 @@ namespace BlackBerry.BuildTasks
             }
         }
 
+        private void NotifyMessage(BuildMessageEventArgs e)
+        {
+            if (e != null)
+            {
+                try
+                {
+                    if (BuildEngine != null)
+                    {
+                        BuildEngine.LogMessageEvent(e);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message, "BlackBerry.Build.Log");
+                }
+            }
+        }
 
-        /// <summary> GDB works with short path names only, which requires converting the path names to/from long ones. This function 
-        /// returns the long path name for a given short one. </summary>
-        /// <param name="path">Short path name. </param>
-        /// <param name="longPath">Returns this long path name. </param>
-        /// <param name="longPathLength"> Lenght of this long path name. </param>
-        /// <returns></returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetLongPathName(
-            [MarshalAs(UnmanagedType.LPTStr)]
-            string path,
-            [MarshalAs(UnmanagedType.LPTStr)]
-            StringBuilder longPath,
-            int longPathLength
-            );
+        private void NotifyWarning(BuildWarningEventArgs e)
+        {
+            if (e != null)
+            {
+                try
+                {
+                    if (BuildEngine != null)
+                    {
+                        BuildEngine.LogWarningEvent(e);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message, "BlackBerry.Build.Warning");
+                }
+            }
+        }
+
+        private void NotifyError(BuildErrorEventArgs e)
+        {
+            if (e != null)
+            {
+                try
+                {
+                    if (BuildEngine != null)
+                    {
+                        BuildEngine.LogErrorEvent(e);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message, "BlackBerry.Build.Error");
+                }
+            }
+        }
 
         [Required]
         public string ProjectDir
@@ -540,14 +559,12 @@ namespace BlackBerry.BuildTasks
         {
             try
             {
-                _proc.Kill();
+                _process.Kill();
             }
             catch (Exception ex)
             {
-                BuildMessageEventArgs taskEvent2 = new BuildMessageEventArgs(ex.Message, "", "", MessageImportance.High);
-                BuildEngine.LogMessageEvent(taskEvent2);
+                NotifyMessage(new BuildMessageEventArgs(ex.Message, "", "", MessageImportance.High));
             }
-            
         }
     }
 }

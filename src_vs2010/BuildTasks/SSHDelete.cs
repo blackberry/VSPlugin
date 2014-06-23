@@ -19,33 +19,36 @@ using Microsoft.Build.Framework;
 
 namespace BlackBerry.BuildTasks
 {
-    public class SSHDelete : TrackedVCToolTask
+    public sealed class SSHDelete : TrackedVCToolTask
     {
         #region Member Variables and Constants
-        protected ArrayList switchOrderList;
+
+        private readonly ArrayList _switchOrderList;
 
         private const string DEVICE = "Device";
         private const string PRIVATE_KEY_PATH = "PrivateKeyPath";
         private const string DELETE_FILES = "DeleteFiles";
         private const string PACKAGE_ID = "PackageId";
         private const string PACKAGE_NAME = "PackageName";
+
         #endregion
 
         /// <summary>
-        /// SSHDelete Constructor
+        /// SSHDelete default constructor
         /// </summary>
         public SSHDelete()
             : base(Resources.ResourceManager)
         {
-            this.switchOrderList = new ArrayList();
-            this.switchOrderList.Add(PRIVATE_KEY_PATH);
+            _switchOrderList = new ArrayList();
+            _switchOrderList.Add(PRIVATE_KEY_PATH);
         }
+
+        #region Overrides
 
         /// <summary>
         /// Return the Response File Switch string
         /// </summary>
         /// <param name="responseFilePath"></param>
-        /// <returns></returns>
         protected override string GetResponseFileSwitch(string responseFilePath)
         {
             return string.Empty;
@@ -54,7 +57,6 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Return the command line string
         /// </summary>
-        /// <returns></returns>
         protected override string GenerateCommandLineCommands()
         {
             return GenerateResponseFileCommands();
@@ -73,7 +75,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string[] ReadTLogNames
         {
-            get { return new string[] { "SSHDelete.read.1.tlog", "SSHDelete.*.read.1.tlog" }; }
+            get { return new[] { "SSHDelete.read.1.tlog", "SSHDelete.*.read.1.tlog" }; }
         }
 
         /// <summary>
@@ -83,7 +85,7 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return new string[] { "SSHDelete.write.1.tlog", "SSHDelete.*.write.1.tlog" };
+                return new[] { "SSHDelete.write.1.tlog", "SSHDelete.*.write.1.tlog" };
             }
         }
 
@@ -94,9 +96,9 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (base.IsPropertySet(DELETE_FILES))
+                if (IsPropertySet(DELETE_FILES))
                 {
-                    return base.ActiveToolSwitches[DELETE_FILES].TaskItemArray;
+                    return ActiveToolSwitches[DELETE_FILES].TaskItemArray;
                 }
                 return null;
             }
@@ -127,23 +129,22 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Function to generate the response file commands string
         /// </summary>
-        /// <returns></returns>
         protected override string GenerateResponseFileCommands()
         {
             string cmd = base.GenerateResponseFileCommands();
 
             cmd += " -o \"StrictHostKeyChecking no\"";
 
-            if (base.IsPropertySet(DEVICE))
+            if (IsPropertySet(DEVICE))
             {
-                cmd += " devuser@" + base.ActiveToolSwitches[DEVICE].Value;
+                cmd += " devuser@" + ActiveToolSwitches[DEVICE].Value;
             }
 
-            if (base.IsPropertySet(DELETE_FILES))
+            if (IsPropertySet(DELETE_FILES))
             {
                 string path = "../../../../apps/" + PackageName + "." + PackageId + "/";
                 cmd += " '";
-                foreach (ITaskItem taskItem in base.ActiveToolSwitches[DELETE_FILES].TaskItemArray)
+                foreach (ITaskItem taskItem in ActiveToolSwitches[DELETE_FILES].TaskItemArray)
                 {
                     cmd += "rm " + path + taskItem.GetMetadata("Identity") + "; ";
                 }
@@ -164,26 +165,30 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return this.switchOrderList;
+                return _switchOrderList;
             }
         }
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Getter/Setter for the Device property
         /// </summary>
-        public virtual string Device
+        public string Device
         {
             get
             {
-                if (base.IsPropertySet(DEVICE))
+                if (IsPropertySet(DEVICE))
                 {
-                    return base.ActiveToolSwitches[DEVICE].Value;
+                    return ActiveToolSwitches[DEVICE].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(DEVICE);
+                ActiveToolSwitches.Remove(DEVICE);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = DEVICE,
@@ -193,27 +198,27 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "devuser@",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(DEVICE, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(DEVICE, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the PrivateKeyPath property
         /// </summary>
-        public virtual string PrivateKeyPath
+        public string PrivateKeyPath
         {
             get
             {
-                if (base.IsPropertySet(PRIVATE_KEY_PATH))
+                if (IsPropertySet(PRIVATE_KEY_PATH))
                 {
-                    return base.ActiveToolSwitches[PRIVATE_KEY_PATH].Value;
+                    return ActiveToolSwitches[PRIVATE_KEY_PATH].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PRIVATE_KEY_PATH);
+                ActiveToolSwitches.Remove(PRIVATE_KEY_PATH);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PRIVATE_KEY_PATH,
@@ -223,27 +228,27 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-i ",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(PRIVATE_KEY_PATH, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PRIVATE_KEY_PATH, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the PackageId property
         /// </summary>
-        public virtual string PackageId
+        public string PackageId
         {
             get
             {
-                if (base.IsPropertySet(PACKAGE_ID))
+                if (IsPropertySet(PACKAGE_ID))
                 {
-                    return base.ActiveToolSwitches[PACKAGE_ID].Value;
+                    return ActiveToolSwitches[PACKAGE_ID].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PACKAGE_ID);
+                ActiveToolSwitches.Remove(PACKAGE_ID);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PACKAGE_ID,
@@ -253,27 +258,27 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-package-id ",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(PACKAGE_ID, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PACKAGE_ID, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the PackageName property
         /// </summary>
-        public virtual string PackageName
+        public string PackageName
         {
             get
             {
-                if (base.IsPropertySet(PACKAGE_NAME))
+                if (IsPropertySet(PACKAGE_NAME))
                 {
-                    return base.ActiveToolSwitches[PACKAGE_NAME].Value;
+                    return ActiveToolSwitches[PACKAGE_NAME].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PACKAGE_NAME);
+                ActiveToolSwitches.Remove(PACKAGE_NAME);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PACKAGE_NAME,
@@ -283,27 +288,27 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-package-name ",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(PACKAGE_NAME, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PACKAGE_NAME, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the DeleteFiles property
         /// </summary>
-        public virtual ITaskItem[] DeleteFiles
+        public ITaskItem[] DeleteFiles
         {
             get
             {
-                if (base.IsPropertySet(DELETE_FILES))
+                if (IsPropertySet(DELETE_FILES))
                 {
-                    return base.ActiveToolSwitches[DELETE_FILES].TaskItemArray;
+                    return ActiveToolSwitches[DELETE_FILES].TaskItemArray;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(DELETE_FILES);
+                ActiveToolSwitches.Remove(DELETE_FILES);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.ITaskItemArray)
                 {
                     Name = DELETE_FILES,
@@ -311,9 +316,11 @@ namespace BlackBerry.BuildTasks
                     Description = "Delete all items in the array from the device.",
                     TaskItemArray = value
                 };
-                base.ActiveToolSwitches.Add(DELETE_FILES, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(DELETE_FILES, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
+
+        #endregion
     }
 }

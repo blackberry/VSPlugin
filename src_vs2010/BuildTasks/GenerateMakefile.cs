@@ -14,9 +14,6 @@
 
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -25,10 +22,11 @@ namespace BlackBerry.BuildTasks
     /// <summary>
     /// MSBuild Task for generating a make file for packaging the bar file. 
     /// </summary>
-    public class GenerateMakefile : Task
+    public sealed class GenerateMakefile : Task
     {
         #region Member Variables and Constants
-        private string _projectDir;
+
+        private string _projectDirectory;
         private string _intDir;
         private string _outDir;
 
@@ -85,9 +83,10 @@ namespace BlackBerry.BuildTasks
             "-include $(II_DEPS)\n" +
             "endif\n" +
             "endif\n\n";
+
         #endregion
 
-        #region properties
+        #region Properties
 
         /// <summary>
         /// Getter/Setter for CompileItems property
@@ -112,8 +111,8 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string ProjectDir
         {
-            set { _projectDir = value.Replace('\\', '/'); }
-            get { return _projectDir; }
+            set { _projectDirectory = value.Replace('\\', '/'); }
+            get { return _projectDirectory; }
         }
 
         /// <summary>
@@ -160,7 +159,6 @@ namespace BlackBerry.BuildTasks
             set;
             get;
         }
-
 
         /// <summary>
         /// Getter/Setter for TargetName property
@@ -210,22 +208,6 @@ namespace BlackBerry.BuildTasks
         #endregion
 
         /// <summary>
-        /// Interface to unmanaged code for getting the SHortPathName for a given directory.
-        /// </summary>
-        /// <param name="path">Path to be converted</param>
-        /// <param name="shortPath">Returned ShortPathName</param>
-        /// <param name="shortPathLength">Length of the ShortPathName</param>
-        /// <returns></returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetShortPathName(
-                 [MarshalAs(UnmanagedType.LPTStr)]
-                   string path,
-                 [MarshalAs(UnmanagedType.LPTStr)]
-                   StringBuilder shortPath,
-                 int shortPathLength
-                 );
-
-        /// <summary>
         /// Execute MSBuild Task
         /// </summary>
         /// <returns></returns>
@@ -243,7 +225,6 @@ namespace BlackBerry.BuildTasks
             using (StreamWriter outFile = new StreamWriter(IntDir + "makefile"))
             {
                 outFile.Write(INITIAL_DEFINITIONS);
-          //      System.Diagnostics.Debugger.Launch();
                 foreach (ITaskItem compileItem in CompileItems)
                 {
                     // Get the metadata we need from this compile item.
@@ -261,16 +242,13 @@ namespace BlackBerry.BuildTasks
                     string additionalOptions = compileItem.GetMetadata("AdditionalOptions");
                     string fullPath = compileItem.GetMetadata("FullPath").Replace('\\', '/');
 
-                    /// if CompileItem is in the ExcludedPath then continue.
-                    if (isExcludedPath(fullPath))
+                    // if CompileItem is in the ExcludedPath then continue.
+                    if (IsExcludedPath(fullPath))
                     {
-
                         continue;
                     }
 
-                    StringBuilder shortPath = new StringBuilder(1024);
-                    GetShortPathName(fullPath, shortPath, shortPath.Capacity);
-                    string fullPathShortened = shortPath.ToString();
+                    string fullPathShortened = NativeMethods.GetShortPathName(fullPath);
                     
                     string handleExceptions = compileItem.GetMetadata("GccExceptionHandling");
 
@@ -282,7 +260,7 @@ namespace BlackBerry.BuildTasks
                     {
                         // Prepend ProjectDir to relative paths -- otherwise they will be interpreted
                         // as being relative to the build dir, e.g. ProjectDir/BlackBerry/Debug
-                        if (additionalIncludeDirs[i] != "" && !additionalIncludeDirs[i].Contains(':'))
+                        if (!string.IsNullOrEmpty(additionalIncludeDirs[i]) && additionalIncludeDirs[i].IndexOf(':') < 0)
                             additionalIncludeDirs[i] = ProjectDir + additionalIncludeDirs[i];
                     }
 
@@ -388,10 +366,7 @@ namespace BlackBerry.BuildTasks
                 outFile.WriteLine();
 
                 string rootedOutDir = (Path.IsPathRooted(OutDir)) ? OutDir : ProjectDir + OutDir;
-
-                StringBuilder shortOutPath = new StringBuilder(1024);
-                GetShortPathName(rootedOutDir, shortOutPath, shortOutPath.Capacity);
-                rootedOutDir = shortOutPath.ToString();
+                rootedOutDir = NativeMethods.GetShortPathName(rootedOutDir);
 
                 if (ConfigurationType == "StaticLibrary")
                 {
@@ -421,7 +396,7 @@ namespace BlackBerry.BuildTasks
                     for (int i = 0; i < libDirs.Length; i++)
                     {
                         // Prepend ProjectDir to relative paths.
-                        if (libDirs[i] != "" && !libDirs[i].Contains(':'))
+                        if (!string.IsNullOrEmpty(libDirs[i]) && libDirs[i].IndexOf(':') < 0)
                             libDirs[i] = ProjectDir + libDirs[i];
                     }
 
@@ -495,22 +470,16 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Check to see if path is in the excluded list
         /// </summary>
-        /// <param name="path"></param>
-        /// <returns></returns>
-        private bool isExcludedPath(string path)
+        private bool IsExcludedPath(string path)
         {
             if (ExcludeDirectories != null)
             {
-                foreach (string exDir in ExcludeDirectories)
+                foreach (string excludedDir in ExcludeDirectories)
                 {
-                    if (Path.GetFullPath(path).Contains(Path.GetFullPath(exDir)))
+                    if (Path.GetFullPath(path).Contains(Path.GetFullPath(excludedDir)))
                     {
                         return true;
                     }
-/*                    else
-                    {
-                        return false;
-                    }*/
                 }
             }
             return false;

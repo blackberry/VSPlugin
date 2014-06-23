@@ -24,9 +24,10 @@ namespace BlackBerry.BuildTasks
     /// <summary>
     /// MSBuild task to compare the manifest file from the bar file being uploaded against the one already installed on the device.
     /// </summary>
-    public class DiffManifests : Task
+    public sealed class DiffManifests : Task
     {
         #region Member Variables and Constants
+
         private string _localManifestFile;
         private string _targetManifestFile;
         private string _targetFileMap;
@@ -34,12 +35,12 @@ namespace BlackBerry.BuildTasks
         private ArrayList _deletedFiles;
         private int _modifiedFilesCount;
         private int _deletedFilesCount;
+
         #endregion
 
         /// <summary>
         /// Execute the MSBuild Task.
         /// </summary>
-        /// <returns></returns>
         public override bool Execute()
         {
             _modifiedFiles = new ArrayList();
@@ -104,7 +105,7 @@ namespace BlackBerry.BuildTasks
                 if (!targetFiles.Contains(file))
                 {
                     TaskItem item = new TaskItem(file.Key);
-                    item.SetMetadata("SourcePath", getSourcePath(file.Key, targetFileMap));
+                    item.SetMetadata("SourcePath", GetSourcePath(file.Key, targetFileMap));
                     _modifiedFiles.Add(item);
                 }
             }
@@ -135,8 +136,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         /// <param name="sourcePath">Path to the source file</param>
         /// <param name="targetFileMap">Target file map</param>
-        /// <returns></returns>
-        private string getSourcePath(string sourcePath, string[] targetFileMap)
+        private string GetSourcePath(string sourcePath, string[] targetFileMap)
         {
             foreach (string line in targetFileMap)
             {
@@ -226,7 +226,7 @@ namespace BlackBerry.BuildTasks
         /// Setter for the targetFileMap property
         /// </summary>
         [Required]
-        public string targetFileMap
+        public string TargetFileMap
         {
             set
             {

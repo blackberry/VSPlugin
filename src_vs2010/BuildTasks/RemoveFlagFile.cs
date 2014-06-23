@@ -22,7 +22,7 @@ namespace BlackBerry.BuildTasks
     /// <summary>
     /// MSBuild Task for reading in the flag file from the start debugging button.
     /// </summary>
-    public class RemoveFlagFile : Task
+    public sealed class RemoveFlagFile : Task
     {
         #region Member Variables and Constants.
         private string _flagFile;
@@ -31,7 +31,6 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Execute the MSBuild Task
         /// </summary>
-        /// <returns></returns>
         public override bool Execute()
         {
             bool removed;

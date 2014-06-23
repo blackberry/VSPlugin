@@ -16,10 +16,10 @@ using Microsoft.Build.Utilities;
 
 namespace BlackBerry.BuildTasks
 {
-    class PackagerCmdBuilder : CommandLineBuilder
+    sealed class PackagerCmdBuilder : CommandLineBuilder
     {
         /// <summary>
-        /// Constructor
+        /// Default constructor
         /// </summary>
         public PackagerCmdBuilder()
             : base(true)
@@ -27,7 +27,7 @@ namespace BlackBerry.BuildTasks
         }
 
         /// <summary>
-        /// Override of IsQuotingRequired function.  Always return true.
+        /// Override of IsQuotingRequired function. Always return true.
         /// </summary>
         protected override bool IsQuotingRequired(string parameter)
         {

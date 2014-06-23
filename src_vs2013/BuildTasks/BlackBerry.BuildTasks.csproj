@@ -95,6 +95,9 @@
     <Compile Include="..\..\src_vs2010\BuildTasks\BBSigner.cs">
       <Link>BBSigner.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\BBTask.cs">
+      <Link>BBTask.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\CheckIfInstalled.cs">
       <Link>CheckIfInstalled.cs</Link>
     </Compile>
@@ -109,6 +112,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\MakeAllAndFormatOutputMessages.cs">
       <Link>MakeAllAndFormatOutputMessages.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\PackagerCmdBuilder.cs">
       <Link>PackagerCmdBuilder.cs</Link>
@@ -139,6 +145,12 @@
     </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\VSNDKTasks.cs">
       <Link>VSNDKTasks.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
+      <Link>ConfigDefaults.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\GlobalHelper.cs">
+      <Link>Helpers\GlobalHelper.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

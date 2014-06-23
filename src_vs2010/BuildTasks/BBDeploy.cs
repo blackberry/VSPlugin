@@ -15,18 +15,18 @@
 using System;
 using System.Collections;
 using System.IO;
-using System.Security.Cryptography;
-using System.Text;
 using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
 using Microsoft.Build.Framework;
 
 namespace BlackBerry.BuildTasks
 {
-    public class BBDeploy : TrackedVCToolTask
+    public sealed class BBDeploy : BBTask
     {
         #region Member Variable Declaration
-        protected ArrayList switchOrderList;
+
+        private readonly ArrayList _switchOrdersList;
+
         private string _localManifest;
         private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
         private const string GET_FILE = "GetFile";
@@ -48,28 +48,28 @@ namespace BlackBerry.BuildTasks
         #endregion
 
         /// <summary>
-        /// BBDeploy Constructor
+        /// BBDeploy default constructor
         /// </summary>
         public BBDeploy()
             : base(Resources.ResourceManager)
         {
-            this.switchOrderList = new ArrayList();
-            this.switchOrderList.Add(INSTALL_APP);
-            this.switchOrderList.Add(LAUNCH_APP);
-            this.switchOrderList.Add(LIST_INSTALLED_APPS);
-            this.switchOrderList.Add(DEBUG_NATIVE);
-            this.switchOrderList.Add(DEVICE);
-            this.switchOrderList.Add(PASSWORD);
-            this.switchOrderList.Add(PACKAGE);
-            this.switchOrderList.Add(PACKAGE_ID);
-            this.switchOrderList.Add(PACKAGE_NAME);
-            this.switchOrderList.Add(GET_FILE);
-            this.switchOrderList.Add(GET_FILE_SAVE_AS);
-            this.switchOrderList.Add(PUT_FILE);
-            this.switchOrderList.Add(PUT_FILE_SAVE_AS);
+            _switchOrdersList = new ArrayList();
+            _switchOrdersList.Add(INSTALL_APP);
+            _switchOrdersList.Add(LAUNCH_APP);
+            _switchOrdersList.Add(LIST_INSTALLED_APPS);
+            _switchOrdersList.Add(DEBUG_NATIVE);
+            _switchOrdersList.Add(DEVICE);
+            _switchOrdersList.Add(PASSWORD);
+            _switchOrdersList.Add(PACKAGE);
+            _switchOrdersList.Add(PACKAGE_ID);
+            _switchOrdersList.Add(PACKAGE_NAME);
+            _switchOrdersList.Add(GET_FILE);
+            _switchOrdersList.Add(GET_FILE_SAVE_AS);
+            _switchOrdersList.Add(PUT_FILE);
+            _switchOrdersList.Add(PUT_FILE_SAVE_AS);
         }
 
-        #region overrides
+        #region Overrides
 
         /// <summary>
         /// Helper function to return Response File Switch
@@ -113,7 +113,7 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return this.switchOrderList;
+                return _switchOrdersList;
             }
         }
 
@@ -130,7 +130,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string[] ReadTLogNames
         {
-            get { return new string[] { "BBDeploy.read.1.tlog", "BBDeploy.*.read.1.tlog" }; }
+            get { return new[] { "BBDeploy.read.1.tlog", "BBDeploy.*.read.1.tlog" }; }
         }
 
         /// <summary>
@@ -140,14 +140,14 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                return new string[] { "BBDeploy.write.1.tlog", "BBDeploy.*.write.1.tlog" };
+                return new[] { "BBDeploy.write.1.tlog", "BBDeploy.*.write.1.tlog" };
             }
         }
         
         /// <summary>
         /// Getter for the TrackedInputFiles property
         /// </summary>
-        protected override Microsoft.Build.Framework.ITaskItem[] TrackedInputFiles
+        protected override ITaskItem[] TrackedInputFiles
         {
             get
             {
@@ -176,9 +176,9 @@ namespace BlackBerry.BuildTasks
         {
             get
             {
-                if (this.TrackerLogDirectory != null)
+                if (TrackerLogDirectory != null)
                 {
-                    return this.TrackerLogDirectory;
+                    return TrackerLogDirectory;
                 }
                 return string.Empty;
             }
@@ -190,30 +190,30 @@ namespace BlackBerry.BuildTasks
         /// <returns></returns>
         protected override string GenerateFullPathToTool()
         {
-            return this.ToolName;
+            return ToolName;
         }
 
-        #endregion overrides
+        #endregion
 
-        #region properties
+        #region Properties
 
         /// <summary>
         /// Getter/Setter for the GetFile property
         /// Retrieve specified file from default application directory
         /// </summary>
-        public virtual string GetFile
+        public string GetFile
         {
             get
             {
-                if (base.IsPropertySet(GET_FILE))
+                if (IsPropertySet(GET_FILE))
                 {
-                    return base.ActiveToolSwitches[GET_FILE].Value;
+                    return ActiveToolSwitches[GET_FILE].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(GET_FILE);
+                ActiveToolSwitches.Remove(GET_FILE);
 
                 // Value passed in is the file to get, relative to our app's directory.
                 // We determine the app's directory from the PackageName and PackageId.
@@ -226,8 +226,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-getFile ",
                     Value = toolValue
                 };
-                base.ActiveToolSwitches.Add(GET_FILE, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(GET_FILE, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -235,19 +235,19 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for the GetFileSaveAs property
         /// Retrieve specified file from location.
         /// </summary>
-        public virtual string GetFileSaveAs
+        public string GetFileSaveAs
         {
             get
             {
-                if (base.IsPropertySet(GET_FILE_SAVE_AS))
+                if (IsPropertySet(GET_FILE_SAVE_AS))
                 {
-                    return base.ActiveToolSwitches[GET_FILE_SAVE_AS].Value;
+                    return ActiveToolSwitches[GET_FILE_SAVE_AS].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(GET_FILE_SAVE_AS);
+                ActiveToolSwitches.Remove(GET_FILE_SAVE_AS);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = GET_FILE_SAVE_AS,
@@ -255,8 +255,8 @@ namespace BlackBerry.BuildTasks
                     Description = "Save a file retrieved using GetFile to the given location.",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(GET_FILE_SAVE_AS, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(GET_FILE_SAVE_AS, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -264,19 +264,19 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for the PutFile property
         /// Save given file to default application directory.
         /// </summary>
-        public virtual string PutFile
+        public string PutFile
         {
             get
             {
-                if (base.IsPropertySet(PUT_FILE))
+                if (IsPropertySet(PUT_FILE))
                 {
-                    return base.ActiveToolSwitches[PUT_FILE].Value;
+                    return ActiveToolSwitches[PUT_FILE].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PUT_FILE);
+                ActiveToolSwitches.Remove(PUT_FILE);
                 //value = value.Replace(".exe", "");
 
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
@@ -287,8 +287,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-putFile ",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(PUT_FILE, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PUT_FILE, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -296,19 +296,19 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for the PutFileSaveAs property
         /// Save given file to specified location
         /// </summary>
-        public virtual string PutFileSaveAs
+        public string PutFileSaveAs
         {
             get
             {
-                if (base.IsPropertySet(PUT_FILE_SAVE_AS))
+                if (IsPropertySet(PUT_FILE_SAVE_AS))
                 {
-                    return base.ActiveToolSwitches[PUT_FILE_SAVE_AS].Value;
+                    return ActiveToolSwitches[PUT_FILE_SAVE_AS].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PUT_FILE_SAVE_AS);
+                ActiveToolSwitches.Remove(PUT_FILE_SAVE_AS);
 
                 // We determine the app's directory from the PackageName and PackageId.
                 String toolValue = "../../../../apps/" + PackageName + "." + PackageId + "/" + value;
@@ -319,23 +319,23 @@ namespace BlackBerry.BuildTasks
                     Description = "Save a file retrieved using PutFile to the given location.",
                     Value = toolValue
                 };
-                base.ActiveToolSwitches.Add(PUT_FILE_SAVE_AS, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PUT_FILE_SAVE_AS, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the InstallApp property - Switch to cause deploy to install a given application
         /// </summary>
-        public virtual bool InstallApp
+        public bool InstallApp
         {
             get
             {
-                return (base.IsPropertySet(INSTALL_APP) && base.ActiveToolSwitches[INSTALL_APP].BooleanValue);
+                return (IsPropertySet(INSTALL_APP) && ActiveToolSwitches[INSTALL_APP].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(INSTALL_APP);
+                ActiveToolSwitches.Remove(INSTALL_APP);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = INSTALL_APP,
@@ -344,23 +344,23 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-installApp",
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(INSTALL_APP, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(INSTALL_APP, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
         /// <summary>
         /// Getter/Setter for the LaunchApp Property - Switch to launch given application.
         /// </summary>
-        public virtual bool LaunchApp
+        public bool LaunchApp
         {
             get
             {
-                return (base.IsPropertySet(LAUNCH_APP) && base.ActiveToolSwitches[LAUNCH_APP].BooleanValue);
+                return (IsPropertySet(LAUNCH_APP) && ActiveToolSwitches[LAUNCH_APP].BooleanValue);
             }
             set
             {
-                base.ActiveToolSwitches.Remove(LAUNCH_APP);
+                ActiveToolSwitches.Remove(LAUNCH_APP);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = LAUNCH_APP,
@@ -369,8 +369,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-launchApp ",
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(LAUNCH_APP, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(LAUNCH_APP, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -378,15 +378,15 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for ListInstalledApps Property.
         /// Switch for command to retrieve the list of installed apps.
         /// </summary>
-        public virtual bool ListInstalledApps
+        public bool ListInstalledApps
         {
             get
             {
-                return (base.IsPropertySet(LIST_INSTALLED_APPS) && base.ActiveToolSwitches[LIST_INSTALLED_APPS].BooleanValue);            
+                return (IsPropertySet(LIST_INSTALLED_APPS) && ActiveToolSwitches[LIST_INSTALLED_APPS].BooleanValue);            
             }
             set
             {
-                base.ActiveToolSwitches.Remove(LIST_INSTALLED_APPS);
+                ActiveToolSwitches.Remove(LIST_INSTALLED_APPS);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = LIST_INSTALLED_APPS,
@@ -395,8 +395,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-listInstalledApps ",
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(LIST_INSTALLED_APPS, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(LIST_INSTALLED_APPS, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -415,11 +415,11 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for DebugNative property
         /// Switch to cause task to install application in debug configuration.
         /// </summary>
-        public virtual bool DebugNative
+        public bool DebugNative
         {
             get
             {
-                return (base.IsPropertySet(DEBUG_NATIVE) && base.ActiveToolSwitches[DEBUG_NATIVE].BooleanValue);
+                return (IsPropertySet(DEBUG_NATIVE) && ActiveToolSwitches[DEBUG_NATIVE].BooleanValue);
             }
 
             set
@@ -427,7 +427,7 @@ namespace BlackBerry.BuildTasks
                 if (File.Exists(_flagFile))
                     value = true;
 
-                base.ActiveToolSwitches.Remove(DEBUG_NATIVE);
+                ActiveToolSwitches.Remove(DEBUG_NATIVE);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = DEBUG_NATIVE,
@@ -436,8 +436,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-debugNative ",
                     BooleanValue = value
                 };
-                base.ActiveToolSwitches.Add(DEBUG_NATIVE, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(DEBUG_NATIVE, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -445,19 +445,19 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for Device property.
         /// Device property designates the IP of the target device.
         /// </summary>
-        public virtual string Device
+        public string Device
         {
             get
             {
-                if (base.IsPropertySet(DEVICE))
+                if (IsPropertySet(DEVICE))
                 {
-                    return base.ActiveToolSwitches[DEVICE].Value;
+                    return ActiveToolSwitches[DEVICE].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(DEVICE);
+                ActiveToolSwitches.Remove(DEVICE);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = DEVICE,
@@ -466,8 +466,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-device ",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(DEVICE, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(DEVICE, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -475,31 +475,30 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for Password property.
         /// Password property specifies the target device password.
         /// </summary>
-        public virtual string Password
+        public string Password
         {
             get
             {
-                if (base.IsPropertySet(PASSWORD))
+                if (IsPropertySet(PASSWORD))
                 {
-                    return base.ActiveToolSwitches[PASSWORD].Value;
+                    return ActiveToolSwitches[PASSWORD].Value;
                 }
                 return null;
             }
             set
             {
-
-                base.ActiveToolSwitches.Remove(PASSWORD);
+                ActiveToolSwitches.Remove(PASSWORD);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PASSWORD,
                     DisplayName = "Device Password",
                     Description = "The -password option specifies the target device's password.",
                     SwitchValue = "-password ",
-                    Value = Decrypt(value)
+                    Value = DecryptPassword(value)
                 };
 
-                base.ActiveToolSwitches.Add(PASSWORD, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PASSWORD, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -507,19 +506,19 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for Package property.
         /// Package property specified package to be installed/launched on task execution.
         /// </summary>
-        public virtual string Package
+        public string Package
         {
             get
             {
-                if (base.IsPropertySet(PACKAGE))
+                if (IsPropertySet(PACKAGE))
                 {
-                    return base.ActiveToolSwitches[PACKAGE].Value;
+                    return ActiveToolSwitches[PACKAGE].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PACKAGE);
+                ActiveToolSwitches.Remove(PACKAGE);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PACKAGE,
@@ -528,8 +527,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-package ",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(PACKAGE, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PACKAGE, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -537,19 +536,19 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for PackageId property
         /// </summary>
         [Output]
-        public virtual string PackageId
+        public string PackageId
         {
             get
             {
-                if (base.IsPropertySet(PACKAGE_ID))
+                if (IsPropertySet(PACKAGE_ID))
                 {
-                    return base.ActiveToolSwitches[PACKAGE_ID].Value;
+                    return ActiveToolSwitches[PACKAGE_ID].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PACKAGE_ID);
+                ActiveToolSwitches.Remove(PACKAGE_ID);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PACKAGE_ID,
@@ -558,8 +557,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-package-id ",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(PACKAGE_ID, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PACKAGE_ID, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -567,19 +566,19 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for PackageName property
         /// </summary>
         [Output]
-        public virtual string PackageName
+        public string PackageName
         {
             get
             {
-                if (base.IsPropertySet(PACKAGE_NAME))
+                if (IsPropertySet(PACKAGE_NAME))
                 {
-                    return base.ActiveToolSwitches[PACKAGE_NAME].Value;
+                    return ActiveToolSwitches[PACKAGE_NAME].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(PACKAGE_NAME);
+                ActiveToolSwitches.Remove(PACKAGE_NAME);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PACKAGE_NAME,
@@ -588,8 +587,8 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-package-name ",
                     Value = value
                 };
-                base.ActiveToolSwitches.Add(PACKAGE_NAME, toolSwitch);
-                base.AddActiveSwitchToolValue(toolSwitch);
+                ActiveToolSwitches.Add(PACKAGE_NAME, toolSwitch);
+                AddActiveSwitchToolValue(toolSwitch);
             }
         }
 
@@ -597,7 +596,7 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for LocalManifestFile property
         /// We need the local manifest in order to determine PackageId and PackageName.
         /// </summary>
-        public virtual string LocalManifestFile
+        public string LocalManifestFile
         {
             get
             {
@@ -631,7 +630,7 @@ namespace BlackBerry.BuildTasks
         /// Getter/Setter for the TargetManifestFile
         /// </summary>
         [Output]
-        public virtual string TargetManifestFile
+        public string TargetManifestFile
         {
             get
             {
@@ -642,55 +641,30 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Getter/Setter for the TrackerLogDirectory property
         /// </summary>
-        public virtual string TrackerLogDirectory
+        public string TrackerLogDirectory
         {
             get
             {
-                if (base.IsPropertySet(TRACKER_LOG_DIRECTORY))
+                if (IsPropertySet(TRACKER_LOG_DIRECTORY))
                 {
-                    return base.ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
+                    return ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
                 }
                 return null;
             }
             set
             {
-                base.ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
+                ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Directory)
                 {
                     DisplayName = "Tracker Log Directory",
                     Description = "Tracker Log Directory.",
-                    Value = VCToolTask.EnsureTrailingSlash(value)
+                    Value = EnsureTrailingSlash(value)
                 };
-                base.ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
-                base.AddActiveSwitchToolValue(switch2);
+                ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
+                AddActiveSwitchToolValue(switch2);
             }
         }
 
         #endregion
-
-        /// <summary>
-        /// Decrypts a given string.
-        /// </summary>
-        /// <param name="cipher">A base64 encoded string that was created
-        /// through the <see cref="Encrypt(string)"/> or
-        /// <see cref="Encrypt(SecureString)"/> extension methods.</param>
-        /// <returns>The decrypted string.</returns>
-        /// <remarks>Keep in mind that the decrypted string remains in memory
-        /// and makes your application vulnerable per se. If runtime protection
-        /// is essential, <see cref="SecureString"/> should be used.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="cipher"/>
-        /// is a null reference.</exception>
-        public string Decrypt(string cipher)
-        {
-        if (cipher == null) throw new ArgumentNullException("cipher");
-
-            //parse base64 string
-            byte[] data = Convert.FromBase64String(cipher);
-
-            //decrypt data
-            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-
-            return Encoding.Unicode.GetString(decrypted);
-        }
     }
 }

@@ -20,14 +20,16 @@ using Microsoft.Build.Utilities;
 namespace BlackBerry.BuildTasks
 {
     /// <summary>
-    /// MSBuild Task to check to see if the application was previously installed.
+    /// MSBuild Task to check if the application was previously installed.
     /// </summary>
-    public class CheckIfInstalled : Task
+    public sealed class CheckIfInstalled : Task
     {
         #region Member Variables and Constants
+
         private string _listFile;
         private string _appName;
         private bool _isAppInstalled;
+
         #endregion
 
         /// <summary>
@@ -36,7 +38,6 @@ namespace BlackBerry.BuildTasks
         /// <returns>True on successful execution</returns>
         public override bool Execute()
         {
-
             try
             {
                 _isAppInstalled = false;
@@ -57,8 +58,6 @@ namespace BlackBerry.BuildTasks
             {
                 return false;
             }
-
-
         }
 
         /// <summary>

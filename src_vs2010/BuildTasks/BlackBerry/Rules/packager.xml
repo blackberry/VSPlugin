@@ -28,7 +28,7 @@
       Category="General" Switch="PackageManifestOnly" F1Keyword="" >
   </BoolProperty>
   <BoolProperty Name="DisableOptimizedDeploy" DisplayName="Disable optimized deploy"
-      Description="PlayBook development dedicated switch. Leave it off for BlackBerry 10 devices. It disables optimized bar-file deployment feature, that updates the device with only changed files from the project, since is not supported on PlayBook at all. Otherwise strange build errors might occur."
+      Description="It disables optimized bar-file deployment feature, that updates the device with only changed files from the project. This features is not unsupported for PlayBook builds."
       Category="General" Switch="DisableOptimizedDeploy" F1Keyword="" >
   </BoolProperty>
   <!-- output-->
