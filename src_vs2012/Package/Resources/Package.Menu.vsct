@@ -1,0 +1,289 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <Extern href="stdidcmd.h" />
+    <Extern href="vsshlids.h" />
+
+    <!--Defines VK_INSERT -->
+    <Extern href="virtkeys.h" />
+    
+    <Commands package="guidVSNDK_PackageString">
+
+        <!--This is the sub-section that defines the menus and toolbars.-->
+        <Menus>
+            <!-- Targets Submenu -->
+            <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" priority="0x0100" type="Menu">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Targets" />
+                <Strings>
+                    <ButtonText>&amp;Targets</ButtonText>
+                </Strings>
+            </Menu>
+
+            <!-- Help Submenu -->
+            <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" priority="0x0900" type="Menu">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
+                <Strings>
+                    <ButtonText>&amp;Help</ButtonText>
+                </Strings>
+            </Menu>
+        </Menus>
+
+        <Groups>
+
+            <!-- Main Menu Groups -->
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Targets" priority="0x0100">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" priority="0x0200">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" priority="0x0300">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" />
+            </Group>
+
+            <!-- Targets Submenu Groups -->
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Devices" priority="0x0100">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_ApiLevels" priority="0x0200">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Configuration" priority="0x0300">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
+            </Group>
+
+            <!-- Help Submenu Groups -->
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Start" priority="0x0100">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" priority="0x0200">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" priority="0x0300">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_About" priority="0x0400">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
+            </Group>
+
+            <!-- Context Menu -->
+            <Group guid="guidVSNDK_PackageCmdSet" id="BlackBerryContextMenuGroup" priority="0x0600">
+                <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
+            </Group>
+
+        </Groups>
+
+        <Buttons>
+
+            <!-- Common Action Buttons -->
+
+            <!-- Settings Action Buttons -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryOptions" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" />
+                <Strings>
+                    <ButtonText>&amp;Options...</ButtonText>
+                    <ToolTipText>Opens BlackBerry dedicated settings</ToolTipText>
+                </Strings>
+            </Button>
+
+            <!-- Targets Configuration Buttons -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsDevicesPlaceholder" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Devices" />
+                <CommandFlag>DynamicItemStart</CommandFlag>
+                <CommandFlag>DynamicVisibility</CommandFlag>
+                <CommandFlag>DefaultInvisible</CommandFlag>
+                <CommandFlag>TextChanges</CommandFlag>
+                <CommandFlag>NoButtonCustomize</CommandFlag>
+                <Strings>
+                    <ButtonText>[Target Devices]</ButtonText>
+                    <ToolTipText>Select a device to run the application on</ToolTipText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsApiLevelsPlaceholder" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_ApiLevels" />
+                <CommandFlag>DynamicItemStart</CommandFlag>
+                <CommandFlag>DynamicVisibility</CommandFlag>
+                <CommandFlag>DefaultInvisible</CommandFlag>
+                <CommandFlag>TextChanges</CommandFlag>
+                <CommandFlag>NoButtonCustomize</CommandFlag>
+                <Strings>
+                    <ButtonText>[Target API Levels]</ButtonText>
+                    <ToolTipText>Select a NDK with desired API Level to run the application against</ToolTipText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsConfigure" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Configuration" />
+                <Strings>
+                    <ButtonText>&amp;Configure...</ButtonText>
+                </Strings>
+            </Button>
+
+            <!-- Help Buttons: Help/Start -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpWelcomePage" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Start" />
+                <Strings>
+                    <ButtonText>Open &amp;Welcome Page</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSupportForum" priority="0x0200" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Start" />
+                <Strings>
+                    <ButtonText>Support &amp;Forum</ButtonText>
+                </Strings>
+            </Button>
+
+            <!-- Help Buttons: Documentation -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpDocNative" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" />
+                <Strings>
+                    <ButtonText>&amp;Native Core Documentation</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpDocCascades" priority="0x0200" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" />
+                <Strings>
+                    <ButtonText>&amp;Cascades Documentation</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpDocPlayBook" priority="0x0300" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" />
+                <Strings>
+                    <ButtonText>&amp;PlayBook Documentation</ButtonText>
+                </Strings>
+            </Button>
+
+            <!-- Help Buttons: Samples -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesNative" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" />
+                <Strings>
+                    <ButtonText>N&amp;ative Core Samples</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesCascades" priority="0x0200" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" />
+                <Strings>
+                    <ButtonText>Ca&amp;scades Samples</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesPlayBook" priority="0x0300" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" />
+                <Strings>
+                    <ButtonText>Play&amp;Book Samples</ButtonText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesOpenSource" priority="0x0400" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" />
+                <Strings>
+                    <ButtonText>&amp;Open Source Projects</ButtonText>
+                </Strings>
+            </Button>
+
+            <!-- Help Buttons: About -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpAbout" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_About" />
+                <Strings>
+                    <ButtonText>&amp;About...</ButtonText>
+                </Strings>
+            </Button>
+
+            <!-- Others -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidfooLocalBox" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryContextMenuGroup" />
+                <CommandFlag>DynamicVisibility</CommandFlag>
+                <Strings>
+                    <CommandName>cmdidfooLocalBox</CommandName>
+                    <ButtonText>Import BlackBerry Core Native Project</ButtonText>
+                </Strings>
+            </Button>
+        </Buttons>
+
+    </Commands>
+
+
+    <!--  Within this section you can specify the set of commands defined somewhere else that your  
+        packages uses; for instance if your package uses the standard ‘Copy’ command, you don’t  
+        need to define it, because it is defined by the shell, but you have to use this section  
+        of the VSCT file to notify the shell that your package uses it using this section. -->
+    <!--  Note that with combo boxes we have effectively two commands in one. Below 
+        we have two pairs of commands; 1st pair commandIDFontName and commandIDFontNameHandler, 
+        2nd pair commandIDFontSize and commandIDFontSizeHandler. Note that: 
+        
+        - commandIDFontName and commandIDFontSize handle the displaying and setting of the font 
+          name and font size respectively 
+        - commandIDFontNameHandler and commandIDFontSizeHandler fill the drop down menus 
+          with the available font names and font sizes respectively 
+     -->
+    <!-- Note also that VS will call QueryStatus only on commandIDFontName and  
+       commandIDFontSize, but not on cmdFontNameHandler and commandIDFontSizeHandler whereas 
+       Exec will be called on all four commands. 
+       Note also that Exec will be called for commandIDFontName and commandIDFontSize for 
+       two cases; first to get the current font name or size and second to 
+       set the font name or size whereas the Exec call for commandIDFontNameHandler and  
+       commandIDFontSizeHandler always have the same meaning - fill the drop down menu. 
+       Finally, note that placement for the combo boxes is defined in the combo 
+       section below by the priority and not in the CommandPlacements section. -->
+    <UsedCommands>
+        <UsedCommand guid="guidVSStd97" id="cmdidBold" />
+        <UsedCommand guid="guidVSStd97" id="cmdidItalic" />
+        <UsedCommand guid="guidVSStd97" id="cmdidUnderline" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyLeft" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyCenter" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyRight" />
+        <UsedCommand guid="guidVSStd97" id="cmdidFontName" />
+        <UsedCommand guid="guidVSStd97" id="cmdidFontSize" />
+        <UsedCommand guid="guidVSStd97" id="cmdidCut" />
+        <UsedCommand guid="guidVSStd97" id="cmdidCopy" />
+        <UsedCommand guid="guidVSStd97" id="cmdidPaste" />
+        <UsedCommand guid="guidVSStd97" id="cmdidDelete" />
+        <UsedCommand guid="guidVSStd2K" id="ECMD_INSERT" />
+        <UsedCommand guid="guidVSStd2K" id="ECMD_BULLETEDLIST" />
+    </UsedCommands>
+
+    <Symbols>
+        <!-- This is the package guid. -->
+        <GuidSymbol name="guidVSNDK_PackageString" value="{db9f9c5f-fb27-4297-ab44-fa8774e962ca}" />
+        <GuidSymbol name="guidVSNDK_PackageEditorFactory" value="{9e985c5e-5b53-4cb1-bcd0-40a56f18eb4d}" />
+
+        <!-- This is the guid used to group the menu commands together -->
+        <GuidSymbol name="guidVSNDK_PackageCmdSet" value="{d531fe01-f48e-443d-8ea1-1530a352525f}">
+
+            <IDSymbol name="BlackBerryTopMenu" value="0x10" />
+            <IDSymbol name="cmdidBlackBerryTopMenuGroup_Targets" value="0x100" />
+            <IDSymbol name="cmdidBlackBerryTopMenuGroup_Common" value="0x200" />
+            <IDSymbol name="cmdidBlackBerryTopMenuGroup_Options" value="0x300" />
+
+            <IDSymbol name="BlackBerrySubMenu_Targets" value="0x400" />
+            <IDSymbol name="cmdidBlackBerryTargetsGroup_Devices" value="0x500" />
+            <IDSymbol name="cmdidBlackBerryTargetsGroup_ApiLevels" value="0x600" />
+            <IDSymbol name="cmdidBlackBerryTargetsGroup_Configuration" value="0x700" />
+
+            <IDSymbol name="BlackBerrySubMenu_Help" value="0x800" />
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Start" value="0x900"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Documentation" value="0x1000"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Samples" value="0x1100"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_About" value="0x1200"/>
+
+            <IDSymbol name="cmdidBlackBerryOptions" value="0x0301" />
+            <IDSymbol name="cmdidBlackBerryTargetsDevicesPlaceholder" value="0x501" />
+            <IDSymbol name="cmdidBlackBerryTargetsApiLevelsPlaceholder" value="0x601" />
+            <IDSymbol name="cmdidBlackBerryTargetsConfigure" value="0x701" />
+
+            <IDSymbol name="cmdidBlackBerryHelpWelcomePage" value="0x901" />
+            <IDSymbol name="cmdidBlackBerryHelpSupportForum" value="0x902" />
+            <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x1001" />
+            <IDSymbol name="cmdidBlackBerryHelpDocCascades" value="0x1002" />
+            <IDSymbol name="cmdidBlackBerryHelpDocPlayBook" value="0x1003" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesNative" value="0x1101" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesCascades" value="0x1102" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesPlayBook" value="0x1103" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesOpenSource" value="0x1104" />
+            <IDSymbol name="cmdidBlackBerryHelpAbout" value="0x1201" />
+
+            <IDSymbol name="cmdidBlackBerryProjectImport" value="0x104" />
+            <IDSymbol name="cmdidfooLocalBox" value="0x105" />
+            <IDSymbol name="BlackBerryContextMenuGroup" value="0x106" />
+        </GuidSymbol>
+
+    </Symbols>
+
+</CommandTable>

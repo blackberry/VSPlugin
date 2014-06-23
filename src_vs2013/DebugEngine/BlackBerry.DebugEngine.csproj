@@ -1,0 +1,188 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{59A7B188-E307-4495-A3AF-4ED76B086A87}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BlackBerry.DebugEngine</RootNamespace>
+    <AssemblyName>BlackBerry.DebugEngine</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2013</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PLATFORM_VS2013</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="EnvDTE100, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="EnvDTE80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="extensibility, Version=7.0.3300.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Debugger.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\VSSDK\VisualStudioIntegration\Common\Assemblies\v2.0\Microsoft.VisualStudio.Debugger.Interop.10.0.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.OLE.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.VisualStudio.Shell.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\VSSDK\VisualStudioIntegration\Common\Assemblies\v4.0\Microsoft.VisualStudio.Shell.11.0.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop, Version=7.1.40304.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=8.0.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Microsoft.VisualStudio.Debugger.InteropA.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Definitions\AD7Enums.cs">
+      <Link>AD7.Definitions\AD7Enums.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Definitions\AD7Guids.cs">
+      <Link>AD7.Definitions\AD7Guids.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Definitions\AD7Hresult.cs">
+      <Link>AD7.Definitions\AD7Hresult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7BoundBreakpoint.cs">
+      <Link>AD7.Impl\AD7BoundBreakpoint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7BreakpointResolution.cs">
+      <Link>AD7.Impl\AD7BreakpointResolution.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7DocumentContext.cs">
+      <Link>AD7.Impl\AD7DocumentContext.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Engine.cs">
+      <Link>AD7.Impl\AD7Engine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Enums.cs">
+      <Link>AD7.Impl\AD7Enums.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Events.cs">
+      <Link>AD7.Impl\AD7Events.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Expression.cs">
+      <Link>AD7.Impl\AD7Expression.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7MemoryAddress.cs">
+      <Link>AD7.Impl\AD7MemoryAddress.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Module.cs">
+      <Link>AD7.Impl\AD7Module.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7PendingBreakpoint.cs">
+      <Link>AD7.Impl\AD7PendingBreakpoint.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Port.cs">
+      <Link>AD7.Impl\AD7Port.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7PortRequest.cs">
+      <Link>AD7.Impl\AD7PortRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7PortSupplier.cs">
+      <Link>AD7.Impl\AD7PortSupplier.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Process.cs">
+      <Link>AD7.Impl\AD7Process.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7ProgramNode.cs">
+      <Link>AD7.Impl\AD7ProgramNode.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7ProgramNodeAttach.cs">
+      <Link>AD7.Impl\AD7ProgramNodeAttach.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7ProgramProvider.cs">
+      <Link>AD7.Impl\AD7ProgramProvider.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Property.cs">
+      <Link>AD7.Impl\AD7Property.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7StackFrame.cs">
+      <Link>AD7.Impl\AD7StackFrame.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Thread.cs">
+      <Link>AD7.Impl\AD7Thread.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\BreakpointManager.cs">
+      <Link>Engine.Impl\BreakpointManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\EngineCallback.cs">
+      <Link>Engine.Impl\EngineCallback.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\EngineUtils.cs">
+      <Link>Engine.Impl\EngineUtils.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\EventDispatcher.cs">
+      <Link>Engine.Impl\EventDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
+      <Link>ConfigDefaults.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
+      <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
+      <Name>GDBParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
+      <Project>{3d6effaf-ff39-497d-b6f8-0b6169e90c6d}</Project>
+      <Name>BlackBerry.Package</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

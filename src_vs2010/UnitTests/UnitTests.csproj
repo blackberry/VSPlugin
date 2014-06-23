@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{EA581F35-1EE6-4C7B-89FF-C3C7D886869D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UnitTests</RootNamespace>
+    <AssemblyName>UnitTests</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2010</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PLATFORM_VS2010</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\ext\NUnit\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src_vs2012\UnitTests\DiagnosticTests.cs">
+      <Link>DiagnosticTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\GDBParserTests.cs">
+      <Link>GDBParserTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\MakeAllAndFormatOutputMessagesTestClass.cs">
+      <Link>MakeAllAndFormatOutputMessagesTestClass.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ParserTests.cs">
+      <Link>ParserTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\TokenProcessorTests.cs">
+      <Link>TokenProcessorTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ToolRunnerTests.cs">
+      <Link>ToolRunnerTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BuildTasks\BlackBerry.BuildTasks.csproj">
+      <Project>{328CAD98-F4E5-444A-B5DF-AD102C67BA3C}</Project>
+      <Name>BlackBerry.BuildTasks</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
+      <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
+      <Name>GDBParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
+      <Project>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</Project>
+      <Name>BlackBerry.NativeCore</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

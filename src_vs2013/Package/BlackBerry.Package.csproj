@@ -1,0 +1,698 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}</ProjectGuid>
+    <ProjectTypeGuids>{82b43b9b-a64c-4715-b499-d71e9ca2bd60};{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BlackBerry.Package</RootNamespace>
+    <AssemblyName>BlackBerry.Package</AssemblyName>
+    <SignAssembly>false</SignAssembly>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <MinimumVisualStudioVersion>12.0</MinimumVisualStudioVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>4.0</OldToolsVersion>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2013</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunRegRiched>true</RunRegRiched>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PLATFORM_VS2013;CODE_ANALYSIS</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <RunCodeAnalysis>true</RunCodeAnalysis>
+    <RunRegRiched>true</RunRegRiched>
+    <Prefer32Bit>false</Prefer32Bit>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
+    <Reference Include="Microsoft.VisualStudio.Package.LanguageService.12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Shell.10.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.10.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.8.0" />
+    <Reference Include="Microsoft.VisualStudio.Shell.Interop.9.0" />
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop" />
+    <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+    <Reference Include="Microsoft.VisualStudio.VCProjectEngine, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\PublicAssemblies\Microsoft.VisualStudio.VCProjectEngine.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualStudio.XmlEditor, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.VisualStudio.XmlEditor\v4.0_12.0.0.0__b03f5f7f11d50a3a\Microsoft.VisualStudio.XmlEditor.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Xaml" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="EnvDTE">
+      <Guid>{80CC9F66-E7D8-4DDD-85B6-D9E6CD0E93E2}</Guid>
+      <VersionMajor>8</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="EnvDTE80">
+      <Guid>{1A31287A-4D7D-413E-8E32-3B374931BD89}</Guid>
+      <VersionMajor>8</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+    <COMReference Include="Microsoft.VisualStudio.CommandBars">
+      <Guid>{1CBA492E-7263-47BB-87FE-639000619B15}</Guid>
+      <VersionMajor>8</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>primary</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src_vs2010\Package\ControlDebugEngine.cs">
+      <Link>ControlDebugEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\Package\GlobalSuppressions.cs">
+      <Link>GlobalSuppressions.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\Package\Import\Import.xaml.cs">
+      <Link>Import\Import.xaml.cs</Link>
+      <DependentUpon>Import.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\Package\Import\Model\ImportModel.cs">
+      <Link>Import\Model\ImportModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\Package\Resources\Strings.Designer.cs">
+      <Link>Resources\Strings.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Strings.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\BlackBerryPackage.cs">
+      <Link>BlackBerryPackage.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\BuildPlatformsManager.cs">
+      <Link>Components\BuildPlatformsManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
+      <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml.cs">
+      <Link>Editors\BarDescriptorEditorControl.xaml.cs</Link>
+      <DependentUpon>BarDescriptorEditorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorFactory.cs">
+      <Link>Editors\BarDescriptorEditorFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorPane.cs">
+      <Link>Editors\BarDescriptorEditorPane.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\EditorFactoryNotifyForProject.cs">
+      <Link>Editors\EditorFactoryNotifyForProject.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Editors\XmlEditorDesignerViewRegistration.cs">
+      <Link>Editors\XmlEditorDesignerViewRegistration.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\GuidList.cs">
+      <Link>GuidList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\CertHelper.cs">
+      <Link>Helpers\CertHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\CommandHelper.cs">
+      <Link>Helpers\CommandHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\DialogHelper.cs">
+      <Link>Helpers\DialogHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
+      <Link>Helpers\MessageBoxHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\NameValueCollectionHelper.cs">
+      <Link>Helpers\NameValueCollectionHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
+      <Link>Model\bar-descriptor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Integration\ComboBoxItem.cs">
+      <Link>Model\Integration\ComboBoxItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Integration\DynamicMenuCommand.cs">
+      <Link>Model\Integration\DynamicMenuCommand.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Integration\WebBrowserTurbo.cs">
+      <Link>Model\Integration\WebBrowserTurbo.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.cs">
+      <Link>Options\ApiLevelOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.designer.cs">
+      <Link>Options\ApiLevelOptionControl.designer.cs</Link>
+      <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionPage.cs">
+      <Link>Options\ApiLevelOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\AboutForm.cs">
+      <Link>Dialogs\AboutForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\AboutForm.designer.cs">
+      <Link>Dialogs\AboutForm.designer.cs</Link>
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\AddLocalNdkForm.cs">
+      <Link>Dialogs\AddLocalNdkForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\AddLocalNdkForm.designer.cs">
+      <Link>Dialogs\AddLocalNdkForm.designer.cs</Link>
+      <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CertificateDetailsForm.cs">
+      <Link>Dialogs\CertificateDetailsForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CertificateDetailsForm.designer.cs">
+      <Link>Dialogs\CertificateDetailsForm.designer.cs</Link>
+      <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CskRequestForm.cs">
+      <Link>Dialogs\CskRequestForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CskRequestForm.designer.cs">
+      <Link>Dialogs\CskRequestForm.designer.cs</Link>
+      <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\DebugTokenDeploymentForm.cs">
+      <Link>Dialogs\DebugTokenDeploymentForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\DebugTokenDeploymentForm.designer.cs">
+      <Link>Dialogs\DebugTokenDeploymentForm.designer.cs</Link>
+      <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\DeviceForm.cs">
+      <Link>Dialogs\DeviceForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\DeviceForm.designer.cs">
+      <Link>Dialogs\DeviceForm.designer.cs</Link>
+      <DependentUpon>DeviceForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\InstallConfirmationForm.cs">
+      <Link>Dialogs\InstallConfirmationForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\InstallConfirmationForm.designer.cs">
+      <Link>Dialogs\InstallConfirmationForm.designer.cs</Link>
+      <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\InstallForm.cs">
+      <Link>Dialogs\InstallForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\InstallForm.designer.cs">
+      <Link>Dialogs\InstallForm.designer.cs</Link>
+      <DependentUpon>InstallForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\ListItemControl.cs">
+      <Link>Dialogs\ListItemControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\ListItemControl.designer.cs">
+      <Link>Dialogs\ListItemControl.designer.cs</Link>
+      <DependentUpon>ListItemControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\MissingNdkInstalledForm.cs">
+      <Link>Dialogs\MissingNdkInstalledForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\MissingNdkInstalledForm.designer.cs">
+      <Link>Dialogs\MissingNdkInstalledForm.designer.cs</Link>
+      <DependentUpon>MissingNdkInstalledForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\PasswordForm.cs">
+      <Link>Dialogs\PasswordForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\PasswordForm.designer.cs">
+      <Link>Dialogs\PasswordForm.designer.cs</Link>
+      <DependentUpon>PasswordForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\PinListForm.cs">
+      <Link>Dialogs\PinListForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\PinListForm.designer.cs">
+      <Link>Dialogs\PinListForm.designer.cs</Link>
+      <DependentUpon>PinListForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\RegistrationForm.cs">
+      <Link>Dialogs\RegistrationForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\RegistrationForm.designer.cs">
+      <Link>Dialogs\RegistrationForm.designer.cs</Link>
+      <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\UpdateManagerStatusForm.cs">
+      <Link>Dialogs\UpdateManagerStatusForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\UpdateManagerStatusForm.designer.cs">
+      <Link>Dialogs\UpdateManagerStatusForm.designer.cs</Link>
+      <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.cs">
+      <Link>Options\GeneralOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.designer.cs">
+      <Link>Options\GeneralOptionControl.designer.cs</Link>
+      <DependentUpon>GeneralOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionPage.cs">
+      <Link>Options\GeneralOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\LogsOptionControl.cs">
+      <Link>Options\LogsOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\LogsOptionControl.designer.cs">
+      <Link>Options\LogsOptionControl.designer.cs</Link>
+      <DependentUpon>LogsOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\LogsOptionPage.cs">
+      <Link>Options\LogsOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\SigningOptionControl.cs">
+      <Link>Options\SigningOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\SigningOptionControl.designer.cs">
+      <Link>Options\SigningOptionControl.designer.cs</Link>
+      <DependentUpon>SigningOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\SigningOptionPage.cs">
+      <Link>Options\SigningOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\TargetsOptionControl.cs">
+      <Link>Options\TargetsOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\TargetsOptionControl.designer.cs">
+      <Link>Options\TargetsOptionControl.designer.cs</Link>
+      <DependentUpon>TargetsOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\TargetsOptionPage.cs">
+      <Link>Options\TargetsOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\PackageCommands.cs">
+      <Link>PackageCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\StandardCommands.cs">
+      <Link>StandardCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelOptionViewModel.cs">
+      <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\BarEditorViewModel.cs">
+      <Link>ViewModels\BarEditorViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageViewModel.cs">
+      <Link>ViewModels\PackageViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\SigningOptionViewModel.cs">
+      <Link>ViewModels\SigningOptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
+      <Link>ViewModels\TargetsOptionViewModel.cs</Link>
+    </Compile>
+    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
+      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\Package\Templates\bar-descriptor.cs">
+      <Link>Templates\bar-descriptor.cs</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="..\..\src_vs2012\Package\Resources\Package.Menu.vsct">
+      <Link>Resources\Package.Menu.vsct</Link>
+    </None>
+    <None Include="..\..\src_vs2012\Package\Resources\Package.Bitmaps.vsct">
+      <Link>Resources\Package.Bitmaps.vsct</Link>
+    </None>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.resx">
+      <Link>Options\ApiLevelOptionControl.resx</Link>
+      <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\AboutForm.resx">
+      <Link>Dialogs\AboutForm.resx</Link>
+      <DependentUpon>AboutForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\AddLocalNdkForm.resx">
+      <Link>Dialogs\AddLocalNdkForm.resx</Link>
+      <DependentUpon>AddLocalNdkForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CertificateDetailsForm.resx">
+      <Link>Dialogs\CertificateDetailsForm.resx</Link>
+      <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CskRequestForm.resx">
+      <Link>Dialogs\CskRequestForm.resx</Link>
+      <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\DebugTokenDeploymentForm.resx">
+      <Link>Dialogs\DebugTokenDeploymentForm.resx</Link>
+      <DependentUpon>DebugTokenDeploymentForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\DeviceForm.resx">
+      <Link>Dialogs\DeviceForm.resx</Link>
+      <DependentUpon>DeviceForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\InstallConfirmationForm.resx">
+      <Link>Dialogs\InstallConfirmationForm.resx</Link>
+      <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\InstallForm.resx">
+      <Link>Dialogs\InstallForm.resx</Link>
+      <DependentUpon>InstallForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\ListItemControl.resx">
+      <Link>Dialogs\ListItemControl.resx</Link>
+      <DependentUpon>ListItemControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\MissingNdkInstalledForm.resx">
+      <Link>Dialogs\MissingNdkInstalledForm.resx</Link>
+      <DependentUpon>MissingNdkInstalledForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\PasswordForm.resx">
+      <Link>Dialogs\PasswordForm.resx</Link>
+      <DependentUpon>PasswordForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\PinListForm.resx">
+      <Link>Dialogs\PinListForm.resx</Link>
+      <DependentUpon>PinListForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\RegistrationForm.resx">
+      <Link>Dialogs\RegistrationForm.resx</Link>
+      <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\UpdateManagerStatusForm.resx">
+      <Link>Dialogs\UpdateManagerStatusForm.resx</Link>
+      <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.resx">
+      <Link>Options\GeneralOptionControl.resx</Link>
+      <DependentUpon>GeneralOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\LogsOptionControl.resx">
+      <Link>Options\LogsOptionControl.resx</Link>
+      <DependentUpon>LogsOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\SigningOptionControl.resx">
+      <Link>Options\SigningOptionControl.resx</Link>
+      <DependentUpon>SigningOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\TargetsOptionControl.resx">
+      <Link>Options\TargetsOptionControl.resx</Link>
+      <DependentUpon>TargetsOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Logo.png">
+      <Link>Resources\Logo.png</Link>
+    </EmbeddedResource>
+    <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsc">
+      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+    </None>
+    <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xss">
+      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+    </None>
+    <Resource Include="..\..\src_vs2010\Package\Resources\BlackBerryMessager.bmp">
+      <Link>Resources\BlackBerryMessager.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Calendar.bmp">
+      <Link>Resources\Calendar.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Camera.bmp">
+      <Link>Resources\Camera.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\CaptureScreen.bmp">
+      <Link>Resources\CaptureScreen.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Contacts.bmp">
+      <Link>Resources\Contacts.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\DeviceIdentifyingInfo.bmp">
+      <Link>Resources\DeviceIdentifyingInfo.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\EmailPINMessages.bmp">
+      <Link>Resources\EmailPINMessages.bmp</Link>
+    </Resource>
+    <Content Include="..\..\src_vs2010\Package\Resources\File.ico">
+      <Link>Resources\File.ico</Link>
+    </Content>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Gamepad.bmp">
+      <Link>Resources\Gamepad.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\GPSLocation.bmp">
+      <Link>Resources\GPSLocation.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Images_24bit.bmp">
+      <Link>Resources\Images_24bit.bmp</Link>
+    </Resource>
+    <None Include="..\..\src_vs2010\Package\Key.snk">
+      <Link>Key.snk</Link>
+    </None>
+    <None Include="..\..\src_vs2010\Package\Resources\Images_32bit.bmp">
+      <Link>Resources\Images_32bit.bmp</Link>
+    </None>
+    <Resource Include="..\..\src_vs2010\Package\Resources\info.png">
+      <Link>Resources\info.png</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Internet.bmp">
+      <Link>Resources\Internet.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Location.bmp">
+      <Link>Resources\Location.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Mircrophone.bmp">
+      <Link>Resources\Mircrophone.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\MyContactInfo.bmp">
+      <Link>Resources\MyContactInfo.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Notebooks.bmp">
+      <Link>Resources\Notebooks.bmp</Link>
+    </Resource>
+    <Content Include="..\..\src_vs2010\Package\Resources\Package.ico">
+      <Link>Resources\Package.ico</Link>
+    </Content>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Phone.bmp">
+      <Link>Resources\Phone.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\PhoneControl.bmp">
+      <Link>Resources\PhoneControl.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\PostNotifications.bmp">
+      <Link>Resources\PostNotifications.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\Push.bmp">
+      <Link>Resources\Push.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\RunBackgrounded.bmp">
+      <Link>Resources\RunBackgrounded.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\SharedFiles.bmp">
+      <Link>Resources\SharedFiles.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2010\Package\Resources\TextMessages.bmp">
+      <Link>Resources\TextMessages.bmp</Link>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Strings.resx">
+      <Link>Resources\Strings.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Package.resx">
+      <Link>Resources\Package.resx</Link>
+      <MergeWithCTO>true</MergeWithCTO>
+      <ManifestResourceName>Package</ManifestResourceName>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsd">
+      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsd</Link>
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <VSCTCompile Include="Resources\Package.vsct">
+      <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
+    </VSCTCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="RichEditObjectModel">
+      <Guid>{8CC497C9-A1DF-11CE-8098-00AA0047BE5D}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="..\..\src_vs2010\Package\Import\Import.xaml">
+      <Link>Import\Import.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml">
+      <Link>Editors\BarDescriptorEditorControl.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
+      <Project>{cc7b28e0-cb31-44f7-a380-e7072f670f38}</Project>
+      <Name>GDBParser</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
+      <Project>{AE6BEE3E-3273-4214-A215-2924E33246CA}</Project>
+      <Name>BlackBerry.NativeCore</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <PropertyGroup>
+    <UseCodebase>true</UseCodebase>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\VSSDK\Microsoft.VsSDK.targets" Condition="false" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
