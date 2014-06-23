@@ -137,14 +137,14 @@
     <Compile Include="..\..\src_vs2010\BuildTasks\QccLink.cs">
       <Link>QccLink.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\QccTask.cs">
+      <Link>QccTask.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\RemoveFlagFile.cs">
       <Link>RemoveFlagFile.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\SSHDelete.cs">
       <Link>SSHDelete.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\VSNDKTasks.cs">
-      <Link>VSNDKTasks.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
       <Link>ConfigDefaults.cs</Link>
