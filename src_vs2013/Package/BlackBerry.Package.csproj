@@ -388,8 +388,8 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\BarEditorViewModel.cs">
       <Link>ViewModels\BarEditorViewModel.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageOptionViewModel.cs">
-      <Link>ViewModels\PackageOptionViewModel.cs</Link>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageViewModel.cs">
+      <Link>ViewModels\PackageViewModel.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\SigningOptionViewModel.cs">
       <Link>ViewModels\SigningOptionViewModel.cs</Link>
