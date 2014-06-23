@@ -158,8 +158,8 @@
     <Compile Include="..\..\src_vs2010\DebugEngine\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\NativeCore\Tools\RunnerDefaults.cs">
-      <Link>RunnerDefaults.cs</Link>
+    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
+      <Link>ConfigDefaults.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

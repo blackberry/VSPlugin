@@ -17,7 +17,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2013</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2013;MAKE_CONFIG_DEFAULTS_PUBLIC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -25,7 +25,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;PLATFORM_VS2013</DefineConstants>
+    <DefineConstants>TRACE;PLATFORM_VS2013;MAKE_CONFIG_DEFAULTS_PUBLIC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -47,6 +47,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Components\UpdateManagerCompletedEventArgs.cs">
       <Link>Components\UpdateManagerCompletedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
+      <Link>ConfigDefaults.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\BlackBerryTraceListener.cs">
       <Link>Diagnostics\BlackBerryTraceListener.cs</Link>
@@ -176,9 +179,6 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\KeyToolRemoveRunner.cs">
       <Link>Tools\KeyToolRemoveRunner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\NativeCore\Tools\RunnerDefaults.cs">
-      <Link>Tools\RunnerDefaults.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\ToolRunner.cs">
       <Link>Tools\ToolRunner.cs</Link>

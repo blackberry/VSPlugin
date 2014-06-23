@@ -168,8 +168,8 @@
     <Compile Include="..\..\src_vs2010\DebugEngine\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\NativeCore\Tools\RunnerDefaults.cs">
-      <Link>RunnerDefaults.cs</Link>
+    <Compile Include="..\NativeCore\ConfigDefaults.cs">
+      <Link>ConfigDefaults.cs</Link>
     </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

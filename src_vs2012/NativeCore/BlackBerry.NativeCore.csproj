@@ -18,7 +18,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2012</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2012;MAKE_CONFIG_DEFAULTS_PUBLIC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -28,7 +28,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE;PLATFORM_VS2012</DefineConstants>
+    <DefineConstants>TRACE;CODE_ANALYSIS;PLATFORM_VS2012;MAKE_CONFIG_DEFAULTS_PUBLIC</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
@@ -47,6 +47,7 @@
     <Compile Include="Components\TokenProcessor.cs" />
     <Compile Include="Components\UpdateManager.cs" />
     <Compile Include="Components\UpdateManagerCompletedEventArgs.cs" />
+    <Compile Include="ConfigDefaults.cs" />
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />
     <Compile Include="Diagnostics\TraceLog.cs" />
@@ -90,7 +91,6 @@
     <Compile Include="Tools\KeyToolInfoRunner.cs" />
     <Compile Include="Tools\KeyToolRegisterRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
-    <Compile Include="Tools\RunnerDefaults.cs" />
     <Compile Include="Tools\ToolRunner.cs" />
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
