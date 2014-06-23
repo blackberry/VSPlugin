@@ -261,6 +261,7 @@ namespace BlackBerry.NativeCore.Components
             // only if the file is executable, not if it is a dll, a library or
             // any other type of binary file.
 
+            // PH: FIXME: No idea, why someone checks for exe/dll binary kind here (x86/x64/DOS/...)...
             uint binaryType;
             if (!NativeMethods.GetBinaryType(source, out binaryType))
             {

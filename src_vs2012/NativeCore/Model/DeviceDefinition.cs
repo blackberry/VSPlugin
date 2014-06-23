@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using BlackBerry.NativeCore.Helpers;
-using BlackBerry.NativeCore.Tools;
 using Microsoft.Win32;
 
 namespace BlackBerry.NativeCore.Model

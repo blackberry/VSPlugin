@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using BlackBerry.NativeCore.Helpers;
-using BlackBerry.NativeCore.Tools;
 using Microsoft.Win32;
 
 namespace BlackBerry.NativeCore.Model
