@@ -1,5 +1,4 @@
 ﻿#if DEBUG
-
 using System;
 using System.IO;
 using System.Threading;
@@ -190,6 +189,16 @@ namespace VSNDK.Package.Test
             Assert.IsNull(runner.LastError);
             Assert.IsNotNull(runner.Info);
             Assert.IsNotNull(runner.Info.Issuer);
+        }
+
+        [Test]
+        public void InstallSimulator()
+        {
+            var runner = new ApiLevelUpdateRunner(RunnerDefaults.NdkDirectory, ApiLevelAction.Install, ApiLevelTarget.Simulator, new Version(10, 1, 0, 2354));
+            var result = runner.Execute();
+
+            runner.Wait();
+            Assert.IsTrue(result);
         }
     }
 }

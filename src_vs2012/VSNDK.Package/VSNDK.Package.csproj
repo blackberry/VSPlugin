@@ -260,6 +260,7 @@
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
     <Compile Include="MessageBoxHelper.cs" />
     <Compile Include="Model\ApiInfo.cs" />
+    <Compile Include="Model\ApiInfoArray.cs" />
     <Compile Include="Model\ApiLevelListTypes.cs" />
     <Compile Include="Model\CertificateInfo.cs" />
     <Compile Include="Model\CskTokenInfo.cs" />
@@ -273,6 +274,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Model\NdkInfo.cs" />
+    <Compile Include="Model\RuntimeInfo.cs" />
+    <Compile Include="Model\SimulatorInfo.cs" />
     <Compile Include="Options\ApiLevelOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -320,11 +323,23 @@
     <Compile Include="Options\Dialogs\DeviceForm.Designer.cs">
       <DependentUpon>DeviceForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Options\Dialogs\InstallNdkForm.cs">
+    <Compile Include="Options\Dialogs\InstallConfirmationForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Options\Dialogs\InstallNdkForm.Designer.cs">
-      <DependentUpon>InstallNdkForm.cs</DependentUpon>
+    <Compile Include="Options\Dialogs\InstallConfirmationForm.Designer.cs">
+      <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Dialogs\InstallForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\InstallForm.Designer.cs">
+      <DependentUpon>InstallForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Dialogs\ListItemControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\ListItemControl.Designer.cs">
+      <DependentUpon>ListItemControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\Dialogs\PasswordForm.cs">
       <SubType>Form</SubType>
@@ -343,6 +358,12 @@
     </Compile>
     <Compile Include="Options\Dialogs\RegistrationForm.Designer.cs">
       <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Options\Dialogs\UpdateManagerStatusForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Options\Dialogs\UpdateManagerStatusForm.Designer.cs">
+      <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Options\GeneralOptionControl.cs">
       <SubType>UserControl</SubType>
@@ -380,13 +401,20 @@
     <Compile Include="Options\TargetsOptionPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
+    <Compile Include="Tools\ApiLevelUpdateRunner.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Tools\EventDispatcher.cs" />
     <Compile Include="Tools\KeyToolGenRunner.cs" />
     <Compile Include="Tools\KeyToolInfoRunner.cs" />
     <Compile Include="Tools\KeyToolRegisterRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
+    <Compile Include="ViewModels\ApiLevelAction.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
+    <Compile Include="ViewModels\ApiLevelTarget.cs" />
+    <Compile Include="ViewModels\ApiLevelTask.cs" />
     <Compile Include="ViewModels\DeveloperDefinition.cs" />
     <Compile Include="ViewModels\DeviceDefinition.cs" />
     <Compile Include="ViewModels\DeviceDefinitionType.cs" />
@@ -403,6 +431,7 @@
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
+    <Compile Include="ViewModels\UpdateManager.cs" />
     <Content Include="..\..\src\VSNDK.Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
@@ -433,6 +462,18 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\CskRequestForm.resx">
       <DependentUpon>CskRequestForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\InstallConfirmationForm.resx">
+      <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\InstallForm.resx">
+      <DependentUpon>InstallForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\ListItemControl.resx">
+      <DependentUpon>ListItemControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Options\Dialogs\UpdateManagerStatusForm.resx">
+      <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Logo.png" />
     <None Include="VSNDK.Package.Bitmaps.vsct" />
@@ -567,9 +608,6 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\DeviceForm.resx">
       <DependentUpon>DeviceForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Options\Dialogs\InstallNdkForm.resx">
-      <DependentUpon>InstallNdkForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Options\Dialogs\PasswordForm.resx">
       <DependentUpon>PasswordForm.cs</DependentUpon>

@@ -7,6 +7,7 @@
     {
         Default,
         Full,
-        Simulators
+        Simulators,
+        Runtimes
     }
 }

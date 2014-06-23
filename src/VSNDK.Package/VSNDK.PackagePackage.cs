@@ -986,8 +986,8 @@ namespace RIM.VSNDK_Package
                     {
                         e["QNX_TARGET"] = ndk.TargetPath;
                         e["QNX_HOST"] = ndk.HostPath;
-                        e["PATH"] = string.Concat(Path.Combine(ndk.HostPath, "usr", "bin"), ";",
-                                                  Path.Combine(RunnerDefaults.JavaHome, "bin"), ";", e["PATH"]);
+                        e["PATH"] = string.Concat(Path.Combine(RunnerDefaults.JavaHome, "bin"), ";", e["PATH"],
+                                                  Path.Combine(ndk.HostPath, "usr", "bin"), ";");
                     }
                     else
                     {

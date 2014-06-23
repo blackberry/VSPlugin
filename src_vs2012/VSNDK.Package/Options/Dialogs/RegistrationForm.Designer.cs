@@ -325,9 +325,9 @@
             // 
             this.label13.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.label13.Location = new System.Drawing.Point(15, 73);
+            this.label13.Location = new System.Drawing.Point(12, 73);
             this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(519, 36);
+            this.label13.Size = new System.Drawing.Size(520, 36);
             this.label13.TabIndex = 2;
             this.label13.Text = "To complete the registration both - BlackBerry Signer and developer certificate -" +
     " are required. Certificate will be created automatically here or at BlackBerry 1" +
@@ -336,7 +336,7 @@
             // lnkMoreInfo
             // 
             this.lnkMoreInfo.AutoSize = true;
-            this.lnkMoreInfo.Location = new System.Drawing.Point(15, 54);
+            this.lnkMoreInfo.Location = new System.Drawing.Point(12, 54);
             this.lnkMoreInfo.Name = "lnkMoreInfo";
             this.lnkMoreInfo.Size = new System.Drawing.Size(60, 13);
             this.lnkMoreInfo.TabIndex = 1;
@@ -364,7 +364,7 @@
             // label11
             // 
             this.label11.AutoSize = true;
-            this.label11.Location = new System.Drawing.Point(15, 199);
+            this.label11.Location = new System.Drawing.Point(12, 199);
             this.label11.Name = "label11";
             this.label11.Size = new System.Drawing.Size(80, 13);
             this.label11.TabIndex = 11;
@@ -381,7 +381,7 @@
             // label10
             // 
             this.label10.AutoSize = true;
-            this.label10.Location = new System.Drawing.Point(15, 173);
+            this.label10.Location = new System.Drawing.Point(12, 173);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(50, 13);
             this.label10.TabIndex = 9;
@@ -399,7 +399,7 @@
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(15, 147);
+            this.label9.Location = new System.Drawing.Point(12, 147);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(86, 13);
             this.label9.TabIndex = 6;
@@ -429,7 +429,7 @@
             // 
             // bttCreateSigner
             // 
-            this.bttCreateSigner.Location = new System.Drawing.Point(18, 259);
+            this.bttCreateSigner.Location = new System.Drawing.Point(15, 259);
             this.bttCreateSigner.Name = "bttCreateSigner";
             this.bttCreateSigner.Size = new System.Drawing.Size(110, 23);
             this.bttCreateSigner.TabIndex = 15;
@@ -449,7 +449,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(15, 121);
+            this.label8.Location = new System.Drawing.Point(12, 121);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(80, 13);
             this.label8.TabIndex = 3;
@@ -457,9 +457,9 @@
             // 
             // label7
             // 
-            this.label7.Location = new System.Drawing.Point(15, 20);
+            this.label7.Location = new System.Drawing.Point(12, 20);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(516, 40);
+            this.label7.Size = new System.Drawing.Size(520, 40);
             this.label7.TabIndex = 0;
             this.label7.Text = "Specify signing properties, that were submitted at BlackBerry CodeSigning page. Y" +
     "ou should receive required RDK and PBDT files via email before.";
@@ -467,7 +467,7 @@
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(15, 225);
+            this.label12.Location = new System.Drawing.Point(12, 225);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(94, 13);
             this.label12.TabIndex = 13;
@@ -495,8 +495,8 @@
             this.Controls.Add(this.bttNavigate);
             this.Controls.Add(this.txtLog);
             this.Controls.Add(this.bttOK);
-            this.Controls.Add(this.groupBlackBerry10);
             this.Controls.Add(this.groupTablet);
+            this.Controls.Add(this.groupBlackBerry10);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.MinimizeBox = false;

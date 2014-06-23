@@ -162,6 +162,9 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\ApiInfo.cs">
       <Link>Model\ApiInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\ApiInfoArray.cs">
+      <Link>Model\ApiInfoArray.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\ApiLevelListTypes.cs">
       <Link>Model\ApiLevelListTypes.cs</Link>
     </Compile>
@@ -195,6 +198,12 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\NdkInfo.cs">
       <Link>Model\NdkInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\RuntimeInfo.cs">
+      <Link>Model\RuntimeInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Model\SimulatorInfo.cs">
+      <Link>Model\SimulatorInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\ApiLevelOptionControl.cs">
       <Link>Options\ApiLevelOptionControl.cs</Link>
@@ -262,13 +271,29 @@
       <Link>Options\Dialogs\DeviceForm.designer.cs</Link>
       <DependentUpon>DeviceForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallNdkForm.cs">
-      <Link>Options\Dialogs\InstallNdkForm.cs</Link>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallConfirmationForm.cs">
+      <Link>Options\Dialogs\InstallConfirmationForm.cs</Link>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallNdkForm.designer.cs">
-      <Link>Options\Dialogs\InstallNdkForm.designer.cs</Link>
-      <DependentUpon>InstallNdkForm.cs</DependentUpon>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallConfirmationForm.designer.cs">
+      <Link>Options\Dialogs\InstallConfirmationForm.designer.cs</Link>
+      <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallForm.cs">
+      <Link>Options\Dialogs\InstallForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallForm.designer.cs">
+      <Link>Options\Dialogs\InstallForm.designer.cs</Link>
+      <DependentUpon>InstallForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\ListItemControl.cs">
+      <Link>Options\Dialogs\ListItemControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\ListItemControl.designer.cs">
+      <Link>Options\Dialogs\ListItemControl.designer.cs</Link>
+      <DependentUpon>ListItemControl.cs</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PasswordForm.cs">
       <Link>Options\Dialogs\PasswordForm.cs</Link>
@@ -293,6 +318,14 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\RegistrationForm.designer.cs">
       <Link>Options\Dialogs\RegistrationForm.designer.cs</Link>
       <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\UpdateManagerStatusForm.cs">
+      <Link>Options\Dialogs\UpdateManagerStatusForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\UpdateManagerStatusForm.designer.cs">
+      <Link>Options\Dialogs\UpdateManagerStatusForm.designer.cs</Link>
+      <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Options\GeneralOptionControl.cs">
       <Link>Options\GeneralOptionControl.cs</Link>
@@ -345,6 +378,12 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ApiLevelListLoadRunner.cs">
       <Link>Tools\ApiLevelListLoadRunner.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ApiLevelUpdateLogEventArgs.cs">
+      <Link>Tools\ApiLevelUpdateLogEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ApiLevelUpdateRunner.cs">
+      <Link>Tools\ApiLevelUpdateRunner.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ApplicationRemoveRunner.cs">
       <Link>Tools\ApplicationRemoveRunner.cs</Link>
     </Compile>
@@ -387,8 +426,17 @@
     <Compile Include="..\..\src_vs2012\VSNDK.Package\Tools\ToolRunnerStartupEventArgs.cs">
       <Link>Tools\ToolRunnerStartupEventArgs.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\ApiLevelAction.cs">
+      <Link>ViewModels\ApiLevelAction.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\ApiLevelTarget.cs">
+      <Link>ViewModels\ApiLevelTarget.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\ApiLevelTask.cs">
+      <Link>ViewModels\ApiLevelTask.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\DeveloperDefinition.cs">
       <Link>ViewModels\DeveloperDefinition.cs</Link>
@@ -410,6 +458,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\VSNDK.Package\ViewModels\UpdateManager.cs">
+      <Link>ViewModels\UpdateManager.cs</Link>
     </Compile>
     <Compile Include="bar-descriptor.cs" />
     <Compile Include="ControlDebugEngine.cs" />
@@ -520,9 +571,17 @@
       <Link>Options\Dialogs\DeviceForm.resx</Link>
       <DependentUpon>DeviceForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallNdkForm.resx">
-      <Link>Options\Dialogs\InstallNdkForm.resx</Link>
-      <DependentUpon>InstallNdkForm.cs</DependentUpon>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallConfirmationForm.resx">
+      <Link>Options\Dialogs\InstallConfirmationForm.resx</Link>
+      <DependentUpon>InstallConfirmationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\InstallForm.resx">
+      <Link>Options\Dialogs\InstallForm.resx</Link>
+      <DependentUpon>InstallForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\ListItemControl.resx">
+      <Link>Options\Dialogs\ListItemControl.resx</Link>
+      <DependentUpon>ListItemControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\PasswordForm.resx">
       <Link>Options\Dialogs\PasswordForm.resx</Link>
@@ -535,6 +594,10 @@
     <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\RegistrationForm.resx">
       <Link>Options\Dialogs\RegistrationForm.resx</Link>
       <DependentUpon>RegistrationForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\Dialogs\UpdateManagerStatusForm.resx">
+      <Link>Options\Dialogs\UpdateManagerStatusForm.resx</Link>
+      <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\VSNDK.Package\Options\GeneralOptionControl.resx">
       <Link>Options\GeneralOptionControl.resx</Link>

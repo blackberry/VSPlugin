@@ -10,11 +10,11 @@ namespace RIM.VSNDK_Package.Model
     /// <summary>
     /// Descriptor of a locally installed NDK.
     /// </summary>
-    internal sealed class NdkInfo : ApiInfo, IComparable<NdkInfo>
+    internal sealed class NdkInfo : ApiInfo
     {
         private const string DescriptorFileName = "blackberry-sdk-descriptor.xml";
 
-        public NdkInfo(string name, Version version, string hostPath, string targetPath, DeviceInfo[] devices)
+        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath, DeviceInfo[] devices)
             : base(name, version)
         {
             if (string.IsNullOrEmpty(hostPath))
@@ -24,12 +24,13 @@ namespace RIM.VSNDK_Package.Model
             if (devices == null)
                 throw new ArgumentNullException("devices");
 
+            FilePath = filePath;
             HostPath = hostPath;
             TargetPath = targetPath;
             Devices = devices;
         }
 
-        public NdkInfo(string name, Version version, string hostPath, string targetPath)
+        public NdkInfo(string filePath, string name, Version version, string hostPath, string targetPath)
             : base(name, version)
         {
             if (string.IsNullOrEmpty(hostPath))
@@ -37,6 +38,7 @@ namespace RIM.VSNDK_Package.Model
             if (string.IsNullOrEmpty(targetPath))
                 throw new ArgumentNullException("targetPath");
 
+            FilePath = filePath;
             HostPath = hostPath;
             TargetPath = targetPath;
 
@@ -61,9 +63,16 @@ namespace RIM.VSNDK_Package.Model
 
             // OK, give up, and say it's unknown:
             Devices = devices ?? new DeviceInfo[0];
+            Details = ToShortDeviceDescription();
         }
 
         #region Properties
+
+        public string FilePath
+        {
+            get;
+            private set;
+        }
 
         public string HostPath
         {
@@ -83,22 +92,22 @@ namespace RIM.VSNDK_Package.Model
             private set;
         }
 
-        #endregion
-
-        /// <summary>
-        /// Checks if given NDK is really available.
-        /// </summary>
-        public bool Exists()
+        public override bool IsInstalled
         {
-            try
+            get
             {
-                return Directory.Exists(HostPath) && Directory.Exists(TargetPath);
-            }
-            catch
-            {
-                return false;
+                try
+                {
+                    return Directory.Exists(HostPath) && Directory.Exists(TargetPath);
+                }
+                catch
+                {
+                    return false;
+                }
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Compares two paths, if they are identical.
@@ -108,7 +117,7 @@ namespace RIM.VSNDK_Package.Model
             if (string.IsNullOrEmpty(pathA) && string.IsNullOrEmpty(pathB))
                 return true;
 
-            // assuming that paths we aquired by Path.GetFullPath(...)
+            // assuming that paths we acquired by Path.GetFullPath(...)
             return string.Compare(pathA, pathB, StringComparison.InvariantCultureIgnoreCase) == 0;
         }
 
@@ -174,10 +183,29 @@ namespace RIM.VSNDK_Package.Model
             return result.ToString();
         }
 
+        private string ToShortDeviceDescription()
+        {
+            if (Devices == null || Devices.Length == 0)
+                return "Device support unknown";
+
+            var result = new StringBuilder("Supports ");
+            int i = 0;
+
+            foreach (var device in Devices)
+            {
+                if (i > 0)
+                    result.Append(", ");
+                result.Append(device.ModelFullName);
+                i++;
+            }
+
+            return result.ToString();
+        }
+
         /// <summary>
         /// Loads info about a single NDK from specific config file, given as XML.
         /// </summary>
-        public static NdkInfo Load(XmlReader reader)
+        public static NdkInfo Load(string fileName, XmlReader reader)
         {
             if (reader == null)
                 return null;
@@ -219,7 +247,7 @@ namespace RIM.VSNDK_Package.Model
                         }
 
                         // try to define info about the installation:
-                        return new NdkInfo(name, version, hostPath, targetPath);
+                        return new NdkInfo(fileName, name, version, hostPath, targetPath);
                     }
 
                     return null;
@@ -281,8 +309,8 @@ namespace RIM.VSNDK_Package.Model
                                 {
                                     using (var reader = XmlReader.Create(fileReader))
                                     {
-                                        var info = Load(reader);
-                                        if (info != null && info.Exists())
+                                        var info = Load(file, reader);
+                                        if (info != null && info.IsInstalled)
                                         {
                                             var existingIndex = IndexOf(result, info);
 
@@ -328,7 +356,7 @@ namespace RIM.VSNDK_Package.Model
         /// </summary>
         public static int IndexOf(IEnumerable<NdkInfo> list, NdkInfo info)
         {
-            if (info != null)
+            if (info != null && list != null)
             {
                 int i = 0;
                 foreach (var item in list)
@@ -339,25 +367,6 @@ namespace RIM.VSNDK_Package.Model
                 }
             }
             return -1;
-        }
-
-        /// <summary>
-        /// Compares the current object with another object of the same type.
-        /// </summary>
-        /// <returns>
-        /// A value that indicates the relative order of the objects being compared. The return value has the following meanings: Value Meaning Less than zero This object is less than the <paramref name="other"/> parameter.Zero This object is equal to <paramref name="other"/>. Greater than zero This object is greater than <paramref name="other"/>. 
-        /// </returns>
-        /// <param name="other">An object to compare with this object.</param>
-        public int CompareTo(NdkInfo other)
-        {
-            if (other == null)
-                return 1;
-
-            int cmp = Version.CompareTo(other.Version);
-            if (cmp != 0)
-                return cmp;
-
-            return string.Compare(Name, other.Name, StringComparison.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -445,7 +454,7 @@ namespace RIM.VSNDK_Package.Model
                         version = new Version(10, 0, 1);
                 }
 
-                return new NdkInfo(string.Concat("BlackBerry Local SDK ", version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
+                return new NdkInfo(null, string.Concat("BlackBerry Local SDK ", version, " /", DateTime.Now.ToString("yyyy-MM-dd"), "/"),
                                    version, Path.Combine(hostDirs[0], "win32", "x86"), Path.Combine(folder, "qnx6"));
             }
 
@@ -474,29 +483,6 @@ namespace RIM.VSNDK_Package.Model
             }
 
             return null;
-        }
-
-        private static Version GetVersionFromFolderName(string directoryName)
-        {
-            if (string.IsNullOrEmpty(directoryName))
-                return null;
-
-            int i = directoryName.Length;
-
-            // find the version substring at the end of the name:
-            while (i > 0 && directoryName[i - 1] == '_' || directoryName[i - 1] == '.' || char.IsDigit(directoryName[i - 1]))
-                i--;
-
-            // we might read one char too much:
-            if (i < directoryName.Length && !char.IsDigit(directoryName[i]))
-                i++;
-
-            // parse:
-            var versionString = directoryName.Substring(i).Trim().Replace('_', '.');
-            if (string.IsNullOrEmpty(versionString) || versionString.IndexOf('.') < 0)
-                return null;
-
-            return new Version(versionString);
         }
 
         public bool Save(string outputDirectory)
@@ -563,7 +549,9 @@ namespace RIM.VSNDK_Package.Model
             }
 
             // store it:
-            doc.Save(Path.Combine(outputDirectory, fileName.ToString()));
+            var fullFilePath = Path.Combine(outputDirectory, fileName.ToString());
+            doc.Save(fullFilePath);
+            FilePath = fullFilePath;
             return true;
         }
     }

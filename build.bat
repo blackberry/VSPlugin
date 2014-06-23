@@ -139,7 +139,6 @@ if %ActionGenScripts% equ 0 (goto skip_scripts)
 echo %actionNo%: Creating installation scripts
 
 if %ActionBuildVS2010% equ 0 (if %ActionGenScripts% neq 2 (goto skip_vs2010_scripts))
-echo Template...
 call :processTemplates 2010 10.0
 :skip_vs2010_scripts
 

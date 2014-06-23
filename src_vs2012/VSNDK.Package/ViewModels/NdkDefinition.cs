@@ -134,17 +134,6 @@ namespace RIM.VSNDK_Package.ViewModels
 
                 settings.SetValue(FieldHostPath, HostPath);
                 settings.SetValue(FieldTargetPath, TargetPath);
-
-                string qnxConfigPath = Path.Combine(RunnerDefaults.DataDirectory, "BlackBerry Native SDK");
-
-                // TODO: PH: copied from 'SettingsData.cs' - I don't quite get, why we need to overwrite EV
-                // as this will break Android as well as installed BB10 NDKs with Momentics...
-                Environment.SetEnvironmentVariable("QNX_TARGET", TargetPath);
-                Environment.SetEnvironmentVariable("QNX_HOST", HostPath);
-                Environment.SetEnvironmentVariable("QNX_CONFIGURATION", qnxConfigPath);
-
-                string ndkpath = string.Format(@"{0}/usr/bin;{1}\bin;{0}/usr/qde/eclipse/jre/bin;", HostPath, qnxConfigPath) + Environment.GetEnvironmentVariable("PATH");
-                Environment.SetEnvironmentVariable("PATH", ndkpath);
             }
             finally
             {
