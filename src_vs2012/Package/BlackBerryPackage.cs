@@ -85,7 +85,7 @@ namespace BlackBerry.Package
     [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable
     {
-        public const string VersionString = "2.1.2014.0622";
+        public const string VersionString = "2.1.2014.0623";
 
         #region private member variables
 
