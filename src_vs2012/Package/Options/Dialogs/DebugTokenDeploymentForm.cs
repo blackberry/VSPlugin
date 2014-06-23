@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -189,7 +190,7 @@ namespace BlackBerry.Package.Options.Dialogs
             UpdateTokenStatusUI(false);
 
             // and load token info asynchronously:
-            _tokenInfoRunner = new DebugTokenInfoRunner(RunnerDefaults.ToolsDirectory, fileName);
+            _tokenInfoRunner = new DebugTokenInfoRunner(ConfigDefaults.ToolsDirectory, fileName);
             _tokenInfoRunner.Dispatcher = EventDispatcher.From(this);
             _tokenInfoRunner.Finished += TokenInfoRunnerOnFinished;
             _tokenInfoRunner.ExecuteAsync();
@@ -295,7 +296,7 @@ namespace BlackBerry.Package.Options.Dialogs
                 UpdateDeviceStatusUI(false);
 
                 // load info asynchronously:
-                _deviceInfoRunner = new DeviceInfoRunner(RunnerDefaults.ToolsDirectory, _device.IP, _device.Password);
+                _deviceInfoRunner = new DeviceInfoRunner(ConfigDefaults.ToolsDirectory, _device.IP, _device.Password);
                 _deviceInfoRunner.Dispatcher = EventDispatcher.From(this);
                 _deviceInfoRunner.Finished += DeviceInfoRunnerOnFinished;
                 _deviceInfoRunner.ExecuteAsync();
@@ -386,7 +387,7 @@ namespace BlackBerry.Package.Options.Dialogs
             UpdateDeviceStatusUI(false);
 
             // upload token asynchronously:
-            _tokenUploadRunner = new DebugTokenUploadRunner(RunnerDefaults.ToolsDirectory, fileName, _device.IP, _device.Password);
+            _tokenUploadRunner = new DebugTokenUploadRunner(ConfigDefaults.ToolsDirectory, fileName, _device.IP, _device.Password);
             _tokenUploadRunner.Dispatcher = EventDispatcher.From(this);
             _tokenUploadRunner.Finished += DebugTokenUploadRunnerOnFinished;
             _tokenUploadRunner.ExecuteAsync();
@@ -448,7 +449,7 @@ namespace BlackBerry.Package.Options.Dialogs
             UpdateDeviceStatusUI(false);
 
             // remove token asynchronously:
-            _tokenRemoveRunner = new ApplicationRemoveRunner(RunnerDefaults.ToolsDirectory, _tokenInfo.ID, _device.IP, _device.Password);
+            _tokenRemoveRunner = new ApplicationRemoveRunner(ConfigDefaults.ToolsDirectory, _tokenInfo.ID, _device.IP, _device.Password);
             _tokenRemoveRunner.Dispatcher = EventDispatcher.From(this);
             _tokenRemoveRunner.Finished += DebugTokenRemoveRunnerOnFinished;
             _tokenRemoveRunner.ExecuteAsync();
@@ -499,7 +500,7 @@ namespace BlackBerry.Package.Options.Dialogs
             UpdateTokenStatusUI(false);
 
             // and create token asynchronously:
-            _tokenCreateRunner = new DebugTokenCreateRunner(RunnerDefaults.ToolsDirectory, fileName, _vm.Developer.CskPassword, devicePins, _vm.Developer.CertificateFullPath);
+            _tokenCreateRunner = new DebugTokenCreateRunner(ConfigDefaults.ToolsDirectory, fileName, _vm.Developer.CskPassword, devicePins, _vm.Developer.CertificateFullPath);
             _tokenCreateRunner.Dispatcher = EventDispatcher.From(this);
             _tokenCreateRunner.Finished += TokenCreateRunnerOnFinished;
             _tokenCreateRunner.ExecuteAsync();
@@ -544,7 +545,7 @@ namespace BlackBerry.Package.Options.Dialogs
                 return;
 
             var openFile = DialogHelper.OpenBarFile("Load Debug Token",
-                                                    string.IsNullOrEmpty(DebugTokenPath) ? RunnerDefaults.DataDirectory : DebugTokenPath);
+                                                    string.IsNullOrEmpty(DebugTokenPath) ? ConfigDefaults.DataDirectory : DebugTokenPath);
 
             if (openFile.ShowDialog() == DialogResult.OK)
             {
@@ -604,7 +605,7 @@ namespace BlackBerry.Package.Options.Dialogs
             }
 
             // ask where to store the debug-token:
-            var startupPath = string.IsNullOrEmpty(DebugTokenPath) ? RunnerDefaults.DataDirectory : Path.GetDirectoryName(DebugTokenPath);
+            var startupPath = string.IsNullOrEmpty(DebugTokenPath) ? ConfigDefaults.DataDirectory : Path.GetDirectoryName(DebugTokenPath);
             var saveFile = DialogHelper.SaveBarFile("Renewed debug token location", startupPath, "debugtoken-" + DateTime.Now.ToString("yyyy-MM-dd") + ".bar");
 
             if (saveFile.ShowDialog() == DialogResult.OK)

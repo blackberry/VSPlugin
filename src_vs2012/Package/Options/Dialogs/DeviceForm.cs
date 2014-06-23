@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -232,7 +233,7 @@ namespace BlackBerry.Package.Options.Dialogs
             IsConnected = false;
             LoadedDeviceName = null;
             PIN = 0;
-            _runner = new DeviceInfoRunner(RunnerDefaults.ToolsDirectory, DeviceIP, DevicePassword);
+            _runner = new DeviceInfoRunner(ConfigDefaults.ToolsDirectory, DeviceIP, DevicePassword);
             _runner.Dispatcher = EventDispatcher.From(this);
             _runner.Finished += RunnerOnFinished;
 

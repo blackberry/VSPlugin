@@ -172,7 +172,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.OpenSubKey(ConfigDefaults.RegistryPath);
             }
             catch
             {
@@ -236,7 +236,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
@@ -262,7 +262,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
@@ -295,7 +295,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.OpenSubKey(ConfigDefaults.RegistryPath);
                 if (settings == null)
                     return new DeviceDefinition[0];
 
@@ -321,7 +321,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
                 if (settings == null)
                     return;
 

@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -154,12 +155,12 @@ namespace BlackBerry.Package
                     {
                         e["QNX_TARGET"] = ndk.TargetPath;
                         e["QNX_HOST"] = ndk.HostPath;
-                        e["PATH"] = string.Concat(Path.Combine(RunnerDefaults.JavaHome, "bin"), ";", e["PATH"],
+                        e["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", e["PATH"],
                                                   Path.Combine(ndk.HostPath, "usr", "bin"), ";");
                     }
                     else
                     {
-                        e["PATH"] = string.Concat(Path.Combine(RunnerDefaults.JavaHome, "bin"), ";", e["PATH"]);
+                        e["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", e["PATH"]);
                     }
                 };
 
@@ -492,7 +493,7 @@ namespace BlackBerry.Package
                 {
                     // Write file to flag the deploy task that it should use the -debugNative option
                     string fileContent = "Use -debugNative.\r\n";
-                    using (var file = new StreamWriter(RunnerDefaults.BuildDebugNativePath))
+                    using (var file = new StreamWriter(ConfigDefaults.BuildDebugNativePath))
                     {
                         file.WriteLine(fileContent);
                     }
@@ -624,7 +625,7 @@ namespace BlackBerry.Package
 
             executablePath = currentPath + _processName; // The executable path
             executablePath = executablePath.Replace('\\', '/');
-            publicKeyPath = RunnerDefaults.SshPublicKeyPath;
+            publicKeyPath = ConfigDefaults.SshPublicKeyPath;
             publicKeyPath = publicKeyPath.Replace('\\', '/');
 
             try
@@ -706,7 +707,7 @@ namespace BlackBerry.Package
                 string processesPaths;
                 try
                 {
-                    StreamReader readProcessesPathsFile = new StreamReader(Path.Combine(RunnerDefaults.DataDirectory, "ProcessesPath.txt"));
+                    StreamReader readProcessesPathsFile = new StreamReader(Path.Combine(ConfigDefaults.DataDirectory, "ProcessesPath.txt"));
                     processesPaths = readProcessesPathsFile.ReadToEnd();
                     readProcessesPathsFile.Close();
                 }
@@ -732,7 +733,7 @@ namespace BlackBerry.Package
                 // Writing contents to file.
                 try
                 {
-                    StreamWriter writeProcessesPathsFile = new StreamWriter(Path.Combine(RunnerDefaults.DataDirectory, "ProcessesPath.txt"), false);
+                    StreamWriter writeProcessesPathsFile = new StreamWriter(Path.Combine(ConfigDefaults.DataDirectory, "ProcessesPath.txt"), false);
                     writeProcessesPathsFile.Write(processesPaths);
                     writeProcessesPathsFile.Close();
                 }

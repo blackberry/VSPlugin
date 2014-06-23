@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
 
@@ -64,9 +65,9 @@ namespace BlackBerry.Package.Options
 
         public void OnReset()
         {
-            txtNdkPath.Text = RunnerDefaults.NdkDirectory;
-            txtToolsPath.Text = RunnerDefaults.ToolsDirectory;
-            txtProfilePath.Text = RunnerDefaults.DataDirectory;
+            txtNdkPath.Text = ConfigDefaults.NdkDirectory;
+            txtToolsPath.Text = ConfigDefaults.ToolsDirectory;
+            txtProfilePath.Text = ConfigDefaults.DataDirectory;
         }
     }
 }

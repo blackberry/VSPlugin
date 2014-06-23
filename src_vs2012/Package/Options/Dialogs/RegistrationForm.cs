@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
@@ -281,7 +282,7 @@ namespace BlackBerry.Package.Options.Dialogs
             // create CSK file:
             bool successful;
             string certificateFileName;
-            using (var runner = new KeyToolRegisterRunner(RunnerDefaults.ToolsDirectory, txtCsjPin.Text, txtCskPassword.Text, txtRdkPath.Text, txtPbdtPath.Text))
+            using (var runner = new KeyToolRegisterRunner(ConfigDefaults.ToolsDirectory, txtCsjPin.Text, txtCskPassword.Text, txtRdkPath.Text, txtPbdtPath.Text))
             {
                 successful = runner.Execute();
                 certificateFileName = runner.CertificateFileName;
@@ -353,7 +354,7 @@ namespace BlackBerry.Package.Options.Dialogs
 
             UpdateActionButtons(false);
 
-            using (var runner = new KeyToolGenRunner(RunnerDefaults.ToolsDirectory, AuthorName, Password, null))
+            using (var runner = new KeyToolGenRunner(ConfigDefaults.ToolsDirectory, AuthorName, Password, null))
             {
                 Log("Started certificate generation..." + Environment.NewLine);
                 var success = runner.Execute();

@@ -263,7 +263,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
@@ -292,7 +292,7 @@ namespace BlackBerry.NativeCore.Model
 
                 try
                 {
-                    settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                    settings = registry.OpenSubKey(ConfigDefaults.RegistryPath);
                     if (settings == null)
                         return false;
 
@@ -329,7 +329,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
@@ -353,7 +353,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
@@ -380,7 +380,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.CreateSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
                 if (settings == null)
                     return;
 
@@ -446,7 +446,7 @@ namespace BlackBerry.NativeCore.Model
 
             try
             {
-                settings = registry.OpenSubKey(RunnerDefaults.RegistryPath);
+                settings = registry.OpenSubKey(ConfigDefaults.RegistryPath);
             }
             catch
             {
@@ -502,7 +502,7 @@ namespace BlackBerry.NativeCore.Model
                 var issuer = cert.Issuer;
                  */
                 string issuer;
-                using (var runner = new KeyToolInfoRunner(RunnerDefaults.ToolsDirectory, certificateFileName, password))
+                using (var runner = new KeyToolInfoRunner(ConfigDefaults.ToolsDirectory, certificateFileName, password))
                 {
                     // invoke
                     if (!runner.Execute())

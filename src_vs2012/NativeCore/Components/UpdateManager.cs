@@ -134,7 +134,7 @@ namespace BlackBerry.NativeCore.Components
                     if (IsRunning)
                         return;
 
-                    _runner = new ApiLevelUpdateRunner(RunnerDefaults.NdkDirectory, Action, Target, Version);
+                    _runner = new ApiLevelUpdateRunner(ConfigDefaults.NdkDirectory, Action, Target, Version);
                     _runner.Finished += OnFinished;
                     _runner.Log += OnLog;
                     _runner.ExecuteAsync();

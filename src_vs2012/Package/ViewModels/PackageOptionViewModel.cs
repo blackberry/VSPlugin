@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
@@ -48,7 +49,7 @@ namespace BlackBerry.Package.ViewModels
             _remoteNDKs = new ApiInfoArray[0];
             _remoteSimulators = new ApiInfoArray[0];
             _remoteRuntimes = new ApiInfoArray[0];
-            UpdateManager = new UpdateManager(RunnerDefaults.NdkDirectory);
+            UpdateManager = new UpdateManager(ConfigDefaults.NdkDirectory);
             UpdateManager.Completed += UpdateManagerOnCompleted;
         }
 
@@ -64,7 +65,7 @@ namespace BlackBerry.Package.ViewModels
                 if (_developer == null)
                 {
                     // load info about current developer:
-                    _developer = DeveloperDefinition.Load(RunnerDefaults.DataDirectory);
+                    _developer = DeveloperDefinition.Load(ConfigDefaults.DataDirectory);
                 }
 
                 return _developer;
@@ -90,10 +91,10 @@ namespace BlackBerry.Package.ViewModels
                 if (_installedNDKs == null)
                 {
                     // load info about NDKs from specified locations:
-                    _installedNDKs = NdkInfo.Load(RunnerDefaults.PluginInstallationConfigDirectory,
-                                                  RunnerDefaults.SupplementaryInstallationConfigDirectory,
-                                                  RunnerDefaults.InstallationConfigDirectory,
-                                                  RunnerDefaults.SupplementaryPlayBookInstallationConfigDirectory);
+                    _installedNDKs = NdkInfo.Load(ConfigDefaults.PluginInstallationConfigDirectory,
+                                                  ConfigDefaults.SupplementaryInstallationConfigDirectory,
+                                                  ConfigDefaults.InstallationConfigDirectory,
+                                                  ConfigDefaults.SupplementaryPlayBookInstallationConfigDirectory);
                 }
 
                 return _installedNDKs;
@@ -119,7 +120,7 @@ namespace BlackBerry.Package.ViewModels
                 if (_installedSimulators == null)
                 {
                     // load info about simulators from specified locations:
-                    _installedSimulators = SimulatorInfo.Load(RunnerDefaults.NdkDirectory);
+                    _installedSimulators = SimulatorInfo.Load(ConfigDefaults.NdkDirectory);
                 }
 
                 return _installedSimulators;
@@ -145,7 +146,7 @@ namespace BlackBerry.Package.ViewModels
                 if (_installedRuntimes == null)
                 {
                     // load info about runtimes from specified locations:
-                    _installedRuntimes = RuntimeInfo.Load(RunnerDefaults.NdkDirectory);
+                    _installedRuntimes = RuntimeInfo.Load(ConfigDefaults.NdkDirectory);
                 }
 
                 return _installedRuntimes;

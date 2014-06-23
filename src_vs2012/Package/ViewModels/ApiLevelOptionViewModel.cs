@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -52,7 +53,7 @@ namespace BlackBerry.Package.ViewModels
                     return false;
                 }
 
-                _runner = new ApiLevelListLoadRunner(RunnerDefaults.NdkDirectory, _type);
+                _runner = new ApiLevelListLoadRunner(ConfigDefaults.NdkDirectory, _type);
                 _runner.Dispatcher = dispatcher;
                 _runner.Finished += RunnerOnFinished;
                 _runner.ExecuteAsync();
@@ -151,13 +152,13 @@ namespace BlackBerry.Package.ViewModels
                 if (ndkInfo != null)
                 {
                     // is it NDK owned by the plugin itself?
-                    if (isInstalled && ndkInfo.TargetPath != null && ndkInfo.TargetPath.StartsWith(RunnerDefaults.NdkDirectory, StringComparison.InvariantCultureIgnoreCase))
+                    if (isInstalled && ndkInfo.TargetPath != null && ndkInfo.TargetPath.StartsWith(ConfigDefaults.NdkDirectory, StringComparison.InvariantCultureIgnoreCase))
                     {
                         return IsProcessing(info) ? ApiLevelTask.Nothing : ApiLevelTask.Uninstall;
                     }
 
                     // is it a custom definition added?
-                    if (ndkInfo.FilePath != null && ndkInfo.FilePath.StartsWith(RunnerDefaults.PluginInstallationConfigDirectory, StringComparison.InvariantCultureIgnoreCase))
+                    if (ndkInfo.FilePath != null && ndkInfo.FilePath.StartsWith(ConfigDefaults.PluginInstallationConfigDirectory, StringComparison.InvariantCultureIgnoreCase))
                     {
                         return ApiLevelTask.Forget;
                     }
@@ -166,7 +167,7 @@ namespace BlackBerry.Package.ViewModels
                 // is it an option to manually add NDK?
                 if (info.Version.Major == 0 && info.Version.Minor == 0)
                 {
-                    argument = RunnerDefaults.NdkDirectory;
+                    argument = ConfigDefaults.NdkDirectory;
                     return ApiLevelTask.AddExisting;
                 }
 

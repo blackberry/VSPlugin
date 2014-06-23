@@ -15,7 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BlackBerry.NativeCore.Tools;
+using BlackBerry.NativeCore;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
 using VSNDK.Parser;
@@ -132,12 +132,12 @@ namespace BlackBerry.DebugEngine
         /// <returns> Returns the list of processes running on this port. </returns>
         IEnumerable<AD7Process> GetProcesses()
         {
-            if (m_processes.Count() != 0)
+            if (m_processes.Count != 0)
             {
                 m_processes.Clear();
             }
 
-            string publicKeyPath = RunnerDefaults.SshPublicKeyPath;
+            string publicKeyPath = ConfigDefaults.SshPublicKeyPath;
 
             string response = GDBParser.GetPIDsThroughGDB(m_IP, m_password, m_isSimulator, m_toolsPath, publicKeyPath, 12);
 

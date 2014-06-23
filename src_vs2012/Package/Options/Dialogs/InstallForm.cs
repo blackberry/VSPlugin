@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
@@ -237,7 +238,7 @@ namespace BlackBerry.Package.Options.Dialogs
                 if (ndk != null)
                 {
                     // save inside 'installation config' directory:
-                    if (ndk.Save(RunnerDefaults.PluginInstallationConfigDirectory))
+                    if (ndk.Save(ConfigDefaults.PluginInstallationConfigDirectory))
                     {
                         // reload NDKs
                         _vm.Reset(ApiLevelTarget.NDK);

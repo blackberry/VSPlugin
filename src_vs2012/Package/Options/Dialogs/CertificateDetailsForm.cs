@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
@@ -48,7 +49,7 @@ namespace BlackBerry.Package.Options.Dialogs
                     _developer.UpdatePassword(form.Password, form.ShouldRemember);
                 }
 
-                _runner = new KeyToolInfoRunner(RunnerDefaults.ToolsDirectory, Path, _developer.CskPassword);
+                _runner = new KeyToolInfoRunner(ConfigDefaults.ToolsDirectory, Path, _developer.CskPassword);
                 _runner.Dispatcher = EventDispatcher.From(this);
                 _runner.Finished += OnInfoLoaded;
                 _runner.ExecuteAsync();

@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Model;
@@ -880,7 +881,7 @@ namespace BlackBerry.Package.ViewModels
                 return;
             }
 
-            _debugTokenInfoRunner = new DebugTokenInfoRunner(RunnerDefaults.ToolsDirectory, debugTokenFileName);
+            _debugTokenInfoRunner = new DebugTokenInfoRunner(ConfigDefaults.ToolsDirectory, debugTokenFileName);
             _debugTokenInfoRunner.Tag = failHandler;
             _debugTokenInfoRunner.Dispatcher = dispatcher;
             _debugTokenInfoRunner.Finished += DebugTokenInfoLoaded;

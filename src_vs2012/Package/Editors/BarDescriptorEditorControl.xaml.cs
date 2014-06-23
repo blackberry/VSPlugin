@@ -18,6 +18,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model;
@@ -142,7 +143,7 @@ namespace BlackBerry.Package.Editors
 
             if (viewModel != null)
             {
-                var form = DialogHelper.OpenBarFile("Select debug token", RunnerDefaults.DataDirectory);
+                var form = DialogHelper.OpenBarFile("Select debug token", ConfigDefaults.DataDirectory);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     viewModel.SetAuthorInfoFrom(form.FileName, EventDispatcher.From(this), OnLoadingDebugInfoFailed);

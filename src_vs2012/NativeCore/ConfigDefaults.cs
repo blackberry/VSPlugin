@@ -1,12 +1,17 @@
 ﻿using System;
 using System.IO;
 
-namespace BlackBerry.NativeCore.Tools
+namespace BlackBerry.NativeCore
 {
-    public static class RunnerDefaults
+#if MAKE_CONFIG_DEFAULTS_PUBLIC
+    public
+#endif
+    static class ConfigDefaults
     {
+#if MAKE_CONFIG_DEFAULTS_PUBLIC
         public static readonly string TestToolsDirectory;
         public static readonly string TestNdkDirectory;
+#endif
 
         public static readonly string ToolsDirectory;
         public static readonly string NdkDirectory;
@@ -25,7 +30,7 @@ namespace BlackBerry.NativeCore.Tools
         public static readonly string PluginInstallationConfigDirectory;
         public static readonly string RegistryPath;
 
-        static RunnerDefaults()
+        static ConfigDefaults()
         {
             var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             if (string.IsNullOrEmpty(programFilesX86))
@@ -57,7 +62,7 @@ namespace BlackBerry.NativeCore.Tools
             BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
 
-#if DEBUG
+#if DEBUG && MAKE_CONFIG_DEFAULTS_PUBLIC
             // TODO: PH: 2014-05-08: for now hardcoded my repository path:
             TestToolsDirectory = @"S:\vs-plugin\qnxtools\bin";
             TestNdkDirectory = NdkDirectory; // @"S:\vs-plugin\bbndk_vs";
