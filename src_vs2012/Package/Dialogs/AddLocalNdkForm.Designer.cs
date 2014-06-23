@@ -178,7 +178,7 @@
             // 
             this.txtName.Location = new System.Drawing.Point(106, 61);
             this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(274, 20);
+            this.txtName.Size = new System.Drawing.Size(335, 20);
             this.txtName.TabIndex = 2;
             // 
             // label3

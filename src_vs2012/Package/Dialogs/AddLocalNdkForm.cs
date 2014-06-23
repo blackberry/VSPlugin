@@ -148,7 +148,7 @@ namespace BlackBerry.Package.Dialogs
 
             if (existingNDK != null)
             {
-                if (MessageBoxHelper.Show("Are you sure, you want to add it?\r\nIt won't probably show up to select as duplicates are not allowed.",
+                if (MessageBoxHelper.Show("Are you sure, you want to add it?\r\nIt won't probably show up to select as duplicates are ignored, when populating lists.",
                                           "Configuration duplicates \"" + existingNDK.Name + "\"",
                                           MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                 {
