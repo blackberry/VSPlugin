@@ -189,11 +189,11 @@
          Switch="-Wl,-z,relro -Wl,-z,now" />
   <BoolProperty Name="PIE" DisplayName="Position Independent Executable(-pie)" Category="Debugging"
             Switch="fPIE" />
-  <BoolProperty Name="ProfilingCall" DisplayName="Build for Profiling ( Call Count) (-p)" Category="Debugging"
+  <BoolProperty Name="ProfilingCall" DisplayName="Build for Profiling (Call Count) (-p)" Category="Debugging"
               Switch="p" />
-  <BoolProperty Name="ProfilingFunc" DisplayName="Build for Profiling ( Function Instrumentation) (-finstrument-functions)" Category="Debugging"
+  <BoolProperty Name="ProfilingFunc" DisplayName="Build for Profiling (Function Instrumentation) (-finstrument-functions)" Category="Debugging"
               Switch="finstrument-functions" />
-  <BoolProperty Name="CodeCoverage" DisplayName="Build for Code Coverage ( -Wc,-ftest-converage -Wc, -fprofile-arcs -p)" Category="Debugging"
+  <BoolProperty Name="CodeCoverage" DisplayName="Build for Code Coverage (-Wc,-ftest-converage -Wc, -fprofile-arcs -p)" Category="Debugging"
               Switch="-Wc,-ftext-coverage -Wc,-fprofile-arcs -p" />
   <BoolProperty Name="Mudflap" DisplayName="Build for Mudflap (-fmudflapth)" Category="Debugging"
               Switch="fmudflapth" />

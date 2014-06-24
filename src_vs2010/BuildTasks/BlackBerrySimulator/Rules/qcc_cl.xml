@@ -118,11 +118,11 @@
           Switch="fstack-protector-all" />
   <BoolProperty Name="PIE" DisplayName="Position Independent Executable(fPIE)" Category="Code Generation"
             Switch="fPIE" />
-  <BoolProperty Name="ProfilingCall" DisplayName="Build for Profiling ( Call Count) (-p)" Category="Code Generation"
+  <BoolProperty Name="ProfilingCall" DisplayName="Build for Profiling (Call Count) (-p)" Category="Code Generation"
               Switch="p" />
-  <BoolProperty Name="ProfilingFunc" DisplayName="Build for Profiling ( Function Instrumentation) (-finstrument-functions)" Category="Code Generation"
+  <BoolProperty Name="ProfilingFunc" DisplayName="Build for Profiling (Function Instrumentation) (-finstrument-functions)" Category="Code Generation"
               Switch="finstrument-functions" />
-  <BoolProperty Name="CodeCoverage" DisplayName="Build for Code Coverage ( -Wc,-ftest-converage -Wc, -fprofile-arcs)" Category="Code Generation"
+  <BoolProperty Name="CodeCoverage" DisplayName="Build for Code Coverage (-Wc,-ftest-converage -Wc, -fprofile-arcs)" Category="Code Generation"
               Switch="-Wc,-ftext-coverage -Wc,-fprofile-arcs" />
   <BoolProperty Name="Mudflap" DisplayName="Build for Mudflap (-fmudflapth)" Category="Code Generation"
               Switch="fmudflapth" />
