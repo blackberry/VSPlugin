@@ -170,9 +170,6 @@
     <Compile Include="..\..\src_vs2012\Package\Editors\EditorFactoryNotifyForProject.cs">
       <Link>Editors\EditorFactoryNotifyForProject.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Editors\XmlEditorDesignerViewRegistration.cs">
-      <Link>Editors\XmlEditorDesignerViewRegistration.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2012\Package\GuidList.cs">
       <Link>GuidList.cs</Link>
     </Compile>
@@ -378,6 +375,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\PackageCommands.cs">
       <Link>PackageCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Registration\XmlEditorDesignerViewRegistrationAttribute.cs">
+      <Link>Registration\XmlEditorDesignerViewRegistrationAttribute.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\StandardCommands.cs">
       <Link>StandardCommands.cs</Link>
