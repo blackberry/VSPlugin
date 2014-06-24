@@ -28,6 +28,7 @@ using BlackBerry.Package.Editors;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
 using BlackBerry.Package.Options;
+using BlackBerry.Package.Registration;
 using BlackBerry.Package.ViewModels;
 using Microsoft.Win32;
 using Microsoft.VisualStudio;

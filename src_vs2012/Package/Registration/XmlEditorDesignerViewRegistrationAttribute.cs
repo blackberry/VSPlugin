@@ -17,7 +17,7 @@ using Microsoft.VisualStudio.Shell;
 using System.IO;
 using Microsoft.VisualStudio;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.Registration
 {
     /// <summary>
     /// Register our bardescriptor.xml custom editor
@@ -31,13 +31,13 @@ namespace BlackBerry.Package
         const string XmlEditorFactoryGuid = "{FA3CD31E-987B-443A-9B81-186104E8DAC1}";
 
         /// Declare Private Member Variables
-        private string keyName;
-        private string defaultExtension;
-        private Guid defaultLogicalView;
-        private int xmlChooserPriority;
+        private readonly string _keyName;
+        private readonly string _defaultExtension;
+        private Guid _defaultLogicalView;
+        private readonly int _xmlChooserPriority;
 
         /// <summary>
-        /// Construtor
+        /// Init constructor
         /// </summary>
         /// <param name="keyName">Registry key name</param>
         /// <param name="defaultExtension">Default extension for editor</param>
@@ -45,53 +45,44 @@ namespace BlackBerry.Package
         /// <param name="xmlChooserPriority">XML Priority</param>
         public XmlEditorDesignerViewRegistrationAttribute(string keyName, string defaultExtension, object defaultLogicalViewEditorFactory, int xmlChooserPriority)
         {
-            /// Validate parameter input 
+            // Validate parameter input 
             if (string.IsNullOrWhiteSpace(keyName))
-            {
                 throw new ArgumentException("Editor description cannot be null or empty.", "editorDescription");
-            }
             if (string.IsNullOrWhiteSpace(defaultExtension))
-            {
                 throw new ArgumentException("Extension cannot be null or empty.", "extension");
-            }
             if (defaultLogicalViewEditorFactory == null)
-            {
                 throw new ArgumentNullException("defaultLogicalViewEditorFactory");
-            }
 
-            /// Set Member Variables 
-            this.keyName = keyName;
-            this.defaultExtension = defaultExtension;
-            this.defaultLogicalView = TryGetGuidFromObject(defaultLogicalViewEditorFactory);
-            this.xmlChooserPriority = xmlChooserPriority;
+            // Set Member Variables 
+            _keyName = keyName;
+            _defaultExtension = defaultExtension;
+            _defaultLogicalView = TryGetGuidFromObject(defaultLogicalViewEditorFactory);
+            _xmlChooserPriority = xmlChooserPriority;
 
-            this.CodeLogicalViewEditor = XmlEditorFactoryGuid;
-            this.DebuggingLogicalViewEditor = XmlEditorFactoryGuid;
-            this.DesignerLogicalViewEditor = XmlEditorFactoryGuid;
-            this.TextLogicalViewEditor = XmlEditorFactoryGuid;            
+            CodeLogicalViewEditor = XmlEditorFactoryGuid;
+            DebuggingLogicalViewEditor = XmlEditorFactoryGuid;
+            DesignerLogicalViewEditor = XmlEditorFactoryGuid;
+            TextLogicalViewEditor = XmlEditorFactoryGuid;            
         }
 
         /// <summary>
         /// Register the custom editor
         /// </summary>
-        /// <param name="context"></param>
-        public override void Register(RegistrationAttribute.RegistrationContext context)
+        public override void Register(RegistrationContext context)
         {
-            /// Validate parameter input
+            // Validate parameter input
             if (context == null)
-            {
                 throw new ArgumentNullException("context");
-            }
 
-            /// Set extension key
+            // Set extension key
             Key extensionKey = context.CreateKey(XmlChooserEditorExtensionsKeyPath);
-            extensionKey.SetValue(defaultExtension, xmlChooserPriority);
+            extensionKey.SetValue(_defaultExtension, _xmlChooserPriority);
             extensionKey.Close();
 
-            /// set editor key
-            Key editorKey = context.CreateKey(Path.Combine(XmlChooserFactory, keyName));
-            editorKey.SetValue("DefaultLogicalView", defaultLogicalView.ToString("B").ToUpperInvariant());
-            editorKey.SetValue("Extension", defaultExtension);
+            // Set editor key
+            Key editorKey = context.CreateKey(Path.Combine(XmlChooserFactory, _keyName));
+            editorKey.SetValue("DefaultLogicalView", _defaultLogicalView.ToString("B").ToUpperInvariant());
+            editorKey.SetValue("Extension", _defaultExtension);
             if (!string.IsNullOrWhiteSpace(Namespace))
             {
                 editorKey.SetValue("Namespace", Namespace);
@@ -104,22 +95,26 @@ namespace BlackBerry.Package
             {
                 editorKey.SetValue("IsDataSet", Convert.ToInt32(IsDataSet.Value));
             }
-            /// Set DebuggingLogicalViewEditor Mapping
+
+            // Set DebuggingLogicalViewEditor Mapping
             if (DebuggingLogicalViewEditor != null)
             {
                 editorKey.SetValue(VSConstants.LOGVIEWID_Debugging.ToString("B").ToUpperInvariant(), TryGetGuidFromObject(DebuggingLogicalViewEditor).ToString("B").ToUpperInvariant());
             }
-            /// Set CodeLogicalViewEditor Mapping
+
+            // Set CodeLogicalViewEditor Mapping
             if (CodeLogicalViewEditor != null)
             {
                 editorKey.SetValue(VSConstants.LOGVIEWID_Code.ToString("B").ToUpperInvariant(), TryGetGuidFromObject(CodeLogicalViewEditor).ToString("B").ToUpperInvariant());
             }
-            /// Set DesignerLogicalViewEditor Mapping
+
+            // Set DesignerLogicalViewEditor Mapping
             if (DesignerLogicalViewEditor != null)
             {
                 editorKey.SetValue(VSConstants.LOGVIEWID_Designer.ToString("B").ToUpperInvariant(), TryGetGuidFromObject(DesignerLogicalViewEditor).ToString("B").ToUpperInvariant());
             }
-            /// Set TextLogicalViewEditor Mapping
+
+            // Set TextLogicalViewEditor Mapping
             if (TextLogicalViewEditor != null)
             {
                 editorKey.SetValue(VSConstants.LOGVIEWID_TextView.ToString("B").ToUpperInvariant(), TryGetGuidFromObject(TextLogicalViewEditor).ToString("B").ToUpperInvariant());
@@ -130,38 +125,36 @@ namespace BlackBerry.Package
         /// <summary>
         /// Unregister the custom editor
         /// </summary>
-        /// <param name="context"></param>
         public override void Unregister(RegistrationContext context)
         {
-            /// Validate parameter input
+            // Validate parameter input
             if (context == null)
-            {
                 throw new ArgumentNullException("context");
-            }
 
-            /// Remove Key
-            context.RemoveKey(Path.Combine(XmlChooserFactory, keyName));
-            context.RemoveValue(XmlChooserEditorExtensionsKeyPath, defaultExtension);
+            // Remove Key
+            context.RemoveKey(Path.Combine(XmlChooserFactory, _keyName));
+            context.RemoveValue(XmlChooserEditorExtensionsKeyPath, _defaultExtension);
             context.RemoveKeyIfEmpty(XmlChooserEditorExtensionsKeyPath);
         }
-
 
         /// <summary>
         /// Private member function to return the GUID of an object.
         /// </summary>
-        /// <param name="guidObject"></param>
-        /// <returns></returns>
         private Guid TryGetGuidFromObject(object guidObject)
         {
             // figure out what type of object they passed in and get the GUID from it
-            if (guidObject is string)
-                return new Guid((string)guidObject);
-            else if (guidObject is Type)
-                return ((Type)guidObject).GUID;
-            else if (guidObject is Guid)
+            var strObject = guidObject as string;
+            if (strObject != null)
+                return new Guid(strObject);
+
+            var typeObject = guidObject as Type;
+            if (typeObject != null)
+                return typeObject.GUID;
+
+            if (guidObject is Guid)
                 return (Guid)guidObject;
-            else
-                throw new ArgumentException("Could not determine Guid from supplied object.", "guidObject");
+
+            throw new ArgumentException("Could not determine Guid from supplied object.", "guidObject");
         }
 
         /// <summary>
