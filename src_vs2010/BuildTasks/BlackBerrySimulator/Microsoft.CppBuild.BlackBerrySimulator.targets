@@ -27,7 +27,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <ItemGroup>
     <!-- Property pages that always apply -->
     <PropertyPageSchema Include="
-        $(VCTargetsPath)\Platforms\BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml;
+        $(VCTargetsPath)Platforms\BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml;
+        $(VCTargetsPath)Platforms\BlackBerry\Rules\debugger_*.xml;
         $(VCTargetsPath)$(LangID)\debugger_*.xml;
         $(VCTargetsPath)$(LangID)\midl.xml;
         $(VCTargetsPath)$(LangID)\build_events.xml;

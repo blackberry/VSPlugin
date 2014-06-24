@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!--Copyright, Microsoft Corporation, All rights reserved.-->
-<Rule Name="VSNDKDebugEngine"
+<Rule Name="BlackBerryDebugEngine"
       DisplayName="BlackBerry NDK Debugger"
       PageTemplate="debugger"
       Description="BlackBerry NDK Debugger options"

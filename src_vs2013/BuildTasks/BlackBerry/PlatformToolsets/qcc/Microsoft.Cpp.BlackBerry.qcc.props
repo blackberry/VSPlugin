@@ -35,7 +35,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Platform)'=='BlackBerry'">
-    <DebuggerFlavor>VSNDKDebugEngine</DebuggerFlavor>
+    <DebuggerFlavor>BlackBerryDebugEngine</DebuggerFlavor>
   </PropertyGroup>
   
   <PropertyGroup>
