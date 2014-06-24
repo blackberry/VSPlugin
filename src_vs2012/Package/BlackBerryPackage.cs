@@ -68,6 +68,14 @@ namespace BlackBerry.Package
     // Microsoft Visual C# Project
     [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", BarDescriptorEditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
+    // Registration of custom debugger
+    [DebugEngineRegistration("BlackBerry NDK DebugEngine", "{E5A37609-2F43-4830-AA85-D94CFA035DD2}",
+        Attach = true, AddressBreakpoints = false, CallstackBreakpoints = true, AlwaysLoadLocal = true, AutoSelectPriority = 4,
+        DebugEngineClassGUID = "{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}", DebugEngineClassName = "BlackBerry.DebugEngine.AD7Engine",
+        ProgramProviderClassGUID = "{AD06FD46-C790-4D5C-A274-8815DF9511B8}", ProgramProviderClassName = "BlackBerry.DebugEngine.AD7ProgramProvider",
+        PortSupplierClassGUID = "{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}", PortSupplierClassName = "BlackBerry.DebugEngine.AD7PortSupplier",
+        AssemblyName = "BlackBerry.DebugEngine.dll")]
+
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", VersionString, IconResourceID = 400)]
@@ -79,14 +87,15 @@ namespace BlackBerry.Package
 
     // This attribute defines set of settings pages provided by this package.
     // They are automatically instantiated and displayed inside [Visual Studio -> Tools -> Options...] dialog.
-    [ProvideOptionPage(typeof(GeneralOptionPage), "BlackBerry", "General", 1001, 1002, true)]
-    [ProvideOptionPage(typeof(LogsOptionPage), "BlackBerry", "Logs", 1001, 1003, true)]
-    [ProvideOptionPage(typeof(ApiLevelOptionPage), "BlackBerry", "API Levels", 1001, 1004, true)]
-    [ProvideOptionPage(typeof(TargetsOptionPage), "BlackBerry", "Targets", 1001, 1005, true)]
-    [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
+    [ProvideOptionPage(typeof(GeneralOptionPage), OptionsCategoryName, "General", 1001, 1002, true)]
+    [ProvideOptionPage(typeof(LogsOptionPage), OptionsCategoryName, "Logs", 1001, 1003, true)]
+    [ProvideOptionPage(typeof(ApiLevelOptionPage), OptionsCategoryName, "API Levels", 1001, 1004, true)]
+    [ProvideOptionPage(typeof(TargetsOptionPage), OptionsCategoryName, "Targets", 1001, 1005, true)]
+    [ProvideOptionPage(typeof(SigningOptionPage), OptionsCategoryName, "Signing", 1001, 1006, true)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable
     {
         public const string VersionString = "2.1.2014.0623";
+        public const string OptionsCategoryName = "BlackBerry";
 
         #region private member variables
 

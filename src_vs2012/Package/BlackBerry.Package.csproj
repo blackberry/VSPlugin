@@ -183,6 +183,7 @@
     <Compile Include="Editors\BarDescriptorEditorPane.cs" />
     <Compile Include="Editors\EditorFactoryNotifyForProject.cs" />
     <Compile Include="GuidList.cs" />
+    <Compile Include="Helpers\AttributeHelper.cs" />
     <Compile Include="Helpers\CertHelper.cs" />
     <Compile Include="Helpers\CommandHelper.cs" />
     <Compile Include="Helpers\DialogHelper.cs" />
@@ -324,6 +325,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="PackageCommands.cs" />
+    <Compile Include="Registration\DebugEngineRegistrationAttribute.cs" />
     <Compile Include="Registration\XmlEditorDesignerViewRegistrationAttribute.cs" />
     <Compile Include="StandardCommands.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />

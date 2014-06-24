@@ -121,17 +121,6 @@ set /a actionNo += 1
 call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%" "%MSBuildTargetPath%" "%VSWizardsPath%"
 set /a actionNo += 1
 
-if %ActionUninstall% neq 0 (goto uninstall_reg)
-
-REM Registering debug-ending and other support classes
-echo %actionNo%: Registering debug-engine [%BuildResults%\setup_VS%VSYear%_install_%SystemArch%.reg]
-REGEDIT.EXE /S "%BuildResults%\setup_VS%VSYear%_install_%SystemArch%.reg"
-goto processSetup_End
-
-:uninstall_reg
-echo %actionNo%: Unregistering debug-engine [%BuildResults%\setup_VS%VSYear%_uninstall.reg]
-REGEDIT.EXE /S "%BuildResults%\setup_VS%VSYear%_uninstall.reg"
-
 :processSetup_End
 endlocal
 exit /b
@@ -162,16 +151,6 @@ md "%OutputPluginPath%"
 echo Make Directory "%OutputVsPath%"
 md "%OutputVsPath%"
 
-REM Install
-echo Copy "%InputPath%\GDBParser.dll" to "%OutputVsPath%\GDBParser.dll"
-copy "%InputPath%\GDBParser.dll" "%OutputVsPath%\GDBParser.dll" 
-echo Copy "%InputPath%\GDBWrapper.exe" to "%OutputPluginPath%\GDBWrapper.exe"
-copy "%InputPath%\GDBWrapper.exe" "%OutputPluginPath%\GDBWrapper.exe" 
-echo Copy "%InputPath%\Instructions.txt" to "%OutputPluginPath%\Instructions.txt"
-copy "%InputPath%\Instructions.txt" "%OutputPluginPath%\Instructions.txt" 
-echo Copy "%InputPath%\BlackBerry.DebugEngine.dll" to "%OutputPluginPath%\BlackBerry.DebugEngine.dll"
-copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputPluginPath%\BlackBerry.DebugEngine.dll" 
-
 REM Install Package Files
 echo "%InputPath%\extension.vsixmanifest" to "%OutputVsPath%\extension.vsixmanifest"
 copy "%InputPath%\extension.vsixmanifest" "%OutputVsPath%\extension.vsixmanifest" 
@@ -181,6 +160,14 @@ echo "%InputPath%\BlackBerry.Package.dll" to "%OutputVsPath%\BlackBerry.Package.
 copy "%InputPath%\BlackBerry.Package.dll" "%OutputVsPath%\BlackBerry.Package.dll"
 echo "%InputPath%\BlackBerry.Package.pkgdef" to "%OutputVsPath%\BlackBerry.Package.pkgdef"
 copy "%InputPath%\BlackBerry.Package.pkgdef" "%OutputVsPath%\BlackBerry.Package.pkgdef" 
+echo "%InputPath%\GDBParser.dll" to "%OutputVsPath%\GDBParser.dll"
+copy "%InputPath%\GDBParser.dll" "%OutputVsPath%\GDBParser.dll" 
+echo "%InputPath%\GDBWrapper.exe" to "%OutputVsPath%\GDBWrapper.exe"
+copy "%InputPath%\GDBWrapper.exe" "%OutputVsPath%\GDBWrapper.exe" 
+echo "%InputPath%\Instructions.txt" to "%OutputVsPath%\Instructions.txt"
+copy "%InputPath%\Instructions.txt" "%OutputVsPath%\Instructions.txt" 
+echo "%InputPath%\BlackBerry.DebugEngine.dll" to "%OutputVsPath%\BlackBerry.DebugEngine.dll"
+copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputVsPath%\BlackBerry.DebugEngine.dll" 
 
 REM MSBuild Files
 echo Copy BlackBerry MSBuild directory [%OutputMsBuildTargetsPath%]
@@ -199,18 +186,10 @@ goto processPlugin_End
 
 :uninstall_Plugin
 
-REM Uninstall
 echo %actionNo%: Removing plugin binaries
-echo Deleting "%OutputVsPath%\GDBParser.dll"
-del "%OutputVsPath%\GDBParser.dll" 
-echo Deleting "%OutputPluginPath%\GDBWrapper.exe"
-del  "%OutputPluginPath%\GDBWrapper.exe" 
-echo Deleting "%OutputPluginPath%\Instructions.txt"
-del "%OutputPluginPath%\Instructions.txt" 
-echo Deleting "%OutputPluginPath%\BlackBerry.DebugEngine.dll"
-del "%OutputPluginPath%\BlackBerry.DebugEngine.dll" 
 
 REM Uninstall Package Files
+
 echo Deleting "%OutputVsPath%\extension.vsixmanifest"
 del "%OutputVsPath%\extension.vsixmanifest" 
 echo Deleting  "%OutputVsPath%\BlackBerry.NativeCore.dll"
@@ -219,6 +198,14 @@ echo Deleting  "%OutputVsPath%\BlackBerry.Package.dll"
 del "%OutputVsPath%\BlackBerry.Package.dll"
 echo Deleting  "%OutputVsPath%\BlackBerry.Package.pkgdef"
 del "%OutputVsPath%\BlackBerry.Package.pkgdef" 
+echo Deleting "%OutputVsPath%\GDBParser.dll"
+del "%OutputVsPath%\GDBParser.dll" 
+echo Deleting "%OutputVsPath%\GDBWrapper.exe"
+del  "%OutputVsPath%\GDBWrapper.exe" 
+echo Deleting "%OutputVsPath%\Instructions.txt"
+del "%OutputVsPath%\Instructions.txt" 
+echo Deleting "%OutputVsPath%\BlackBerry.DebugEngine.dll"
+del "%OutputVsPath%\BlackBerry.DebugEngine.dll" 
 
 REM Remove folders
 echo Remove Directory "%OutputPluginPath%"

@@ -173,6 +173,9 @@
     <Compile Include="..\..\src_vs2012\Package\GuidList.cs">
       <Link>GuidList.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\AttributeHelper.cs">
+      <Link>Helpers\AttributeHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\CertHelper.cs">
       <Link>Helpers\CertHelper.cs</Link>
     </Compile>
@@ -375,6 +378,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\PackageCommands.cs">
       <Link>PackageCommands.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Registration\DebugEngineRegistrationAttribute.cs">
+      <Link>Registration\DebugEngineRegistrationAttribute.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Registration\XmlEditorDesignerViewRegistrationAttribute.cs">
       <Link>Registration\XmlEditorDesignerViewRegistrationAttribute.cs</Link>

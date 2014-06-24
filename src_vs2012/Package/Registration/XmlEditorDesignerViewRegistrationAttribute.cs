@@ -13,6 +13,7 @@
 //* limitations under the License.
 
 using System;
+using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio.Shell;
 using System.IO;
 using Microsoft.VisualStudio;
@@ -33,7 +34,7 @@ namespace BlackBerry.Package.Registration
         /// Declare Private Member Variables
         private readonly string _keyName;
         private readonly string _defaultExtension;
-        private Guid _defaultLogicalView;
+        private readonly Guid _defaultLogicalView;
         private readonly int _xmlChooserPriority;
 
         /// <summary>
@@ -56,13 +57,13 @@ namespace BlackBerry.Package.Registration
             // Set Member Variables 
             _keyName = keyName;
             _defaultExtension = defaultExtension;
-            _defaultLogicalView = TryGetGuidFromObject(defaultLogicalViewEditorFactory);
+            _defaultLogicalView = AttributeHelper.GetGuidFrom(defaultLogicalViewEditorFactory);
             _xmlChooserPriority = xmlChooserPriority;
 
             CodeLogicalViewEditor = XmlEditorFactoryGuid;
             DebuggingLogicalViewEditor = XmlEditorFactoryGuid;
             DesignerLogicalViewEditor = XmlEditorFactoryGuid;
-            TextLogicalViewEditor = XmlEditorFactoryGuid;            
+            TextLogicalViewEditor = XmlEditorFactoryGuid;
         }
 
         /// <summary>
@@ -81,7 +82,7 @@ namespace BlackBerry.Package.Registration
 
             // Set editor key
             Key editorKey = context.CreateKey(Path.Combine(XmlChooserFactory, _keyName));
-            editorKey.SetValue("DefaultLogicalView", _defaultLogicalView.ToString("B").ToUpperInvariant());
+            editorKey.SetValue("DefaultLogicalView", AttributeHelper.Format(_defaultLogicalView));
             editorKey.SetValue("Extension", _defaultExtension);
             if (!string.IsNullOrWhiteSpace(Namespace))
             {
@@ -99,25 +100,25 @@ namespace BlackBerry.Package.Registration
             // Set DebuggingLogicalViewEditor Mapping
             if (DebuggingLogicalViewEditor != null)
             {
-                editorKey.SetValue(VSConstants.LOGVIEWID_Debugging.ToString("B").ToUpperInvariant(), TryGetGuidFromObject(DebuggingLogicalViewEditor).ToString("B").ToUpperInvariant());
+                editorKey.SetValue(AttributeHelper.Format(VSConstants.LOGVIEWID_Debugging), AttributeHelper.Format(DebuggingLogicalViewEditor));
             }
 
             // Set CodeLogicalViewEditor Mapping
             if (CodeLogicalViewEditor != null)
             {
-                editorKey.SetValue(VSConstants.LOGVIEWID_Code.ToString("B").ToUpperInvariant(), TryGetGuidFromObject(CodeLogicalViewEditor).ToString("B").ToUpperInvariant());
+                editorKey.SetValue(AttributeHelper.Format(VSConstants.LOGVIEWID_Code), AttributeHelper.Format(CodeLogicalViewEditor));
             }
 
             // Set DesignerLogicalViewEditor Mapping
             if (DesignerLogicalViewEditor != null)
             {
-                editorKey.SetValue(VSConstants.LOGVIEWID_Designer.ToString("B").ToUpperInvariant(), TryGetGuidFromObject(DesignerLogicalViewEditor).ToString("B").ToUpperInvariant());
+                editorKey.SetValue(AttributeHelper.Format(VSConstants.LOGVIEWID_Designer), AttributeHelper.Format(DesignerLogicalViewEditor));
             }
 
             // Set TextLogicalViewEditor Mapping
             if (TextLogicalViewEditor != null)
             {
-                editorKey.SetValue(VSConstants.LOGVIEWID_TextView.ToString("B").ToUpperInvariant(), TryGetGuidFromObject(TextLogicalViewEditor).ToString("B").ToUpperInvariant());
+                editorKey.SetValue(AttributeHelper.Format(VSConstants.LOGVIEWID_TextView), AttributeHelper.Format(TextLogicalViewEditor));
             }
             editorKey.Close();
         }
@@ -135,26 +136,6 @@ namespace BlackBerry.Package.Registration
             context.RemoveKey(Path.Combine(XmlChooserFactory, _keyName));
             context.RemoveValue(XmlChooserEditorExtensionsKeyPath, _defaultExtension);
             context.RemoveKeyIfEmpty(XmlChooserEditorExtensionsKeyPath);
-        }
-
-        /// <summary>
-        /// Private member function to return the GUID of an object.
-        /// </summary>
-        private Guid TryGetGuidFromObject(object guidObject)
-        {
-            // figure out what type of object they passed in and get the GUID from it
-            var strObject = guidObject as string;
-            if (strObject != null)
-                return new Guid(strObject);
-
-            var typeObject = guidObject as Type;
-            if (typeObject != null)
-                return typeObject.GUID;
-
-            if (guidObject is Guid)
-                return (Guid)guidObject;
-
-            throw new ArgumentException("Could not determine Guid from supplied object.", "guidObject");
         }
 
         /// <summary>
