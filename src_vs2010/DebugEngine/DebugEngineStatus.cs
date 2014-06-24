@@ -1,7 +1,14 @@
-﻿namespace BlackBerry.Package
+﻿namespace BlackBerry.DebugEngine
 {
-    public static class ControlDebugEngine
+    public static class DebugEngineStatus
     {
-        public static bool isDebugEngineRunning = false;
+        /// <summary>
+        /// Gets or sets an indication, if the DebugEngine is running.
+        /// </summary>
+        public static bool IsRunning
+        {
+            get;
+            set;
+        }
     }
 }

@@ -15,8 +15,7 @@
 using System;
 using System.Runtime.InteropServices;
 using BlackBerry.NativeCore;
-using BlackBerry.Package;
-using BlackBerry.Package.Helpers;
+using BlackBerry.NativeCore.Helpers;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
@@ -226,7 +225,7 @@ namespace BlackBerry.DebugEngine
                 // by LaunchSuspended and ResumeProcess methods when debugging an open project.
                 if (m_engineCallback == null) 
                 {
-                    ControlDebugEngine.isDebugEngineRunning = true;
+                    DebugEngineStatus.IsRunning = true;
                     m_engineCallback = new EngineCallback(this, ad7Callback);
 
                     AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
@@ -281,7 +280,7 @@ namespace BlackBerry.DebugEngine
                     else
                     {
                         GDBParser.exitGDB();
-                        ControlDebugEngine.isDebugEngineRunning = false;
+                        DebugEngineStatus.IsRunning = false;
                         return VSConstants.E_FAIL;
                     }
                 }
@@ -334,7 +333,7 @@ namespace BlackBerry.DebugEngine
 
                     m_running.Set();
 
-                    if (ControlDebugEngine.isDebugEngineRunning)
+                    if (DebugEngineStatus.IsRunning)
                         HandleProcessExecution.m_mre.Reset();
                 }
             }
@@ -568,7 +567,7 @@ namespace BlackBerry.DebugEngine
 
             try
             {
-                ControlDebugEngine.isDebugEngineRunning = true;
+                DebugEngineStatus.IsRunning = true;
                 m_engineCallback = new EngineCallback(this, ad7Callback);
 
                 // Read arguments back from the args string
@@ -604,7 +603,7 @@ namespace BlackBerry.DebugEngine
                 else
                 {
                     GDBParser.exitGDB();
-                    ControlDebugEngine.isDebugEngineRunning = false;
+                    DebugEngineStatus.IsRunning = false;
                     return VSConstants.E_FAIL;
                 }
             }

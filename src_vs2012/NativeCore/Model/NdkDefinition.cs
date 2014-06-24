@@ -66,7 +66,7 @@ namespace BlackBerry.NativeCore.Model
             }
             catch
             {
-                // no pluging info found at all...
+                // no plugin info found at all...
                 return null;
             }
             if (settings == null)

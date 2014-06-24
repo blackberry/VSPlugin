@@ -16,34 +16,29 @@ using System;
 using System.Text;
 using System.Collections.Specialized;
 
-namespace BlackBerry.Package.Helpers
+namespace BlackBerry.NativeCore.Helpers
 {
     /// <summary>
-    /// 
+    /// Helper class in managing key-value collection.
     /// </summary>
     public static class NameValueCollectionHelper
     {
-        
         /// <summary>
-        /// 
+        /// Dumps given collection into a single string.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
         public static string DumpToString(NameValueCollection value)
         {
             var xSB = new StringBuilder();
             foreach (string xKey in value.Keys)
             {
-                xSB.AppendFormat("{0}={1};", xKey, (string)value[xKey]);
+                xSB.AppendFormat("{0}={1};", xKey, value[xKey]);
             }
             return xSB.ToString();
         }
 
         /// <summary>
-        /// 
+        /// Updates the collection with a value parsed out from a given string.
         /// </summary>
-        /// <param name="target"></param>
-        /// <param name="value"></param>
         public static void LoadFromString(NameValueCollection target, string value)
         {
             if (target.Count > 0)

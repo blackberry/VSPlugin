@@ -184,9 +184,6 @@
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Helpers\NameValueCollectionHelper.cs">
-      <Link>Helpers\NameValueCollectionHelper.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
       <Link>Model\bar-descriptor.cs</Link>
     </Compile>
@@ -399,7 +396,6 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
     </Compile>
-    <Compile Include="ControlDebugEngine.cs" />
     <Compile Include="Import\Model\ImportModel.cs" />
     <Compile Include="Import\Import.xaml.cs">
       <DependentUpon>Import.xaml</DependentUpon>
@@ -608,6 +604,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DebugEngine\BlackBerry.DebugEngine.csproj">
+      <Project>{59A7B188-E307-4495-A3AF-4ED76B086A87}</Project>
+      <Name>BlackBerry.DebugEngine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
       <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
       <Name>GDBParser</Name>

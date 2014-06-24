@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using BlackBerry.Package;
 using Microsoft.VisualStudio.Debugger.Interop;
 using VSNDK.Parser;
 using System.Threading;
@@ -117,7 +116,7 @@ namespace BlackBerry.DebugEngine
             GDBParser.exitGDB();
 
             // Notify the AddIn that this debug session has ended.
-            ControlDebugEngine.isDebugEngineRunning = false;
+            DebugEngineStatus.IsRunning = false;
         }
 
 
@@ -290,7 +289,7 @@ namespace BlackBerry.DebugEngine
             GDB_address = "";
             GDB_line = 0;
 
-            if (ControlDebugEngine.isDebugEngineRunning)
+            if (DebugEngineStatus.IsRunning)
             {
                 prepareToModifyBreakpoint();
 
@@ -303,7 +302,7 @@ namespace BlackBerry.DebugEngine
                     response = GDBParser.parseCommand(command2, 6);
                 }
 
-                if (((response.Length < 2) && (ControlDebugEngine.isDebugEngineRunning == false)) || (response == "Function not found!"))
+                if (((response.Length < 2) && (DebugEngineStatus.IsRunning == false)) || (response == "Function not found!"))
                 {
                     resumeFromInterrupt();
                     return false;

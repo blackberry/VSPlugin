@@ -151,9 +151,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src_vs2010\Package\ControlDebugEngine.cs">
-      <Link>ControlDebugEngine.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
@@ -188,7 +185,6 @@
     <Compile Include="Helpers\CommandHelper.cs" />
     <Compile Include="Helpers\DialogHelper.cs" />
     <Compile Include="Helpers\MessageBoxHelper.cs" />
-    <Compile Include="Helpers\NameValueCollectionHelper.cs" />
     <Compile Include="Model\bar-descriptor.cs" />
     <Compile Include="Model\Integration\ComboBoxItem.cs" />
     <Compile Include="Model\Integration\DynamicMenuCommand.cs" />
@@ -555,6 +551,10 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DebugEngine\BlackBerry.DebugEngine.csproj">
+      <Project>{59a7b188-e307-4495-a3af-4ed76b086a87}</Project>
+      <Name>BlackBerry.DebugEngine</Name>
+    </ProjectReference>
     <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
       <Project>{cc7b28e0-cb31-44f7-a380-e7072f670f38}</Project>
       <Name>GDBParser</Name>

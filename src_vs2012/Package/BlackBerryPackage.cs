@@ -17,8 +17,10 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Components;
@@ -885,7 +887,7 @@ namespace BlackBerry.Package
 
             Debug.WriteLine("Before Start Debug");
 
-            if (ControlDebugEngine.isDebugEngineRunning || !bbPlatform)
+            if (DebugEngineStatus.IsRunning || !bbPlatform)
             {
                 // Disable the override of F5 (this allows the debugged process to continue execution)
                 cancelDefault = false;

@@ -66,6 +66,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Helpers\GlobalHelper.cs">
       <Link>Helpers\GlobalHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\NameValueCollectionHelper.cs">
+      <Link>Helpers\NameValueCollectionHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiInfo.cs">
       <Link>Model\ApiInfo.cs</Link>
     </Compile>
