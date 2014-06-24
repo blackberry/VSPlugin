@@ -74,7 +74,12 @@ namespace BlackBerry.Package
         DebugEngineClassGUID = "{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}", DebugEngineClassName = "BlackBerry.DebugEngine.AD7Engine",
         ProgramProviderClassGUID = "{AD06FD46-C790-4D5C-A274-8815DF9511B8}", ProgramProviderClassName = "BlackBerry.DebugEngine.AD7ProgramProvider",
         PortSupplierClassGUID = "{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}", PortSupplierClassName = "BlackBerry.DebugEngine.AD7PortSupplier",
-        AssemblyName = "BlackBerry.DebugEngine.dll")]
+#if DEBUG
+        AssemblyName = @"S:\vs-plugin\src_vs2012\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll"
+#else
+        AssemblyName = "BlackBerry.DebugEngine.dll"
+#endif
+)]
 
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.

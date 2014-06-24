@@ -195,7 +195,16 @@ namespace BlackBerry.Package.Registration
                 if (!string.IsNullOrEmpty(AssemblyName))
                 {
                     key.SetValue("InprocServer32", DefaultInprocServerPath);
-                    key.SetValue("CodeBase", "$PackageFolder$\\" + AssemblyName);
+
+                    // check if full-path specified or relative to the package location:
+                    if ((AssemblyName.Length > 2 && AssemblyName[1] == ':') || AssemblyName.StartsWith("file://", StringComparison.InvariantCultureIgnoreCase))
+                    {
+                        key.SetValue("CodeBase", AssemblyName);
+                    }
+                    else
+                    {
+                        key.SetValue("CodeBase", "$PackageFolder$\\" + AssemblyName);
+                    }
                 }
                 key.Close();
             }

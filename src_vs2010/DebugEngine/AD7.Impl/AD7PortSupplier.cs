@@ -68,7 +68,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public AD7PortSupplier()
         {
-            m_name = "BlackBerry";
+            m_name = "BlackBerry Native Debugger";
             m_description = "The BlackBerry transport lets you select a process that is running in a BlackBerry Device/Simulator";
         }
 
