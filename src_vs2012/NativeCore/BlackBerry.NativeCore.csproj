@@ -48,6 +48,7 @@
     <Compile Include="Components\UpdateManager.cs" />
     <Compile Include="Components\UpdateManagerCompletedEventArgs.cs" />
     <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="Debugger\Instruction.cs" />
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />
     <Compile Include="Diagnostics\TraceLog.cs" />
@@ -95,6 +96,11 @@
     <Compile Include="Tools\ToolRunner.cs" />
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\src_vs2010\GDBParser\Instructions.txt">
+      <Link>Resources\Instructions.txt</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
