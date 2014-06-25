@@ -30,65 +30,47 @@ namespace BlackBerry.DebugEngine
     /// inserted).
     /// Call debug engine methods to notify the SDM of an event (e.g. if a breakpoint is hit, call EngineCallback.OnBreakpoint()).
     /// </summary>
-    public class EventDispatcher
+    public sealed class EventDispatcher
     {
-        /// <summary>
-        /// The private AD7Engine object that represents the DE.
-        /// </summary>
-        private AD7Engine m_engine;
-        
-        /// <summary>
-        /// The public AD7Engine object that represents the DE.
-        /// </summary>
-        public AD7Engine engine
-        {
-            get { return m_engine; }
-        }
-        
-        /// <summary>
-        /// Thread responsible for handling asynchronous output from GDB.
-        /// </summary>
-        private Thread m_processingThread;
-
         /// <summary>
         /// Represents the object that process asynchronous GDB's output by classifying it by type (e.g. breakpoint event).
         /// </summary>
-        GDBOutput m_gdbOutput;
+        private readonly GDBOutput _gdbOutput;
 
         /// <summary>
         /// Boolean variable that indicates if the current code is known or unknown, i.e., if there is a source code file associated.
         /// </summary>
-        public static bool m_unknownCode = false;
+        public static bool _unknownCode;
 
         /// <summary>
         /// Object used to control the access to the critical section that exists in the "lockedBreakpoint" method.
         /// </summary>
-        private Object m_lockBreakpoint = new Object();
+        private readonly Object _lockBreakpoint = new Object();
 
         /// <summary>
         /// Object used to control the access to the critical section that exists in the "unlockBreakpoint" method.
         /// </summary>
-        private Object m_unlockBreakpoint = new Object();
+        private readonly Object _unlockBreakpoint = new Object();
 
         /// <summary>
         /// Object used to control the access to the critical section that exists in the "enterCriticalRegion" method.
         /// </summary>
-        private Object m_criticalRegion = new Object(); 
+        private readonly Object _criticalRegion = new Object(); 
 
         /// <summary>
         /// Object used to control the access to the critical section that exists in the "leaveCriticalRegion" method.
         /// </summary>
-        private Object m_leaveCriticalRegion = new Object();
+        private readonly Object _leaveCriticalRegion = new Object();
         
         /// <summary>
         /// Boolean variable that indicates the GDB state: TRUE -> run mode; FALSE -> break mode.
         /// </summary>
-        public static bool m_GDBRunMode = true;
+        public static bool _GDBRunMode = true;
 
         /// <summary>
         /// Variable that is manipulated only in methods enterCriticalRegion and leaveCriticalRegion        
         /// </summary>
-        public bool inCriticalRegion = false; 
+        public bool _inCriticalRegion;
 
         /// <summary>
         /// There is a GDB bug that causes a message "Quit (expect signal SIGINT when the program is resumed)". If this message occurs
@@ -96,21 +78,33 @@ namespace BlackBerry.DebugEngine
         /// that is received in a sequence.
         /// </summary>
         public int countSIGINT = 0;
-        
+
+        #region Properties
+
+        /// <summary>
+        /// The public AD7Engine object that represents the DE.
+        /// </summary>
+        public AD7Engine Engine
+        {
+            get;
+            private set;
+        }
+
+        #endregion
 
         /// <summary>
         /// Ends the debug session by closing GDB, sending the appropriate events to the SDM, and breaking out of all 
         /// buffer- and event-listening loops.
         /// </summary>
         /// <param name="exitCode">The exit code. </param>
-        public void endDebugSession(uint exitCode)
+        public void EndDebugSession(uint exitCode)
         {
             // Exit the event dispatch loop.
-            m_gdbOutput._running = false;
+            _gdbOutput.IsRunning = false;
 
             // Send events to the SDM.
-            AD7ThreadDestroyEvent.Send(engine, exitCode, null);
-            AD7ProgramDestroyEvent.Send(engine, exitCode);
+            AD7ThreadDestroyEvent.Send(Engine, exitCode, null);
+            AD7ProgramDestroyEvent.Send(Engine, exitCode);
 
             // Exit GDB.
             GDBParser.exitGDB();
@@ -126,44 +120,40 @@ namespace BlackBerry.DebugEngine
         /// <param name="engine"> The AD7Engine object that represents the DE. </param>
         public EventDispatcher(AD7Engine engine)
         {
-            m_engine = engine;
+            if (engine == null)
+                throw new ArgumentNullException("engine");
 
-            m_gdbOutput = new GDBOutput(this);
-            m_processingThread = new Thread(m_gdbOutput.processingGDBOutput);
-            m_processingThread.Start();
+            Engine = engine;
+
+            _gdbOutput = new GDBOutput(this);
+            var processingThread = new Thread(_gdbOutput.ProcessingGDBOutput);
+            processingThread.Start();
         }
-
 
         /// <summary>
         /// Process asynchronous GDB's output by classifying it by type (e.g. breakpoint event).
         /// </summary>
-        public class GDBOutput
+        public sealed class GDBOutput
         {
             /// <summary>
             /// This object manages debug events in the engine.
             /// </summary>
-            private EventDispatcher m_eventDispatcher;
+            private readonly EventDispatcher _eventDispatcher;
 
             /// <summary>
             /// This object manages breakpoints events.
             /// </summary>
-            private HandleBreakpoints m_hBreakpoints;
+            private HandleBreakpoints _hBreakpoints;
 
             /// <summary>
             /// This object manages events related to execution control (processes, threads, programs). 
             /// </summary>
-            private HandleProcessExecution m_hProcExe;
+            private HandleProcessExecution _hProcExe;
 
             /// <summary>
             /// This object manages events related to output messages.
             /// </summary>
-            private HandleOutputs m_hOutputs;
-
-            /// <summary>
-            /// Boolean variable that corresponds to the event dispatcher status. When false, exit the event dispatch loop.
-            /// </summary>
-            public bool _running = true;
-
+            private HandleOutputs _hOutputs;
 
             /// <summary>
             /// Constructor.
@@ -171,20 +161,32 @@ namespace BlackBerry.DebugEngine
             /// <param name="ed"> This object manages debug events in the engine. </param>
             public GDBOutput(EventDispatcher ed)
             {
-                m_eventDispatcher = ed;                
-                _running = true;
+                _eventDispatcher = ed;
+                IsRunning = true;
             }
 
+            #region Properties
+
+            /// <summary>
+            /// Corresponds to the event-dispatcher status. When false, exit the event dispatch loop.
+            /// </summary>
+            public bool IsRunning
+            {
+                get;
+                set;
+            }
+
+            #endregion
 
             /// <summary>
             /// Thread responsible for handling asynchronous GDB output.
             /// </summary>
-            public void processingGDBOutput()
+            public void ProcessingGDBOutput()
             {
-                while (_running)
+                while (IsRunning)
                 {
                     string response = "";
-                    while ((response = GDBParser.removeGDBResponse()) == ""  && _running)
+                    while ((response = GDBParser.removeGDBResponse()) == ""  && IsRunning)
                     {
                     };
 
@@ -196,9 +198,9 @@ namespace BlackBerry.DebugEngine
                     {
                         if (ev.Length > 1)  // only to avoid empty events, when there are two delimiters characters together.
                         {
-                            if (m_eventDispatcher.countSIGINT > 0)
+                            if (_eventDispatcher.countSIGINT > 0)
                                 if ((ev.Substring(0, 2) != "50") && (ev.Substring(0, 2) != "80"))
-                                    m_eventDispatcher.countSIGINT = 0; // Reset the counter, if GDB has recovered from a GDB bug.
+                                    _eventDispatcher.countSIGINT = 0; // Reset the counter, if GDB has recovered from a GDB bug.
                             switch (ev[0])
                             {
                                 case '0':  // Events related to starting GDB.
@@ -206,26 +208,26 @@ namespace BlackBerry.DebugEngine
                                 case '1':  // Not used.
                                     break;
                                 case '2':  // Events related to breakpoints (including breakpoint hits).
-                                    m_hBreakpoints = new HandleBreakpoints(m_eventDispatcher);
-                                    m_hBreakpoints.handle(ev);
+                                    _hBreakpoints = new HandleBreakpoints(_eventDispatcher);
+                                    _hBreakpoints.handle(ev);
                                     break;
                                 case '3':  // Not used.
                                     break;
                                 case '4':  // Events related to execution control (processes, threads, programs) 1.
-                                    m_hProcExe = new HandleProcessExecution(m_eventDispatcher);
-                                    m_hProcExe.handle(ev);
+                                    _hProcExe = new HandleProcessExecution(_eventDispatcher);
+                                    _hProcExe.handle(ev);
                                     break;
                                 case '5':  // Events related to execution control (processes, threads, programs and GDB Bugs) 2.
-                                    m_hProcExe = new HandleProcessExecution(m_eventDispatcher);
-                                    m_hProcExe.handle(ev);
+                                    _hProcExe = new HandleProcessExecution(_eventDispatcher);
+                                    _hProcExe.handle(ev);
                                     break;
                                 case '6':  // Events related to evaluating expressions. Not used.
                                     break;
                                 case '7':  // Events related to stack frames. Not used.
                                     break;
                                 case '8':  // Events related to output.
-                                    m_hOutputs = new HandleOutputs(m_eventDispatcher);
-                                    m_hOutputs.handle(ev);
+                                    _hOutputs = new HandleOutputs(_eventDispatcher);
+                                    _hOutputs.handle(ev);
                                     break;
                                 case '9':  // Not used.
                                     break;
@@ -242,21 +244,21 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Interrupt the debugged process if necessary before changing a breakpoint.
         /// </summary>
-        public void prepareToModifyBreakpoint()
+        public void PrepareToModifyBreakpoint()
         {
-            if (m_engine.m_state != AD7Engine.DE_STATE.DESIGN_MODE 
-             && m_engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
+            if (Engine.m_state != AD7Engine.DE_STATE.DESIGN_MODE 
+             && Engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
             {
                 HandleProcessExecution.m_needsResumeAfterInterrupt = true;
-                m_engine.CauseBreak();
-            }            
+                Engine.CauseBreak();
+            }
         }
 
 
         /// <summary>
         /// If the process was running when the breakpoint was changed, resume the process.
         /// </summary>
-        public void resumeFromInterrupt()
+        public void ResumeFromInterrupt()
         {
             if (HandleProcessExecution.m_needsResumeAfterInterrupt)
             {
@@ -278,7 +280,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="GDB_filename"> Returns the breakpoint File Name. </param>
         /// <param name="GDB_address"> Returns the Breakpoint Address. </param>
         /// <returns> If successful, returns true; otherwise, returns false. </returns>
-        private bool setBreakpointImpl(string command, string command2, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
+        private bool SetBreakpointImpl(string command, string command2, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
         {
             string response;
             string bpointAddress;
@@ -291,7 +293,7 @@ namespace BlackBerry.DebugEngine
 
             if (DebugEngineStatus.IsRunning)
             {
-                prepareToModifyBreakpoint();
+                PrepareToModifyBreakpoint();
 
                 // Gets the parsed response for the GDB/MI command that inserts breakpoint in a given line or a given function.
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
@@ -304,7 +306,7 @@ namespace BlackBerry.DebugEngine
 
                 if (((response.Length < 2) && (DebugEngineStatus.IsRunning == false)) || (response == "Function not found!"))
                 {
-                    resumeFromInterrupt();
+                    ResumeFromInterrupt();
                     return false;
                 }
 
@@ -320,7 +322,7 @@ namespace BlackBerry.DebugEngine
 
                     // Gets the parsed response for the GDB command that print information about the specified breakpoint, in this 
                     // case, only its address. (http://sourceware.org/gdb/onlinedocs/gdb/Set-Breaks.html)
-                    bpointAddress = GDBParser.parseCommand("info b " + GDB_ID.ToString(), 18);
+                    bpointAddress = GDBParser.parseCommand("info b " + GDB_ID, 18);
 
                     // Gets the parsed response for the GDB command that inquire what source line covers a particular address.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/Machine-Code.html)
@@ -334,7 +336,7 @@ namespace BlackBerry.DebugEngine
                     GDB_line = (uint)hBreakpoints.linePos;
                 }
 
-                resumeFromInterrupt();
+                ResumeFromInterrupt();
 
                 return true;
             }
@@ -353,14 +355,14 @@ namespace BlackBerry.DebugEngine
         /// <param name="GDB_filename"> Returns the breakpoint File Name. </param>
         /// <param name="GDB_address"> Returns the Breakpoint Address. </param>
         /// <returns> If successful, returns true; otherwise, returns false. </returns>
-        public bool setBreakpoint(string filename, uint line, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
+        public bool SetBreakpoint(string filename, uint line, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
         {
             string cmd = @"-break-insert --thread-group i1 -f " + filename + ":" + line;
             int i = filename.LastIndexOf('\\');
             if ((i != -1) && (i + 1 < filename.Length))
                 filename = filename.Substring(i + 1);
             string cmd2 = @"-break-insert --thread-group i1 -f " + filename + ":" + line;
-            return setBreakpointImpl(cmd, cmd2, out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
+            return SetBreakpointImpl(cmd, cmd2, out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
         }
 
         /// <summary>
@@ -372,10 +374,10 @@ namespace BlackBerry.DebugEngine
         /// <param name="GDB_filename"> Returns the breakpoint File Name. </param>
         /// <param name="GDB_address"> Returns the Breakpoint Address. </param>
         /// <returns> If successful, returns true; otherwise, returns false. </returns>
-        public bool setBreakpoint(string func, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
+        public bool SetBreakpoint(string func, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
         {
             string cmd = @"-break-insert " + func;
-            return setBreakpointImpl(cmd, "", out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
+            return SetBreakpointImpl(cmd, "", out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
         }
 
         /// <summary>
@@ -428,23 +430,23 @@ namespace BlackBerry.DebugEngine
             uint GDB_ID = bbp.GDB_ID;
 
             // Deleting GDB breakpoint.
-            deleteBreakpoint(GDB_ID);
+            DeleteBreakpoint(GDB_ID);
 
             // Creating a new GDB breakpoint.
             bool ret = false;
             if (bbp.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
             {
-                ret = setBreakpoint(bbp.m_filename, bbp.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = SetBreakpoint(bbp.m_filename, bbp.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
             }
             else if (bbp.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
-                ret = setBreakpoint(bbp.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = SetBreakpoint(bbp.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
             }
 
             if (ret)
             {
                 bbp.GDB_ID = GDB_ID;
-                bbp.m_hitCount = 0;
+                bbp._hitCount = 0;
                 bbp.SetPassCount(bbp.m_bpPassCount);
                 if (resetCondition)
                     bbp.SetCondition(bbp.m_bpCondition);
@@ -453,10 +455,6 @@ namespace BlackBerry.DebugEngine
             }
             return false;
         }
-
-
-
-
 
         /// <summary>
         /// Set breakpoint condition in GDB.
@@ -491,18 +489,18 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="GDB_ID"> Breakpoint ID in GDB. </param>
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
-        public bool deleteBreakpoint(uint GDB_ID)
+        public bool DeleteBreakpoint(uint GDB_ID)
         {
-            if (m_gdbOutput._running)
+            if (_gdbOutput.IsRunning)
             {
-                prepareToModifyBreakpoint();
+                PrepareToModifyBreakpoint();
 
                 // Gets the parsed response for the GDB/MI command that deletes the breakpoint "GDB_ID".
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
                 string response = GDBParser.parseCommand(@"-break-delete " + GDB_ID, 7);
                 if (response == null || response == "")
                 {
-                    resumeFromInterrupt();
+                    ResumeFromInterrupt();
                     return false;
                 }
             
@@ -510,7 +508,7 @@ namespace BlackBerry.DebugEngine
                 hBreakpoints.handle(response);
                 uint retID = (uint)hBreakpoints.number;
 
-                resumeFromInterrupt();
+                ResumeFromInterrupt();
 
                 if (GDB_ID != retID)
                 {
@@ -530,7 +528,7 @@ namespace BlackBerry.DebugEngine
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
         public bool enableBreakpoint(uint GDB_ID, bool fEnable)
         {
-            prepareToModifyBreakpoint();
+            PrepareToModifyBreakpoint();
 
             string inputCommand;
             string sEnable = "enable";
@@ -549,7 +547,7 @@ namespace BlackBerry.DebugEngine
             hBreakpoints.handle(response);
             uint retID = (uint)hBreakpoints.number;
 
-            resumeFromInterrupt();
+            ResumeFromInterrupt();
             if (GDB_ID != retID)
             {
                 return false;
@@ -566,10 +564,10 @@ namespace BlackBerry.DebugEngine
         /// <param name="hitCount"> Hit count. </param>
         public void updateHitCount(uint ID, uint hitCount)
         {
-            var bbp = m_engine.BPMgr.getBoundBreakpointForGDBID(ID);
+            var bbp = Engine.BPMgr.GetBoundBreakpointForGDBID(ID);
             if (bbp != null)
             {
-                if (!bbp.m_breakWhenCondChanged)
+                if (!bbp._breakWhenCondChanged)
                     ((IDebugBoundBreakpoint2)bbp).SetHitCount(hitCount);
             }
         }
@@ -588,30 +586,30 @@ namespace BlackBerry.DebugEngine
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
         public bool lockedBreakpoint(AD7BoundBreakpoint bbp, bool hit, bool cond)
         {
-            lock (m_lockBreakpoint)
+            lock (_lockBreakpoint)
             {
                 if (hit && cond)
                 {
-                    if ((!bbp.m_blockedPassCount) && (!bbp.m_blockedConditional))
+                    if ((!bbp._blockedPassCount) && (!bbp._blockedConditional))
                     {
-                        bbp.m_blockedPassCount = true;
-                        bbp.m_blockedConditional = true;
+                        bbp._blockedPassCount = true;
+                        bbp._blockedConditional = true;
                         return true;
                     }
                 }
                 else if (hit)
                 {
-                    if (!bbp.m_blockedPassCount)
+                    if (!bbp._blockedPassCount)
                     {
-                        bbp.m_blockedPassCount = true;
+                        bbp._blockedPassCount = true;
                         return true;
                     }
                 }
                 else if (cond)
                 {
-                    if (!bbp.m_blockedConditional)
+                    if (!bbp._blockedConditional)
                     {
-                        bbp.m_blockedConditional = true;
+                        bbp._blockedConditional = true;
                         return true;
                     }
                 }
@@ -632,20 +630,20 @@ namespace BlackBerry.DebugEngine
         /// when event dispatcher is handling a breakpoint hit. </param>
         public void unlockBreakpoint(AD7BoundBreakpoint bbp, bool hit, bool cond)
         {
-            lock (m_unlockBreakpoint)
+            lock (_unlockBreakpoint)
             {
                 if (hit && cond)
                 {
-                    bbp.m_blockedPassCount = false;
-                    bbp.m_blockedConditional = false;
+                    bbp._blockedPassCount = false;
+                    bbp._blockedConditional = false;
                 }
                 else if (hit)
                 {
-                    bbp.m_blockedPassCount = false;
+                    bbp._blockedPassCount = false;
                 }
                 else if (cond)
                 {
-                    bbp.m_blockedConditional = false;
+                    bbp._blockedConditional = false;
                 }
             }
         }
@@ -659,11 +657,11 @@ namespace BlackBerry.DebugEngine
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
         public bool enterCriticalRegion()
         {
-            lock (m_criticalRegion)
+            lock (_criticalRegion)
             {
-                if (!inCriticalRegion)
+                if (!_inCriticalRegion)
                 {
-                    inCriticalRegion = true;
+                    _inCriticalRegion = true;
                     return true;
                 }
                 return false;
@@ -678,9 +676,9 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void leaveCriticalRegion()
         {
-            lock (m_leaveCriticalRegion)
+            lock (_leaveCriticalRegion)
             {
-                inCriticalRegion = false;
+                _inCriticalRegion = false;
             }
         }
        
@@ -695,7 +693,7 @@ namespace BlackBerry.DebugEngine
             var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
 
             // Search the active bound BPs and find ones that match the ID.
-            var bbp = m_engine.BPMgr.getBoundBreakpointForGDBID(ID);
+            var bbp = Engine.BPMgr.GetBoundBreakpointForGDBID(ID);
 
             if (bbp != null)
                 xBoundBreakpoints.Add(bbp);
@@ -718,63 +716,63 @@ namespace BlackBerry.DebugEngine
 
                     bool breakExecution = true;
 
-                    if (bbp.m_breakWhenCondChanged)
+                    if (bbp._breakWhenCondChanged)
                     {
                         string result = "";
                         bool valid = VariableInfo.evaluateExpression(bbp.m_bpCondition.bstrCondition, ref result, null);
-                        if ((valid) && (bbp.m_previousCondEvaluation != result)) // check if condition evaluation has changed
+                        if ((valid) && (bbp._previousCondEvaluation != result)) // check if condition evaluation has changed
                         {
-                            if ((bbp.m_bpPassCount.stylePassCount == enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL) && (bbp.m_hitCount != bbp.m_bpPassCount.dwPassCount))
+                            if ((bbp.m_bpPassCount.stylePassCount == enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL) && (bbp._hitCount != bbp.m_bpPassCount.dwPassCount))
                             {
                                 breakExecution = false;
                             }
-                            else if ((bbp.m_bpPassCount.stylePassCount == enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL_OR_GREATER) && (bbp.m_hitCount < bbp.m_bpPassCount.dwPassCount))
+                            else if ((bbp.m_bpPassCount.stylePassCount == enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL_OR_GREATER) && (bbp._hitCount < bbp.m_bpPassCount.dwPassCount))
                             {
                                 breakExecution = false;
                             }
-                            else if ((bbp.m_bpPassCount.stylePassCount == enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_MOD) && ((bbp.m_hitCount % bbp.m_bpPassCount.dwPassCount) != 0))
+                            else if ((bbp.m_bpPassCount.stylePassCount == enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_MOD) && ((bbp._hitCount % bbp.m_bpPassCount.dwPassCount) != 0))
                             {
                                 breakExecution = false;
                             }
-                            bbp.m_previousCondEvaluation = result;
+                            bbp._previousCondEvaluation = result;
                         }
                         else
                             breakExecution = false;
                     }
                     if (!breakExecution) // must continue the execution
                     {
-                        bool hitBreakAll = m_engine.m_running.WaitOne(0);
+                        bool hitBreakAll = Engine.m_running.WaitOne(0);
                         if (hitBreakAll)
                         {
-                            m_engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
+                            Engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
 
                             // Sends the GDB command that resumes the execution of the inferior program. 
                             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
                             GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
-                            EventDispatcher.m_GDBRunMode = true;
-                            m_engine.m_running.Set();
+                            EventDispatcher._GDBRunMode = true;
+                            Engine.m_running.Set();
                         }
                     }
                     else
                     {
-                        if (bbp.m_breakWhenCondChanged)
-                            bbp.m_hitCount += 1;
+                        if (bbp._breakWhenCondChanged)
+                            bbp._hitCount += 1;
 
                         // Transition DE state
-                        EventDispatcher.m_GDBRunMode = false;
-                        m_engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
+                        EventDispatcher._GDBRunMode = false;
+                        Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
 
                         // Found a bound breakpoint
-                        m_engine.Callback.OnBreakpoint(m_engine.SelectThread(threadID), xBoundBreakpoints.AsReadOnly());
+                        Engine.Callback.OnBreakpoint(Engine.SelectThread(threadID), xBoundBreakpoints.AsReadOnly());
 
-                        if (bbp.m_isHitCountEqual)
+                        if (bbp._isHitCountEqual)
                         {
                             // Have to ignore the biggest number of times to keep the breakpoint enabled and to avoid stopping on it.
                             ignoreHitCount(ID, int.MaxValue); 
                         }
-                        else if (bbp.m_hitCountMultiple != 0)
+                        else if (bbp._hitCountMultiple != 0)
                         {
-                            ignoreHitCount(ID, (int)(bbp.m_hitCountMultiple - (bbp.m_hitCount % bbp.m_hitCountMultiple)));
+                            ignoreHitCount(ID, (int)(bbp._hitCountMultiple - (bbp._hitCount % bbp._hitCountMultiple)));
                         }
                     }
                     leaveCriticalRegion();
@@ -787,16 +785,16 @@ namespace BlackBerry.DebugEngine
                         Thread.Sleep(0);
                     }
 
-                    bool hitBreakAll = m_engine.m_running.WaitOne(0);
+                    bool hitBreakAll = Engine.m_running.WaitOne(0);
                     if (hitBreakAll)
                     {
-                        m_engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
+                        Engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
 
                         // Sends the GDB command that resumes the execution of the inferior program. 
                         // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
                         GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
-                        EventDispatcher.m_GDBRunMode = true;
-                        m_engine.m_running.Set();
+                        EventDispatcher._GDBRunMode = true;
+                        Engine.m_running.Set();
                     }
 
                     leaveCriticalRegion();
@@ -822,7 +820,7 @@ namespace BlackBerry.DebugEngine
             endPosition[0].dwColumn = 0;
 
             uint address = 0;
-            AD7MemoryAddress codeContext = new AD7MemoryAddress(m_engine, address);
+            AD7MemoryAddress codeContext = new AD7MemoryAddress(Engine, address);
 
             return new AD7DocumentContext(filename, startPosition[0], endPosition[0], codeContext);
         }
@@ -948,16 +946,16 @@ namespace BlackBerry.DebugEngine
         public void continueExecution()
         {
             //** Transition DE state
-            bool hitBreakAll = m_engine.m_running.WaitOne(0);
+            bool hitBreakAll = Engine.m_running.WaitOne(0);
             if (hitBreakAll)
             {
-                m_engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
+                Engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
 
                 // Sends the GDB command that resumes the execution of the inferior program. 
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
                 GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
-                EventDispatcher.m_GDBRunMode = true;
-                m_engine.m_running.Set();
+                EventDispatcher._GDBRunMode = true;
+                Engine.m_running.Set();
             }
         }
     }
@@ -1094,7 +1092,7 @@ namespace BlackBerry.DebugEngine
                     if (m_addr == "<PENDING>")
                     {
                         m_func = "??";
-                        EventDispatcher.m_unknownCode = true;
+                        EventDispatcher._unknownCode = true;
                         m_filename = "";
                         m_line = 0;
                         m_hits = 0;
@@ -1140,11 +1138,11 @@ namespace BlackBerry.DebugEngine
                     // Need to set the flag for unknown code if necessary.
                     if (m_func == "??")
                     {
-                        EventDispatcher.m_unknownCode = true;
+                        EventDispatcher._unknownCode = true;
                     }
                     else
                     {
-                        EventDispatcher.m_unknownCode = false;
+                        EventDispatcher._unknownCode = false;
                     }
 
                     ini = end + 1;
@@ -1204,11 +1202,11 @@ namespace BlackBerry.DebugEngine
                 case '7':  
                 // Breakpoint hit. 
                 // Example: 27,1,C:/Users/xxxxxx/vsplugin-ndk/samples/Square/Square/main.c,319;1\r\n
-                    bool updatingCondBreak = this.m_eventDispatcher.engine.m_updatingConditionalBreakpoint.WaitOne(0);
+                    bool updatingCondBreak = m_eventDispatcher.Engine.m_updatingConditionalBreakpoint.WaitOne(0);
                     if (updatingCondBreak)
                     {
 
-                        m_eventDispatcher.engine.resetStackFrames();
+                        m_eventDispatcher.Engine.resetStackFrames();
 
                         ini = 3;
                         end = ev.IndexOf(';', 3);
@@ -1225,28 +1223,28 @@ namespace BlackBerry.DebugEngine
                         ini = end + 1;
                         m_threadID = ev.Substring(ini, (ev.Length - ini));
 
-                        this.m_eventDispatcher.engine.cleanEvaluatedThreads();
+                        m_eventDispatcher.Engine.cleanEvaluatedThreads();
 
                         // Call the method/event that will stop SDM because a breakpoint was hit here.
-                        if (m_eventDispatcher.engine._updateThreads)
+                        if (m_eventDispatcher.Engine._updateThreads)
                         {
-                            m_eventDispatcher.engine.UpdateListOfThreads();
+                            m_eventDispatcher.Engine.UpdateListOfThreads();
                         }
-                        m_eventDispatcher.engine.SelectThread(m_threadID).setCurrentLocation(m_filename, (uint)m_line);
-                        m_eventDispatcher.engine.SetAsCurrentThread(m_threadID);
+                        m_eventDispatcher.Engine.SelectThread(m_threadID).setCurrentLocation(m_filename, (uint)m_line);
+                        m_eventDispatcher.Engine.SetAsCurrentThread(m_threadID);
 
                         // A breakpoint can be hit during a step
-                        if (m_eventDispatcher.engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
+                        if (m_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
                         {
                             HandleProcessExecution.onStepCompleted(m_eventDispatcher, m_filename, (uint)m_line);
                         }
                         else
                         {
                             // Visual Studio shows the line position one more than it actually is
-                            m_eventDispatcher.engine.m_docContext = m_eventDispatcher.getDocumentContext(m_filename, (uint)(m_line - 1));
+                            m_eventDispatcher.Engine.m_docContext = m_eventDispatcher.getDocumentContext(m_filename, (uint)(m_line - 1));
                             m_eventDispatcher.breakpointHit((uint)m_number, m_threadID);
                         }
-                        this.m_eventDispatcher.engine.m_updatingConditionalBreakpoint.Set();
+                        m_eventDispatcher.Engine.m_updatingConditionalBreakpoint.Set();
                     }
                     break;
                 case '8':  
@@ -1368,7 +1366,7 @@ namespace BlackBerry.DebugEngine
                     {
                         case '0':  
                         // Thread created. Example: 40,2,20537438
-                            EventDispatcher.m_GDBRunMode = true;
+                            EventDispatcher._GDBRunMode = true;
                             ini = 3;
                             end = ev.IndexOf(";", 3);
                             m_threadId = Convert.ToInt32(ev.Substring(ini, (end - ini)));
@@ -1383,18 +1381,18 @@ namespace BlackBerry.DebugEngine
                                 m_processId = 0;
                             }
 
-                            m_eventDispatcher.engine._updateThreads = true;
+                            m_eventDispatcher.Engine._updateThreads = true;
 
                             break;
                         case '1':  
                         // Process running. Example: 41,1     (when threadId is 0 means "all threads": example: 41,0)
-                            EventDispatcher.m_GDBRunMode = true;
+                            EventDispatcher._GDBRunMode = true;
                             m_threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
 
                             break;
                         case '2':  
                         // Program exited normally. Example: 42
-                            m_eventDispatcher.endDebugSession(0);
+                            m_eventDispatcher.EndDebugSession(0);
 
                             break;
                         case '3':  
@@ -1402,7 +1400,7 @@ namespace BlackBerry.DebugEngine
                             // TODO: not tested yet
                             end = ev.IndexOf(";", 3);
                             uint exitCode = Convert.ToUInt32(ev.Substring(3, (end - 3)));
-                            m_eventDispatcher.endDebugSession(exitCode);
+                            m_eventDispatcher.EndDebugSession(exitCode);
 
                             break;
                         case '4':  
@@ -1411,8 +1409,8 @@ namespace BlackBerry.DebugEngine
                             // 44,ADDR,FUNC,THREAD-ID         
                             // 44,ADDR,FUNC,FILENAME,LINE,THREAD-ID
 
-                            m_eventDispatcher.engine.resetStackFrames();
-                            EventDispatcher.m_GDBRunMode = false;
+                            m_eventDispatcher.Engine.resetStackFrames();
+                            EventDispatcher._GDBRunMode = false;
                             numCommas = 0;
                             foreach (char c in ev)
                             {
@@ -1430,11 +1428,11 @@ namespace BlackBerry.DebugEngine
 
                             if (m_func == "??")
                             {
-                                EventDispatcher.m_unknownCode = true;
+                                EventDispatcher._unknownCode = true;
                             }
                             else
                             {
-                                EventDispatcher.m_unknownCode = false;
+                                EventDispatcher._unknownCode = false;
                             }
 
                             switch (numCommas)
@@ -1443,7 +1441,7 @@ namespace BlackBerry.DebugEngine
                                     // Thread ID
                                     ini = end + 1;
                                     m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    EventDispatcher.m_unknownCode = true;
+                                    EventDispatcher._unknownCode = true;
                                     break;
                                 case 4:
                                     // Filename and line number
@@ -1471,17 +1469,17 @@ namespace BlackBerry.DebugEngine
                                     break;
                             }
 
-                            this.m_eventDispatcher.engine.cleanEvaluatedThreads();
+                            this.m_eventDispatcher.Engine.cleanEvaluatedThreads();
 
 
-                            if (m_eventDispatcher.engine._updateThreads)
+                            if (m_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.engine.UpdateListOfThreads();
+                                m_eventDispatcher.Engine.UpdateListOfThreads();
                             }
                             if (m_threadId > 0)
                             {
-                                m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
+                                m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
                             }
                             
                             // Call the method/event that will let SDM know that the debugged program was interrupted.
@@ -1494,8 +1492,8 @@ namespace BlackBerry.DebugEngine
 
                         case '5':  
                         // End-stepping-range.
-                            m_eventDispatcher.engine.resetStackFrames();
-                            EventDispatcher.m_GDBRunMode = false;
+                            m_eventDispatcher.Engine.resetStackFrames();
+                            EventDispatcher._GDBRunMode = false;
                             ini = 3;
                             end = ev.IndexOf(';', 3);
                             if (end == -1)
@@ -1515,7 +1513,7 @@ namespace BlackBerry.DebugEngine
                                 m_file = "";
                                 m_line = 1;
                                 m_threadId = Convert.ToInt32(temp);
-                                EventDispatcher.m_unknownCode = true;
+                                EventDispatcher._unknownCode = true;
                             }
                             else
                             {
@@ -1524,21 +1522,21 @@ namespace BlackBerry.DebugEngine
 
                                 ini = end + 1;
                                 m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                EventDispatcher.m_unknownCode = false;
+                                EventDispatcher._unknownCode = false;
                             }
 
-                            this.m_eventDispatcher.engine.cleanEvaluatedThreads();
+                            this.m_eventDispatcher.Engine.cleanEvaluatedThreads();
 
 
-                            if (m_eventDispatcher.engine._updateThreads)
+                            if (m_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.engine.UpdateListOfThreads();
+                                m_eventDispatcher.Engine.UpdateListOfThreads();
                             }
                             if (m_threadId > 0)
                             {
-                                if ((EventDispatcher.m_unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
+                                if ((EventDispatcher._unknownCode == false) && (m_file != ""))
+                                    m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
                             }
 
                             HandleProcessExecution.onStepCompleted(m_eventDispatcher, m_file, (uint)m_line);
@@ -1546,8 +1544,8 @@ namespace BlackBerry.DebugEngine
                             break;
                         case '6':  
                         // Function-finished.
-                            m_eventDispatcher.engine.resetStackFrames();
-                            EventDispatcher.m_GDBRunMode = false;
+                            m_eventDispatcher.Engine.resetStackFrames();
+                            EventDispatcher._GDBRunMode = false;
                             ini = 3;
                             end = ev.IndexOf(';', 3);
                             if (end == -1)
@@ -1556,7 +1554,7 @@ namespace BlackBerry.DebugEngine
                                 m_file = "";
                                 m_line = 1;
                                 m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                EventDispatcher.m_unknownCode = true;
+                                EventDispatcher._unknownCode = true;
                             }
                             else
                             {
@@ -1567,20 +1565,20 @@ namespace BlackBerry.DebugEngine
 
                                 ini = end + 1;
                                 m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                EventDispatcher.m_unknownCode = false;
+                                EventDispatcher._unknownCode = false;
                             }
 
-                            this.m_eventDispatcher.engine.cleanEvaluatedThreads();
+                            m_eventDispatcher.Engine.cleanEvaluatedThreads();
 
-                            if (m_eventDispatcher.engine._updateThreads)
+                            if (m_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.engine.UpdateListOfThreads();
+                                m_eventDispatcher.Engine.UpdateListOfThreads();
                             }
                             if (m_threadId > 0)
                             {
-                                if ((EventDispatcher.m_unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
+                                if ((EventDispatcher._unknownCode == false) && (m_file != ""))
+                                    m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
                             }
 
                             HandleProcessExecution.onStepCompleted(m_eventDispatcher, m_file, (uint)m_line);
@@ -1588,25 +1586,25 @@ namespace BlackBerry.DebugEngine
                             break;
                         case '7':  
                         // -exec-interrupt or signal-meaning="Killed". There's nothing to do in this case.
-                            m_eventDispatcher.engine.resetStackFrames();
-                            EventDispatcher.m_GDBRunMode = false;
+                            m_eventDispatcher.Engine.resetStackFrames();
+                            EventDispatcher._GDBRunMode = false;
 
-                            this.m_eventDispatcher.engine.cleanEvaluatedThreads();
+                            m_eventDispatcher.Engine.cleanEvaluatedThreads();
 
                             m_threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
 
-                            if (m_eventDispatcher.engine._updateThreads)
+                            if (m_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.engine.UpdateListOfThreads();
+                                m_eventDispatcher.Engine.UpdateListOfThreads();
                             }
                             if (m_threadId > 0)
                             {
-                                if ((EventDispatcher.m_unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
+                                if ((EventDispatcher._unknownCode == false) && (m_file != ""))
+                                    m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
                             }
 
-                            if (m_eventDispatcher.engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
+                            if (m_eventDispatcher.Engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
                             {
                                 onInterrupt(m_threadId);
                             }
@@ -1616,16 +1614,16 @@ namespace BlackBerry.DebugEngine
                             break;
                         case '8':  
                         // SIGKILL
-                            m_eventDispatcher.endDebugSession(0);
+                            m_eventDispatcher.EndDebugSession(0);
                             break;
                         case '9':  
                         // ERROR, ex: 49,Cannot find bounds of current function
-                            m_eventDispatcher.engine.resetStackFrames();
-                            this.m_eventDispatcher.engine.cleanEvaluatedThreads();
+                            m_eventDispatcher.Engine.resetStackFrames();
+                            m_eventDispatcher.Engine.cleanEvaluatedThreads();
 
-                            if (m_eventDispatcher.engine._updateThreads)
+                            if (m_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.engine.UpdateListOfThreads();
+                                m_eventDispatcher.Engine.UpdateListOfThreads();
                             }
 
                             if (ev.Length >= 3)
@@ -1634,8 +1632,8 @@ namespace BlackBerry.DebugEngine
                                 if (m_error == "Cannot find bounds of current function")
                                 {
                                     // We don't have symbols for this function so further stepping won't be possible. Return from this function.
-                                    EventDispatcher.m_unknownCode = true;
-                                    m_eventDispatcher.engine.Step(m_eventDispatcher.engine.CurrentThread(), enum_STEPKIND.STEP_OUT, enum_STEPUNIT.STEP_LINE);
+                                    EventDispatcher._unknownCode = true;
+                                    m_eventDispatcher.Engine.Step(m_eventDispatcher.Engine.CurrentThread(), enum_STEPKIND.STEP_OUT, enum_STEPUNIT.STEP_LINE);
                                 }
                             }
                             break;
@@ -1651,7 +1649,7 @@ namespace BlackBerry.DebugEngine
                             m_eventDispatcher.countSIGINT += 1;
                             if (m_eventDispatcher.countSIGINT > 5)
                             {
-                                m_eventDispatcher.endDebugSession(0);
+                                m_eventDispatcher.EndDebugSession(0);
                                 MessageBox.Show("Lost communication with GDB. Please refer to documentation for more details.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                             break;
@@ -1660,19 +1658,19 @@ namespace BlackBerry.DebugEngine
                             ini = 3;
                             m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
 
-                            m_eventDispatcher.engine._updateThreads = true;
+                            m_eventDispatcher.Engine._updateThreads = true;
 
                             break;
                         case '2':  
                         // GDB Bugs, like "... 2374: internal-error: frame_cleanup_after_sniffer ...". Example: 52
-                            m_eventDispatcher.endDebugSession(0);
+                            m_eventDispatcher.EndDebugSession(0);
                             MessageBox.Show("This is a known issue that can happen when interrupting GDB's execution by hitting the \"break all\" or toggling a breakpoint in run mode. \n\n GDB CRASHED. Details: \"../../gdb/frame.c:2374: internal-error: frame_cleanup_after_sniffer: Assertion `frame->prologue_cache == NULL' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             break;
                         case '3':  
                         // Lost communication with device/simulator: ^error,msg="Remote communication error: No error."
                             MessageBox.Show("Lost communication with the device/simulator.", "Communication lost", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            m_eventDispatcher.endDebugSession(0);
+                            m_eventDispatcher.EndDebugSession(0);
 
                             break;
                         case '4':  
@@ -1681,8 +1679,8 @@ namespace BlackBerry.DebugEngine
                             // 54,ADDR,FUNC,THREAD-ID         
                             // 54,ADDR,FUNC,FILENAME,LINE,THREAD-ID
 
-                            m_eventDispatcher.engine.resetStackFrames();
-                            EventDispatcher.m_GDBRunMode = false;
+                            m_eventDispatcher.Engine.resetStackFrames();
+                            EventDispatcher._GDBRunMode = false;
                             numCommas = 0;
                             foreach (char c in ev)
                             {
@@ -1700,11 +1698,11 @@ namespace BlackBerry.DebugEngine
 
                             if (m_func == "??")
                             {
-                                EventDispatcher.m_unknownCode = true;
+                                EventDispatcher._unknownCode = true;
                             }
                             else
                             {
-                                EventDispatcher.m_unknownCode = false;
+                                EventDispatcher._unknownCode = false;
                             }
 
                             switch (numCommas)
@@ -1713,7 +1711,7 @@ namespace BlackBerry.DebugEngine
                                     // Thread ID
                                     ini = end + 1;
                                     m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    EventDispatcher.m_unknownCode = true;
+                                    EventDispatcher._unknownCode = true;
                                     break;
                                 case 5:
                                     //  Filename, line number and thread ID
@@ -1734,16 +1732,16 @@ namespace BlackBerry.DebugEngine
 
                             MessageBox.Show("Segmentation Fault: If you continue debugging could take the environment to an unstable state.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                            this.m_eventDispatcher.engine.cleanEvaluatedThreads();
+                            m_eventDispatcher.Engine.cleanEvaluatedThreads();
 
-                            if (m_eventDispatcher.engine._updateThreads)
+                            if (m_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.engine.UpdateListOfThreads();
+                                m_eventDispatcher.Engine.UpdateListOfThreads();
                             }
                             if (m_threadId > 0)
                             {
-                                m_eventDispatcher.engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.engine.SetAsCurrentThread(m_threadId.ToString());
+                                m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
+                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
                             }
 
                             onInterrupt(m_threadId);
@@ -1773,19 +1771,19 @@ namespace BlackBerry.DebugEngine
                             if (m_signalMeaning == "Segmentation fault")
                             {
                                 MessageBox.Show("Segmentation Fault: Closing debugger.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                m_eventDispatcher.endDebugSession(0);
+                                m_eventDispatcher.EndDebugSession(0);
                             }
 
                             if (m_signalMeaning == "Aborted")
                             {
                                 MessageBox.Show("Program aborted: Closing debugger.", "Program Aborted", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                m_eventDispatcher.endDebugSession(0);
+                                m_eventDispatcher.EndDebugSession(0);
                             }
 
                             break;
                         case '6':  
                         // GDB Bugs, like "... 3550: internal-error: handle_inferior_event ...". Example: 56
-                            m_eventDispatcher.endDebugSession(0);
+                            m_eventDispatcher.EndDebugSession(0);
                             MessageBox.Show("This is a known issue that can happen while debugging multithreaded programs. \n\n GDB CRASHED. Details: \"../../gdb/infrun.c:3550: internal-error: handle_inferior_event: Assertion ptid_equal (singlestep_ptid, ecs->ptid)' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             break;
@@ -1813,13 +1811,13 @@ namespace BlackBerry.DebugEngine
         /// <param name="line"> Line number. </param>
         public static void onStepCompleted(EventDispatcher eventDispatcher, string file, uint line)
         {
-            if (eventDispatcher.engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
+            if (eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
             {
-                eventDispatcher.engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
+                eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
 
                 // Visual Studio shows the line position one more than it actually is
-                eventDispatcher.engine.m_docContext = eventDispatcher.getDocumentContext(file, line - 1);
-                AD7StepCompletedEvent.Send(eventDispatcher.engine);
+                eventDispatcher.Engine.m_docContext = eventDispatcher.getDocumentContext(file, line - 1);
+                AD7StepCompletedEvent.Send(eventDispatcher.Engine);
             }
         }
 
@@ -1830,19 +1828,19 @@ namespace BlackBerry.DebugEngine
         /// <param name="threadID"> Thread ID. </param>
         private void onInterrupt(int threadID)
         {
-            Debug.Assert(m_eventDispatcher.engine.m_state == AD7Engine.DE_STATE.RUN_MODE);
-            m_eventDispatcher.engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
+            Debug.Assert(m_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.RUN_MODE);
+            m_eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
 
             if (m_file != "" && m_line > 0)
             {
                 // Visual Studio shows the line position one more than it actually is
-                m_eventDispatcher.engine.m_docContext = m_eventDispatcher.getDocumentContext(m_file, (uint)(m_line - 1));
+                m_eventDispatcher.Engine.m_docContext = m_eventDispatcher.getDocumentContext(m_file, (uint)(m_line - 1));
             }
 
             // Only send OnAsyncBreakComplete if break-all was requested by the user
             if (!m_needsResumeAfterInterrupt)
             {
-                m_eventDispatcher.engine.Callback.OnAsyncBreakComplete(m_eventDispatcher.engine.SelectThread(threadID.ToString()));
+                m_eventDispatcher.Engine.Callback.OnAsyncBreakComplete(m_eventDispatcher.Engine.SelectThread(threadID.ToString()));
             }
         }
     }

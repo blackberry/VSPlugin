@@ -23,19 +23,17 @@ namespace BlackBerry.DebugEngine
     /// </summary>
     public static class EngineUtils
     {
-
         /// <summary>
         /// 
         /// </summary>
         /// <param name="hr"> An integer value. </param>
         public static void RequireOk(int hr)
         {
-            if (hr != 0)
+            if (hr != VSConstants.S_OK)
             {
                 throw new InvalidOperationException();
             }
         }
-
 
         /// <summary>
         /// 

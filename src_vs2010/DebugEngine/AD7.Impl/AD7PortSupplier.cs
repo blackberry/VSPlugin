@@ -151,7 +151,7 @@ namespace BlackBerry.DebugEngine
             }
 
             ppPort = null;
-            return VSConstants.E_INVALIDARG;
+            return VSConstants.S_FALSE;
         }
 
         private AD7Port FindPort(string text)
@@ -230,7 +230,7 @@ namespace BlackBerry.DebugEngine
             {
                 MessageBox.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ppEnum = null;
-                return VSConstants.S_OK;
+                return VSConstants.S_FALSE;
             }
 
             var defaultPorts = CreateDefaultPorts();
@@ -238,13 +238,13 @@ namespace BlackBerry.DebugEngine
             {
                 MessageBox.Show("You must select an API Level to be able to attach to a running process.\n\nPlease, use \"BlackBerry -> Options -> API Level\" to download or select one.", "Missing NDK", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ppEnum = null;
-                return VSConstants.S_OK;
+                return VSConstants.S_FALSE;
             }
             if (defaultPorts.Length == 0)
             {
                 MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ppEnum = null;
-                return VSConstants.S_OK;
+                return VSConstants.S_FALSE;
             }
 
             _ports.Clear();

@@ -193,7 +193,6 @@ namespace BlackBerry.DebugEngine
             return result.ToArray();
         }
 
-
         #region Implementation of IDebugPort2
 
         /// <summary>

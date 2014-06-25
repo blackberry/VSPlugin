@@ -22,20 +22,6 @@ using System.Collections;
 
 namespace BlackBerry.DebugEngine
 {
-
-    /// <summary>
-    /// Thread's category, from http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/807e26cc-4f3f-4e90-a9a8-b550d484b8c1
-    /// </summary>
-    enum enum_THREADCATEGORY
-    {
-        THREADCATEGORY_Worker = 0,
-        THREADCATEGORY_UI = (THREADCATEGORY_Worker + 1),
-        THREADCATEGORY_Main = (THREADCATEGORY_UI + 1),
-        THREADCATEGORY_RPC = (THREADCATEGORY_Main + 1),
-        THREADCATEGORY_Unknown = (THREADCATEGORY_RPC + 1)
-    };
-
-
     /// <summary>
     /// This class represents a thread running in a program and it implements:
     /// 
@@ -45,6 +31,21 @@ namespace BlackBerry.DebugEngine
     /// </summary>
     public class AD7Thread : IDebugThread2, IDebugThread100
     {
+        #region Internal Types
+        /// <summary>
+        /// Thread's category, from http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/807e26cc-4f3f-4e90-a9a8-b550d484b8c1
+        /// </summary>
+        enum enum_THREADCATEGORY
+        {
+            THREADCATEGORY_Worker = 0,
+            THREADCATEGORY_UI = (THREADCATEGORY_Worker + 1),
+            THREADCATEGORY_Main = (THREADCATEGORY_UI + 1),
+            THREADCATEGORY_RPC = (THREADCATEGORY_Main + 1),
+            THREADCATEGORY_Unknown = (THREADCATEGORY_RPC + 1)
+        }
+
+        #endregion
+
         /// <summary>
         /// The AD7Engine object that represents the DE.
         /// </summary>
@@ -74,12 +75,12 @@ namespace BlackBerry.DebugEngine
         /// Contains flags that specifies the information that were already verified about this thread's stack frame object. 
         /// Used to avoid reevaluating stack frames that were already evaluated.
         /// </summary>
-        public int _alreadyEvaluated = 0;
+        public int _alreadyEvaluated;
 
         /// <summary>
         /// Contains the stack frames for this thread
         /// </summary>
-        public ArrayList __stackFrames = null;
+        public ArrayList __stackFrames;
 
         /// <summary>
         /// A FRAMEINFO structure that is filled in with the description of the previous stack frame that works as a cache, to avoid

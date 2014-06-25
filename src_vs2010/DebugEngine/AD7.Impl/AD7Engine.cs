@@ -319,7 +319,7 @@ namespace BlackBerry.DebugEngine
             // If not already broken, send the interrupt
             if (m_state != DE_STATE.DESIGN_MODE && m_state != DE_STATE.BREAK_MODE && m_state != DE_STATE.STEP_MODE)
             {
-                if (EventDispatcher.m_GDBRunMode)
+                if (EventDispatcher._GDBRunMode)
                 {
                     HandleProcessExecution.m_mre.Reset();
                     m_running.WaitOne();
@@ -667,7 +667,7 @@ namespace BlackBerry.DebugEngine
             if (eDispatcher != null)
             {
                 eDispatcher.killProcess();
-                eDispatcher.endDebugSession(0);
+                eDispatcher.EndDebugSession(0);
             }
 
             return VSConstants.S_OK;
@@ -726,7 +726,7 @@ namespace BlackBerry.DebugEngine
                 m_breakpointManager.ClearBoundBreakpoints(); // TODO: Check if active bound BP list needs to be updated too?
             
             if (eDispatcher != null)
-                eDispatcher.endDebugSession(0);
+                eDispatcher.EndDebugSession(0);
             
             return VSConstants.S_OK;            
         }
@@ -985,7 +985,7 @@ namespace BlackBerry.DebugEngine
         public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step)
         {
             // Don't allow stepping through unknown code because it can lead to future problems with stepping and break-all.
-            if (EventDispatcher.m_unknownCode)
+            if (EventDispatcher._unknownCode)
             {
                 m_state = AD7Engine.DE_STATE.STEP_MODE;
                 m_eventDispatcher.continueExecution();                
