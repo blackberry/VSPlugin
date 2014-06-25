@@ -86,6 +86,7 @@
     <Compile Include="Tools\DebugTokenCreateRunner.cs" />
     <Compile Include="Tools\DebugTokenInfoRunner.cs" />
     <Compile Include="Tools\DebugTokenUploadRunner.cs" />
+    <Compile Include="Tools\DeviceConnectRunner.cs" />
     <Compile Include="Tools\DeviceInfoRunner.cs" />
     <Compile Include="Tools\EventDispatcher.cs" />
     <Compile Include="Tools\IEventDispatcher.cs" />

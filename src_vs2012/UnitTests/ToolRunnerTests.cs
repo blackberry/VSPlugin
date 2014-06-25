@@ -200,5 +200,21 @@ namespace UnitTests
             runner.Wait();
             Assert.IsTrue(result);
         }
+
+        [Test]
+        public void EstablishConnection()
+        {
+            var runner = new DeviceConnectRunner(ConfigDefaults.TestToolsDirectory, IP, Password, ConfigDefaults.SshPublicKeyPath);
+            runner.ExecuteAsync();
+
+            // monitor for max 30sec, if it successfully connected or failed:
+            for (int i = 0; i < 10000 && !runner.IsConnected; i++)
+            {
+                Thread.Sleep(3);
+                Assert.IsFalse(runner.IsConnectionFailed, "Failed to connect to the device");
+            }
+
+            Assert.IsTrue(runner.IsConnected, "Unable to connect to the device");
+        }
     }
 }

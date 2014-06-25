@@ -167,6 +167,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\DebugTokenUploadRunner.cs">
       <Link>Tools\DebugTokenUploadRunner.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\DeviceConnectRunner.cs">
+      <Link>Tools\DeviceConnectRunner.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\DeviceInfoRunner.cs">
       <Link>Tools\DeviceInfoRunner.cs</Link>
     </Compile>
