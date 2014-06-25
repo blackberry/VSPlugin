@@ -71,10 +71,10 @@ namespace BlackBerry.Package
     [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", BarDescriptorEditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
     // Registration of custom debugger
-    [DebugEngineRegistration("BlackBerry NDK DebugEngine", "{E5A37609-2F43-4830-AA85-D94CFA035DD2}",
+    [DebugEngineRegistration(AD7PortSupplier.PublicName, AD7Engine.DebugEngineGuid,
         Attach = true, AddressBreakpoints = false, CallstackBreakpoints = true, AlwaysLoadLocal = true, AutoSelectPriority = 4,
-        DebugEngineClassGUID = "{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}", DebugEngineClassName = "BlackBerry.DebugEngine.AD7Engine",
-        ProgramProviderClassGUID = "{AD06FD46-C790-4D5C-A274-8815DF9511B8}", ProgramProviderClassName = "BlackBerry.DebugEngine.AD7ProgramProvider",
+        DebugEngineClassGUID = AD7Engine.ClassGuid, DebugEngineClassName = AD7Engine.ClassName,
+        ProgramProviderClassGUID = AD7ProgramProvider.ClassGuid, ProgramProviderClassName = AD7ProgramProvider.ClassName,
         PortSupplierClassGUID = AD7PortSupplier.ClassGuid, PortSupplierClassName = AD7PortSupplier.ClassName,
 #if DEBUG
         AssemblyName = @"S:\vs-plugin\src_vs2012\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll"
@@ -590,7 +590,7 @@ namespace BlackBerry.Package
 
             info.bstrRemoteMachine = null; // debug locally
             info.fSendStdoutToOutputWindow = 0; // Let stdout stay with the application.
-            info.clsidCustom = new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}"); // Set the launching engine as the BlackBerry debug-engine
+            info.clsidCustom = new Guid(AD7Engine.DebugEngineGuid); // Set the launching engine as the BlackBerry debug-engine
             info.grfLaunch = 0;
 
             IntPtr pInfo = Marshal.AllocCoTaskMem((int)info.cbSize);

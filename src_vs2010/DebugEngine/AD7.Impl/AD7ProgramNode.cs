@@ -64,7 +64,7 @@ namespace BlackBerry.DebugEngine
             m_programID = "";
             m_exePath = "";
             m_programName = "";
-            m_engineGuid = new Guid(AD7Engine.Id);
+            m_engineGuid = new Guid(AD7Engine.DebugEngineGuid);
         }
 
 

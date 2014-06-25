@@ -171,7 +171,7 @@ namespace BlackBerry.DebugEngine
         {
             if (m_listOfPrograms.Count == 0)
             {
-                AD7ProgramNodeAttach pn = new AD7ProgramNodeAttach(this, new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}"));
+                AD7ProgramNodeAttach pn = new AD7ProgramNodeAttach(this, new Guid(AD7Engine.DebugEngineGuid));
                 m_listOfPrograms.Add((IDebugProgram2)pn);
             }
             IDebugProgram2[] p = new IDebugProgram2[m_listOfPrograms.Count()];
@@ -389,7 +389,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int AddImplicitProgramNodes(ref Guid guidLaunchingEngine, Guid[] rgguidSpecificEngines, uint celtSpecificEngines)
         {
-            guidLaunchingEngine = new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}");
+            guidLaunchingEngine = new Guid(AD7Engine.DebugEngineGuid);
             return VSConstants.S_OK;
         }
 

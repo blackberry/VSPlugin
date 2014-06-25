@@ -63,16 +63,16 @@ namespace BlackBerry.DebugEngine
 
             EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
 
-            if ((thread == null) && (_engine != null) && (_engine.thread != null) && (program != null) && (eventObject != null) && (riidEvent != null) && (attributes != 0))
+            if ((thread == null) && (_engine != null) && (_engine.Threads != null) && (program != null) && (eventObject != null) && (riidEvent != null) && (attributes != 0))
             {
                 if (_engine._currentThreadIndex != -1)
                 {
-                    EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, _engine.thread[_engine._currentThreadIndex], eventObject, ref riidEvent, attributes));
+                    EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, _engine.Threads[_engine._currentThreadIndex], eventObject, ref riidEvent, attributes));
                 }
                 else
                 {
-                    if (_engine.thread != null)
-                        EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, _engine.thread[0], eventObject, ref riidEvent, attributes));
+                    if (_engine.Threads != null)
+                        EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, _engine.Threads[0], eventObject, ref riidEvent, attributes));
                     else
                         EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, null, eventObject, ref riidEvent, attributes));
                 }

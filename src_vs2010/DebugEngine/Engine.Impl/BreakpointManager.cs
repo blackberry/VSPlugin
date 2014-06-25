@@ -108,11 +108,11 @@ namespace BlackBerry.DebugEngine
 
             if (aBBP.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
             {
-                ret = _engine.eDispatcher.SetBreakpoint(aBBP.m_filename, aBBP.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = _engine.EventDispatcher.SetBreakpoint(aBBP.m_filename, aBBP.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
             }
             else if (aBBP.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
-                ret = _engine.eDispatcher.SetBreakpoint(aBBP.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = _engine.EventDispatcher.SetBreakpoint(aBBP.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
             }
 
             if (ret)
@@ -133,7 +133,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="breakpoint"> The Bound breakpoint to enable. </param>
         public void RemoteEnable(AD7BoundBreakpoint breakpoint)
         {            
-            _engine.eDispatcher.enableBreakpoint(breakpoint.GDB_ID, true);
+            _engine.EventDispatcher.enableBreakpoint(breakpoint.GDB_ID, true);
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="breakpoint"> The Bound breakpoint to disable. </param>
         public void RemoteDisable(AD7BoundBreakpoint breakpoint)
         {            
-            _engine.eDispatcher.enableBreakpoint(breakpoint.GDB_ID, false);
+            _engine.EventDispatcher.enableBreakpoint(breakpoint.GDB_ID, false);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace BlackBerry.DebugEngine
         public void RemoteDelete(AD7BoundBreakpoint breakpoint)
         {
             _activeBPs.Remove(breakpoint);
-            _engine.eDispatcher.DeleteBreakpoint(breakpoint.GDB_ID);
+            _engine.EventDispatcher.DeleteBreakpoint(breakpoint.GDB_ID);
         }
     }
 }

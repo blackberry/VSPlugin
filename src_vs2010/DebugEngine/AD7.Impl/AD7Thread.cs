@@ -200,9 +200,9 @@ namespace BlackBerry.DebugEngine
             string func = "";
 
             if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                _engine.eDispatcher.selectThread(this._id);
+                _engine.EventDispatcher.selectThread(this._id);
 
-            string stackResponse = _engine.eDispatcher.getStackFrames().Replace("#;;;;", "");
+            string stackResponse = _engine.EventDispatcher.getStackFrames().Replace("#;;;;", "");
 
             if (stackResponse != "")
             {
@@ -228,7 +228,7 @@ namespace BlackBerry.DebugEngine
                 }
 
                 if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
+                    _engine.EventDispatcher.selectThread(this._engine.CurrentThread()._id);
             }
 
             return func;
@@ -275,9 +275,9 @@ namespace BlackBerry.DebugEngine
 
             // Ask for general stack information.
             if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                _engine.eDispatcher.selectThread(this._id);
+                _engine.EventDispatcher.selectThread(this._id);
 
-            string stackResponse = _engine.eDispatcher.getStackFrames().Replace("#;;;;", "");
+            string stackResponse = _engine.EventDispatcher.getStackFrames().Replace("#;;;;", "");
             if (stackResponse == "")
             {
                 ppEnum = null;
@@ -350,20 +350,20 @@ namespace BlackBerry.DebugEngine
                 }
 
                 if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
+                    _engine.EventDispatcher.selectThread(this._engine.CurrentThread()._id);
 
                 return Constants.S_OK;
             }
             catch (ComponentException e)
             {
                 if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
+                    _engine.EventDispatcher.selectThread(this._engine.CurrentThread()._id);
                 return e.HResult;
             }
             catch (Exception e)
             {
                 if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                    _engine.eDispatcher.selectThread(this._engine.CurrentThread()._id);
+                    _engine.EventDispatcher.selectThread(this._engine.CurrentThread()._id);
                 return EngineUtils.UnexpectedException(e);
             }
         }

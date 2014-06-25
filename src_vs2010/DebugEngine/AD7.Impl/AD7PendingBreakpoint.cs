@@ -95,7 +95,7 @@ namespace BlackBerry.DebugEngine
             // The engine only supports these types of breakpoints: 
             // - File and line number.
             // - Function name and offset.
-            if (this.m_deleted || m_engine.m_process == null)
+            if (this.m_deleted || m_engine._process == null)
             {
                 return false;
             }

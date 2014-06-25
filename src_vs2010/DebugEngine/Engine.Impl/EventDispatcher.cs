@@ -564,7 +564,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="hitCount"> Hit count. </param>
         public void updateHitCount(uint ID, uint hitCount)
         {
-            var bbp = Engine.BPMgr.GetBoundBreakpointForGDBID(ID);
+            var bbp = Engine.BreakpointManager.GetBoundBreakpointForGDBID(ID);
             if (bbp != null)
             {
                 if (!bbp._breakWhenCondChanged)
@@ -693,7 +693,7 @@ namespace BlackBerry.DebugEngine
             var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
 
             // Search the active bound BPs and find ones that match the ID.
-            var bbp = Engine.BPMgr.GetBoundBreakpointForGDBID(ID);
+            var bbp = Engine.BreakpointManager.GetBoundBreakpointForGDBID(ID);
 
             if (bbp != null)
                 xBoundBreakpoints.Add(bbp);

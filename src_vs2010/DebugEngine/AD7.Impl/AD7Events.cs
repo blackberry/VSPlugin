@@ -406,7 +406,7 @@ namespace BlackBerry.DebugEngine
             var eventObject = new AD7ThreadDestroyEvent(exitCode);
             if (thread == null)
             {
-                foreach (AD7Thread t in engine.thread)
+                foreach (AD7Thread t in engine.Threads)
                 {
                     engine.Callback.Send(eventObject, IID, t);
                 }

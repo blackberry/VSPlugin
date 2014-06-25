@@ -27,9 +27,11 @@ namespace BlackBerry.DebugEngine
     /// Partially implemented and not used at this moment.
     /// </summary>
     [ComVisible(true)]
-    [Guid("AD06FD46-C790-4D5C-A274-8815DF9511B8")]
+    [Guid(ClassGuid)]
     public class AD7ProgramProvider : IDebugProgramProvider2
     {
+        public const string ClassGuid = "AD06FD46-C790-4D5C-A274-8815DF9511B8";
+        public const string ClassName = "BlackBerry.DebugEngine.AD7ProgramProvider";
 
         /// <summary>
         /// Constructor.

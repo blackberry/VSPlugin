@@ -710,7 +710,7 @@ namespace BlackBerry.DebugEngine
         {
             m_engine = engine;
             m_thread = thread;
-            m_dispatcher = m_engine.eDispatcher;
+            m_dispatcher = m_engine.EventDispatcher;
 
             uint level = Convert.ToUInt32(frameInfo[0]);
             string address = frameInfo[1];
@@ -739,7 +739,7 @@ namespace BlackBerry.DebugEngine
             m_address = uint.Parse(address, System.Globalization.NumberStyles.AllowHexSpecifier);
 
             // Query GDB for parameters and locals.
-            string variablesResponse = m_engine.eDispatcher.getVariablesForFrame(level, m_thread._id).Replace("#;;;", "");
+            string variablesResponse = m_engine.EventDispatcher.getVariablesForFrame(level, m_thread._id).Replace("#;;;", "");
             if (variablesResponse == null || variablesResponse == "ERROR" || variablesResponse == "")
                 return;
             variablesResponse = variablesResponse.Substring(3);
@@ -768,9 +768,9 @@ namespace BlackBerry.DebugEngine
                         if (variableProperties[3] != "")
                             value = variableProperties[3];
                         if (arg)
-                            _arguments.Add(VariableInfo.create(name, type, value, m_engine.eDispatcher));
+                            _arguments.Add(VariableInfo.create(name, type, value, m_engine.EventDispatcher));
                         else
-                            _locals.Add(VariableInfo.create(name, type, value, m_engine.eDispatcher));
+                            _locals.Add(VariableInfo.create(name, type, value, m_engine.EventDispatcher));
                     }
                 }
             }
@@ -981,7 +981,7 @@ namespace BlackBerry.DebugEngine
             // The debugger would like a pointer to the IDebugModule2 that contains this stack frame.
             if ((dwFieldSpec & enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP) != 0)
             {
-                frameInfo.m_pModule = m_engine.m_module;
+                frameInfo.m_pModule = m_engine._module;
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP;
             }
 
@@ -1298,14 +1298,14 @@ namespace BlackBerry.DebugEngine
                 }
 
                 if (m_thread._id != m_engine.CurrentThread()._id)
-                    m_engine.eDispatcher.selectThread(m_thread._id);
+                    m_engine.EventDispatcher.selectThread(m_thread._id);
 
                 // Waits for the parsed response for the GDB/MI command that changes the selected frame.
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
                 GDBParser.parseCommand("-stack-select-frame " + frame, 5);
 
                 if (m_thread._id != m_engine.CurrentThread()._id)
-                    m_engine.eDispatcher.selectThread(m_engine.CurrentThread()._id);
+                    m_engine.EventDispatcher.selectThread(m_engine.CurrentThread()._id);
 
                 m_engine.cleanEvaluatedThreads();
                 
@@ -1425,7 +1425,7 @@ namespace BlackBerry.DebugEngine
             pichError = 0;
             ppExpr = null;
 
-            ppExpr = new AD7Expression(pszCode, this, m_engine.eDispatcher);
+            ppExpr = new AD7Expression(pszCode, this, m_engine.EventDispatcher);
             return VSConstants.S_OK;
         }
 

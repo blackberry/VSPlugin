@@ -178,7 +178,7 @@ namespace BlackBerry.DebugEngine
                 _enabled = true;
                 _deleted = false;
                 _hitCount = 0;
-                m_remoteID = _engine.BPMgr.RemoteAdd(this);
+                m_remoteID = _engine.BreakpointManager.RemoteAdd(this);
             }
             else if (bpReqInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
@@ -194,7 +194,7 @@ namespace BlackBerry.DebugEngine
                 _hitCount = 0;
                 m_bpLocationType = (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET;
                 _pendingBreakpoint = pendingBreakpoint;
-                m_remoteID = _engine.BPMgr.RemoteAdd(this);
+                m_remoteID = _engine.BreakpointManager.RemoteAdd(this);
             }
 
 //            if ((m_remoteID == 0) && (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false))
@@ -234,18 +234,18 @@ namespace BlackBerry.DebugEngine
         {
             bool isRunning = false;
             int result = VSConstants.S_FALSE;
-            while (!_engine.eDispatcher.lockedBreakpoint(this, true, false))
+            while (!_engine.EventDispatcher.lockedBreakpoint(this, true, false))
             {
                 Thread.Sleep(0);
             }
-            while (!_engine.eDispatcher.enterCriticalRegion())
+            while (!_engine.EventDispatcher.enterCriticalRegion())
             {
                 Thread.Sleep(0);
             }
             if ((_engine.m_state == AD7Engine.DE_STATE.RUN_MODE) && (EventDispatcher._GDBRunMode == true))
             {
                 isRunning = true;
-                _engine.eDispatcher.PrepareToModifyBreakpoint();
+                _engine.EventDispatcher.PrepareToModifyBreakpoint();
             }
             m_bpPassCount = bpPassCount;
             if (bpPassCount.stylePassCount == enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL_OR_GREATER)
@@ -256,12 +256,12 @@ namespace BlackBerry.DebugEngine
                 {
                     if ((int)((bpPassCount.dwPassCount - _hitCount)) >= 0)
                     {
-                        if (_engine.eDispatcher.ignoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
+                        if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
                             result = VSConstants.S_OK;
                     }
                     else
                     {
-                        if (_engine.eDispatcher.ignoreHitCount(GDB_ID, 1))
+                        if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, 1))
                             result = VSConstants.S_OK;
                     }
 
@@ -275,7 +275,7 @@ namespace BlackBerry.DebugEngine
                 _isHitCountEqual = true;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.eDispatcher.ignoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
+                    if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
                         result = VSConstants.S_OK;
                 }
                 else
@@ -287,7 +287,7 @@ namespace BlackBerry.DebugEngine
                 _hitCountMultiple = bpPassCount.dwPassCount;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.eDispatcher.ignoreHitCount(GDB_ID, (int)(_hitCountMultiple - (_hitCount % _hitCountMultiple))))
+                    if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, (int)(_hitCountMultiple - (_hitCount % _hitCountMultiple))))
                         result = VSConstants.S_OK;
                 }
                 else
@@ -299,7 +299,7 @@ namespace BlackBerry.DebugEngine
                 _hitCountMultiple = 0;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.eDispatcher.ignoreHitCount(GDB_ID, 1)) // ignoreHitCount decrement by 1 automatically, so sending 1 means to stop ignoring (or ignore 0)
+                    if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, 1)) // ignoreHitCount decrement by 1 automatically, so sending 1 means to stop ignoring (or ignore 0)
                         result = VSConstants.S_OK;
                 }
                 else
@@ -309,11 +309,11 @@ namespace BlackBerry.DebugEngine
             if (isRunning)
             {
                 isRunning = false;
-                _engine.eDispatcher.ResumeFromInterrupt();
+                _engine.EventDispatcher.ResumeFromInterrupt();
             }
 
-            _engine.eDispatcher.leaveCriticalRegion();
-            _engine.eDispatcher.unlockBreakpoint(this, true, false);
+            _engine.EventDispatcher.leaveCriticalRegion();
+            _engine.EventDispatcher.unlockBreakpoint(this, true, false);
             return result;
         }
 
@@ -329,17 +329,17 @@ namespace BlackBerry.DebugEngine
             bool isRunning = false;
             bool verifyCondition = false;
             int result = VSConstants.S_FALSE;
-            while (!_engine.eDispatcher.lockedBreakpoint(this, false, true))
+            while (!_engine.EventDispatcher.lockedBreakpoint(this, false, true))
             {
                 Thread.Sleep(0);
             }
 
             if (_hitCount != 0)
             {
-                _engine.eDispatcher.resetHitCount(this, false);
+                _engine.EventDispatcher.resetHitCount(this, false);
             }
 
-            while (!_engine.eDispatcher.enterCriticalRegion())
+            while (!_engine.EventDispatcher.enterCriticalRegion())
             {
                 Thread.Sleep(0);
             }
@@ -347,7 +347,7 @@ namespace BlackBerry.DebugEngine
             if ((_engine.m_state == AD7Engine.DE_STATE.RUN_MODE) && (EventDispatcher._GDBRunMode == true))
             {
                 isRunning = true;
-                _engine.eDispatcher.PrepareToModifyBreakpoint();
+                _engine.EventDispatcher.PrepareToModifyBreakpoint();
                 _engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
             }
 
@@ -364,15 +364,15 @@ namespace BlackBerry.DebugEngine
                     _breakWhenCondChanged = false;
 
                 _previousCondEvaluation = "";
-                if (_engine.eDispatcher.setBreakpointCondition(GDB_ID, bpCondition.bstrCondition))
+                if (_engine.EventDispatcher.setBreakpointCondition(GDB_ID, bpCondition.bstrCondition))
                     result = VSConstants.S_OK;
             }
             else if (bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED)
             {
                 _breakWhenCondChanged = true;
                 _previousCondEvaluation = bpCondition.bstrCondition; // just to initialize this variable
-                _engine.eDispatcher.ignoreHitCount(GDB_ID, 1); // have to break always to evaluate this option because GDB doesn't support it.
-                _engine.eDispatcher.setBreakpointCondition(GDB_ID, "");
+                _engine.EventDispatcher.ignoreHitCount(GDB_ID, 1); // have to break always to evaluate this option because GDB doesn't support it.
+                _engine.EventDispatcher.setBreakpointCondition(GDB_ID, "");
 
                 result = VSConstants.S_OK;
             }
@@ -387,12 +387,12 @@ namespace BlackBerry.DebugEngine
                     _breakWhenCondChanged = false;
 
                 _previousCondEvaluation = "";
-                if (_engine.eDispatcher.setBreakpointCondition(GDB_ID, ""))
+                if (_engine.EventDispatcher.setBreakpointCondition(GDB_ID, ""))
                     result = VSConstants.S_OK;
             }
 
-            _engine.eDispatcher.leaveCriticalRegion();
-            _engine.eDispatcher.unlockBreakpoint(this, false, true);
+            _engine.EventDispatcher.leaveCriticalRegion();
+            _engine.EventDispatcher.unlockBreakpoint(this, false, true);
 
             if (verifyCondition)
             {
@@ -404,7 +404,7 @@ namespace BlackBerry.DebugEngine
             {
                 isRunning = false;
                 _engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
-                _engine.eDispatcher.ResumeFromInterrupt();
+                _engine.EventDispatcher.ResumeFromInterrupt();
             }
 
             this._engine.m_updatingConditionalBreakpoint.Set();
@@ -426,7 +426,7 @@ namespace BlackBerry.DebugEngine
                 _enabled = false;
                 _deleted = true;
                 _pendingBreakpoint.OnBoundBreakpointDeleted(this);                
-                _engine.BPMgr.RemoteDelete(this);
+                _engine.BreakpointManager.RemoteDelete(this);
                 m_remoteID = -1;
             }
             return VSConstants.S_OK;
@@ -446,11 +446,11 @@ namespace BlackBerry.DebugEngine
             {
                 if (xEnabled)
                 {
-                    _engine.BPMgr.RemoteEnable(this);
+                    _engine.BreakpointManager.RemoteEnable(this);
                 }
                 else
                 {
-                    _engine.BPMgr.RemoteDisable(this);
+                    _engine.BreakpointManager.RemoteDisable(this);
                 }
                 _enabled = xEnabled;
             }
@@ -556,7 +556,7 @@ namespace BlackBerry.DebugEngine
                 if ((dwHitCount == 0) && (_hitCount != 0))
                 {
                     _hitCount = dwHitCount;
-                    _engine.eDispatcher.resetHitCount(this, true);
+                    _engine.EventDispatcher.resetHitCount(this, true);
                 }
                 else
                     _hitCount = dwHitCount;
