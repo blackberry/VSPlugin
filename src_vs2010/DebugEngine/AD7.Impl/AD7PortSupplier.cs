@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
@@ -42,63 +43,60 @@ namespace BlackBerry.DebugEngine
         public const string ClassGuid = "BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6";
         public const string ClassName = "BlackBerry.DebugEngine.AD7PortSupplier";
 
-        private const string DevicePortGuid = "{69519DBB-5329-4CCE-88A9-EC1628AD99C2}";
-        private const string SimulatorPortGuid = "{25040BDD-6683-4D5C-8EFA-EB4DDF5CA08E}";
-
         /// <summary>
-        /// The NDK host path.
+        /// The NDK reference.
         /// </summary>
-        private string _toolsPath = "";
+        private NdkDefinition _ndk;
 
         /// <summary>
         /// List of ports for this port supplier.
         /// </summary>
         private readonly Dictionary<Guid, AD7Port> _ports = new Dictionary<Guid, AD7Port>();
 
-        private int VerifyAndAddPorts()
+        private IDebugPort2[] CreateDefaultPorts()
         {
-            // Returning because VS can debug only one app at a time.
-            if (GDBParser.s_running)
-                return 0;
-
             var ndk = NdkDefinition.Load();
-            var device = DeviceDefinition.Load(DeviceDefinitionType.Device);
-            var simulator = DeviceDefinition.Load(DeviceDefinitionType.Simulator);
+            var devices = DeviceDefinition.LoadAll();
 
             if (ndk == null || string.IsNullOrEmpty(ndk.ToolsPath))
-                return -1;
-            _toolsPath = ndk.ToolsPath;
+                return null;
+            _ndk = ndk;
 
-            if (device != null)
+            var result = new List<IDebugPort2>();
+
+            if (devices != null)
             {
-                IDebugPort2 p;
-                AddPort(new AD7PortRequest("Device: " + device.IP, device), out p);
+                foreach (var device in devices)
+                {
+                    result.Add(CreatePort(this, new AD7PortRequest(GetPortRequestName(device), device), _ndk));
+                }
             }
 
-            if (simulator != null)
-            {
-                IDebugPort2 p;
-                AddPort(new AD7PortRequest("Simulator: " + simulator.IP, simulator), out p);
-            }
-            return 1;
+            return result.ToArray();
+        }
+
+        private static string GetPortRequestName(DeviceDefinition device)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            string prefix = device.Type == DeviceDefinitionType.Device ? "Device: " : "Simulator: ";
+            string name = string.IsNullOrEmpty(device.Name) ? device.IP : string.Concat(device.Name, " (", device.IP, ")");
+
+            return prefix + name;
         }
 
         /// <summary>
         /// Creates an AD7Port.
         /// </summary>
-        /// <param name="request">Port request</param>
-        /// <returns>Returns an AD7Port</returns>
-        AD7Port CreatePort(AD7PortRequest request)
+        private static AD7Port CreatePort(AD7PortSupplier supplier, AD7PortRequest request, NdkDefinition ndk)
         {
             if (request == null)
                 throw new ArgumentNullException("request");
             if (request.Device == null)
                 throw new ArgumentOutOfRangeException("request");
 
-            bool isSimulator = request.Device.Type == DeviceDefinitionType.Simulator;
-            var guid = isSimulator ? new Guid(SimulatorPortGuid) : new Guid(DevicePortGuid);
-
-            return new AD7Port(this, request, guid, request.Name, request.Device.Password, isSimulator, _toolsPath);
+            return new AD7Port(supplier, request, Guid.NewGuid(), request.Name, request.Device, ndk);
         }
 
         #region Implementation of IDebugPortSupplier2
@@ -111,85 +109,105 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
         {
-            bool success = true;
-            AD7PortRequest port_request = null;
-            AD7Port port = null;
-
-            try
+            if (pRequest == null || _ndk == null)
             {
-                port_request = (AD7PortRequest)pRequest;
+                ppPort = null;
+                return VSConstants.S_OK;
             }
-            catch
-            {
-                success = false;
-                string portRequestName;
-                AD7Port defaultPort = null;
-                pRequest.GetPortName(out portRequestName);
-                string search;
-                if (portRequestName.ToLower().Contains("device"))
-                    search = "device";
-                else if (portRequestName.ToLower().Contains("simulator"))
-                    search = "simulator";
-                else
-                {
-                    search = portRequestName.ToLower();
-                }
-                foreach (var p in _ports)
-                {
-                    AD7Port tempPort = p.Value;
-                    if (defaultPort == null)
-                        defaultPort = tempPort;
 
-                    string tempPortName;
-                    tempPort.GetPortName(out tempPortName);
-                    if (tempPortName.ToLower().Contains(search))
-                    {
-                        port = tempPort;
-                        break;
-                    }
-                    else
-                    {
-                        string IP = search;
-                        do
-                        {
-                            int pos = IP.LastIndexOf('.');
-                            if (pos != -1)
-                            {
-                                IP = IP.Remove(pos);
-                                if (tempPortName.Contains(IP))
-                                {
-                                    port = tempPort;
-                                    break;
-                                }
-                            }
-                            else
-                                IP = "";
-                        } while (IP != "");
-                        if (IP != "")
-                            break;
-                    }
-                }
+            // is it one of the default requests created by the AD7PortSupplier?
+            var portRequest = pRequest as AD7PortRequest;
+            if (portRequest != null)
+            {
+                var port = CreatePort(this, portRequest, _ndk);
+                _ports[port.Guid] = port;
+                ppPort = port;
+                return VSConstants.S_OK;
+            }
+
+            string requestName;
+            if (pRequest.GetPortName(out requestName) == VSConstants.S_OK)
+            {
+                requestName = requestName.Trim();
+                var port = FindPort(requestName);
+
+                // create something at hoc?
                 if (port == null)
                 {
-                    if (defaultPort != null)
+                    var device = CreateAdHocDevice(requestName);
+                    if (device != null)
                     {
-                        port = defaultPort;
+                        ppPort = new AD7Port(this, null, Guid.NewGuid(), GetPortRequestName(device), device, _ndk);
+                        return VSConstants.S_OK;
                     }
-                    else
-                        port = new AD7Port(this, port_request, Guid.NewGuid(), "", "", true, "");
+                    
+                    MessageBox.Show("Too few information about device you are trying to connect.\n\nPlease, follow the pattern: \"(device|simulator) IP password\".", "Unable to create device connection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                {
+                    ppPort = port;
+                    return VSConstants.S_OK;
                 }
             }
-            if (success)
-            {
-                port = CreatePort(port_request);
-                Guid portGuid;
-                port.GetPortId(out portGuid);
-                _ports.Add(portGuid, port);
-            }
-            ppPort = port;
-            return VSConstants.S_OK; 
+
+            ppPort = null;
+            return VSConstants.E_INVALIDARG;
         }
 
+        private AD7Port FindPort(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            foreach (var port in _ports.Values)
+            {
+                if (port.Device.HasIdenticalIP(text) || port.Device.HasIdenticalName(text))
+                    return port;
+            }
+
+            return null;
+        }
+
+        private static DeviceDefinition CreateAdHocDevice(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            var items = text.Split(new[] { ' ', '|', ':', ',' }, StringSplitOptions.RemoveEmptyEntries);
+            if (items.Length < 2)
+                return null;
+
+            int i = 0;
+            var type = DeviceDefinitionType.Device;
+            string ip = null;
+            string password = null;
+
+            if (string.Compare("simulator", items[i], StringComparison.OrdinalIgnoreCase) == 0
+                || string.Compare("sim", items[i], StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                type = DeviceDefinitionType.Simulator;
+                i++;
+            }
+            if (string.Compare("device", items[i], StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                type = DeviceDefinitionType.Device;
+                i++;
+            }
+            if (items.Length > i && items[i].IndexOf('.') > 0)
+            {
+                ip = items[i++];
+            }
+            if (items.Length > i)
+            {
+                password = items[i];
+            }
+
+            // verify input:
+            if (string.IsNullOrEmpty(ip) || string.IsNullOrEmpty(password))
+                return null;
+
+            return new DeviceDefinition("Ad-hoc Connection", ip, password, type);
+        }
 
         /// <summary>
         /// Verifies that a port supplier can add new ports. (http://msdn.microsoft.com/en-ca/library/bb145880.aspx)
@@ -207,30 +225,39 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumPorts(out IEnumDebugPorts2 ppEnum)
         {
-            _ports.Clear();
-            int success = VerifyAndAddPorts();
-            AD7Port[] ports = new AD7Port[_ports.Count];
-
-            if (_ports.Count > 0)
+            // Returning because VS can debug only one app at a time.
+            if (GDBParser.s_running)
             {
-                int i = 0;
-                foreach (var p in _ports)
+                MessageBox.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ppEnum = null;
+                return VSConstants.S_OK;
+            }
+
+            var defaultPorts = CreateDefaultPorts();
+            if (defaultPorts == null)
+            {
+                MessageBox.Show("You must select an API Level to be able to attach to a running process.\n\nPlease, use \"BlackBerry -> Options -> API Level\" to download or select one.", "Missing NDK", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                ppEnum = null;
+                return VSConstants.S_OK;
+            }
+            if (defaultPorts.Length == 0)
+            {
+                MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                ppEnum = null;
+                return VSConstants.S_OK;
+            }
+
+            _ports.Clear();
+            foreach (var port in defaultPorts)
+            {
+                Guid portGuid;
+                if (port.GetPortId(out portGuid) == VSConstants.S_OK)
                 {
-                    ports[i] = p.Value;
-                    i++;
+                    _ports[portGuid] = (AD7Port) port;
                 }
             }
-            else
-            {
-                if (success == 0)
-                    MessageBox.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                else if (success == -1)
-                    MessageBox.Show("You must select an API Level to be able to attach to a running process.\n\nPlease, use \"BlackBerry -> Settings -> Get more\" to download one.", "Missing NDK", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                else
-                    MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
 
-            ppEnum = new AD7PortEnum(ports);
+            ppEnum = new AD7PortEnum(defaultPorts);
             return VSConstants.S_OK;
         }
 
@@ -275,7 +302,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
         public int RemovePort(IDebugPort2 pPort)
         {
-            throw new NotImplementedException();
+            return VSConstants.E_NOTIMPL;
         }
 
         #endregion

@@ -16,6 +16,7 @@ using System;
 using System.Runtime.InteropServices;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Helpers;
+using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
@@ -248,7 +249,7 @@ namespace BlackBerry.DebugEngine
                         processesPaths = "";
                     }
 
-                    string searchProgName = progName + "_" + port.m_isSimulator;
+                    string searchProgName = progName + "_" + (port.Device.Type == DeviceDefinitionType.Simulator);
                     int begin = processesPaths.IndexOf(searchProgName + ":>");
 
                     if (begin != -1)
@@ -265,7 +266,7 @@ namespace BlackBerry.DebugEngine
 
                     exePath = exePath.Replace("\\", "\\\\\\\\");
 
-                    if (GDBParser.LaunchProcess(pnt.m_programID, exePath, port.m_IP, port.m_isSimulator, port.m_toolsPath, publicKeyPath, port.m_password))
+                    if (GDBParser.LaunchProcess(pnt.m_programID, exePath, port.Device.IP, port.Device.Type == DeviceDefinitionType.Simulator, port.NDK.ToolsPath, publicKeyPath, port.Device.Password))
                     {
                         if (exePath == "CannotAttachToRunningProcess")
                         {
