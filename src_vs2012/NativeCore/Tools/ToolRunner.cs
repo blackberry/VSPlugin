@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Management;
 using System.Text;
 using BlackBerry.NativeCore.Diagnostics;
 
@@ -28,8 +29,8 @@ namespace BlackBerry.NativeCore.Tools
 
             _process.StartInfo.UseShellExecute = false;
             _process.StartInfo.CreateNoWindow = true;
-            _process.StartInfo.RedirectStandardError = true;
             _process.StartInfo.RedirectStandardOutput = true;
+            _process.StartInfo.RedirectStandardError = true;
 
             _process.OutputDataReceived += OutputDataReceived;
             _process.ErrorDataReceived += ErrorDataReceived;
@@ -114,6 +115,26 @@ namespace BlackBerry.NativeCore.Tools
 
         #endregion
 
+        #region Internal Properties
+
+        protected bool ShowWindow
+        {
+            get { return _process != null && !_process.StartInfo.CreateNoWindow; }
+            set
+            {
+                if (_process == null)
+                    throw new ObjectDisposedException("ToolRunner");
+
+                _process.StartInfo.CreateNoWindow = !value;
+
+                // and don't redirect anything, to have the data displayed inside that window:
+                _process.StartInfo.RedirectStandardOutput = !value;
+                _process.StartInfo.RedirectStandardError = !value;
+            }
+        }
+
+        #endregion
+
         protected virtual void ProcessOutputLine(string text)
         {
             if (_output != null && text != null)
@@ -159,8 +180,10 @@ namespace BlackBerry.NativeCore.Tools
                 _process.EnableRaisingEvents = false;
                 _process.Start();
 
-                _process.BeginErrorReadLine();
-                _process.BeginOutputReadLine();
+                if (_process.StartInfo.RedirectStandardError)
+                    _process.BeginErrorReadLine();
+                if (_process.StartInfo.RedirectStandardOutput)
+                    _process.BeginOutputReadLine();
 
                 PrepareStarted(_process.Id);
                 _process.WaitForExit();
@@ -199,8 +222,10 @@ namespace BlackBerry.NativeCore.Tools
                 _process.EnableRaisingEvents = true;
 
                 _process.Start();
-                _process.BeginErrorReadLine();
-                _process.BeginOutputReadLine();
+                if (_process.StartInfo.RedirectStandardError)
+                    _process.BeginErrorReadLine();
+                if (_process.StartInfo.RedirectStandardOutput)
+                    _process.BeginOutputReadLine();
 
                 PrepareStarted(_process.Id);
             }
@@ -333,12 +358,48 @@ namespace BlackBerry.NativeCore.Tools
             return result.ToString();
         }
 
+        public void Abort()
+        {
+            if (!IsProcessing)
+                return;
+            if (_process == null)
+                throw new ObjectDisposedException("ToolRunner");
+
+            // kill current process and all child ones:
+            int pid = _process.Id;
+            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process WHERE ParentProcessId=" + pid);
+            foreach (var item in searcher.Get())
+            {
+                try
+                {
+                    var childProcess = Process.GetProcessById(Convert.ToInt32(item["ProcessId"].ToString()));
+                    childProcess.Kill();
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to kill current tool child-process");
+                }
+            }
+
+            if (IsProcessing)
+            {
+                try
+                {
+                    _process.Kill(); // PH: INFO: somehow, it gets automatically killed for command-line tools...
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to kill current tool");
+                }
+            }
+        }
+
         #region IDisposable Implementation
 
         public void Dispose()
         {
-            Dispose(true);
             GC.SuppressFinalize(this);
+            Dispose(true);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -348,6 +409,7 @@ namespace BlackBerry.NativeCore.Tools
                 _process.OutputDataReceived -= OutputDataReceived;
                 _process.ErrorDataReceived -= ErrorDataReceived;
 
+                Abort();
                 _process.Dispose();
                 _process = null;
             }
