@@ -40,6 +40,11 @@ namespace BlackBerry.NativeCore.Model
             private set;
         }
 
+        public string ToolsPath
+        {
+            get { return string.IsNullOrEmpty(HostPath) ? null : Path.Combine(HostPath, "usr", "bin"); }
+        }
+
         public DeviceFamilyType Type
         {
             get;

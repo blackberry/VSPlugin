@@ -14,14 +14,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
 using Microsoft.VisualStudio;
-using Microsoft.Win32;
 using System.Windows.Forms;
-using System.Security.Cryptography;
 using VSNDK.Parser;
 
 namespace BlackBerry.DebugEngine
@@ -38,147 +35,71 @@ namespace BlackBerry.DebugEngine
     /// It is needed to enable updating the list of processes in the "attach to process" user interface.
     /// </summary>
     [ComVisible(true)]
-    [Guid("BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6")]
-    public class AD7PortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2
+    [Guid(ClassGuid)]
+    public sealed class AD7PortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2
     {
+        public const string PublicName = "BlackBerry Native Debugger";
+        public const string ClassGuid = "BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6";
+        public const string ClassName = "BlackBerry.DebugEngine.AD7PortSupplier";
 
-        /// <summary>
-        /// The name of the port supplier.
-        /// </summary>
-        private string m_name;
-
-        /// <summary>
-        /// The description for the port supplier.
-        /// </summary>
-        private string m_description;
+        private const string DevicePortGuid = "{69519DBB-5329-4CCE-88A9-EC1628AD99C2}";
+        private const string SimulatorPortGuid = "{25040BDD-6683-4D5C-8EFA-EB4DDF5CA08E}";
 
         /// <summary>
         /// The NDK host path.
         /// </summary>
-        private string m_toolsPath = "";
+        private string _toolsPath = "";
 
         /// <summary>
         /// List of ports for this port supplier.
         /// </summary>
-        Dictionary<Guid, AD7Port> m_ports = new Dictionary<Guid, AD7Port>();
+        private readonly Dictionary<Guid, AD7Port> _ports = new Dictionary<Guid, AD7Port>();
 
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AD7PortSupplier()
+        private int VerifyAndAddPorts()
         {
-            m_name = "BlackBerry Native Debugger";
-            m_description = "The BlackBerry transport lets you select a process that is running in a BlackBerry Device/Simulator";
-        }
-
-        private int verifyAndAddPorts()
-        {
-            if (GDBParser.s_running == true) // Returning because VS can debug only one app at a time.
+            // Returning because VS can debug only one app at a time.
+            if (GDBParser.s_running)
                 return 0;
 
-            RegistryKey rkHKCU = Registry.CurrentUser;
-            RegistryKey rkPluginRegKey = null;
-            string DeviceIP = "";
-            string DevicePassword = "";
-            string SimulatorIP = "";
-            string SimulatorPassword = "";
+            var ndk = NdkDefinition.Load();
+            var device = DeviceDefinition.Load(DeviceDefinitionType.Device);
+            var simulator = DeviceDefinition.Load(DeviceDefinitionType.Simulator);
 
-            try
-            {
-                rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                m_toolsPath = rkPluginRegKey.GetValue("NDKHostPath").ToString();
+            if (ndk == null || string.IsNullOrEmpty(ndk.ToolsPath))
+                return -1;
+            _toolsPath = ndk.ToolsPath;
 
-                if ((m_toolsPath == null) || (m_toolsPath == ""))
-                    return -1;
-
-                m_toolsPath += "/usr/bin";
-
-                DeviceIP = rkPluginRegKey.GetValue("device_IP").ToString();
-                if ((DeviceIP != "") && (DeviceIP != null))
-                {
-                    DevicePassword = rkPluginRegKey.GetValue("device_password").ToString();
-                    if ((DevicePassword != "") && (DevicePassword != null))
-                    {
-                        try
-                        {
-                            DevicePassword = Decrypt(DevicePassword);
-                        }
-                        catch
-                        {
-                            DevicePassword = "";
-                        }
-                    }
-                    if (DevicePassword == "")
-                    {
-                        MessageBox.Show("Missing Device password", "Missing Device Password", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    }
-                }
-                else
-                {
-                    DeviceIP = "";
-                }
-                SimulatorIP = rkPluginRegKey.GetValue("simulator_IP").ToString();
-                SimulatorPassword = rkPluginRegKey.GetValue("simulator_password").ToString();
-                if ((SimulatorPassword != "") && (SimulatorPassword != null))
-                {
-                    try
-                    {
-                        SimulatorPassword = Decrypt(SimulatorPassword);
-                    }
-                    catch
-                    {
-                        SimulatorPassword = "";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Microsoft Visual Studio", System.Windows.Forms.MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            rkPluginRegKey.Close();
-            rkHKCU.Close();
-
-            if ((DeviceIP != "") && (DevicePassword != ""))
+            if (device != null)
             {
                 IDebugPort2 p;
-                AddPort(new AD7PortRequest("Device: " + DeviceIP + "-" + DevicePassword), out p);
+                AddPort(new AD7PortRequest("Device: " + device.IP, device), out p);
             }
 
-            if (SimulatorIP != "")
+            if (simulator != null)
             {
                 IDebugPort2 p;
-                AddPort(new AD7PortRequest("Simulator: " + SimulatorIP + "-" + SimulatorPassword), out p);
+                AddPort(new AD7PortRequest("Simulator: " + simulator.IP, simulator), out p);
             }
             return 1;
         }
 
-
         /// <summary>
         /// Creates an AD7Port.
         /// </summary>
-        /// <param name="port_request"> Port request. </param>
-        /// <returns> Returns an AD7Port. </returns>
-        AD7Port CreatePort(AD7PortRequest port_request)
+        /// <param name="request">Port request</param>
+        /// <returns>Returns an AD7Port</returns>
+        AD7Port CreatePort(AD7PortRequest request)
         {
-            string portname;
-            Guid guid;
-            bool isSimulator = false;
-            port_request.GetPortName(out portname);
-            string password = portname.Substring(portname.IndexOf('-') + 1);
-            portname = portname.Remove(portname.IndexOf('-'));
-            if (portname.Substring(0, 6) == "Device")
-                guid = new Guid("{69519DBB-5329-4CCE-88A9-EC1628AD99C2}");
-            else
-            {
-                guid = new Guid("{25040BDD-6683-4D5C-8EFA-EB4DDF5CA08E}");
-                isSimulator = true;
-            }
+            if (request == null)
+                throw new ArgumentNullException("request");
+            if (request.Device == null)
+                throw new ArgumentOutOfRangeException("request");
 
-            return new AD7Port(this, port_request, guid, portname, password, isSimulator, m_toolsPath);
+            bool isSimulator = request.Device.Type == DeviceDefinitionType.Simulator;
+            var guid = isSimulator ? new Guid(SimulatorPortGuid) : new Guid(DevicePortGuid);
+
+            return new AD7Port(this, request, guid, request.Name, request.Device.Password, isSimulator, _toolsPath);
         }
-
 
         #region Implementation of IDebugPortSupplier2
         
@@ -190,20 +111,21 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
         {
-            bool sucess = true;
+            bool success = true;
             AD7PortRequest port_request = null;
             AD7Port port = null;
+
             try
             {
                 port_request = (AD7PortRequest)pRequest;
             }
             catch
             {
-                sucess = false;
+                success = false;
                 string portRequestName;
                 AD7Port defaultPort = null;
                 pRequest.GetPortName(out portRequestName);
-                string search = "";
+                string search;
                 if (portRequestName.ToLower().Contains("device"))
                     search = "device";
                 else if (portRequestName.ToLower().Contains("simulator"))
@@ -212,13 +134,13 @@ namespace BlackBerry.DebugEngine
                 {
                     search = portRequestName.ToLower();
                 }
-                foreach (var p in m_ports)
+                foreach (var p in _ports)
                 {
                     AD7Port tempPort = p.Value;
                     if (defaultPort == null)
                         defaultPort = tempPort;
 
-                    string tempPortName = "";
+                    string tempPortName;
                     tempPort.GetPortName(out tempPortName);
                     if (tempPortName.ToLower().Contains(search))
                     {
@@ -257,12 +179,12 @@ namespace BlackBerry.DebugEngine
                         port = new AD7Port(this, port_request, Guid.NewGuid(), "", "", true, "");
                 }
             }
-            if (sucess)
+            if (success)
             {
                 port = CreatePort(port_request);
                 Guid portGuid;
                 port.GetPortId(out portGuid);
-                m_ports.Add(portGuid, port);
+                _ports.Add(portGuid, port);
             }
             ppPort = port;
             return VSConstants.S_OK; 
@@ -278,7 +200,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Retrieves a list of all the ports supplied by a port supplier. (http://msdn.microsoft.com/en-ca/library/bb146984.aspx)
         /// </summary>
@@ -286,14 +207,14 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumPorts(out IEnumDebugPorts2 ppEnum)
         {
-            m_ports.Clear();
-            int success = verifyAndAddPorts();
-            AD7Port[] ports = new AD7Port[m_ports.Count()];
+            _ports.Clear();
+            int success = VerifyAndAddPorts();
+            AD7Port[] ports = new AD7Port[_ports.Count];
 
-            if (m_ports.Count() > 0)
+            if (_ports.Count > 0)
             {
                 int i = 0;
-                foreach (var p in m_ports)
+                foreach (var p in _ports)
                 {
                     ports[i] = p.Value;
                     i++;
@@ -313,7 +234,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets a port from a port supplier. (http://msdn.microsoft.com/en-ca/library/bb161812.aspx)
         /// </summary>
@@ -322,10 +242,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPort(ref Guid guidPort, out IDebugPort2 ppPort)
         {
-            ppPort = m_ports[guidPort];
+            ppPort = _ports[guidPort];
             return VSConstants.S_OK; 
         }
-
 
         /// <summary>
         /// Gets the port supplier identifier. (http://msdn.microsoft.com/en-ca/library/bb146617.aspx)
@@ -334,10 +253,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPortSupplierId(out Guid pguidPortSupplier)
         {
-            pguidPortSupplier = this.GetType().GUID;
+            pguidPortSupplier = new Guid(ClassGuid);
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the port supplier name. (http://msdn.microsoft.com/en-ca/library/bb162136.aspx)
@@ -346,10 +264,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPortSupplierName(out string pbstrName)
         {
-            pbstrName = m_name;
+            pbstrName = PublicName;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Removes a port. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb162306.aspx)
@@ -363,7 +280,6 @@ namespace BlackBerry.DebugEngine
 
         #endregion
 
-
         #region Implementation of IDebugPortSupplierDescription2
 
         /// <summary>
@@ -374,35 +290,10 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetDescription(enum_PORT_SUPPLIER_DESCRIPTION_FLAGS[] pdwFlags, out string pbstrText)
         {
-            pbstrText = m_description;
+            pbstrText = "The BlackBerry Native Transport lets you select and attach to a process that is running on a device or simulator";
             return VSConstants.S_OK;
         }
 
         #endregion
-
-        /// <summary>
-        /// Decrypts a given string.
-        /// </summary>
-        /// <param name="cipher">A base64 encoded string that was created
-        /// through the <see cref="Encrypt(string)"/> or
-        /// <see cref="Encrypt(SecureString)"/> extension methods.</param>
-        /// <returns>The decrypted string.</returns>
-        /// <remarks>Keep in mind that the decrypted string remains in memory
-        /// and makes your application vulnerable per se. If runtime protection
-        /// is essential, <see cref="SecureString"/> should be used.</remarks>
-        /// <exception cref="ArgumentNullException">If <paramref name="cipher"/>
-        /// is a null reference.</exception>
-        public string Decrypt(string cipher)
-        {
-            if (cipher == null) throw new ArgumentNullException("cipher");
-
-            //parse base64 string
-            byte[] data = Convert.FromBase64String(cipher);
-
-            //decrypt data
-            byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-
-            return Encoding.Unicode.GetString(decrypted);
-        }
     }
 }

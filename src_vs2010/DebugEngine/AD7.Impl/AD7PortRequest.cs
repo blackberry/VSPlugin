@@ -12,6 +12,8 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+using System;
+using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -22,23 +24,39 @@ namespace BlackBerry.DebugEngine
     /// 
     /// It implements IDebugPortRequest2 (http://msdn.microsoft.com/en-us/library/bb146168.aspx) 
     /// </summary>
-    public class AD7PortRequest : IDebugPortRequest2
+    public sealed class AD7PortRequest : IDebugPortRequest2
     {
-        /// <summary>
-        /// The name of the port to be created.
-        /// </summary>
-        private string m_name;
-
-
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="name"> The name of the port. It is contains the IP and password of the Device/Simulator. The password must be
-        /// removed when creating the port because this name will be displayed in Attach to Process UI. </param>
-        public AD7PortRequest(string name)
+        /// <param name="name">The name of the port.</param>
+        /// <param name="device">Detailed info about the device.</param>
+        public AD7PortRequest(string name, DeviceDefinition device)
         {
-            m_name = name;
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            Name = name;
+            Device = device;
         }
+
+        #region Properties
+
+        public string Name
+        {
+            get;
+            private set;
+        }
+
+        public DeviceDefinition Device
+        {
+            get;
+            private set;
+        }
+
+        #endregion
 
         #region Implementation of IDebugPortRequest2
 
@@ -49,7 +67,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPortName(out string portName)
         {
-            portName = m_name;
+            portName = Name;
             return VSConstants.S_OK;
         }
 

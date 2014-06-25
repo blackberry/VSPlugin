@@ -166,7 +166,6 @@ namespace BlackBerry.DebugEngine
         {
         }
 
-
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb147027.aspx)
         /// </summary>
@@ -180,13 +179,11 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This class enumerates the ports of a machine or port supplier. (http://msdn.microsoft.com/en-ca/library/bb145137.aspx)
     /// </summary>
-    class AD7PortEnum : AD7Enum<IDebugPort2, IEnumDebugPorts2>, IEnumDebugPorts2
+    sealed class AD7PortEnum : AD7Enum<IDebugPort2, IEnumDebugPorts2>, IEnumDebugPorts2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -195,7 +192,6 @@ namespace BlackBerry.DebugEngine
             : base(data)
         {
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb147027.aspx)
@@ -210,9 +206,6 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
-    
-    
     /// <summary>
     /// This class enumerates the programs running in the current debug session. (http://msdn.microsoft.com/en-ca/library/bb146727.aspx)
     /// </summary>

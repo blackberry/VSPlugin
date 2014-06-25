@@ -75,7 +75,7 @@ namespace BlackBerry.Package
         Attach = true, AddressBreakpoints = false, CallstackBreakpoints = true, AlwaysLoadLocal = true, AutoSelectPriority = 4,
         DebugEngineClassGUID = "{904AA6E0-942C-4D11-9094-7BAAEB3EE4B9}", DebugEngineClassName = "BlackBerry.DebugEngine.AD7Engine",
         ProgramProviderClassGUID = "{AD06FD46-C790-4D5C-A274-8815DF9511B8}", ProgramProviderClassName = "BlackBerry.DebugEngine.AD7ProgramProvider",
-        PortSupplierClassGUID = "{BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6}", PortSupplierClassName = "BlackBerry.DebugEngine.AD7PortSupplier",
+        PortSupplierClassGUID = AD7PortSupplier.ClassGuid, PortSupplierClassName = AD7PortSupplier.ClassName,
 #if DEBUG
         AssemblyName = @"S:\vs-plugin\src_vs2012\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll"
 #else

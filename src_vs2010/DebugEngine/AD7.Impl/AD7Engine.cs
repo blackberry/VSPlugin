@@ -153,8 +153,7 @@ namespace BlackBerry.DebugEngine
 
 
         /// <summary>
-        /// This is the engine GUID of the VSNDK debug engine. It needs to be changed here and in the registration when creating a 
-        /// new engine.
+        /// This is the engine GUID of the VSNDK debug engine. It needs to be changed here and in the registration when creating a new engine.
         /// </summary>
         public const string Id = "{E5A37609-2F43-4830-AA85-D94CFA035DD2}";
 
@@ -178,7 +177,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public AD7Engine()
         {
-            m_breakpointManager = new BreakpointManager(this);            
+            m_breakpointManager = new BreakpointManager(this);
             m_state = DE_STATE.DESIGN_MODE;
         }
 

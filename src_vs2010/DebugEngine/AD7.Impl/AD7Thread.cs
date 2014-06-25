@@ -48,7 +48,7 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// The AD7Engine object that represents the DE.
         /// </summary>
-        public AD7Engine _engine = null;
+        public AD7Engine _engine;
 
         /// <summary>
         /// Thread's name.
