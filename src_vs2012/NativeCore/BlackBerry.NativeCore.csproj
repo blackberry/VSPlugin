@@ -49,6 +49,7 @@
     <Compile Include="Components\UpdateManagerCompletedEventArgs.cs" />
     <Compile Include="ConfigDefaults.cs" />
     <Compile Include="Debugger\Instruction.cs" />
+    <Compile Include="Debugger\InstructionCollection.cs" />
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />
     <Compile Include="Diagnostics\TraceLog.cs" />

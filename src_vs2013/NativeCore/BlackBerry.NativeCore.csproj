@@ -51,6 +51,12 @@
     <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
       <Link>ConfigDefaults.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Instruction.cs">
+      <Link>Debugger\Instruction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\InstructionCollection.cs">
+      <Link>Debugger\InstructionCollection.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\BlackBerryTraceListener.cs">
       <Link>Diagnostics\BlackBerryTraceListener.cs</Link>
     </Compile>

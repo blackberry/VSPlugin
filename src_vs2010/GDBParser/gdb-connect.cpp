@@ -370,7 +370,7 @@ void GDBConsole::prepAndLaunchRedirectedChild(void)
 
 	flags = CREATE_NEW_CONSOLE;	
 	
-    String^ StringFilePath = Environment::GetFolderPath(Environment::SpecialFolder::ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\GDBWrapper.exe";
+    String^ StringFilePath = "S:\\vs-plugin\\src_vs2012\\Debug\\GDBWrapper.exe"; // Environment::GetFolderPath(Environment::SpecialFolder::ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\GDBWrapper.exe";
 	pin_ptr<const wchar_t> FilePath = PtrToStringChars(StringFilePath);
 
     if (!m_pcGDBCmd) {

@@ -11,8 +11,9 @@ namespace UnitTests
     [TestFixture]
     public class ToolRunnerTests
     {
-        const string IP = "10.0.0.127";
-        const string Password = "test";
+        public const string IP = "10.0.0.147";
+        public const string Password = "test";
+
         readonly static string DebugTokenPath = ConfigDefaults.DataFileName("debugtoken.bar");
 
         [Test]
