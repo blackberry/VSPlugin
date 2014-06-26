@@ -358,10 +358,10 @@ namespace BlackBerry.NativeCore.Tools
             return result.ToString();
         }
 
-        public void Abort()
+        public virtual bool Abort()
         {
             if (!IsProcessing)
-                return;
+                return false;
             if (_process == null)
                 throw new ObjectDisposedException("ToolRunner");
 
@@ -392,6 +392,8 @@ namespace BlackBerry.NativeCore.Tools
                     TraceLog.WriteException(ex, "Unable to kill current tool");
                 }
             }
+
+            return true;
         }
 
         #region IDisposable Implementation
