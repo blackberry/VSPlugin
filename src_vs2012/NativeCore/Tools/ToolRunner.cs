@@ -117,6 +117,12 @@ namespace BlackBerry.NativeCore.Tools
 
         #region Internal Properties
 
+        protected int PID
+        {
+            get;
+            set;
+        }
+
         protected bool ShowWindow
         {
             get { return _process != null && !_process.StartInfo.CreateNoWindow; }
@@ -185,7 +191,8 @@ namespace BlackBerry.NativeCore.Tools
                 if (_process.StartInfo.RedirectStandardOutput)
                     _process.BeginOutputReadLine();
 
-                PrepareStarted(_process.Id);
+                PID = _process.Id;
+                PrepareStarted(PID);
                 _process.WaitForExit();
                 ExitCode = _process.ExitCode;
 
@@ -227,7 +234,8 @@ namespace BlackBerry.NativeCore.Tools
                 if (_process.StartInfo.RedirectStandardOutput)
                     _process.BeginOutputReadLine();
 
-                PrepareStarted(_process.Id);
+                PID = _process.Id;
+                PrepareStarted(PID);
             }
             catch (Exception ex)
             {
@@ -366,8 +374,19 @@ namespace BlackBerry.NativeCore.Tools
                 throw new ObjectDisposedException("ToolRunner");
 
             // kill current process and all child ones:
-            int pid = _process.Id;
-            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process WHERE ParentProcessId=" + pid);
+            if (IsProcessing)
+            {
+                try
+                {
+                    _process.Kill(); // PH: INFO: somehow, it gets automatically killed for command-line tools...
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to kill current tool");
+                }
+            }
+
+            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process WHERE ParentProcessId=" + PID);
             foreach (var item in searcher.Get())
             {
                 try
@@ -378,18 +397,6 @@ namespace BlackBerry.NativeCore.Tools
                 catch (Exception ex)
                 {
                     TraceLog.WriteException(ex, "Unable to kill current tool child-process");
-                }
-            }
-
-            if (IsProcessing)
-            {
-                try
-                {
-                    _process.Kill(); // PH: INFO: somehow, it gets automatically killed for command-line tools...
-                }
-                catch (Exception ex)
-                {
-                    TraceLog.WriteException(ex, "Unable to kill current tool");
                 }
             }
 
