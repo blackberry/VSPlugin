@@ -21,7 +21,10 @@
     <ClInclude Include="targetver.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GDBWrapper.h">
+    <ClInclude Include="..\..\src_vs2012\GDBHost\GDBWrapper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src_vs2012\GDBHost\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -29,7 +32,13 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GDBWrapper.cpp">
+    <ClCompile Include="..\..\src_vs2012\GDBHost\GDBWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src_vs2012\GDBHost\Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src_vs2012\GDBHost\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

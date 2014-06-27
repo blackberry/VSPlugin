@@ -14,34 +14,22 @@
 
 #pragma once
 
-#include <windows.h>
-#include <strsafe.h>
-
 #include "stdafx.h"
-#include <string>
-#include <iostream>
-#include <unordered_map>
 
-using namespace std;
-
-#define LOG_GDB_RAW_IO 1
-
-class GDBWrapper {
-
-private:    		
-	BOOL m_isClosed;
-	HANDLE m_hProcess;	
-	HANDLE m_eventCtrlC;
-	HANDLE m_eventTerminate;
-	TCHAR* m_pcGDBCmd;
-	
-	void prepAndLaunchRedirectedChild();	
+class GDBWrapper
+{
+private:
+    BOOL m_isClosed;
+    HANDLE m_hProcess;
+    HANDLE m_eventCtrlC;
+    HANDLE m_eventTerminate;
+    TCHAR* m_pcGDBCmd;
 
 public:	
-	GDBWrapper(TCHAR*, HANDLE, HANDLE);	
-	~GDBWrapper();
-	void shutdown();
-};
+    GDBWrapper(TCHAR*, HANDLE, HANDLE);
+    ~GDBWrapper();
+    void Shutdown();
 
-void ErrorExit(LPTSTR);
-void DisplayError(LPCTSTR);
+private:
+    void PrepAndLaunchRedirectedChild();
+};
