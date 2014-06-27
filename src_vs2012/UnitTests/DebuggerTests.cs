@@ -1,6 +1,6 @@
 ﻿using System.Threading;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using NUnit.Framework;
 using VSNDK.Parser;
@@ -10,9 +10,6 @@ namespace UnitTests
     [TestFixture]
     public sealed class DebuggerTests
     {
-        private const string IP = ToolRunnerTests.IP;
-        private const string Password = ToolRunnerTests.Password;
-
         #region Device Connection Establishing
 
         private DeviceConnectRunner _connection;
@@ -20,7 +17,7 @@ namespace UnitTests
         [TestFixtureSetUp]
         public void Setup()
         {
-            _connection = new DeviceConnectRunner(ConfigDefaults.TestToolsDirectory, IP, Password, ConfigDefaults.SshPublicKeyPath);
+            _connection = new DeviceConnectRunner(Defaults.ToolsDirectory, Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
             Assert.IsNotNull(_connection);
 
             _connection.ExecuteAsync();
@@ -53,9 +50,36 @@ namespace UnitTests
         }
 
         [Test]
+        public void StartGDB()
+        {
+            // get the NDK info:
+            var ndk = NdkInfo.Scan(Defaults.InstalledNdkPath);
+            Assert.IsNotNull(ndk);
+
+            // get the description of GDB for a device:
+            var gdb = new GdbInfo(ndk, DeviceDefinitionType.Device, null, null);
+            Assert.IsNotNull(gdb);
+
+            // start the GDB:
+            var runner = new GdbRunner(gdb);
+            runner.ShowConsole = true;
+            runner.ExecuteAsync();
+
+            for (int i = 0; i < 1000; i++)
+                Thread.Sleep(1);
+
+            runner.SendInput("hello"); // Ctrl+C
+            //runner.Break();
+
+            for (int i = 0; i < 1000; i++)
+                Thread.Sleep(10);
+            runner.Abort();
+        }
+
+        [Test]
         public void LoadListOfProcesses()
         {
-            string response = GDBParser.GetPIDsThroughGDB(IP, Password, false, ConfigDefaults.ToolsDirectory, ConfigDefaults.SshPublicKeyPath, 12);
+            string response = GDBParser.GetPIDsThroughGDB(Defaults.IP, Defaults.Password, false, Defaults.ToolsDirectory, Defaults.SshPublicKeyPath, 12);
 
             Assert.IsNotNull(response);
         }

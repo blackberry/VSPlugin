@@ -56,6 +56,9 @@
     <Compile Include="..\..\src_vs2012\UnitTests\DebuggerTests.cs">
       <Link>DebuggerTests.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\Defaults.cs">
+      <Link>Defaults.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\DiagnosticTests.cs">
       <Link>DiagnosticTests.cs</Link>
     </Compile>
