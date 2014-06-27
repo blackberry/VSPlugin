@@ -3,11 +3,16 @@
 #include "stdafx.h"
 
 
-#define LOG_GDB_RAW_IO 1
+#define LOGS_ENABLED        0
 
 
-void LogInitialize();
-void LogPrint (TCHAR *message);
+#if LOGS_ENABLED
+    void LogInitialize();
+    void LogPrint(TCHAR *message);
+#else
+#   define LogInitialize()                  // do nothing
+#   define LogPrint(message)                // do nothing
+#endif
 
-void ErrorExit(LPTSTR);
-void DisplayError(LPCTSTR);
+void PrintError(LPCTSTR lpszFunctionName);
+void ShowMessage(LPCTSTR lpszFunctionName);

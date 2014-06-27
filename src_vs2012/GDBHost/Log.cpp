@@ -6,8 +6,10 @@
 #include <strsafe.h>
 #include <wtypes.h>
 
-static char path_log[_MAX_PATH]; // contains the path to the output log (needed in LogPrint())
 
+#if LOGS_ENABLED
+
+static char path_log[_MAX_PATH]; // contains the path to the output log (needed in LogPrint())
 
 void LogInitialize()
 {
@@ -29,7 +31,6 @@ void LogInitialize()
 /// <param name="buffer"> Message to be printed to a log file. </param>
 void LogPrint(TCHAR* message)
 {
-#if LOG_GDB_RAW_IO
     FILE* file = NULL;
     errno_t retCode;
 
@@ -39,60 +40,48 @@ void LogPrint(TCHAR* message)
         _ftprintf(file, _T("%s\r\n"), message);
         fclose(file);
     }
-#endif
 }
 
+#endif /* LOGS_ENABLED */
+
 /// <summary> 
-/// Displays the error number and corresponding message. 
+/// Displays the error number and corresponding message.
 /// </summary>
-/// <param name="pszAPI"> Error message. </param>
-void DisplayError(LPCTSTR pszAPI)
+/// <param name="lpszFunctionName">Name of the API function, that failed</param>
+void PrintError(LPCTSTR lpszFunctionName)
 {
-    LPVOID lpvMessageBuffer;
+    HLOCAL lpvMessageBuffer = NULL;
     TCHAR szPrintBuffer[512];
-    DWORD bufSize = 512 * sizeof(TCHAR);
 
-    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM,
-            NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR)&lpvMessageBuffer, 0, NULL);
+    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpvMessageBuffer, 0, NULL);
 
-    StringCbPrintf(szPrintBuffer, bufSize, 
-        _T("ERROR: API    = %s.\n   error code = %d.\n   message    = %s.\n"),
-            pszAPI, GetLastError(), (char *)lpvMessageBuffer);
-
+    _stprintf_s(szPrintBuffer, _countof(szPrintBuffer), _T("Error: API    = %s.\n   error code = %d.\n   message    = %s.\n"),
+            lpszFunctionName, GetLastError(), (LPTSTR)lpvMessageBuffer);
     _tprintf(_T("%s\n"), szPrintBuffer);
 
     LocalFree(lpvMessageBuffer);
-    ExitProcess(GetLastError());
 }
-
 
 /// <summary> 
 /// Retrieve the system error message for the last-error code. 
 /// </summary>
-/// <param name="lpszFunction"> Error message. </param>
-void ErrorExit(LPTSTR lpszFunction) 
+/// <param name="lpszFunctionName">Name of the API function, that failed</param>
+void ShowMessage(LPCTSTR lpszFunctionName) 
 { 
-    LPVOID lpMsgBuf;
-    LPVOID lpDisplayBuf;
-    DWORD dw = GetLastError(); 
+    HLOCAL lpMsgBuf;
+    HLOCAL lpDisplayBuf;
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-        NULL, dw, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPTSTR) &lpMsgBuf, 0, NULL);
+            NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
 
     // Display the error message and exit the process
+    lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT, (_tcslen((LPCTSTR)lpMsgBuf) + _tcslen(lpszFunctionName) + 40) * sizeof(TCHAR));
+    _stprintf_s((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR), _T("%s failed with error %d: %s"), lpszFunctionName, GetLastError(), lpMsgBuf);
 
-    lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
-        (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
-    StringCchPrintf((LPTSTR)lpDisplayBuf, 
-        LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-        TEXT("%s failed with error %d: %s"), 
-        lpszFunction, dw, lpMsgBuf); 
-    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+    MessageBox(NULL, (LPCTSTR)lpDisplayBuf, _T("GDB Host Error"), MB_OK);
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
-    ExitProcess(dw); 
 }
 

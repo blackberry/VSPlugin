@@ -28,7 +28,8 @@ private:
 public:
     GDBWrapper(LPCTSTR lpszGdbCommand, HANDLE hEventCtrlC, HANDLE hEventTerminate);
     ~GDBWrapper();
-    void Shutdown();
 
+    HANDLE GetProcessHandle();
+    void Shutdown();
     BOOL StartProcess();
 };

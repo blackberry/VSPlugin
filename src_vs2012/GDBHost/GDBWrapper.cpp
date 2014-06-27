@@ -63,7 +63,7 @@ GDBWrapper::GDBWrapper(LPCTSTR lpszGdbCommandpcGDBCmd, HANDLE hEventCtrlC, HANDL
     // Register own CTRL-C handler
     if (!SetConsoleCtrlHandler(GDBWrapperCtrlHandler, TRUE))
     {
-        DisplayError(_T("SetConsoleCtrlHandler"));
+        PrintError(_T("SetConsoleCtrlHandler"));
     }
 }
 
@@ -78,6 +78,11 @@ GDBWrapper::~GDBWrapper()
         Shutdown();
     }
     LogPrint(_T("-~GDBWrapper"));
+}
+
+HANDLE GDBWrapper::GetProcessHandle()
+{
+    return m_hProcess;
 }
 
 /// <summary> 
@@ -102,7 +107,10 @@ void GDBWrapper::Shutdown()
     }
 
     if (!CloseHandle(m_hProcess))
-        DisplayError(_T("CloseHandle"));
+    {
+        PrintError(_T("CloseHandle"));
+    }
+
     LogPrint(_T("-shutdown"));
 }
 
@@ -140,7 +148,7 @@ BOOL GDBWrapper::StartProcess()
     // Launch the process
     if (!CreateProcess(NULL, m_lpszGdbCommand, NULL, NULL, TRUE, flags, NULL, NULL, &si, &pi))
     {
-        ErrorExit(_T("CreateProcess"));
+        ShowMessage(_T("CreateProcess"));
         return FALSE;
     }
 
@@ -148,7 +156,7 @@ BOOL GDBWrapper::StartProcess()
 
     if (!CloseHandle(pi.hThread))
     {
-        DisplayError(_T("CloseHandle"));
+        PrintError(_T("CloseHandle"));
         return FALSE;
     }
 

@@ -42,17 +42,19 @@ int _tmain(int argc, _TCHAR* argv[])
     handleCtrlC     = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[2]); // Ctrl-C signal
     handleTerminate = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[3]); // Signal to terminate the wrapper process
 
+    // If opening failed, create by itself events with the same names:
     if (handleCtrlC == NULL)
     {
         _tprintf(_T("Error: Unable to open Ctrl+C event (%s)\r\n"), argv[2]);
-        return 1;
+        handleCtrlC = CreateEvent(NULL, FALSE, FALSE, argv[2]);
     }
     if (handleTerminate == NULL)
     {
         _tprintf(_T("Error: Unable to open termination event (%s)\r\n"), argv[3]);
-        return 2;
+        handleTerminate = CreateEvent(NULL, FALSE, FALSE, argv[3]);
     }
 
+    // Print status
     _stprintf_s(msg, _countof(msg), _T("args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3]);
     _tprintf(msg);
     LogPrint(msg);
@@ -66,15 +68,16 @@ int _tmain(int argc, _TCHAR* argv[])
     LogPrint(msg);
 
     GDBWrapper* gdb = new GDBWrapper(argv[1], handleCtrlC, handleTerminate);
-    HANDLE handles[2] = { handleCtrlC, handleTerminate };
 
     if (!gdb->StartProcess())
     {
         _tprintf(_T("Error: Failed to start the GDB process (%s)\r\n"), argv[1]);
-        return 3;
+        return 1;
     }
 
+    HANDLE handles[] = { handleCtrlC, handleTerminate, gdb->GetProcessHandle() };
     BOOL exitProc = FALSE;
+
     while(!exitProc)
     {
         // Wait for a CTRL-C event indicating GDB should be interrupted
@@ -90,8 +93,13 @@ int _tmain(int argc, _TCHAR* argv[])
                 LogPrint(_T("WAIT_OBJECT_0 + 1 (Terminate)"));
                 exitProc = TRUE;
                 break;
+            case WAIT_OBJECT_0 + 2:
+                LogPrint(_T("WAIT_OBJECT_0 + 2 (GDB Terminated)"));
+                _tprintf_s(_T("GDB terminated!"));
+                exitProc = TRUE;
+                break;
             case WAIT_FAILED:
-                DisplayError(_T("WaitForSingleObject WAIT_FAILED"));
+                PrintError(_T("WaitForSingleObject WAIT_FAILED"));
                 exitProc = TRUE;
                 break;
             default:
