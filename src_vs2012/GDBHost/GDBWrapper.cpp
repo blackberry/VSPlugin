@@ -46,53 +46,25 @@ static BOOL WINAPI GDBWrapperCtrlHandler(DWORD dwCtrlType)
 /// <summary> 
 /// Constructor. 
 /// </summary>
-/// <param name="pcGDBCmd"> String with full path and command to initialize GDB/MI. </param>
-/// <param name="eventCtrlC"> Ctrl-C handler; </param>
-/// <param name="eventTerminate"> Terminate handler; </param>
-GDBWrapper::GDBWrapper(TCHAR* pcGDBCmd, HANDLE eventCtrlC, HANDLE eventTerminate)
-    : m_eventCtrlC(eventCtrlC), m_eventTerminate(eventTerminate), m_isClosed(FALSE)
+/// <param name="pcGDBCmd">String with full path and command to initialize GDB/MI.</param>
+/// <param name="eventCtrlC">Ctrl-C event handle</param>
+/// <param name="eventTerminate">Terminate event handle</param>
+GDBWrapper::GDBWrapper(LPCTSTR lpszGdbCommandpcGDBCmd, HANDLE hEventCtrlC, HANDLE hEventTerminate)
+    : m_lpszGdbCommand(NULL), m_eventCtrlC(hEventCtrlC), m_eventTerminate(hEventCtrlC), m_isClosed(FALSE), m_hProcess(NULL)
 {
-    SECURITY_ATTRIBUTES sa;
-
     // Copy path to GDB
-    size_t numChars = _tcslen(pcGDBCmd) + 1;
-    m_pcGDBCmd = new TCHAR[numChars * sizeof(TCHAR)];
-    _tcscpy_s(m_pcGDBCmd, numChars, pcGDBCmd);
+    if (lpszGdbCommandpcGDBCmd != NULL)
+    {
+        size_t numChars = _tcslen(lpszGdbCommandpcGDBCmd) + 1;
+        m_lpszGdbCommand = new TCHAR[numChars * sizeof(TCHAR)];
+        _tcscpy_s(m_lpszGdbCommand, numChars, lpszGdbCommandpcGDBCmd);
+    }
 
-    // Register CTRL-C handler
+    // Register own CTRL-C handler
     if (!SetConsoleCtrlHandler(GDBWrapperCtrlHandler, TRUE))
     {
         DisplayError(_T("SetConsoleCtrlHandler"));
     }
-
-    // Set up the security attributes struct used when creating the pipes
-    sa.nLength = sizeof(SECURITY_ATTRIBUTES);
-    sa.lpSecurityDescriptor = NULL;
-    sa.bInheritHandle = TRUE;
-
-    PrepAndLaunchRedirectedChild();
-}
-
-/// <summary> 
-/// Shut down GDB Wrapper: Update variables and terminate GDBWrapper process. 
-/// </summary>
-void GDBWrapper::Shutdown()
-{
-    LogPrint(_T("+shutdown"));
-    m_isClosed = TRUE;
-
-    if (m_pcGDBCmd != NULL)
-    {
-        delete[] m_pcGDBCmd;
-        m_pcGDBCmd = NULL;
-    }
-
-    // Kill GDB process
-    TerminateProcess(m_hProcess, 0);
-
-    if (!CloseHandle(m_hProcess))
-        DisplayError(_T("CloseHandle"));
-    LogPrint(_T("-shutdown"));
 }
 
 /// <summary> 
@@ -109,18 +81,48 @@ GDBWrapper::~GDBWrapper()
 }
 
 /// <summary> 
+/// Shut down GDB Wrapper: Update variables and terminate GDBWrapper process. 
+/// </summary>
+void GDBWrapper::Shutdown()
+{
+    LogPrint(_T("+shutdown"));
+    m_isClosed = TRUE;
+
+    if (m_lpszGdbCommand != NULL)
+    {
+        delete[] m_lpszGdbCommand;
+        m_lpszGdbCommand = NULL;
+    }
+
+    // Kill GDB process
+    if (m_hProcess != NULL)
+    {
+        TerminateProcess(m_hProcess, 0);
+        m_hProcess = NULL;
+    }
+
+    if (!CloseHandle(m_hProcess))
+        DisplayError(_T("CloseHandle"));
+    LogPrint(_T("-shutdown"));
+}
+
+/// <summary> 
 /// Sets up STARTUPINFO structure and launches redirected child. 
 /// </summary>
-void GDBWrapper::PrepAndLaunchRedirectedChild()
+BOOL GDBWrapper::StartProcess()
 {
+    if (m_hProcess != NULL)
+    {
+        return FALSE;
+    }
+
     LPCTSTR lpApplicationName = NULL;
     PROCESS_INFORMATION pi;
-    STARTUPINFO si;	
+    STARTUPINFO si;
     DWORD flags = 0;
 
-    memset(&pi, 0, sizeof(pi));
-
     // Set up the start up info struct.
+    ZeroMemory(&pi, sizeof(pi));
     ZeroMemory(&si, sizeof(STARTUPINFO));
     si.cb = sizeof(STARTUPINFO);
     si.dwFlags = STARTF_USESTDHANDLES;
@@ -135,21 +137,20 @@ void GDBWrapper::PrepAndLaunchRedirectedChild()
     // Note that dwFlags must include STARTF_USESHOWWINDOW if you want to
     // use the wShowWindow flags.
 
-    /* CreateProcessW can modify pCmdLine thus we allocate memory */
-    int pCmdSz = _tcslen(m_pcGDBCmd) + 1;
-    LPTSTR pCmdLine = new TCHAR[pCmdSz];
-    if (pCmdLine == 0)
-    {
-        DisplayError(_T("GDBWrapper::launch: failed to allocate memory for pCmdLine"));
-    }
-    _tcscpy_s(pCmdLine, pCmdSz, m_pcGDBCmd);
-
     // Launch the process
-    if (!CreateProcess(NULL, pCmdLine, NULL, NULL, TRUE, flags, NULL, NULL, &si, &pi))
+    if (!CreateProcess(NULL, m_lpszGdbCommand, NULL, NULL, TRUE, flags, NULL, NULL, &si, &pi))
+    {
         ErrorExit(_T("CreateProcess"));
+        return FALSE;
+    }
 
     m_hProcess = pi.hProcess;
 
     if (!CloseHandle(pi.hThread))
+    {
         DisplayError(_T("CloseHandle"));
+        return FALSE;
+    }
+
+    return TRUE;
 }

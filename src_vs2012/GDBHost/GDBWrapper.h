@@ -19,17 +19,16 @@
 class GDBWrapper
 {
 private:
-    BOOL m_isClosed;
+    BOOL   m_isClosed;
     HANDLE m_hProcess;
     HANDLE m_eventCtrlC;
     HANDLE m_eventTerminate;
-    TCHAR* m_pcGDBCmd;
+    TCHAR* m_lpszGdbCommand;
 
-public:	
-    GDBWrapper(TCHAR*, HANDLE, HANDLE);
+public:
+    GDBWrapper(LPCTSTR lpszGdbCommand, HANDLE hEventCtrlC, HANDLE hEventTerminate);
     ~GDBWrapper();
     void Shutdown();
 
-private:
-    void PrepAndLaunchRedirectedChild();
+    BOOL StartProcess();
 };

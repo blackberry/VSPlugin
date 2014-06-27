@@ -65,8 +65,14 @@ int _tmain(int argc, _TCHAR* argv[])
     _tprintf(msg);
     LogPrint(msg);
 
-    GDBWrapper* g = new GDBWrapper(argv[1], handleCtrlC, handleTerminate);
+    GDBWrapper* gdb = new GDBWrapper(argv[1], handleCtrlC, handleTerminate);
     HANDLE handles[2] = { handleCtrlC, handleTerminate };
+
+    if (!gdb->StartProcess())
+    {
+        _tprintf(_T("Error: Failed to start the GDB process (%s)\r\n"), argv[1]);
+        return 3;
+    }
 
     BOOL exitProc = FALSE;
     while(!exitProc)
@@ -94,6 +100,7 @@ int _tmain(int argc, _TCHAR* argv[])
         }
     }
 
-    g->Shutdown();
+    gdb->Shutdown();
+    LogPrint(_T("Finished"));
     return 0;
 }
