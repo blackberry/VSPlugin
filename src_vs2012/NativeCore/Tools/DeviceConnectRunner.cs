@@ -126,6 +126,7 @@ namespace BlackBerry.NativeCore.Tools
         {
             base.ProcessErrorLine(text);
             IsConnectionFailed = true;
+            LastError = ExtractErrorMessages(text);
         }
     }
 }

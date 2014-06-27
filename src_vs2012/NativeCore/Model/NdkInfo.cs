@@ -670,5 +670,13 @@ namespace BlackBerry.NativeCore.Model
             FilePath = fullFilePath;
             return true;
         }
+
+        /// <summary>
+        /// Creates the shimmed definition instance.
+        /// </summary>
+        public NdkDefinition ToDefinition()
+        {
+            return new NdkDefinition(HostPath, TargetPath, Type);
+        }
     }
 }

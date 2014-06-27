@@ -19,6 +19,9 @@ namespace BlackBerry.NativeCore.Model
 
         #region Properties
 
+        /// <summary>
+        /// Gets the local path, where the runtime libraries are installed.
+        /// </summary>
         public string Folder
         {
             get;
@@ -31,6 +34,14 @@ namespace BlackBerry.NativeCore.Model
         }
 
         #endregion
+
+        /// <summary>
+        /// Creates the shimmed definition instance.
+        /// </summary>
+        public RuntimeDefinition ToDefinition()
+        {
+            return new RuntimeDefinition(Folder);
+        }
 
         /// <summary>
         /// Loads descriptions of installed runtimes from specified folders.

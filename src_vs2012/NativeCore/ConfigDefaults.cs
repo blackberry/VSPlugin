@@ -8,11 +8,6 @@ namespace BlackBerry.NativeCore
 #endif
     static class ConfigDefaults
     {
-#if MAKE_CONFIG_DEFAULTS_PUBLIC
-        public static readonly string TestToolsDirectory;
-        public static readonly string TestNdkDirectory;
-#endif
-
         public static readonly string ToolsDirectory;
         public static readonly string NdkDirectory;
         public static readonly string DataDirectory;
@@ -61,13 +56,6 @@ namespace BlackBerry.NativeCore
             SshPublicKeyPath = Path.Combine(DataDirectory, "bbt_id_rsa.pub");
             BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
-
-#if DEBUG && MAKE_CONFIG_DEFAULTS_PUBLIC
-            // TODO: PH: 2014-05-08: for now hardcoded my repository path:
-            TestToolsDirectory = @"S:\vs-plugin\qnxtools\bin";
-            TestNdkDirectory = NdkDirectory; // @"S:\vs-plugin\bbndk_vs";
-            ToolsDirectory = TestToolsDirectory;
-#endif
         }
 
         /// <summary>

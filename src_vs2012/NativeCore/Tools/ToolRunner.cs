@@ -31,6 +31,7 @@ namespace BlackBerry.NativeCore.Tools
             _process.StartInfo.CreateNoWindow = true;
             _process.StartInfo.RedirectStandardOutput = true;
             _process.StartInfo.RedirectStandardError = true;
+            _process.StartInfo.RedirectStandardInput = true;
 
             _process.OutputDataReceived += OutputDataReceived;
             _process.ErrorDataReceived += ErrorDataReceived;
@@ -190,6 +191,8 @@ namespace BlackBerry.NativeCore.Tools
                     _process.BeginErrorReadLine();
                 if (_process.StartInfo.RedirectStandardOutput)
                     _process.BeginOutputReadLine();
+                if (_process.StartInfo.RedirectStandardInput)
+                    _process.StandardInput.AutoFlush = true;
 
                 PID = _process.Id;
                 PrepareStarted(PID);
@@ -233,6 +236,8 @@ namespace BlackBerry.NativeCore.Tools
                     _process.BeginErrorReadLine();
                 if (_process.StartInfo.RedirectStandardOutput)
                     _process.BeginOutputReadLine();
+                if (_process.StartInfo.RedirectStandardInput)
+                    _process.StandardInput.AutoFlush = true;
 
                 PID = _process.Id;
                 PrepareStarted(PID);
@@ -346,6 +351,28 @@ namespace BlackBerry.NativeCore.Tools
         }
 
         /// <summary>
+        /// Sends given text to the process.
+        /// </summary>
+        public virtual void SendInput(string text)
+        {
+            if (_process != null)
+            {
+                _process.StandardInput.WriteLine(text);
+            }
+        }
+
+        /// <summary>
+        /// Sends given char to the process.
+        /// </summary>
+        public virtual void SendInput(char c)
+        {
+            if (_process != null)
+            {
+                _process.StandardInput.Write(c);
+            }
+        }
+
+        /// <summary>
         /// Extracts the error messages out of the given text.
         /// </summary>
         protected static string ExtractErrorMessages(string error)
@@ -366,6 +393,9 @@ namespace BlackBerry.NativeCore.Tools
             return result.ToString();
         }
 
+        /// <summary>
+        /// Aborts the process and all its child processes.
+        /// </summary>
         public virtual bool Abort()
         {
             if (!IsProcessing)
