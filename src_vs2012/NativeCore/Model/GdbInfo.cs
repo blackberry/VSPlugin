@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 
 namespace BlackBerry.NativeCore.Model
@@ -43,6 +44,22 @@ namespace BlackBerry.NativeCore.Model
         {
             get;
             private set;
+        }
+
+        public string Architecture
+        {
+            get
+            {
+                switch (DeviceType)
+                {
+                    case DeviceDefinitionType.Device:
+                        return "ARM";
+                    case DeviceDefinitionType.Simulator:
+                        return "x86";
+                    default:
+                        throw new InvalidEnumArgumentException("Unsupported enum value (" + DeviceType + ")");
+                }
+            }
         }
 
         public RuntimeDefinition Runtime
