@@ -22,30 +22,58 @@ int _tmain(int argc, _TCHAR* argv[])
     LogInitialize();
     LogPrint(_T("Starting"));
 
-    HANDLE handles[2];
-    handles[0] = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[2]); // Ctrl-C signal
-    handles[1] = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[3]); // Signal to terminate the wrapper process
+    if (argc < 4)
+    {
+        _tprintf(_T("Copyright (C) 2010-2014 Research in Motion Limited\r\n"));
+        _tprintf(_T("This application runs GDB in console mode and helps it handle Ctrl+C signal.\r\n"));
+        _tprintf(_T("Usage:\r\n"));
+        _tprintf(_T("  BlackBerry.GDBHost.exe <path-to-GDB.exe> <ctrl-c-event-name> <termination-event-name>\r\n"));
+        _tprintf(_T("Where:\r\n"));
+        _tprintf(_T("  <path-to-GDB.exe>        - path to GDB executable and its arguments\r\n"));
+        _tprintf(_T("  <ctrl-c-event-name>      - name of the global event, firing it will cause sending Ctrl+C to GDB\r\n"));
+        _tprintf(_T("  <termination-event-name> - name of the global event, firing it will cause this process to finish\r\n"));
+        _tprintf(_T("\r\n\r\n"));
+        return 0;
+    }
+
+    HANDLE handleCtrlC;
+    HANDLE handleTerminate;
+
+    handleCtrlC     = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[2]); // Ctrl-C signal
+    handleTerminate = OpenEventW(EVENT_ALL_ACCESS, TRUE, argv[3]); // Signal to terminate the wrapper process
+
+    if (handleCtrlC == NULL)
+    {
+        _tprintf(_T("Error: Unable to open Ctrl+C event (%s)\r\n"), argv[2]);
+        return 1;
+    }
+    if (handleTerminate == NULL)
+    {
+        _tprintf(_T("Error: Unable to open termination event (%s)\r\n"), argv[3]);
+        return 2;
+    }
 
     _stprintf_s(msg, _countof(msg), _T("args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3]);
     _tprintf(msg);
     LogPrint(msg);
 
-    _stprintf_s(msg, _countof(msg), _T("Ctrl-C handler: name: %s handle: %p\r\n"), argv[2], handles[0]);
+    _stprintf_s(msg, _countof(msg), _T("Ctrl-C handler: name: %s handle: %p\r\n"), argv[2], handleCtrlC);
     _tprintf(msg);
     LogPrint(msg);
 
-    _stprintf_s(msg, _countof(msg), _T("Terminate handler: name: %s handle: %p\r\n"), argv[3], handles[1]);
+    _stprintf_s(msg, _countof(msg), _T("Terminate handler: name: %s handle: %p\r\n"), argv[3], handleTerminate);
     _tprintf(msg);
     LogPrint(msg);
 
-    GDBWrapper* g = new GDBWrapper(argv[1], handles[0], handles[1]);
+    GDBWrapper* g = new GDBWrapper(argv[1], handleCtrlC, handleTerminate);
+    HANDLE handles[2] = { handleCtrlC, handleTerminate };
 
     BOOL exitProc = FALSE;
     while(!exitProc)
     {
         // Wait for a CTRL-C event indicating GDB should be interrupted
         LogPrint(_T("WaitForMultipleObjects"));
-        DWORD event = WaitForMultipleObjects(2, handles, false, INFINITE);
+        DWORD event = WaitForMultipleObjects(_countof(handles), handles, false, INFINITE);
         switch (event)
         {
             case WAIT_OBJECT_0:
