@@ -363,7 +363,7 @@ namespace BlackBerry.Package.ViewModels
 
             try
             {
-                var setting = new NdkDefinition(_activeNDK.HostPath, _activeNDK.TargetPath, _activeNDK.Type);
+                var setting = _activeNDK.ToDefinition();
                 setting.Save();
             }
             catch (Exception ex)
