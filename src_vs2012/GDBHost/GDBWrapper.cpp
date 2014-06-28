@@ -57,7 +57,11 @@ GDBWrapper::GDBWrapper(LPCTSTR lpszGdbCommandpcGDBCmd, HANDLE hEventCtrlC, HANDL
     {
         size_t numChars = _tcslen(lpszGdbCommandpcGDBCmd) + 1;
         m_lpszGdbCommand = new TCHAR[numChars * sizeof(TCHAR)];
-        _tcscpy_s(m_lpszGdbCommand, numChars, lpszGdbCommandpcGDBCmd);
+
+        if (m_lpszGdbCommand != NULL)
+        {
+            _tcscpy_s(m_lpszGdbCommand, numChars, lpszGdbCommandpcGDBCmd);
+        }
     }
 
     // Register own CTRL-C handler
@@ -93,11 +97,8 @@ void GDBWrapper::Shutdown()
     LogPrint(_T("+shutdown"));
     m_isClosed = TRUE;
 
-    if (m_lpszGdbCommand != NULL)
-    {
-        delete[] m_lpszGdbCommand;
-        m_lpszGdbCommand = NULL;
-    }
+    delete[] m_lpszGdbCommand;
+    m_lpszGdbCommand = NULL;
 
     // Kill GDB process
     if (m_hProcess != NULL)
