@@ -103,12 +103,12 @@ void GDBWrapper::Shutdown()
     if (m_hProcess != NULL)
     {
         TerminateProcess(m_hProcess, 0);
-        m_hProcess = NULL;
-    }
 
-    if (!CloseHandle(m_hProcess))
-    {
-        PrintError(_T("CloseHandle"));
+        if (!CloseHandle(m_hProcess))
+        {
+            PrintError(_T("CloseHandle"));
+        }
+        m_hProcess = NULL;
     }
 
     LogPrint(_T("-shutdown"));
