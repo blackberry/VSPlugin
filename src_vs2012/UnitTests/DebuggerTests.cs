@@ -11,7 +11,7 @@ namespace UnitTests
     public sealed class DebuggerTests
     {
         #region Device Connection Establishing
-
+/*
         private DeviceConnectRunner _connection;
 
         [TestFixtureSetUp]
@@ -37,7 +37,7 @@ namespace UnitTests
                 _connection = null;
             }
         }
-
+        */
         #endregion
 
         [Test]
@@ -61,18 +61,17 @@ namespace UnitTests
             Assert.IsNotNull(gdb);
 
             // start the GDB:
-            var runner = new GdbRunner(gdb);
+            var runner = new GdbHostRunner(@"S:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe", gdb);
             runner.ShowConsole = true;
             runner.ExecuteAsync();
 
             for (int i = 0; i < 1000; i++)
                 Thread.Sleep(1);
 
-            runner.SendInput("hello"); // Ctrl+C
-            //runner.Break();
+            runner.Break();
 
             for (int i = 0; i < 1000; i++)
-                Thread.Sleep(10);
+                Thread.Sleep(3);
             runner.Abort();
         }
 

@@ -188,6 +188,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\EventDispatcher.cs">
       <Link>Tools\EventDispatcher.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\GdbHostRunner.cs">
+      <Link>Tools\GdbHostRunner.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\GdbRunner.cs">
       <Link>Tools\GdbRunner.cs</Link>
     </Compile>
