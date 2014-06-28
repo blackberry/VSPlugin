@@ -61,7 +61,7 @@ namespace UnitTests
             Assert.IsNotNull(gdb);
 
             // start the GDB:
-            var runner = new GdbHostRunner(@"S:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe", gdb);
+            var runner = new GdbHostRunner(Defaults.GdbHostPath, gdb);
             runner.ShowConsole = true;
             runner.ExecuteAsync();
 
