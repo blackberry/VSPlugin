@@ -63,24 +63,21 @@ static LPCTSTR ConcatGdbCommand(int argc, _TCHAR* argv[], LPCTSTR exePath, int a
 /// <returns> 0 </returns>
 int _tmain(int argc, _TCHAR* argv[])
 {
-    TCHAR msg[1024];
-    memset(msg, 0, 1024);
-
     LogInitialize();
     LogPrint(_T("Starting"));
 
     if (argc < 4)
     {
-        _tprintf(_T("Copyright (C) 2010-2014 Research in Motion Limited\r\n"));
-        _tprintf(_T("This application runs GDB in console mode and helps it handle Ctrl+C signal.\r\n"));
-        _tprintf(_T("Usage:\r\n"));
-        _tprintf(_T("  BlackBerry.GDBHost.exe <ctrl-c-event-name> <termination-event-name> <path-to-GDB.exe> (<gdb-arguments>)*\r\n"));
-        _tprintf(_T("Where:\r\n"));
-        _tprintf(_T("  <ctrl-c-event-name>      - name of the global event, firing it will cause sending Ctrl+C to GDB\r\n"));
-        _tprintf(_T("  <termination-event-name> - name of the global event, firing it will cause this process to finish\r\n"));
-        _tprintf(_T("  <path-to-GDB.exe>        - path to GDB executable and its arguments\r\n"));
-        _tprintf(_T("  <gdb-arguments>          - additional arguments passed directly to GDB\r\n"));
-        _tprintf(_T("\r\n\r\n"));
+        PrintMessage(_T("Copyright (C) 2010-2014 Research in Motion Limited\r\n"));
+        PrintMessage(_T("This application runs GDB in console mode and helps it handle Ctrl+C signal.\r\n"));
+        PrintMessage(_T("Usage:\r\n"));
+        PrintMessage(_T("  BlackBerry.GDBHost.exe <ctrl-c-event-name> <termination-event-name> <path-to-GDB.exe> (<gdb-arguments>)*\r\n"));
+        PrintMessage(_T("Where:\r\n"));
+        PrintMessage(_T("  <ctrl-c-event-name>      - name of the global event, firing it will cause sending Ctrl+C to GDB\r\n"));
+        PrintMessage(_T("  <termination-event-name> - name of the global event, firing it will cause this process to finish\r\n"));
+        PrintMessage(_T("  <path-to-GDB.exe>        - path to GDB executable and its arguments\r\n"));
+        PrintMessage(_T("  <gdb-arguments>          - additional arguments passed directly to GDB\r\n"));
+        PrintMessage(_T("\r\n\r\n"));
         return 0;
     }
 
@@ -97,44 +94,34 @@ int _tmain(int argc, _TCHAR* argv[])
     // If opening failed, create by itself events with the same names:
     if (handleCtrlC == NULL)
     {
-        _tprintf(_T("Error: Unable to open Ctrl+C event (%s)\r\n"), eventNameCtrlC);
+        PrintMessage(_T("Error: Unable to open Ctrl+C event (%s), creating new one\r\n"), eventNameCtrlC);
         handleCtrlC = CreateEvent(NULL, FALSE, FALSE, eventNameCtrlC);
     }
     if (handleTerminate == NULL)
     {
-        _tprintf(_T("Error: Unable to open termination event (%s)\r\n"), eventNameTerminate);
+        PrintMessage(_T("Error: Unable to open termination event (%s), creating new one\r\n"), eventNameTerminate);
         handleTerminate = CreateEvent(NULL, FALSE, FALSE, eventNameTerminate);
     }
 
     // Print status
-    _tprintf(_T("STARTUP INFO:\r\n"));
-    _stprintf_s(msg, _countof(msg), _T("  Args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3]);
-    _tprintf(msg);
-    LogPrint(msg);
-
-    _stprintf_s(msg, _countof(msg), _T("  Ctrl-C handler: name: \"%s\", handle: 0x%p\r\n"), eventNameCtrlC, handleCtrlC);
-    _tprintf(msg);
-    LogPrint(msg);
-
-    _stprintf_s(msg, _countof(msg), _T("  Terminate handler: name: \"%s\", handle: 0x%p\r\n"), eventNameTerminate, handleTerminate);
-    _tprintf(msg);
-    LogPrint(msg);
+    PrintMessage(_T("STARTUP INFO:\r\n"));
+    PrintMessage(_T("  Args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3]);
+    PrintMessage(_T("  Ctrl-C handler: name: \"%s\", handle: 0x%p\r\n"), eventNameCtrlC, handleCtrlC);
+    PrintMessage(_T("  Terminate handler: name: \"%s\", handle: 0x%p\r\n"), eventNameTerminate, handleTerminate);
 
     // Initialize GDB
     LPCTSTR gdbCommand = ConcatGdbCommand(argc, argv, eventNameGdbPath, 4);
     GDBWrapper* gdb = new GDBWrapper(gdbCommand, handleCtrlC, handleTerminate);
 
-    _stprintf_s(msg, _countof(msg), _T("  GDB command: %s\r\n"), gdbCommand);
-    _tprintf(msg);
-    LogPrint(msg);
-    _tprintf(_T("\r\n\r\n"));
+    PrintMessage(_T("  GDB command: %s\r\n"), gdbCommand);
+    PrintMessage(_T("\r\n\r\n"));
 
     delete[] gdbCommand;
 
     // Start GDB
     if (!gdb->StartProcess())
     {
-        _tprintf(_T("Error: Failed to start the GDB process (%s)\r\n"), eventNameGdbPath);
+        PrintMessage(_T("Error: Failed to start the GDB process (%s)\r\n"), eventNameGdbPath);
         return 1;
     }
 
@@ -159,11 +146,11 @@ int _tmain(int argc, _TCHAR* argv[])
                 break;
             case WAIT_OBJECT_0 + 2:
                 LogPrint(_T("WAIT_OBJECT_0 + 2 (GDB Terminated)"));
-                _tprintf_s(_T("GDB terminated!"));
+                PrintMessage(_T("GDB process terminated!"));
                 exitProc = TRUE;
                 break;
             case WAIT_FAILED:
-                PrintError(_T("WaitForSingleObject WAIT_FAILED"));
+                PrintError(_T("WaitForSingleObject WAIT_FAILED"), GetLastError());
                 exitProc = TRUE;
                 break;
             default:
@@ -174,6 +161,6 @@ int _tmain(int argc, _TCHAR* argv[])
 
     // Clean-up
     gdb->Shutdown();
-    LogPrint(_T("Finished"));
+    PrintMessage(_T("Finished"));
     return 0;
 }

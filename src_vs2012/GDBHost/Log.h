@@ -14,6 +14,10 @@
 #   define LogPrint(message)                // do nothing
 #endif
 
-void PrintConsole(LPCTSTR format, ...);
-void PrintError(LPCTSTR lpszFunctionName);
-void ShowMessage(LPCTSTR lpszFunctionName, LPCTSTR arguments);
+void DisableConsolePrinting();
+
+// prints given message directly to console and log file
+void PrintMessage(LPCTSTR format, ...);
+// print predefined 
+void PrintError(LPCTSTR lpszFunctionName, DWORD lastError);
+void ShowMessage(LPCTSTR lpszFunctionName, DWORD lastError, LPCTSTR arguments);

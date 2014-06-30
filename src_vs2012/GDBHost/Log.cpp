@@ -7,18 +7,20 @@
 #include <wtypes.h>
 
 
+static bool gPrintConsole = true;
+
 #if LOGS_ENABLED
 
-static char path_log[_MAX_PATH]; // contains the path to the output log (needed in LogPrint())
+static char gLogFilePath[_MAX_PATH]; // contains the path to the output log (needed in LogPrint())
 
 void LogInitialize()
 {
-    GetEnvironmentVariableA("AppData", path_log, _countof(path_log));
-    strcat_s(path_log, _countof(path_log), "\\BlackBerry\\wrapper.log");
+    GetEnvironmentVariableA("AppData", gLogFilePath, _countof(gLogFilePath));
+    strcat_s(gLogFilePath, _countof(gLogFilePath), "\\BlackBerry\\wrapper.log");
 
     FILE* file = NULL;
     errno_t retCode;
-    retCode = fopen_s(&file, path_log, "w"); // just to delete a possible existing file
+    retCode = fopen_s(&file, gLogFilePath, "w"); // just to delete a possible existing file
     if (file != NULL && retCode == 0)
     {
         fclose(file);
@@ -34,7 +36,7 @@ void LogPrint(TCHAR* message)
     FILE* file = NULL;
     errno_t retCode;
 
-    retCode = fopen_s(&file, path_log, "a");
+    retCode = fopen_s(&file, gLogFilePath, "a");
     if (file != NULL && retCode == 0)
     {
         _ftprintf(file, _T("%s\r\n"), message);
@@ -44,24 +46,33 @@ void LogPrint(TCHAR* message)
 
 #endif /* LOGS_ENABLED */
 
-static void VsPrintConsole(LPCTSTR format, va_list args)
+void DisableConsolePrinting()
+{
+    gPrintConsole = false;
+}
+
+static void VsPrintMessage(LPCTSTR format, va_list args)
 {
     TCHAR buffer[1024] = _T("");
 
     _vstprintf_s(buffer, _countof(buffer), format, args);
-    _tprintf(buffer);
-    fflush(stdout);
+
+    if (gPrintConsole)
+    {
+        _tprintf(buffer);
+        fflush(stdout);
+    }
 
     // and also put it into logs...
     LogPrint(buffer);
 }
 
-void PrintConsole(LPCTSTR format, ...)
+void PrintMessage(LPCTSTR format, ...)
 {
     va_list list;
 
     va_start(list, format);
-    VsPrintConsole(format, list);
+    VsPrintMessage(format, list);
     va_end(list);
 }
 
@@ -69,18 +80,13 @@ void PrintConsole(LPCTSTR format, ...)
 /// Displays the error number and corresponding message.
 /// </summary>
 /// <param name="lpszFunctionName">Name of the API function, that failed</param>
-void PrintError(LPCTSTR lpszFunctionName)
+void PrintError(LPCTSTR lpszFunctionName, DWORD lastError)
 {
     HLOCAL lpvMessageBuffer = NULL;
-    TCHAR szPrintBuffer[512];
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpvMessageBuffer, 0, NULL);
-
-    _stprintf_s(szPrintBuffer, _countof(szPrintBuffer), _T("Error: API    = %s.\n   error code = %d.\n   message    = %s.\n"),
-            lpszFunctionName, GetLastError(), (LPTSTR)lpvMessageBuffer);
-    _tprintf(_T("%s\n"), szPrintBuffer);
-
+        NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpvMessageBuffer, 0, NULL);
+    PrintMessage(_T("Error: API    = %s.\n   error code = %d.\n   message    = %s.\n"), lpszFunctionName, lastError, (LPTSTR)lpvMessageBuffer);
     LocalFree(lpvMessageBuffer);
 }
 
@@ -88,7 +94,7 @@ void PrintError(LPCTSTR lpszFunctionName)
 /// Retrieve the system error message for the last-error code. 
 /// </summary>
 /// <param name="lpszFunctionName">Name of the API function, that failed</param>
-void ShowMessage(LPCTSTR lpszFunctionName, LPCTSTR arguments)
+void ShowMessage(LPCTSTR lpszFunctionName, DWORD lastError, LPCTSTR arguments)
 { 
     HLOCAL lpMsgBuf;
     HLOCAL lpDisplayBuf;
@@ -97,16 +103,16 @@ void ShowMessage(LPCTSTR lpszFunctionName, LPCTSTR arguments)
         arguments = _T("");
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
+        NULL, lastError, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
 
     // Display the error message and exit the process
     lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT, (_tcslen((LPCTSTR)lpMsgBuf) + _tcslen(lpszFunctionName) + 40 + _tcslen(arguments)) * sizeof(TCHAR));
     _stprintf_s((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR), _T("%s failed with error %d: %s\r\n%s"), lpszFunctionName,
-                GetLastError(), lpMsgBuf, arguments);
+        lastError, lpMsgBuf, arguments);
 
+    PrintMessage(_T("%s"), (LPCTSTR)lpDisplayBuf);
     MessageBox(NULL, (LPCTSTR)lpDisplayBuf, _T("GDB Host Error"), MB_OK);
 
     LocalFree(lpMsgBuf);
     LocalFree(lpDisplayBuf);
 }
-
