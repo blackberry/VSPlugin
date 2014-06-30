@@ -8,7 +8,10 @@ using BlackBerry.NativeCore.Diagnostics;
 namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
-    /// Class that runs specified executable, captures its output and error messages, then provides to parsers.
+    /// Class that runs specified executable, captures its output and error messages, then provides to parsers (implemented in child classes! by overriding ConsumeResults() method).
+    /// 
+    /// Note: The outputs are assumed to be small. They are all accumulated inside internal buffers and at process exit just flushed.
+    /// If this behavior doesn't suit specific tool needs, override the ProcessOutputLine() and ProcessErrorLine() methods to process them as they arrive.
     /// </summary>
     public class ToolRunner : IDisposable
     {
@@ -124,6 +127,10 @@ namespace BlackBerry.NativeCore.Tools
             set;
         }
 
+        /// <summary>
+        /// Gets or sets the indication, if started process should display a main application window.
+        /// Please note, that showing a console window for CUI tools will disable any output redirection.
+        /// </summary>
         protected bool ShowWindow
         {
             get { return _process != null && !_process.StartInfo.CreateNoWindow; }
@@ -170,6 +177,24 @@ namespace BlackBerry.NativeCore.Tools
             }
         }
 
+        private void InternalPrepareStarted()
+        {
+            if (_process.StartInfo.RedirectStandardError)
+                _process.BeginErrorReadLine();
+            if (_process.StartInfo.RedirectStandardOutput)
+                _process.BeginOutputReadLine();
+            if (_process.StartInfo.RedirectStandardInput)
+                _process.StandardInput.AutoFlush = true;
+
+            PID = _process.Id;
+            PrepareStarted(PID);
+        }
+
+        /// <summary>
+        /// Starts the tool and waits until it completes. It will block the current thread until that time.
+        /// The executable file name and all arguments are required to be setup earlier.
+        /// </summary>
+        /// <returns>Returns 'true', if tool returned exit code '0', otherwise 'false'.</returns>
         public bool Execute()
         {
             if (_isProcessing)
@@ -180,22 +205,13 @@ namespace BlackBerry.NativeCore.Tools
                 throw new InvalidOperationException("No executable to start");
 
             PrepareExecution();
-            ExitCode = int.MinValue;
 
             try
             {
                 _process.EnableRaisingEvents = false;
                 _process.Start();
+                InternalPrepareStarted();
 
-                if (_process.StartInfo.RedirectStandardError)
-                    _process.BeginErrorReadLine();
-                if (_process.StartInfo.RedirectStandardOutput)
-                    _process.BeginOutputReadLine();
-                if (_process.StartInfo.RedirectStandardInput)
-                    _process.StandardInput.AutoFlush = true;
-
-                PID = _process.Id;
-                PrepareStarted(PID);
                 _process.WaitForExit();
                 ExitCode = _process.ExitCode;
 
@@ -216,6 +232,10 @@ namespace BlackBerry.NativeCore.Tools
             }
         }
 
+        /// <summary>
+        /// Starts the tool asynchronously. It will not block the current thread.
+        /// Subscribe to Finished event before, to know, when tool's process completed execution.
+        /// </summary>
         public void ExecuteAsync()
         {
             if (_isProcessing)
@@ -224,7 +244,6 @@ namespace BlackBerry.NativeCore.Tools
                 throw new ObjectDisposedException("ToolRunner");
 
             PrepareExecution();
-            ExitCode = int.MinValue;
 
             try
             {
@@ -232,15 +251,7 @@ namespace BlackBerry.NativeCore.Tools
                 _process.EnableRaisingEvents = true;
 
                 _process.Start();
-                if (_process.StartInfo.RedirectStandardError)
-                    _process.BeginErrorReadLine();
-                if (_process.StartInfo.RedirectStandardOutput)
-                    _process.BeginOutputReadLine();
-                if (_process.StartInfo.RedirectStandardInput)
-                    _process.StandardInput.AutoFlush = true;
-
-                PID = _process.Id;
-                PrepareStarted(PID);
+                InternalPrepareStarted();
             }
             catch (Exception ex)
             {
@@ -285,6 +296,7 @@ namespace BlackBerry.NativeCore.Tools
 
         private void PrepareExecution()
         {
+            ExitCode = int.MinValue;
             _isProcessing = true;
             LastOutput = null;
             LastError = null;
@@ -343,6 +355,7 @@ namespace BlackBerry.NativeCore.Tools
         /// </summary>
         protected virtual void PrepareStarted(int pid)
         {
+            // do nothing, subclasses should handle it, if needed
         }
 
         protected virtual void ConsumeResults(string output, string error)
@@ -353,23 +366,46 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Sends given text to the process.
         /// </summary>
-        public virtual void SendInput(string text)
+        /// <returns>Returns 'true', when sending succeeded, otherwise 'false'.</returns>
+        public virtual bool SendInput(string text)
         {
             if (_process != null)
             {
                 _process.StandardInput.WriteLine(text);
+                return true;
             }
+
+            return false;
         }
 
         /// <summary>
         /// Sends given char to the process.
         /// </summary>
-        public virtual void SendInput(char c)
+        /// <returns>Returns 'true', when sending succeeded, otherwise 'false'.</returns>
+        public virtual bool SendInput(char c)
         {
             if (_process != null)
             {
                 _process.StandardInput.Write(c);
+                return true;
             }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Sends given chars to the process.
+        /// </summary>
+        /// <returns>Returns 'true', when sending succeeded, otherwise 'false'.</returns>
+        public virtual bool SendInput(char[] buffer, int startIndex, int count)
+        {
+            if (_process != null)
+            {
+                _process.StandardInput.Write(buffer, startIndex, count);
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

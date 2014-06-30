@@ -2,7 +2,6 @@
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using System;
-using System.IO;
 using System.Threading;
 using NUnit.Framework;
 
@@ -21,6 +20,22 @@ namespace UnitTests
             Assert.IsNotNull(runner.LastOutput);
             Assert.IsNull(runner.LastError);
             Assert.IsNotNull(runner.DebugToken);
+        }
+
+        [Test]
+        public void AbortAfterSuccessfulLoadDebugTokenInfo()
+        {
+            var runner = new DebugTokenInfoRunner(Defaults.ToolsDirectory, Defaults.DebugTokenPath);
+            var result = runner.Execute();
+
+            Assert.IsTrue(result, "Unable to start the tool");
+            Assert.IsNotNull(runner.LastOutput);
+            Assert.IsNull(runner.LastError);
+            Assert.IsNotNull(runner.DebugToken);
+
+            result = runner.Abort();
+            Assert.IsFalse(result, "There should be nothing to abort!");
+            Assert.IsFalse(runner.IsProcessing);
         }
 
         [Test]
@@ -46,6 +61,21 @@ namespace UnitTests
             Assert.IsNotNull(runner.LastOutput);
             Assert.IsNull(runner.LastError);
             Assert.IsNotNull(runner.DebugToken);
+        }
+
+        [Test]
+        public void AbortDuringLoadDebugTokenAsync()
+        {
+            var runner = new DebugTokenInfoRunner(Defaults.ToolsDirectory, Defaults.DebugTokenPath);
+            bool result;
+
+            Assert.IsFalse(runner.IsProcessing);
+            runner.ExecuteAsync();
+            Assert.IsTrue(runner.IsProcessing);
+
+            result = runner.Abort();
+            Assert.IsTrue(result, "Impossible to abort the tool execution");
+            Assert.IsFalse(runner.IsProcessing);
         }
 
         [Test]
@@ -174,9 +204,7 @@ namespace UnitTests
         [Test]
         public void LoadInfoAboutCertificate()
         {
-            var fileName = Path.Combine(ConfigDefaults.DataDirectory, DeveloperDefinition.DefaultCertificateName);
-            var password = "abcdef";
-            var runner = new KeyToolInfoRunner(Defaults.ToolsDirectory, fileName, password);
+            var runner = new KeyToolInfoRunner(Defaults.ToolsDirectory, Defaults.CertificatePath, Defaults.CertificatePassword);
             var result = runner.Execute();
 
             Assert.IsTrue(result, "Unable to start the tool");
