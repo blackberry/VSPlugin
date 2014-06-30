@@ -18,7 +18,7 @@ namespace BlackBerry.NativeCore.Debugger
         private readonly object _sync;
         private readonly AutoResetEvent _eventMessageAvailable;
 
-        private readonly StringBuilder _messageCache;
+        private readonly List<string> _messageCache;
         private readonly Queue<Response> _responses;
 
         private Request _currentRequest;
@@ -36,7 +36,7 @@ namespace BlackBerry.NativeCore.Debugger
             _sync = new object();
             _eventMessageAvailable = new AutoResetEvent(false);
 
-            _messageCache = new StringBuilder();
+            _messageCache = new List<string>();
             _responses = new Queue<Response>();
             _requests = new Queue<Request>();
             IsClosed = false;
@@ -96,13 +96,11 @@ namespace BlackBerry.NativeCore.Debugger
                 // is it an end of the message?
                 if (text == Prompt)
                 {
-                    var message = _messageCache.ToString();
-                    _messageCache.Remove(0, _messageCache.Length);
-
-                    // then store it separately for further processing:
-                    if (!string.IsNullOrEmpty(message))
+                    // then convert to message object and pass for further processing:
+                    if (_messageCache.Count > 0)
                     {
-                        response = Response.Parse(message);
+                        response = Response.Parse(_messageCache.ToArray());
+                        _messageCache.Clear();
                     }
                 }
                 else
@@ -110,7 +108,7 @@ namespace BlackBerry.NativeCore.Debugger
                     // check, if exit response, in that case, don't wait for never coming prompt:
                     if (string.CompareOrdinal(text, currentIDLength, "^exit", 0, text.Length - currentIDLength) == 0)
                     {
-                        response = Response.Parse(text);
+                        response = Response.Parse(new[] { text });
                         if (response != null)
                         {
                             IsClosed = true;
@@ -119,7 +117,7 @@ namespace BlackBerry.NativeCore.Debugger
 
                     if (response == null)
                     {
-                        _messageCache.AppendLine(text);
+                        _messageCache.Add(text);
                     }
                 }
 

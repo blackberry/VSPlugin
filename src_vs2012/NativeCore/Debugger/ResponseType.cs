@@ -5,6 +5,10 @@
         ResultRecord,
         ExecAsyncOutput,
         StatusAsyncOutput,
-        NotificationAsyncOutput
+        NotificationAsyncOutput,
+        /// <summary>
+        /// Comments only record.
+        /// </summary>
+        StreamRecord
     }
 }

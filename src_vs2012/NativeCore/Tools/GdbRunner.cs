@@ -84,7 +84,7 @@ namespace BlackBerry.NativeCore.Tools
         bool IGdbSender.Send(string text)
         {
 #if DEBUG
-            Debug.WriteLine(string.Format("GDB-INPUT: {0}", text));
+            Debug.WriteLine(string.Format("GDB-INPUT : {0}", text));
 #endif
 
             return SendInput(text);
