@@ -15,4 +15,4 @@
 #endif
 
 void PrintError(LPCTSTR lpszFunctionName);
-void ShowMessage(LPCTSTR lpszFunctionName);
+void ShowMessage(LPCTSTR lpszFunctionName, LPCTSTR arguments);

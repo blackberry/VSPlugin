@@ -149,7 +149,7 @@ BOOL GDBWrapper::StartProcess()
     // Launch the process
     if (!CreateProcess(NULL, m_lpszGdbCommand, NULL, NULL, TRUE, flags, NULL, NULL, &si, &pi))
     {
-        ShowMessage(_T("CreateProcess"));
+        ShowMessage(_T("CreateProcess"), m_lpszGdbCommand);
         return FALSE;
     }
 

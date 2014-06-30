@@ -67,17 +67,21 @@ void PrintError(LPCTSTR lpszFunctionName)
 /// Retrieve the system error message for the last-error code. 
 /// </summary>
 /// <param name="lpszFunctionName">Name of the API function, that failed</param>
-void ShowMessage(LPCTSTR lpszFunctionName) 
+void ShowMessage(LPCTSTR lpszFunctionName, LPCTSTR arguments)
 { 
     HLOCAL lpMsgBuf;
     HLOCAL lpDisplayBuf;
+
+    if (arguments == NULL)
+        arguments = _T("");
 
     FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
             NULL, GetLastError(), MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) &lpMsgBuf, 0, NULL);
 
     // Display the error message and exit the process
-    lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT, (_tcslen((LPCTSTR)lpMsgBuf) + _tcslen(lpszFunctionName) + 40) * sizeof(TCHAR));
-    _stprintf_s((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR), _T("%s failed with error %d: %s"), lpszFunctionName, GetLastError(), lpMsgBuf);
+    lpDisplayBuf = LocalAlloc(LMEM_ZEROINIT, (_tcslen((LPCTSTR)lpMsgBuf) + _tcslen(lpszFunctionName) + 40 + _tcslen(arguments)) * sizeof(TCHAR));
+    _stprintf_s((LPTSTR)lpDisplayBuf, LocalSize(lpDisplayBuf) / sizeof(TCHAR), _T("%s failed with error %d: %s\r\n%s"), lpszFunctionName,
+                GetLastError(), lpMsgBuf, arguments);
 
     MessageBox(NULL, (LPCTSTR)lpDisplayBuf, _T("GDB Host Error"), MB_OK);
 

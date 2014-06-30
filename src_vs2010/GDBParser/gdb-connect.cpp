@@ -386,7 +386,7 @@ void GDBConsole::prepAndLaunchRedirectedChild(void)
         DisplayError(_T("prepAndLaunchRedirectedChild: failed to allocate memory for pCmdLine"));
     }    
 	
-	_stprintf_s(pCmdLine, numChars, _T("\"%s\" \"%s\" \"%s\" \"%s\""), FilePath, m_pcGDBCmd, eventCtrlCName, eventTerminateName);
+	_stprintf_s(pCmdLine, numChars, _T("\"%s\" \"%s\" \"%s\" %s"), FilePath, eventCtrlCName, eventTerminateName, m_pcGDBCmd);
 			
     // Launch the process (create a new console).
     if (!CreateProcess(NULL,			/* executable name */

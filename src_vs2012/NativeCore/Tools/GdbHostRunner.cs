@@ -35,12 +35,12 @@ namespace BlackBerry.NativeCore.Tools
             _eventTerminate = new EventWaitHandle(false, EventResetMode.AutoReset, eventTerminateName);
 
             // GDB-Host process required a specific order of arguments:
-            // 1. the path to GDB executable itself, that will run
-            // 2. the name of the event, which set will trigger the Ctrl+C signal to the GDB
-            // 3. the name of the event, which set will exit the host process and GDB
+            // 1. the name of the event, which set will trigger the Ctrl+C signal to the GDB
+            // 2. the name of the event, which set will exit the host process and GDB
+            // 3. the path to GDB executable itself, that will run
             // 4. all the other arguments that should be passed to GDB (although it's possible to pass arguments to GDB via the executable path,
             //    but in practice they can't be escaped this way; that's why passing them as last arguments of the host are the recommended approach)
-            Arguments = string.Concat("\"", gdb.Executable, "\" ", eventCtrlCName, " ", eventTerminateName, " ", gdb.Arguments);
+            Arguments = string.Concat(eventCtrlCName, " ", eventTerminateName, " ", "\"", gdb.Executable, "\" ", gdb.Arguments);
         }
 
         #region Properties
@@ -75,7 +75,7 @@ namespace BlackBerry.NativeCore.Tools
         /// </summary>
         public void Terminate()
         {
-            if (_eventCtrlC == null)
+            if (_eventTerminate == null)
                 throw new ObjectDisposedException("GdbHostRunner");
 
             _eventTerminate.Set();
