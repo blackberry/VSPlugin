@@ -72,7 +72,7 @@ namespace BlackBerry.NativeCore.Debugger
                     throw new FormatException("Invalid message received from GDB");
             }
 
-            string id = tokenEnd == 0 ? null : message.Substring(startAt, tokenEnd);
+            string id = tokenEnd == 0 ? null : message.Substring(startAt, tokenEnd - startAt);
             char typeChar = message[tokenEnd];
 
             switch (typeChar)

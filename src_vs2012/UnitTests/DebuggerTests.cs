@@ -160,11 +160,13 @@ namespace UnitTests
             result = runner.Processor.Wait(out message);
             Assert.IsTrue(result, "Should receive GDB startup info");
 
+            var selectDevice = RequestsFactory.SelectTargetDevice(Defaults.IP);
             var listRequest = RequestsFactory.ListProcesses();
-            runner.Processor.Send(RequestsFactory.SelectTargetDevice(Defaults.IP));
+            runner.Processor.Send(selectDevice);
             runner.Processor.Send(listRequest);
 
             listRequest.Wait();
+            Assert.IsNotNull(listRequest.Response);
         }
 
         [Test]

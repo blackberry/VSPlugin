@@ -12,7 +12,6 @@ namespace BlackBerry.NativeCore.Debugger
         private static int _globalID;
 
 
-        private readonly string _command;
         private AutoResetEvent _event;
 
         public Request(string command)
@@ -20,7 +19,7 @@ namespace BlackBerry.NativeCore.Debugger
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
 
-            _command = command;
+            Command = command;
             _event = new AutoResetEvent(false);
 
             // make sure IDs never repeats, even if request created from different threads:
@@ -38,6 +37,12 @@ namespace BlackBerry.NativeCore.Debugger
         {
             get;
             private set;
+        }
+
+        public string Command
+        {
+            get;
+            protected set;
         }
 
         public Response Response
@@ -72,7 +77,7 @@ namespace BlackBerry.NativeCore.Debugger
 
         public override string ToString()
         {
-            return string.Concat(ID, "-", _command);
+            return string.Concat(ID, "-", Command);
         }
 
         /// <summary>

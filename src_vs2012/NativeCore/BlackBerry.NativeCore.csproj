@@ -48,6 +48,7 @@
     <Compile Include="Components\UpdateManager.cs" />
     <Compile Include="Components\UpdateManagerCompletedEventArgs.cs" />
     <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="Debugger\CliRequest.cs" />
     <Compile Include="Debugger\GdbProcessor.cs" />
     <Compile Include="Debugger\IGdbWriter.cs" />
     <Compile Include="Debugger\Instruction.cs" />

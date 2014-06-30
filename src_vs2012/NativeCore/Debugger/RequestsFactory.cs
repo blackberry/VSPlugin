@@ -22,7 +22,7 @@ namespace BlackBerry.NativeCore.Debugger
 
         public static Request ListProcesses()
         {
-            return new Request("info pidlist");
+            return new CliRequest("info pidlist");
         }
     }
 }
