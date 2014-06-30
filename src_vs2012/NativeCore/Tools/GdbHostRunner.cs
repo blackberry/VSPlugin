@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 
 namespace BlackBerry.NativeCore.Tools
@@ -9,11 +10,10 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that starts up the GDB via GDBHostprocess and helps in passing commands in both directions.
     /// </summary>
-    public sealed class GdbHostRunner : ToolRunner, IGdbSender
+    public sealed class GdbHostRunner : GdbRunner
     {
         private EventWaitHandle _eventCtrlC;
         private EventWaitHandle _eventTerminate;
-        private GdbProcessor _processor;
 
         /// <summary>
         /// Init constructor.
@@ -21,51 +21,28 @@ namespace BlackBerry.NativeCore.Tools
         /// <param name="gdbHostFileName">Path to the BlackBerry.GDBHost.exe tool.</param>
         /// <param name="gdb">Description of the GDB to communicate with.</param>
         public GdbHostRunner(string gdbHostFileName, GdbInfo gdb)
-            : base(gdbHostFileName, null)
+            : base(gdbHostFileName, gdb)
         {
-            if (string.IsNullOrEmpty(gdbHostFileName))
-                throw new ArgumentNullException("gdbHostFileName");
-            if (gdb == null)
-                throw new ArgumentNullException("gdb");
-
-            GDB = gdb;
-
             int currentPID = Process.GetCurrentProcess().Id;
             string eventCtrlCName = "Ctrl-C-" + currentPID;
             string eventTerminateName = "Terminate-" + currentPID;
             _eventCtrlC = new EventWaitHandle(false, EventResetMode.AutoReset, eventCtrlCName);
             _eventTerminate = new EventWaitHandle(false, EventResetMode.AutoReset, eventTerminateName);
-            _processor = new GdbProcessor(this);
 
             // GDB-Host process required a specific order of arguments:
             // 1. the name of the event, which set will trigger the Ctrl+C signal to the GDB
             // 2. the name of the event, which set will exit the host process and GDB
             // 3. the path to GDB executable itself, that will run
-            // 4. all the other arguments that should be passed to GDB (although it's possible to pass arguments to GDB via the executable path,
+            // 4. optional settings for GDBHost (-s => disable custom console logs)
+            // 5. all the other arguments that should be passed to GDB (although it's possible to pass arguments to GDB via the executable path,
             //    but in practice they can't be escaped this way; that's why passing them as last arguments of the host are the recommended approach)
-            Arguments = string.Concat(eventCtrlCName, " ", eventTerminateName, " ", "\"", gdb.Executable, "\" ", gdb.Arguments);
+            Arguments = string.Concat(eventCtrlCName, " ", eventTerminateName, " -s ", "\"", gdb.Executable, "\" ", gdb.Arguments);
         }
-
-        #region Properties
-
-        public GdbInfo GDB
-        {
-            get;
-            private set;
-        }
-
-        public bool ShowConsole
-        {
-            get { return ShowWindow; }
-            set { ShowWindow = value; }
-        }
-
-        #endregion
 
         /// <summary>
         /// Sends Ctrl+C to the GDB process.
         /// </summary>
-        public void Break()
+        public override void Break()
         {
             if (_eventCtrlC == null)
                 throw new ObjectDisposedException("GdbHostRunner");
@@ -89,6 +66,23 @@ namespace BlackBerry.NativeCore.Tools
         /// </summary>
         public override bool Abort()
         {
+            if (Processor != null)
+            {
+                try
+                {
+                    var request = RequestsFactory.Exit();
+                    if (Processor.Send(request))
+                    {
+                        // synchronously wait for the completion:
+                        request.Wait();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to send input data");
+                }
+            }
+
             if (_eventTerminate != null)
             {
                 Terminate();
@@ -113,39 +107,11 @@ namespace BlackBerry.NativeCore.Tools
                     _eventTerminate.Dispose();
                     _eventTerminate = null;
                 }
-
-                if (_processor != null)
-                {
-                    _processor.Dispose();
-                    _processor = null;
-                }
             }
             base.Dispose(disposing);
         }
 
         #region Message Processing
-
-        protected override void ProcessOutputLine(string text)
-        {
-            if (_processor != null)
-            {
-                _processor.Receive(text);
-            }
-        }
-
-        #endregion
-
-        #region IGdbSender Implementation
-
-        void IGdbSender.Break()
-        {
-            Break();
-        }
-
-        void IGdbSender.Send(string text)
-        {
-            SendInput(text);
-        }
 
         #endregion
     }

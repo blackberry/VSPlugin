@@ -52,6 +52,9 @@
     <Compile Include="Debugger\IGdbWriter.cs" />
     <Compile Include="Debugger\Instruction.cs" />
     <Compile Include="Debugger\InstructionCollection.cs" />
+    <Compile Include="Debugger\Request.cs" />
+    <Compile Include="Debugger\Response.cs" />
+    <Compile Include="Debugger\ResponseType.cs" />
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />
     <Compile Include="Diagnostics\TraceLog.cs" />
@@ -101,6 +104,7 @@
     <Compile Include="Tools\KeyToolInfoRunner.cs" />
     <Compile Include="Tools\KeyToolRegisterRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
+    <Compile Include="Debugger\RequestsFactory.cs" />
     <Compile Include="Tools\ToolRunner.cs" />
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />

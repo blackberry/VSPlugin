@@ -369,7 +369,7 @@ namespace BlackBerry.NativeCore.Tools
         /// <returns>Returns 'true', when sending succeeded, otherwise 'false'.</returns>
         public virtual bool SendInput(string text)
         {
-            if (_process != null)
+            if (_process != null && IsProcessing)
             {
                 _process.StandardInput.WriteLine(text);
                 return true;
