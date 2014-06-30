@@ -71,22 +71,43 @@ int _tmain(int argc, _TCHAR* argv[])
         PrintMessage(_T("Copyright (C) 2010-2014 Research in Motion Limited\r\n"));
         PrintMessage(_T("This application runs GDB in console mode and helps it handle Ctrl+C signal.\r\n"));
         PrintMessage(_T("Usage:\r\n"));
-        PrintMessage(_T("  BlackBerry.GDBHost.exe <ctrl-c-event-name> <termination-event-name> <path-to-GDB.exe> (<gdb-arguments>)*\r\n"));
+        PrintMessage(_T("  BlackBerry.GDBHost.exe <ctrl-c-event-name> <termination-event-name> (host-options) <path-to-GDB.exe> (<gdb-arguments>)*\r\n"));
         PrintMessage(_T("Where:\r\n"));
         PrintMessage(_T("  <ctrl-c-event-name>      - name of the global event, firing it will cause sending Ctrl+C to GDB\r\n"));
         PrintMessage(_T("  <termination-event-name> - name of the global event, firing it will cause this process to finish\r\n"));
         PrintMessage(_T("  <path-to-GDB.exe>        - path to GDB executable and its arguments\r\n"));
         PrintMessage(_T("  <gdb-arguments>          - additional arguments passed directly to GDB\r\n"));
+        PrintMessage(_T("  (host-options)           - single parameter starting with '-', which defines custom behavior of the host process itself\r\n"));
+        PrintMessage(_T("Host options:\r\n"));
+        PrintMessage(_T("  s                        - [silent] - disable all custom console logs\r\n"));
         PrintMessage(_T("\r\n\r\n"));
         return 0;
     }
 
     HANDLE handleCtrlC;
     HANDLE handleTerminate;
-    LPCTSTR eventNameGdbPath = argv[3];
+    LPCTSTR hostOptions = argv[3];          // it's not a mistake, the hostOptions and gdbExecutablePath should point to the same 'opitional' parameter
+    LPCTSTR gdbExecutablePath = argv[3];
     LPCTSTR eventNameCtrlC = argv[1];
     LPCTSTR eventNameTerminate = argv[2];
+    int gdbArgsStartFrom = 4;
 
+    // check, if we passed some optional arguments for the host...
+    if (hostOptions[0] == '-')
+    {
+        gdbExecutablePath = argv[4];
+        gdbArgsStartFrom = 5;
+
+        // and parse host options:
+        int optionsLength = _tcslen(hostOptions);
+        for (int i = 1; i < optionsLength; i++)
+        {
+            if (hostOptions[i] == 's')
+            {
+                DisableConsolePrinting();
+            }
+        }
+    }
 
     handleCtrlC     = OpenEventW(EVENT_ALL_ACCESS, TRUE, eventNameCtrlC); // Ctrl-C signal
     handleTerminate = OpenEventW(EVENT_ALL_ACCESS, TRUE, eventNameTerminate); // Signal to terminate the wrapper process
@@ -105,12 +126,12 @@ int _tmain(int argc, _TCHAR* argv[])
 
     // Print status
     PrintMessage(_T("STARTUP INFO:\r\n"));
-    PrintMessage(_T("  Args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3]);
+    PrintMessage(_T("  Args: %s %s %s %s\r\n"), argv[0], argv[1], argv[2], argv[3], argc >= 5 ? argv[4] : _T(""), argc >= 6 ? argv[5] : _T(""));
     PrintMessage(_T("  Ctrl-C handler: name: \"%s\", handle: 0x%p\r\n"), eventNameCtrlC, handleCtrlC);
     PrintMessage(_T("  Terminate handler: name: \"%s\", handle: 0x%p\r\n"), eventNameTerminate, handleTerminate);
 
     // Initialize GDB
-    LPCTSTR gdbCommand = ConcatGdbCommand(argc, argv, eventNameGdbPath, 4);
+    LPCTSTR gdbCommand = ConcatGdbCommand(argc, argv, gdbExecutablePath, gdbArgsStartFrom);
     GDBWrapper* gdb = new GDBWrapper(gdbCommand, handleCtrlC, handleTerminate);
 
     PrintMessage(_T("  GDB command: %s\r\n"), gdbCommand);
@@ -121,7 +142,7 @@ int _tmain(int argc, _TCHAR* argv[])
     // Start GDB
     if (!gdb->StartProcess())
     {
-        PrintMessage(_T("Error: Failed to start the GDB process (%s)\r\n"), eventNameGdbPath);
+        PrintMessage(_T("Error: Failed to start the GDB process (%s)\r\n"), gdbExecutablePath);
         return 1;
     }
 
