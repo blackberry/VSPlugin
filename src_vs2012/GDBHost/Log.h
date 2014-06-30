@@ -14,5 +14,6 @@
 #   define LogPrint(message)                // do nothing
 #endif
 
+void PrintConsole(LPCTSTR format, ...);
 void PrintError(LPCTSTR lpszFunctionName);
 void ShowMessage(LPCTSTR lpszFunctionName, LPCTSTR arguments);

@@ -44,6 +44,27 @@ void LogPrint(TCHAR* message)
 
 #endif /* LOGS_ENABLED */
 
+static void VsPrintConsole(LPCTSTR format, va_list args)
+{
+    TCHAR buffer[1024] = _T("");
+
+    _vstprintf_s(buffer, _countof(buffer), format, args);
+    _tprintf(buffer);
+    fflush(stdout);
+
+    // and also put it into logs...
+    LogPrint(buffer);
+}
+
+void PrintConsole(LPCTSTR format, ...)
+{
+    va_list list;
+
+    va_start(list, format);
+    VsPrintConsole(format, list);
+    va_end(list);
+}
+
 /// <summary> 
 /// Displays the error number and corresponding message.
 /// </summary>
