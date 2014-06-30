@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Model;
 
 namespace BlackBerry.NativeCore.Tools
@@ -6,8 +7,10 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that starts up the GDB and helps in passing commands in both directions.
     /// </summary>
-    public sealed class GdbRunner : ToolRunner
+    public sealed class GdbRunner : ToolRunner, IGdbSender
     {
+        private GdbProcessor _processor;
+
         /// <summary>
         /// Init constructor.
         /// </summary>
@@ -19,6 +22,7 @@ namespace BlackBerry.NativeCore.Tools
                 throw new ArgumentNullException("gdb");
 
             GDB = gdb;
+            _processor = new GdbProcessor(this);
         }
 
         #region Properties
@@ -36,5 +40,32 @@ namespace BlackBerry.NativeCore.Tools
         }
 
         #endregion
+
+        #region IGdbSender Implementation
+
+        void IGdbSender.Break()
+        {
+            throw new NotSupportedException("Breaking is not supported by GDB in this type of call");
+        }
+
+        void IGdbSender.Send(string text)
+        {
+            SendInput(text);
+        }
+
+        #endregion
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_processor != null)
+                {
+                    _processor.Dispose();
+                    _processor = null;
+                }
+            }
+            base.Dispose(disposing);
+        }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading;
+using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Model;
 
 namespace BlackBerry.NativeCore.Tools
@@ -8,10 +9,11 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that starts up the GDB via GDBHostprocess and helps in passing commands in both directions.
     /// </summary>
-    public sealed class GdbHostRunner : ToolRunner
+    public sealed class GdbHostRunner : ToolRunner, IGdbSender
     {
         private EventWaitHandle _eventCtrlC;
         private EventWaitHandle _eventTerminate;
+        private GdbProcessor _processor;
 
         /// <summary>
         /// Init constructor.
@@ -33,6 +35,7 @@ namespace BlackBerry.NativeCore.Tools
             string eventTerminateName = "Terminate-" + currentPID;
             _eventCtrlC = new EventWaitHandle(false, EventResetMode.AutoReset, eventCtrlCName);
             _eventTerminate = new EventWaitHandle(false, EventResetMode.AutoReset, eventTerminateName);
+            _processor = new GdbProcessor(this);
 
             // GDB-Host process required a specific order of arguments:
             // 1. the name of the event, which set will trigger the Ctrl+C signal to the GDB
@@ -81,6 +84,20 @@ namespace BlackBerry.NativeCore.Tools
             _eventTerminate.Set();
         }
 
+        /// <summary>
+        /// Aborts the process and all its child processes.
+        /// </summary>
+        public override bool Abort()
+        {
+            if (_eventTerminate != null)
+            {
+                Terminate();
+                return true;
+            }
+
+            return false;
+        }
+
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -96,6 +113,12 @@ namespace BlackBerry.NativeCore.Tools
                     _eventTerminate.Dispose();
                     _eventTerminate = null;
                 }
+
+                if (_processor != null)
+                {
+                    _processor.Dispose();
+                    _processor = null;
+                }
             }
             base.Dispose(disposing);
         }
@@ -104,6 +127,24 @@ namespace BlackBerry.NativeCore.Tools
 
         protected override void ProcessOutputLine(string text)
         {
+            if (_processor != null)
+            {
+                _processor.Receive(text);
+            }
+        }
+
+        #endregion
+
+        #region IGdbSender Implementation
+
+        void IGdbSender.Break()
+        {
+            Break();
+        }
+
+        void IGdbSender.Send(string text)
+        {
+            SendInput(text);
         }
 
         #endregion
