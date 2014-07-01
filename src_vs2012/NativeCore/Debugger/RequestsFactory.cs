@@ -75,14 +75,69 @@ namespace BlackBerry.NativeCore.Debugger
             return new Request("target-attach " + pid);
         }
 
+        public static Request InfoThreads()
+        {
+            return new CliRequest("info threads");
+        }
+
         public static Request DetachTargetProcess()
         {
             return new Request("target-detach");
         }
 
+        public static Request SetStackTraceDepth(int threadID, int depth)
+        {
+            if (depth < 0)
+                return new Request("stack-info-depth --thread " + threadID + " --frame 0");
+            return new Request("stack-info-depth " + depth + " --thread " + threadID + " --frame 0");
+        }
+
         public static Request StackTraceListFrames()
         {
             return new Request("stack-list-frames");
+        }
+
+        public static Request InsertBreakPoint(string fileName, uint line)
+        {
+            if (string.IsNullOrEmpty(fileName))
+                throw new ArgumentNullException("fileName");
+
+            return new Request("break-insert --thread-group i1 -f " + fileName + ":" + line);
+        }
+
+        public static Request InsertBreakpoint(string functionName)
+        {
+            if (string.IsNullOrEmpty(functionName))
+                throw new ArgumentNullException("functionName");
+
+            return new Request("break-insert --thread-group i1 -f " + functionName);
+        }
+
+        public static Request DeleteBreakpoint(params uint[] breakpointIDs)
+        {
+            if (breakpointIDs == null || breakpointIDs.Length == 0)
+                throw new ArgumentNullException("breakpointIDs");
+
+            if (breakpointIDs.Length == 1)
+                return new Request("break-delete " + breakpointIDs[0]);
+
+            var identifiers = new StringBuilder();
+            for (int i = 0; i < identifiers.Length; i++)
+            {
+                identifiers.Append(i).Append(' ');
+            }
+
+            return new Request("break-delete " + identifiers);
+        }
+
+        public static Request Continue()
+        {
+            return new Request("exec-continue");
+        }
+        
+        public static Request Run()
+        {
+            return new Request("exec-run");
         }
 
         /// <summary>

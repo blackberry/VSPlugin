@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Model;
@@ -241,21 +242,85 @@ namespace UnitTests
             procGroup.Wait(); // at this point, we should receive a list of running processes
 
             // find the PID of FallingBlocks sample:
-            uint pid = 19873794;
+            uint pid = GetPID("FallingBlocks", listProcesses.Response.Comments);
 
             // attach to this process:
             var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(runner.GDB.LibraryPaths);
             var setExecutable = RequestsFactory.SetExecutable(@"S:\test\FallingBlocks\Device-Debug\FallingBlocks", true);
             var attachProcess = RequestsFactory.AttachTargetProcess(pid);
+            var stackDepth = RequestsFactory.SetStackTraceDepth(1, -20);
+            var infoThreads = RequestsFactory.InfoThreads();
             var stackTrace = RequestsFactory.StackTraceListFrames();
 
-            var attachGroup = RequestsFactory.Group(setLibSearchPath, setExecutable, attachProcess, stackTrace);
+            var attachGroup = RequestsFactory.Group(setLibSearchPath, setExecutable, attachProcess, stackDepth, stackTrace, infoThreads);
             runner.Processor.Send(attachGroup);
             attachGroup.Wait();
 
+            // insert a breakpoint
+            var bp = RequestsFactory.InsertBreakPoint("main.c", 151);
+            //var bp = RequestsFactory.InsertBreakpoint("update");
+
+            var breakGroup = RequestsFactory.Group(bp);
+            runner.Processor.Send(breakGroup);
+            breakGroup.Wait();
+
+            // resume execution:
+            var continueExec = RequestsFactory.Continue();
+            runner.Processor.Send(continueExec);
+            continueExec.Wait();
+
+            for (int i = 0; i < 1000; i++)
+                Thread.Sleep(1);
+
+            // delete the breakpoint:
+            var delBp = RequestsFactory.DeleteBreakpoint(1); // PH: FIXME: assuming this BP-id, should be updated, when parsing responses is fully implemented
+            runner.Processor.Send(delBp);
+            delBp.Wait();
+
+            // resume after breakpoint:
+            runner.Processor.Send(continueExec);
+            continueExec.Wait();
+
+            for (int i = 0; i < 1000; i++)
+                Thread.Sleep(5);
+
+            // detach:
+            runner.Break();
             var detachProcess = RequestsFactory.DetachTargetProcess();
             runner.Processor.Send(detachProcess);
             detachProcess.Wait();
+        }
+
+        private static uint GetPID(string exeName, string[] info)
+        {
+            if (string.IsNullOrEmpty(exeName))
+                throw new ArgumentNullException("exeName");
+            if (info == null || info.Length == 0)
+                throw new ArgumentNullException("info");
+
+            foreach (var process in info)
+            {
+                int startAt = process.IndexOf(exeName, StringComparison.OrdinalIgnoreCase);
+                if (startAt >= 0)
+                {
+                    int pidStartAt = process.IndexOf('-', startAt);
+                    if (pidStartAt > 0)
+                    {
+                        string pidString;
+                        uint pid;
+                        int pidEndAt = process.IndexOf('/', pidStartAt);
+                        if (pidEndAt < 0)
+                            pidString = process.Substring(pidStartAt + 1).Trim();
+                        else
+                            pidString = process.Substring(pidStartAt + 1, pidEndAt - pidStartAt - 1).Trim();
+
+                        if (uint.TryParse(pidString, NumberStyles.Number, null, out pid))
+                            return pid;
+                    }
+                }
+            }
+
+            throw new InvalidOperationException("Specified process is not running");
         }
 
         [Test]
