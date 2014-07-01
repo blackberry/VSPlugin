@@ -248,7 +248,7 @@ namespace UnitTests
             var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(runner.GDB.LibraryPaths);
             var setExecutable = RequestsFactory.SetExecutable(@"S:\test\FallingBlocks\Device-Debug\FallingBlocks", true);
             var attachProcess = RequestsFactory.AttachTargetProcess(pid);
-            var stackDepth = RequestsFactory.SetStackTraceDepth(1, -20);
+            var stackDepth = RequestsFactory.SetStackTraceDepth(1, 20);
             var infoThreads = RequestsFactory.InfoThreads();
             var stackTrace = RequestsFactory.StackTraceListFrames();
 
@@ -278,8 +278,9 @@ namespace UnitTests
             delBp.Wait();
 
             // resume after breakpoint:
-            runner.Processor.Send(continueExec);
-            continueExec.Wait();
+            var contGroup = RequestsFactory.Group(stackTrace, continueExec);
+            runner.Processor.Send(contGroup);
+            contGroup.Wait();
 
             for (int i = 0; i < 1000; i++)
                 Thread.Sleep(5);
