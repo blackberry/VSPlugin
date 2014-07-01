@@ -16,6 +16,7 @@ namespace UnitTests
         public static readonly string NdkDirectory;
 
         public const string InstalledNdkPath = @"C:\bbndk\10_2_2674";
+        public const string InstalledRuntimePath = @"C:\bbndk_vs\runtime_10_2_1_3247\qnx6";
         public const string GdbHostPath = @"S:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
         public static readonly string SshPublicKeyPath;
         public static readonly string DebugTokenPath;

@@ -45,12 +45,19 @@ namespace UnitTests
 
         public GdbHostRunner CreateDebuggerRunner()
         {
+            return CreateDebuggerRunner(null);
+        }
+
+        public GdbHostRunner CreateDebuggerRunner(string runtimeFolder)
+        {
             // get the NDK info:
             var ndk = NdkInfo.Scan(Defaults.InstalledNdkPath);
             Assert.IsNotNull(ndk);
 
+            var runtime = string.IsNullOrEmpty(runtimeFolder) ? null : new RuntimeDefinition(runtimeFolder);
+
             // get the description of GDB for a device:
-            var gdb = new GdbInfo(ndk, DeviceDefinitionType.Device, null, null);
+            var gdb = new GdbInfo(ndk, DeviceDefinitionType.Device, runtime, null);
             Assert.IsNotNull(gdb);
 
             // start the GDB:
@@ -160,13 +167,95 @@ namespace UnitTests
             result = runner.Processor.Wait(out message);
             Assert.IsTrue(result, "Should receive GDB startup info");
 
-            var selectDevice = RequestsFactory.SelectTargetDevice(Defaults.IP);
+            var selectDevice = RequestsFactory.SetTargetDevice(Defaults.IP);
             var listRequest = RequestsFactory.ListProcesses();
             runner.Processor.Send(selectDevice);
             runner.Processor.Send(listRequest);
 
             listRequest.Wait();
             Assert.IsNotNull(listRequest.Response);
+        }
+
+        [Test]
+        public void LoadListOfProcessesByGroup()
+        {
+            var runner = CreateDebuggerRunner();
+            runner.ExecuteAsync();
+
+            var selectDevice = RequestsFactory.SetTargetDevice(Defaults.IP);
+            var listRequest = RequestsFactory.ListProcesses();
+            var group = RequestsFactory.Group(selectDevice, listRequest);
+            runner.Processor.Send(group);
+
+            group.Wait();
+            Assert.IsNotNull(listRequest.Response);
+            Assert.AreSame(group.Response, listRequest.Response);
+        }
+
+        [Test]
+        public void ListAvailableFeaturesExtraGrouped()
+        {
+            var runner = CreateDebuggerRunner();
+            runner.ExecuteAsync();
+
+            var listFeatures = RequestsFactory.ListFeatures();
+            // yes, it's not necessary to wrap it into any group, but just for testing purposes:
+            var group = RequestsFactory.Group(RequestsFactory.Group(listFeatures));
+
+            runner.Processor.Send(group);
+            group.Wait();
+
+            Assert.IsNotNull(listFeatures.Response);
+            Assert.IsNotNull(listFeatures.Response.Content); // the list of features
+            Assert.AreSame(group.Response, listFeatures.Response);
+        }
+
+        [Test]
+        public void ListAvailableTargetFeatures()
+        {
+            var runner = CreateDebuggerRunner();
+            runner.ExecuteAsync();
+
+            var selectTarget = RequestsFactory.SetTargetDevice(Defaults.IP);
+            var listTargetFeatures = RequestsFactory.ListTargetFeatures();
+
+            runner.Processor.Send(selectTarget);
+            runner.Processor.Send(listTargetFeatures);
+            listTargetFeatures.Wait();
+
+            Assert.IsNotNull(listTargetFeatures.Response);
+        }
+
+        [Test]
+        public void AttachToProcess()
+        {
+            var runner = CreateDebuggerRunner(Defaults.InstalledRuntimePath);
+            runner.ExecuteAsync();
+
+            var enablePending = RequestsFactory.SetPendingBreakpoints(true);
+            var selectDevice = RequestsFactory.SetTargetDevice(Defaults.IP);
+            var listProcesses = RequestsFactory.ListProcesses();
+
+            var procGroup = RequestsFactory.Group(enablePending, selectDevice, listProcesses);
+            runner.Processor.Send(procGroup);
+            procGroup.Wait(); // at this point, we should receive a list of running processes
+
+            // find the PID of FallingBlocks sample:
+            uint pid = 19873794;
+
+            // attach to this process:
+            var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(runner.GDB.LibraryPaths);
+            var setExecutable = RequestsFactory.SetExecutable(@"S:\test\FallingBlocks\Device-Debug\FallingBlocks", true);
+            var attachProcess = RequestsFactory.AttachTargetProcess(pid);
+            var stackTrace = RequestsFactory.StackTraceListFrames();
+
+            var attachGroup = RequestsFactory.Group(setLibSearchPath, setExecutable, attachProcess, stackTrace);
+            runner.Processor.Send(attachGroup);
+            attachGroup.Wait();
+
+            var detachProcess = RequestsFactory.DetachTargetProcess();
+            runner.Processor.Send(detachProcess);
+            detachProcess.Wait();
         }
 
         [Test]

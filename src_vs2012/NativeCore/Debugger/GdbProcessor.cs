@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace BlackBerry.NativeCore.Debugger
@@ -86,6 +85,7 @@ namespace BlackBerry.NativeCore.Debugger
             Request currentRequest;
             Response response = null;
             bool clearCurrentRequest = false;
+            bool retryRequest = false;
 
             lock (_sync)
             {
@@ -133,17 +133,21 @@ namespace BlackBerry.NativeCore.Debugger
                 // inform a request, that a matching response arrived:
                 if (currentRequest != null && currentRequest.HasIdenticalID(response.ID))
                 {
-                    clearCurrentRequest = currentRequest.Complete(response);
+                    clearCurrentRequest = currentRequest.Complete(response, out retryRequest);
                 }
 
                 //NotifyResposeReceived(response);
                 _eventMessageAvailable.Set();
             }
 
-            if (clearCurrentRequest)
+            if (clearCurrentRequest && !retryRequest)
             {
                 _currentRequest = null;
                 SendNextRequest();
+            }
+            if (retryRequest)
+            {
+                Send(currentRequest);
             }
 
             return response != null;
@@ -225,7 +229,7 @@ namespace BlackBerry.NativeCore.Debugger
 
             lock (_sync)
             {
-                if (_currentRequest != null)
+                if (_currentRequest != null && _currentRequest != request)
                 {
                     _requests.Enqueue(request);
                 }

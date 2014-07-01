@@ -19,8 +19,9 @@ namespace BlackBerry.NativeCore.Debugger
         /// <param name="id">Identifier of the response (it should match the ID of the request)</param>
         /// <param name="type">Type of the response</param>
         /// <param name="content">Name and content of the response. This value can not be empty.</param>
+        /// <param name="notifications">Additional asynchronous notifications received along with the content</param>
         /// <param name="comments">Additional comments received along with the content</param>
-        public Response(string id, ResponseType type, string content, string[] comments)
+        public Response(string id, ResponseType type, string content, string[] notifications, string[] comments)
         {
             if (string.IsNullOrEmpty(content))
                 throw new ArgumentNullException("content");
@@ -39,14 +40,16 @@ namespace BlackBerry.NativeCore.Debugger
                 Name = null;
                 Content = content;
             }
+            Notifications = notifications ?? new string[0];
             Comments = comments ?? new string[0];
         }
 
         /// <summary>
         /// Init constructor.
         /// </summary>
+        /// <param name="notifications">Additional asynchronous notifications received along with the content</param>
         /// <param name="comments">Set of comments. This value can not be empty</param>
-        public Response(string[] comments)
+        public Response(string[] notifications, string[] comments)
         {
             if (comments == null || comments.Length == 0)
                 throw new ArgumentOutOfRangeException("comments");
@@ -55,6 +58,7 @@ namespace BlackBerry.NativeCore.Debugger
             Type = ResponseType.StreamRecord;
             Name = null;
             Content = null;
+            Notifications = notifications ?? new string[0];
             Comments = comments;
         }
 
@@ -84,6 +88,12 @@ namespace BlackBerry.NativeCore.Debugger
             private set;
         }
 
+        public string[] Notifications
+        {
+            get;
+            private set;
+        }
+
         public string[] Comments
         {
             get;
@@ -107,6 +117,7 @@ namespace BlackBerry.NativeCore.Debugger
             string resultID = null;
             ResponseType resultType = ResponseType.ResultRecord;
             List<string> streamRecords = null;
+            List<string> notificationRecords = null;
 
             foreach (var line in message)
             {
@@ -131,22 +142,32 @@ namespace BlackBerry.NativeCore.Debugger
                 }
                 else
                 {
-                    if (resultRecord != null)
-                        throw new FormatException("More than one result record is not expected inside GDB message");
-
-                    resultID = lineIndex > 0 ? line.Substring(0, lineIndex) : null;
-                    resultRecord = line.Substring(lineIndex + 1);
                     resultType = GetResponseType(typeChar);
+
+                    if (resultType == ResponseType.ResultRecord)
+                    {
+                        if (resultRecord != null)
+                            throw new FormatException("More than one result record is not expected inside GDB message");
+
+                        resultID = lineIndex > 0 ? line.Substring(0, lineIndex) : null;
+                        resultRecord = line.Substring(lineIndex + 1);
+                    }
+                    else
+                    {
+                        if (notificationRecords == null)
+                            notificationRecords = new List<string>();
+                        notificationRecords.Add(line);
+                    }
                 }
             }
 
             // found comments only message:
             if (resultRecord == null)
             {
-                return streamRecords == null ? null : new Response(streamRecords.ToArray());
+                return streamRecords == null ? null : new Response(notificationRecords.ToArray(), streamRecords.ToArray());
             }
 
-            return new Response(resultID, resultType, resultRecord, streamRecords != null ? streamRecords.ToArray() : null);
+            return new Response(resultID, resultType, resultRecord, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords != null ? streamRecords.ToArray() : null);
         }
 
         private static ResponseType GetResponseType(char typeChar)

@@ -12,6 +12,8 @@ namespace BlackBerry.NativeCore.Debugger
         private static int _globalID;
 
 
+        private string _id;
+        private string _command;
         private AutoResetEvent _event;
 
         public Request(string command)
@@ -19,11 +21,19 @@ namespace BlackBerry.NativeCore.Debugger
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
 
-            Command = command;
+            _command = command;
             _event = new AutoResetEvent(false);
 
             // make sure IDs never repeats, even if request created from different threads:
-            ID = Interlocked.Add(ref _globalID, 1).ToString(CultureInfo.InvariantCulture);
+            _id = Interlocked.Add(ref _globalID, 1).ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
+        /// Dedicated constructor for a group of requests.
+        /// </summary>
+        protected Request()
+        {
+            _event = new AutoResetEvent(false);
         }
 
         ~Request()
@@ -33,19 +43,19 @@ namespace BlackBerry.NativeCore.Debugger
 
         #region Properties
 
-        public string ID
+        public virtual string ID
         {
-            get;
-            private set;
+            get { return _id; }
+            private set { _id = value; }
         }
 
-        public string Command
+        public virtual string Command
         {
-            get;
-            protected set;
+            get { return _command; }
+            protected set { _command = value; }
         }
 
-        public Response Response
+        public virtual Response Response
         {
             get;
             private set;
@@ -93,16 +103,28 @@ namespace BlackBerry.NativeCore.Debugger
         /// <summary>
         /// Method executed by GdbParser, to inform the request, that response has arrived.
         /// There is no limitation for, how many responses a request can handle.
-        /// It should just return 'true', when it is the final one.
+        /// It should just return 'true', when it is the final one and use the 'retry'
+        /// parameter to be sent again to GDB.
         /// </summary>
-        internal bool Complete(Response response)
+        internal virtual bool Complete(Response response, out bool retry)
         {
             if (response == null)
                 throw new ArgumentNullException("response");
+            if (_event == null)
+                throw new ObjectDisposedException("Request");
 
+            retry = false;
             Response = response;
             _event.Set();
             return true;
+        }
+
+        protected void SetEvent()
+        {
+            if (_event == null)
+                throw new ObjectDisposedException("Request");
+
+            _event.Set();
         }
 
         /// <summary>
