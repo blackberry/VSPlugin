@@ -22,7 +22,7 @@ namespace BlackBerry.NativeCore.Model
             NDK = ndk;
             DeviceType = deviceType;
             Runtime = runtime;
-            LibraryPaths = CreateLibraryPaths(ndk, deviceType, additionalLibraryPaths);
+            LibraryPaths = CreateLibraryPaths(ndk, runtime, deviceType, additionalLibraryPaths);
             Executable = Path.Combine(NDK.HostPath, "usr", "bin", GetName(deviceType));
             Arguments = "--interpreter=mi2";
         }
@@ -101,13 +101,14 @@ namespace BlackBerry.NativeCore.Model
             }
         }
 
-        private static string[] CreateLibraryPaths(NdkDefinition ndk, DeviceDefinitionType deviceType, IEnumerable<string> additionalLibraryPaths)
+        private static string[] CreateLibraryPaths(NdkDefinition ndk, RuntimeDefinition runtime, DeviceDefinitionType deviceType, IEnumerable<string> additionalLibraryPaths)
         {
             if (ndk == null)
                 throw new ArgumentNullException("ndk");
 
             // create list of folders with installed libraries:
             var libraries = new List<string>();
+            string archFolder = GetArchitectureFolder(deviceType);
 
             // developer-specified paths go first:
             if (additionalLibraryPaths != null)
@@ -115,9 +116,17 @@ namespace BlackBerry.NativeCore.Model
                 libraries.AddRange(additionalLibraryPaths);
             }
 
+            // first the libraries from the runtime:
+            if (runtime != null)
+            {
+                libraries.Add(Path.Combine(runtime.Folder, archFolder, "lib"));
+                libraries.Add(Path.Combine(runtime.Folder, archFolder, "user", "lib"));
+                libraries.Add(Path.Combine(runtime.Folder, archFolder, "user", "lib", "qt4"));
+            }
+
             // then the default ones, that belong to current NDK:
-            libraries.Add(Path.Combine(ndk.TargetPath, GetArchitectureFolder(deviceType), "lib"));
-            libraries.Add(Path.Combine(ndk.TargetPath, GetArchitectureFolder(deviceType), "usr", "lib"));
+            libraries.Add(Path.Combine(ndk.TargetPath, archFolder, "lib"));
+            libraries.Add(Path.Combine(ndk.TargetPath, archFolder, "usr", "lib"));
             return libraries.ToArray();
         }
 
