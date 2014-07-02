@@ -87,6 +87,7 @@ namespace BlackBerry.NativeCore.Debugger
 
         public override string ToString()
         {
+            // MI commands to GDB have this magic '-' in front of them
             return string.Concat(ID, "-", Command);
         }
 
