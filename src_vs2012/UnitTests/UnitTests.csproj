@@ -53,6 +53,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DebuggerProcessorTests.cs" />
     <Compile Include="DebuggerTests.cs" />
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="GDBParserTests.cs" />

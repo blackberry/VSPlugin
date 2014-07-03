@@ -44,12 +44,12 @@ namespace UnitTests
 
         #region Initialize Debugger
 
-        public GdbHostRunner CreateDebuggerRunner()
+        public static GdbHostRunner CreateDebuggerRunner()
         {
             return CreateDebuggerRunner(null);
         }
 
-        public GdbHostRunner CreateDebuggerRunner(string runtimeFolder)
+        public static GdbHostRunner CreateDebuggerRunner(string runtimeFolder)
         {
             // get the NDK info:
             var ndk = NdkInfo.Scan(Defaults.InstalledNdkPath);

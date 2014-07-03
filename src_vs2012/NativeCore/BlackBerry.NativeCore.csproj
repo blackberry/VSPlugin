@@ -56,6 +56,7 @@
     <Compile Include="Debugger\Request.cs" />
     <Compile Include="Debugger\RequestGroup.cs" />
     <Compile Include="Debugger\Response.cs" />
+    <Compile Include="Debugger\ResponseReceivedEventArgs.cs" />
     <Compile Include="Debugger\ResponseType.cs" />
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />

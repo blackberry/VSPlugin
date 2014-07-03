@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using BlackBerry.NativeCore.Tools;
 
 namespace BlackBerry.NativeCore.Debugger
 {
@@ -10,7 +11,7 @@ namespace BlackBerry.NativeCore.Debugger
     /// </summary>
     public sealed class GdbProcessor : IDisposable
     {
-        private const string Prompt = "(gdb) ";
+        internal const string Prompt = "(gdb) ";
         internal const int ShortInfinite = 30 * 1000; // 30 sec
 
         private readonly IGdbSender _sender;
@@ -22,6 +23,8 @@ namespace BlackBerry.NativeCore.Debugger
 
         private Request _currentRequest;
         private readonly Queue<Request> _requests;
+
+        public event EventHandler<ResponseReceivedEventArgs> Received;
 
         /// <summary>
         /// Init constructor.
@@ -47,6 +50,12 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         #region Properties
+
+        public IEventDispatcher Dispatcher
+        {
+            get;
+            set;
+        }
 
         public bool IsClosed
         {
@@ -120,11 +129,6 @@ namespace BlackBerry.NativeCore.Debugger
                         _messageCache.Add(text);
                     }
                 }
-
-                if (response != null)
-                {
-                    _responses.Enqueue(response);
-                }
             }
 
             // if completed the message wake up one thread waiting for ANY response:
@@ -136,21 +140,57 @@ namespace BlackBerry.NativeCore.Debugger
                     clearCurrentRequest = currentRequest.Complete(response, out retryRequest);
                 }
 
-                //NotifyResposeReceived(response);
-                _eventMessageAvailable.Set();
+                // if response was not handled by listeners of Received event
+                // than add it to the queue for to be processed by waiting thread:
+                if (!NotifyResponseReceived(response))
+                {
+                    lock (_sync)
+                    {
+                        _responses.Enqueue(response);
+                        _eventMessageAvailable.Set();
+                    }
+                }
             }
 
-            if (clearCurrentRequest && !retryRequest)
-            {
-                _currentRequest = null;
-                SendNextRequest();
-            }
+            // send the same request, in case it expects more data
+            // or the next stored one:
             if (retryRequest)
             {
                 Send(currentRequest);
             }
+            else
+            {
+                if (clearCurrentRequest)
+                {
+                    _currentRequest = null;
+                    SendNextRequest();
+                }
+            }
 
             return response != null;
+        }
+
+        private bool NotifyResponseReceived(Response response)
+        {
+            var receivedHandler = Received;
+            var dispatcher = Dispatcher;
+            ResponseReceivedEventArgs e = null;
+
+            if (dispatcher != null)
+            {
+                e = new ResponseReceivedEventArgs(response, !dispatcher.IsSynchronous); // this call doesn't guarantee sync exec (so don't allow non-handling of the response)
+                dispatcher.Invoke(receivedHandler, this, e); 
+            }
+            else
+            {
+                if (receivedHandler != null)
+                {
+                    e = new ResponseReceivedEventArgs(response, false);
+                    receivedHandler(this, e);
+                }
+            }
+
+            return e != null && e.Handled;
         }
 
         /// <summary>

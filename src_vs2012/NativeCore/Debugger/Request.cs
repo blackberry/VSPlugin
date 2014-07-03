@@ -16,7 +16,21 @@ namespace BlackBerry.NativeCore.Debugger
         private string _command;
         private AutoResetEvent _event;
 
+        public event EventHandler<ResponseReceivedEventArgs> Received;
+
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public Request(string command)
+            : this(command, false)
+        {
+        }
+
+        /// <summary>
+        /// Init constructor, allowing to skip setting the ID.
+        /// To be used only by unit-tests.
+        /// </summary>
+        internal Request(string command, bool skipID)
         {
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
@@ -24,8 +38,11 @@ namespace BlackBerry.NativeCore.Debugger
             _command = command;
             _event = new AutoResetEvent(false);
 
-            // make sure IDs never repeats, even if request created from different threads:
-            _id = Interlocked.Add(ref _globalID, 1).ToString(CultureInfo.InvariantCulture);
+            if (!skipID)
+            {
+                // make sure IDs never repeats, even if request created from different threads:
+                _id = Interlocked.Add(ref _globalID, 1).ToString(CultureInfo.InvariantCulture);
+            }
         }
 
         /// <summary>
@@ -114,8 +131,17 @@ namespace BlackBerry.NativeCore.Debugger
             if (_event == null)
                 throw new ObjectDisposedException("Request");
 
+            var receivedHandler = Received;
+
+            // reset the state:
             retry = false;
             Response = response;
+
+            // notify all listeners synchronously:
+            if (receivedHandler != null)
+                receivedHandler(this, new ResponseReceivedEventArgs(response, false));
+
+            // wake up one waiting for response thread:
             _event.Set();
             return true;
         }

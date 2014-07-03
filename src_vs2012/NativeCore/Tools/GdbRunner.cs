@@ -81,13 +81,13 @@ namespace BlackBerry.NativeCore.Tools
             Break();
         }
 
-        bool IGdbSender.Send(string text)
+        bool IGdbSender.Send(string command)
         {
 #if DEBUG
-            Debug.WriteLine(string.Format("GDB-INPUT : {0}", text));
+            Debug.WriteLine(string.Format("GDB-INPUT : {0}", command));
 #endif
 
-            return SendInput(text);
+            return SendInput(command);
         }
 
         #endregion

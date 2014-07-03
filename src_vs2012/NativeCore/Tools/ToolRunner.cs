@@ -279,13 +279,14 @@ namespace BlackBerry.NativeCore.Tools
         private void NotifyFinished(int exitCode, string output, string error)
         {
             var finishedHandler = Finished;
+            var dispatcher = Dispatcher;
 
             if (finishedHandler != null)
             {
                 // perform a cross-thread notification (in case we want to update UI directly from the handler)
-                if (Dispatcher != null)
+                if (dispatcher != null)
                 {
-                    Dispatcher.Invoke(finishedHandler, this, new ToolRunnerEventArgs(exitCode, output, error, Tag));
+                    dispatcher.Invoke(finishedHandler, this, new ToolRunnerEventArgs(exitCode, output, error, Tag));
                 }
                 else
                 {

@@ -3,6 +3,6 @@
     public interface IGdbSender
     {
         void Break();
-        bool Send(string text);
+        bool Send(string command);
     }
 }
