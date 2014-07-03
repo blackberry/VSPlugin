@@ -56,11 +56,38 @@
     <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
       <Link>ConfigDefaults.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\CliRequest.cs">
+      <Link>Debugger\CliRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\GdbProcessor.cs">
+      <Link>Debugger\GdbProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\IGdbSender.cs">
+      <Link>Debugger\IGdbSender.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Instruction.cs">
       <Link>Debugger\Instruction.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\InstructionCollection.cs">
       <Link>Debugger\InstructionCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Request.cs">
+      <Link>Debugger\Request.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\RequestGroup.cs">
+      <Link>Debugger\RequestGroup.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\RequestsFactory.cs">
+      <Link>Debugger\RequestsFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Response.cs">
+      <Link>Debugger\Response.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\ResponseReceivedEventArgs.cs">
+      <Link>Debugger\ResponseReceivedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\ResponseType.cs">
+      <Link>Debugger\ResponseType.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\BlackBerryTraceListener.cs">
       <Link>Diagnostics\BlackBerryTraceListener.cs</Link>
@@ -218,6 +245,11 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\ToolRunnerStartupEventArgs.cs">
       <Link>Tools\ToolRunnerStartupEventArgs.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\GDBParser\Instructions.txt">
+      <Link>Resources\Instructions.txt</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

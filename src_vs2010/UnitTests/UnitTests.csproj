@@ -49,6 +49,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src_vs2012\UnitTests\DebuggerProcessorTests.cs">
+      <Link>DebuggerProcessorTests.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\DebuggerTests.cs">
       <Link>DebuggerTests.cs</Link>
     </Compile>

@@ -248,7 +248,7 @@ namespace UnitTests
             var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(runner.GDB.LibraryPaths);
             var setExecutable = RequestsFactory.SetExecutable(@"S:\test\FallingBlocks\Device-Debug\FallingBlocks", true);
             var attachProcess = RequestsFactory.AttachTargetProcess(pid);
-            var stackDepth = RequestsFactory.SetStackTraceDepth(1, 20);
+            var stackDepth = RequestsFactory.SetStackTraceDepth(1, 10);
             var infoThreads = RequestsFactory.InfoThreads();
             var stackTrace = RequestsFactory.StackTraceListFrames();
 

@@ -50,7 +50,7 @@
     <Compile Include="ConfigDefaults.cs" />
     <Compile Include="Debugger\CliRequest.cs" />
     <Compile Include="Debugger\GdbProcessor.cs" />
-    <Compile Include="Debugger\IGdbWriter.cs" />
+    <Compile Include="Debugger\IGdbSender.cs" />
     <Compile Include="Debugger\Instruction.cs" />
     <Compile Include="Debugger\InstructionCollection.cs" />
     <Compile Include="Debugger\Request.cs" />
