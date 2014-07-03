@@ -25,6 +25,11 @@ namespace BlackBerry.NativeCore.Tools
 
             #region IEventDispatcher Implementation
 
+            public bool IsSynchronous
+            {
+                get { return true; }
+            }
+
             public void Invoke<T>(EventHandler<T> eventHandler, object sender, T e) where T : EventArgs
             {
                 if (eventHandler != null)
@@ -84,6 +89,11 @@ namespace BlackBerry.NativeCore.Tools
         {
             #region IEventDispatcher Implementation
 
+            public bool IsSynchronous
+            {
+                get { return true; }
+            }
+
             public void Invoke<T>(EventHandler<T> eventHandler, object sender, T e) where T : EventArgs
             {
                 if (eventHandler != null)
@@ -117,14 +127,14 @@ namespace BlackBerry.NativeCore.Tools
 
         class DependencyObjectEventDispatcher : IEventDispatcher
         {
-            private readonly Dispatcher _dispacher;
+            private readonly Dispatcher _dispatcher;
 
             public DependencyObjectEventDispatcher()
             {
                 // PH: could use System.Windows.Deployment.Current.Dispatcher instead
                 // but that would require reference to System.Windows.dll...
-                _dispacher = Dispatcher.CurrentDispatcher;
-                if (_dispacher == null)
+                _dispatcher = Dispatcher.CurrentDispatcher;
+                if (_dispatcher == null)
                     throw new InvalidOperationException("Could not create dispatcher object associated with current thread");
             }
 
@@ -132,23 +142,27 @@ namespace BlackBerry.NativeCore.Tools
             {
                 if (control == null)
                     throw new ArgumentNullException("control");
-                _dispacher = control.Dispatcher;
+                _dispatcher = control.Dispatcher;
             }
 
-
             #region IEventDispatcher Implementation
+
+            public bool IsSynchronous
+            {
+                get { return false; }
+            }
 
             public void Invoke<T>(EventHandler<T> eventHandler, object sender, T e) where T : EventArgs
             {
                 if (eventHandler != null)
                 {
-                    if (_dispacher.CheckAccess())
+                    if (_dispatcher.CheckAccess())
                     {
                         eventHandler(sender, e);
                     }
                     else
                     {
-                        _dispacher.BeginInvoke(eventHandler, sender, e);
+                        _dispatcher.BeginInvoke(eventHandler, sender, e);
                     }
                 }
             }
@@ -157,13 +171,13 @@ namespace BlackBerry.NativeCore.Tools
             {
                 if (action != null)
                 {
-                    if (_dispacher.CheckAccess())
+                    if (_dispatcher.CheckAccess())
                     {
                         action();
                     }
                     else
                     {
-                        _dispacher.BeginInvoke(action);
+                        _dispatcher.BeginInvoke(action);
                     }
                 }
             }
@@ -172,13 +186,13 @@ namespace BlackBerry.NativeCore.Tools
             {
                 if (action != null)
                 {
-                    if (_dispacher.CheckAccess())
+                    if (_dispatcher.CheckAccess())
                     {
                         action(e);
                     }
                     else
                     {
-                        _dispacher.BeginInvoke(action, e);
+                        _dispatcher.BeginInvoke(action, e);
                     }
                 }
             }
