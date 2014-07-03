@@ -44,6 +44,9 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\TargetConnectionEventArgs.cs" />
+    <Compile Include="Components\Targets.cs" />
+    <Compile Include="Components\TargetStatus.cs" />
     <Compile Include="Components\TokenProcessor.cs" />
     <Compile Include="Components\UpdateManager.cs" />
     <Compile Include="Components\UpdateManagerCompletedEventArgs.cs" />

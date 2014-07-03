@@ -30,7 +30,7 @@ namespace BlackBerry.NativeCore.Model
                 throw new ArgumentNullException("password");
 
             Name = name;
-            IP = ip;
+            IP = ip.Trim();
             Password = password;
             Type = type;
         }

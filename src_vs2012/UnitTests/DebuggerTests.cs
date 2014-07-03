@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -19,25 +20,26 @@ namespace UnitTests
         [TestFixtureSetUp]
         public void Setup()
         {
-            _connection = new DeviceConnectRunner(Defaults.ToolsDirectory, Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
-            Assert.IsNotNull(_connection);
+            Targets.Connect(Defaults.IP, Defaults.Password, DeviceDefinitionType.Device, Defaults.SshPublicKeyPath, OnDeviceConnectionStatusChanged);
 
-            _connection.ExecuteAsync();
-
-            // wait until connection with a device is established:
-            while (!_connection.IsConnected && !_connection.IsConnectionFailed)
+            while (!Targets.IsConnectedOrFailed(Defaults.IP))
                 Thread.Sleep(10);
-            Assert.IsTrue(_connection.IsConnected, "Connection was not established properly");
+
+            Assert.IsTrue(Targets.IsConnected(Defaults.IP), "Connection was not established properly");
+        }
+
+        private void OnDeviceConnectionStatusChanged(object sender, TargetConnectionEventArgs e)
+        {
+            if (e.Status == TargetStatus.Failed)
+            {
+                Targets.Disconnect(Defaults.IP);
+            }
         }
 
         [TestFixtureTearDown]
         public void Cleanup()
         {
-            if (_connection != null)
-            {
-                _connection.Abort();
-                _connection = null;
-            }
+            Targets.Disconnect(Defaults.IP);
         }
 
         #endregion
