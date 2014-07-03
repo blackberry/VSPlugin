@@ -429,7 +429,9 @@ namespace BlackBerry.NativeCore.Tools
             {
                 if (line.StartsWith("error:", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    result.AppendLine(line.Substring(6).Trim());
+                    if (result.Length > 0)
+                        result.AppendLine();
+                    result.Append(line.Substring(6).Trim());
                 }
             }
 
