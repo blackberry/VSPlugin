@@ -338,6 +338,7 @@ namespace BlackBerry.NativeCore.Tools
             NotifyFinished(ExitCode, outputText, errorText);
 
             _isProcessing = false;
+            Cleanup();
         }
 
         /// <summary>
@@ -362,6 +363,11 @@ namespace BlackBerry.NativeCore.Tools
         protected virtual void ConsumeResults(string output, string error)
         {
             // do nothing, subclasses should handle parsing output
+        }
+
+        protected virtual void Cleanup()
+        {
+            // do nothing, subclasses should handle it, when needed
         }
 
         /// <summary>
