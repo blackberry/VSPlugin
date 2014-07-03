@@ -11,6 +11,8 @@ namespace BlackBerry.NativeCore.Tools
         private string _password;
         private string _publicKeyPath;
 
+        public event EventHandler<EventArgs> StatusChanged;
+
         /// <summary>
         /// Init constructor.
         /// </summary>
@@ -118,8 +120,14 @@ namespace BlackBerry.NativeCore.Tools
 
         protected override void ProcessOutputLine(string text)
         {
+            bool wasConnected = IsConnected;
             base.ProcessOutputLine(text);
+
             IsConnected |= text != null && text.StartsWith("Info: Successfully connected.");
+            if (!wasConnected && IsConnected)
+            {
+                NotifyStatusChange();
+            }
         }
 
         protected override void ProcessErrorLine(string text)
@@ -127,6 +135,27 @@ namespace BlackBerry.NativeCore.Tools
             base.ProcessErrorLine(text);
             IsConnectionFailed = true;
             LastError = ExtractErrorMessages(text);
+            NotifyStatusChange();
+        }
+
+        protected override void Cleanup()
+        {
+            bool wasConnectedOrFailed = IsConnected || IsConnectionFailed;
+
+            IsConnected = false;
+            IsConnectionFailed = false;
+
+            if (wasConnectedOrFailed)
+            {
+                NotifyStatusChange();
+            }
+        }
+
+        private void NotifyStatusChange()
+        {
+            var eventHandler = StatusChanged;
+            if (eventHandler != null)
+                eventHandler(this, EventArgs.Empty);
         }
     }
 }
