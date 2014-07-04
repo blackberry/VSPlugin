@@ -228,6 +228,42 @@ namespace BlackBerry.NativeCore.Components
         }
 
         /// <summary>
+        /// Stops receiving more events related to the connection state to the target device.
+        /// </summary>
+        public static bool Unsubscribe(DeviceDefinition device, EventHandler<TargetConnectionEventArgs> resultHandler)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (resultHandler == null)
+                throw new ArgumentNullException("resultHandler");
+            return Unsubscribe(device.IP, resultHandler);
+        }
+
+        /// <summary>
+        /// Stops receiving more events related to the connection state to the target device.
+        /// </summary>
+        public static bool Unsubscribe(string ip, EventHandler<TargetConnectionEventArgs> resultHandler)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+            if (resultHandler == null)
+                throw new ArgumentNullException("resultHandler");
+
+            TargetInfo existingTarget;
+
+            lock (_sync)
+            {
+                existingTarget = NoSyncFind(ip);
+                if (existingTarget != null)
+                {
+                    existingTarget.StatusChanged -= resultHandler;
+                }
+            }
+
+            return existingTarget != null;
+        }
+
+        /// <summary>
         /// Requests closing secure connection to given device.
         /// </summary>
         public static bool Disconnect(string ip)
