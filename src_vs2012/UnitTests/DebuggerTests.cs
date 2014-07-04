@@ -15,8 +15,6 @@ namespace UnitTests
     {
         #region Device Connection Establishing
 
-        private DeviceConnectRunner _connection;
-
         [TestFixtureSetUp]
         public void Setup()
         {

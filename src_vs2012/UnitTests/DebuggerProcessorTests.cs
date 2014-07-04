@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using BlackBerry.NativeCore.Debugger;
 using NUnit.Framework;
 
@@ -84,6 +85,9 @@ namespace UnitTests
             {
                 Assert.IsFalse(string.IsNullOrEmpty(command), "Unexpected empty command");
 
+                Trace.WriteLine("::: Sending command: ::::::::::::::::::::");
+                Trace.WriteLine(command);
+
                 // skip the ID and verify received command:
                 int i = 0;
                 while (i < command.Length && char.IsDigit(command[i]))
@@ -96,10 +100,43 @@ namespace UnitTests
                     throw new InvalidOperationException("Unexpected command sent");
 
                 // and send response asynchronously:
+
                 var responseHandler = Received;
                 if (responseHandler != null)
-                    responseHandler.BeginInvoke(_responses[_expectationIndex], null, null);
+                {
+                    var id = i > 0 ? command.Substring(0, i) : null;
+                    var response = PrepareResponse(id, _responses[_expectationIndex]);
+
+                    Trace.WriteLine("::: Received response: ::::::::::::::::::");
+                    foreach (var line in response)
+                        Trace.WriteLine(line);
+                    Trace.WriteLine(":::::::::::::::::::::::::::::::::::::::::");
+
+                    responseHandler.BeginInvoke(response, null, null);
+                }
                 return true;
+            }
+
+            private string[] PrepareResponse(string id, string[] lines)
+            {
+                if (string.IsNullOrEmpty(id))
+                    return lines;
+
+                // append ID into the response result:
+                var result = new string[lines.Length];
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    if (lines[i][0] == '^')
+                    {
+                        result[i] = id + lines[i];
+                    }
+                    else
+                    {
+                        result[i] = lines[i];
+                    }
+                }
+
+                return result;
             }
 
             private bool CheckExpected(string command)
@@ -121,7 +158,6 @@ namespace UnitTests
             /// <summary>
             /// Checks if all requests has been called in an expected order.
             /// </summary>
-            /// <returns></returns>
             public bool CheckIfMetAllExpectations()
             {
                 // all expected requests has been processed:
@@ -133,7 +169,7 @@ namespace UnitTests
 
         private static Request CreateRequest(string command)
         {
-            return new Request(command, true); // create request with disabled ID check, when receiving response
+            return new Request(command); // create request with disabled ID check, when receiving response
         }
 
         [Test]

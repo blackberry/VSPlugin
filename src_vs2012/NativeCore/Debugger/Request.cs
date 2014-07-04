@@ -22,15 +22,6 @@ namespace BlackBerry.NativeCore.Debugger
         /// Init constructor.
         /// </summary>
         public Request(string command)
-            : this(command, false)
-        {
-        }
-
-        /// <summary>
-        /// Init constructor, allowing to skip setting the ID.
-        /// To be used only by unit-tests.
-        /// </summary>
-        internal Request(string command, bool skipID)
         {
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
@@ -38,11 +29,8 @@ namespace BlackBerry.NativeCore.Debugger
             _command = command;
             _event = new AutoResetEvent(false);
 
-            if (!skipID)
-            {
-                // make sure IDs never repeats, even if request created from different threads:
-                _id = Interlocked.Add(ref _globalID, 1).ToString(CultureInfo.InvariantCulture);
-            }
+            // make sure IDs never repeats, even if request created from different threads:
+            _id = Interlocked.Add(ref _globalID, 1).ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -84,8 +72,8 @@ namespace BlackBerry.NativeCore.Debugger
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         protected virtual void Dispose(bool disposing)

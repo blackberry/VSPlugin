@@ -11,12 +11,12 @@ namespace BlackBerry.NativeCore.Debugger
     /// </summary>
     public sealed class GdbProcessor : IDisposable
     {
-        internal const string Prompt = "(gdb) ";
+        public const string Prompt = "(gdb) ";
         internal const int ShortInfinite = 30 * 1000; // 30 sec
 
         private readonly IGdbSender _sender;
         private readonly object _sync;
-        private readonly AutoResetEvent _eventMessageAvailable;
+        private AutoResetEvent _eventMessageAvailable;
 
         private readonly List<string> _messageCache;
         private readonly Queue<Response> _responses;
@@ -76,6 +76,15 @@ namespace BlackBerry.NativeCore.Debugger
         private void Dispose(bool dispose)
         {
             IsClosed = true;
+
+            if (dispose)
+            {
+                if (_eventMessageAvailable != null)
+                {
+                    _eventMessageAvailable.Dispose();
+                    _eventMessageAvailable = null;
+                }
+            }
         }
 
         #endregion
