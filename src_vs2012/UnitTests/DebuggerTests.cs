@@ -55,9 +55,10 @@ namespace UnitTests
             Assert.IsNotNull(ndk);
 
             var runtime = string.IsNullOrEmpty(runtimeFolder) ? null : new RuntimeDefinition(runtimeFolder);
+            var device = new DeviceDefinition("Test Device", Defaults.IP, Defaults.Password, DeviceDefinitionType.Device);
 
             // get the description of GDB for a device:
-            var gdb = new GdbInfo(ndk, DeviceDefinitionType.Device, runtime, null);
+            var gdb = new GdbInfo(ndk, device, runtime, null);
             Assert.IsNotNull(gdb);
 
             // start the GDB:
@@ -167,7 +168,7 @@ namespace UnitTests
             result = runner.Wait(out message);
             Assert.IsTrue(result, "Should receive GDB startup info");
 
-            var selectDevice = RequestsFactory.SetTargetDevice(Defaults.IP);
+            var selectDevice = RequestsFactory.SetTargetDevice(runner.Device);
             var listRequest = RequestsFactory.ListProcesses();
             runner.Send(selectDevice);
             runner.Send(listRequest);
@@ -182,7 +183,7 @@ namespace UnitTests
             var runner = CreateDebuggerRunner();
             runner.ExecuteAsync();
 
-            var selectDevice = RequestsFactory.SetTargetDevice(Defaults.IP);
+            var selectDevice = RequestsFactory.SetTargetDevice(runner.Device);
             var listRequest = RequestsFactory.ListProcesses();
             var group = RequestsFactory.Group(selectDevice, listRequest);
             runner.Send(group);
@@ -216,7 +217,7 @@ namespace UnitTests
             var runner = CreateDebuggerRunner();
             runner.ExecuteAsync();
 
-            var selectTarget = RequestsFactory.SetTargetDevice(Defaults.IP);
+            var selectTarget = RequestsFactory.SetTargetDevice(runner.Device);
             var listTargetFeatures = RequestsFactory.ListTargetFeatures();
 
             runner.Send(selectTarget);
@@ -233,7 +234,7 @@ namespace UnitTests
             runner.ExecuteAsync();
 
             var enablePending = RequestsFactory.SetPendingBreakpoints(true);
-            var selectDevice = RequestsFactory.SetTargetDevice(Defaults.IP);
+            var selectDevice = RequestsFactory.SetTargetDevice(runner.Device);
             var listProcesses = RequestsFactory.ListProcesses();
 
             var procGroup = RequestsFactory.Group(enablePending, selectDevice, listProcesses);

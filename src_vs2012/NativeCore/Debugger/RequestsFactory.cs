@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Text;
+using BlackBerry.NativeCore.Model;
 
 namespace BlackBerry.NativeCore.Debugger
 {
@@ -30,6 +31,14 @@ namespace BlackBerry.NativeCore.Debugger
                 throw new ArgumentNullException("ip");
 
             return new Request(string.Concat("target-select qnx ", ip, ":8000"));
+        }
+
+        public static Request SetTargetDevice(DeviceDefinition device)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            return SetTargetDevice(device.IP);
         }
 
         public static Request ListProcesses()

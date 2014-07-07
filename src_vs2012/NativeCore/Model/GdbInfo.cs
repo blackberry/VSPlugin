@@ -10,7 +10,7 @@ namespace BlackBerry.NativeCore.Model
     /// </summary>
     public sealed class GdbInfo
     {
-        public GdbInfo(NdkDefinition ndk, DeviceDefinitionType deviceType, RuntimeDefinition runtime, IEnumerable<string> additionalLibraryPaths)
+        public GdbInfo(NdkDefinition ndk, DeviceDefinition device, RuntimeDefinition runtime, IEnumerable<string> additionalLibraryPaths)
         {
             if (ndk == null)
                 throw new ArgumentNullException("ndk");
@@ -18,17 +18,21 @@ namespace BlackBerry.NativeCore.Model
                 throw new ArgumentOutOfRangeException("ndk");
             if (string.IsNullOrEmpty(ndk.TargetPath))
                 throw new ArgumentOutOfRangeException("ndk");
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (string.IsNullOrEmpty(device.IP))
+                throw new ArgumentOutOfRangeException("device");
 
             NDK = ndk;
-            DeviceType = deviceType;
+            Device = device;
             Runtime = runtime;
-            LibraryPaths = CreateLibraryPaths(ndk, runtime, deviceType, additionalLibraryPaths);
-            Executable = Path.Combine(NDK.HostPath, "usr", "bin", GetName(deviceType));
+            LibraryPaths = CreateLibraryPaths(ndk, runtime, device.Type, additionalLibraryPaths);
+            Executable = Path.Combine(NDK.HostPath, "usr", "bin", GetName(device.Type));
             Arguments = "--interpreter=mi2";
         }
 
-        public GdbInfo(NdkInfo ndk, DeviceDefinitionType deviceType, RuntimeDefinition runtime, IEnumerable<string> additionalLibraryPaths)
-            : this(ndk != null ? ndk.ToDefinition() : null, deviceType, runtime, additionalLibraryPaths)
+        public GdbInfo(NdkInfo ndk, DeviceDefinition device, RuntimeDefinition runtime, IEnumerable<string> additionalLibraryPaths)
+            : this(ndk != null ? ndk.ToDefinition() : null, device, runtime, additionalLibraryPaths)
         {
         }
 
@@ -40,7 +44,7 @@ namespace BlackBerry.NativeCore.Model
             private set;
         }
 
-        public DeviceDefinitionType DeviceType
+        public DeviceDefinition Device
         {
             get;
             private set;
@@ -50,14 +54,14 @@ namespace BlackBerry.NativeCore.Model
         {
             get
             {
-                switch (DeviceType)
+                switch (Device.Type)
                 {
                     case DeviceDefinitionType.Device:
                         return "ARM";
                     case DeviceDefinitionType.Simulator:
                         return "x86";
                     default:
-                        throw new InvalidEnumArgumentException("Unsupported enum value (" + DeviceType + ")");
+                        throw new InvalidEnumArgumentException("Unsupported enum value (" + Device.Type + ")");
                 }
             }
         }

@@ -54,6 +54,14 @@ namespace BlackBerry.NativeCore.Tools
         }
 
         /// <summary>
+        /// Gets the target device the GDB is supposed to connect.
+        /// </summary>
+        public DeviceDefinition Device
+        {
+            get { return GDB.Device; }
+        }
+
+        /// <summary>
         /// Gets the runtime state and events from the GDB.
         /// </summary>
         public GdbProcessor Processor
