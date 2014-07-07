@@ -32,7 +32,6 @@ using BlackBerry.Package.Model.Integration;
 using BlackBerry.Package.Options;
 using BlackBerry.Package.Registration;
 using BlackBerry.Package.ViewModels;
-using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -43,8 +42,6 @@ using System.Windows.Forms;
 using EnvDTE80;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
-using System.Security.Cryptography;
-using System.Text;
 using VSNDK.Parser;
 
 namespace BlackBerry.Package
@@ -189,6 +186,8 @@ namespace BlackBerry.Package
             TraceLog.WriteLine(" * registered editors");
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
 
+            // INFO: the references to returned objects must be stored and live as long, as the handlers are needed,
+            // since they are COM objects and will be automatically reclaimed on next GC.Collect(), causing handlers to be unsubscribed...
             _eventsDebug = CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_BeforeExecute, StartDebugCommandEvents_AfterExecute);
             _eventsDebugContext = CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, StartDebugCommandEvents_BeforeExecute, StartDebugCommandEvents_AfterExecute);
             TraceLog.WriteLine(" * registered build-platforms manager");
@@ -417,6 +416,14 @@ namespace BlackBerry.Package
         }
 
         /// <summary>
+        /// Gets the currently selected device all actions should be performed against.
+        /// </summary>
+        private DeviceDefinition ActiveDevice
+        {
+            get { return PackageViewModel.Instance.ActiveDevice; }
+        }
+
+        /// <summary>
         /// Gets the number of installed NDKs.
         /// </summary>
         private int GetInstalledNdkCount()
@@ -465,10 +472,6 @@ namespace BlackBerry.Package
             {
                 if (_buildThese.Count != 0)
                 {
-                    RegistryKey key = Registry.CurrentUser.CreateSubKey("VSNDK");
-                    key.SetValue("Run", "True");
-                    key.Close();
-
                     _buildEvents.OnBuildDone += OnBuildDone;
 
                     try
@@ -544,10 +547,6 @@ namespace BlackBerry.Package
         /// </summary>
         private void Deployed()
         {
-            RegistryKey key = Registry.CurrentUser.CreateSubKey("VSNDK");
-            key.SetValue("Run", "False");
-            key.Close();
-
             string pidString = "";
             string toolsPath = "";
             string publicKeyPath = "";
@@ -647,36 +646,25 @@ namespace BlackBerry.Package
             publicKeyPath = ConfigDefaults.SshPublicKeyPath;
             publicKeyPath = publicKeyPath.Replace('\\', '/');
 
-            try
-            {
-                RegistryKey rkHKCU = Registry.CurrentUser;
-                RegistryKey rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                toolsPath = rkPluginRegKey.GetValue("NDKHostPath") + "/usr/bin";
-                toolsPath = toolsPath.Replace('\\', '/');
+            var ndk = ActiveNDK;
+            var device = ActiveDevice;
 
-                if (_isSimulator)
-                {
-                    targetIP = rkPluginRegKey.GetValue("simulator_IP").ToString();
-                    password = rkPluginRegKey.GetValue("simulator_password").ToString();
-                }
-                else
-                {
-                    targetIP = rkPluginRegKey.GetValue("device_IP").ToString();
-                    password = rkPluginRegKey.GetValue("device_password").ToString();
-                }
-
-                // Decrypt stored password.
-                byte[] data = Convert.FromBase64String(password);
-                if (data.Length > 0)
-                {
-                    byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-                    password = Encoding.Unicode.GetString(decrypted);
-                }
-            }
-            catch (Exception ex)
+            if (ndk == null)
             {
-                MessageBox.Show(ex.Message, "Microsoft Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Missing NDK selected. Please install any and mark as active using BlackBerry menu options.", null,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
             }
+            if (device == null)
+            {
+                MessageBoxHelper.Show("Missing device selected. Please define an IP, password and mark a device as active using BlackBerry menu options.", null,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+
+            toolsPath = ndk.ToDefinition().ToolsPath;
+            targetIP = device.IP;
+            password = device.Password;
 
             pidString = GetPIDfromGDB(_processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
 
