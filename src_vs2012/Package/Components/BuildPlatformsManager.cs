@@ -67,7 +67,7 @@ namespace BlackBerry.Package.Components
             CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidSolutionPlatform, cmdNewPlatform_beforeExec, cmdNewPlatform_afterExec);
             CommandHelper.Register(_dte, GuidList.guidVSDebugGroup, StandardCommands.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_beforeExec, cmdNewFunctionBreakpoint_afterExec);
 
-            DisableIntelliSenseErrorReport(true);
+            //DisableIntelliSenseErrorReport(true);
             CheckSolutionPlatformCommand();
         }
 
