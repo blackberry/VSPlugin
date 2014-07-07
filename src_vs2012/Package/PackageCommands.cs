@@ -16,6 +16,8 @@ namespace BlackBerry.Package
 {
     internal static class PackageCommands
     {
+        public const int cmdidBlackBerryCommonProjectImport = 0x0201;
+
         public const int cmdidBlackBerryOptions = 0x301;
         public const int cmdidBlackBerryTargetsDevicesPlaceholder = 0x501;
         public const int cmdidBlackBerryTargetsApiLevelsPlaceholder = 0x601;
@@ -31,9 +33,5 @@ namespace BlackBerry.Package
         public const int cmdidBlackBerryHelpSamplesPlayBook = 0x1103;
         public const int cmdidBlackBerryHelpSamplesOpenSource = 0x1104;
         public const int cmdidBlackBerryHelpAbout = 0x1201;
-
-
-        public const int cmdidBlackBerryProjectImport = 0x0104;
-        public const int cmdidfooLocalBox = 0x0105;
     }
 }

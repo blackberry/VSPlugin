@@ -261,9 +261,9 @@ namespace BlackBerry.Package
                 MenuCommand configureMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(TargetsOptionPage)), configureCommandID);
                 mcs.AddCommand(configureMenu);
 
-                // Create the command for the menu item.
-                CommandID projectCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidfooLocalBox);
-                OleMenuCommand projectItem = new OleMenuCommand(MenuItemCallback, projectCommandID);
+                // Create the command for 'Import BlackBerry Native Project' menu item.
+                CommandID projectCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryCommonProjectImport);
+                OleMenuCommand projectItem = new OleMenuCommand(ImportBlackBerryProject, projectCommandID);
                 mcs.AddCommand(projectItem);
 
                 TraceLog.WriteLine(" * initialized menus");
@@ -1032,20 +1032,12 @@ namespace BlackBerry.Package
             }
         }
 
-        private void MenuItemCallback(object sender, EventArgs e)
+        private void ImportBlackBerryProject(object sender, EventArgs e)
         {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".cproject"; // Default file extension
-            dlg.Filter = "Native Core Application Project Files (*.cproject, *.project)|*.cproject;*.project;";
-            dlg.Title = "Open BlackBerry Core Native Application Project Files";
-            dlg.Multiselect = false;
-            dlg.InitialDirectory = Environment.SpecialFolder.MyComputer.ToString();
-            dlg.CheckFileExists = true;
-
-            bool? result = dlg.ShowDialog();
-            if (result == true)
+            var form = DialogHelper.OpenNativeCoreProject("Open Core Native Application Project", null);
+            if (form.ShowDialog() == DialogResult.OK)
             {
-                string filename = dlg.FileName;
+                string filename = form.FileName;
                 FileInfo fi = new FileInfo(filename);
                 string folderName = fi.DirectoryName;
 

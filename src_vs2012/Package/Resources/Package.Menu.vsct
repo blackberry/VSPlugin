@@ -66,18 +66,19 @@
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
             </Group>
 
-            <!-- Context Menu -->
-            <Group guid="guidVSNDK_PackageCmdSet" id="BlackBerryContextMenuGroup" priority="0x0600">
-                <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
-            </Group>
-
         </Groups>
 
         <Buttons>
 
-            <!-- Common Action Buttons -->
+          <!-- Common Action Buttons -->
+          <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonProjectImport" priority="0x0100" type="Button">
+            <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
+            <Strings>
+              <ButtonText>Import &amp;Core Native Project</ButtonText>
+            </Strings>
+          </Button>
 
-            <!-- Settings Action Buttons -->
+          <!-- Settings Action Buttons -->
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryOptions" priority="0x0100" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" />
                 <Strings>
@@ -185,16 +186,6 @@
                     <ButtonText>&amp;About...</ButtonText>
                 </Strings>
             </Button>
-
-            <!-- Others -->
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidfooLocalBox" priority="0x0100" type="Button">
-                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryContextMenuGroup" />
-                <CommandFlag>DynamicVisibility</CommandFlag>
-                <Strings>
-                    <CommandName>cmdidfooLocalBox</CommandName>
-                    <ButtonText>Import BlackBerry Core Native Project</ButtonText>
-                </Strings>
-            </Button>
         </Buttons>
 
     </Commands>
@@ -268,6 +259,7 @@
             <IDSymbol name="cmdidBlackBerryTargetsApiLevelsPlaceholder" value="0x601" />
             <IDSymbol name="cmdidBlackBerryTargetsConfigure" value="0x701" />
 
+            <IDSymbol name="cmdidBlackBerryCommonProjectImport" value="0x201" />
             <IDSymbol name="cmdidBlackBerryHelpWelcomePage" value="0x901" />
             <IDSymbol name="cmdidBlackBerryHelpSupportForum" value="0x902" />
             <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x1001" />
@@ -278,10 +270,6 @@
             <IDSymbol name="cmdidBlackBerryHelpSamplesPlayBook" value="0x1103" />
             <IDSymbol name="cmdidBlackBerryHelpSamplesOpenSource" value="0x1104" />
             <IDSymbol name="cmdidBlackBerryHelpAbout" value="0x1201" />
-
-            <IDSymbol name="cmdidBlackBerryProjectImport" value="0x104" />
-            <IDSymbol name="cmdidfooLocalBox" value="0x105" />
-            <IDSymbol name="BlackBerryContextMenuGroup" value="0x106" />
         </GuidSymbol>
 
     </Symbols>
