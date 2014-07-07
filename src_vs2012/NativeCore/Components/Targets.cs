@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
+using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 
@@ -31,13 +33,19 @@ namespace BlackBerry.NativeCore.Components
                 Runner.StatusChanged += OnConnectionStatusChanged;
             }
 
-            private void OnConnectionStatusChanged(object sender, EventArgs eventArgs)
+            private void OnConnectionStatusChanged(object sender, EventArgs e)
             {
+                // notify external handler:
                 var statusHandler = StatusChanged;
+                var args = ToEventArgs();
+
                 if (statusHandler != null)
                 {
-                    statusHandler(null, ToEventArgs());
+                    statusHandler(null, args);
                 }
+
+                // then notify Targets class, so it updates the internal state:
+                OnChildConnectionStatusChanged(this, args);
             }
 
             ~TargetInfo()
@@ -65,8 +73,8 @@ namespace BlackBerry.NativeCore.Components
 
             public void Dispose()
             {
-                GC.SuppressFinalize(this);
                 Dispose(true);
+                GC.SuppressFinalize(this);
             }
 
             private void Dispose(bool disposing)
@@ -227,6 +235,31 @@ namespace BlackBerry.NativeCore.Components
             }
         }
 
+        private static void OnChildConnectionStatusChanged(object sender, TargetConnectionEventArgs e)
+        {
+            bool removed = false;
+            var target = sender as TargetInfo;
+            if (target == null)
+                throw new ArgumentNullException("sender");
+
+            if (e.Status == TargetStatus.Disconnected)
+            {
+                lock (_sync)
+                {
+                    removed = _activeTargets.Remove(target);
+                }
+            }
+
+            // only release the object, when it belong to the list
+            // (to avoid double-releases, in case external handlers manipulated the list):
+            if (removed)
+            {
+                // and release resources:
+                target.Dispose();
+            }
+        }
+
+
         /// <summary>
         /// Stops receiving more events related to the connection state to the target device.
         /// </summary>
@@ -301,6 +334,53 @@ namespace BlackBerry.NativeCore.Components
                 throw new ArgumentNullException("device");
 
             return Disconnect(device.IP);
+        }
+
+        /// <summary>
+        /// Waits until connection status changes to connected or failed for a given device.
+        /// </summary>
+        public static void Wait(DeviceDefinition device)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            Wait(device.IP);
+        }
+
+        /// <summary>
+        /// Waits until connection status changes to connected or failed for a given device.
+        /// </summary>
+        public static void Wait(string ip)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+
+            Wait(GdbProcessor.ShortInfinite, ip);
+        }
+
+        /// <summary>
+        /// Waits until connection status changes to connected or failed for a given device.
+        /// </summary>
+        public static void Wait(int millisecondsTimeout, DeviceDefinition device)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            Wait(millisecondsTimeout, device.IP);
+        }
+
+        /// <summary>
+        /// Waits until connection status changes to connected or failed for a given device.
+        /// </summary>
+        public static void Wait(int millisecondsTimeout, string ip)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+
+            DateTime timesUp = millisecondsTimeout < 0 ? DateTime.MaxValue : DateTime.Now.AddMilliseconds(millisecondsTimeout);
+
+            while (DateTime.Now < timesUp && !IsConnectedOrFailed(ip))
+                Thread.Sleep(10);
         }
     }
 }
