@@ -33,10 +33,10 @@ namespace BlackBerry.NativeCore.Tools
             // 1. the name of the event, which set will trigger the Ctrl+C signal to the GDB
             // 2. the name of the event, which set will exit the host process and GDB
             // 3. the path to GDB executable itself, that will run
-            // 4. optional settings for GDBHost (-s => disable custom console logs)
+            // 4. optional settings for GDBHost (-s => disable custom console logs, -c => skip checking for GDB-executable existence)
             // 5. all the other arguments that should be passed to GDB (although it's possible to pass arguments to GDB via the executable path,
             //    but in practice they can't be escaped this way; that's why passing them as last arguments of the host are the recommended approach)
-            Arguments = string.Concat(eventCtrlCName, " ", eventTerminateName, " -s ", "\"", gdb.Executable, "\" ", gdb.Arguments);
+            Arguments = string.Concat(eventCtrlCName, " ", eventTerminateName, " -sc ", "\"", gdb.Executable, "\" ", gdb.Arguments);
         }
 
         /// <summary>

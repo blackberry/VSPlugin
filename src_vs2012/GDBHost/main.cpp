@@ -41,6 +41,10 @@ static LPCTSTR ConcatGdbCommand(int argc, _TCHAR* argv[], LPCTSTR exePath, int a
         _tcscat_s(result, length, exePath);
         _tcscat_s(result, length, _T("\""));
     }
+    else
+    {
+        result[0] = '\0';
+    }
 
     for (int i = argsFrom; i < argc; i++)
     {
@@ -50,6 +54,13 @@ static LPCTSTR ConcatGdbCommand(int argc, _TCHAR* argv[], LPCTSTR exePath, int a
     }
 
     return result;
+}
+
+static BOOL FileExists(LPCTSTR lpszPath)
+{
+  DWORD attributes = GetFileAttributes(lpszPath);
+
+  return (attributes != INVALID_FILE_ATTRIBUTES && !(attributes & FILE_ATTRIBUTE_DIRECTORY));
 }
 
 /// <summary> 
@@ -63,6 +74,8 @@ static LPCTSTR ConcatGdbCommand(int argc, _TCHAR* argv[], LPCTSTR exePath, int a
 /// <returns> 0 </returns>
 int _tmain(int argc, _TCHAR* argv[])
 {
+    SetConsoleTitle(_T("BlackBerry GDB Host Application"));
+
     LogInitialize();
     LogPrint(_T("Starting"));
 
@@ -80,6 +93,7 @@ int _tmain(int argc, _TCHAR* argv[])
         PrintMessage(_T("  (host-options)           - single parameter starting with '-', which defines custom behavior of the host process itself\r\n"));
         PrintMessage(_T("Host options:\r\n"));
         PrintMessage(_T("  s                        - [silent] - disable all custom console logs\r\n"));
+        PrintMessage(_T("  c                        - skip checking GDB executable existance, before executing\r\n"));
         PrintMessage(_T("\r\n\r\n"));
         return 0;
     }
@@ -91,20 +105,26 @@ int _tmain(int argc, _TCHAR* argv[])
     LPCTSTR eventNameCtrlC = argv[1];
     LPCTSTR eventNameTerminate = argv[2];
     int gdbArgsStartFrom = 4;
+    BOOL checkGdbExistence = TRUE;
 
     // check, if we passed some optional arguments for the host...
     if (hostOptions[0] == '-')
     {
-        gdbExecutablePath = argv[4];
+        gdbExecutablePath = argc >= 5 ? argv[4] : NULL;
         gdbArgsStartFrom = 5;
 
         // and parse host options:
         int optionsLength = _tcslen(hostOptions);
         for (int i = 1; i < optionsLength; i++)
         {
-            if (hostOptions[i] == 's')
+            switch(hostOptions[i])
             {
+            case 's':
                 DisableConsolePrinting();
+                break;
+            case 'c':
+                checkGdbExistence = FALSE;
+                break;
             }
         }
     }
@@ -130,6 +150,12 @@ int _tmain(int argc, _TCHAR* argv[])
     PrintMessage(_T("  Ctrl-C handler: name: \"%s\", handle: 0x%p\r\n"), eventNameCtrlC, handleCtrlC);
     PrintMessage(_T("  Terminate handler: name: \"%s\", handle: 0x%p\r\n"), eventNameTerminate, handleTerminate);
 
+    if (gdbExecutablePath == NULL || gdbExecutablePath[0] == '\0' || (checkGdbExistence && !FileExists(gdbExecutablePath)))
+    {
+        PrintMessage(_T("Error: Unable to find GDB executable (%s)\r\n"), gdbExecutablePath != NULL ? gdbExecutablePath : _T("-missing path-"));
+        return 1;
+    }
+
     // Initialize GDB
     LPCTSTR gdbCommand = ConcatGdbCommand(argc, argv, gdbExecutablePath, gdbArgsStartFrom);
     GDBWrapper* gdb = new GDBWrapper(gdbCommand, handleCtrlC, handleTerminate);
@@ -143,7 +169,7 @@ int _tmain(int argc, _TCHAR* argv[])
     if (!gdb->StartProcess())
     {
         PrintMessage(_T("Error: Failed to start the GDB process (%s)\r\n"), gdbExecutablePath);
-        return 1;
+        return 2;
     }
 
     HANDLE handles[] = { handleCtrlC, handleTerminate, gdb->GetProcessHandle() };
