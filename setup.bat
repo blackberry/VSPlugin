@@ -128,14 +128,46 @@ call :processTools "%thisDir%" "%PluginRoot%" "%SystemDrive%"
 set /a actionNo += 1
 :skip_tools
 
-call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%" "%VSWizardsPath%"
+call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%"
 set /a actionNo += 1
 :msbuild_only
 
-call :processMSBuild "%BuildPath%" "%MSBuildTargetPath%" 
+call :processMSBuild "%BuildPath%" "%MSBuildTargetPath%"
+set /a actionNo += 1
+
+call :processTemplates "%BuildPath%" "%VSWizardsPath%"
 set /a actionNo += 1
 
 :processSetup_End
+endlocal
+exit /b
+
+REM ********************************************************************************************
+REM Templates
+REM ********************************************************************************************
+REM $1 - from
+REM $2 - Wizards path
+:processTemplates
+setlocal
+
+set InputPath=%~1
+set OutputWizardsPath=%~2
+
+if %ActionUninstall% neq 0 (goto uninstall_Templates)
+
+REM Templates
+echo Copy BlackBerry VCWizards directory
+xcopy "%InputPath%\Templates\VCWizards" "%OutputWizardsPath%" /e /i /y
+
+goto processTemplates_End
+
+:uninstall_Templates
+
+REM Remove Templates
+echo Delete BlackBerry VCWizards directory
+rd "%OutputWizardsPath%\BlackBerry" /s /q 
+
+:processTemplates_End
 endlocal
 exit /b
 
@@ -180,14 +212,12 @@ REM ****************************************************************************
 REM $1 - from
 REM $2 - to (plugin path)
 REM $3 - to (Visual Studio path)
-REM $4 - Wizards path
 :processPlugin
 setlocal EnableDelayedExpansion
 
 set InputPath=%~1
 set OutputPluginPath=%~2
 set OutputVsPath=%~3
-set OutputWizardsPath=%~4
 
 if %ActionUninstall% neq 0 (goto uninstall_Plugin)
 
@@ -215,10 +245,6 @@ echo "%InputPath%\Instructions.txt" to "%OutputVsPath%\Instructions.txt"
 copy "%InputPath%\Instructions.txt" "%OutputVsPath%\Instructions.txt" 
 echo "%InputPath%\BlackBerry.DebugEngine.dll" to "%OutputVsPath%\BlackBerry.DebugEngine.dll"
 copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputVsPath%\BlackBerry.DebugEngine.dll" 
-
-REM Templates
-echo Copy BlackBerry VCWizards directory
-xcopy "%InputPath%\Templates\VCWizards" "%OutputWizardsPath%" /e /i /y
 
 goto processPlugin_End
 
@@ -250,10 +276,6 @@ echo Remove Directory "%OutputPluginPath%"
 rd "%OutputPluginPath%"
 echo Remove Directory "%OutputVsPath%"
 rd "%OutputVsPath%"
-
-REM Remove Templates
-echo Delete BlackBerry VCWizards directory
-rd "%OutputWizardsPath%\BlackBerry" /s /q 
 
 :processPlugin_End
 endlocal
