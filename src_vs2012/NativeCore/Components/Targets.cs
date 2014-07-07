@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 
@@ -38,6 +39,8 @@ namespace BlackBerry.NativeCore.Components
                 // notify external handler:
                 var statusHandler = StatusChanged;
                 var args = ToEventArgs();
+
+                TraceLog.WriteLine("Target status changed to {0} ({1}) for device {2}", args.Status, args.Message ?? "-", Device);
 
                 if (statusHandler != null)
                 {
@@ -171,12 +174,28 @@ namespace BlackBerry.NativeCore.Components
         }
 
         /// <summary>
+        /// Gets an indication, if there is already a valid connection to the device with given IP.
+        /// </summary>
+        public static bool IsConnected(DeviceDefinition device)
+        {
+            return device != null && IsConnected(device.IP);
+        }
+
+        /// <summary>
         /// Gets an indication, if there is already a valid or broken connection to the device with given IP.
         /// </summary>
         public static bool IsConnectedOrFailed(string ip)
         {
             var connection = Find(ip);
             return connection == null || connection.Runner.IsConnected || connection.Runner.IsConnectionFailed;
+        }
+
+        /// <summary>
+        /// Gets an indication, if there is already a valid or broken connection to the device with given IP.
+        /// </summary>
+        public static bool IsConnectedOrFailed(DeviceDefinition device)
+        {
+            return device != null && IsConnectedOrFailed(device.IP);
         }
 
         /// <summary>
