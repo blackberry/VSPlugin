@@ -139,15 +139,7 @@ namespace BlackBerry.DebugEngine
             else
                 _filename = fullname;
 
-            try
-            {
-                _line = Convert.ToUInt32(line);
-            }
-            catch
-            {
-                _line = 0;
-            }
-
+            uint.TryParse(line, out _line); // stopping on that exception was just horrible...
             _id = id;
             _state = state;
             _targetID = targetID;
