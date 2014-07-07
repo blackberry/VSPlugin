@@ -716,11 +716,8 @@ namespace BlackBerry.DebugEngine
             string address = frameInfo[1];
             m_functionName = frameInfo[2];
             m_documentName = frameInfo[3];
-            try
-            {
-                m_lineNum = Convert.ToUInt32(frameInfo[4]);
-            }
-            catch (Exception)
+
+            if (!uint.TryParse(frameInfo[4], out m_lineNum))
             {
                 m_lineNum = 0;
             }
