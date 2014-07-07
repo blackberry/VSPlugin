@@ -120,6 +120,9 @@ namespace BlackBerry.Package
         private bool _isDebugConfiguration = true;
         private string _processName = "";
 
+        private CommandEvents _eventsDebug;
+        private CommandEvents _eventsDebugContext;
+
         #endregion
 
         #region Package Members
@@ -186,9 +189,8 @@ namespace BlackBerry.Package
             TraceLog.WriteLine(" * registered editors");
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
 
-            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
-            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
-            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
+            _eventsDebug = CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_BeforeExecute, StartDebugCommandEvents_AfterExecute);
+            _eventsDebugContext = CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, StartDebugCommandEvents_BeforeExecute, StartDebugCommandEvents_AfterExecute);
             TraceLog.WriteLine(" * registered build-platforms manager");
 
             _buildEvents = _dte.Events.BuildEvents;
@@ -825,7 +827,7 @@ namespace BlackBerry.Package
                     }
                 }
             }
-            return (false);
+            return false;
         }
 
 
@@ -965,11 +967,11 @@ namespace BlackBerry.Package
                         cancelDefault = true;
                     }
                     else
+                     */
                     {
                         BuildBar();
                         cancelDefault = true;
                     }
-                     */
                 }
                 else
                 {
