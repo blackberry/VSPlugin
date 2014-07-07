@@ -674,10 +674,6 @@
       <Project>{59a7b188-e307-4495-a3af-4ed76b086a87}</Project>
       <Name>BlackBerry.DebugEngine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
-      <Project>{cc7b28e0-cb31-44f7-a380-e7072f670f38}</Project>
-      <Name>GDBParser</Name>
-    </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{AE6BEE3E-3273-4214-A215-2924E33246CA}</Project>
       <Name>BlackBerry.NativeCore</Name>

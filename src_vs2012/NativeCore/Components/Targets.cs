@@ -40,7 +40,7 @@ namespace BlackBerry.NativeCore.Components
                 var statusHandler = StatusChanged;
                 var args = ToEventArgs();
 
-                TraceLog.WriteLine("Target status changed to {0} ({1}) for device {2}", args.Status, args.Message ?? "-", Device);
+                TraceLog.WriteLine("Target status changed to {0} (message: \"{1}\") for device {2}", args.Status, args.Message ?? "-", Device);
 
                 if (statusHandler != null)
                 {

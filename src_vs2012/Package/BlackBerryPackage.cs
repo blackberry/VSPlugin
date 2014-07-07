@@ -19,8 +19,6 @@ using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
-using BlackBerry.NativeCore.Components;
-using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
@@ -44,7 +42,6 @@ using System.Windows.Forms;
 using EnvDTE80;
 using System.Text.RegularExpressions;
 using System.Collections.Specialized;
-using VSNDK.Parser;
 
 namespace BlackBerry.Package
 {
