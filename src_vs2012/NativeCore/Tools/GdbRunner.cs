@@ -127,5 +127,58 @@ namespace BlackBerry.NativeCore.Tools
         }
 
         #endregion
+
+        #region Forwarded Communication
+
+        /// <summary>
+        /// Reads next response from the buffer.
+        /// If there is nothing received until last call, null value is returned.
+        /// </summary>
+        public Response Read()
+        {
+            if (_processor == null)
+                throw new ObjectDisposedException("GdbRunner");
+
+            return _processor.Read();
+        }
+
+        /// <summary>
+        /// This method sends a desired request to the GDB.
+        /// </summary>
+        public bool Send(Request request)
+        {
+            if (request == null)
+                throw new ArgumentNullException("request");
+            if (_processor == null)
+                throw new ObjectDisposedException("GdbRunner");
+
+            return _processor.Send(request);
+        }
+
+        /// <summary>
+        /// Waits until a valid message was not received.
+        /// </summary>
+        /// <returns>Returns 'true', if the signal was received and data is valid, 'false' in case of timeout.</returns>
+        public bool Wait(out Response response)
+        {
+            if (_processor == null)
+                throw new ObjectDisposedException("GdbRunner");
+
+            return _processor.Wait(out response);
+        }
+
+        /// <summary>
+        /// Waits until a valid message was not received.
+        /// </summary>
+        /// <returns>Returns 'true', if the signal was received and data is valid, 'false' in case of timeout.</returns>
+        public bool Wait(int millisecondsTimeout, out Response response)
+        {
+            if (_processor == null)
+                throw new ObjectDisposedException("GdbRunner");
+
+            return _processor.Wait(millisecondsTimeout, out response);
+        }
+
+        #endregion
     }
 }

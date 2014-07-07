@@ -20,8 +20,7 @@ namespace UnitTests
         {
             Targets.Connect(Defaults.IP, Defaults.Password, DeviceDefinitionType.Device, Defaults.SshPublicKeyPath, OnDeviceConnectionStatusChanged);
 
-            while (!Targets.IsConnectedOrFailed(Defaults.IP))
-                Thread.Sleep(10);
+            Targets.Wait(Defaults.IP);
 
             Assert.IsTrue(Targets.IsConnected(Defaults.IP), "Connection was not established properly");
         }
@@ -87,12 +86,12 @@ namespace UnitTests
             Response message;
             bool result;
 
-            result = runner.Processor.Wait(out message);
+            result = runner.Wait(out message);
             Assert.IsTrue(result, "Should receive GDB startup info");
 
             runner.Break();
 
-            result = runner.Processor.Wait(3 * 1000, out message);
+            result = runner.Wait(3 * 1000, out message);
             Assert.IsFalse(result, "Did not expect any notification");
 
             runner.Abort();
@@ -109,11 +108,11 @@ namespace UnitTests
             Response message;
             bool result;
 
-            result = runner.Processor.Wait(out message);
+            result = runner.Wait(out message);
             Assert.IsTrue(result, "Should receive GDB startup info");
 
             var exitRequest = RequestsFactory.Exit();
-            runner.Processor.Send(exitRequest);
+            runner.Send(exitRequest);
             result = exitRequest.Wait();
             Assert.IsTrue(result, "Exit command should be confirmed by the GDB");
 
@@ -136,21 +135,21 @@ namespace UnitTests
             bool result;
 
             // ok, wait util GDB is initialized:
-            result = runner.Processor.Wait(out message);
+            result = runner.Wait(out message);
             Assert.IsTrue(result, "Should receive GDB startup info");
 
             // send invalid request and wait for error:
             var rubbish1 = new Request("gdb-exit-rubbish");
             var rubbish2 = new Request("xxx-yyy-zzz");
-            runner.Processor.Send(rubbish1);
-            runner.Processor.Send(rubbish2);
+            runner.Send(rubbish1);
+            runner.Send(rubbish2);
 
             rubbish1.Wait();
-            message = runner.Processor.Read();
+            message = runner.Read();
             Assert.IsNotNull(message, "Should already receive a message");
 
             // for rubbish 2:
-            result = runner.Processor.Wait(out message);
+            result = runner.Wait(out message);
             Assert.IsTrue(result, "Should already receive a message");
             Assert.AreEqual(rubbish2.ID, message.ID, "Request and respose should have identical ID");
         }
@@ -165,13 +164,13 @@ namespace UnitTests
             bool result;
 
             // ok, wait util GDB is initialized:
-            result = runner.Processor.Wait(out message);
+            result = runner.Wait(out message);
             Assert.IsTrue(result, "Should receive GDB startup info");
 
             var selectDevice = RequestsFactory.SetTargetDevice(Defaults.IP);
             var listRequest = RequestsFactory.ListProcesses();
-            runner.Processor.Send(selectDevice);
-            runner.Processor.Send(listRequest);
+            runner.Send(selectDevice);
+            runner.Send(listRequest);
 
             listRequest.Wait();
             Assert.IsNotNull(listRequest.Response);
@@ -186,7 +185,7 @@ namespace UnitTests
             var selectDevice = RequestsFactory.SetTargetDevice(Defaults.IP);
             var listRequest = RequestsFactory.ListProcesses();
             var group = RequestsFactory.Group(selectDevice, listRequest);
-            runner.Processor.Send(group);
+            runner.Send(group);
 
             group.Wait();
             Assert.IsNotNull(listRequest.Response);
@@ -203,7 +202,7 @@ namespace UnitTests
             // yes, it's not necessary to wrap it into any group, but just for testing purposes:
             var group = RequestsFactory.Group(RequestsFactory.Group(listFeatures));
 
-            runner.Processor.Send(group);
+            runner.Send(group);
             group.Wait();
 
             Assert.IsNotNull(listFeatures.Response);
@@ -220,8 +219,8 @@ namespace UnitTests
             var selectTarget = RequestsFactory.SetTargetDevice(Defaults.IP);
             var listTargetFeatures = RequestsFactory.ListTargetFeatures();
 
-            runner.Processor.Send(selectTarget);
-            runner.Processor.Send(listTargetFeatures);
+            runner.Send(selectTarget);
+            runner.Send(listTargetFeatures);
             listTargetFeatures.Wait();
 
             Assert.IsNotNull(listTargetFeatures.Response);
@@ -238,7 +237,7 @@ namespace UnitTests
             var listProcesses = RequestsFactory.ListProcesses();
 
             var procGroup = RequestsFactory.Group(enablePending, selectDevice, listProcesses);
-            runner.Processor.Send(procGroup);
+            runner.Send(procGroup);
             procGroup.Wait(); // at this point, we should receive a list of running processes
 
             // find the PID of FallingBlocks sample:
@@ -253,7 +252,7 @@ namespace UnitTests
             var stackTrace = RequestsFactory.StackTraceListFrames();
 
             var attachGroup = RequestsFactory.Group(setLibSearchPath, setExecutable, attachProcess, stackDepth, stackTrace, infoThreads);
-            runner.Processor.Send(attachGroup);
+            runner.Send(attachGroup);
             attachGroup.Wait();
 
             // insert a breakpoint
@@ -261,12 +260,12 @@ namespace UnitTests
             //var bp = RequestsFactory.InsertBreakpoint("update");
 
             var breakGroup = RequestsFactory.Group(bp);
-            runner.Processor.Send(breakGroup);
+            runner.Send(breakGroup);
             breakGroup.Wait();
 
             // resume execution:
             var continueExec = RequestsFactory.Continue();
-            runner.Processor.Send(continueExec);
+            runner.Send(continueExec);
             continueExec.Wait();
 
             for (int i = 0; i < 1000; i++)
@@ -274,12 +273,12 @@ namespace UnitTests
 
             // delete the breakpoint:
             var delBp = RequestsFactory.DeleteBreakpoint(1); // PH: FIXME: assuming this BP-id, should be updated, when parsing responses is fully implemented
-            runner.Processor.Send(delBp);
+            runner.Send(delBp);
             delBp.Wait();
 
             // resume after breakpoint:
             var contGroup = RequestsFactory.Group(stackTrace, continueExec);
-            runner.Processor.Send(contGroup);
+            runner.Send(contGroup);
             contGroup.Wait();
 
             for (int i = 0; i < 1000; i++)
@@ -288,7 +287,7 @@ namespace UnitTests
             // detach:
             runner.Break();
             var detachProcess = RequestsFactory.DetachTargetProcess();
-            runner.Processor.Send(detachProcess);
+            runner.Send(detachProcess);
             detachProcess.Wait();
         }
 
