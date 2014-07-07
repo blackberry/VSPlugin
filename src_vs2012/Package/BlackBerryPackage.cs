@@ -19,6 +19,8 @@ using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
@@ -547,6 +549,40 @@ namespace BlackBerry.Package
         /// </summary>
         private void Deployed()
         {
+            string currentPath = "";
+            string executablePath;
+
+            foreach (string[] paths in _targetDir)
+            {
+                if (paths[0] == _processName)
+                {
+                    currentPath = paths[1];
+                    break;
+                }
+            }
+
+            executablePath = currentPath + _processName; // The executable path
+            executablePath = executablePath.Replace('\\', '/');
+
+            var ndk = ActiveNDK;
+            var device = ActiveDevice;
+
+            if (ndk == null)
+            {
+                MessageBoxHelper.Show("Missing NDK selected. Please install any and mark as active using BlackBerry menu options.", null,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            if (device == null)
+            {
+                MessageBoxHelper.Show("Missing device selected. Please define an IP, password and mark a device as active using BlackBerry menu options.", null,
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            LaunchDebugTarget(_processName, ndk.ToDefinition().ToolsPath, ConfigDefaults.SshPublicKeyPath.Replace('\\', '/'), device.IP, device.Password, executablePath);
+
+            /*
             string pidString = "";
             string toolsPath = "";
             string publicKeyPath = "";
@@ -561,6 +597,7 @@ namespace BlackBerry.Package
             {
                 MessageBox.Show("Failed to debug the application.\n\nPlease, close the app in case it was launched in the device/simulator.", "Failed to launch debugger", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+             */
         }
 
         /// <summary> 
@@ -622,6 +659,7 @@ namespace BlackBerry.Package
             return false;
         }
 
+        /*
         /// <summary> 
         /// Get the PID of the launched native app by parsing text from the output window. 
         /// </summary>
@@ -662,9 +700,25 @@ namespace BlackBerry.Package
                 return false;
             }
 
+            var gdbInfo = new GdbInfo(ndk, device, null, null);
+
             toolsPath = ndk.ToDefinition().ToolsPath;
             targetIP = device.IP;
             password = device.Password;
+
+            Targets.Connect(device, publicKeyPath, null);
+            Targets.Wait(device);
+
+            var runner = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
+            runner.ExecuteAsync();
+
+            var processesResponse = RequestsFactory.ListProcesses();
+            var request = RequestsFactory.Group(RequestsFactory.SetTargetDevice(gdbInfo.Device), processesResponse, RequestsFactory.Exit());
+            runner.Send(request);
+            request.Wait();
+
+            var message = processesResponse.Response;
+
 
             pidString = GetPIDfromGDB(_processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
 
@@ -793,7 +847,7 @@ namespace BlackBerry.Package
             }
             return pid;
         }
-
+        */
 
         /// <summary>
         /// Verify if the app configuration is Debug.
@@ -859,6 +913,15 @@ namespace BlackBerry.Package
         /// <param name="cancelDefault"> Cancel the default execution of the command. </param>
         private void StartDebugCommandEvents_BeforeExecute(string guid, int id, object customIn, object customOut, ref bool cancelDefault)
         {
+            Debug.WriteLine("Before Start Debug");
+
+            if (DebugEngineStatus.IsRunning)
+            {
+                // Disable the override of F5 (this allows the debugged process to continue execution)
+                cancelDefault = false;
+                return;
+            }
+
             bool bbPlatform = false;
             if (_dte.Solution.SolutionBuild.ActiveConfiguration != null)
             {
@@ -875,9 +938,7 @@ namespace BlackBerry.Package
                 }
             }
 
-            Debug.WriteLine("Before Start Debug");
-
-            if (DebugEngineStatus.IsRunning || !bbPlatform)
+            if (!bbPlatform)
             {
                 // Disable the override of F5 (this allows the debugged process to continue execution)
                 cancelDefault = false;

@@ -18,6 +18,8 @@ namespace BlackBerry.NativeCore
         public static readonly string JavaHome;
         public static readonly string SshPublicKeyPath;
         public static readonly string BuildDebugNativePath;
+        public static readonly string GdbHostPath;
+
 
         /// <summary>
         /// Plugin-owned installation cache config directory.
@@ -56,6 +58,7 @@ namespace BlackBerry.NativeCore
             SshPublicKeyPath = Path.Combine(DataDirectory, "bbt_id_rsa.pub");
             BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
+            GdbHostPath = @"S:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
         }
 
         /// <summary>

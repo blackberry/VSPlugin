@@ -15,6 +15,7 @@
 using System;
 using System.Runtime.InteropServices;
 using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio;
@@ -572,6 +573,7 @@ namespace BlackBerry.DebugEngine
                 NameValueCollectionHelper.LoadFromString(nvc, args);
 
                 string pid = nvc.GetValues("pid")[0];
+                uint pidNumber;
                 string exePath = exe;
                 string targetIP = nvc.GetValues("targetIP")[0];
                 bool isSimulator = Convert.ToBoolean(nvc.GetValues("isSimulator")[0]);
@@ -583,7 +585,12 @@ namespace BlackBerry.DebugEngine
                 if (passwordArray != null)
                     password = passwordArray[0];
 
-                if (GDBParser.LaunchProcess(pid, exePath, targetIP, isSimulator, toolsPath, publicKeyPath, password))
+                if (!uint.TryParse(pid, out pidNumber))
+                {
+                    uint.TryParse(GetPIDfromGDB(pid, targetIP, password, isSimulator, toolsPath, publicKeyPath), out pidNumber);
+                }
+
+                if (GDBParser.LaunchProcess(pidNumber.ToString(), exePath, targetIP, isSimulator, toolsPath, publicKeyPath, password))
                 {
                     process = _process = new AD7Process(this, port);
                     EventDispatcher = new EventDispatcher(this);
@@ -609,6 +616,46 @@ namespace BlackBerry.DebugEngine
             }
         }
 
+        private string GetPIDfromGDB(string processName, string ip, string password, bool isSimulator, string toolsPath, string publicKeyPath)
+        {
+            string pid = "";
+            string response = GDBParser.GetPIDsThroughGDB(ip, password, isSimulator, toolsPath, publicKeyPath, 7);
+
+            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0, StringComparison.Ordinal) != -1)) //found an error
+            {
+                if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
+                {
+                    MessageBox.Show("Please, verify if the Device/Simulator IP in \"BlackBerry -> Settings\" menu is correct and check if it is connected.", "Device/Simulator not connected or not configured properly", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+                else
+                    if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
+                    {
+                        string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
+                        string caption;
+                        if (txt.IndexOf("The requested address is not valid in its context.") != -1)
+                        {
+                            txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
+                            caption = "Invalid IP";
+                        }
+                        else
+                        {
+                            txt += "\n\nPlease, verify if the device/simulator is connected.";
+                            caption = "Connection failed";
+                        }
+                        MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
+            }
+            else if (response.Contains("^done"))
+            {
+                int i = response.IndexOf(processName + " - ", StringComparison.Ordinal);
+                if (i != -1)
+                {
+                    i += processName.Length + 3;
+                    pid = response.Substring(i, response.IndexOf('/', i) - i);
+                }
+            }
+            return pid;
+        }
 
         /// <summary>
         /// Resume a process launched by IDebugEngineLaunch2.LaunchSuspended. (http://msdn.microsoft.com/en-us/library/bb146261.aspx)
@@ -1376,7 +1423,7 @@ namespace BlackBerry.DebugEngine
 
             if (_currentThreadIndex != -1)
             {
-                foreach (AD7Thread t in Threads)
+                foreach (AD7Thread t in threads)
                 {
                     Callback.OnThreadStart(t);
                 }
