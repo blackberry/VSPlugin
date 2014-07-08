@@ -49,20 +49,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <LibPrefix>lib</LibPrefix>
   </PropertyGroup>
 
-  <PropertyGroup Condition="$(Configuration.Contains('Simulator'))">
-    <CPUVARDIR>x86</CPUVARDIR>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(Configuration.Contains('Device'))">
-    <CPUVARDIR>armle-v7</CPUVARDIR>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <CompilerVersion>$(from_file)</CompilerVersion>
-    <CompilerTarget Condition="'$(CPUVARDIR)' == 'x86'">gcc_ntox86</CompilerTarget>
-    <CompilerTarget Condition="'$(CPUVARDIR)' == 'armle-v7'">gcc_ntoarmv7le</CompilerTarget>
-    <QccLibPath>$(QNX_TARGET)\$(CPUVARDIR)\lib</QccLibPath>
-  </PropertyGroup>
-
   <!-- Redefine the Target Macros-->
   <PropertyGroup>
     <TargetPath>$([System.IO.Path]::Combine($(ProjectDir),$(OutDir)$(LibPrefix)$(TargetName)$(TargetExt)))</TargetPath>
