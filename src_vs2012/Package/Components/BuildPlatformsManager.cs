@@ -32,6 +32,7 @@ using BlackBerry.Package.ViewModels;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.VCProjectEngine;
@@ -65,6 +66,9 @@ namespace BlackBerry.Package.Components
 
         private const string BLACKBERRY = "BlackBerry";
         private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
+        private const string STANDARD_TOOL_BAR = "Standard";
+        private const string SOLUTION_CONFIGURATIONS = "Solution Configurations";
+        private const string SOLUTION_PLATFORMS = "Solution Platforms";
         private const string BAR_DESCRIPTOR = "bar-descriptor.xml";
         private const string BAR_DESCRIPTOR_PATH = @"\..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033\";
 
@@ -84,7 +88,7 @@ namespace BlackBerry.Package.Components
             //CommandHelper.Register(_dte, GuidList.guidVSDebugGroup, StandardCommands.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_beforeExec, cmdNewFunctionBreakpoint_afterExec);
 
             //DisableIntelliSenseErrorReport(true);
-            //CheckSolutionPlatformCommand();
+            ShowSolutionPlatformSelector();
 
             // INFO: the references to returned objects must be stored and live as long, as the handlers are needed,
             // since they are COM objects and will be automatically reclaimed on next GC.Collect(), causing handlers to be unsubscribed...
@@ -140,6 +144,39 @@ namespace BlackBerry.Package.Components
             }
         }
          */
+
+        /// <summary> 
+        /// Solution Platform command is shown in the Standard toolbar by default with Visual C++ settings. Add the 
+        /// command if not in the Standard toolbar. 
+        /// </summary>
+        private void ShowSolutionPlatformSelector()
+        {
+            DTE dte = (DTE)_dte;
+            CommandBars commandBars = (CommandBars)dte.CommandBars;
+            CommandBar standardCommandBar = commandBars[STANDARD_TOOL_BAR];
+            int pos = 0;
+            foreach (CommandBarControl cmd in standardCommandBar.Controls)
+            {
+                if (cmd.Caption == SOLUTION_CONFIGURATIONS)
+                    pos = cmd.Index;
+                if (cmd.Caption == SOLUTION_PLATFORMS)
+                    return;
+            }
+
+
+            Command sp = null;
+            foreach (Command c in dte.Commands)
+            {
+                if (c.Guid == GuidList.guidVSStd2KString && c.ID == StandardCommands.cmdidSolutionPlatform)
+                {
+                    sp = c;
+                    break;
+                }
+            }
+            if (sp != null)
+                sp.AddControl(standardCommandBar, pos + 1);
+        }
+
 
         /// <summary> 
         /// New Platform After Execution Event Handler. 
