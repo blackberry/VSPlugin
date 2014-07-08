@@ -17,13 +17,13 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Dialogs;
@@ -32,7 +32,6 @@ using BlackBerry.Package.ViewModels;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
-using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.VCProjectEngine;
@@ -44,20 +43,8 @@ namespace BlackBerry.Package.Components
     /// </summary>
     internal sealed class BuildPlatformsManager
     {
-        #region Internal Classes
-
-        sealed class ConfigTableEntry
-        {
-            public string config;
-            public string platform;
-            public bool deployable;
-        }
-
-        #endregion
-
         private readonly DTE2 _dte;
         private TokenProcessor _tokenProcessor;
-        private readonly List<ConfigTableEntry> _configTable;
 
         private bool _isSimulator;
         private List<string[]> _targetDir;
@@ -71,15 +58,13 @@ namespace BlackBerry.Package.Components
 
         private BuildEvents _buildEvents;
 
+        private CommandEvents _deploymentEvents;
         private CommandEvents _eventsDebug;
         private CommandEvents _eventsDebugContext;
 
 
         private const string BLACKBERRY = "BlackBerry";
         private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
-        private const string STANDARD_TOOL_BAR = "Standard";
-        private const string SOLUTION_CONFIGURATIONS = "Solution Configurations";
-        private const string SOLUTION_PLATFORMS = "Solution Platforms";
         private const string BAR_DESCRIPTOR = "bar-descriptor.xml";
         private const string BAR_DESCRIPTOR_PATH = @"\..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033\";
 
@@ -90,17 +75,16 @@ namespace BlackBerry.Package.Components
 
             // initialize variables:
             _dte = dte;
-            _configTable = new List<ConfigTableEntry>();
         }
 
         public void Initialize()
         {
             // register for command events, when accessing build platforms:
-            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidSolutionPlatform, cmdNewPlatform_beforeExec, cmdNewPlatform_afterExec);
-            CommandHelper.Register(_dte, GuidList.guidVSDebugGroup, StandardCommands.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_beforeExec, cmdNewFunctionBreakpoint_afterExec);
+            _deploymentEvents = CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidSolutionPlatform, null, cmdNewPlatform_afterExec);
+            //CommandHelper.Register(_dte, GuidList.guidVSDebugGroup, StandardCommands.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_beforeExec, cmdNewFunctionBreakpoint_afterExec);
 
             //DisableIntelliSenseErrorReport(true);
-            CheckSolutionPlatformCommand();
+            //CheckSolutionPlatformCommand();
 
             // INFO: the references to returned objects must be stored and live as long, as the handlers are needed,
             // since they are COM objects and will be automatically reclaimed on next GC.Collect(), causing handlers to be unsubscribed...
@@ -139,37 +123,7 @@ namespace BlackBerry.Package.Components
             //DisableIntelliSenseErrorReport(false);
         }
 
-        /// <summary> 
-        /// Solution Platform command is shown in the Standard toolbar by default with Visual C++ settings. Add the 
-        /// command if not in the Standard toolbar. 
-        /// </summary>
-        private void CheckSolutionPlatformCommand()
-        {
-            DTE dte = (DTE)_dte;
-            CommandBars commandBars = (CommandBars)dte.CommandBars;
-            CommandBar standardCommandBar = commandBars[STANDARD_TOOL_BAR];
-            int pos = 0;
-            foreach (CommandBarControl cmd in standardCommandBar.Controls)
-            {
-                if (cmd.Caption == SOLUTION_CONFIGURATIONS)
-                    pos = cmd.Index;
-                if (cmd.Caption == SOLUTION_PLATFORMS)
-                    return;
-            }
-
-            Command sp = null;
-            foreach (Command c in dte.Commands)
-            {
-                if (c.Guid == GuidList.guidVSStd2KString && c.ID == StandardCommands.cmdidSolutionPlatform)
-                {
-                    sp = c;
-                    break;
-                }
-            }
-            if (sp != null)
-                sp.AddControl(standardCommandBar, pos + 1);
-        }
-
+        /*
         /// <summary> 
         /// Set the DisableErrorReporting property value. 
         /// </summary>
@@ -185,19 +139,7 @@ namespace BlackBerry.Package.Components
                     prop.Value = disable;
             }
         }
-
-        /// <summary> 
-        /// New Platform Before Execution Event Handler. 
-        /// </summary>
-        /// <param name="Guid">Command GUID. </param>
-        /// <param name="ID">Command ID. </param>
-        /// <param name="CustomIn">Custom IN Object. </param>
-        /// <param name="CustomOut">Custom OUT Object. </param>
-        /// <param name="CancelDefault">Cancel the default execution of the command. </param>
-        private void cmdNewPlatform_beforeExec(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
-        {
-            GetSolutionPlatformConfig();
-        }
+         */
 
         /// <summary> 
         /// New Platform After Execution Event Handler. 
@@ -208,8 +150,7 @@ namespace BlackBerry.Package.Components
         /// <param name="CustomOut">Custom OUT Object. </param>
         private void cmdNewPlatform_afterExec(string Guid, int ID, object CustomIn, object CustomOut)
         {
-            SolutionPlatformConfig();
-            AddBarDescriptor();
+            //EnableDeploymentForSolutionPlatforms();
         }
 
         /// <summary> 
@@ -247,159 +188,57 @@ namespace BlackBerry.Package.Components
         }
 
         /// <summary>
-        /// Set solution config after edit
+        /// Enable deployment feature for all BlackBerry projects.
         /// </summary>
-        private void SolutionPlatformConfig()
+        private void EnableDeploymentForSolutionPlatforms()
         {
-            DTE dte = _dte as DTE;
-
-            SolutionConfigurations SGS = dte.Solution.SolutionBuild.SolutionConfigurations;
-
-            foreach (SolutionConfiguration SG in SGS)
+            SolutionConfigurations solutionConfigurations = _dte.Solution.SolutionBuild.SolutionConfigurations;
+            foreach (SolutionConfiguration configuration in solutionConfigurations)
             {
-                string name = SG.Name;
-
-                SolutionContexts SCS = SG.SolutionContexts;
-                foreach (SolutionContext SC in SCS)
+                foreach (SolutionContext context in configuration.SolutionContexts)
                 {
-                    string cname = SC.ConfigurationName;
-                    string pname = SC.PlatformName;
-                    string prname = SC.ProjectName;
-
-                    ConfigTableEntry e = _configTable.Find(i => (i.config == cname) && (i.platform == pname));
-
-                    if (e != null)
+                    if (context.PlatformName == "BlackBerry" || context.PlatformName == "BlackBerrySimulator")
                     {
-                        _configTable.Remove(e);
+                        context.ShouldDeploy = true;
                     }
-                    else
-                    {
-                        SC.ShouldDeploy = true;
-                    }
-
                 }
             }
         }
 
-        /// <summary>
-        /// Get solution configuration before edit
-        /// </summary>
-        private void GetSolutionPlatformConfig()
+        private void AddBarDescriptorToProject(Project project)
         {
-            DTE dte = _dte as DTE;
+            if (project == null)
+                throw new ArgumentNullException("project");
 
-            SolutionConfigurations SGS = dte.Solution.SolutionBuild.SolutionConfigurations;
-
-            foreach (SolutionConfiguration SG in SGS)
+            ProjectItem baritem = project.ProjectItems.Item(BAR_DESCRIPTOR);
+            string n = project.Name;
+            if (baritem == null)
             {
-                string name = SG.Name;
+                _tokenProcessor = new TokenProcessor();
+                Debug.WriteLine("Add bar descriptor file to the project");
+                string templatePath = _dte.Solution.ProjectItemsTemplatePath(project.Kind);
+                templatePath += BAR_DESCRIPTOR_PATH + BAR_DESCRIPTOR;
+                _tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", project.Name);
+                string destination = Path.GetFileName(templatePath);
 
-                SolutionContexts SCS = SG.SolutionContexts;
-                foreach (SolutionContext SC in SCS)
+                // Remove directory used in previous versions of this plug-in.
+                string folder = Path.Combine(Path.GetDirectoryName(project.FullName), project.Name + "_barDescriptor");
+                if (Directory.Exists(folder))
                 {
-                    string cname = SC.ConfigurationName;
-                    string pname = SC.PlatformName;
-                    string prname = SC.ProjectName;
-
-                    ConfigTableEntry c = new ConfigTableEntry();
-                    c.platform = pname;
-                    c.config = cname;
-                    c.deployable = SC.ShouldDeploy;
-
-                    _configTable.Add(c);
-                }
-            }
-        }
-
-        /// <summary> 
-        /// Add Bar Descriptor to each project. 
-        /// </summary>
-        private void AddBarDescriptor()
-        {
-            try
-            {
-                DTE dte = _dte as DTE;
-                Projects projs = dte.Solution.Projects;
-
-
-                List<Project> projList = new List<Project>();
-                foreach (Project proj in projs)
-                {
-                    projList.Add(proj);
-                }
-
-                while (projList.Count > 0)
-                {
-                    Project proj = projList.ElementAt(0);
-                    projList.RemoveAt(0);
-
-                    Configuration config;
-                    Property prop;
                     try
                     {
-                        config = proj.ConfigurationManager.ActiveConfiguration;
-                        prop = config.Properties.Item("ConfigurationType");
+                        Directory.Delete(folder);
                     }
-                    catch
+                    catch (Exception)
                     {
-                        config = null;
-                        prop = null;
-                    }
-
-                    if (prop == null)
-                    {
-                        if (proj.ProjectItems != null)
-                        {
-                            foreach (ProjectItem projItem in proj.ProjectItems)
-                            {
-                                if (projItem.SubProject != null)
-                                    projList.Add(projItem.SubProject);
-                            }
-                        }
-                        continue;
-                    }
-                    
-                    if (Convert.ToInt16(prop.Value) != Convert.ToInt16(ConfigurationTypes.typeApplication))
-                        continue;
-
-                    if (config.PlatformName != BLACKBERRY && config.PlatformName != BLACKBERRYSIMULATOR)
-                        continue;
-                    
-                    ProjectItem baritem = proj.ProjectItems.Item(BAR_DESCRIPTOR);
-                    string n = proj.Name;
-                    if (baritem == null)
-                    {
-                        _tokenProcessor = new TokenProcessor();
-                        Debug.WriteLine("Add bar descriptor file to the project");
-                        string templatePath = dte.Solution.ProjectItemsTemplatePath(proj.Kind);
-                        templatePath += BAR_DESCRIPTOR_PATH + BAR_DESCRIPTOR;
-                        _tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", proj.Name);
-                        string destination = Path.GetFileName(templatePath);
-
-                        // Remove directory used in previous versions of this plug-in.
-                        string folder = Path.Combine(Path.GetDirectoryName(proj.FullName), proj.Name + "_barDescriptor");
-                        if (Directory.Exists(folder))
-                        {
-                            try
-                            {
-                                Directory.Delete(folder);
-                            }
-                            catch (Exception)
-                            {
-                            }
-                        }
-
-                        folder = Path.Combine(Path.GetDirectoryName(proj.FullName), "BlackBerry-" + proj.Name);
-                        Directory.CreateDirectory(folder);
-                        destination = Path.Combine(folder, destination);
-                        _tokenProcessor.UntokenFile(templatePath, destination);
-                        ProjectItem projectitem = proj.ProjectItems.AddFromFile(destination);
                     }
                 }
-            }
-            catch (Exception e)
-            {
-                Debug.WriteLine(e.Message);
+
+                folder = Path.Combine(Path.GetDirectoryName(project.FullName), "BlackBerry-" + project.Name);
+                Directory.CreateDirectory(folder);
+                destination = Path.Combine(folder, destination);
+                _tokenProcessor.UntokenFile(templatePath, destination);
+                project.ProjectItems.AddFromFile(destination);
             }
         }
 
@@ -582,7 +421,6 @@ namespace BlackBerry.Package.Components
 
             return false;
         }
-
 
         #region Event Handlers
 
@@ -821,6 +659,36 @@ namespace BlackBerry.Package.Components
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Adds BlackBerry specific target platforms.
+        /// </summary>
+        public bool AddPlatforms(Project project)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            try
+            {
+                AddBarDescriptorToProject(project);
+                project.ConfigurationManager.AddPlatform("BlackBerry", "BlackBerry", true);
+                project.ConfigurationManager.AddPlatform("BlackBerrySimulator", "BlackBerrySimulator", true);
+                EnableDeploymentForSolutionPlatforms();
+
+                project.ConfigurationManager.DeletePlatform("Win32");
+                project.ConfigurationManager.DeletePlatform("x64");
+                project.ConfigurationManager.DeletePlatform("ARM");
+                project.ConfigurationManager.DeleteConfigurationRow("Win32");
+                project.ConfigurationManager.DeleteConfigurationRow("x64");
+                project.ConfigurationManager.DeleteConfigurationRow("ARM");
+                return true;
+            }
+            catch (Exception e)
+            {
+                TraceLog.WriteException(e);
+                return false;
+            }
         }
     }
 }

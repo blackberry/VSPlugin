@@ -71,10 +71,17 @@
         <Buttons>
 
           <!-- Common Action Buttons -->
+          <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonAddPlatformTargets" priority="0x0100" type="Button">
+            <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
+            <Strings>
+              <ButtonText>Add BlackBerry Pla&amp;tforms...</ButtonText>
+            </Strings>
+          </Button>
+
           <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonProjectImport" priority="0x0100" type="Button">
             <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
             <Strings>
-              <ButtonText>Import &amp;Core Native Project</ButtonText>
+              <ButtonText>Import &amp;Core Native Project...</ButtonText>
             </Strings>
           </Button>
 
@@ -259,7 +266,8 @@
             <IDSymbol name="cmdidBlackBerryTargetsApiLevelsPlaceholder" value="0x601" />
             <IDSymbol name="cmdidBlackBerryTargetsConfigure" value="0x701" />
 
-            <IDSymbol name="cmdidBlackBerryCommonProjectImport" value="0x201" />
+            <IDSymbol name="cmdidBlackBerryCommonAddPlatformTargets" value="0x201" />
+            <IDSymbol name="cmdidBlackBerryCommonProjectImport" value="0x202" />
             <IDSymbol name="cmdidBlackBerryHelpWelcomePage" value="0x901" />
             <IDSymbol name="cmdidBlackBerryHelpSupportForum" value="0x902" />
             <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x1001" />

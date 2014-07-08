@@ -230,7 +230,12 @@ namespace BlackBerry.Package
                 MenuCommand configureMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(TargetsOptionPage)), configureCommandID);
                 mcs.AddCommand(configureMenu);
 
-                // Create the command for 'Import BlackBerry Native Project' menu item.
+                // Create the command for 'Add BlackBerry Platforms' menu item
+                CommandID platformsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryCommonAddPlatformTargets);
+                OleMenuCommand platformsItem = new OleMenuCommand(AddBlackBerryTargetPlatforms, platformsCommandID);
+                mcs.AddCommand(platformsItem);
+
+                // Create the command for 'Import BlackBerry Native Project' menu item
                 CommandID projectCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryCommonProjectImport);
                 OleMenuCommand projectItem = new OleMenuCommand(ImportBlackBerryProject, projectCommandID);
                 mcs.AddCommand(projectItem);
@@ -362,14 +367,6 @@ namespace BlackBerry.Package
         #endregion
 
         /// <summary>
-        /// Gets the number of installed NDKs.
-        /// </summary>
-        private int GetInstalledNdkCount()
-        {
-            return PackageViewModel.Instance.InstalledNDKs.Length;
-        }
-
-        /// <summary>
         /// Gets the currently selected NDK to build against.
         /// </summary>
         private NdkInfo ActiveNDK
@@ -383,6 +380,22 @@ namespace BlackBerry.Package
         private void EnsureActiveNDK()
         {
             PackageViewModel.Instance.EnsureActiveNDK();
+        }
+
+        private void AddBlackBerryTargetPlatforms(object sender, EventArgs e)
+        {
+            var projects = DteHelper.GetProjects(_dte);
+
+            if (projects == null || projects.Length == 0)
+            {
+                MessageBoxHelper.Show("Unable to add BlackBerry Platforms. Please open a solution with Visual C++ projects", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+
+            foreach (var project in projects)
+            {
+                _buildPlatformsManager.AddPlatforms(project);
+            }
         }
 
         private void ImportBlackBerryProject(object sender, EventArgs e)

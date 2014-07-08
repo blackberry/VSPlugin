@@ -16,7 +16,8 @@ namespace BlackBerry.Package
 {
     internal static class PackageCommands
     {
-        public const int cmdidBlackBerryCommonProjectImport = 0x0201;
+        public const int cmdidBlackBerryCommonAddPlatformTargets = 0x0201;
+        public const int cmdidBlackBerryCommonProjectImport = 0x0202;
 
         public const int cmdidBlackBerryOptions = 0x301;
         public const int cmdidBlackBerryTargetsDevicesPlaceholder = 0x501;

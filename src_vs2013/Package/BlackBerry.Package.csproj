@@ -184,6 +184,9 @@
     <Compile Include="..\..\src_vs2012\Package\Helpers\DialogHelper.cs">
       <Link>Helpers\DialogHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\DteHelper.cs">
+      <Link>Helpers\DteHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
     </Compile>

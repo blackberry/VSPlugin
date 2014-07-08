@@ -186,6 +186,7 @@
     <Compile Include="Helpers\CertHelper.cs" />
     <Compile Include="Helpers\CommandHelper.cs" />
     <Compile Include="Helpers\DialogHelper.cs" />
+    <Compile Include="Helpers\DteHelper.cs" />
     <Compile Include="Helpers\MessageBoxHelper.cs" />
     <Compile Include="Model\bar-descriptor.cs" />
     <Compile Include="Model\Integration\ComboBoxItem.cs" />
