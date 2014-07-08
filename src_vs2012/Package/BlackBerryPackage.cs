@@ -247,7 +247,7 @@ namespace BlackBerry.Package
 
             // make sure there is an NDK selected and developer knows about it:
             EnsureActiveNDK();
-            if (_buildPlatformsManager.IsBlackBerrySolution(_dte) && ActiveNDK == null)
+            if (_buildPlatformsManager.IsBlackBerrySolution() && ActiveNDK == null)
             {
                 var form = new MissingNdkInstalledForm();
                 form.ShowDialog();

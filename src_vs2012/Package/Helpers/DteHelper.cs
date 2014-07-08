@@ -31,5 +31,33 @@ namespace BlackBerry.Package.Helpers
 
             return result.ToArray();
         }
+
+        /// <summary>
+        /// Gets the output path for specified project.
+        /// </summary>
+        public static string GetOutputPath(Project project)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            ConfigurationManager config = project.ConfigurationManager;
+            Configuration active = config.ActiveConfiguration;
+
+            foreach (Property prop in active.Properties)
+            {
+                try
+                {
+                    if (prop.Name == "OutputPath")
+                    {
+                        return prop.Value.ToString();
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            return null;
+        }
     }
 }

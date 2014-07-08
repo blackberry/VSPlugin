@@ -1,6 +1,7 @@
 ﻿using System;
 using EnvDTE;
 using EnvDTE80;
+using Microsoft.VisualStudio;
 
 namespace BlackBerry.Package.Helpers
 {
@@ -9,7 +10,25 @@ namespace BlackBerry.Package.Helpers
         /// <summary>
         /// Registers specified handlers for a command given by guid:id anywhere inside Visual Studio.
         /// </summary>
-        public static CommandEvents Register(DTE2 dte, string commandGuid, int commandId, _dispCommandEvents_BeforeExecuteEventHandler beforeHandler,
+        public static CommandEvents Register(DTE2 dte, Guid commandGuid, VSConstants.VSStd97CmdID commandId, _dispCommandEvents_BeforeExecuteEventHandler beforeHandler,
+            _dispCommandEvents_AfterExecuteEventHandler afterHandler)
+        {
+            return Register(dte, commandGuid, (int)commandId, beforeHandler, afterHandler);
+        }
+
+        /// <summary>
+        /// Registers specified handlers for a command given by guid:id anywhere inside Visual Studio.
+        /// </summary>
+        public static CommandEvents Register(DTE2 dte, Guid commandGuid, VSConstants.VSStd2KCmdID commandId, _dispCommandEvents_BeforeExecuteEventHandler beforeHandler,
+            _dispCommandEvents_AfterExecuteEventHandler afterHandler)
+        {
+            return Register(dte, commandGuid, (int)commandId, beforeHandler, afterHandler);
+        }
+
+        /// <summary>
+        /// Registers specified handlers for a command given by guid:id anywhere inside Visual Studio.
+        /// </summary>
+        public static CommandEvents Register(DTE2 dte, Guid commandGuid, int commandId, _dispCommandEvents_BeforeExecuteEventHandler beforeHandler,
             _dispCommandEvents_AfterExecuteEventHandler afterHandler)
         {
             if (dte == null)
@@ -20,7 +39,7 @@ namespace BlackBerry.Package.Helpers
             if (beforeHandler == null && afterHandler == null)
                 return null;
 
-            var commandEvents = dte.Events.CommandEvents[commandGuid, commandId];
+            var commandEvents = dte.Events.CommandEvents[commandGuid.ToString("B"), commandId];
             if (commandEvents != null)
             {
                 if (beforeHandler != null)

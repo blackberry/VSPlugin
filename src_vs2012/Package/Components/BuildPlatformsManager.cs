@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -35,7 +34,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.VCProjectEngine;
 
 namespace BlackBerry.Package.Components
 {
@@ -45,46 +43,48 @@ namespace BlackBerry.Package.Components
     internal sealed class BuildPlatformsManager
     {
         private readonly DTE2 _dte;
-        private TokenProcessor _tokenProcessor;
 
-        private bool _isSimulator;
-        private List<string[]> _targetDir;
         private List<String> _buildThese;
         private bool _hitPlay;
         private int _amountOfProjects;
         private bool _isDeploying;
-        private OutputWindowPane _owP;
-        private bool _isDebugConfiguration = true;
-        private string _processName = "";
+        private Project _startProject;
+        private bool _startDebugger;
+
+        private OutputWindowPane _outputWindowPane;
 
         private BuildEvents _buildEvents;
-
         private CommandEvents _deploymentEvents;
         private CommandEvents _eventsDebug;
+        private CommandEvents _eventsNoDebug;
         private CommandEvents _eventsDebugContext;
 
+        private const string ConfigNameBlackBerry = "BlackBerry";
+        private const string ConfigNameBlackBerrySimulator = "BlackBerrySimulator";
+        private const string ToolbarNameStandard = "Standard";
+        private const string SolutionConfigurationsName = "Solution Configurations";
+        private const string SolutionPlatformsName = "Solution Platforms";
+        private const string BarDescriptorFileName = "bar-descriptor.xml";
+        private const string BarDescriptorFolder = @"..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033";
 
-        private const string BLACKBERRY = "BlackBerry";
-        private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
-        private const string STANDARD_TOOL_BAR = "Standard";
-        private const string SOLUTION_CONFIGURATIONS = "Solution Configurations";
-        private const string SOLUTION_PLATFORMS = "Solution Platforms";
-        private const string BAR_DESCRIPTOR = "bar-descriptor.xml";
-        private const string BAR_DESCRIPTOR_PATH = @"\..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033\";
-
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public BuildPlatformsManager(DTE2 dte)
         {
             if (dte == null)
                 throw new ArgumentNullException("dte");
 
-            // initialize variables:
             _dte = dte;
         }
 
         public void Initialize()
         {
+            if (_buildEvents != null)
+                return;
+
             // register for command events, when accessing build platforms:
-            _deploymentEvents = CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidSolutionPlatform, null, cmdNewPlatform_afterExec);
+            _deploymentEvents = CommandHelper.Register(_dte, VSConstants.GUID_VSStandardCommandSet97, VSConstants.VSStd2KCmdID.SolutionPlatform, null, OnNewPlatform_AfterExecute);
             //CommandHelper.Register(_dte, GuidList.guidVSDebugGroup, StandardCommands.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_beforeExec, cmdNewFunctionBreakpoint_afterExec);
 
             //DisableIntelliSenseErrorReport(true);
@@ -92,8 +92,9 @@ namespace BlackBerry.Package.Components
 
             // INFO: the references to returned objects must be stored and live as long, as the handlers are needed,
             // since they are COM objects and will be automatically reclaimed on next GC.Collect(), causing handlers to be unsubscribed...
-            _eventsDebug = CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_BeforeExecute, StartDebugCommandEvents_AfterExecute);
-            _eventsDebugContext = CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, StartDebugCommandEvents_BeforeExecute, StartDebugCommandEvents_AfterExecute);
+            _eventsDebug = CommandHelper.Register(_dte, VSConstants.GUID_VSStandardCommandSet97, VSConstants.VSStd97CmdID.Start, StartDebugCommandEvents_BeforeExecute, null);
+            _eventsNoDebug = CommandHelper.Register(_dte, VSConstants.GUID_VSStandardCommandSet97, VSConstants.VSStd97CmdID.StartNoDebug, StartNoDebugCommandEvents_BeforeExecute, null);
+            _eventsDebugContext = CommandHelper.Register(_dte, VSConstants.VSStd2K, VSConstants.VSStd2KCmdID.PROJSTARTDEBUG, StartDebugCommandEvents_BeforeExecute, null);
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
@@ -145,31 +146,35 @@ namespace BlackBerry.Package.Components
         }
          */
 
+        #region Managing Configurations
+
         /// <summary> 
         /// Solution Platform command is shown in the Standard toolbar by default with Visual C++ settings. Add the 
         /// command if not in the Standard toolbar. 
         /// </summary>
         private void ShowSolutionPlatformSelector()
         {
-            DTE dte = (DTE)_dte;
-            CommandBars commandBars = (CommandBars)dte.CommandBars;
-            CommandBar standardCommandBar = commandBars[STANDARD_TOOL_BAR];
+            CommandBars commandBars = (CommandBars)_dte.CommandBars;
+            CommandBar standardCommandBar = commandBars[ToolbarNameStandard];
+
             int pos = 0;
             foreach (CommandBarControl cmd in standardCommandBar.Controls)
             {
-                if (cmd.Caption == SOLUTION_CONFIGURATIONS)
+                if (cmd.Caption == SolutionConfigurationsName)
                     pos = cmd.Index;
-                if (cmd.Caption == SOLUTION_PLATFORMS)
+                if (cmd.Caption == SolutionPlatformsName)
                     return;
             }
 
-
             Command sp = null;
-            foreach (Command c in dte.Commands)
+            string expectedGuid = VSConstants.VSStd2K.ToString("B");
+            int expectedID = (int) VSConstants.VSStd2KCmdID.SolutionPlatform;
+
+            foreach (Command command in _dte.Commands)
             {
-                if (c.Guid == GuidList.guidVSStd2KString && c.ID == StandardCommands.cmdidSolutionPlatform)
+                if (command.Guid == expectedGuid && command.ID == expectedID)
                 {
-                    sp = c;
+                    sp = command;
                     break;
                 }
             }
@@ -177,50 +182,33 @@ namespace BlackBerry.Package.Components
                 sp.AddControl(standardCommandBar, pos + 1);
         }
 
-
-        /// <summary> 
-        /// New Platform After Execution Event Handler. 
+        /// <summary>
+        /// Adds BlackBerry specific target platforms.
         /// </summary>
-        /// <param name="Guid">Command GUID. </param>
-        /// <param name="ID">Command ID. </param>
-        /// <param name="CustomIn">Custom IN Object. </param>
-        /// <param name="CustomOut">Custom OUT Object. </param>
-        private void cmdNewPlatform_afterExec(string Guid, int ID, object CustomIn, object CustomOut)
+        public bool AddPlatforms(Project project)
         {
-            //EnableDeploymentForSolutionPlatforms();
-        }
+            if (project == null)
+                throw new ArgumentNullException("project");
 
-        /// <summary> 
-        /// New Function Breakpoint Before Execution Event Handler. 
-        /// </summary>
-        /// <param name="Guid">Command GUID. </param>
-        /// <param name="ID">Command ID. </param>
-        /// <param name="CustomIn">Custom IN Object. </param>
-        /// <param name="CustomOut">Custom OUT Object. </param>
-        /// <param name="CancelDefault">Cancel the default execution of the command. </param>
-        private void cmdNewFunctionBreakpoint_beforeExec(string Guid, int ID, object CustomIn, object CustomOut, ref bool CancelDefault)
-        {
-            // Add Code Here
-        }
-
-        /// <summary> 
-        /// New Function Breakpoint After Execution Event Handler. 
-        /// </summary>
-        /// <param name="Guid">Command GUID. </param>
-        /// <param name="ID">Command ID. </param>
-        /// <param name="CustomIn">Custom IN Object. </param>
-        /// <param name="CustomOut">Custom OUT Object. </param>
-        private void cmdNewFunctionBreakpoint_afterExec(string Guid, int ID, object CustomIn, object CustomOut)
-        {
-            Breakpoint functionBP = _dte.Debugger.Breakpoints.Item(_dte.Debugger.Breakpoints.Count);
-
-            if (functionBP != null)
+            try
             {
-                if ((functionBP.FunctionColumnOffset != 1) || (functionBP.FunctionLineOffset != 1))
-                {
-                    System.Windows.Forms.MessageBox.Show("The breakpoint cannot be set.  Function breakpoints are only supported on the first line.", "Microsoft Visual Studio", System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
-                    functionBP.Delete();
-                }
+                AddBarDescriptorToProject(project);
+                project.ConfigurationManager.AddPlatform(ConfigNameBlackBerry, ConfigNameBlackBerry, true);
+                project.ConfigurationManager.AddPlatform(ConfigNameBlackBerrySimulator, ConfigNameBlackBerrySimulator, true);
+                EnableDeploymentForSolutionPlatforms();
+
+                project.ConfigurationManager.DeletePlatform("Win32");
+                project.ConfigurationManager.DeletePlatform("x64");
+                project.ConfigurationManager.DeletePlatform("ARM");
+                project.ConfigurationManager.DeleteConfigurationRow("Win32");
+                project.ConfigurationManager.DeleteConfigurationRow("x64");
+                project.ConfigurationManager.DeleteConfigurationRow("ARM");
+                return true;
+            }
+            catch (Exception e)
+            {
+                TraceLog.WriteException(e);
+                return false;
             }
         }
 
@@ -234,7 +222,7 @@ namespace BlackBerry.Package.Components
             {
                 foreach (SolutionContext context in configuration.SolutionContexts)
                 {
-                    if (context.PlatformName == "BlackBerry" || context.PlatformName == "BlackBerrySimulator")
+                    if (context.PlatformName == ConfigNameBlackBerry || context.PlatformName == ConfigNameBlackBerrySimulator)
                     {
                         context.ShouldDeploy = true;
                     }
@@ -247,41 +235,236 @@ namespace BlackBerry.Package.Components
             if (project == null)
                 throw new ArgumentNullException("project");
 
-            ProjectItem baritem = project.ProjectItems.Item(BAR_DESCRIPTOR);
-            string n = project.Name;
-            if (baritem == null)
+            ProjectItem existingBarItem = project.ProjectItems.Item(BarDescriptorFileName);
+            if (existingBarItem == null)
             {
-                _tokenProcessor = new TokenProcessor();
-                Debug.WriteLine("Add bar descriptor file to the project");
-                string templatePath = _dte.Solution.ProjectItemsTemplatePath(project.Kind);
-                templatePath += BAR_DESCRIPTOR_PATH + BAR_DESCRIPTOR;
-                _tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", project.Name);
-                string destination = Path.GetFileName(templatePath);
+                TraceLog.WriteLine("Adding bar descriptor file to the project");
+
+                string projectFolder = Path.GetDirectoryName(project.FullName);
 
                 // Remove directory used in previous versions of this plug-in.
-                string folder = Path.Combine(Path.GetDirectoryName(project.FullName), project.Name + "_barDescriptor");
-                if (Directory.Exists(folder))
+                if (!string.IsNullOrEmpty(project.FullName))
                 {
-                    try
+                    if (!string.IsNullOrEmpty(projectFolder))
                     {
-                        Directory.Delete(folder);
-                    }
-                    catch (Exception)
-                    {
+                        string oldFolder = Path.Combine(projectFolder, project.Name + "_barDescriptor");
+                        if (Directory.Exists(oldFolder))
+                        {
+                            try
+                            {
+                                Directory.Delete(oldFolder, true);
+                            }
+                            catch (Exception ex)
+                            {
+                                TraceLog.WriteException(ex);
+                            }
+                        }
                     }
                 }
 
-                folder = Path.Combine(Path.GetDirectoryName(project.FullName), "BlackBerry-" + project.Name);
-                Directory.CreateDirectory(folder);
-                destination = Path.Combine(folder, destination);
-                _tokenProcessor.UntokenFile(templatePath, destination);
+                string templatePath = Path.Combine(_dte.Solution.ProjectItemsTemplatePath(project.Kind), BarDescriptorFolder, BarDescriptorFileName);
+                string destination = string.IsNullOrEmpty(projectFolder) ? BarDescriptorFileName : Path.Combine(projectFolder, BarDescriptorFileName);
+
+                var tokenProcessor = new TokenProcessor();
+                tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", project.Name);
+
+                tokenProcessor.UntokenFile(templatePath, destination);
                 project.ProjectItems.AddFromFile(destination);
+            }
+        }
+
+        #endregion
+
+        #region Build Event Handlers
+
+        /// <summary> 
+        /// New Platform After Execution Event Handler. 
+        /// </summary>
+        /// <param name="guid">Command GUID. </param>
+        /// <param name="id">Command ID. </param>
+        /// <param name="customIn">Custom IN Object. </param>
+        /// <param name="customOut">Custom OUT Object. </param>
+        private void OnNewPlatform_AfterExecute(string guid, int id, object customIn, object customOut)
+        {
+            EnableDeploymentForSolutionPlatforms();
+        }
+
+        /// <summary> 
+        /// New Function Breakpoint After Execution Event Handler. 
+        /// </summary>
+        /// <param name="guid">Command GUID. </param>
+        /// <param name="id">Command ID. </param>
+        /// <param name="customIn">Custom IN Object. </param>
+        /// <param name="customOut">Custom OUT Object. </param>
+        private void OnNewFunctionBreakpoint_AfterExecute(string guid, int id, object customIn, object customOut)
+        {
+            Breakpoint functionBP = _dte.Debugger.Breakpoints.Item(_dte.Debugger.Breakpoints.Count);
+
+            if (functionBP != null)
+            {
+                if ((functionBP.FunctionColumnOffset != 1) || (functionBP.FunctionLineOffset != 1))
+                {
+                    MessageBoxHelper.Show("The breakpoint cannot be set. Function breakpoints are only supported on the first line.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    functionBP.Delete();
+                }
+            }
+        }
+
+        /// <summary> 
+        /// This event is fired only when user wants to build, rebuild or clean the project. 
+        /// </summary>
+        /// <param name="scope"> Represents the scope of the build. </param>
+        /// <param name="action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
+        private void OnBuildBegin(vsBuildScope scope, vsBuildAction action)
+        {
+            if (IsBlackBerrySolution() && ActiveNDK == null)
+            {
+                var form = new MissingNdkInstalledForm();
+                form.ShowDialog();
+                return;
+            }
+
+            if (action == vsBuildAction.vsBuildActionBuild || action == vsBuildAction.vsBuildActionRebuildAll)
+            {
+                if (!_hitPlay && !_isDeploying)
+                {
+                    // means that the "play" building and deploying process was cancelled before, so we have to disable the 
+                    // OnBuildDone event to avoid deploying in case user only wants to build.
+                    _buildEvents.OnBuildDone -= OnBuildDone;
+                }
+                _hitPlay = false;
             }
         }
 
 
         /// <summary> 
-        /// Identify the projects to be build and start the build process. 
+        /// New Start Debug Command Events Before Execution Event Handler. Call the method responsible for building the app. 
+        /// </summary>
+        /// <param name="guid"> Command GUID. </param>
+        /// <param name="id"> Command ID. </param>
+        /// <param name="customIn"> Custom IN Object. </param>
+        /// <param name="customOut"> Custom OUT Object. </param>
+        /// <param name="cancelDefault"> Cancel the default execution of the command. </param>
+        private void StartNoDebugCommandEvents_BeforeExecute(string guid, int id, object customIn, object customOut, ref bool cancelDefault)
+        {
+            TraceLog.WriteLine("Before Start NoDebug");
+            _startDebugger = false;
+            StartBuild(out cancelDefault);
+        }
+
+        /// <summary> 
+        /// New Start Debug Command Events Before Execution Event Handler. Call the method responsible for building the app. 
+        /// </summary>
+        /// <param name="guid"> Command GUID. </param>
+        /// <param name="id"> Command ID. </param>
+        /// <param name="customIn"> Custom IN Object. </param>
+        /// <param name="customOut"> Custom OUT Object. </param>
+        /// <param name="cancelDefault"> Cancel the default execution of the command. </param>
+        private void StartDebugCommandEvents_BeforeExecute(string guid, int id, object customIn, object customOut, ref bool cancelDefault)
+        {
+            TraceLog.WriteLine("Before Start Debug");
+            _startDebugger = true;
+            StartBuild(out cancelDefault);
+        }
+
+        /// <summary> 
+        /// This event is fired only when the build/rebuild/clean process ends. 
+        /// </summary>
+        /// <param name="scope"> Represents the scope of the build. </param>
+        /// <param name="action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
+        private void OnBuildDone(vsBuildScope scope, vsBuildAction action)
+        {
+            switch (action)
+            {
+                case vsBuildAction.vsBuildActionBuild:
+                    _amountOfProjects--;
+                    if (_amountOfProjects == 0)
+                    {
+                        _buildEvents.OnBuildDone -= OnBuildDone;
+                        Built();
+                    }
+                    break;
+
+                case vsBuildAction.vsBuildActionDeploy:
+                    _buildEvents.OnBuildDone -= OnBuildDone;
+                    _isDeploying = false;
+                    Deployed();
+                    break;
+            }
+        }
+
+        private void StartBuild(out bool cancelDefault)
+        {
+            if (DebugEngineStatus.IsRunning)
+            {
+                // Disable the override of F5 (this allows the debugged process to continue execution)
+                cancelDefault = false;
+                return;
+            }
+
+            if (!IsBlackBerryConfigurationActive())
+            {
+                // Disable the override of F5 (this allows the debugged process to continue execution)
+                cancelDefault = false;
+                return;
+            }
+
+            try
+            {
+                _buildThese = new List<String>();
+                _startProject = null;
+
+                foreach (String startupProject in (Array) _dte.Solution.SolutionBuild.StartupProjects)
+                {
+                    foreach (Project project in _dte.Solution.Projects)
+                    {
+                        if (project.UniqueName == startupProject)
+                        {
+                            _buildThese.Add(project.FullName);
+                            _startProject = project;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex);
+            }
+
+
+            // Create a reference to the Output window.
+            // Create a tool window reference for the Output window
+            // and window pane.
+            OutputWindow ow = _dte.ToolWindows.OutputWindow;
+
+            // Select the Build pane in the Output window.
+            _outputWindowPane = ow.OutputWindowPanes.Item("Build");
+            _outputWindowPane.Activate();
+
+            if (_startDebugger)
+            {
+                /*
+                     PH: FIXME: update API Level vs current project verification...
+                    UpdateManagerData upData;
+                    if (_targetDir.Count > 0)
+                        upData = new UpdateManagerData(_targetDir[0][1]);
+                    else
+                        upData = new UpdateManagerData();
+
+                    if (!upData.validateDeviceVersion(_isSimulator))
+                    {
+                        cancelDefault = true;
+                    }
+                    else
+                     */
+            }
+
+            BuildBar();
+            cancelDefault = true;
+        }
+
+        /// <summary> 
+        /// Identify the projects to be build and start the build process.
         /// </summary>
         /// <returns> TRUE if successful, FALSE if not. </returns>
         private bool BuildBar()
@@ -299,11 +482,13 @@ namespace BlackBerry.Package.Components
                         _hitPlay = true;
                         _amountOfProjects = _buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
                         foreach (string projectName in _buildThese)
-                            solution.SolutionBuild.BuildProject("Debug", projectName, false);
+                        {
+                            solution.SolutionBuild.BuildProject(solution.SolutionBuild.ActiveConfiguration.Name, projectName, false);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine(ex.Message);
+                        TraceLog.WriteException(ex);
                         success = false;
                     }
                 }
@@ -312,11 +497,12 @@ namespace BlackBerry.Package.Components
                     success = false;
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                Debug.WriteLine(e.Message);
+                TraceLog.WriteException(ex);
                 success = false;
             }
+
             return success;
         }
 
@@ -325,24 +511,19 @@ namespace BlackBerry.Package.Components
         /// </summary>
         private void Built()
         {
-            _owP.TextDocument.Selection.SelectAll();
-            string outputText = _owP.TextDocument.Selection.Text;
+            _outputWindowPane.TextDocument.Selection.SelectAll();
+            string outputText = _outputWindowPane.TextDocument.Selection.Text;
 
-            if ((outputText == "") || (Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
+            if (string.IsNullOrEmpty(outputText) || Regex.IsMatch(outputText, ">Build succeeded.\r\n") || !outputText.Contains("): error :"))
             {
-                if (_isDebugConfiguration)
+                if (_startDebugger)
                 {
                     // Write file to flag the deploy task that it should use the -debugNative option
-                    string fileContent = "Use -debugNative.\r\n";
-                    using (var file = new StreamWriter(ConfigDefaults.BuildDebugNativePath))
-                    {
-                        file.WriteLine(fileContent);
-                    }
-
+                    File.WriteAllText(ConfigDefaults.BuildDebugNativePath, "Use -debugNative.\r\n");
                     _buildEvents.OnBuildDone += OnBuildDone;
                 }
 
-                foreach (String startupProject in (Array)_dte.Solution.SolutionBuild.StartupProjects)
+                foreach (string startupProject in (Array)_dte.Solution.SolutionBuild.StartupProjects)
                 {
                     foreach (SolutionContext sc in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
                     {
@@ -366,21 +547,14 @@ namespace BlackBerry.Package.Components
         /// </summary>
         private void Deployed()
         {
-            string currentPath = "";
-            string executablePath;
-
-            foreach (string[] paths in _targetDir)
+            if (_startProject == null)
             {
-                if (paths[0] == _processName)
-                {
-                    currentPath = paths[1];
-                    break;
-                }
+                MessageBoxHelper.Show("Unable to determine the executable to start.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
 
-            executablePath = currentPath + _processName; // The executable path
-            executablePath = executablePath.Replace('\\', '/');
-
+            var targetName = _startProject.Name;  // name of the binary... should be better way to detect it... although whole deploying fails, if binary-name != project-name
+            var executablePath = Path.Combine(DteHelper.GetOutputPath(_startProject), targetName);
             var ndk = ActiveNDK;
             var device = ActiveDevice;
 
@@ -397,15 +571,19 @@ namespace BlackBerry.Package.Components
                 return;
             }
 
-            LaunchDebugTarget(_processName, ndk.ToDefinition().ToolsPath, ConfigDefaults.SshPublicKeyPath.Replace('\\', '/'), device.IP, device.Password, executablePath);
+            if (_startDebugger)
+            {
+                var isSimulator = _startProject.ConfigurationManager.ActiveConfiguration.PlatformName == ConfigNameBlackBerrySimulator;
+                LaunchDebugTarget(targetName, ndk.ToDefinition().ToolsPath, ConfigDefaults.SshPublicKeyPath, device.IP, device.Password, isSimulator, executablePath);
+            }
         }
 
         /// <summary> 
         /// Launch an executable using the BlackBerry debug engine. 
         /// </summary>
-        /// <param name="pidString"> Process ID in string format. </param>
+        /// <param name="pidOrTargetName">Process ID in string format or the binary name for debugger to attach to.</param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool LaunchDebugTarget(string pidString, string toolsPath, string publicKeyPath, string targetIP, string password, string executablePath)
+        private bool LaunchDebugTarget(string pidOrTargetName, string toolsPath, string publicKeyPath, string targetIP, string password, bool isSimulator, string executablePath)
         {
             ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
             IVsDebugger dbg = (IVsDebugger)sp.GetService(typeof(SVsShellDebugger));
@@ -416,12 +594,12 @@ namespace BlackBerry.Package.Components
 
             // Store all debugger arguments in a string
             var nvc = new NameValueCollection();
-            nvc.Add("pid", pidString);
+            nvc.Add("pid", pidOrTargetName);
             nvc.Add("targetIP", targetIP); // The device (IP address)
-            info.bstrExe = executablePath; // The executable path
-            nvc.Add("isSimulator", _isSimulator.ToString());
+            info.bstrExe = executablePath.Replace('\\', '/'); // The executable path
+            nvc.Add("isSimulator", isSimulator.ToString());
             nvc.Add("ToolsPath", toolsPath);
-            nvc.Add("PublicKeyPath", publicKeyPath);
+            nvc.Add("PublicKeyPath", publicKeyPath.Replace('\\', '/'));
             nvc.Add("Password", password);
 
             info.bstrArg = NameValueCollectionHelper.DumpToString(nvc);
@@ -443,7 +621,7 @@ namespace BlackBerry.Package.Components
                     string msg;
                     IVsUIShell sh = (IVsUIShell)sp.GetService(typeof(SVsUIShell));
                     sh.GetErrorInfo(out msg);
-                    Debug.WriteLine("LaunchDebugTargets: " + msg);
+                    TraceLog.WriteLine("LaunchDebugTargets: " + msg);
 
                     return true;
                 }
@@ -459,214 +637,22 @@ namespace BlackBerry.Package.Components
             return false;
         }
 
-        #region Event Handlers
-
-        /// <summary> 
-        /// New Start Debug Command Events After Execution Event Handler. 
-        /// </summary>
-        /// <param name="guid">Command GUID. </param>
-        /// <param name="id">Command ID. </param>
-        /// <param name="customIn">Custom IN Object. </param>
-        /// <param name="customOut">Custom OUT Object. </param>
-        private void StartDebugCommandEvents_AfterExecute(string guid, int id, object customIn, object customOut)
-        {
-            Debug.WriteLine("After Start Debug");
-        }
-
-        /// <summary> 
-        /// New Start Debug Command Events Before Execution Event Handler. Call the method responsible for building the app. 
-        /// </summary>
-        /// <param name="guid"> Command GUID. </param>
-        /// <param name="id"> Command ID. </param>
-        /// <param name="customIn"> Custom IN Object. </param>
-        /// <param name="customOut"> Custom OUT Object. </param>
-        /// <param name="cancelDefault"> Cancel the default execution of the command. </param>
-        private void StartDebugCommandEvents_BeforeExecute(string guid, int id, object customIn, object customOut, ref bool cancelDefault)
-        {
-            Debug.WriteLine("Before Start Debug");
-
-            if (DebugEngineStatus.IsRunning)
-            {
-                // Disable the override of F5 (this allows the debugged process to continue execution)
-                cancelDefault = false;
-                return;
-            }
-
-            bool bbPlatform = false;
-            if (_dte.Solution.SolutionBuild.ActiveConfiguration != null)
-            {
-                _isDebugConfiguration = CheckDebugConfiguration();
-
-                SolutionContexts scCollection = _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts;
-                foreach (SolutionContext sc in scCollection)
-                {
-                    if (sc.PlatformName == "BlackBerry" || sc.PlatformName == "BlackBerrySimulator")
-                    {
-                        bbPlatform = true;
-                        _isSimulator = sc.PlatformName == "BlackBerrySimulator";
-                    }
-                }
-            }
-
-            if (!bbPlatform)
-            {
-                // Disable the override of F5 (this allows the debugged process to continue execution)
-                cancelDefault = false;
-            }
-            else
-            {
-                try
-                {
-                    Solution2 solution = (Solution2)_dte.Solution;
-                    _buildThese = new List<String>();
-                    _targetDir = new List<string[]>();
-
-                    foreach (String startupProject in (Array)solution.SolutionBuild.StartupProjects)
-                    {
-                        foreach (Project p1 in solution.Projects)
-                        {
-                            if (p1.UniqueName == startupProject)
-                            {
-                                _buildThese.Add(p1.FullName);
-                                _processName = p1.Name;
-
-                                ConfigurationManager config = p1.ConfigurationManager;
-                                Configuration active = config.ActiveConfiguration;
-
-                                foreach (Property prop in active.Properties)
-                                {
-                                    try
-                                    {
-                                        if (prop.Name == "OutputPath")
-                                        {
-                                            string[] path = new string[2];
-                                            path[0] = p1.Name;
-                                            path[1] = prop.Value.ToString();
-                                            _targetDir.Add(path);
-                                            break;
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-
-
-                // Create a reference to the Output window.
-                // Create a tool window reference for the Output window
-                // and window pane.
-                OutputWindow ow = _dte.ToolWindows.OutputWindow;
-
-                // Select the Build pane in the Output window.
-                _owP = ow.OutputWindowPanes.Item("Build");
-                _owP.Activate();
-
-                if (_isDebugConfiguration)
-                {
-                    /*
-                     PH: FIXME: update API Level vs current project verification...
-                    UpdateManagerData upData;
-                    if (_targetDir.Count > 0)
-                        upData = new UpdateManagerData(_targetDir[0][1]);
-                    else
-                        upData = new UpdateManagerData();
-
-                    if (!upData.validateDeviceVersion(_isSimulator))
-                    {
-                        cancelDefault = true;
-                    }
-                    else
-                     */
-                    {
-                        BuildBar();
-                        cancelDefault = true;
-                    }
-                }
-                else
-                {
-                    BuildBar();
-                    cancelDefault = true;
-                }
-            }
-        }
-
-
-        /// <summary> 
-        /// This event is fired only when the build/rebuild/clean process ends. 
-        /// </summary>
-        /// <param name="scope"> Represents the scope of the build. </param>
-        /// <param name="action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
-        private void OnBuildDone(vsBuildScope scope, vsBuildAction action)
-        {
-            if (action == vsBuildAction.vsBuildActionBuild)
-            {
-                _amountOfProjects -= 1;
-                if (_amountOfProjects == 0)
-                {
-                    _buildEvents.OnBuildDone -= OnBuildDone;
-                    Built();
-                }
-            }
-            else if (action == vsBuildAction.vsBuildActionDeploy)
-            {
-                _buildEvents.OnBuildDone -= OnBuildDone;
-                _isDeploying = false;
-                Deployed();
-            }
-        }
-
-        /// <summary> 
-        /// This event is fired only when user wants to build, rebuild or clean the project. 
-        /// </summary>
-        /// <param name="scope"> Represents the scope of the build. </param>
-        /// <param name="action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
-        private void OnBuildBegin(vsBuildScope scope, vsBuildAction action)
-        {
-            if (IsBlackBerrySolution(_dte) && ActiveNDK == null)
-            {
-                var form = new MissingNdkInstalledForm();
-                form.ShowDialog();
-                return;
-            }
-
-            if (action == vsBuildAction.vsBuildActionBuild || action == vsBuildAction.vsBuildActionRebuildAll)
-            {
-                if (!_hitPlay && !_isDeploying)
-                {
-                    // means that the "play" building and deploying process was cancelled before, so we have to disable the 
-                    // OnBuildDone event to avoid deploying in case user only wants to build.
-                    _buildEvents.OnBuildDone -= OnBuildDone;
-                }
-                _hitPlay = false;
-            }
-        }
-
         #endregion
 
         /// <summary>
-        /// Check to see if current solution is configured with a BlackBerry Configuration.
+        /// Check to see if current solution is configured with a BlackBerry configurations.
         /// </summary>
-        public bool IsBlackBerrySolution(DTE2 dte)
+        public bool IsBlackBerrySolution()
         {
-            if (dte.Solution != null)
+            if (_dte.Solution != null)
             {
-                var projects = dte.Solution.Projects;
+                var projects = _dte.Solution.Projects;
                 if (projects != null)
                 {
                     foreach (Project project in projects)
                     {
                         var platformName = project.ConfigurationManager != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
-                        if (platformName == "BlackBerry" || platformName == "BlackBerrySimulator")
+                        if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
                             return true;
                     }
                 }
@@ -675,57 +661,19 @@ namespace BlackBerry.Package.Components
             return false;
         }
 
-        /// <summary>
-        /// Verify if the app configuration is Debug.
-        /// </summary>
-        /// <returns> True if Debug configuration; False otherwise. </returns>
-        private bool CheckDebugConfiguration()
+        public bool IsBlackBerryConfigurationActive()
         {
-            Solution2 solution = (Solution2)_dte.Solution;
-            foreach (String startupProject in (Array)solution.SolutionBuild.StartupProjects)
+            if (_dte.Solution != null && _dte.Solution.SolutionBuild != null && _dte.Solution.SolutionBuild.ActiveConfiguration != null)
             {
-                foreach (Project p1 in solution.Projects)
+                foreach (SolutionContext context in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
                 {
-                    if (p1.UniqueName == startupProject)
-                    {
-                        ConfigurationManager config = p1.ConfigurationManager;
-                        Configuration active = config.ActiveConfiguration;
-
-                        return active.ConfigurationName.ToUpper() == "DEBUG";
-                    }
+                    string platformName = context.PlatformName;
+                    if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
+                        return true;
                 }
             }
+
             return false;
-        }
-
-        /// <summary>
-        /// Adds BlackBerry specific target platforms.
-        /// </summary>
-        public bool AddPlatforms(Project project)
-        {
-            if (project == null)
-                throw new ArgumentNullException("project");
-
-            try
-            {
-                AddBarDescriptorToProject(project);
-                project.ConfigurationManager.AddPlatform("BlackBerry", "BlackBerry", true);
-                project.ConfigurationManager.AddPlatform("BlackBerrySimulator", "BlackBerrySimulator", true);
-                EnableDeploymentForSolutionPlatforms();
-
-                project.ConfigurationManager.DeletePlatform("Win32");
-                project.ConfigurationManager.DeletePlatform("x64");
-                project.ConfigurationManager.DeletePlatform("ARM");
-                project.ConfigurationManager.DeleteConfigurationRow("Win32");
-                project.ConfigurationManager.DeleteConfigurationRow("x64");
-                project.ConfigurationManager.DeleteConfigurationRow("ARM");
-                return true;
-            }
-            catch (Exception e)
-            {
-                TraceLog.WriteException(e);
-                return false;
-            }
         }
     }
 }
