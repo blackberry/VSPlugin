@@ -347,7 +347,7 @@ namespace BlackBerry.Package.Components
         /// <param name="cancelDefault"> Cancel the default execution of the command. </param>
         private void StartNoDebugCommandEvents_BeforeExecute(string guid, int id, object customIn, object customOut, ref bool cancelDefault)
         {
-            TraceLog.WriteLine("Before Start NoDebug");
+            TraceLog.WriteLine("BUILD: Start no Debug");
             _startDebugger = false;
             StartBuild(out cancelDefault);
         }
@@ -362,7 +362,7 @@ namespace BlackBerry.Package.Components
         /// <param name="cancelDefault"> Cancel the default execution of the command. </param>
         private void StartDebugCommandEvents_BeforeExecute(string guid, int id, object customIn, object customOut, ref bool cancelDefault)
         {
-            TraceLog.WriteLine("Before Start Debug");
+            TraceLog.WriteLine("BUILD: Start Debug");
             _startDebugger = true;
             StartBuild(out cancelDefault);
         }
@@ -397,6 +397,8 @@ namespace BlackBerry.Package.Components
         {
             if (DebugEngineStatus.IsRunning)
             {
+                TraceLog.WriteLine("BUILD: StartBuild - Debugger running");
+
                 // Disable the override of F5 (this allows the debugged process to continue execution)
                 cancelDefault = false;
                 return;
@@ -404,6 +406,8 @@ namespace BlackBerry.Package.Components
 
             if (!IsBlackBerryConfigurationActive())
             {
+                TraceLog.WriteLine("BUILD: StartBuild - not a BlackBerry project");
+
                 // Disable the override of F5 (this allows the debugged process to continue execution)
                 cancelDefault = false;
                 return;
@@ -469,6 +473,8 @@ namespace BlackBerry.Package.Components
         /// <returns> TRUE if successful, FALSE if not. </returns>
         private bool BuildBar()
         {
+            TraceLog.WriteLine("BUILD: BuildBar");
+
             bool success = true;
             try
             {
@@ -511,6 +517,8 @@ namespace BlackBerry.Package.Components
         /// </summary>
         private void Built()
         {
+            TraceLog.WriteLine("BUILD: Built");
+            
             _outputWindowPane.TextDocument.Selection.SelectAll();
             string outputText = _outputWindowPane.TextDocument.Selection.Text;
 
@@ -547,6 +555,8 @@ namespace BlackBerry.Package.Components
         /// </summary>
         private void Deployed()
         {
+            TraceLog.WriteLine("BUILD: Deployed");
+
             if (_startProject == null)
             {
                 MessageBoxHelper.Show("Unable to determine the executable to start.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -618,10 +628,10 @@ namespace BlackBerry.Package.Components
 
                 if (result != VSConstants.S_OK)
                 {
-                    string msg;
+                    string message;
                     IVsUIShell sh = (IVsUIShell)sp.GetService(typeof(SVsUIShell));
-                    sh.GetErrorInfo(out msg);
-                    TraceLog.WriteLine("LaunchDebugTargets: " + msg);
+                    sh.GetErrorInfo(out message);
+                    TraceLog.WriteLine("LaunchDebugTargets: " + message.Trim());
 
                     return true;
                 }

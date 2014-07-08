@@ -93,7 +93,7 @@ namespace BlackBerry.Package
     [ProvideOptionPage(typeof(SigningOptionPage), OptionsCategoryName, "Signing", 1001, 1006, true)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable
     {
-        public const string VersionString = "2.1.2014.0623";
+        public const string VersionString = "2.1.2014.709";
         public const string OptionsCategoryName = "BlackBerry";
 
         private BlackBerryPaneTraceListener _traceWindow;
@@ -388,7 +388,7 @@ namespace BlackBerry.Package
 
             if (projects == null || projects.Length == 0)
             {
-                MessageBoxHelper.Show("Unable to add BlackBerry Platforms. Please open a solution with Visual C++ projects", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Please open a solution with Visual C++ projects", "Unable to add BlackBerry Platforms.", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
@@ -396,6 +396,9 @@ namespace BlackBerry.Package
             {
                 _buildPlatformsManager.AddPlatforms(project);
             }
+
+            MessageBoxHelper.Show("You might now:\r\n * restart Visual Studio, as it has the 'deploy' option disabled\r\n * update the Author Information within the bar-descriptor.xml", "BlackBerry and BlackBerrySimulator targets have been added to solution configurations.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
         }
 
         private void ImportBlackBerryProject(object sender, EventArgs e)
