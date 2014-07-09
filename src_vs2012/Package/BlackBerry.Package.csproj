@@ -508,17 +508,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="RichEditObjectModel">
-      <Guid>{8CC497C9-A1DF-11CE-8098-00AA0047BE5D}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <Page Include="..\..\src_vs2010\Package\Import\Import.xaml">
       <Link>Import\Import.xaml</Link>
       <Generator>MSBuild:Compile</Generator>

@@ -135,15 +135,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
-    <COMReference Include="stdole">
-      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\src_vs2012\Package\BlackBerryPackage.cs">
@@ -559,17 +550,6 @@
   <ItemGroup>
     <None Include="Resources\Images_32bit.bmp" />
     <Resource Include="Resources\Images_24bit.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <COMReference Include="RichEditObjectModel">
-      <Guid>{8CC497C9-A1DF-11CE-8098-00AA0047BE5D}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\File.ico" />
