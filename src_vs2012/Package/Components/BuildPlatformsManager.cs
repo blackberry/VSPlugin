@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -111,6 +110,14 @@ namespace BlackBerry.Package.Components
         }
 
         /// <summary>
+        /// Gets the currently selected simulator all actions should be performed against.
+        /// </summary>
+        private DeviceDefinition ActiveSimulator
+        {
+            get { return PackageViewModel.Instance.ActiveSimulator; }
+        }
+
+        /// <summary>
         /// Gets the currently selected NDK to build against.
         /// </summary>
         private NdkInfo ActiveNDK
@@ -168,7 +175,7 @@ namespace BlackBerry.Package.Components
 
             Command sp = null;
             string expectedGuid = VSConstants.VSStd2K.ToString("B");
-            int expectedID = (int) VSConstants.VSStd2KCmdID.SolutionPlatform;
+            const int expectedID = (int) VSConstants.VSStd2KCmdID.SolutionPlatform;
 
             foreach (Command command in _dte.Commands)
             {
@@ -565,8 +572,9 @@ namespace BlackBerry.Package.Components
 
             var targetName = _startProject.Name;  // name of the binary... should be better way to detect it... although whole deploying fails, if binary-name != project-name
             var executablePath = Path.Combine(DteHelper.GetOutputPath(_startProject), targetName);
+            bool isSimulator = _startProject.ConfigurationManager.ActiveConfiguration.PlatformName == ConfigNameBlackBerrySimulator;
             var ndk = ActiveNDK;
-            var device = ActiveDevice;
+            var device = isSimulator ? ActiveSimulator : ActiveDevice;
 
             if (ndk == null)
             {
@@ -583,8 +591,7 @@ namespace BlackBerry.Package.Components
 
             if (_startDebugger)
             {
-                var isSimulator = _startProject.ConfigurationManager.ActiveConfiguration.PlatformName == ConfigNameBlackBerrySimulator;
-                LaunchDebugTarget(targetName, ndk.ToDefinition().ToolsPath, ConfigDefaults.SshPublicKeyPath, device.IP, device.Password, isSimulator, executablePath);
+                LaunchDebugTarget(targetName, ndk, device, ConfigDefaults.SshPublicKeyPath, executablePath);
             }
         }
 
@@ -593,27 +600,27 @@ namespace BlackBerry.Package.Components
         /// </summary>
         /// <param name="pidOrTargetName">Process ID in string format or the binary name for debugger to attach to.</param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool LaunchDebugTarget(string pidOrTargetName, string toolsPath, string publicKeyPath, string targetIP, string password, bool isSimulator, string executablePath)
+        private bool LaunchDebugTarget(string pidOrTargetName, NdkInfo ndk, DeviceDefinition device, string publicKeyPath, string executablePath)
         {
+            TraceLog.WriteLine("BUILD: Starting debugger ('{0}', {1})", pidOrTargetName, executablePath);
+
             ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
             IVsDebugger dbg = (IVsDebugger)sp.GetService(typeof(SVsShellDebugger));
             VsDebugTargetInfo info = new VsDebugTargetInfo();
 
             info.cbSize = (uint)Marshal.SizeOf(info);
             info.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
+            info.bstrExe = executablePath; // The executable path
 
             // Store all debugger arguments in a string
-            var nvc = new NameValueCollection();
-            nvc.Add("pid", pidOrTargetName);
-            nvc.Add("targetIP", targetIP); // The device (IP address)
-            info.bstrExe = executablePath.Replace('\\', '/'); // The executable path
-            nvc.Add("isSimulator", isSimulator.ToString());
-            nvc.Add("ToolsPath", toolsPath);
-            nvc.Add("PublicKeyPath", publicKeyPath.Replace('\\', '/'));
-            nvc.Add("Password", password);
-
-            info.bstrArg = NameValueCollectionHelper.DumpToString(nvc);
-
+            var nvc = new Dictionary<string, string>();
+            nvc["pid"] = pidOrTargetName;
+            nvc["ToolsPath"] = ndk.ToDefinition().ToolsPath;
+            nvc["PublicKeyPath"] = publicKeyPath;
+            nvc["targetIP"] = device.IP; // The device (IP address)
+            nvc["Password"] = device.Password;
+            nvc["isSimulator"] = (device.Type == DeviceDefinitionType.Simulator).ToString();
+            info.bstrArg = CollectionHelper.Serialize(nvc);
             info.bstrRemoteMachine = null; // debug locally
             info.fSendStdoutToOutputWindow = 0; // Let stdout stay with the application.
             info.clsidCustom = new Guid(AD7Engine.DebugEngineGuid); // Set the launching engine as the BlackBerry debug-engine
@@ -625,7 +632,6 @@ namespace BlackBerry.Package.Components
             try
             {
                 int result = dbg.LaunchDebugTargets(1, pInfo);
-
                 if (result != VSConstants.S_OK)
                 {
                     string message;

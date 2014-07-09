@@ -13,56 +13,78 @@
 //* limitations under the License.
 
 using System;
+using System.Collections.Generic;
 using System.Text;
-using System.Collections.Specialized;
 
 namespace BlackBerry.NativeCore.Helpers
 {
     /// <summary>
-    /// Helper class in managing key-value collection.
+    /// Helper class for managing key-value collection.
     /// </summary>
-    public static class NameValueCollectionHelper
+    public static class CollectionHelper
     {
         /// <summary>
         /// Dumps given collection into a single string.
+        /// All values are converted to Base64 (just to avoid possible collisions with special separator chars: ';' and '=').
         /// </summary>
-        public static string DumpToString(NameValueCollection value)
+        public static string Serialize(Dictionary<string, string> dictionary)
         {
-            var xSB = new StringBuilder();
-            foreach (string xKey in value.Keys)
+            if (dictionary == null)
+                throw new ArgumentNullException("dictionary");
+
+            var result = new StringBuilder();
+            foreach (var pair in dictionary)
             {
-                xSB.AppendFormat("{0}={1};", xKey, value[xKey]);
+                if (pair.Key.IndexOf('=') >= 0 || pair.Key.IndexOf(';') >= 0)
+                    throw new ArgumentOutOfRangeException("dictionary", "Forbidden char found in key name (" + pair.Key + ")");
+
+                result.Append(pair.Key).Append('=');
+                if (pair.Value == null)
+                    result.Append('~');
+                else
+                {
+                    if (!string.IsNullOrEmpty(pair.Value))
+                        result.Append(Convert.ToBase64String(Encoding.UTF8.GetBytes(pair.Value)));
+                }
+                result.Append(';');
             }
-            return xSB.ToString();
+            return result.ToString();
         }
 
         /// <summary>
         /// Updates the collection with a value parsed out from a given string.
         /// </summary>
-        public static void LoadFromString(NameValueCollection target, string value)
+        public static Dictionary<string, string> Deserialize(string data)
         {
-            if (target.Count > 0)
+            var result = new Dictionary<string, string>();
+
+            // if there was any input data:
+            if (!string.IsNullOrEmpty(data))
             {
-                throw new Exception("Target is not empty!");
-            }
-            if (String.IsNullOrEmpty(value))
-            {
-                return;
+                string[] entryDescriptor = data.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var item in entryDescriptor)
+                {
+                    int valueAt = item.IndexOf('=');
+                    if (valueAt < 0)
+                        throw new ArgumentOutOfRangeException("data", "Missing value definition in entry: \"" + item + "\"");
+
+                    var key = item.Substring(0, valueAt);
+                    var value = item.Substring(valueAt + 1);
+                    if (string.IsNullOrEmpty(value))
+                    {
+                        result.Add(key, string.Empty);
+                    }
+                    else
+                    {
+                        if (value == "~")
+                            result.Add(key, null);
+                        else
+                            result.Add(key, Encoding.UTF8.GetString(Convert.FromBase64String(value)));
+                    }
+                }
             }
 
-            string[] xPairs = value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
-            foreach (var xPair in xPairs)
-            {
-                string[] xParts = xPair.Split('=');
-                if (xParts.Length > 1)
-                {
-                    target.Add(xParts[0], xParts[1]);
-                }
-                else
-                {
-                    target.Add(xParts[0], "");
-                }
-            }
+            return result;
         }
     }
 }

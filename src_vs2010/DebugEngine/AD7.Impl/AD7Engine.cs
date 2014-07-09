@@ -569,28 +569,23 @@ namespace BlackBerry.DebugEngine
                 Callback = new EngineCallback(this, ad7Callback);
 
                 // Read arguments back from the args string
-                var nvc = new NameValueCollection();
-                NameValueCollectionHelper.LoadFromString(nvc, args);
+                var nvc = CollectionHelper.Deserialize(args);
 
-                string pid = nvc.GetValues("pid")[0];
+                string pid = nvc["pid"];
                 uint pidNumber;
                 string exePath = exe;
-                string targetIP = nvc.GetValues("targetIP")[0];
-                bool isSimulator = Convert.ToBoolean(nvc.GetValues("isSimulator")[0]);
-                string toolsPath = nvc.GetValues("ToolsPath")[0];
-                string publicKeyPath = nvc.GetValues("PublicKeyPath")[0];
-
-                string password = null;
-                string[] passwordArray = nvc.GetValues("Password");
-                if (passwordArray != null)
-                    password = passwordArray[0];
+                string targetIP = nvc["targetIP"];
+                bool isSimulator = Convert.ToBoolean(nvc["isSimulator"]);
+                string toolsPath = nvc["ToolsPath"];
+                string publicKeyPath = nvc["PublicKeyPath"];
+                string password = nvc["Password"];
 
                 if (!uint.TryParse(pid, out pidNumber))
                 {
                     uint.TryParse(GetPIDfromGDB(pid, targetIP, password, isSimulator, toolsPath, publicKeyPath), out pidNumber);
                 }
 
-                if (GDBParser.LaunchProcess(pidNumber.ToString(), exePath, targetIP, isSimulator, toolsPath, publicKeyPath, password))
+                if (GDBParser.LaunchProcess(pidNumber.ToString(), exePath.Replace("\\", "\\\\"), targetIP, isSimulator, toolsPath, publicKeyPath, password))
                 {
                     process = _process = new AD7Process(this, port);
                     EventDispatcher = new EventDispatcher(this);
