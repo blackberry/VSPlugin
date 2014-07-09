@@ -1,7 +1,9 @@
 using System;
 using System.IO;
 using System.Text;
+using BlackBerry.NativeCore.Debugger.Requests;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
 
 namespace BlackBerry.NativeCore.Debugger
 {
@@ -41,9 +43,9 @@ namespace BlackBerry.NativeCore.Debugger
             return SetTargetDevice(device.IP);
         }
 
-        public static Request ListProcesses()
+        public static ProcessListRequest ListProcesses()
         {
-            return new CliRequest("info pidlist");
+            return new ProcessListRequest();
         }
 
         public static Request SetPendingBreakpoints(bool on)
@@ -77,6 +79,22 @@ namespace BlackBerry.NativeCore.Debugger
 
             // and return the prepared request:
             return new CliRequest("set solib-search-path " + paths);
+        }
+
+        public static Request SetLibrarySearchPath(GdbInfo gdbInfo)
+        {
+            if (gdbInfo == null)
+                throw new ArgumentNullException("gdbInfo");
+
+            return SetLibrarySearchPath(gdbInfo.LibraryPaths);
+        }
+
+        public static Request SetLibrarySearchPath(GdbRunner runner)
+        {
+            if (runner == null)
+                throw new ArgumentNullException("runner");
+
+            return SetLibrarySearchPath(runner.GDB.LibraryPaths);
         }
 
         public static Request AttachTargetProcess(uint pid)

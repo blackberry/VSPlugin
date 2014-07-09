@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 
 namespace BlackBerry.NativeCore
 {
@@ -58,7 +59,12 @@ namespace BlackBerry.NativeCore
             SshPublicKeyPath = Path.Combine(DataDirectory, "bbt_id_rsa.pub");
             BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
+
+#if DEBUG
             GdbHostPath = @"S:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
+#else
+            GdbHostPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "BlackBerry.GDBHost.exe");
+#endif
         }
 
         /// <summary>

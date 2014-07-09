@@ -75,6 +75,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\InstructionCollection.cs">
       <Link>Debugger\InstructionCollection.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Model\ProcessInfo.cs">
+      <Link>Debugger\Model\ProcessInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Request.cs">
       <Link>Debugger\Request.cs</Link>
     </Compile>
@@ -83,6 +86,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\RequestsFactory.cs">
       <Link>Debugger\RequestsFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Requests\ProcessListRequest.cs">
+      <Link>Debugger\Requests\ProcessListRequest.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Response.cs">
       <Link>Debugger\Response.cs</Link>

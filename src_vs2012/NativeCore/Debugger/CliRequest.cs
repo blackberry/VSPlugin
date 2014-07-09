@@ -3,7 +3,7 @@
     /// <summary>
     /// Class wrapping the regular command send to the GDB.
     /// </summary>
-    public sealed class CliRequest : Request
+    public class CliRequest : Request
     {
         public CliRequest(string command)
             : base(command)

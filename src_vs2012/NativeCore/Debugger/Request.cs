@@ -107,12 +107,21 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         /// <summary>
+        /// Mostly for parser testing.
+        /// </summary>
+        public bool Complete(Response response)
+        {
+            bool retry;
+            return Complete(response, out retry);
+        }
+
+        /// <summary>
         /// Method executed by GdbParser, to inform the request, that response has arrived.
         /// There is no limitation for, how many responses a request can handle.
         /// It should just return 'true', when it is the final one and use the 'retry'
         /// parameter to be sent again to GDB.
         /// </summary>
-        internal virtual bool Complete(Response response, out bool retry)
+        public virtual bool Complete(Response response, out bool retry)
         {
             if (response == null)
                 throw new ArgumentNullException("response");
@@ -124,6 +133,7 @@ namespace BlackBerry.NativeCore.Debugger
             // reset the state:
             retry = false;
             Response = response;
+            ProcessResponse(response);
 
             // notify all listeners synchronously:
             if (receivedHandler != null)
@@ -132,6 +142,13 @@ namespace BlackBerry.NativeCore.Debugger
             // wake up one waiting for response thread:
             _event.Set();
             return true;
+        }
+
+        /// <summary>
+        /// Method executed internally by the request to process incoming data.
+        /// </summary>
+        protected virtual void ProcessResponse(Response response)
+        {
         }
 
         protected void SetEvent()

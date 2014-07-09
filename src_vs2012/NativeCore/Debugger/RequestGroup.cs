@@ -75,7 +75,7 @@ namespace BlackBerry.NativeCore.Debugger
             _requests.Add(request);
         }
 
-        internal override bool Complete(Response response, out bool retry)
+        public override bool Complete(Response response, out bool retry)
         {
             if (response == null)
                 throw new ArgumentNullException("response");
