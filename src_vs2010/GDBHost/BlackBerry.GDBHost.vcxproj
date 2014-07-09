@@ -78,7 +78,7 @@
       <RegisterOutput>false</RegisterOutput>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(OutDir)GDBWrapper.*" "$(OutputPath)" /d /y </Command>
+      <Command>xcopy "$(OutDir)BlackBerry.GDBHost.exe" "$(OutputPath)" /d /y</Command>
       <Message>Copying Executable to output directory.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>

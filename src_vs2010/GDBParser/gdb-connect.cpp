@@ -32,7 +32,8 @@
 
 using namespace std;
 using namespace System;
-
+using namespace System::IO;
+using namespace System::Reflection;
 
 /// <summary> 
 /// Used to send parameters for the listeningGDB thread (the one that is listening GDB responses). 
@@ -370,7 +371,12 @@ void GDBConsole::prepAndLaunchRedirectedChild(void)
 
 	flags = CREATE_NEW_CONSOLE;	
 	
-    String^ StringFilePath = "S:\\vs-plugin\\src_vs2012\\Debug\\BlackBerry.GDBHost.exe"; // Environment::GetFolderPath(Environment::SpecialFolder::ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\GDBWrapper.exe";
+#if DEBUG
+    String^ StringFilePath = "S:\\vs-plugin\\src_vs2012\\Debug\\BlackBerry.GDBHost.exe";
+#else
+    String^ StringFilePath = Path::Combine(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "BlackBerry.GDBHost.exe");
+        //Environment::GetFolderPath(Environment::SpecialFolder::ProgramFilesX86) + "\\BlackBerry\\VSPlugin-NDK\\BlackBerry.GDBHost.exe";
+#endif
 	pin_ptr<const wchar_t> FilePath = PtrToStringChars(StringFilePath);
 
     if (!m_pcGDBCmd) {
@@ -379,7 +385,7 @@ void GDBConsole::prepAndLaunchRedirectedChild(void)
 	}
 
 	/* CreateProcess can modify pCmdLine thus we allocate memory */		
-	size_t numChars = _tcslen(m_pcGDBCmd) + MAX_EVENT_NAME_LENGTH * 2 + 1;	
+    size_t numChars = _tcslen(m_pcGDBCmd) + MAX_EVENT_NAME_LENGTH * 2 + 1 + StringFilePath->Length;	
 	TCHAR* pCmdLine = new TCHAR[numChars * sizeof(TCHAR)];
 
 	if (pCmdLine == 0) {
