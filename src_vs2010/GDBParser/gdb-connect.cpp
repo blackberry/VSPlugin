@@ -371,7 +371,7 @@ void GDBConsole::prepAndLaunchRedirectedChild(void)
 
 	flags = CREATE_NEW_CONSOLE;	
 	
-#if DEBUG
+#if _DEBUG
     String^ StringFilePath = "S:\\vs-plugin\\src_vs2012\\Debug\\BlackBerry.GDBHost.exe";
 #else
     String^ StringFilePath = Path::Combine(Path::GetDirectoryName(Assembly::GetExecutingAssembly()->Location), "BlackBerry.GDBHost.exe");
