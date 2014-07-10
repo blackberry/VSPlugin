@@ -18,69 +18,44 @@ namespace BlackBerry.DebugEngine
     /// A running process is viewed as a ProgramNode by VS. 
     /// A debug engine (DE) or a custom port supplier implements this interface to represent a program that can be debugged. 
     /// </summary>
-    class AD7ProgramNodeAttach : IDebugProgramNode2, IDebugProgram2
+    sealed class AD7ProgramNodeAttach : IDebugProgramNode2, IDebugProgram2
     {
         /// <summary>
         ///  The hosting process. 
         /// </summary>
-        public AD7Process m_process;
-
-        /// <summary>
-        ///  The GUID of the hosting process. 
-        /// </summary>
-        public Guid m_processGuid;
-
-        /// <summary>
-        ///  The ID of the program to be debugged. 
-        /// </summary>
-        public string m_programID;
-
-        /// <summary>
-        /// The program friendly name.
-        /// </summary>
-        public string m_programName;
-
-        /// <summary>
-        ///  The file name of the program to be debugged.
-        /// </summary>
-        readonly string m_exePath;
+        private readonly AD7Process _process;
 
         /// <summary>
         /// The GUID of the VSNDK debug engine. 
         /// </summary>
-        readonly Guid m_engineGuid;
-
+        private readonly Guid _engineGuid;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="processGuid"> The hosting process. </param>
-        /// <param name="engineGuid"> The GUID of the VSNDK debug engine. </param>
-        public AD7ProgramNodeAttach(AD7Process proc, Guid engineGuid)
+        /// <param name="process"> The process on the target device engine is supposed to attach. </param>
+        /// <param name="engineGuid"> The GUID of a debug engine. </param>
+        public AD7ProgramNodeAttach(AD7Process process, Guid engineGuid)
         {
-            m_process = proc;
-            m_processGuid = proc._processGUID;
-            m_programID = proc._processID;
+            if (process == null)
+                throw new ArgumentNullException("process");
+            if (process.Details == null)
+                throw new ArgumentOutOfRangeException("process");
 
-            m_exePath = proc._name;
-            do
-            {
-                m_exePath = m_exePath.Replace("\\\\", "\\");
-            }
-            while (m_exePath.IndexOf("\\\\") != -1);
-
-            int i = proc._name.LastIndexOf('\\');
-            if ((i != -1) && (i < (proc._name.Length - 1)))
-                m_programName = proc._name.Substring(i + 1);
-            else
-                m_programName = proc._name;
-
-            m_engineGuid = engineGuid;
+            _process = process;
+            _engineGuid = engineGuid;
         }
 
+        #region Properties
+
+        public AD7Process Process
+        {
+            get { return _process; }
+        }
+
+        #endregion
 
         #region IDebugProgram2 Members
-
 
         /// <summary>
         /// Determines if a debug engine (DE) can detach from the program. (http://msdn.microsoft.com/en-us/library/bb161967.aspx)
@@ -93,7 +68,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Requests that the program stop execution the next time one of its threads attempts to run. The debugger calls CauseBreak 
         /// when the user clicks on the pause button in VS. The debugger should respond by entering breakmode. 
@@ -103,9 +77,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int CauseBreak()
         {
-            return ((IDebugEngine2)this).CauseBreak();
+            return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Continues running this program from a stopped state. Any previous execution state (such as a step) is preserved, and 
@@ -120,7 +93,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Detaches a debug engine from the program. (http://msdn.microsoft.com/en-us/library/bb146228.aspx)
         /// Not implemented because this class is not used by the debug engine. Read the description of this class at the top.
@@ -132,7 +104,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Retrieves a list of the code contexts for a given position in a source file. Not implemented. 
         /// (http://msdn.microsoft.com/en-us/library/bb145902.aspx)
@@ -142,9 +113,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppEnum = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Retrieves a list of the code paths for a given position in a source file. EnumCodePaths is used for the step-into specific 
@@ -160,13 +131,12 @@ namespace BlackBerry.DebugEngine
         /// breakpoint in case the chosen code path is skipped. This can happen in the case of a short-circuited Boolean expression, 
         /// for example. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int EnumCodePaths(string Hint, IDebugCodeContext2 start, IDebugStackFrame2 frame, int fSource, out IEnumCodePaths2 pathEnum, out IDebugCodeContext2 safetyContext)
+        public int EnumCodePaths(string hint, IDebugCodeContext2 start, IDebugStackFrame2 frame, int fSource, out IEnumCodePaths2 pathEnum, out IDebugCodeContext2 safetyContext)
         {
             pathEnum = null;
             safetyContext = null;
             return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Retrieves a list of the modules that this program has loaded and is executing. 
@@ -182,7 +152,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Retrieves a list of the threads that are running in the program. (http://msdn.microsoft.com/en-us/library/bb145110.aspx)
         /// Not implemented because this class is not used by the debug engine. Read the description of this class at the top.
@@ -195,7 +164,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets the program's properties. The VSNDK debug engine does not support this. 
         /// (http://msdn.microsoft.com/en-us/library/bb161801.aspx)
@@ -204,9 +172,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetDebugProperty(out IDebugProperty2 ppProperty)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppProperty = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Gets the disassembly stream for this program or a part of this program.
@@ -223,7 +191,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
         /// </summary>
@@ -236,7 +203,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Retrieves the memory bytes occupied by the program. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145291.aspx)
         /// </summary>
@@ -244,9 +210,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetMemoryBytes(out IDebugMemoryBytes2 ppMemoryBytes)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppMemoryBytes = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Gets the name of the program. The name returned by this method is always a friendly, user-displayable name that describes 
@@ -256,10 +222,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetName(out string programName)
         {
-            programName = this.m_programName;
+            programName = _process.Details != null ? _process.Details.Name : string.Empty;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the 
@@ -270,10 +235,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetProgramId(out Guid guidProgramId)
         {
-            guidProgramId = m_processGuid;
+            guidProgramId = _process.UID;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Performs a step. This method is deprecated. Use the IDebugProcess3::Step method instead. 
@@ -289,7 +253,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Terminates the program. (http://msdn.microsoft.com/en-us/library/bb145919.aspx)
         /// Not implemented because this class is not used by the debug engine. Read the description of this class at the top.
@@ -299,7 +262,6 @@ namespace BlackBerry.DebugEngine
         {
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Writes a dump to a file. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145827.aspx)
@@ -315,7 +277,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// Get the process that this program is running in. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145293.aspx)
         /// </summary>
@@ -323,12 +284,10 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         public int GetProcess(out IDebugProcess2 process)
         {
-            Debug.Fail("This function is not called by the debugger");
-
             process = null;
+            Debug.Fail("This function is not called by the debugger");
             return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Attaches to the program. Not implemented. (http://msdn.microsoft.com/en-us/library/bb161973.aspx)
@@ -338,10 +297,8 @@ namespace BlackBerry.DebugEngine
         public int Attach(IDebugEventCallback2 pCallback)
         {
             Debug.Fail("This function is not called by the debugger");
-
             return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Continues running this program from a stopped state. Any previous execution state (such as a step) is cleared, and the 
@@ -358,7 +315,6 @@ namespace BlackBerry.DebugEngine
 
         #region IDebugProgramNode2 Members
 
-
         /// <summary>
         /// Gets the name and GUID of the debug engine running this program. (http://msdn.microsoft.com/en-ca/library/bb146303.aspx)
         /// </summary>
@@ -367,12 +323,11 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetEngineInfo(out string engineName, out Guid engineGuid)
         {
-            engineName = "VSNDK Debug Engine";
-            engineGuid = m_engineGuid;
+            engineName = _process.Device.Architecture;
+            engineGuid = _engineGuid;
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the system process identifier for the process hosting a program. (http://msdn.microsoft.com/en-us/library/bb162159.aspx)
@@ -383,12 +338,19 @@ namespace BlackBerry.DebugEngine
         {
             // According to the MSDN documentation (http://msdn.microsoft.com/en-us/library/bb162159.aspx),
             // it should return the process id of the hosting process, but what is expected is the program ID...
-            pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
-            pHostProcessId[0].guidProcessId = m_processGuid;
+            if (_process.Details != null)
+            {
+                pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
+                pHostProcessId[0].dwProcessId = _process.ID;
+            }
+            else
+            {
+                pHostProcessId[0].ProcessIdType = (uint) enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+                pHostProcessId[0].guidProcessId = _process.UID;
+            }
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the name of the process hosting a program. (http://msdn.microsoft.com/en-us/library/bb145135.aspx)
@@ -399,12 +361,11 @@ namespace BlackBerry.DebugEngine
         public int GetHostName(enum_GETHOSTNAME_TYPE dwHostNameType, out string processName)
         {
             if (dwHostNameType == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
-                processName = "(BB-pid = " + m_programID + ") " + m_exePath;
+                processName = "(BB-pid = " + _process.Details.ID + ") " + _process.Details.ExecutablePath;
             else
-                processName = m_programName;
+                processName = _process.Details.Name;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the name of a program. (http://msdn.microsoft.com/en-us/library/bb145928.aspx)
@@ -413,7 +374,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugProgramNode2.GetProgramName(out string programName)
         {
-            programName = m_programName;
+            programName = _process.Details.Name;
             return VSConstants.S_OK;
         }
         
@@ -421,7 +382,6 @@ namespace BlackBerry.DebugEngine
 
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
-
 
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161399.aspx)
@@ -436,7 +396,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161803.aspx)
         /// </summary>
@@ -447,7 +406,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161297.aspx)
         /// </summary>
@@ -455,8 +413,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         public int GetHostMachineName_V7(out string hostMachineName)
         {
-            Debug.Fail("This function is not called by the debugger");
             hostMachineName = null;
+            Debug.Fail("This function is not called by the debugger");
             return VSConstants.E_NOTIMPL;
         }
 

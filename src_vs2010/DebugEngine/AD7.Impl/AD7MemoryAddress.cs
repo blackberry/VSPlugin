@@ -24,24 +24,23 @@ namespace BlackBerry.DebugEngine
     /// IDebugCodeContext2 represents the starting position of a code instruction. For most run-time architectures today, a code 
     /// context can be thought of as an address in a program's execution stream.
     /// </summary>
-    public class AD7MemoryAddress : IDebugCodeContext2, IDebugCodeContext100
+    public sealed class AD7MemoryAddress : IDebugCodeContext2, IDebugCodeContext100
     {
         /// <summary>
         /// The AD7Engine object that represents the DE.
         /// </summary>
-        readonly AD7Engine m_engine;
+        private readonly AD7Engine _engine;
 
         /// <summary>
         /// The current context's address. 
         /// </summary>
-        readonly uint m_address;
+        private readonly uint _address;
 
         /// <summary>
         /// The IDebugDocumentContext2 object that corresponds to the code context. 
         /// </summary>
-        IDebugDocumentContext2 m_documentContext;
+        private IDebugDocumentContext2 _documentContext;
         
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -49,10 +48,12 @@ namespace BlackBerry.DebugEngine
         /// <param name="address"> The current context's address. </param>
         public AD7MemoryAddress(AD7Engine engine, uint address)
         {
-            m_engine = engine;
-            m_address = address;
-        }
+            if (engine == null)
+                throw new ArgumentNullException("engine");
 
+            _engine = engine;
+            _address = address;
+        }
 
         /// <summary>
         /// Sets the document context.
@@ -60,11 +61,10 @@ namespace BlackBerry.DebugEngine
         /// <param name="docContext"> The IDebugDocumentContext2 object that corresponds to the code context. </param>
         public void SetDocumentContext(IDebugDocumentContext2 docContext)
         {
-            m_documentContext = docContext;
+            _documentContext = docContext;
         }
 
         #region IDebugMemoryContext2 Members
-
 
         /// <summary>
         /// Adds a specified value to the current context's address to create a new context. 
@@ -75,10 +75,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int Add(ulong dwCount, out IDebugMemoryContext2 newAddress)
         {
-            newAddress = new AD7MemoryAddress(m_engine, (uint)dwCount + m_address);
+            newAddress = new AD7MemoryAddress(_engine, (uint)dwCount + _address);
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Compares the memory context to each context in the given array in the manner indicated by compare flags, 
@@ -95,17 +94,13 @@ namespace BlackBerry.DebugEngine
 
             try
             {
-                enum_CONTEXT_COMPARE contextCompare = (enum_CONTEXT_COMPARE)uContextCompare;
+                enum_CONTEXT_COMPARE contextCompare = uContextCompare;
 
                 for (uint c = 0; c < compareToLength; c++)
                 {
+                    // check if expected type and managed by the same debug-engine:
                     AD7MemoryAddress compareTo = compareToItems[c] as AD7MemoryAddress;
-                    if (compareTo == null)
-                    {
-                        continue;
-                    }
-
-                    if (!AD7Engine.ReferenceEquals(this.m_engine, compareTo.m_engine))
+                    if (compareTo == null || !ReferenceEquals(_engine, compareTo._engine))
                     {
                         continue;
                     }
@@ -115,33 +110,33 @@ namespace BlackBerry.DebugEngine
                     switch (contextCompare)
                     {
                         case enum_CONTEXT_COMPARE.CONTEXT_EQUAL:
-                            result = (this.m_address == compareTo.m_address);
+                            result = _address == compareTo._address;
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN:
-                            result = (this.m_address < compareTo.m_address);
+                            result = _address < compareTo._address;
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN:
-                            result = (this.m_address > compareTo.m_address);
+                            result = _address > compareTo._address;
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_LESS_THAN_OR_EQUAL:
-                            result = (this.m_address <= compareTo.m_address);
+                            result = _address <= compareTo._address;
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_GREATER_THAN_OR_EQUAL:
-                            result = (this.m_address >= compareTo.m_address);
+                            result = _address >= compareTo._address;
                             break;
 
                         // The VSNDK debug engine doesn't understand scopes or functions
                         case enum_CONTEXT_COMPARE.CONTEXT_SAME_SCOPE:
                         case enum_CONTEXT_COMPARE.CONTEXT_SAME_FUNCTION:
-                            result = (this.m_address == compareTo.m_address);
+                            result = _address == compareTo._address;
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_SAME_MODULE:
-                            result = (this.m_address == compareTo.m_address);
+                            result = _address == compareTo._address;
                             break;
 
                         case enum_CONTEXT_COMPARE.CONTEXT_SAME_PROCESS:
@@ -168,7 +163,6 @@ namespace BlackBerry.DebugEngine
             }
         }
 
-
         /// <summary>
         /// Gets information that describes this context. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb145034.aspx)
         /// </summary>
@@ -181,7 +175,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// Gets the user-displayable name for this context. This is not supported by the VSNDK debug engine.
         /// (http://msdn.microsoft.com/en-ca/library/bb146997.aspx)
@@ -190,9 +183,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetName(out string pbstrName)
         {
-            throw new Exception("The method or operation is not implemented.");
+            pbstrName = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Subtracts a specified value from the current context's address to create a new context. 
@@ -203,14 +196,13 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int Subtract(ulong dwCount, out IDebugMemoryContext2 ppMemCxt)
         {
-            ppMemCxt = new AD7MemoryAddress(m_engine, (uint)dwCount - m_address);
+            ppMemCxt = new AD7MemoryAddress(_engine, (uint)dwCount - _address);
             return VSConstants.S_OK;
         }
 
         #endregion
 
         #region IDebugCodeContext2 Members
-
 
         /// <summary>
         /// Gets the document context that corresponds to this code context. The document context represents a position in the source file
@@ -220,10 +212,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetDocumentContext(out IDebugDocumentContext2 ppSrcCxt)
         {
-            ppSrcCxt = m_documentContext;
+            ppSrcCxt = _documentContext;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the language information for this code context. (http://msdn.microsoft.com/en-ca/library/bb144925.aspx)
@@ -233,21 +224,17 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns S_OK; otherwise, returns S_FALSE. </returns>
         public int GetLanguageInfo(ref string pbstrLanguage, ref Guid pguidLanguage)
         {
-            if (m_documentContext != null)
+            if (_documentContext != null)
             {
-                m_documentContext.GetLanguageInfo(ref pbstrLanguage, ref pguidLanguage);
+                _documentContext.GetLanguageInfo(ref pbstrLanguage, ref pguidLanguage);
                 return VSConstants.S_OK;
             }
-            else
-            {
-                return VSConstants.S_FALSE;
-            }
+            return VSConstants.S_FALSE;
         }
 
         #endregion
 
         #region IDebugCodeContext100 Members
-
 
         /// <summary>
         /// Returns the program being debugged. In the case of this VSNDK debug debug engine, AD7Engine implements IDebugProgram2 which 
@@ -258,7 +245,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugCodeContext100.GetProgram(out IDebugProgram2 pProgram)
         {
-            pProgram = m_engine;
+            pProgram = _engine;
             return VSConstants.S_OK;
         }
 

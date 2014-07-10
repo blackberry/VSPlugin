@@ -64,7 +64,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugExpression2.Abort()
         {
-            throw new NotImplementedException();
+            return VSConstants.E_NOTIMPL;
         }
 
         /// <summary>
@@ -72,10 +72,10 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void EvaluatingAsync()
         {
-            VariableInfo vi = VariableInfo.get(_expression, _eventDispatcher, _frame);
+            VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
             AD7Property ppResult = new AD7Property(vi);
 
-            _frame.m_engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, ppResult), AD7ExpressionEvaluationCompleteEvent.IID, _frame.m_engine, _frame.m_thread);
+            _frame._engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, ppResult), AD7ExpressionEvaluationCompleteEvent.IID, _frame._engine, _frame._thread);
         }
 
         /// <summary>
@@ -105,7 +105,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult)
         {
-            VariableInfo vi = VariableInfo.get(_expression, _eventDispatcher, _frame);
+            VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
             ppResult = new AD7Property(vi);
             _frame._lastEvaluatedExpression = vi;
             return VSConstants.S_OK;

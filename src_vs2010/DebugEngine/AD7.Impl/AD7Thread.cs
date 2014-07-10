@@ -13,11 +13,10 @@
 //* limitations under the License.
 
 using System;
-using System.Text;
+using BlackBerry.NativeCore;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using VSNDK.Parser;
-using System.Runtime.InteropServices;
 using System.Collections;
 
 namespace BlackBerry.DebugEngine
@@ -29,7 +28,7 @@ namespace BlackBerry.DebugEngine
     /// 
     /// IDebugThread100: (http://msdn.microsoft.com/en-us/library/ff471152.aspx)
     /// </summary>
-    public class AD7Thread : IDebugThread2, IDebugThread100
+    public sealed class AD7Thread : IDebugThread2, IDebugThread100
     {
         #region Internal Types
         /// <summary>
@@ -112,56 +111,30 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="aEngine"> The AD7Engine object that represents the DE. </param>
+        /// <param name="engine"> The AD7Engine object that represents the DE. </param>
         /// <param name="id"> Thread's ID. </param>
         /// <param name="targetID"> Process' ID + Thread's ID. </param>
         /// <param name="state"> Thread's state. </param>
         /// <param name="priority"> Thread's priority. </param>
         /// <param name="name"> Thread's name. </param>
-        /// <param name="fullname"> Full short path file name. </param>
+        /// <param name="filename"> Full short path file name. </param>
         /// <param name="line"> Line number. </param>
-        public AD7Thread(AD7Engine aEngine, string id, string targetID, string state, string priority, string name, string fullname, string line)//, DebuggedThread debuggedThread)
+        public AD7Thread(AD7Engine engine, string id, string targetID, string state, string priority, string name, string filename, string line)//, DebuggedThread debuggedThread)
         {
-            _engine = aEngine;
+            _engine = engine;
             _suspendCount = 0;
             if (id == "1")
                 _threadDisplayName = "Main Thread";
             else
                 _threadDisplayName = (name != "") ? name : "<No Name>";
 
-            if (fullname.Contains("~"))
-            {
-                // Need to lengthen the path used by Visual Studio.
-                StringBuilder longPathName = new StringBuilder(1024);
-                GetLongPathName(fullname, longPathName, longPathName.Capacity);
-                _filename = longPathName.ToString();
-            }
-            else
-                _filename = fullname;
-
+            _filename = NativeMethods.GetLongPathName(filename);
             uint.TryParse(line, out _line); // stopping on that exception was just horrible...
             _id = id;
             _state = state;
             _targetID = targetID;
             _priority = priority;
         }
-
-
-        /// <summary> GDB works with short path names only, which requires converting the path names to/from long ones. This function 
-        /// returns the long path name for a given short one. </summary>
-        /// <param name="path">Short path name. </param>
-        /// <param name="longPath">Returns this long path name. </param>
-        /// <param name="longPathLength"> Lenght of this long path name. </param>
-        /// <returns></returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetLongPathName(
-            [MarshalAs(UnmanagedType.LPTStr)]
-            string path,
-            [MarshalAs(UnmanagedType.LPTStr)]
-            StringBuilder longPath,
-            int longPathLength
-            );
-        
 
         /// <summary>
         /// Called by EventDipatcher to set the current location during break mode.
@@ -170,15 +143,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="line"> Line number. </param>
         public void setCurrentLocation(string filename, uint line)
         {
-            if (filename.Contains("~"))
-            {
-                // Need to lengthen the path used by Visual Studio.
-                StringBuilder longPathName = new StringBuilder(1024);
-                GetLongPathName(filename, longPathName, longPathName.Capacity);
-                _filename = longPathName.ToString();
-            }
-            else
-                _filename = filename;
+            _filename = NativeMethods.GetLongPathName(filename);
             _line = line;
         }
 
@@ -187,12 +152,12 @@ namespace BlackBerry.DebugEngine
         /// Gets the function name.
         /// </summary>
         /// <returns> If successful, returns the function name; otherwise, returns "". </returns>
-        public string getFunctionName()
+        public string GetFunctionName()
         {
             string func = "";
 
-            if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                _engine.EventDispatcher.selectThread(this._id);
+            if ((_id != "") && (_id != _engine.CurrentThread()._id))
+                _engine.EventDispatcher.SelectThread(_id);
 
             string stackResponse = _engine.EventDispatcher.getStackFrames().Replace("#;;;;", "");
 
@@ -219,13 +184,12 @@ namespace BlackBerry.DebugEngine
                     }
                 }
 
-                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                    _engine.EventDispatcher.selectThread(this._engine.CurrentThread()._id);
+                if ((_id != "") && (_id != _engine.CurrentThread()._id))
+                    _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
             }
 
             return func;
         }
-
 
         /// <summary>
         /// Determines whether the next statement can be set to the given stack frame and code context. Not implemented.
@@ -241,7 +205,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Retrieves a list of the stack frames for this thread. (http://msdn.microsoft.com/en-ca/library/bb145138.aspx)
         /// </summary>
@@ -253,21 +216,21 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 ppEnum)
         {
-            if (this._id == "")
+            if (_id == "")
             {
                 ppEnum = null;
                 return Constants.S_FALSE;
             }
 
-            if (this._engine.evaluatedTheseFlags(this._id, dwFieldSpec))
+            if (_engine.evaluatedTheseFlags(_id, dwFieldSpec))
             {
                 ppEnum = new AD7FrameInfoEnum(previousFrameInfoArray);
                 return Constants.S_OK;
             }
 
             // Ask for general stack information.
-            if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                _engine.EventDispatcher.selectThread(this._id);
+            if ((_id != "") && (_id != _engine.CurrentThread()._id))
+                _engine.EventDispatcher.SelectThread(_id);
 
             string stackResponse = _engine.EventDispatcher.getStackFrames().Replace("#;;;;", "");
             if (stackResponse == "")
@@ -293,18 +256,12 @@ namespace BlackBerry.DebugEngine
                     string[] frameInfo = frameStrings[i].Split(';');
                     if (frameInfo.Length >= 3)
                     {
-                        if (frameInfo[3].Contains("~"))
-                        {
-                            // Need to lengthen the path used by Visual Studio.
-                            StringBuilder longPathName = new StringBuilder(1024);
-                            GetLongPathName(frameInfo[3], longPathName, longPathName.Capacity);
-                            frameInfo[3] = longPathName.ToString();
-                        }
-                        AD7StackFrame frame = AD7StackFrame.create(_engine, this, frameInfo, ref created);
+                        frameInfo[3] = NativeMethods.GetLongPathName(frameInfo[3]);
+                        AD7StackFrame frame = AD7StackFrame.Create(_engine, this, frameInfo, ref created);
                         frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
                     }
                 }
-                if ((previousFrameInfoArray.Length != frameInfoArray.Length) || (created == true))
+                if ((previousFrameInfoArray.Length != frameInfoArray.Length) || created)
                 {
                     previousFrameInfoArray = frameInfoArray;
                     ppEnum = new AD7FrameInfoEnum(frameInfoArray);
@@ -341,25 +298,24 @@ namespace BlackBerry.DebugEngine
                     }
                 }
 
-                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                    _engine.EventDispatcher.selectThread(this._engine.CurrentThread()._id);
+                if ((_id != "") && (_id != _engine.CurrentThread()._id))
+                    _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
 
                 return Constants.S_OK;
             }
             catch (ComponentException e)
             {
-                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                    _engine.EventDispatcher.selectThread(this._engine.CurrentThread()._id);
+                if ((_id != "") && (_id != _engine.CurrentThread()._id))
+                    _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
                 return e.HResult;
             }
             catch (Exception e)
             {
-                if ((this._id != "") && (this._id != this._engine.CurrentThread()._id))
-                    _engine.EventDispatcher.selectThread(this._engine.CurrentThread()._id);
+                if ((_id != "") && (_id != _engine.CurrentThread()._id))
+                    _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
                 return EngineUtils.UnexpectedException(e);
             }
         }
-
 
         /// <summary>
         /// Gets the logical thread associated with this physical thread. Not implemented. 
@@ -375,7 +331,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets the name of a thread. (http://msdn.microsoft.com/en-ca/library/bb162273.aspx)
         /// </summary>
@@ -386,7 +341,6 @@ namespace BlackBerry.DebugEngine
             pbstrName = _threadDisplayName;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the program in which a thread is running. (http://msdn.microsoft.com/en-ca/library/bb147002.aspx)
@@ -399,7 +353,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets the system thread identifier. (http://msdn.microsoft.com/en-ca/library/bb161964.aspx)
         /// </summary>
@@ -409,7 +362,7 @@ namespace BlackBerry.DebugEngine
         {
             try
             {
-                pdwThreadId = Convert.ToUInt32(this._id);
+                pdwThreadId = Convert.ToUInt32(_id);
             }
             catch
             {
@@ -417,7 +370,6 @@ namespace BlackBerry.DebugEngine
             }
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the properties that describe this thread. (http://msdn.microsoft.com/en-ca/library/bb145602.aspx)
@@ -434,7 +386,7 @@ namespace BlackBerry.DebugEngine
                 {
                     try
                     {
-                        ptp[0].dwThreadId = Convert.ToUInt32(this._id);
+                        ptp[0].dwThreadId = Convert.ToUInt32(_id);
                     }
                     catch
                     {
@@ -449,7 +401,7 @@ namespace BlackBerry.DebugEngine
                 }
                 if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_STATE) != 0)
                 {
-                    if (this._state == "running")
+                    if (_state == "running")
                         ptp[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_RUNNING;
                     else
                         ptp[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_STOPPED;
@@ -472,9 +424,9 @@ namespace BlackBerry.DebugEngine
                     {
                         foreach (AD7StackFrame frame in __stackFrames)
                         {
-                            if (frame.m_functionName != "")
+                            if (frame._functionName != "")
                             {
-                                ptp[0].bstrLocation = frame.m_functionName;
+                                ptp[0].bstrLocation = frame._functionName;
                                 break;
                             }
                         }
@@ -497,7 +449,6 @@ namespace BlackBerry.DebugEngine
             }
         }
 
-
         /// <summary>
         /// Resumes execution of a thread. (http://msdn.microsoft.com/en-ca/library/bb145813.aspx)
         /// </summary>
@@ -514,7 +465,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Sets the next statement to the given stack frame and code context. Not implemented. 
         /// (http://msdn.microsoft.com/en-ca/library/bb160944.aspx)
@@ -528,7 +478,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Sets the name of the thread. (http://msdn.microsoft.com/en-ca/library/bb162322.aspx)
         /// </summary>
@@ -539,7 +488,6 @@ namespace BlackBerry.DebugEngine
             _threadDisplayName = pszName;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Suspends a thread. (http://msdn.microsoft.com/en-us/library/bb145297.aspx)
@@ -555,7 +503,6 @@ namespace BlackBerry.DebugEngine
 
         #region IDebugThread100 Members
 
-        
         /// <summary>
         /// Sets the name of the thread.
         /// (http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.debugger.interop.idebugthread100.setthreaddisplayname.aspx)
@@ -564,10 +511,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugThread100.SetThreadDisplayName(string name)
         {
-            this._threadDisplayName = name;
+            _threadDisplayName = name;
             return Constants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the name of a thread.
@@ -577,10 +523,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugThread100.GetThreadDisplayName(out string name)
         {
-            name = this._threadDisplayName;
+            name = _threadDisplayName;
             return Constants.S_OK;
         }
-
 
         /// <summary>
         /// Returns whether this thread can be used to do function/property evaluation. Not implemented.
@@ -591,7 +536,6 @@ namespace BlackBerry.DebugEngine
         {
             return Constants.S_FALSE;
         }
-
 
         /// <summary>
         /// Set flags. Not implemented.
@@ -605,7 +549,6 @@ namespace BlackBerry.DebugEngine
             return Constants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// Get flags. Not implemented.
         /// (http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.debugger.interop.idebugthread100.getflags.aspx)
@@ -618,7 +561,6 @@ namespace BlackBerry.DebugEngine
             flags = 0;
             return Constants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Gets the properties that describe this thread.
@@ -636,7 +578,7 @@ namespace BlackBerry.DebugEngine
                 {
                     try
                     {
-                        ptp[0].dwThreadId = Convert.ToUInt32(this._id);
+                        ptp[0].dwThreadId = Convert.ToUInt32(_id);
                     }
                     catch
                     {
@@ -651,7 +593,7 @@ namespace BlackBerry.DebugEngine
                 }
                 if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_STATE) != 0)
                 {
-                    if (this._state == "running")
+                    if (_state == "running")
                         ptp[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_RUNNING;
                     else
                         ptp[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_STOPPED;
@@ -685,15 +627,15 @@ namespace BlackBerry.DebugEngine
                     {
                         foreach (AD7StackFrame frame in __stackFrames)
                         {
-                            if ((frame.m_functionName != "") && (frame.m_functionName != "??"))
+                            if ((frame._functionName != "") && (frame._functionName != "??"))
                             {
-                                ptp[0].bstrLocation = frame.m_functionName;
+                                ptp[0].bstrLocation = frame._functionName;
                                 break;
                             }
                         }
                     }
                     else
-                        ptp[0].bstrLocation = getFunctionName();
+                        ptp[0].bstrLocation = GetFunctionName();
 
                     if (ptp[0].bstrLocation == "")
                         ptp[0].bstrLocation = "[External Code]";
@@ -702,7 +644,7 @@ namespace BlackBerry.DebugEngine
                 }
                 if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY) != 0)
                 {
-                    if (this._id == "1")
+                    if (_id == "1")
                         ptp[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Main;
                     else
                         ptp[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Worker;

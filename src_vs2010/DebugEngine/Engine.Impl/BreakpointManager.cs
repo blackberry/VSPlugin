@@ -59,7 +59,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="ppPendingBP"> Returns an IDebugPendingBreakpoint2 object that represents the pending breakpoint. </param>
         public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
         {
-            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, _engine, this);
+            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(_engine, pBPRequest);
             ppPendingBP = pendingBreakpoint;
             _pendingBreakpoints.Add(pendingBreakpoint);
         }

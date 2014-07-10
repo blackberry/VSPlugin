@@ -12,9 +12,10 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
+using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
+using System;
 using System.Diagnostics;
 
 namespace BlackBerry.DebugEngine
@@ -25,33 +26,19 @@ namespace BlackBerry.DebugEngine
     /// A running process is viewed as a ProgramNode by VS. 
     /// A debug engine (DE) or a custom port supplier implements this interface to represent a program that can be debugged. 
     /// </summary>
-    public class AD7ProgramNode : IDebugProgramNode2
+    public sealed class AD7ProgramNode : IDebugProgramNode2
     {
         /// <summary>
         ///  The GUID of the hosting process. 
         /// </summary>
-        readonly Guid m_processGuid;
+        private readonly Guid _processGuid;
 
-        /// <summary>
-        ///  The ID of the program to be debugged. 
-        /// </summary>
-        public string m_programID;
-
-        /// <summary>
-        /// The program friendly name.
-        /// </summary>
-        public string m_programName;
-
-        /// <summary>
-        ///  The file name of the program to be debugged.
-        /// </summary>
-        readonly string m_exePath;
+        private readonly ProcessInfo _program;
 
         /// <summary>
         /// The GUID of the VSNDK debug engine. 
         /// </summary>
-        readonly Guid m_engineGuid;
-
+        private readonly Guid _engineGuid;
 
         /// <summary>
         /// Constructor.
@@ -60,41 +47,34 @@ namespace BlackBerry.DebugEngine
         /// <param name="processGuid"> The GUID for this process. </param>
         public AD7ProgramNode(Guid processGuid)
         {
-            m_processGuid = processGuid;
-            m_programID = "";
-            m_exePath = "";
-            m_programName = "";
-            m_engineGuid = new Guid(AD7Engine.DebugEngineGuid);
+            _processGuid = processGuid;
+            _engineGuid = new Guid(AD7Engine.DebugEngineGuid);
         }
-
 
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="program"> The description of the the debugged program. </param>
         /// <param name="processGuid"> The GUID for this process. </param>
-        /// <param name="programID"> The ID of the program to be debugged. </param>
-        /// <param name="exePath"> The name of the executable to be debugged. </param>
         /// <param name="engineGuid"> The GUID of the VSNDK debug engine. </param>
-        public AD7ProgramNode(Guid processGuid, string programID, string exePath, Guid engineGuid)
+        public AD7ProgramNode(ProcessInfo program, Guid processGuid, Guid engineGuid)
         {
-            m_processGuid = processGuid;
-            m_programID = programID;
+            if (program == null)
+                throw new ArgumentNullException("program");
 
-            m_exePath = exePath;
-            do
-            {
-                m_exePath = m_exePath.Replace("\\\\", "\\");
-            }
-            while (m_exePath.IndexOf("\\\\") != -1);
-
-            int i = exePath.LastIndexOf('\\');
-            if ((i != -1) && (i < (exePath.Length - 1)))
-                m_programName = exePath.Substring(i + 1);
-            else
-                m_programName = exePath;
-
-            m_engineGuid = engineGuid;
+            _program = program;
+            _processGuid = processGuid;
+            _engineGuid = engineGuid;
         }
+
+        #region Properties
+
+        public string Name
+        {
+            get { return _program != null ? _program.Name : string.Empty; }
+        }
+
+        #endregion
 
         #region IDebugProgramNode2 Members
 
@@ -109,12 +89,11 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugProgramNode2.GetEngineInfo(out string engineName, out Guid engineGuid)
         {
-            engineName = "";
-            engineGuid = m_engineGuid;
+            engineName = string.Empty;
+            engineGuid = _engineGuid;
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the system process identifier for the process hosting a program. (http://msdn.microsoft.com/en-us/library/bb162159.aspx)
@@ -125,12 +104,19 @@ namespace BlackBerry.DebugEngine
         {
             // According to the MSDN documentation (http://msdn.microsoft.com/en-us/library/bb162159.aspx),
             // it should return the process id of the hosting process, but what is expected is the program ID...
-            pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
-            pHostProcessId[0].guidProcessId = m_processGuid;
+            if (_program != null)
+            {
+                pHostProcessId[0].ProcessIdType = (uint) enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
+                pHostProcessId[0].dwProcessId = _program.ID;
+            }
+            else
+            {
+                pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+                pHostProcessId[0].guidProcessId = _processGuid;
+            }
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the name of the process hosting a program. (http://msdn.microsoft.com/en-us/library/bb145135.aspx)
@@ -141,12 +127,11 @@ namespace BlackBerry.DebugEngine
         int IDebugProgramNode2.GetHostName(enum_GETHOSTNAME_TYPE dwHostNameType, out string processName)
         {
             if (dwHostNameType == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
-                processName = "(BB-pid = " + m_programID + ") " + m_exePath;
+                processName = "(BB-pid = " + _program.ID + ") " + _program.ExecutablePath;
             else
-                processName = m_programName;
+                processName = _program.Name;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the name of a program. (http://msdn.microsoft.com/en-us/library/bb145928.aspx)
@@ -155,7 +140,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugProgramNode2.GetProgramName(out string programName)
         {
-            programName = m_programName;
+            programName = _program.Name;
             return VSConstants.S_OK;
         }
 
@@ -163,7 +148,6 @@ namespace BlackBerry.DebugEngine
 
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
-
 
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161399.aspx)
@@ -178,7 +162,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161803.aspx)
         /// </summary>
@@ -189,7 +172,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161297.aspx)
         /// </summary>
@@ -197,12 +179,11 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         int IDebugProgramNode2.GetHostMachineName_V7(out string hostMachineName)
         {
-            Debug.Fail("This function is not called by the debugger");
             hostMachineName = null;
+            Debug.Fail("This function is not called by the debugger");
             return VSConstants.E_NOTIMPL;
         }
 
         #endregion
     }
-
 }

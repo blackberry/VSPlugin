@@ -12,15 +12,13 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+using BlackBerry.NativeCore.Model;
+using Microsoft.VisualStudio;
+using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using BlackBerry.NativeCore.Model;
-using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
-using Microsoft.VisualStudio;
 using System.Windows.Forms;
-using VSNDK.Parser;
 
 namespace BlackBerry.DebugEngine
 {
@@ -226,7 +224,7 @@ namespace BlackBerry.DebugEngine
         public int EnumPorts(out IEnumDebugPorts2 ppEnum)
         {
             // Returning because VS can debug only one app at a time.
-            if (GDBParser.s_running)
+            if (DebugEngineStatus.IsRunning)
             {
                 MessageBox.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ppEnum = null;

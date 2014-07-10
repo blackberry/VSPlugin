@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
@@ -185,7 +186,7 @@ namespace BlackBerry.DebugEngine
                         if ((pos2 <= 2) || (tempListOfProcesses[ind].Substring(2, pos2 - 2) != process))
                             break;
                     }
-                    AD7Process proc = new AD7Process(this, process.Substring(process.IndexOf("- ") + 2), process.Remove(process.IndexOf(" ")));
+                    AD7Process proc = new AD7Process(this, new ProcessInfo(uint.Parse(process.Substring(process.IndexOf("- ") + 2)), process.Remove(process.IndexOf(" "))));
                     result.Add(proc);
                 }
             }
@@ -249,7 +250,7 @@ namespace BlackBerry.DebugEngine
         {
             IEnumerable<AD7Process> procList = GetProcesses();
             var proc = from p in procList
-                       where p._processID == ProcessId.dwProcessId.ToString()
+                       where p.ID == ProcessId.dwProcessId
                        select p;
             ppProcess = proc.FirstOrDefault();
             return ppProcess != null ? VSConstants.S_OK : VSConstants.S_FALSE;

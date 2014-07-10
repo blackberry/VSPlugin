@@ -25,7 +25,6 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
 using VSNDK.Parser;
-using NameValueCollection = System.Collections.Specialized.NameValueCollection;
 using System.Windows.Forms;
 
 namespace BlackBerry.DebugEngine
@@ -228,12 +227,27 @@ namespace BlackBerry.DebugEngine
                 _gdb.Dispose();
             }
             _gdb = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
+            _gdb.Finished += GdbRunnerFinished;
             _gdb.ExecuteAsync();
 
             // and select current target device:
             _gdb.Send(RequestsFactory.SetTargetDevice(_gdb.Device));
 
             return _gdb;
+        }
+
+        private void GdbRunnerFinished(object sender, ToolRunnerEventArgs e)
+        {
+            _gdb = null;
+        }
+
+        #endregion
+
+        #region Properties
+
+        public bool HasProcess
+        {
+            get { return _process != null; }
         }
 
         #endregion
@@ -275,10 +289,10 @@ namespace BlackBerry.DebugEngine
                     Callback = new EngineCallback(this, ad7Callback);
 
                     AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
-                    _process = pnt.m_process;
-                    AD7Port port = pnt.m_process._portAttach;
+                    _process = pnt.Process;
+                    AD7Port port = pnt.Process.Port;
                     string publicKeyPath = ConfigDefaults.SshPublicKeyPath;
-                    string progName = pnt.m_programName.Substring(pnt.m_programName.LastIndexOf('/') + 1);
+                    string progName = _process.Details.Name;
 
                     string exePath;
                     string processesPaths;
@@ -310,9 +324,7 @@ namespace BlackBerry.DebugEngine
                         exePath = "CannotAttachToRunningProcess";
                     }
 
-                    exePath = exePath.Replace("\\", "\\\\\\\\");
-
-                    if (GDBParser.LaunchProcess(pnt.m_programID, exePath, port.Device.IP, port.Device.Type == DeviceDefinitionType.Simulator, port.NDK.ToolsPath, publicKeyPath, port.Device.Password))
+                    if (GDBParser.LaunchProcess(pnt.Process.ID.ToString(), exePath.Replace("\\", "\\\\\\\\"), port.Device.IP, port.Device.Type == DeviceDefinitionType.Simulator, port.NDK.ToolsPath, publicKeyPath, port.Device.Password))
                     {
                         if (exePath == "CannotAttachToRunningProcess")
                         {
@@ -320,7 +332,7 @@ namespace BlackBerry.DebugEngine
                         }
                         EventDispatcher = new EventDispatcher(this);
                         _module = new AD7Module();
-                        m_progNode = new AD7ProgramNode(_process._processGUID, _process._processID, exePath, new Guid(DebugEngineGuid));
+                        m_progNode = new AD7ProgramNode(_process.Details, _process.UID, new Guid(DebugEngineGuid));
                         AddThreadsToProgram();
                     }
                     else
@@ -660,11 +672,11 @@ namespace BlackBerry.DebugEngine
 
                 if (GDBParser.LaunchProcess(pidNumber.ToString(), exePath.Replace("\\", "\\\\"), targetIP, isSimulator, toolsPath, publicKeyPath, password))
                 {
-                    process = _process = new AD7Process(this, port);
+                    process = _process = new AD7Process(port as AD7Port);
                     EventDispatcher = new EventDispatcher(this);
-                    _programGuid = _process._processGUID;
+                    _programGuid = _process.UID;
                     _module = new AD7Module();
-                    m_progNode = new AD7ProgramNode(_process._processGUID, pid, exePath, new Guid(DebugEngineGuid));
+                    m_progNode = new AD7ProgramNode(_process.Details, _process.UID, new Guid(DebugEngineGuid));
                     AddThreadsToProgram();
 
                     AD7EngineCreateEvent.Send(this);
@@ -1014,8 +1026,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetName(out string programName)
         {
-            if (this.m_progNode != null)
-                programName = this.m_progNode.m_programName;
+            if (m_progNode != null)
+                programName = m_progNode.Name;
             else
                 programName = null;
             return VSConstants.S_OK;
@@ -1034,7 +1046,7 @@ namespace BlackBerry.DebugEngine
             if (_programGuid != null)
                 guidProgramId = _programGuid;
             else
-                guidProgramId = _process._processGUID;
+                guidProgramId = _process.UID;
 
             return VSConstants.S_OK;
         }

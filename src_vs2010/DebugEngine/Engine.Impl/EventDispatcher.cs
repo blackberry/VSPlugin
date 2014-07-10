@@ -45,22 +45,22 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Object used to control the access to the critical section that exists in the "lockedBreakpoint" method.
         /// </summary>
-        private readonly Object _lockBreakpoint = new Object();
+        private readonly object _lockBreakpoint = new object();
 
         /// <summary>
         /// Object used to control the access to the critical section that exists in the "unlockBreakpoint" method.
         /// </summary>
-        private readonly Object _unlockBreakpoint = new Object();
+        private readonly object _unlockBreakpoint = new object();
 
         /// <summary>
         /// Object used to control the access to the critical section that exists in the "enterCriticalRegion" method.
         /// </summary>
-        private readonly Object _criticalRegion = new Object(); 
+        private readonly object _criticalRegion = new object(); 
 
         /// <summary>
         /// Object used to control the access to the critical section that exists in the "leaveCriticalRegion" method.
         /// </summary>
-        private readonly Object _leaveCriticalRegion = new Object();
+        private readonly object _leaveCriticalRegion = new object();
         
         /// <summary>
         /// Boolean variable that indicates the GDB state: TRUE -> run mode; FALSE -> break mode.
@@ -77,7 +77,7 @@ namespace BlackBerry.DebugEngine
         /// 5 times, VSNDK will end the debug session. That's why this variable is needed, to count the amount of this kind of message
         /// that is received in a sequence.
         /// </summary>
-        public int countSIGINT = 0;
+        public int countSIGINT;
 
         #region Properties
 
@@ -209,17 +209,17 @@ namespace BlackBerry.DebugEngine
                                     break;
                                 case '2':  // Events related to breakpoints (including breakpoint hits).
                                     _hBreakpoints = new HandleBreakpoints(_eventDispatcher);
-                                    _hBreakpoints.handle(ev);
+                                    _hBreakpoints.Handle(ev);
                                     break;
                                 case '3':  // Not used.
                                     break;
                                 case '4':  // Events related to execution control (processes, threads, programs) 1.
                                     _hProcExe = new HandleProcessExecution(_eventDispatcher);
-                                    _hProcExe.handle(ev);
+                                    _hProcExe.Handle(ev);
                                     break;
                                 case '5':  // Events related to execution control (processes, threads, programs and GDB Bugs) 2.
                                     _hProcExe = new HandleProcessExecution(_eventDispatcher);
-                                    _hProcExe.handle(ev);
+                                    _hProcExe.Handle(ev);
                                     break;
                                 case '6':  // Events related to evaluating expressions. Not used.
                                     break;
@@ -227,7 +227,7 @@ namespace BlackBerry.DebugEngine
                                     break;
                                 case '8':  // Events related to output.
                                     _hOutputs = new HandleOutputs(_eventDispatcher);
-                                    _hOutputs.handle(ev);
+                                    _hOutputs.Handle(ev);
                                     break;
                                 case '9':  // Not used.
                                     break;
@@ -249,7 +249,7 @@ namespace BlackBerry.DebugEngine
             if (Engine.m_state != AD7Engine.DE_STATE.DESIGN_MODE 
              && Engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
             {
-                HandleProcessExecution.m_needsResumeAfterInterrupt = true;
+                HandleProcessExecution.NeedsResumeAfterInterrupt = true;
                 Engine.CauseBreak();
             }
         }
@@ -260,9 +260,9 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void ResumeFromInterrupt()
         {
-            if (HandleProcessExecution.m_needsResumeAfterInterrupt)
+            if (HandleProcessExecution.NeedsResumeAfterInterrupt)
             {
-                HandleProcessExecution.m_needsResumeAfterInterrupt = false;
+                HandleProcessExecution.NeedsResumeAfterInterrupt = false;
                 continueExecution();
             }
         }
@@ -311,8 +311,8 @@ namespace BlackBerry.DebugEngine
                 }
 
                 HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
-                hBreakpoints.handle(response);
-                GDB_ID = (uint)hBreakpoints.number;
+                hBreakpoints.Handle(response);
+                GDB_ID = (uint)hBreakpoints.Number;
                 GDB_filename = hBreakpoints.FileName;
                 GDB_address = hBreakpoints.Address;
 
@@ -333,7 +333,7 @@ namespace BlackBerry.DebugEngine
                 else
                 {
                     GDB_address = "0x0";
-                    GDB_line = (uint)hBreakpoints.linePos;
+                    GDB_line = (uint)hBreakpoints.LinePosition;
                 }
 
                 ResumeFromInterrupt();
@@ -406,7 +406,7 @@ namespace BlackBerry.DebugEngine
                 return false;
 
             HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
-            hBreakpoints.handle(response);
+            hBreakpoints.Handle(response);
 
             return true;
         }
@@ -479,7 +479,7 @@ namespace BlackBerry.DebugEngine
                 return false;
 
             HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
-            hBreakpoints.handle(response);
+            hBreakpoints.Handle(response);
             return true;
         }
 
@@ -505,8 +505,8 @@ namespace BlackBerry.DebugEngine
                 }
             
                 HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
-                hBreakpoints.handle(response);
-                uint retID = (uint)hBreakpoints.number;
+                hBreakpoints.Handle(response);
+                uint retID = (uint)hBreakpoints.Number;
 
                 ResumeFromInterrupt();
 
@@ -544,8 +544,8 @@ namespace BlackBerry.DebugEngine
             string response = GDBParser.parseCommand(inputCommand, 8);
  
             HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
-            hBreakpoints.handle(response);
-            uint retID = (uint)hBreakpoints.number;
+            hBreakpoints.Handle(response);
+            uint retID = (uint)hBreakpoints.Number;
 
             ResumeFromInterrupt();
             if (GDB_ID != retID)
@@ -718,8 +718,8 @@ namespace BlackBerry.DebugEngine
 
                     if (bbp._breakWhenCondChanged)
                     {
-                        string result = "";
-                        bool valid = VariableInfo.evaluateExpression(bbp.m_bpCondition.bstrCondition, ref result, null);
+                        string result;
+                        bool valid = VariableInfo.EvaluateExpression(bbp.m_bpCondition.bstrCondition, out result, null);
                         if ((valid) && (bbp._previousCondEvaluation != result)) // check if condition evaluation has changed
                         {
                             if ((bbp.m_bpPassCount.stylePassCount == enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_EQUAL) && (bbp._hitCount != bbp.m_bpPassCount.dwPassCount))
@@ -864,12 +864,11 @@ namespace BlackBerry.DebugEngine
             return GDBParser.parseCommand(@"-stack-list-variables --thread " + threadID + " --frame " + frameIndex + " --simple-values", 11);
         }
 
-
         /// <summary>
         /// Make "id" the current thread.
         /// </summary>
         /// <param name="id"> Thread ID. </param>
-        public void selectThread(string id)
+        public void SelectThread(string id)
         {
             // Waits for the parsed response for the GDB/MI command that make "id" the current thread.
             // (http://www.sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Thread-Commands.html)
@@ -881,10 +880,12 @@ namespace BlackBerry.DebugEngine
         /// Creates a variable object.
         /// </summary>
         /// <param name="name"> Name of the variable. </param>
-        /// <param name="hasVsNdK_"> Boolean value that indicates if the variable name has the prefix VsNdK_. </param>
+        /// <param name="hasVsNdK"> Boolean value that indicates if the variable name has the prefix VsNdK_. </param>
         /// <returns> If successful, returns the variable's number of children; otherwise, returns string "ERROR". </returns>
-        public string createVar(string name, ref bool hasVsNdK_)
+        public string CreateVar(string name, out bool hasVsNdK)
         {
+            hasVsNdK = false;
+
             // Gets the variable's number of children after sending the following GDB/MI command to create a variable object. 
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Variable-Objects.html)
             string response = GDBParser.parseCommand("-var-create " + name + " \"*\" " + name, 13);
@@ -894,7 +895,7 @@ namespace BlackBerry.DebugEngine
                 // So, in case of an error, add the prefix VsNdK_ to the variable name and try to create it again. 
                 response = GDBParser.parseCommand("-var-create VsNdK_" + name + " \"*\" " + name, 13);
                 if (response != "ERROR")
-                    hasVsNdK_ = true;
+                    hasVsNdK = true;
             }
             return response;
         }
@@ -969,72 +970,72 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// GDB breakpoint ID.
         /// </summary>
-        private int m_number = -1;
+        private int _number = -1;
 
         /// <summary>
         /// Boolean variable that indicates if this breakpoint is enable (true) or disable (false).
         /// </summary>
-        private bool m_enable;
+        private bool _enabled;
 
         /// <summary>
         /// Breakpoint address.
         /// </summary>
-        private string m_addr = "";
+        private string _address = "";
 
         /// <summary>
         /// Name of the function that contains this breakpoint.
         /// </summary>
-        private string m_func = "";
+        private string _functionName = "";
 
         /// <summary>
         /// File name that contains this breakpoint.
         /// </summary>
-        private string m_filename = "";
+        private string _fileName = "";
 
         /// <summary>
         /// Line number for this breakpoint.
         /// </summary>
-        private int m_line = -1;
+        private int _line = -1;
 
         /// <summary>
         /// Number of hits for this breakpoint.
         /// </summary>
-        private int m_hits = -1;
+        private int _hits = -1;
 
         /// <summary>
         /// Number of hits to be ignored by this breakpoint.
         /// </summary>
-        private int m_ignoreHits = -1;
+        private int _ignoreHits = -1;
 
         /// <summary>
         /// Condition associated to this breakpoint.
         /// </summary>
-        private string m_condition = "";
+        private string _condition = "";
 
         /// <summary>
         /// Thread ID that was interrupted when this breakpoint was hit.
         /// </summary>
-        private string m_threadID = "";
+        private string _threadID = "";
 
         /// <summary>
         /// This object manages debug events in the engine.
         /// </summary>
-        private EventDispatcher m_eventDispatcher;
+        private EventDispatcher _eventDispatcher;
 
         /// <summary>
         /// GDB_ID Property
         /// </summary>
-        public int number 
+        public int Number 
         {
-            get { return m_number; }
+            get { return _number; }
         }
 
         /// <summary>
         /// GDB Line Position Property
         /// </summary>
-        public int linePos
+        public int LinePosition
         {
-            get { return m_line; }
+            get { return _line; }
         }
 
         /// <summary>
@@ -1042,7 +1043,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public string FileName
         {
-            get { return m_filename; }
+            get { return _fileName; }
         }
 
         /// <summary>
@@ -1050,9 +1051,8 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public string Address
         {
-            get { return m_addr; }
+            get { return _address; }
         }
-
 
         /// <summary>
         /// Constructor.
@@ -1060,15 +1060,14 @@ namespace BlackBerry.DebugEngine
         /// <param name="ed"> This object manages debug events in the engine. </param>
         public HandleBreakpoints(EventDispatcher ed)
         {
-            m_eventDispatcher = ed;
+            _eventDispatcher = ed;
         }
-
         
         /// <summary>
         /// This method manages breakpoints events by classifying each of them by sub-type (e.g. breakpoint inserted, modified, etc.).
         /// </summary>
         /// <param name="ev"> String that contains the event description. </param>
-        public void handle(string ev)
+        public void Handle(string ev)
         {
             int ini = 0;
             int end = 0;
@@ -1079,40 +1078,40 @@ namespace BlackBerry.DebugEngine
                 // Example: 20,1,y,0x0804d843,main,C:/Users/xxxxx/vsplugin-ndk/samples/Square/Square/main.c,319,0       
                     ini = 3;
                     end = ev.IndexOf(';', 3);
-                    m_number = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                    _number = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                     if (ev[end + 1] == 'y')
-                        m_enable = true;
+                        _enabled = true;
                     else
-                        m_enable = false;
+                        _enabled = false;
 
                     ini = end + 3;
                     end = ev.IndexOf(';', ini);
-                    m_addr = ev.Substring(ini, (end - ini));
-                    if (m_addr == "<PENDING>")
+                    _address = ev.Substring(ini, (end - ini));
+                    if (_address == "<PENDING>")
                     {
-                        m_func = "??";
+                        _functionName = "??";
                         EventDispatcher._unknownCode = true;
-                        m_filename = "";
-                        m_line = 0;
-                        m_hits = 0;
+                        _fileName = "";
+                        _line = 0;
+                        _hits = 0;
                         return;
                     }
 
                     ini = end + 1;
                     end = ev.IndexOf(';', ini);
-                    m_func = ev.Substring(ini, end - ini);
+                    _functionName = ev.Substring(ini, end - ini);
 
                     ini = end + 1;
                     end = ev.IndexOf(';', ini);
-                    m_filename = ev.Substring(ini, end - ini);
+                    _fileName = ev.Substring(ini, end - ini);
 
                     ini = end + 1;
                     end = ev.IndexOf(';', ini);
-                    m_line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                    _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                     ini = end + 1;
-                    m_hits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));                   
+                    _hits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));                   
 
                     break;
                 case '1':  
@@ -1120,23 +1119,23 @@ namespace BlackBerry.DebugEngine
                 // Example: 21,1,y,0x0804d843,main,C:/Users/xxxxxx/vsplugin-ndk/samples/Square/Square/main.c,318,1
                     ini = 3;
                     end = ev.IndexOf(';', 3);
-                    m_number = Convert.ToInt32(ev.Substring(ini, (end - ini))); ;
+                    _number = Convert.ToInt32(ev.Substring(ini, (end - ini))); ;
 
                     if (ev[end + 1] == 'y')
-                        m_enable = true;
+                        _enabled = true;
                     else
-                        m_enable = false;
+                        _enabled = false;
 
                     ini = end + 3;
                     end = ev.IndexOf(';', ini);
-                    m_addr = ev.Substring(ini, (end - ini));
+                    _address = ev.Substring(ini, (end - ini));
 
                     ini = end + 1;
                     end = ev.IndexOf(';', ini);
-                    m_func = ev.Substring(ini, end - ini);
+                    _functionName = ev.Substring(ini, end - ini);
 
                     // Need to set the flag for unknown code if necessary.
-                    if (m_func == "??")
+                    if (_functionName == "??")
                     {
                         EventDispatcher._unknownCode = true;
                     }
@@ -1147,104 +1146,104 @@ namespace BlackBerry.DebugEngine
 
                     ini = end + 1;
                     end = ev.IndexOf(';', ini);
-                    m_filename = ev.Substring(ini, end - ini);
+                    _fileName = ev.Substring(ini, end - ini);
 
                     ini = end + 1;
                     end = ev.IndexOf(';', ini);
-                    m_line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                    _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                     ini = end + 1;
-                    m_hits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                    _hits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
 
                     // Update hit count on affected bound breakpoint.
-                    m_eventDispatcher.updateHitCount((uint)m_number, (uint)m_hits);
+                    _eventDispatcher.updateHitCount((uint)_number, (uint)_hits);
 
                     break;
                 case '2':  
                 // Breakpoint deleted asynchronously (a temporary breakpoint). Example: 22,2\r\n
-                    m_number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
+                    _number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
 
                     break;
                 case '3':  
                 // Breakpoint enabled. Example: 23 (enabled all) or 23,1 (enabled only breakpoint 1)
                     if (ev.Length > 2)
-                        m_number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
+                        _number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
                     else
-                        m_number = 0;  // 0 means ALL breakpoints.
+                        _number = 0;  // 0 means ALL breakpoints.
 
                     break;
                 case '4':  
                 // Breakpoint disabled. Example: 24 (disabled all) or 24,1 (disabled only breakpoint 1)
                     if (ev.Length > 2)
-                        m_number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
+                        _number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
                     else
-                        m_number = 0;  // 0 means ALL breakpoints.
+                        _number = 0;  // 0 means ALL breakpoints.
 
                     break;
                 case '5':  
                 // Breakpoint deleted. Example: 25 (deleted all) or 25,1 (deleted only breakpoint 1)
                     if (ev.Length > 2)
-                        m_number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
+                        _number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
                     else
-                        m_number = 0;  // 0 means ALL breakpoints.
+                        _number = 0;  // 0 means ALL breakpoints.
 
                     break;
                 case '6':  
                 // Break after "n" hits (or ignore n hits). Example: 26;1;100
                     ini = 3;
                     end = ev.IndexOf(';', 3);
-                    m_number = Convert.ToInt32(ev.Substring(3, (end - 3)));
+                    _number = Convert.ToInt32(ev.Substring(3, (end - 3)));
 
                     ini = end + 1;
-                    m_ignoreHits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                    _ignoreHits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
 
                     break;
                 case '7':  
                 // Breakpoint hit. 
                 // Example: 27,1,C:/Users/xxxxxx/vsplugin-ndk/samples/Square/Square/main.c,319;1\r\n
-                    bool updatingCondBreak = m_eventDispatcher.Engine.m_updatingConditionalBreakpoint.WaitOne(0);
+                    bool updatingCondBreak = _eventDispatcher.Engine.m_updatingConditionalBreakpoint.WaitOne(0);
                     if (updatingCondBreak)
                     {
 
-                        m_eventDispatcher.Engine.resetStackFrames();
+                        _eventDispatcher.Engine.resetStackFrames();
 
                         ini = 3;
                         end = ev.IndexOf(';', 3);
-                        m_number = Convert.ToInt32(ev.Substring(3, (end - 3)));
+                        _number = Convert.ToInt32(ev.Substring(3, (end - 3)));
 
                         ini = end + 1;
                         end = ev.IndexOf(';', ini);
-                        m_filename = ev.Substring(ini, end - ini);
+                        _fileName = ev.Substring(ini, end - ini);
 
                         ini = end + 1;
                         end = ev.IndexOf(';', ini);
-                        m_line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                        _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                         ini = end + 1;
-                        m_threadID = ev.Substring(ini, (ev.Length - ini));
+                        _threadID = ev.Substring(ini, (ev.Length - ini));
 
-                        m_eventDispatcher.Engine.cleanEvaluatedThreads();
+                        _eventDispatcher.Engine.cleanEvaluatedThreads();
 
                         // Call the method/event that will stop SDM because a breakpoint was hit here.
-                        if (m_eventDispatcher.Engine._updateThreads)
+                        if (_eventDispatcher.Engine._updateThreads)
                         {
-                            m_eventDispatcher.Engine.UpdateListOfThreads();
+                            _eventDispatcher.Engine.UpdateListOfThreads();
                         }
-                        m_eventDispatcher.Engine.SelectThread(m_threadID).setCurrentLocation(m_filename, (uint)m_line);
-                        m_eventDispatcher.Engine.SetAsCurrentThread(m_threadID);
+                        _eventDispatcher.Engine.SelectThread(_threadID).setCurrentLocation(_fileName, (uint)_line);
+                        _eventDispatcher.Engine.SetAsCurrentThread(_threadID);
 
                         // A breakpoint can be hit during a step
-                        if (m_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
+                        if (_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
                         {
-                            HandleProcessExecution.onStepCompleted(m_eventDispatcher, m_filename, (uint)m_line);
+                            HandleProcessExecution.OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
                         }
                         else
                         {
                             // Visual Studio shows the line position one more than it actually is
-                            m_eventDispatcher.Engine.m_docContext = m_eventDispatcher.getDocumentContext(m_filename, (uint)(m_line - 1));
-                            m_eventDispatcher.breakpointHit((uint)m_number, m_threadID);
+                            _eventDispatcher.Engine.m_docContext = _eventDispatcher.getDocumentContext(_fileName, (uint)(_line - 1));
+                            _eventDispatcher.breakpointHit((uint)_number, _threadID);
                         }
-                        m_eventDispatcher.Engine.m_updatingConditionalBreakpoint.Set();
+                        _eventDispatcher.Engine.m_updatingConditionalBreakpoint.Set();
                     }
                     break;
                 case '8':  
@@ -1253,15 +1252,15 @@ namespace BlackBerry.DebugEngine
                     end = ev.IndexOf(';', 3);
                     if (end != -1)
                     {
-                        m_number = Convert.ToInt32(ev.Substring(3, (end - 3)));
+                        _number = Convert.ToInt32(ev.Substring(3, (end - 3)));
 
                         ini = end + 1;
-                        m_condition = ev.Substring(ini, (ev.Length - ini));
+                        _condition = ev.Substring(ini, (ev.Length - ini));
                     }
                     else
                     {
-                        m_number = Convert.ToInt32(ev.Substring(3));
-                        m_condition = "";
+                        _number = Convert.ToInt32(ev.Substring(3));
+                        _condition = "";
                     }
                     break;
                 case '9':  // Error in testing breakpoint condition
@@ -1276,62 +1275,62 @@ namespace BlackBerry.DebugEngine
     /// <summary>
     /// This class manages events related to execution control (processes, threads, programs).
     /// </summary>
-    public class HandleProcessExecution
+    public sealed class HandleProcessExecution
     {
         /// <summary>
         /// Thread ID.
         /// </summary>
-        private int m_threadId = -1; // when threadId is 0, it means all threads.
+        private int _threadId = -1; // when threadId is 0, it means all threads.
 
         /// <summary>
         /// Process ID.
         /// </summary>
-        private int m_processId = -1;
+        private int _processId = -1;
 
         /// <summary>
         /// Name of the signal that caused an interruption.
         /// </summary>
-        private string m_signalName = "";
+        private string _signalName = "";
 
         /// <summary>
         /// Meaning of the signal that caused an interruption.
         /// </summary>
-        private string m_signalMeaning = "";
+        private string _signalMeaning = "";
 
         /// <summary>
         /// File name.
         /// </summary>
-        private string m_file = "";
+        private string _fileName = "";
 
         /// <summary>
         /// Line number.
         /// </summary>
-        private int m_line = -1;
+        private int _line = -1;
 
         /// <summary>
         /// Address.
         /// </summary>
-        private int m_address = -1;
+        private int _address = -1;
 
         /// <summary>
         /// Function name.
         /// </summary>
-        private string m_func = "";
+        private string _functionName = "";
 
         /// <summary>
         /// Error caused by a GDB command that failed.
         /// </summary>
-        private string m_error = "";
+        private string _error = "";
 
         /// <summary>
         /// This object manages debug events in the engine.
         /// </summary>
-        private EventDispatcher m_eventDispatcher = null;
+        private readonly EventDispatcher _eventDispatcher;
 
         /// <summary>
         /// Boolean variable that indicates if GDB has to resume execution after handling what caused it to enter in break mode.
         /// </summary>
-        public static bool m_needsResumeAfterInterrupt = false;
+        public static bool NeedsResumeAfterInterrupt;
 
         /// <summary>
         /// Used as a communication signal between the Event Dispatcher and the debug engine method responsible for stopping GDB 
@@ -1339,22 +1338,20 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public static ManualResetEvent m_mre = new ManualResetEvent(false);
         
-
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="ed"> This object manages debug events in the engine. </param>
         public HandleProcessExecution(EventDispatcher ed)
         {
-            m_eventDispatcher = ed;
+            _eventDispatcher = ed;
         }
-
 
         /// <summary>
         /// This method manages events related to execution control by classifying each of them by sub-type (e.g. thread created, program interrupted, etc.).
         /// </summary>
         /// <param name="ev"> String that contains the event description. </param>
-        public void handle(string ev)
+        public void Handle(string ev)
         {
             int ini = 0;
             int end = 0;
@@ -1369,30 +1366,30 @@ namespace BlackBerry.DebugEngine
                             EventDispatcher._GDBRunMode = true;
                             ini = 3;
                             end = ev.IndexOf(";", 3);
-                            m_threadId = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                            _threadId = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                             ini = end + 1;
                             try
                             {
-                                m_processId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                _processId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                             }
                             catch
                             {
-                                m_processId = 0;
+                                _processId = 0;
                             }
 
-                            m_eventDispatcher.Engine._updateThreads = true;
+                            _eventDispatcher.Engine._updateThreads = true;
 
                             break;
                         case '1':  
                         // Process running. Example: 41,1     (when threadId is 0 means "all threads": example: 41,0)
                             EventDispatcher._GDBRunMode = true;
-                            m_threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
+                            _threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
 
                             break;
                         case '2':  
                         // Program exited normally. Example: 42
-                            m_eventDispatcher.EndDebugSession(0);
+                            _eventDispatcher.EndDebugSession(0);
 
                             break;
                         case '3':  
@@ -1400,7 +1397,7 @@ namespace BlackBerry.DebugEngine
                             // TODO: not tested yet
                             end = ev.IndexOf(";", 3);
                             uint exitCode = Convert.ToUInt32(ev.Substring(3, (end - 3)));
-                            m_eventDispatcher.EndDebugSession(exitCode);
+                            _eventDispatcher.EndDebugSession(exitCode);
 
                             break;
                         case '4':  
@@ -1409,7 +1406,7 @@ namespace BlackBerry.DebugEngine
                             // 44,ADDR,FUNC,THREAD-ID         
                             // 44,ADDR,FUNC,FILENAME,LINE,THREAD-ID
 
-                            m_eventDispatcher.Engine.resetStackFrames();
+                            _eventDispatcher.Engine.resetStackFrames();
                             EventDispatcher._GDBRunMode = false;
                             numCommas = 0;
                             foreach (char c in ev)
@@ -1420,13 +1417,13 @@ namespace BlackBerry.DebugEngine
 
                             ini = 3;
                             end = ev.IndexOf(';', ini);
-                            m_address = Convert.ToInt32(ev.Substring(ini, (end - ini)), 16);
+                            _address = Convert.ToInt32(ev.Substring(ini, (end - ini)), 16);
 
                             ini = end + 1;
                             end = ev.IndexOf(';', ini);
-                            m_func = ev.Substring(ini, (end - ini));
+                            _functionName = ev.Substring(ini, (end - ini));
 
-                            if (m_func == "??")
+                            if (_functionName == "??")
                             {
                                 EventDispatcher._unknownCode = true;
                             }
@@ -1440,50 +1437,48 @@ namespace BlackBerry.DebugEngine
                                 case 3:
                                     // Thread ID
                                     ini = end + 1;
-                                    m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                                     EventDispatcher._unknownCode = true;
                                     break;
                                 case 4:
                                     // Filename and line number
                                     ini = end + 1;
                                     end = ev.IndexOf(';', ini);
-                                    m_file = ev.Substring(ini, (end - ini));
+                                    _fileName = ev.Substring(ini, (end - ini));
 
                                     ini = end + 1;
-                                    m_line = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    _line = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                                     break;
                                 case 5:
                                     //  Filename, line number and thread ID
                                     ini = end + 1;
                                     end = ev.IndexOf(';', ini);
-                                    m_file = ev.Substring(ini, (end - ini));
+                                    _fileName = ev.Substring(ini, (end - ini));
 
                                     ini = end + 1;
                                     end = ev.IndexOf(';', ini);
-                                    m_line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                                    _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                                     ini = end + 1;
-                                    m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    break;
-                                default:
+                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                                     break;
                             }
 
-                            this.m_eventDispatcher.Engine.cleanEvaluatedThreads();
+                            _eventDispatcher.Engine.cleanEvaluatedThreads();
 
 
-                            if (m_eventDispatcher.Engine._updateThreads)
+                            if (_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.Engine.UpdateListOfThreads();
+                                _eventDispatcher.Engine.UpdateListOfThreads();
                             }
-                            if (m_threadId > 0)
+                            if (_threadId > 0)
                             {
-                                m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
+                                _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
+                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
                             }
                             
                             // Call the method/event that will let SDM know that the debugged program was interrupted.
-                            onInterrupt(m_threadId);
+                            OnInterrupt(_threadId);
 
                             // Signal that interrupt is processed 
                             m_mre.Set();
@@ -1492,7 +1487,7 @@ namespace BlackBerry.DebugEngine
 
                         case '5':  
                         // End-stepping-range.
-                            m_eventDispatcher.Engine.resetStackFrames();
+                            _eventDispatcher.Engine.resetStackFrames();
                             EventDispatcher._GDBRunMode = false;
                             ini = 3;
                             end = ev.IndexOf(';', 3);
@@ -1510,103 +1505,103 @@ namespace BlackBerry.DebugEngine
                             if (end == -1)
                             {
                                 // Set sane default values for the missing file and line information 
-                                m_file = "";
-                                m_line = 1;
-                                m_threadId = Convert.ToInt32(temp);
+                                _fileName = "";
+                                _line = 1;
+                                _threadId = Convert.ToInt32(temp);
                                 EventDispatcher._unknownCode = true;
                             }
                             else
                             {
-                                m_file = temp;
-                                m_line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                                _fileName = temp;
+                                _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                                 ini = end + 1;
-                                m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                                 EventDispatcher._unknownCode = false;
                             }
 
-                            this.m_eventDispatcher.Engine.cleanEvaluatedThreads();
+                            _eventDispatcher.Engine.cleanEvaluatedThreads();
 
 
-                            if (m_eventDispatcher.Engine._updateThreads)
+                            if (_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.Engine.UpdateListOfThreads();
+                                _eventDispatcher.Engine.UpdateListOfThreads();
                             }
-                            if (m_threadId > 0)
+                            if (_threadId > 0)
                             {
-                                if ((EventDispatcher._unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
+                                if ((EventDispatcher._unknownCode == false) && (_fileName != ""))
+                                    _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
+                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
                             }
 
-                            HandleProcessExecution.onStepCompleted(m_eventDispatcher, m_file, (uint)m_line);
+                            OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
 
                             break;
                         case '6':  
                         // Function-finished.
-                            m_eventDispatcher.Engine.resetStackFrames();
+                            _eventDispatcher.Engine.resetStackFrames();
                             EventDispatcher._GDBRunMode = false;
                             ini = 3;
                             end = ev.IndexOf(';', 3);
                             if (end == -1)
                             {
                                 // Set sane default values for the missing file and line information 
-                                m_file = "";
-                                m_line = 1;
-                                m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                _fileName = "";
+                                _line = 1;
+                                _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                                 EventDispatcher._unknownCode = true;
                             }
                             else
                             {
-                                m_file = ev.Substring(ini, (end - ini));
+                                _fileName = ev.Substring(ini, (end - ini));
                                 ini = end + 1;
                                 end = ev.IndexOf(';', ini);
-                                m_line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                                _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                                 ini = end + 1;
-                                m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                                 EventDispatcher._unknownCode = false;
                             }
 
-                            m_eventDispatcher.Engine.cleanEvaluatedThreads();
+                            _eventDispatcher.Engine.cleanEvaluatedThreads();
 
-                            if (m_eventDispatcher.Engine._updateThreads)
+                            if (_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.Engine.UpdateListOfThreads();
+                                _eventDispatcher.Engine.UpdateListOfThreads();
                             }
-                            if (m_threadId > 0)
+                            if (_threadId > 0)
                             {
-                                if ((EventDispatcher._unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
+                                if ((EventDispatcher._unknownCode == false) && (_fileName != ""))
+                                    _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
+                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
                             }
 
-                            HandleProcessExecution.onStepCompleted(m_eventDispatcher, m_file, (uint)m_line);
+                            OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
 
                             break;
                         case '7':  
                         // -exec-interrupt or signal-meaning="Killed". There's nothing to do in this case.
-                            m_eventDispatcher.Engine.resetStackFrames();
+                            _eventDispatcher.Engine.resetStackFrames();
                             EventDispatcher._GDBRunMode = false;
 
-                            m_eventDispatcher.Engine.cleanEvaluatedThreads();
+                            _eventDispatcher.Engine.cleanEvaluatedThreads();
 
-                            m_threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
+                            _threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
 
-                            if (m_eventDispatcher.Engine._updateThreads)
+                            if (_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.Engine.UpdateListOfThreads();
+                                _eventDispatcher.Engine.UpdateListOfThreads();
                             }
-                            if (m_threadId > 0)
+                            if (_threadId > 0)
                             {
-                                if ((EventDispatcher._unknownCode == false) && (m_file != ""))
-                                    m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
+                                if ((EventDispatcher._unknownCode == false) && (_fileName != ""))
+                                    _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
+                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
                             }
 
-                            if (m_eventDispatcher.Engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
+                            if (_eventDispatcher.Engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
                             {
-                                onInterrupt(m_threadId);
+                                OnInterrupt(_threadId);
                             }
                             // Signal that interrupt is processed 
                             m_mre.Set();
@@ -1614,30 +1609,28 @@ namespace BlackBerry.DebugEngine
                             break;
                         case '8':  
                         // SIGKILL
-                            m_eventDispatcher.EndDebugSession(0);
+                            _eventDispatcher.EndDebugSession(0);
                             break;
                         case '9':  
                         // ERROR, ex: 49,Cannot find bounds of current function
-                            m_eventDispatcher.Engine.resetStackFrames();
-                            m_eventDispatcher.Engine.cleanEvaluatedThreads();
+                            _eventDispatcher.Engine.resetStackFrames();
+                            _eventDispatcher.Engine.cleanEvaluatedThreads();
 
-                            if (m_eventDispatcher.Engine._updateThreads)
+                            if (_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.Engine.UpdateListOfThreads();
+                                _eventDispatcher.Engine.UpdateListOfThreads();
                             }
 
                             if (ev.Length >= 3)
                             {
-                                m_error = ev.Substring(3, (ev.Length - 3));
-                                if (m_error == "Cannot find bounds of current function")
+                                _error = ev.Substring(3, (ev.Length - 3));
+                                if (_error == "Cannot find bounds of current function")
                                 {
                                     // We don't have symbols for this function so further stepping won't be possible. Return from this function.
                                     EventDispatcher._unknownCode = true;
-                                    m_eventDispatcher.Engine.Step(m_eventDispatcher.Engine.CurrentThread(), enum_STEPKIND.STEP_OUT, enum_STEPUNIT.STEP_LINE);
+                                    _eventDispatcher.Engine.Step(_eventDispatcher.Engine.CurrentThread(), enum_STEPKIND.STEP_OUT, enum_STEPUNIT.STEP_LINE);
                                 }
                             }
-                            break;
-                        default:   // Not used.
                             break;
                     }
                     break;
@@ -1646,31 +1639,31 @@ namespace BlackBerry.DebugEngine
                     {
                         case '0':  
                         // Quit (expect signal SIGINT when the program is resumed)
-                            m_eventDispatcher.countSIGINT += 1;
-                            if (m_eventDispatcher.countSIGINT > 5)
+                            _eventDispatcher.countSIGINT += 1;
+                            if (_eventDispatcher.countSIGINT > 5)
                             {
-                                m_eventDispatcher.EndDebugSession(0);
+                                _eventDispatcher.EndDebugSession(0);
                                 MessageBox.Show("Lost communication with GDB. Please refer to documentation for more details.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                             break;
                         case '1':  
                         // Thread exited. Example: 51,2
                             ini = 3;
-                            m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                            _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
 
-                            m_eventDispatcher.Engine._updateThreads = true;
+                            _eventDispatcher.Engine._updateThreads = true;
 
                             break;
                         case '2':  
                         // GDB Bugs, like "... 2374: internal-error: frame_cleanup_after_sniffer ...". Example: 52
-                            m_eventDispatcher.EndDebugSession(0);
+                            _eventDispatcher.EndDebugSession(0);
                             MessageBox.Show("This is a known issue that can happen when interrupting GDB's execution by hitting the \"break all\" or toggling a breakpoint in run mode. \n\n GDB CRASHED. Details: \"../../gdb/frame.c:2374: internal-error: frame_cleanup_after_sniffer: Assertion `frame->prologue_cache == NULL' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             break;
                         case '3':  
                         // Lost communication with device/simulator: ^error,msg="Remote communication error: No error."
                             MessageBox.Show("Lost communication with the device/simulator.", "Communication lost", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            m_eventDispatcher.EndDebugSession(0);
+                            _eventDispatcher.EndDebugSession(0);
 
                             break;
                         case '4':  
@@ -1679,7 +1672,7 @@ namespace BlackBerry.DebugEngine
                             // 54,ADDR,FUNC,THREAD-ID         
                             // 54,ADDR,FUNC,FILENAME,LINE,THREAD-ID
 
-                            m_eventDispatcher.Engine.resetStackFrames();
+                            _eventDispatcher.Engine.resetStackFrames();
                             EventDispatcher._GDBRunMode = false;
                             numCommas = 0;
                             foreach (char c in ev)
@@ -1690,13 +1683,13 @@ namespace BlackBerry.DebugEngine
 
                             ini = 3;
                             end = ev.IndexOf(';', ini);
-                            m_address = Convert.ToInt32(ev.Substring(ini, (end - ini)), 16);
+                            _address = Convert.ToInt32(ev.Substring(ini, (end - ini)), 16);
 
                             ini = end + 1;
                             end = ev.IndexOf(';', ini);
-                            m_func = ev.Substring(ini, (end - ini));
+                            _functionName = ev.Substring(ini, (end - ini));
 
-                            if (m_func == "??")
+                            if (_functionName == "??")
                             {
                                 EventDispatcher._unknownCode = true;
                             }
@@ -1710,41 +1703,39 @@ namespace BlackBerry.DebugEngine
                                 case 3:
                                     // Thread ID
                                     ini = end + 1;
-                                    m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                                     EventDispatcher._unknownCode = true;
                                     break;
                                 case 5:
                                     //  Filename, line number and thread ID
                                     ini = end + 1;
                                     end = ev.IndexOf(';', ini);
-                                    m_file = ev.Substring(ini, (end - ini));
+                                    _fileName = ev.Substring(ini, (end - ini));
 
                                     ini = end + 1;
                                     end = ev.IndexOf(';', ini);
-                                    m_line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
+                                    _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
                                     ini = end + 1;
-                                    m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    break;
-                                default:
+                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                                     break;
                             }
 
                             MessageBox.Show("Segmentation Fault: If you continue debugging could take the environment to an unstable state.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-                            m_eventDispatcher.Engine.cleanEvaluatedThreads();
+                            _eventDispatcher.Engine.cleanEvaluatedThreads();
 
-                            if (m_eventDispatcher.Engine._updateThreads)
+                            if (_eventDispatcher.Engine._updateThreads)
                             {
-                                m_eventDispatcher.Engine.UpdateListOfThreads();
+                                _eventDispatcher.Engine.UpdateListOfThreads();
                             }
-                            if (m_threadId > 0)
+                            if (_threadId > 0)
                             {
-                                m_eventDispatcher.Engine.SelectThread(m_threadId.ToString()).setCurrentLocation(m_file, (uint)m_line);
-                                m_eventDispatcher.Engine.SetAsCurrentThread(m_threadId.ToString());
+                                _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
+                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
                             }
 
-                            onInterrupt(m_threadId);
+                            OnInterrupt(_threadId);
 
                             break;
 
@@ -1753,37 +1744,37 @@ namespace BlackBerry.DebugEngine
                         // or Aborted. Ex: 55;SIGABRT;Aborted
                             ini = 3;
                             end = ev.IndexOf(';', ini);
-                            m_signalName = ev.Substring(ini, (end - ini));
+                            _signalName = ev.Substring(ini, (end - ini));
 
                             ini = end + 1;
                             end = ev.IndexOf(';', ini);
-                            m_signalMeaning = ev.Substring(ini, (end - ini));
+                            _signalMeaning = ev.Substring(ini, (end - ini));
 
                             ini = end + 1;
                             try
                             {
-                                m_threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
                             }
                             catch
                             {
                             }
 
-                            if (m_signalMeaning == "Segmentation fault")
+                            if (_signalMeaning == "Segmentation fault")
                             {
                                 MessageBox.Show("Segmentation Fault: Closing debugger.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                m_eventDispatcher.EndDebugSession(0);
+                                _eventDispatcher.EndDebugSession(0);
                             }
 
-                            if (m_signalMeaning == "Aborted")
+                            if (_signalMeaning == "Aborted")
                             {
                                 MessageBox.Show("Program aborted: Closing debugger.", "Program Aborted", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                m_eventDispatcher.EndDebugSession(0);
+                                _eventDispatcher.EndDebugSession(0);
                             }
 
                             break;
                         case '6':  
                         // GDB Bugs, like "... 3550: internal-error: handle_inferior_event ...". Example: 56
-                            m_eventDispatcher.EndDebugSession(0);
+                            _eventDispatcher.EndDebugSession(0);
                             MessageBox.Show("This is a known issue that can happen while debugging multithreaded programs. \n\n GDB CRASHED. Details: \"../../gdb/infrun.c:3550: internal-error: handle_inferior_event: Assertion ptid_equal (singlestep_ptid, ecs->ptid)' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             break;
@@ -1793,11 +1784,7 @@ namespace BlackBerry.DebugEngine
                             break;
                         case '9':  // Not used
                             break;
-                        default:   // Not used.
-                            break;
                     }
-                    break;
-                default:   // Not used.
                     break;
             }
         }
@@ -1809,7 +1796,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="eventDispatcher"> This object manages debug events in the engine. </param>
         /// <param name="file"> File name. </param>
         /// <param name="line"> Line number. </param>
-        public static void onStepCompleted(EventDispatcher eventDispatcher, string file, uint line)
+        public static void OnStepCompleted(EventDispatcher eventDispatcher, string file, uint line)
         {
             if (eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
             {
@@ -1826,25 +1813,24 @@ namespace BlackBerry.DebugEngine
         /// Update VS when the debugging process is interrupted in GDB.
         /// </summary>
         /// <param name="threadID"> Thread ID. </param>
-        private void onInterrupt(int threadID)
+        private void OnInterrupt(int threadID)
         {
-            Debug.Assert(m_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.RUN_MODE);
-            m_eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
+            Debug.Assert(_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.RUN_MODE);
+            _eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
 
-            if (m_file != "" && m_line > 0)
+            if (_fileName != "" && _line > 0)
             {
                 // Visual Studio shows the line position one more than it actually is
-                m_eventDispatcher.Engine.m_docContext = m_eventDispatcher.getDocumentContext(m_file, (uint)(m_line - 1));
+                _eventDispatcher.Engine.m_docContext = _eventDispatcher.getDocumentContext(_fileName, (uint)(_line - 1));
             }
 
             // Only send OnAsyncBreakComplete if break-all was requested by the user
-            if (!m_needsResumeAfterInterrupt)
+            if (!NeedsResumeAfterInterrupt)
             {
-                m_eventDispatcher.Engine.Callback.OnAsyncBreakComplete(m_eventDispatcher.Engine.SelectThread(threadID.ToString()));
+                _eventDispatcher.Engine.Callback.OnAsyncBreakComplete(_eventDispatcher.Engine.SelectThread(threadID.ToString()));
             }
         }
     }
-
 
     /// <summary>
     /// This class manages events related to output messages.
@@ -1854,18 +1840,17 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// GDB textual output from the running target to be presented in the VS standard output window.
         /// </summary>
-        private string m_stdOut = "";
+        private string _stdOut = "";
 
         /// <summary>
         /// Other GDB messages to be presented in the VS standard output window.
         /// </summary>
-        private string m_console = "";
+        private string _console = "";
 
         /// <summary>
         /// This object manages debug events in the engine.
         /// </summary>
-        private EventDispatcher m_eventDispatcher = null;
-
+        private EventDispatcher _eventDispatcher;
 
         /// <summary>
         /// Constructor.
@@ -1873,15 +1858,14 @@ namespace BlackBerry.DebugEngine
         /// <param name="ed"> This object manages debug events in the engine. </param>
         public HandleOutputs(EventDispatcher ed)
         {
-            m_eventDispatcher = ed;
+            _eventDispatcher = ed;
         }
-
 
         /// <summary>
         /// This method manages events related to output messages by classifying each of them by sub-type.
         /// </summary>
         /// <param name="ev"> String that contains the event description. </param>
-        public void handle(string ev)
+        public void Handle(string ev)
         {
             int ini = 0;
             int end = 0;
@@ -1892,7 +1876,7 @@ namespace BlackBerry.DebugEngine
                     end = ev.IndexOf("\"!80", 4);
                     if (end == -1)
                         end = ev.Length;
-                    m_console = ev.Substring(ini, (end - ini));
+                    _console = ev.Substring(ini, (end - ini));
 
                 // TODO: Call the method/event that will output this message in the VS output window.
 
@@ -1902,12 +1886,10 @@ namespace BlackBerry.DebugEngine
                     end = ev.IndexOf("\"!81", 4);
                     if (end == -1)
                         end = ev.Length;
-                    m_stdOut = ev.Substring(ini, (end - ini));
+                    _stdOut = ev.Substring(ini, (end - ini));
 
                 // TODO: Call the method/event that will output this message in the VS standar output window.
 
-                    break;
-                default:   // not used.
                     break;
             }
         }

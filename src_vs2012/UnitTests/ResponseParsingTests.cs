@@ -1,4 +1,5 @@
 ﻿using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Debugger.Model;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -27,6 +28,28 @@ namespace UnitTests
             Assert.IsTrue(result);
             Assert.IsNotNull(request.Processes);
             Assert.AreEqual(3, request.Processes.Length);
+        }
+
+        [Test]
+        public void ParseProcessNames()
+        {
+            var process = new ProcessInfo(0, "just name");
+            Assert.AreEqual("just name", process.Name);
+
+            process = new ProcessInfo(0, "just name/");
+            Assert.AreEqual("just name", process.Name);
+
+            process = new ProcessInfo(0, "just.name.exe");
+            Assert.AreEqual("just.name.exe", process.Name);
+
+            process = new ProcessInfo(0, "/path/to/executable");
+            Assert.AreEqual("executable", process.Name);
+
+            process = new ProcessInfo(0, "/path/to/executable/");
+            Assert.AreEqual("executable", process.Name);
+
+            process = new ProcessInfo(0, "path\\to\\executable");
+            Assert.AreEqual("executable", process.Name);
         }
     }
 }

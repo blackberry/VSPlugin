@@ -13,6 +13,7 @@
 //* limitations under the License.
 
 using System;
+using BlackBerry.NativeCore.Diagnostics;
 using Microsoft.VisualStudio;
 using System.Diagnostics;
 
@@ -38,12 +39,14 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="e"> Exception. </param>
+        /// <param name="ex"> Exception. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public static int UnexpectedException(Exception e)
+        public static int UnexpectedException(Exception ex)
         {
-            Debug.Fail("Unexpected exception:" + e);
-            return VSConstants.E_NOTIMPL;
+            TraceLog.WriteException(ex);
+
+            Debug.Fail("Unexpected exception: " + ex);
+            return VSConstants.E_FAIL;
         }
     }
 }

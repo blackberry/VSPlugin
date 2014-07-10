@@ -28,48 +28,40 @@ namespace BlackBerry.DebugEngine
     /// </summary>
     [ComVisible(true)]
     [Guid(ClassGuid)]
-    public class AD7ProgramProvider : IDebugProgramProvider2
+    public sealed class AD7ProgramProvider : IDebugProgramProvider2
     {
         public const string ClassGuid = "AD06FD46-C790-4D5C-A274-8815DF9511B8";
         public const string ClassName = "BlackBerry.DebugEngine.AD7ProgramProvider";
 
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AD7ProgramProvider()
-        {
-        }
-
         #region IDebugProgramProvider2 Members
-
 
         /// <summary>
         /// Obtains information about programs running, filtered in a variety of ways. 
         /// (http://msdn.microsoft.com/en-us/library/bb147025.aspx)
         /// </summary>
-        /// <param name="Flags">  A combination of flags from the PROVIDER_FLAGS enumeration. </param>
+        /// <param name="flags">  A combination of flags from the PROVIDER_FLAGS enumeration. </param>
         /// <param name="port"> The port the calling process is running on. </param>
-        /// <param name="ProcessId"> An AD_PROCESS_ID structure holding the ID of the process that contains the program in question. </param>
-        /// <param name="EngineFilter"> An array of GUIDs for debug engines assigned to debug this process (these will be used to filter 
+        /// <param name="processId"> An AD_PROCESS_ID structure holding the ID of the process that contains the program in question. </param>
+        /// <param name="engineFilter"> An array of GUIDs for debug engines assigned to debug this process (these will be used to filter 
         /// the programs that are actually returned based on what the supplied engines support; if no engines are specified, then all 
         /// programs will be returned). </param>
         /// <param name="processArray"> A PROVIDER_PROCESS_DATA structure that is filled in with the requested information. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns VSConstants.S_FALSE. </returns>
-        int IDebugProgramProvider2.GetProviderProcessData(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, PROVIDER_PROCESS_DATA[] processArray)
+        int IDebugProgramProvider2.GetProviderProcessData(enum_PROVIDER_FLAGS flags, IDebugDefaultPort2 port, AD_PROCESS_ID processId, CONST_GUID_ARRAY engineFilter, PROVIDER_PROCESS_DATA[] processArray)
         {
             processArray[0] = new PROVIDER_PROCESS_DATA();
 
-            if (((uint)Flags & (uint)enum_PROVIDER_FLAGS.PFLAG_GET_PROGRAM_NODES) != 0)
+            if (((uint)flags & (uint)enum_PROVIDER_FLAGS.PFLAG_GET_PROGRAM_NODES) != 0)
             {
                 // The debugger is asking the engine to return the program nodes it can debug. The VSNDK debug engine claims that it can 
                 // debug all processes, and returns exactly one program node for each process. A full-featured debugger may wish to 
                 // examine the target process and determine if it understands how to debug it.
 
-                IDebugProgramNode2 node = (IDebugProgramNode2)(new AD7ProgramNode(ProcessId.guidProcessId));             
+                IDebugProgramNode2 node = new AD7ProgramNode(processId.guidProcessId);
 
                 IntPtr[] programNodes = { Marshal.GetComInterfaceForObject(node, typeof(IDebugProgramNode2)) };
 
-                IntPtr destinationArray = Marshal.AllocCoTaskMem(IntPtr.Size * programNodes.Length);                
+                IntPtr destinationArray = Marshal.AllocCoTaskMem(IntPtr.Size * programNodes.Length);
                 Marshal.Copy(programNodes, 0, destinationArray, programNodes.Length);
 
                 processArray[0].Fields = enum_PROVIDER_FIELDS.PFIELD_PROGRAM_NODES;
@@ -101,7 +93,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// Establishes a locale for any language-specific resources needed by the DE. Not implemented.
         /// (http://msdn.microsoft.com/en-us/library/bb161383.aspx)
@@ -112,7 +103,6 @@ namespace BlackBerry.DebugEngine
         {           
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Establishes a callback to watch for provider events associated with specific kinds of processes, allowing the process to 

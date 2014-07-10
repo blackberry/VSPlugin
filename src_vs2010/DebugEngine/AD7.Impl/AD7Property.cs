@@ -24,20 +24,17 @@ namespace BlackBerry.DebugEngine
     /// This interface represents a stack frame property, a program document property, or some other property. 
     /// The property is usually the result of an expression evaluation. 
     /// </summary>
-    class AD7Property : IDebugProperty2
+    sealed class AD7Property : IDebugProperty2
     {
-        
         /// <summary>
         /// Object that contains all information about a variable / expression.
         /// </summary>
         private readonly VariableInfo _variableInfo;
 
-
         /// <summary>
         /// Object that contains all information about a stack frame.
         /// </summary>
         private readonly AD7StackFrame _stackFrame;
-
 
         /// <summary>
         /// Constructor.
@@ -114,7 +111,6 @@ namespace BlackBerry.DebugEngine
             return propertyInfo;
         }
 
-
         #region IDebugProperty2 Members
         
         /// <summary>
@@ -152,9 +148,8 @@ namespace BlackBerry.DebugEngine
                         // Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
                         // name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
                         // same index position. This bool variable just indicate if this prefix is used or not.
-                        bool hasVsNDK = false;
-
-                        string numChildren = AD7StackFrame.m_dispatcher.createVar(_variableInfo._name, ref hasVsNDK);
+                        bool hasVsNDK;
+                        string numChildren = AD7StackFrame._dispatcher.CreateVar(_variableInfo._name, out hasVsNDK);
 
                         ArrayList GDBNames = new ArrayList();
                         ArrayList VSNames = new ArrayList();
@@ -172,30 +167,30 @@ namespace BlackBerry.DebugEngine
                             {
                                 if (_variableInfo._type.Contains("struct"))
                                     if (_variableInfo._type[_variableInfo._type.Length - 1] == '*')
-                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNDK, null);
+                                        _variableInfo.ListChildren(AD7StackFrame._dispatcher, "*", GDBNames, VSNames, hasVsNDK, null);
                                     else if (_variableInfo._type.Contains("["))
-                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct[]", GDBNames, VSNames, hasVsNDK, null);
+                                        _variableInfo.ListChildren(AD7StackFrame._dispatcher, "struct[]", GDBNames, VSNames, hasVsNDK, null);
                                     else
-                                        _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "struct", GDBNames, VSNames, hasVsNDK, null);
+                                        _variableInfo.ListChildren(AD7StackFrame._dispatcher, "struct", GDBNames, VSNames, hasVsNDK, null);
                                 else if (_variableInfo._type.Contains("["))
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "[]", GDBNames, VSNames, hasVsNDK, null);
+                                    _variableInfo.ListChildren(AD7StackFrame._dispatcher, "[]", GDBNames, VSNames, hasVsNDK, null);
                                 else if (_variableInfo._type.Contains("*"))
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "*", GDBNames, VSNames, hasVsNDK, null);
+                                    _variableInfo.ListChildren(AD7StackFrame._dispatcher, "*", GDBNames, VSNames, hasVsNDK, null);
                                 else
-                                    _variableInfo.listChildren(AD7StackFrame.m_dispatcher, "", GDBNames, VSNames, hasVsNDK, null);
+                                    _variableInfo.ListChildren(AD7StackFrame._dispatcher, "", GDBNames, VSNames, hasVsNDK, null);
 
                             }
                         }
                         catch (FormatException)
                         {
                         }
-                        AD7StackFrame.m_dispatcher.deleteVar(_variableInfo._name, hasVsNDK);
+                        AD7StackFrame._dispatcher.deleteVar(_variableInfo._name, hasVsNDK);
                     }
                     DEBUG_PROPERTY_INFO[] properties = new DEBUG_PROPERTY_INFO[_variableInfo._children.Count];
                     int i = 0;
                     foreach (VariableInfo child in _variableInfo._children)
                     {
-                        VariableInfo.evaluateExpression(child._name, ref child._value, child._GDBName);
+                        VariableInfo.EvaluateExpression(child._name, out child._value, child._GDBName);
                         properties[i] = new AD7Property(child).ConstructDebugPropertyInfo(dwFields);
                         i++;
                     }
@@ -213,7 +208,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_FALSE;
         }
 
-
         /// <summary>
         /// Returns the property that describes the most-derived property of a property. 
         /// (http://msdn.microsoft.com/en-ca/library/bb161781.aspx)
@@ -225,9 +219,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetDerivedMostProperty(out IDebugProperty2 ppDerivedMost)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppDerivedMost = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Returns the extended information of a property. (http://msdn.microsoft.com/en-ca/library/bb145070.aspx)
@@ -243,9 +237,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetExtendedInfo(ref Guid guidExtendedInfo, out object pExtendedInfo)
         {
-            throw new Exception("The method or operation is not implemented.");
+            pExtendedInfo = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Returns the memory bytes that compose the value of a property. (http://msdn.microsoft.com/en-ca/library/bb161360.aspx)
@@ -256,9 +250,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetMemoryBytes(out IDebugMemoryBytes2 ppMemoryBytes)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppMemoryBytes = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Returns the memory context for a property value. (http://msdn.microsoft.com/en-ca/library/bb147028.aspx)
@@ -268,9 +262,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetMemoryContext(out IDebugMemoryContext2 ppMemory)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppMemory = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Returns the parent of a property. (http://msdn.microsoft.com/en-ca/library/bb146184.aspx)
@@ -282,7 +276,6 @@ namespace BlackBerry.DebugEngine
         {
             throw new Exception("The method or operation is not implemented.");
         }
-
 
         /// <summary>
         /// Fills in a DEBUG_PROPERTY_INFO structure that describes a property. (http://msdn.microsoft.com/en-ca/library/bb145852.aspx)
@@ -299,12 +292,10 @@ namespace BlackBerry.DebugEngine
         public int GetPropertyInfo(enum_DEBUGPROP_INFO_FLAGS dwFields, uint dwRadix, uint dwTimeout, IDebugReference2[] rgpArgs, uint dwArgCount, DEBUG_PROPERTY_INFO[] pPropertyInfo)
         {
             pPropertyInfo[0] = new DEBUG_PROPERTY_INFO();
-            rgpArgs = null;
             pPropertyInfo[0] = ConstructDebugPropertyInfo(dwFields);
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Returns a reference to the property's value. IDebugProperty2 represents a property, while IDebugReference2 represents a 
@@ -315,9 +306,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetReference(out IDebugReference2 ppReference)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppReference = null;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Returns the size, in bytes, of the property value. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb145093.aspx)
@@ -326,9 +317,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetSize(out uint pdwSize)
         {
-            throw new Exception("The method or operation is not implemented.");
+            pdwSize = 0;
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Sets the value of the property from the value of a given reference. (http://msdn.microsoft.com/en-ca/library/bb145613.aspx)
@@ -346,9 +337,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int SetValueAsReference(IDebugReference2[] rgpArgs, uint dwArgCount, IDebugReference2 pValue, uint dwTimeout)
         {
-            throw new Exception("The method or operation is not implemented.");
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Sets the value of a property from a given string. (http://msdn.microsoft.com/en-ca/library/bb160956.aspx)
@@ -362,13 +352,10 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout)
         {
-            string result = "";
-            VariableInfo.evaluateExpression(_variableInfo._name + "=" + pszValue, ref result, null);
-
-            return VSConstants.S_OK;
+            string result;
+            return VariableInfo.EvaluateExpression(_variableInfo._name + "=" + pszValue, out result, null) ? VSConstants.S_OK : VSConstants.E_FAIL;
         }
 
         #endregion
-
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using BlackBerry.NativeCore.Helpers;
 using Microsoft.Win32;
@@ -67,6 +68,25 @@ namespace BlackBerry.NativeCore.Model
         public string ShortName
         {
             get { return string.IsNullOrEmpty(Name) ? IP : Name; }
+        }
+
+        /// <summary>
+        /// Gets the name of the processor architecture on that device.
+        /// </summary>
+        public string Architecture
+        {
+            get
+            {
+                switch (Type)
+                {
+                    case DeviceDefinitionType.Device:
+                        return "ARMv7";
+                    case DeviceDefinitionType.Simulator:
+                        return "x86";
+                    default:
+                        throw new InvalidEnumArgumentException("Unsupported enum value (" + Type + ")");
+                }
+            }
         }
 
         #endregion

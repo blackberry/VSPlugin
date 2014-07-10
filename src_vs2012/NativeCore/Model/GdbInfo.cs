@@ -50,22 +50,6 @@ namespace BlackBerry.NativeCore.Model
             private set;
         }
 
-        public string Architecture
-        {
-            get
-            {
-                switch (Device.Type)
-                {
-                    case DeviceDefinitionType.Device:
-                        return "ARM";
-                    case DeviceDefinitionType.Simulator:
-                        return "x86";
-                    default:
-                        throw new InvalidEnumArgumentException("Unsupported enum value (" + Device.Type + ")");
-                }
-            }
-        }
-
         public RuntimeDefinition Runtime
         {
             get;

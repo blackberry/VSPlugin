@@ -13,6 +13,7 @@
 //* limitations under the License.
 
 using System;
+using System.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -29,86 +30,76 @@ namespace BlackBerry.DebugEngine
     /// IDebugModule3: This interface represents a module that supports alternate locations of symbols and JustMyCode states.
     /// (http://msdn.microsoft.com/en-ca/library/bb145893.aspx)
     /// </summary>
-    public class AD7Module : IDebugModule2, IDebugModule3
+    public sealed class AD7Module : IDebugModule2, IDebugModule3
     {
-        
-        /// <summary>
-        /// Constructor. Not implemented, yet. 
-        /// </summary>
-        public AD7Module()
-        { 
-        }
-
-
         /// <summary>
         /// Gets information about this module. (http://msdn.microsoft.com/en-ca/library/bb161975.aspx)
         /// </summary>
-        /// <param name="dwFields"> A combination of flags from the MODULE_INFO_FIELDS enumeration that specify which fields of pInfo 
+        /// <param name="fields"> A combination of flags from the MODULE_INFO_FIELDS enumeration that specify which fields of pInfo 
         /// are to be filled out. </param>
         /// <param name="infoArray"> A MODULE_INFO structure that is filled in with a description of the module. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        int IDebugModule2.GetInfo(enum_MODULE_INFO_FIELDS dwFields, MODULE_INFO[] infoArray)
+        int IDebugModule2.GetInfo(enum_MODULE_INFO_FIELDS fields, MODULE_INFO[] infoArray)
         {
             try
             {
                 MODULE_INFO info = new MODULE_INFO();
 
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_NAME))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_NAME))
                 {
                     info.m_bstrName = "";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_NAME;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_URL))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_URL))
                 {
                     info.m_bstrUrl = "";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_URL;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_LOADADDRESS))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_LOADADDRESS))
                 {
                     info.m_addrLoadAddress = 0;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_LOADADDRESS;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_PREFFEREDADDRESS))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_PREFFEREDADDRESS))
                 {
                     // A debugger that actually supports showing the preferred base should crack the PE header and get 
                     // that field. This debugger does not do that, so assume the module loaded where it was suppose to.                   
                     info.m_addrPreferredLoadAddress = 0;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_PREFFEREDADDRESS;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_SIZE))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_SIZE))
                 {
                     info.m_dwSize = 0;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_SIZE;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_LOADORDER))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_LOADORDER))
                 {
                     info.m_dwLoadOrder = 0;
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_LOADORDER;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_URLSYMBOLLOCATION))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_URLSYMBOLLOCATION))
                 {
                     info.m_bstrUrlSymbolLocation = "";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_URLSYMBOLLOCATION;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_FLAGS))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_FLAGS))
                 {
                     info.m_dwModuleFlags = 0;
                     info.m_dwModuleFlags |= (enum_MODULE_FLAGS.MODULE_FLAG_SYMBOLS);
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_FLAGS;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_VERSION))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_VERSION))
                 {
                     info.m_bstrVersion = "";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_VERSION;
                 }
-                if (dwFields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_DEBUGMESSAGE))
+                if (fields.HasFlag(enum_MODULE_INFO_FIELDS.MIF_DEBUGMESSAGE))
                 {
                     info.m_bstrDebugMessage = "";
                     info.dwValidFields |= enum_MODULE_INFO_FIELDS.MIF_DEBUGMESSAGE;
                 }
 
                 infoArray[0] = info;
-
                 return VSConstants.S_OK;
             }
             catch (Exception e)
@@ -120,7 +111,6 @@ namespace BlackBerry.DebugEngine
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
         
-
         /// <summary>
         /// OBSOLETE. DO NOT USE. Reloads the symbols for this module. (http://msdn.microsoft.com/en-ca/library/bb145113.aspx)
         /// </summary>
@@ -131,10 +121,9 @@ namespace BlackBerry.DebugEngine
         int IDebugModule2.ReloadSymbols_Deprecated(string urlToSymbols, out string debugMessage)
         {
             debugMessage = null;
-            System.Diagnostics.Debug.Fail("This function is not called by the debugger.");
+            Debug.Fail("This function is not called by the debugger.");
             return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// This method is not presented in IDebugModule3 webpage but the debug engine fails to build without it. It should have the same
@@ -145,25 +134,25 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugModule3.ReloadSymbols_Deprecated(string pszUrlToSymbols, out string pbstrDebugMessage)
         {
-            throw new NotImplementedException();
+            pbstrDebugMessage = null;
+            return VSConstants.E_NOTIMPL;
         }
-        #endregion
 
+        #endregion
 
         /// <summary>
         /// This method is not presented in IDebugModule3 webpage but the debug engine fails to build without it. 
         /// (http://msdn.microsoft.com/en-ca/library/bb145893.aspx). It should have the same behavior as the above 
         /// IDebugModule2.GetInfo, i.e., gets information about this module. (http://msdn.microsoft.com/en-ca/library/bb161975.aspx)
         /// </summary>
-        /// <param name="dwFields"> A combination of flags from the MODULE_INFO_FIELDS enumeration that specify which fields of pInfo 
+        /// <param name="fields"> A combination of flags from the MODULE_INFO_FIELDS enumeration that specify which fields of pInfo 
         /// are to be filled out. </param>
         /// <param name="pinfo"> A MODULE_INFO structure that is filled in with a description of the module. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        int IDebugModule3.GetInfo(enum_MODULE_INFO_FIELDS dwFields, MODULE_INFO[] pinfo)
+        int IDebugModule3.GetInfo(enum_MODULE_INFO_FIELDS fields, MODULE_INFO[] pinfo)
         {
-            return ((IDebugModule2)this).GetInfo(dwFields, pinfo);
+            return ((IDebugModule2)this).GetInfo(fields, pinfo);
         }
-
 
         /// <summary>
         /// Returns a list of paths searched for symbols and the results of searching each path. 
@@ -184,7 +173,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Retrieves information on whether the module represents user code or not.  Used to support the JustMyCode features of the 
         /// debugger. [http://msdn.microsoft.com/en-ca/library/bb146644(v=vs.100).aspx]
@@ -198,7 +186,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Loads and initializes symbols for the current module when the user explicitly asks for them to load. Not implemented.
         /// [http://msdn.microsoft.com/en-ca/library/bb146634(v=vs.100).aspx]
@@ -206,9 +193,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugModule3.LoadSymbols()
         {
-            throw new NotImplementedException();
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Specifies whether the module should be considered user code or not. Used to support the JustMyCode features of the debugger.
@@ -219,8 +205,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugModule3.SetJustMyCodeState(int fIsUserCode)
         {
-            throw new NotImplementedException();
+            return VSConstants.E_NOTIMPL;
         }
-
     }
 }

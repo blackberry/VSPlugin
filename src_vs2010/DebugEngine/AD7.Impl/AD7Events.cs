@@ -12,7 +12,6 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -33,7 +32,7 @@ namespace BlackBerry.DebugEngine
     /// </summary>
     class AD7AsynchronousEvent : IDebugEvent2
     {
-        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_ASYNCHRONOUS;
+        private const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_ASYNCHRONOUS;
 
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
@@ -298,11 +297,11 @@ namespace BlackBerry.DebugEngine
         /// Sends the event.
         /// </summary>
         /// <param name="engine"> The AD7Engine object that represents the DE. </param>
-        /// <param name="aModule"> The IDebugModule2 object that represents the module which is loading or unloading. </param>
+        /// <param name="module"> The IDebugModule2 object that represents the module which is loading or unloading. </param>
         /// <param name="fLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
-        internal static void Send(AD7Engine engine, AD7Module aModule, bool fLoad)
+        internal static void Send(AD7Engine engine, AD7Module module, bool fLoad)
         {
-            var eventObject = new AD7ModuleLoadEvent(aModule, fLoad);
+            var eventObject = new AD7ModuleLoadEvent(module, fLoad);
             engine.Callback.Send(eventObject, IID, null);
         }
     }
@@ -338,7 +337,6 @@ namespace BlackBerry.DebugEngine
             exitCode = _exitCode;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Sends the event.
@@ -497,7 +495,6 @@ namespace BlackBerry.DebugEngine
         private readonly string _searchInfo;
         private readonly uint _symbolFlags;
 
-        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -652,11 +649,11 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
         /// </summary>
-        /// <param name="pdwAttrib"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
+        /// <param name="pdwAttributes"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetAttributes(out uint pdwAttrib)
+        public int GetAttributes(out uint pdwAttributes)
         {
-            pdwAttrib = (uint)(enum_EVENTATTRIBUTES.EVENT_ASYNC_STOP);
+            pdwAttributes = (uint)(enum_EVENTATTRIBUTES.EVENT_ASYNC_STOP);
             return VSConstants.S_OK;
         }
 
