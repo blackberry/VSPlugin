@@ -15,9 +15,11 @@
 using System;
 using System.Runtime.InteropServices;
 using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Tools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
@@ -55,7 +57,7 @@ namespace BlackBerry.DebugEngine
     /// </summary>
     [ComVisible(true)]
     [Guid(ClassGuid)]
-    public sealed class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2, IDebugSymbolSettings100
+    public sealed class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2, IDebugSymbolSettings100, IDisposable
     {
         public const string ClassGuid = "904AA6E0-942C-4D11-9094-7BAAEB3EE4B9";
         public const string ClassName = "BlackBerry.DebugEngine.AD7Engine";
@@ -170,6 +172,7 @@ namespace BlackBerry.DebugEngine
         }
         public DE_STATE m_state = 0;
 
+        private GdbRunner _gdb;
         
         /// <summary>
         /// Constructor.
@@ -188,7 +191,52 @@ namespace BlackBerry.DebugEngine
         {
             // Transition DE state
             m_state = DE_STATE.DONE;
+            Dispose(false);
         }
+
+        #region IDisposable Implementation
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        private void Dispose(bool dispose)
+        {
+            if (dispose)
+            {
+                if (_gdb != null)
+                {
+                    _gdb.Dispose();
+                    _gdb = null;
+                }
+            }
+        }
+
+        private GdbRunner CreateGdb(NdkDefinition ndk, DeviceDefinition device, RuntimeDefinition runtime)
+        {
+            if (ndk == null)
+                ndk = NdkDefinition.Load(); // load from system registry
+            if (device == null)
+                device = DeviceDefinition.LoadDevice(); // load from registry
+            if (runtime == null)
+                runtime = RuntimeDefinition.Load(); // load from registry
+
+            var gdbInfo = new GdbInfo(ndk, device, runtime, null);
+            if (_gdb != null)
+            {
+                _gdb.Dispose();
+            }
+            _gdb = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
+            _gdb.ExecuteAsync();
+
+            // and select current target device:
+            _gdb.Send(RequestsFactory.SetTargetDevice(_gdb.Device));
+
+            return _gdb;
+        }
+
+        #endregion
 
         #region IDebugEngine2 Members
 
@@ -580,10 +628,35 @@ namespace BlackBerry.DebugEngine
                 string publicKeyPath = nvc["PublicKeyPath"];
                 string password = nvc["Password"];
 
+                var target = new DeviceDefinition("Target", targetIP, password, isSimulator ? DeviceDefinitionType.Simulator : DeviceDefinitionType.Device);
+                Targets.Connect(target, publicKeyPath, null);
+                CreateGdb(null, target, null);
+
                 if (!uint.TryParse(pid, out pidNumber))
                 {
-                    uint.TryParse(GetPIDfromGDB(pid, targetIP, password, isSimulator, toolsPath, publicKeyPath), out pidNumber);
+                    var listRequest = RequestsFactory.ListProcesses();
+                    _gdb.Send(listRequest);
+
+                    // wait for response:
+                    listRequest.Wait();
+                    var existingProcess = listRequest.Find(pid);
+                    if (existingProcess != null)
+                    {
+                        // doesn't run
+                        pidNumber = existingProcess.ID;
+                    }
                 }
+
+                // attach to this process:
+                /*
+                var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(_gdb);
+                var setExecutable = RequestsFactory.SetExecutable(exePath, true);
+                var attachProcess = RequestsFactory.AttachTargetProcess(pidNumber);
+
+                var attachGroup = RequestsFactory.Group(setLibSearchPath, setExecutable, attachProcess);
+                _gdb.Send(attachGroup);
+                attachGroup.Wait();
+                */
 
                 if (GDBParser.LaunchProcess(pidNumber.ToString(), exePath.Replace("\\", "\\\\"), targetIP, isSimulator, toolsPath, publicKeyPath, password))
                 {
@@ -609,47 +682,6 @@ namespace BlackBerry.DebugEngine
             {
                 return EngineUtils.UnexpectedException(e);
             }
-        }
-
-        private string GetPIDfromGDB(string processName, string ip, string password, bool isSimulator, string toolsPath, string publicKeyPath)
-        {
-            string pid = "";
-            string response = GDBParser.GetPIDsThroughGDB(ip, password, isSimulator, toolsPath, publicKeyPath, 7);
-
-            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0, StringComparison.Ordinal) != -1)) //found an error
-            {
-                if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
-                {
-                    MessageBox.Show("Please, verify if the Device/Simulator IP in \"BlackBerry -> Settings\" menu is correct and check if it is connected.", "Device/Simulator not connected or not configured properly", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                else
-                    if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
-                    {
-                        string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
-                        string caption;
-                        if (txt.IndexOf("The requested address is not valid in its context.") != -1)
-                        {
-                            txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
-                            caption = "Invalid IP";
-                        }
-                        else
-                        {
-                            txt += "\n\nPlease, verify if the device/simulator is connected.";
-                            caption = "Connection failed";
-                        }
-                        MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-            }
-            else if (response.Contains("^done"))
-            {
-                int i = response.IndexOf(processName + " - ", StringComparison.Ordinal);
-                if (i != -1)
-                {
-                    i += processName.Length + 3;
-                    pid = response.Substring(i, response.IndexOf('/', i) - i);
-                }
-            }
-            return pid;
         }
 
         /// <summary>
