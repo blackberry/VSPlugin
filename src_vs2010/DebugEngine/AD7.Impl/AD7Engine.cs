@@ -17,6 +17,7 @@ using System.Runtime.InteropServices;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -290,7 +291,7 @@ namespace BlackBerry.DebugEngine
 
                     AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
                     _process = pnt.Process;
-                    AD7Port port = pnt.Process.Port;
+                    AD7Port port = pnt.Process.Port as AD7Port;
                     string publicKeyPath = ConfigDefaults.SshPublicKeyPath;
                     string progName = _process.Details.Name;
 
@@ -672,11 +673,11 @@ namespace BlackBerry.DebugEngine
 
                 if (GDBParser.LaunchProcess(pidNumber.ToString(), exePath.Replace("\\", "\\\\"), targetIP, isSimulator, toolsPath, publicKeyPath, password))
                 {
-                    process = _process = new AD7Process(port as AD7Port);
+                    process = _process = new AD7Process(port);
                     EventDispatcher = new EventDispatcher(this);
                     _programGuid = _process.UID;
                     _module = new AD7Module();
-                    m_progNode = new AD7ProgramNode(_process.Details, _process.UID, new Guid(DebugEngineGuid));
+                    m_progNode = new AD7ProgramNode(_process.Details ?? new ProcessInfo(pidNumber, exePath), _process.UID, new Guid(DebugEngineGuid));
                     AddThreadsToProgram();
 
                     AD7EngineCreateEvent.Send(this);

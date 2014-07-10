@@ -46,9 +46,9 @@ namespace BlackBerry.DebugEngine
         private readonly ProcessInfo _details;
 
         /// <summary>
-        /// The AD7Port object that represents the port used in Attach to Process UI or on which the process was launched.
+        /// The object that represents the port used in Attach to Process UI or on which the process was launched.
         /// </summary>
-        private AD7Port _port;
+        private IDebugPort2 _port;
 
         /// <summary>
         /// The list of programs that are running in this process.
@@ -59,7 +59,7 @@ namespace BlackBerry.DebugEngine
         /// Constructor.
         /// </summary>
         /// <param name="port"> The IDebugPort2 object that represents the port on which the process was launched. </param>
-        public AD7Process(AD7Port port)
+        public AD7Process(IDebugPort2 port)
         {
             if (port == null)
                 throw new ArgumentNullException("port");
@@ -105,14 +105,18 @@ namespace BlackBerry.DebugEngine
             get { return _details; }
         }
 
-        public AD7Port Port
+        public IDebugPort2 Port
         {
             get { return _port; }
         }
 
         public DeviceDefinition Device
         {
-            get { return _port != null ? _port.Device : null; }
+            get
+            {
+                var port = _port as AD7Port;
+                return port != null ? port.Device : null;
+            }
         }
 
         #endregion
