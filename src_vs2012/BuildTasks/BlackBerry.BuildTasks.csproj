@@ -112,9 +112,6 @@
     <Compile Include="..\..\src_vs2010\BuildTasks\MakeAllAndFormatOutputMessages.cs">
       <Link>MakeAllAndFormatOutputMessages.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\NativeMethods.cs">
-      <Link>NativeMethods.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\PackagerCmdBuilder.cs">
       <Link>PackagerCmdBuilder.cs</Link>
     </Compile>
@@ -150,6 +147,9 @@
     </Compile>
     <Compile Include="..\NativeCore\Helpers\GlobalHelper.cs">
       <Link>Helpers\GlobalHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\NativeCore\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

@@ -13,10 +13,9 @@
 //* limitations under the License.
 
 using System;
-using System.Text;
+using BlackBerry.NativeCore;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Runtime.InteropServices;
 
 namespace BlackBerry.DebugEngine
 {
@@ -29,80 +28,56 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Long path file name
         /// </summary>
-        string m_fileName;
+        private readonly string _fileName;
 
         /// <summary>
         ///  Start position. In VSNDK debug engine, both begPos and endPos have the same value.
         /// </summary>
-        TEXT_POSITION m_begPos;
+        private TEXT_POSITION _beginPosition;
 
         /// <summary>
         ///  End position. In VSNDK debug engine, both begPos and endPos have the same value.
         /// </summary>
-        TEXT_POSITION m_endPos;
+        private TEXT_POSITION _endPosition;
 
         /// <summary>
         ///  An address in a program's execution stream. 
         /// </summary>
-        AD7MemoryAddress m_codeContext;
-
-
-        /// <summary> GDB works with short path names only, which requires converting the path names to/from long ones. This function 
-        /// returns the long path name for a given short one. </summary>
-        /// <param name="path"> Short path name. </param>
-        /// <param name="longPath"> Returns this long path name. </param>
-        /// <param name="longPathLength"> Lenght of this long path name. </param>
-        /// <returns></returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetLongPathName(
-            [MarshalAs(UnmanagedType.LPTStr)]
-            string path,
-            [MarshalAs(UnmanagedType.LPTStr)]
-            StringBuilder longPath,
-            int longPathLength
-            );
-
+        private readonly AD7MemoryAddress _codeContext;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="fileName"> Short path file name. </param>
         /// <param name="begPos"> Start position. </param>
-        /// <param name="endPos"> End position. In VSNDK debug engine, both begPos and endPos have the same value. </param>
+        /// <param name="endPosition"> End position. In VSNDK debug engine, both begPos and endPos have the same value. </param>
         /// <param name="codeContext"> An address in a program's execution stream. </param>
-        public AD7DocumentContext(string fileName, TEXT_POSITION begPos, TEXT_POSITION endPos, AD7MemoryAddress codeContext)
+        public AD7DocumentContext(string fileName, TEXT_POSITION begPos, TEXT_POSITION endPosition, AD7MemoryAddress codeContext)
         {
-            // Need to lengthen the path used by Visual Studio.
-            StringBuilder documentNameSB = new StringBuilder(1024);
-            GetLongPathName(fileName, documentNameSB, documentNameSB.Capacity);
-            m_fileName = documentNameSB.ToString();
+            // Need to lengthen the path to be used by Visual Studio.
+            _fileName = NativeMethods.GetLongPathName(fileName);
 
-            m_begPos = begPos;
-            m_endPos = endPos;
-            m_codeContext = codeContext;
+            _beginPosition = begPos;
+            _endPosition = endPosition;
+            _codeContext = codeContext;
         }
 
-
         #region IDebugDocumentContext2 Members
-
 
         /// <summary>
         /// Compares this document context to a given array of document contexts. (http://msdn.microsoft.com/en-us/library/bb145338.aspx)
         /// </summary>
-        /// <param name="Compare"> A value from the DOCCONTEXT_COMPARE enumeration that specifies the type of comparison. </param>
+        /// <param name="compare"> A value from the DOCCONTEXT_COMPARE enumeration that specifies the type of comparison. </param>
         /// <param name="rgpDocContextSet"> An array of IDebugDocumentContext2 objects that represent the document contexts being compared to. </param>
         /// <param name="dwDocContextSetLen"> The length of the array of document contexts to compare. </param>
         /// <param name="pdwDocContext"> Returns the index into the rgpDocContextSet array of the first document context that satisfies the comparison. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        int IDebugDocumentContext2.Compare(enum_DOCCONTEXT_COMPARE Compare, IDebugDocumentContext2[] rgpDocContextSet, uint dwDocContextSetLen, out uint pdwDocContext)
+        int IDebugDocumentContext2.Compare(enum_DOCCONTEXT_COMPARE compare, IDebugDocumentContext2[] rgpDocContextSet, uint dwDocContextSetLen, out uint pdwDocContext)
         {
-            dwDocContextSetLen = 0;
             pdwDocContext = 0;
-
             return VSConstants.E_NOTIMPL;
         }
 
-        
         /// <summary>
         /// Retrieves a list of all code contexts associated with this document context. The VSNDK Debug Engine only supports one code context per document 
         /// context and the code contexts are always memory addresses. (http://msdn.microsoft.com/en-us/library/bb146273.aspx)
@@ -114,17 +89,16 @@ namespace BlackBerry.DebugEngine
             ppEnumCodeCxts = null;
             try
             {
-                AD7MemoryAddress[] codeContexts = new AD7MemoryAddress[1];
-                codeContexts[0] = m_codeContext;
+                IDebugCodeContext2[] codeContexts = new IDebugCodeContext2[1];
+                codeContexts[0] = _codeContext;
                 ppEnumCodeCxts = new AD7CodeContextEnum(codeContexts);
                 return VSConstants.S_OK;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return EngineUtils.UnexpectedException(e);
+                return EngineUtils.UnexpectedException(ex);
             }
         }
-
 
         /// <summary>
         /// Gets the document that contains this document context. This method is for those debug engines that supply documents directly 
@@ -138,7 +112,6 @@ namespace BlackBerry.DebugEngine
             ppDocument = null;
             return VSConstants.E_FAIL;
         }
-
 
         /// <summary>
         /// Gets the language associated with this document context. The language for this sample is always C++.
@@ -154,7 +127,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets the displayable name of the document that contains this document context. 
         /// (http://msdn.microsoft.com/en-us/library/bb146162.aspx)
@@ -164,10 +136,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugDocumentContext2.GetName(enum_GETNAME_TYPE gnType, out string pbstrFileName)
         {
-            pbstrFileName = m_fileName;
+            pbstrFileName = _fileName;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the source code range of this document context. A source range is the entire range of source code, from the current 
@@ -180,9 +151,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugDocumentContext2.GetSourceRange(TEXT_POSITION[] pBegPosition, TEXT_POSITION[] pEndPosition)
         {
-            throw new NotImplementedException("This method is not implemented");
+            return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Gets the file statement range of the document context. A statement range is the range of the lines that contributed the code 
@@ -195,20 +165,19 @@ namespace BlackBerry.DebugEngine
         {
             try
             {
-                pBegPosition[0].dwColumn = m_begPos.dwColumn;
-                pBegPosition[0].dwLine = m_begPos.dwLine;
+                pBegPosition[0].dwColumn = _beginPosition.dwColumn;
+                pBegPosition[0].dwLine = _beginPosition.dwLine;
 
-                pEndPosition[0].dwColumn = m_endPos.dwColumn;
-                pEndPosition[0].dwLine = m_endPos.dwLine;
+                pEndPosition[0].dwColumn = _endPosition.dwColumn;
+                pEndPosition[0].dwLine = _endPosition.dwLine;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return EngineUtils.UnexpectedException(e);
+                return EngineUtils.UnexpectedException(ex);
             }
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Moves the document context by a given number of statements or lines. This is used primarily to support the Autos window in 

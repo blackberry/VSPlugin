@@ -78,6 +78,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Helpers\GlobalHelper.cs">
       <Link>Helpers\GlobalHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
+    </Compile>
     <Compile Include="BarDescriptor\Parser.cs" />
     <Compile Include="BarDescriptor\Schema\bar-descriptor.cs">
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
@@ -87,7 +90,6 @@
     <Compile Include="BBNativePackager.cs" />
     <Compile Include="BBSigner.cs" />
     <Compile Include="BBTask.cs" />
-    <Compile Include="NativeMethods.cs" />
     <Compile Include="RemoveFlagFile.cs" />
     <Compile Include="MakeAllAndFormatOutputMessages.cs" />
     <Compile Include="CheckIfInstalled.cs" />
