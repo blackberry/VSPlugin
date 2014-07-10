@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Threading;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger;
@@ -242,7 +241,11 @@ namespace UnitTests
             procGroup.Wait(); // at this point, we should receive a list of running processes
 
             // find the PID of FallingBlocks sample:
-            uint pid = GetPID("FallingBlocks", listProcesses.Response.Comments);
+            var process = listProcesses.Find("FallingBlocks");
+            if (process == null)
+                throw new InvalidOperationException("Specified process is not running");
+
+            uint pid = process.ID;
 
             // attach to this process:
             var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(runner.GDB.LibraryPaths);
@@ -290,38 +293,6 @@ namespace UnitTests
             var detachProcess = RequestsFactory.DetachTargetProcess();
             runner.Send(detachProcess);
             detachProcess.Wait();
-        }
-
-        private static uint GetPID(string exeName, string[] info)
-        {
-            if (string.IsNullOrEmpty(exeName))
-                throw new ArgumentNullException("exeName");
-            if (info == null || info.Length == 0)
-                throw new ArgumentNullException("info");
-
-            foreach (var process in info)
-            {
-                int startAt = process.IndexOf(exeName, StringComparison.OrdinalIgnoreCase);
-                if (startAt >= 0)
-                {
-                    int pidStartAt = process.IndexOf('-', startAt);
-                    if (pidStartAt > 0)
-                    {
-                        string pidString;
-                        uint pid;
-                        int pidEndAt = process.IndexOf('/', pidStartAt);
-                        if (pidEndAt < 0)
-                            pidString = process.Substring(pidStartAt + 1).Trim();
-                        else
-                            pidString = process.Substring(pidStartAt + 1, pidEndAt - pidStartAt - 1).Trim();
-
-                        if (uint.TryParse(pidString, NumberStyles.Number, null, out pid))
-                            return pid;
-                    }
-                }
-            }
-
-            throw new InvalidOperationException("Specified process is not running");
         }
 
         [Test]
