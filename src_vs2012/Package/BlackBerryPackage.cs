@@ -101,7 +101,7 @@ namespace BlackBerry.Package
     [ProvideOptionPage(typeof(SigningOptionPage), OptionsCategoryName, "Signing", 1001, 1006, true)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable
     {
-        public const string VersionString = "2.1.2014.709";
+        public const string VersionString = "2.1.2014.711";
         public const string OptionsCategoryName = "BlackBerry";
 
         private BlackBerryPaneTraceListener _traceWindow;

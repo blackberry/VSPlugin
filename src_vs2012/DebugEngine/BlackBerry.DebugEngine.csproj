@@ -108,6 +108,9 @@
     <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Enums.cs">
       <Link>AD7.Impl\AD7Enums.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7ErrorBreakpointResolution.cs">
+      <Link>AD7.Impl\AD7ErrorBreakpointResolution.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Events.cs">
       <Link>AD7.Impl\AD7Events.cs</Link>
     </Compile>
@@ -175,7 +178,9 @@
       <Link>NativeMethods.cs</Link>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

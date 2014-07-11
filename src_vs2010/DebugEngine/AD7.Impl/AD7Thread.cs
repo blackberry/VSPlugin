@@ -119,7 +119,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="name"> Thread's name. </param>
         /// <param name="filename"> Full short path file name. </param>
         /// <param name="line"> Line number. </param>
-        public AD7Thread(AD7Engine engine, string id, string targetID, string state, string priority, string name, string filename, string line)//, DebuggedThread debuggedThread)
+        public AD7Thread(AD7Engine engine, string id, string targetID, string state, string priority, string name, string filename, string line)
         {
             _engine = engine;
             _suspendCount = 0;
@@ -349,7 +349,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugThread2.GetProgram(out IDebugProgram2 ppProgram)
         {
-            ppProgram = _engine.m_program;
+            ppProgram = _engine._program;
             return VSConstants.S_OK;
         }
 

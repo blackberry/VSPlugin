@@ -106,7 +106,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="pRequest"> An IDebugPortRequest2 object that describes the port to be added. </param>
         /// <param name="ppPort"> Returns an IDebugPort2 object that represents the port. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
+        int IDebugPortSupplier2.AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
         {
             if (pRequest == null || _ndk == null)
             {
@@ -212,7 +212,7 @@ namespace BlackBerry.DebugEngine
         /// Verifies that a port supplier can add new ports. (http://msdn.microsoft.com/en-ca/library/bb145880.aspx)
         /// </summary>
         /// <returns> VSConstants.S_OK. </returns>
-        public int CanAddPort()
+        int IDebugPortSupplier2.CanAddPort()
         {
             return VSConstants.S_OK;
         }
@@ -222,7 +222,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="ppEnum"> Returns an IEnumDebugPorts2 object containing a list of ports supplied. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int EnumPorts(out IEnumDebugPorts2 ppEnum)
+        int IDebugPortSupplier2.EnumPorts(out IEnumDebugPorts2 ppEnum)
         {
             // Returning because VS can debug only one app at a time.
             if (DebugEngineStatus.IsRunning)
@@ -266,7 +266,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="guidPort"> Globally unique identifier (GUID) of the port. </param>
         /// <param name="ppPort"> Returns an IDebugPort2 object that represents the port. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetPort(ref Guid guidPort, out IDebugPort2 ppPort)
+        int IDebugPortSupplier2.GetPort(ref Guid guidPort, out IDebugPort2 ppPort)
         {
             ppPort = _ports[guidPort];
             return VSConstants.S_OK; 
@@ -277,7 +277,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="pguidPortSupplier"> Returns the GUID of the port supplier. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetPortSupplierId(out Guid pguidPortSupplier)
+        int IDebugPortSupplier2.GetPortSupplierId(out Guid pguidPortSupplier)
         {
             pguidPortSupplier = new Guid(ClassGuid);
             return VSConstants.S_OK;
@@ -288,7 +288,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="pbstrName"> Returns the name of the port supplier. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetPortSupplierName(out string pbstrName)
+        int IDebugPortSupplier2.GetPortSupplierName(out string pbstrName)
         {
             pbstrName = PublicName;
             return VSConstants.S_OK;
@@ -299,7 +299,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="pPort"> An IDebugPort2 object that represents the port to be removed. </param>
         /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
-        public int RemovePort(IDebugPort2 pPort)
+        int IDebugPortSupplier2.RemovePort(IDebugPort2 pPort)
         {
             return EngineUtils.NotImplemented();
         }
@@ -314,7 +314,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="pdwFlags"> Metadata flags for the description. </param>
         /// <param name="pbstrText"> Description of the port supplier. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetDescription(enum_PORT_SUPPLIER_DESCRIPTION_FLAGS[] pdwFlags, out string pbstrText)
+        int IDebugPortSupplierDescription2.GetDescription(enum_PORT_SUPPLIER_DESCRIPTION_FLAGS[] pdwFlags, out string pbstrText)
         {
             pbstrText = "The BlackBerry Native Transport lets you select and attach to a process that is running on a device or simulator";
             return VSConstants.S_OK;
@@ -322,12 +322,22 @@ namespace BlackBerry.DebugEngine
 
         #endregion
 
-        public int SetSite(IServiceProvider serviceProvider)
+        /// <summary>
+        /// Sets the service provider. (http://msdn.microsoft.com/en-us/library/bb491408.aspx)
+        /// </summary>
+        /// <param name="serviceProvider">Reference to the interface of the service provider.</param>
+        int IDebugPortPicker.SetSite(IServiceProvider serviceProvider)
         {
             return VSConstants.S_OK;
         }
 
-        public int DisplayPortPicker(IntPtr hwndParentDialog, out string pbstrPortId)
+        /// <summary>
+        /// Displays the specified dialog box that allows the user to select a port. (http://msdn.microsoft.com/en-us/library/bb491260.aspx)
+        /// </summary>
+        /// <param name="hwndParentDialog">Handle for the parent dialog box.</param>
+        /// <param name="pbstrPortId">Port identifier string.</param>
+        /// <returns>If successful, returns S_OK; otherwise, returns an error code. A return value of S_FALSE (or a return value of S_OK with the BSTR set to NULL) indicates that the user clicked Cancel.</returns>
+        int IDebugPortPicker.DisplayPortPicker(IntPtr hwndParentDialog, out string pbstrPortId)
         {
             MessageBox.Show(
                 "Searching is not supported.\r\nPlease add more devices at \"BlackBerry -> Options -> Targets\", if you want to quickly switch between them. They will automatically appear, when \"Qualifier\" list is expanded.",

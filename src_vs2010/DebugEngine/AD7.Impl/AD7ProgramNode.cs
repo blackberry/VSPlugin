@@ -16,7 +16,6 @@ using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System;
-using System.Diagnostics;
 
 namespace BlackBerry.DebugEngine
 {
@@ -33,12 +32,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         private readonly Guid _processGuid;
 
-        private readonly ProcessInfo _program;
-
-        /// <summary>
-        /// The GUID of the VSNDK debug engine. 
-        /// </summary>
-        private readonly Guid _engineGuid;
+        private readonly ProcessInfo _details;
 
         /// <summary>
         /// Constructor.
@@ -48,30 +42,43 @@ namespace BlackBerry.DebugEngine
         public AD7ProgramNode(Guid processGuid)
         {
             _processGuid = processGuid;
-            _engineGuid = new Guid(AD7Engine.DebugEngineGuid);
         }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="program"> The description of the the debugged program. </param>
+        /// <param name="details"> The description of the the debugged program. </param>
         /// <param name="processGuid"> The GUID for this process. </param>
         /// <param name="engineGuid"> The GUID of the VSNDK debug engine. </param>
-        public AD7ProgramNode(ProcessInfo program, Guid processGuid, Guid engineGuid)
+        public AD7ProgramNode(ProcessInfo details, Guid processGuid)
         {
-            if (program == null)
-                throw new ArgumentNullException("program");
+            if (details == null)
+                throw new ArgumentNullException("details");
 
-            _program = program;
+            _details = details;
             _processGuid = processGuid;
-            _engineGuid = engineGuid;
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="process">The process associated with the node.</param>
+        public AD7ProgramNode(AD7Process process)
+        {
+            if (process == null)
+                throw new ArgumentNullException("process");
+            if (process.Details == null)
+                throw new ArgumentOutOfRangeException("process");
+
+            _details = process.Details;
+            _processGuid = process.UID;
         }
 
         #region Properties
 
         public string Name
         {
-            get { return _program != null ? _program.Name : string.Empty; }
+            get { return _details.Name; }
         }
 
         #endregion
@@ -90,7 +97,7 @@ namespace BlackBerry.DebugEngine
         int IDebugProgramNode2.GetEngineInfo(out string engineName, out Guid engineGuid)
         {
             engineName = string.Empty;
-            engineGuid = _engineGuid;
+            engineGuid = new Guid(AD7Engine.DebugEngineGuid);
 
             return VSConstants.S_OK;
         }
@@ -119,9 +126,9 @@ namespace BlackBerry.DebugEngine
         int IDebugProgramNode2.GetHostName(enum_GETHOSTNAME_TYPE dwHostNameType, out string processName)
         {
             if (dwHostNameType == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
-                processName = "(BB-pid = " + _program.ID + ") " + _program.ExecutablePath;
+                processName = "(BB-pid = " + _details.ID + ") " + _details.ExecutablePath;
             else
-                processName = _program.Name;
+                processName = _details.Name;
             return VSConstants.S_OK;
         }
 
@@ -132,7 +139,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugProgramNode2.GetProgramName(out string programName)
         {
-            programName = _program.Name;
+            programName = _details.Name;
             return VSConstants.S_OK;
         }
 

@@ -23,7 +23,7 @@ namespace BlackBerry.DebugEngine
     /// This class represents a document context to the debugger. A document context represents a location within a source file. 
     /// (http://msdn.microsoft.com/en-us/library/bb145572.aspx)
     /// </summary>
-    public class AD7DocumentContext : IDebugDocumentContext2
+    public sealed class AD7DocumentContext : IDebugDocumentContext2
     {
         /// <summary>
         /// Long path file name

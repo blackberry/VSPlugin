@@ -26,16 +26,11 @@ namespace BlackBerry.DebugEngine
         private readonly AD7Process _process;
 
         /// <summary>
-        /// The GUID of the VSNDK debug engine. 
-        /// </summary>
-        private readonly Guid _engineGuid;
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="process"> The process on the target device engine is supposed to attach. </param>
         /// <param name="engineGuid"> The GUID of a debug engine. </param>
-        public AD7ProgramNodeAttach(AD7Process process, Guid engineGuid)
+        public AD7ProgramNodeAttach(AD7Process process)
         {
             if (process == null)
                 throw new ArgumentNullException("process");
@@ -43,7 +38,6 @@ namespace BlackBerry.DebugEngine
                 throw new ArgumentOutOfRangeException("process");
 
             _process = process;
-            _engineGuid = engineGuid;
         }
 
         #region Properties
@@ -85,9 +79,9 @@ namespace BlackBerry.DebugEngine
         /// the program starts executing again. (http://msdn.microsoft.com/en-us/library/bb162148.aspx).
         /// Not implemented because this class is not used by the debug engine. Read the description of this class at the top.
         /// </summary>
-        /// <param name="pThread"> An IDebugThread2 object that represents the thread. </param>
+        /// <param name="thread"> An IDebugThread2 object that represents the thread. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int Continue(IDebugThread2 pThread)
+        public int Continue(IDebugThread2 thread)
         {
             // This method is not called by the debug engine.
             return VSConstants.S_OK;
@@ -108,10 +102,10 @@ namespace BlackBerry.DebugEngine
         /// Retrieves a list of the code contexts for a given position in a source file. Not implemented. 
         /// (http://msdn.microsoft.com/en-us/library/bb145902.aspx)
         /// </summary>
-        /// <param name="pDocPos"> An object representing an abstract position in a source file known to the IDE. </param>
+        /// <param name="docPos"> An object representing an abstract position in a source file known to the IDE. </param>
         /// <param name="ppEnum"> Returns an IEnumDebugCodeContexts2 object that contains a list of the code contexts. </param>
         /// <returns> Not implemented. </returns>
-        public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum)
+        public int EnumCodeContexts(IDebugDocumentPosition2 docPos, out IEnumDebugCodeContexts2 ppEnum)
         {
             ppEnum = null;
             return EngineUtils.NotImplemented();
@@ -180,12 +174,12 @@ namespace BlackBerry.DebugEngine
         /// Gets the disassembly stream for this program or a part of this program.
         /// The sample engine does not support dissassembly so it returns E_NOTIMPL
         /// </summary>
-        /// <param name="dwScope"> Specifies a value from the DISASSEMBLY_STREAM_SCOPE enumeration that defines the scope of the 
+        /// <param name="scope"> Specifies a value from the DISASSEMBLY_STREAM_SCOPE enumeration that defines the scope of the 
         /// disassembly stream.</param>
         /// <param name="codeContext"> An object that represents the position of where to start the disassembly stream. </param>
         /// <param name="disassemblyStream"> Returns an IDebugDisassemblyStream2 object that represents the disassembly stream. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
+        public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE scope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
         {
             disassemblyStream = null;
             return EngineUtils.NotImplemented();
@@ -244,11 +238,11 @@ namespace BlackBerry.DebugEngine
         /// (http://msdn.microsoft.com/en-us/library/bb162134.aspx)
         /// Not implemented because this class is not used by the debug engine. Read the description of this class at the top.
         /// </summary>
-        /// <param name="pThread"> An IDebugThread2 object that represents the thread being stepped. </param>
-        /// <param name="sk"> A value from the STEPKIND enumeration that specifies the kind of step. </param>
-        /// <param name="Step"> A value from the STEPUNIT enumeration that specifies the unit of step. </param>
+        /// <param name="thread"> An IDebugThread2 object that represents the thread being stepped. </param>
+        /// <param name="stepKind"> A value from the STEPKIND enumeration that specifies the kind of step. </param>
+        /// <param name="step"> A value from the STEPUNIT enumeration that specifies the unit of step. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step)
+        public int Step(IDebugThread2 thread, enum_STEPKIND stepKind, enum_STEPUNIT step)
         {
             return VSConstants.S_OK;
         }
@@ -266,12 +260,12 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Writes a dump to a file. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145827.aspx)
         /// </summary>
-        /// <param name="DUMPTYPE"> A value from the DUMPTYPE enumeration that specifies the type of dump, for example, short or 
+        /// <param name="type"> A value from the DUMPTYPE enumeration that specifies the type of dump, for example, short or 
         /// long. </param>
-        /// <param name="pszDumpUrl"> The URL to write the dump to. Typically, this is in the form of file://c:\path\filename.ext, 
+        /// <param name="dumpUrl"> The URL to write the dump to. Typically, this is in the form of file://c:\path\filename.ext, 
         /// but may be any valid URL. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int WriteDump(enum_DUMPTYPE DUMPTYPE, string pszDumpUrl)
+        public int WriteDump(enum_DUMPTYPE type, string dumpUrl)
         {
             // The VSNDK debugger does not support creating or reading mini-dumps.
             return EngineUtils.NotImplemented();
@@ -280,11 +274,11 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Get the process that this program is running in. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145293.aspx)
         /// </summary>
-        /// <param name="process"> Returns the IDebugProcess2 interface that represents the process. </param>
+        /// <param name="ppProcess"> Returns the IDebugProcess2 interface that represents the process. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int GetProcess(out IDebugProcess2 process)
+        public int GetProcess(out IDebugProcess2 ppProcess)
         {
-            process = null;
+            ppProcess = null;
             return EngineUtils.NotImplemented();
         }
 
@@ -293,7 +287,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="programs"> An IDebugEventCallback2 object to be used for debug event notification. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int Attach(IDebugEventCallback2 pCallback)
+        public int Attach(IDebugEventCallback2 callback)
         {
             return EngineUtils.NotImplemented();
         }
@@ -322,7 +316,7 @@ namespace BlackBerry.DebugEngine
         public int GetEngineInfo(out string engineName, out Guid engineGuid)
         {
             engineName = _process.Device.Architecture;
-            engineGuid = _engineGuid;
+            engineGuid = new Guid(AD7Engine.DebugEngineGuid);
 
             return VSConstants.S_OK;
         }
@@ -376,11 +370,11 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161399.aspx)
         /// </summary>
-        /// <param name="pMDMProgram"> The IDebugProgram2 interface that represents the program to attach to. </param>
-        /// <param name="pCallback"> The IDebugEventCallback2 interface to be used to send debug events to the SDM. </param>
-        /// <param name="dwReason"> A value from the ATTACH_REASON enumeration that specifies the reason for attaching. </param>
+        /// <param name="program"> The IDebugProgram2 interface that represents the program to attach to. </param>
+        /// <param name="callback"> The IDebugEventCallback2 interface to be used to send debug events to the SDM. </param>
+        /// <param name="reason"> A value from the ATTACH_REASON enumeration that specifies the reason for attaching. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int Attach_V7(IDebugProgram2 pMDMProgram, IDebugEventCallback2 pCallback, uint dwReason)
+        public int Attach_V7(IDebugProgram2 program, IDebugEventCallback2 callback, uint reason)
         {
             return EngineUtils.NotImplemented();
         }

@@ -121,7 +121,6 @@ namespace BlackBerry.DebugEngine
         int IDebugModule2.ReloadSymbols_Deprecated(string urlToSymbols, out string debugMessage)
         {
             debugMessage = null;
-            Debug.Fail("This function is not called by the debugger.");
             return EngineUtils.NotImplemented();
         }
 

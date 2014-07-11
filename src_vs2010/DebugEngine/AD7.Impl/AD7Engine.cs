@@ -18,6 +18,7 @@ using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Debugger.Model;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -30,7 +31,6 @@ using System.Windows.Forms;
 
 namespace BlackBerry.DebugEngine
 {
-    
     /// <summary>
     /// AD7Engine is the primary entrypoint object for the sample engine. 
     /// 
@@ -108,17 +108,17 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// A process running on a port. A process "Is a container for a set of programs".
         /// </summary>
-        public AD7Process _process;
+        private AD7Process _process;
 
         /// <summary>
         /// A program that can be debugged.
         /// </summary>
-        public AD7ProgramNode m_progNode;
+        private AD7ProgramNode _progNode;
 
         /// <summary>
         /// A program that is running in a process.
         /// </summary>
-        internal IDebugProgram2 m_program;
+        internal IDebugProgram2 _program;
 
         /// <summary>
         /// TRUE whenever a thread is created/ended, so the debug engine can update the m_threads data structure.
@@ -143,7 +143,7 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Allows IDE to show current position in a source file
         /// </summary>
-        public AD7DocumentContext m_docContext = null;
+        public AD7DocumentContext _docContext;
 
 
         /// <summary>
@@ -151,13 +151,13 @@ namespace BlackBerry.DebugEngine
         /// the Debug Engine, but the one related to conditional breakpoint can resume execution. If both events happens at the same 
         /// time, the Debug Engine could resume the execution instead of pausing it.
         /// </summary>
-        public ManualResetEvent m_running = new ManualResetEvent(true); 
+        public ManualResetEvent _running = new ManualResetEvent(true); 
 
 
         /// <summary>
         /// Used to avoid race condition when there are conditional breakpoints and a breakpoint is hit. This situation is similar to the above one.
         /// </summary>
-        public ManualResetEvent m_updatingConditionalBreakpoint = new ManualResetEvent(true); 
+        public ManualResetEvent _updatingConditionalBreakpoint = new ManualResetEvent(true); 
 
         /// <summary>
         /// Keeps track of debug engine states
@@ -278,7 +278,7 @@ namespace BlackBerry.DebugEngine
             {
                 EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out _programGuid));
 
-                m_program = rgpPrograms[0];
+                _program = rgpPrograms[0];
 
                 // It is NULL when the user attached the debugger to a running process (by using Attach to Process UI). When that 
                 // happens, some objects must be instantiated, as well as GDB must be launched. Those ones are instantiated/launched
@@ -288,7 +288,7 @@ namespace BlackBerry.DebugEngine
                     DebugEngineStatus.IsRunning = true;
                     Callback = new EngineCallback(this, ad7Callback);
 
-                    AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
+                    AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)_program;
                     _process = pnt.Process;
                     AD7Port port = pnt.Process.Port as AD7Port;
                     string publicKeyPath = ConfigDefaults.SshPublicKeyPath;
@@ -332,7 +332,7 @@ namespace BlackBerry.DebugEngine
                         }
                         EventDispatcher = new EventDispatcher(this);
                         _module = new AD7Module();
-                        m_progNode = new AD7ProgramNode(_process.Details, _process.UID, new Guid(DebugEngineGuid));
+                        _progNode = new AD7ProgramNode(_process);
                         AddThreadsToProgram();
                     }
                     else
@@ -354,7 +354,7 @@ namespace BlackBerry.DebugEngine
                     AD7EntryPointEvent ad7Event = new AD7EntryPointEvent();
                     Guid riidEvent = new Guid(AD7EntryPointEvent.IID);
                     uint attributes = (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING | (uint)enum_EVENTATTRIBUTES.EVENT_SYNCHRONOUS;
-                    int rc = ad7Callback.Event(this, null, m_program, CurrentThread(), ad7Event, ref riidEvent, attributes);
+                    int rc = ad7Callback.Event(this, null, _program, CurrentThread(), ad7Event, ref riidEvent, attributes);
                     Debug.Assert(rc == VSConstants.S_OK);
                 }
             }
@@ -380,7 +380,7 @@ namespace BlackBerry.DebugEngine
                 if (EventDispatcher._GDBRunMode)
                 {
                     HandleProcessExecution.m_mre.Reset();
-                    m_running.WaitOne();
+                    _running.WaitOne();
 
                     // Sends the GDB command that interrupts the background execution of the target.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
@@ -389,7 +389,7 @@ namespace BlackBerry.DebugEngine
                     // Ensure the process is interrupted before returning
                     HandleProcessExecution.m_mre.WaitOne(1000);
 
-                    m_running.Set();
+                    _running.Set();
 
                     if (DebugEngineStatus.IsRunning)
                         HandleProcessExecution.m_mre.Reset();
@@ -417,32 +417,31 @@ namespace BlackBerry.DebugEngine
                     _process.Detach();
                     _process = null;
 
-                    m_program.Detach();
-                    m_program = null;
+                    _program.Detach();
+                    _program = null;
 
                     Callback = null;
                     BreakpointManager = null;
-                    m_docContext = null;
+                    _docContext = null;
                     EventDispatcher = null;
                     _module = null;
-                    m_progNode = null;
+                    _progNode = null;
                     _programGuid = Guid.Empty;
 
                     Threads = null;
-                    GC.Collect();
                 }
                 else
                 {
                     Debug.Fail("Unknown synchronous event");
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return EngineUtils.UnexpectedException(e);
+                return EngineUtils.UnexpectedException(ex);
             }
             
             if (EventDispatcher != null)
-                EventDispatcher.continueExecution();
+                EventDispatcher.ContinueExecution();
 
             return VSConstants.S_OK;
         }
@@ -631,27 +630,34 @@ namespace BlackBerry.DebugEngine
                 // Read arguments back from the args string
                 var nvc = CollectionHelper.Deserialize(args);
 
-                string pid = nvc["pid"];
                 uint pidNumber;
-                string exePath = exe;
-                string targetIP = nvc["targetIP"];
-                bool isSimulator = Convert.ToBoolean(nvc["isSimulator"]);
-                string toolsPath = nvc["ToolsPath"];
-                string publicKeyPath = nvc["PublicKeyPath"];
-                string password = nvc["Password"];
+                string pidOrName = nvc["pidOrName"];
+                string publicKeyPath = nvc.ContainsKey("sshKeyPath") ? nvc["sshKeyPath"] : ConfigDefaults.SshPublicKeyPath;
+                
+                var target = CollectionHelper.GetDevice(nvc);
+                var ndk = CollectionHelper.GetNDK(nvc);
+                if (target == null)
+                {
+                    TraceLog.WriteLine("LaunchSuspended: Missing info about target device");
+                    return VSConstants.E_FAIL;
+                }
+                if (ndk == null)
+                {
+                    TraceLog.WriteLine("LaunchSuspended: Missing info about NDK");
+                    return VSConstants.E_FAIL;
+                }
 
-                var target = new DeviceDefinition("Target", targetIP, password, isSimulator ? DeviceDefinitionType.Simulator : DeviceDefinitionType.Device);
                 Targets.Connect(target, publicKeyPath, null);
                 CreateGdb(null, target, null);
 
-                if (!uint.TryParse(pid, out pidNumber))
+                if (!uint.TryParse(pidOrName, out pidNumber))
                 {
                     var listRequest = RequestsFactory.ListProcesses();
                     _gdb.Send(listRequest);
 
                     // wait for response:
                     listRequest.Wait();
-                    var existingProcess = listRequest.Find(pid);
+                    var existingProcess = listRequest.Find(pidOrName);
                     if (existingProcess != null)
                     {
                         // doesn't run
@@ -670,13 +676,13 @@ namespace BlackBerry.DebugEngine
                 attachGroup.Wait();
                 */
 
-                if (GDBParser.LaunchProcess(pidNumber.ToString(), exePath.Replace("\\", "\\\\"), targetIP, isSimulator, toolsPath, publicKeyPath, password))
+                if (GDBParser.LaunchProcess(pidNumber.ToString(), exe.Replace("\\", "\\\\"), target.IP, target.Type == DeviceDefinitionType.Simulator, ndk.ToolsPath, publicKeyPath, target.Password))
                 {
-                    process = _process = new AD7Process(port);
+                    process = _process = new AD7Process(port, new ProcessInfo(pidNumber, exe), target);
                     EventDispatcher = new EventDispatcher(this);
                     _programGuid = _process.UID;
                     _module = new AD7Module();
-                    m_progNode = new AD7ProgramNode(_process.Details ?? new ProcessInfo(pidNumber, exePath), _process.UID, new Guid(DebugEngineGuid));
+                    _progNode = new AD7ProgramNode(_process);
                     AddThreadsToProgram();
 
                     AD7EngineCreateEvent.Send(this);
@@ -692,7 +698,8 @@ namespace BlackBerry.DebugEngine
             }
             catch (Exception e)
             {
-                return EngineUtils.UnexpectedException(e);
+                EngineUtils.UnexpectedException(e);
+                return VSConstants.E_FAIL;
             }
         }
 
@@ -723,7 +730,7 @@ namespace BlackBerry.DebugEngine
                 IDebugPortNotify2 portNotify;
                 EngineUtils.RequireOk(defaultPort.GetPortNotify(out portNotify));
 
-                EngineUtils.RequireOk(portNotify.AddProgramNode(m_progNode));
+                EngineUtils.RequireOk(portNotify.AddProgramNode(_progNode));
 
                 Callback.OnModuleLoad(_module);
 
@@ -748,7 +755,7 @@ namespace BlackBerry.DebugEngine
             CauseBreak();
             if (EventDispatcher != null)
             {
-                EventDispatcher.killProcess();
+                EventDispatcher.KillProcess();
                 EventDispatcher.EndDebugSession(0);
             }
 
@@ -791,7 +798,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int Continue(IDebugThread2 pThread)
         {
-            EventDispatcher.continueExecution();
+            EventDispatcher.ContinueExecution();
 
             return VSConstants.S_OK;
         }
@@ -1027,8 +1034,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetName(out string programName)
         {
-            if (m_progNode != null)
-                programName = m_progNode.Name;
+            if (_progNode != null)
+                programName = _progNode.Name;
             else
                 programName = null;
             return VSConstants.S_OK;
@@ -1067,7 +1074,7 @@ namespace BlackBerry.DebugEngine
             if (EventDispatcher._unknownCode)
             {
                 m_state = AD7Engine.DE_STATE.STEP_MODE;
-                EventDispatcher.continueExecution();
+                EventDispatcher.ContinueExecution();
 
                 return VSConstants.S_OK;
             }
@@ -1156,7 +1163,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int ExecuteOnThread(IDebugThread2 pThread)
         {
-            EventDispatcher.continueExecution();
+            EventDispatcher.ContinueExecution();
 
             return VSConstants.S_OK;
         }
@@ -1520,7 +1527,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int Execute()
         {
-            EventDispatcher.continueExecution();
+            EventDispatcher.ContinueExecution();
             return VSConstants.S_OK;
         }
 

@@ -612,7 +612,7 @@ namespace BlackBerry.Package.Components
 
             if (_startDebugger)
             {
-                LaunchDebugTarget(targetName, ndk, device, ConfigDefaults.SshPublicKeyPath, executablePath);
+                LaunchDebugTarget(targetName, ndk, device, null, executablePath);
             }
         }
 
@@ -621,27 +621,34 @@ namespace BlackBerry.Package.Components
         /// </summary>
         /// <param name="pidOrTargetAppName">Process ID in string format or the binary name for debugger to attach to.</param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool LaunchDebugTarget(string pidOrTargetAppName, NdkInfo ndk, DeviceDefinition target, string publicKeyPath, string executablePath)
+        private bool LaunchDebugTarget(string pidOrTargetAppName, NdkInfo ndk, DeviceDefinition target, string sshPublicKeyPath, string executablePath)
         {
             TraceLog.WriteLine("BUILD: Starting debugger ('{0}', {1})", pidOrTargetAppName, executablePath);
 
-            ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
-            IVsDebugger dbg = (IVsDebugger)sp.GetService(typeof(SVsShellDebugger));
-            VsDebugTargetInfo info = new VsDebugTargetInfo();
+            IVsDebugger dbg;
+            IVsUIShell shell;
+            using (var serviceProvider = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider) _dte))
+            {
+                dbg = (IVsDebugger)serviceProvider.GetService(typeof(SVsShellDebugger));
+                shell = (IVsUIShell)serviceProvider.GetService(typeof(SVsUIShell));
+            }
 
+            VsDebugTargetInfo info = new VsDebugTargetInfo();
             info.cbSize = (uint)Marshal.SizeOf(info);
             info.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
             info.bstrExe = executablePath; // The executable path
 
             // Store all debugger arguments in a string
             var nvc = new Dictionary<string, string>();
-            nvc["pid"] = pidOrTargetAppName;
-            nvc["ToolsPath"] = ndk.ToDefinition().ToolsPath;
-            nvc["PublicKeyPath"] = publicKeyPath;
-            nvc["targetIP"] = target.IP; // The device (IP address)
-            nvc["Password"] = target.Password;
-            nvc["isSimulator"] = (target.Type == DeviceDefinitionType.Simulator).ToString();
+            nvc["pidOrName"] = pidOrTargetAppName;
+            if (!string.IsNullOrEmpty(sshPublicKeyPath))
+            {
+                nvc["sshKeyPath"] = sshPublicKeyPath;
+            }
+            CollectionHelper.AppendDevice(nvc, target);
+            CollectionHelper.AppendNDK(nvc, ndk.ToDefinition());
             info.bstrArg = CollectionHelper.Serialize(nvc);
+
             info.bstrRemoteMachine = null; // debug locally
             info.fSendStdoutToOutputWindow = 0; // Let stdout stay with the application.
             info.clsidCustom = new Guid(AD7Engine.DebugEngineGuid); // Set the launching engine as the BlackBerry debug-engine
@@ -656,10 +663,11 @@ namespace BlackBerry.Package.Components
                 if (result != VSConstants.S_OK)
                 {
                     string message;
-                    IVsUIShell sh = (IVsUIShell)sp.GetService(typeof(SVsUIShell));
-                    sh.GetErrorInfo(out message);
-                    TraceLog.WriteLine("LaunchDebugTargets: " + message.Trim());
+                    shell.GetErrorInfo(out message);
+                    message = message.Trim();
 
+                    TraceLog.WriteLine("LaunchDebugTargets: " + message);
+                    MessageBoxHelper.Show(message, null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return true;
                 }
             }

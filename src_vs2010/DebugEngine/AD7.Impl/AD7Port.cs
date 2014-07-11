@@ -14,7 +14,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Model;
@@ -66,7 +65,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="guid">The GUID that identifies the port.</param>
         /// <param name="name">The name of the port.</param>
         /// <param name="device">Description of the device it should communicate with.</param>
-        /// <param name="toolsPath">The NDK host path.</param>
+        /// <param name="ndk">The description of NDK installed on host machine.</param>
         public AD7Port(AD7PortSupplier supplier, AD7PortRequest request, Guid guid, string name, DeviceDefinition device, NdkDefinition ndk)
         {
             if (supplier == null)
@@ -248,14 +247,19 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns VSConstants.S_OK; otherwise, returns VSConstants.S_FALSE. </returns>
         public int GetProcess(AD_PROCESS_ID ProcessId, out IDebugProcess2 ppProcess)
         {
-            IEnumerable<AD7Process> procList = GetProcesses();
-            var proc = from p in procList
-                       where p.ID == ProcessId.dwProcessId
-                       select p;
-            ppProcess = proc.FirstOrDefault();
+            IEnumerable<AD7Process> list = GetProcesses();
+
+            ppProcess = null;
+            foreach (var process in list)
+            {
+                if (process.ID == ProcessId.dwProcessId)
+                {
+                    ppProcess = process;
+                    break;
+                }
+            }
             return ppProcess != null ? VSConstants.S_OK : VSConstants.S_FALSE;
         }
-
 
         /// <summary>
         /// Enumerates all the processes running on a port. (http://msdn.microsoft.com/en-us/library/bb161302.aspx)
@@ -277,10 +281,10 @@ namespace BlackBerry.DebugEngine
 
                 if (seconds > 1)
                 {
-                    IEnumerable<AD7Process> procList = GetProcesses();
-                    _processes = new IDebugProcess2[procList.Count()];
+                    var processlist = GetProcesses();
+                    _processes = new IDebugProcess2[processlist.Length];
                     int i = 0;
-                    foreach (var debugProcess in procList)
+                    foreach (var debugProcess in processlist)
                     {
                         _processes[i] = debugProcess;
                         i++;

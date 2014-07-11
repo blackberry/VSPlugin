@@ -59,7 +59,7 @@ namespace BlackBerry.DebugEngine
 
         /// <summary>
         /// This method cancels asynchronous expression evaluation as started by a call to the IDebugExpression2::EvaluateAsync method.
-        /// Not implemented yet because it was not needed till now. (http://msdn.microsoft.com/en-ca/library/bb145924.aspx)
+        /// Not implemented yet because it was not needed yet. (http://msdn.microsoft.com/en-ca/library/bb145924.aspx)
         /// </summary>
         /// <returns> Not implemented. </returns>
         int IDebugExpression2.Abort()
@@ -78,6 +78,13 @@ namespace BlackBerry.DebugEngine
             _frame._engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, ppResult), AD7ExpressionEvaluationCompleteEvent.IID, _frame._engine, _frame._thread);
         }
 
+        private void EvaluateAsyncCompleted(IAsyncResult ar)
+        {
+            // release async-call system resources:
+            var action = (Action) ar.AsyncState;
+            action.EndInvoke(ar);
+        }
+
         /// <summary>
         /// This method evaluates the expression asynchronously.
         /// This is primarily used for the immediate window. (http://msdn.microsoft.com/en-ca/library/bb146752.aspx)
@@ -87,9 +94,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback)
         {
-            // Creating a thread to evaluate the expression asynchronously.
-            Thread processingThread = new Thread(EvaluatingAsync);
-            processingThread.Start();
+            // Evaluate the expression asynchronously
+            var action = new Action(EvaluatingAsync);
+            action.BeginInvoke(EvaluateAsyncCompleted, action);
 
             return VSConstants.S_OK;
         }

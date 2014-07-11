@@ -29,6 +29,7 @@ namespace BlackBerry.DebugEngine
     public sealed class AD7PendingBreakpoint : IDebugPendingBreakpoint2
     {
         private readonly AD7Engine _engine;
+
         /// <summary>
         /// The breakpoint request that resulted in this pending breakpoint being created.
         /// </summary>
@@ -80,19 +81,22 @@ namespace BlackBerry.DebugEngine
         /// Determines whether this pending breakpoint can bind to a code location.
         /// </summary>
         /// <returns> If successful, returns TRUE; otherwise, returns FALSE. </returns>
-        private bool CanBind()
+        private bool CanBind
         {
-            if (_deleted || !_engine.HasProcess)
+            get
+            {
+                if (_deleted || !_engine.HasProcess)
+                    return false;
+
+                // The engine only supports these types of breakpoints:
+                // - file and line number
+                // - function name and offset
+                if (_breakpointRequestInfo.bpLocation.bpLocationType == (uint) enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE
+                    || _breakpointRequestInfo.bpLocation.bpLocationType == (uint) enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
+                    return true;
+
                 return false;
-
-            // The engine only supports these types of breakpoints:
-            // - file and line number
-            // - function name and offset
-            if (_breakpointRequestInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE
-                || _breakpointRequestInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
-                return true;
-
-            return false;
+            }
         }
 
         /// <summary>
@@ -136,7 +140,7 @@ namespace BlackBerry.DebugEngine
 
             try
             {
-                if (CanBind())
+                if (CanBind)
                 {
                     // Visual Studio returns a start position that is one less than it actually is
                     var boundBreakpoint = new AD7BoundBreakpoint(_engine, _breakpointRequestInfo, this);
@@ -177,7 +181,7 @@ namespace BlackBerry.DebugEngine
         {
             ppErrorEnum = null;
 
-            if (!CanBind())
+            if (!CanBind)
             {
                 // PH: FIXME:
                 // The breakpoint could not be bound. This may occur for many reasons such as an invalid location, an invalid 

@@ -50,6 +50,8 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         private IDebugPort2 _port;
 
+        private readonly bool _attaching;
+
         /// <summary>
         /// The list of programs that are running in this process.
         /// </summary>
@@ -58,13 +60,22 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="port"> The IDebugPort2 object that represents the port on which the process was launched. </param>
-        public AD7Process(IDebugPort2 port)
+        /// <param name="port">The IDebugPort2 object that represents the port on which the process was launched.</param>
+        /// <param name="details">The ID of the process running on the device and local path to the executable.</param>
+        /// <param name="device">Description of the device the process is running programs on.</param>
+        public AD7Process(IDebugPort2 port, ProcessInfo details, DeviceDefinition device)
         {
             if (port == null)
                 throw new ArgumentNullException("port");
+            if (details == null)
+                throw new ArgumentNullException("details");
+            if (device == null)
+                throw new ArgumentNullException("device");
 
             _port = port;
+            _attaching = false;
+            _details = details;
+            Device = device;
             _listOfPrograms = new List<IDebugProgram2>();
             UID = Guid.NewGuid();
         }
@@ -72,17 +83,21 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="port"> The AD7Port object that represents the port used in Attach to Process UI. </param>
-        /// <param name="details"> The name and ID of the process running on device. </param>
+        /// <param name="port">The AD7Port object that represents the port used in Attach to Process UI.</param>
+        /// <param name="details">The name and ID of the process running on device.</param>
         public AD7Process(AD7Port port, ProcessInfo details)
         {
             if (port == null)
                 throw new ArgumentNullException("port");
+            if (port.Device == null)
+                throw new ArgumentOutOfRangeException("port");
             if (details == null)
                 throw new ArgumentNullException("details");
 
             _port = port;
+            _attaching = true;
             _details = details;
+            Device = port.Device;
             _listOfPrograms = new List<IDebugProgram2>();
             UID = Guid.NewGuid();
         }
@@ -91,7 +106,7 @@ namespace BlackBerry.DebugEngine
 
         public uint ID
         {
-            get { return _details != null ? _details.ID : 0; }
+            get { return _details.ID; }
         }
 
         public Guid UID
@@ -112,11 +127,8 @@ namespace BlackBerry.DebugEngine
 
         public DeviceDefinition Device
         {
-            get
-            {
-                var port = _port as AD7Port;
-                return port != null ? port.Device : null;
-            }
+            get;
+            private set;
         }
 
         #endregion
@@ -178,7 +190,7 @@ namespace BlackBerry.DebugEngine
         {
             if (_listOfPrograms.Count == 0)
             {
-                AD7ProgramNodeAttach pn = new AD7ProgramNodeAttach(this, new Guid(AD7Engine.DebugEngineGuid));
+                AD7ProgramNodeAttach pn = new AD7ProgramNodeAttach(this);
                 _listOfPrograms.Add(pn);
             }
 
@@ -286,7 +298,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId)
         {
-            if (_details != null)
+            if (_attaching)
             {
                 pProcessId[0].dwProcessId = _details.ID;
                 pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
@@ -344,28 +356,27 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         #region IDebugProcessEx2 Members
 
         /// <summary>
         /// Informs the process that a session is now debugging the process. (http://msdn.microsoft.com/en-us/library/bb162300.aspx)
         /// </summary>
-        /// <param name="pSession"> A value that uniquely identifies the session attaching to this process. </param>
+        /// <param name="session"> A value that uniquely identifies the session attaching to this process. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int Attach(IDebugSession2 pSession)
+        public int Attach(IDebugSession2 session)
         {
-            _session = pSession;
+            _session = session;
             return VSConstants.S_OK;
         }
 
         /// <summary>
         /// Informs the process that a session is no longer debugging the process. (http://msdn.microsoft.com/en-us/library/bb146313.aspx)
         /// </summary>
-        /// <param name="pSession"> A value that uniquely identifies the session to detach this process from. </param>
+        /// <param name="session"> A value that uniquely identifies the session to detach this process from. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int Detach(IDebugSession2 pSession)
+        public int Detach(IDebugSession2 session)
         {
-            _session = pSession;
+            _session = session;
             return VSConstants.S_OK;
         }
 
@@ -385,6 +396,5 @@ namespace BlackBerry.DebugEngine
         }
 
         #endregion
-        
     }
 }

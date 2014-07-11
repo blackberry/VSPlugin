@@ -14,6 +14,7 @@
 
 using System;
 using System.Text;
+using BlackBerry.NativeCore;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
@@ -21,7 +22,6 @@ using System.Threading;
 
 namespace BlackBerry.DebugEngine
 {
-
     /// <summary> 
     /// This class represents a breakpoint that has been bound to a location in the debuggee. It is a child of the pending 
     /// breakpoint that creates it. Unless the pending breakpoint only has one bound breakpoint, each bound breakpoint is displayed as 
@@ -125,44 +125,24 @@ namespace BlackBerry.DebugEngine
             set { _GDB_Address = value; }
         }
 
-
-        /// <summary> 
-        /// GDB works with short path names only, which requires converting the path names to/from long ones. This function 
-        /// returns the short path name for a given long one. 
-        /// </summary>
-        /// <param name="path">Long path name. </param>
-        /// <param name="shortPath">Returns this short path name. </param>
-        /// <param name="shortPathLength"> Lenght of this short path name. </param>
-        /// <returns></returns>
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern int GetShortPathName(
-                 [MarshalAs(UnmanagedType.LPTStr)]
-                   string path,
-                 [MarshalAs(UnmanagedType.LPTStr)]
-                   StringBuilder shortPath,
-                 int shortPathLength
-                 );
-
-
         /// <summary> 
         /// AD7BoundBreakpoint constructor for file/line breaks. 
         /// </summary>
         /// <param name="engine"> AD7 Engine. </param>
-        /// <param name="bpReqInfo"> Contains the information required to implement a breakpoint. </param>
+        /// <param name="requestInfo"> Contains the information required to implement a breakpoint. </param>
         /// <param name="pendingBreakpoint"> Associated pending breakpoint. </param>
-        public AD7BoundBreakpoint(AD7Engine engine, BP_REQUEST_INFO bpReqInfo, AD7PendingBreakpoint pendingBreakpoint)
+        public AD7BoundBreakpoint(AD7Engine engine, BP_REQUEST_INFO requestInfo, AD7PendingBreakpoint pendingBreakpoint)
         {
-            if (bpReqInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
+            if (engine == null)
+                throw new ArgumentNullException("engine");
+
+            if (requestInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
             {
                 string documentName;
 
-                // Get Decument Position and File Name
-                IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(bpReqInfo.bpLocation.unionmember2));
+                // Get Document Position and File Name
+                IDebugDocumentPosition2 docPosition = (IDebugDocumentPosition2)(Marshal.GetObjectForIUnknown(requestInfo.bpLocation.unionmember2));
                 docPosition.GetFileName(out documentName);
-
-                // Need to shorten the path we send to GDB.
-                StringBuilder shortPath = new StringBuilder(1024);
-                GetShortPathName(documentName, shortPath, shortPath.Capacity);
 
                 // Get the location in the document that the breakpoint is in.
                 TEXT_POSITION[] startPosition = new TEXT_POSITION[1];
@@ -171,7 +151,8 @@ namespace BlackBerry.DebugEngine
 
                 _engine = engine;
                 m_bpLocationType = (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE;
-                m_filename = shortPath.ToString();
+                // Need to shorten the path we send to GDB.
+                m_filename = NativeMethods.GetShortPathName(documentName);
                 m_line = startPosition[0].dwLine + 1;
 
                 _pendingBreakpoint = pendingBreakpoint;
@@ -180,11 +161,11 @@ namespace BlackBerry.DebugEngine
                 _hitCount = 0;
                 m_remoteID = _engine.BreakpointManager.RemoteAdd(this);
             }
-            else if (bpReqInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
+            else if (requestInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
                 string func;
 
-                IDebugFunctionPosition2 funcPosition = (IDebugFunctionPosition2)(Marshal.GetObjectForIUnknown(bpReqInfo.bpLocation.unionmember2));
+                IDebugFunctionPosition2 funcPosition = (IDebugFunctionPosition2)(Marshal.GetObjectForIUnknown(requestInfo.bpLocation.unionmember2));
                 funcPosition.GetFunctionName(out func);
 
                 _engine = engine;
@@ -197,17 +178,16 @@ namespace BlackBerry.DebugEngine
                 m_remoteID = _engine.BreakpointManager.RemoteAdd(this);
             }
 
-//            if ((m_remoteID == 0) && (VSNDK.AddIn.VSNDKAddIn.isDebugEngineRunning == false))
             if (m_remoteID == 0)
             {
                 return;
             }
 
             // Set the hit count and condition
-            if (bpReqInfo.bpPassCount.stylePassCount != enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE)
-                SetPassCount(bpReqInfo.bpPassCount);
-            if (bpReqInfo.bpCondition.styleCondition != enum_BP_COND_STYLE.BP_COND_NONE)
-                SetCondition(bpReqInfo.bpCondition);
+            if (requestInfo.bpPassCount.stylePassCount != enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE)
+                SetPassCount(requestInfo.bpPassCount);
+            if (requestInfo.bpCondition.styleCondition != enum_BP_COND_STYLE.BP_COND_NONE)
+                SetCondition(requestInfo.bpCondition);
 
             // Get the Line Position sent back from GDB
             TEXT_POSITION tpos = new TEXT_POSITION();
@@ -325,7 +305,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK if successful, VSConstants.S_FALSE if not. </returns>
         public int SetCondition(BP_CONDITION bpCondition)
         {
-            bool updatingCondBreak = this._engine.m_updatingConditionalBreakpoint.WaitOne(0);
+            bool updatingCondBreak = _engine._updatingConditionalBreakpoint.WaitOne(0);
             bool isRunning = false;
             bool verifyCondition = false;
             int result = VSConstants.S_FALSE;
@@ -407,7 +387,7 @@ namespace BlackBerry.DebugEngine
                 _engine.EventDispatcher.ResumeFromInterrupt();
             }
 
-            this._engine.m_updatingConditionalBreakpoint.Set();
+            this._engine._updatingConditionalBreakpoint.Set();
 
             return result;
         }
