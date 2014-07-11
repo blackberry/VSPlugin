@@ -19,6 +19,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace BlackBerry.DebugEngine
 {
@@ -35,7 +36,7 @@ namespace BlackBerry.DebugEngine
     /// </summary>
     [ComVisible(true)]
     [Guid(ClassGuid)]
-    public sealed class AD7PortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2
+    public sealed class AD7PortSupplier : IDebugPortSupplier2, IDebugPortSupplierDescription2, IDebugPortPicker
     {
         public const string PublicName = "BlackBerry Native Debugger";
         public const string ClassGuid = "BDC2218C-D50C-4A5A-A2F6-66BDC94FF8D6";
@@ -149,7 +150,7 @@ namespace BlackBerry.DebugEngine
             }
 
             ppPort = null;
-            return VSConstants.S_FALSE;
+            return VSConstants.E_FAIL;
         }
 
         private AD7Port FindPort(string text)
@@ -320,5 +321,19 @@ namespace BlackBerry.DebugEngine
         }
 
         #endregion
+
+        public int SetSite(IServiceProvider serviceProvider)
+        {
+            return VSConstants.S_OK;
+        }
+
+        public int DisplayPortPicker(IntPtr hwndParentDialog, out string pbstrPortId)
+        {
+            MessageBox.Show(
+                "Searching is not supported.\r\nPlease add more devices at \"BlackBerry -> Options -> Targets\", if you want to quickly switch between them. They will automatically appear, when \"Qualifier\" list is expanded.",
+                "Microsoft Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            pbstrPortId = null;
+            return VSConstants.S_FALSE;
+        }
     }
 }

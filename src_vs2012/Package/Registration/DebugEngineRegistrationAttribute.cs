@@ -167,11 +167,10 @@ namespace BlackBerry.Package.Registration
                 var portSupplierFormattedGuid = AttributeHelper.Format(PortSupplierClassGUID);
 
                 key.SetValue("PortSupplier", portSupplierFormattedGuid);
-
                 var supplierDetailsKey = context.CreateKey(@"AD7Metrics\PortSupplier\" + portSupplierFormattedGuid);
                 supplierDetailsKey.SetValue("DisallowUserEnteredPorts", 0u);
                 supplierDetailsKey.SetValue("CLSID", portSupplierFormattedGuid);
-                //supplierDetailsKey.SetValue("PortPickerCLSID", "{3FAA02D6-72D8-4F69-A1E6-BB05ECB4E37A}");
+                supplierDetailsKey.SetValue("PortPickerCLSID", portSupplierFormattedGuid);
                 supplierDetailsKey.Close();
             }
             key.Close();
