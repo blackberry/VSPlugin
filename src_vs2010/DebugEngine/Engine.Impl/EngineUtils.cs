@@ -48,5 +48,14 @@ namespace BlackBerry.DebugEngine
             Debug.Fail("Unexpected exception: " + ex);
             return VSConstants.E_FAIL;
         }
+
+        public static int NotImplemented()
+        {
+            TraceLog.WriteLine("Hit non implemented method!");
+            if (Debugger.IsAttached)
+                Debugger.Break();
+
+            return VSConstants.E_NOTIMPL;
+        }
     }
 }

@@ -824,7 +824,7 @@ namespace BlackBerry.DebugEngine
         public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum)
         {
             ppEnum = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -845,7 +845,7 @@ namespace BlackBerry.DebugEngine
         {
             pathEnum = null;
             safetyContext = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
 
@@ -978,7 +978,7 @@ namespace BlackBerry.DebugEngine
         public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
         {
             disassemblyStream = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
 
@@ -1105,7 +1105,7 @@ namespace BlackBerry.DebugEngine
             }
             else if (sk == enum_STEPKIND.STEP_BACKWARDS)
             {
-                return VSConstants.E_NOTIMPL;
+                return EngineUtils.NotImplemented();
             }
             else
             {
@@ -1140,7 +1140,7 @@ namespace BlackBerry.DebugEngine
         public int WriteDump(enum_DUMPTYPE DUMPTYPE, string pszDumpUrl)
         {
             // The VSNDK debugger does not support creating or reading mini-dumps.
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         #endregion
@@ -1178,7 +1178,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         public int Stop()
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
 
@@ -1489,9 +1489,7 @@ namespace BlackBerry.DebugEngine
         int IDebugEngine2.EnumPrograms(out IEnumDebugPrograms2 programs)
         {
             programs = null;
-
-            Debug.Fail("This function is not called by the debugger");
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -1499,11 +1497,9 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="programs"> An IDebugEventCallback2 object to be used for debug event notification. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int Attach(IDebugEventCallback2 pCallback)
+        public int Attach(IDebugEventCallback2 callback)
         {
-            Debug.Fail("This function is not called by the debugger");
-
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -1514,9 +1510,7 @@ namespace BlackBerry.DebugEngine
         public int GetProcess(out IDebugProcess2 process)
         {
             process = null;
-
-            Debug.Fail("This function is not called by the debugger");
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary> TODO: Verify if this method is called or not by VS.

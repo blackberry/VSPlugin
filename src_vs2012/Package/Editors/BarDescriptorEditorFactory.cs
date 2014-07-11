@@ -15,6 +15,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using BlackBerry.DebugEngine;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -166,11 +167,9 @@ namespace BlackBerry.Package.Editors
                 // primary view uses NULL as pbstrPhysicalView
                 return VSConstants.S_OK;        
             }
-            else
-            {
-                // you must return E_NOTIMPL for any unrecognized rguidLogicalView values
-                return VSConstants.E_NOTIMPL;
-            } 
+
+            // you must return E_NOTIMPL for any unrecognized rguidLogicalView values
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>

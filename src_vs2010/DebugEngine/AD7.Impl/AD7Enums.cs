@@ -54,7 +54,7 @@ namespace BlackBerry.DebugEngine
         public int Clone(out I ppEnum)
         {
             ppEnum = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>

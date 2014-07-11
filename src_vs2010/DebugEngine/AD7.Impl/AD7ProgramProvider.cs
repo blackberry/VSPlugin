@@ -90,7 +90,7 @@ namespace BlackBerry.DebugEngine
         {
             // This method is used for Just-In-Time debugging support, which this program provider does not support
             programNode = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>

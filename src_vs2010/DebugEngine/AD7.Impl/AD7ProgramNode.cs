@@ -150,8 +150,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         int IDebugProgramNode2.Attach_V7(IDebugProgram2 pMDMProgram, IDebugEventCallback2 pCallback, uint dwReason)
         {
-            Debug.Fail("This function is not called by the debugger");
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -160,8 +159,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         int IDebugProgramNode2.DetachDebugger_V7()
         {
-            Debug.Fail("This function is not called by the debugger");
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -172,8 +170,7 @@ namespace BlackBerry.DebugEngine
         int IDebugProgramNode2.GetHostMachineName_V7(out string hostMachineName)
         {
             hostMachineName = null;
-            Debug.Fail("This function is not called by the debugger");
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         #endregion

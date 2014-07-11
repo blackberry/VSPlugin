@@ -1159,7 +1159,7 @@ namespace BlackBerry.DebugEngine
                     CreateParameterProperties(dwFields, out elementsReturned, out enumObject);
                     return VSConstants.S_OK;
                 }
-                return VSConstants.E_NOTIMPL;
+                return EngineUtils.NotImplemented();
             }
             catch (Exception ex)
             {
@@ -1327,8 +1327,7 @@ namespace BlackBerry.DebugEngine
         int IDebugStackFrame2.GetName(out string name)
         {
             name = null;
-
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -1342,8 +1341,7 @@ namespace BlackBerry.DebugEngine
         {
             addrMin = 0;
             addrMax = 0;
-
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -1372,7 +1370,7 @@ namespace BlackBerry.DebugEngine
         int IDebugExpressionContext2.GetName(out string pbstrName)
         {
             pbstrName = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>

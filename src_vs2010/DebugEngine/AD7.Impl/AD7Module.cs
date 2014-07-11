@@ -122,7 +122,7 @@ namespace BlackBerry.DebugEngine
         {
             debugMessage = null;
             Debug.Fail("This function is not called by the debugger.");
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -135,7 +135,7 @@ namespace BlackBerry.DebugEngine
         int IDebugModule3.ReloadSymbols_Deprecated(string pszUrlToSymbols, out string pbstrDebugMessage)
         {
             pbstrDebugMessage = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         #endregion
@@ -193,7 +193,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugModule3.LoadSymbols()
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -205,7 +205,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugModule3.SetJustMyCodeState(int fIsUserCode)
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
     }
 }

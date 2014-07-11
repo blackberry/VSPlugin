@@ -208,7 +208,7 @@ namespace BlackBerry.DebugEngine
         public int GetAttachedSessionName(out string pbstrSessionName)
         {
             pbstrSessionName = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>

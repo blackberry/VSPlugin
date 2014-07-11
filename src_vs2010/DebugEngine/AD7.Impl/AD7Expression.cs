@@ -64,7 +64,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugExpression2.Abort()
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>

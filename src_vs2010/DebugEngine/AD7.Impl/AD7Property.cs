@@ -220,7 +220,7 @@ namespace BlackBerry.DebugEngine
         public int GetDerivedMostProperty(out IDebugProperty2 ppDerivedMost)
         {
             ppDerivedMost = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -238,7 +238,7 @@ namespace BlackBerry.DebugEngine
         public int GetExtendedInfo(ref Guid guidExtendedInfo, out object pExtendedInfo)
         {
             pExtendedInfo = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace BlackBerry.DebugEngine
         public int GetMemoryBytes(out IDebugMemoryBytes2 ppMemoryBytes)
         {
             ppMemoryBytes = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace BlackBerry.DebugEngine
         public int GetMemoryContext(out IDebugMemoryContext2 ppMemory)
         {
             ppMemory = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -274,7 +274,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetParent(out IDebugProperty2 ppParent)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppParent = null;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -307,7 +308,7 @@ namespace BlackBerry.DebugEngine
         public int GetReference(out IDebugReference2 ppReference)
         {
             ppReference = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -318,7 +319,7 @@ namespace BlackBerry.DebugEngine
         public int GetSize(out uint pdwSize)
         {
             pdwSize = 0;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -337,7 +338,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int SetValueAsReference(IDebugReference2[] rgpArgs, uint dwArgCount, IDebugReference2 pValue, uint dwTimeout)
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>

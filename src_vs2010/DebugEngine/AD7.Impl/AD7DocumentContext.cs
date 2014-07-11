@@ -75,7 +75,7 @@ namespace BlackBerry.DebugEngine
         int IDebugDocumentContext2.Compare(enum_DOCCONTEXT_COMPARE compare, IDebugDocumentContext2[] rgpDocContextSet, uint dwDocContextSetLen, out uint pdwDocContext)
         {
             pdwDocContext = 0;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -151,7 +151,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugDocumentContext2.GetSourceRange(TEXT_POSITION[] pBegPosition, TEXT_POSITION[] pEndPosition)
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -190,7 +190,7 @@ namespace BlackBerry.DebugEngine
         int IDebugDocumentContext2.Seek(int nCount, out IDebugDocumentContext2 ppDocContext)
         {
             ppDocContext = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         #endregion

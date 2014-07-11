@@ -123,7 +123,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugErrorBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType)
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -141,7 +141,7 @@ namespace BlackBerry.DebugEngine
             if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_MESSAGE) != 0) { }
             if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_TYPE) != 0) { }
 
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         #endregion

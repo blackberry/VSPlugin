@@ -145,7 +145,7 @@ namespace BlackBerry.DebugEngine
 
                         default:
                             // A new comparison was invented that we don't support
-                            return VSConstants.E_NOTIMPL;
+                            return EngineUtils.NotImplemented();
                     }
 
                     if (result)
@@ -172,7 +172,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetInfo(enum_CONTEXT_INFO_FIELDS dwFields, CONTEXT_INFO[] pinfo)
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace BlackBerry.DebugEngine
         public int GetName(out string pbstrName)
         {
             pbstrName = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>

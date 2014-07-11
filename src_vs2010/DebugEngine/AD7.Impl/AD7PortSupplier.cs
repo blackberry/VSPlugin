@@ -300,7 +300,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
         public int RemovePort(IDebugPort2 pPort)
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         #endregion

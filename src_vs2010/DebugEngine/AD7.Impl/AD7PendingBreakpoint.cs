@@ -262,7 +262,7 @@ namespace BlackBerry.DebugEngine
             // IDebugPendingBreakpoint2::EnumErrorBreakpoints. The debugger will then display information about why the breakpoint 
             // did not bind to the user.
             ppEnum = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -309,7 +309,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugPendingBreakpoint2.SetCondition(BP_CONDITION bpCondition)
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -321,7 +321,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         int IDebugPendingBreakpoint2.SetPassCount(BP_PASSCOUNT bpPassCount)
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
