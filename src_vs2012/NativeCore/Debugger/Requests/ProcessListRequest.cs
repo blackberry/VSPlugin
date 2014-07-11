@@ -40,7 +40,7 @@ namespace BlackBerry.NativeCore.Debugger.Requests
         /// <summary>
         /// Parses typical response from GDB.
         /// </summary>
-        private static ProcessInfo[] ParseProcessList(string[] info)
+        private static ProcessInfo[] ParseProcessList(IEnumerable<string> info)
         {
             const string processEndToken = " - ";
             var result = new List<ProcessInfo>();
@@ -96,6 +96,13 @@ namespace BlackBerry.NativeCore.Debugger.Requests
             foreach (var process in Processes)
             {
                 if (string.CompareOrdinal(process.ExecutablePath, executable) == 0)
+                    return process;
+            }
+
+            // is the name matching:
+            foreach (var process in Processes)
+            {
+                if (string.CompareOrdinal(process.Name, executable) == 0)
                     return process;
             }
 
