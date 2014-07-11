@@ -234,11 +234,11 @@ namespace BlackBerry.DebugEngine
         {
             bool isRunning = false;
             int result = VSConstants.S_FALSE;
-            while (!_engine.EventDispatcher.lockedBreakpoint(this, true, false))
+            while (!_engine.EventDispatcher.LockedBreakpoint(this, true, false))
             {
                 Thread.Sleep(0);
             }
-            while (!_engine.EventDispatcher.enterCriticalRegion())
+            while (!_engine.EventDispatcher.EnterCriticalRegion())
             {
                 Thread.Sleep(0);
             }
@@ -312,8 +312,8 @@ namespace BlackBerry.DebugEngine
                 _engine.EventDispatcher.ResumeFromInterrupt();
             }
 
-            _engine.EventDispatcher.leaveCriticalRegion();
-            _engine.EventDispatcher.unlockBreakpoint(this, true, false);
+            _engine.EventDispatcher.LeaveCriticalRegion();
+            _engine.EventDispatcher.UnlockBreakpoint(this, true, false);
             return result;
         }
 
@@ -329,7 +329,7 @@ namespace BlackBerry.DebugEngine
             bool isRunning = false;
             bool verifyCondition = false;
             int result = VSConstants.S_FALSE;
-            while (!_engine.EventDispatcher.lockedBreakpoint(this, false, true))
+            while (!_engine.EventDispatcher.LockedBreakpoint(this, false, true))
             {
                 Thread.Sleep(0);
             }
@@ -339,7 +339,7 @@ namespace BlackBerry.DebugEngine
                 _engine.EventDispatcher.resetHitCount(this, false);
             }
 
-            while (!_engine.EventDispatcher.enterCriticalRegion())
+            while (!_engine.EventDispatcher.EnterCriticalRegion())
             {
                 Thread.Sleep(0);
             }
@@ -391,8 +391,8 @@ namespace BlackBerry.DebugEngine
                     result = VSConstants.S_OK;
             }
 
-            _engine.EventDispatcher.leaveCriticalRegion();
-            _engine.EventDispatcher.unlockBreakpoint(this, false, true);
+            _engine.EventDispatcher.LeaveCriticalRegion();
+            _engine.EventDispatcher.UnlockBreakpoint(this, false, true);
 
             if (verifyCondition)
             {

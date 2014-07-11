@@ -159,7 +159,7 @@ namespace BlackBerry.DebugEngine
             if ((_id != "") && (_id != _engine.CurrentThread()._id))
                 _engine.EventDispatcher.SelectThread(_id);
 
-            string stackResponse = _engine.EventDispatcher.getStackFrames().Replace("#;;;;", "");
+            string stackResponse = _engine.EventDispatcher.GetStackFrames().Replace("#;;;;", "");
 
             if (stackResponse != "")
             {
@@ -232,7 +232,7 @@ namespace BlackBerry.DebugEngine
             if ((_id != "") && (_id != _engine.CurrentThread()._id))
                 _engine.EventDispatcher.SelectThread(_id);
 
-            string stackResponse = _engine.EventDispatcher.getStackFrames().Replace("#;;;;", "");
+            string stackResponse = _engine.EventDispatcher.GetStackFrames().Replace("#;;;;", "");
             if (stackResponse == "")
             {
                 ppEnum = null;

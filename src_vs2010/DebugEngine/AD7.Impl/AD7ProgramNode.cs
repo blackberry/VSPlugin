@@ -104,16 +104,8 @@ namespace BlackBerry.DebugEngine
         {
             // According to the MSDN documentation (http://msdn.microsoft.com/en-us/library/bb162159.aspx),
             // it should return the process id of the hosting process, but what is expected is the program ID...
-            if (_program != null)
-            {
-                pHostProcessId[0].ProcessIdType = (uint) enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
-                pHostProcessId[0].dwProcessId = _program.ID;
-            }
-            else
-            {
-                pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
-                pHostProcessId[0].guidProcessId = _processGuid;
-            }
+            pHostProcessId[0].ProcessIdType = (uint) enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+            pHostProcessId[0].guidProcessId = _processGuid;
 
             return VSConstants.S_OK;
         }

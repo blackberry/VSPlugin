@@ -262,7 +262,7 @@ namespace BlackBerry.DebugEngine
                             vi.ListChildren(eventDispatcher, "*", GDBNames, VSNames, hasVsNdK, null);
                         else
                             vi.ListChildren(eventDispatcher, "", GDBNames, VSNames, hasVsNdK, null);
-                        eventDispatcher.deleteVar(vi._name, hasVsNdK);
+                        eventDispatcher.DeleteVar(vi._name, hasVsNdK);
                     }
                 }
             }
@@ -428,7 +428,7 @@ namespace BlackBerry.DebugEngine
 
                 }
 
-                dispatcher.deleteVar(_name, hasVsNdK);
+                dispatcher.DeleteVar(_name, hasVsNdK);
             }
 
             if (value == null)
@@ -728,7 +728,7 @@ namespace BlackBerry.DebugEngine
             _address = uint.Parse(address, System.Globalization.NumberStyles.AllowHexSpecifier);
 
             // Query GDB for parameters and locals.
-            string variablesResponse = _engine.EventDispatcher.getVariablesForFrame(level, _thread._id).Replace("#;;;", "");
+            string variablesResponse = _engine.EventDispatcher.GetVariablesForFrame(level, _thread._id).Replace("#;;;", "");
             if (variablesResponse == null || variablesResponse == "ERROR" || variablesResponse == "")
                 return;
             variablesResponse = variablesResponse.Substring(3);

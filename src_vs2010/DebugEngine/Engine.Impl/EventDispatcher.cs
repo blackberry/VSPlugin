@@ -584,7 +584,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="cond"> True if user is adding/modifying conditions under which a conditional breakpoint fires. It is also true
         /// when event dispatcher is handling a breakpoint hit. </param>
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
-        public bool lockedBreakpoint(AD7BoundBreakpoint bbp, bool hit, bool cond)
+        public bool LockedBreakpoint(AD7BoundBreakpoint bbp, bool hit, bool cond)
         {
             lock (_lockBreakpoint)
             {
@@ -617,7 +617,6 @@ namespace BlackBerry.DebugEngine
             }
         }
 
-
         /// <summary>
         /// Unlock a breakpoint after updating its hit counts and/or condition. This is done to avoid a race condition that can happen when
         /// user modifies a breakpoint condition at run time and the same breakpoint is hit. When that happens, only one event will be
@@ -628,7 +627,7 @@ namespace BlackBerry.DebugEngine
         /// when event dispatcher is handling a breakpoint hit. </param>
         /// <param name="cond"> True if user is adding/modifying conditions under which a conditional breakpoint fires. It is also true
         /// when event dispatcher is handling a breakpoint hit. </param>
-        public void unlockBreakpoint(AD7BoundBreakpoint bbp, bool hit, bool cond)
+        public void UnlockBreakpoint(AD7BoundBreakpoint bbp, bool hit, bool cond)
         {
             lock (_unlockBreakpoint)
             {
@@ -648,14 +647,13 @@ namespace BlackBerry.DebugEngine
             }
         }
 
-
         /// <summary>
         /// Control access to a critical region, that manipulates some of the debug engine variables, like its state. This is done to 
         /// avoid a race condition that can happen when user modifies a breakpoint condition at run time and the same breakpoint is hit. 
         /// When that happens, only one event will be handled at a time.
         /// </summary>
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
-        public bool enterCriticalRegion()
+        public bool EnterCriticalRegion()
         {
             lock (_criticalRegion)
             {
@@ -668,27 +666,25 @@ namespace BlackBerry.DebugEngine
             }
         }
 
-
         /// <summary>
         /// Leave the critical region, that manipulates some of the debug engine variables, like its state. This is done to 
         /// avoid a race condition that can happen when user modifies a breakpoint condition at run time and the same breakpoint is hit. 
         /// When that happens, only one event will be handled at a time.
         /// </summary>
-        public void leaveCriticalRegion()
+        public void LeaveCriticalRegion()
         {
             lock (_leaveCriticalRegion)
             {
                 _inCriticalRegion = false;
             }
         }
-       
 
         /// <summary>
         /// Update VS when a breakpoint is hit in GDB.
         /// </summary>
         /// <param name="ID"> Breakpoint ID from GDB. </param>
         /// <param name="threadID"> Thread ID. </param>
-        public void breakpointHit(uint ID, string threadID)
+        public void BreakpointHit(uint ID, string threadID)
         {
             var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
 
@@ -707,9 +703,9 @@ namespace BlackBerry.DebugEngine
             }
             else
             {
-                if (lockedBreakpoint(bbp, true, true))
+                if (LockedBreakpoint(bbp, true, true))
                 {
-                    while (!enterCriticalRegion())
+                    while (!EnterCriticalRegion())
                     {
                         Thread.Sleep(0);
                     }
@@ -775,12 +771,12 @@ namespace BlackBerry.DebugEngine
                             ignoreHitCount(ID, (int)(bbp._hitCountMultiple - (bbp._hitCount % bbp._hitCountMultiple)));
                         }
                     }
-                    leaveCriticalRegion();
-                    unlockBreakpoint(bbp, true, true);
+                    LeaveCriticalRegion();
+                    UnlockBreakpoint(bbp, true, true);
                 }
                 else
                 {
-                    while (!enterCriticalRegion())
+                    while (!EnterCriticalRegion())
                     {
                         Thread.Sleep(0);
                     }
@@ -797,7 +793,7 @@ namespace BlackBerry.DebugEngine
                         Engine.m_running.Set();
                     }
 
-                    leaveCriticalRegion();
+                    LeaveCriticalRegion();
                 }
             }
         }
@@ -809,7 +805,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="filename"> File name. </param>
         /// <param name="line"> Line number. </param>
         /// <returns> Returns the document context needed for showing the location of the current instruction pointer. </returns>
-        public AD7DocumentContext getDocumentContext(string filename, uint line)
+        public AD7DocumentContext GetDocumentContext(string filename, uint line)
         {
             // Get the location in the document that the breakpoint is in.
             TEXT_POSITION[] startPosition = new TEXT_POSITION[1];
@@ -831,25 +827,23 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="threadID"> Thread ID. </param>
         /// <returns> Returns the stack depth. </returns>
-        public int getStackDepth(string threadID)
+        public int GetStackDepth(string threadID)
         {
             // Returns the parsed response for the GDB/MI command that inquires about the depth of the stack. 
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
             return Convert.ToInt32(GDBParser.parseCommand(@"-stack-info-depth --thread " + threadID + " --frame 0", 9));
         }
 
-
         /// <summary>
         /// List the frames currently on the stack.
         /// </summary>
         /// <returns> Returns a string with the frames currently on the stack. </returns>
-        public string getStackFrames()
+        public string GetStackFrames()
         {
             // Returns the parsed response for the GDB/MI command that list the frames currently on the stack. 
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
             return GDBParser.parseCommand(@"-stack-list-frames", 10);
         }
-
 
         /// <summary>
         /// List the names of local variables and function arguments for the selected frame.
@@ -857,7 +851,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="frameIndex"> Frame number. </param>
         /// <param name="threadID"> Thread ID. </param>
         /// <returns> Returns a string with the names of local variables and function arguments for the selected frame. </returns>
-        public string getVariablesForFrame(uint frameIndex, string threadID)
+        public string GetVariablesForFrame(uint frameIndex, string threadID)
         {
             // Returns the parsed response for the GDB/MI command that list the names of local variables and function arguments for the 
             // selected frame. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
@@ -875,7 +869,6 @@ namespace BlackBerry.DebugEngine
             GDBParser.parseCommand(@"-thread-select " + id, 12);
         }
 
-        
         /// <summary>
         /// Creates a variable object.
         /// </summary>
@@ -900,22 +893,20 @@ namespace BlackBerry.DebugEngine
             return response;
         }
 
-
         /// <summary>
         /// Deletes a previously created variable object and all of its children.
         /// </summary>
         /// <param name="name"> Name of the variable. </param>
-        /// <param name="hasVsNdK_"> Boolean value that indicates if the variable name has the prefix VsNdK_. </param>
-        public void deleteVar(string name, bool hasVsNdK_)
+        /// <param name="hasVsNdK"> Boolean value that indicates if the variable name has the prefix VsNdK_. </param>
+        public void DeleteVar(string name, bool hasVsNdK)
         {
             // Waits for the parsed response for the GDB/MI command that deletes a previously created variable object and all of 
             // its children. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Variable-Objects.html)
-            if (!hasVsNdK_)
+            if (!hasVsNdK)
                 GDBParser.parseCommand("-var-delete " + name, 14);
             else
                 GDBParser.parseCommand("-var-delete VsNdK_" + name, 14);
         }
-
 
         /// <summary>
         /// Return a list of the children of the specified variable object.
@@ -1240,8 +1231,8 @@ namespace BlackBerry.DebugEngine
                         else
                         {
                             // Visual Studio shows the line position one more than it actually is
-                            _eventDispatcher.Engine.m_docContext = _eventDispatcher.getDocumentContext(_fileName, (uint)(_line - 1));
-                            _eventDispatcher.breakpointHit((uint)_number, _threadID);
+                            _eventDispatcher.Engine.m_docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint)(_line - 1));
+                            _eventDispatcher.BreakpointHit((uint)_number, _threadID);
                         }
                         _eventDispatcher.Engine.m_updatingConditionalBreakpoint.Set();
                     }
@@ -1803,7 +1794,7 @@ namespace BlackBerry.DebugEngine
                 eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
 
                 // Visual Studio shows the line position one more than it actually is
-                eventDispatcher.Engine.m_docContext = eventDispatcher.getDocumentContext(file, line - 1);
+                eventDispatcher.Engine.m_docContext = eventDispatcher.GetDocumentContext(file, line - 1);
                 AD7StepCompletedEvent.Send(eventDispatcher.Engine);
             }
         }
@@ -1821,7 +1812,7 @@ namespace BlackBerry.DebugEngine
             if (_fileName != "" && _line > 0)
             {
                 // Visual Studio shows the line position one more than it actually is
-                _eventDispatcher.Engine.m_docContext = _eventDispatcher.getDocumentContext(_fileName, (uint)(_line - 1));
+                _eventDispatcher.Engine.m_docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint)(_line - 1));
             }
 
             // Only send OnAsyncBreakComplete if break-all was requested by the user

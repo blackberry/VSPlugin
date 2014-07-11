@@ -314,7 +314,7 @@ void GDBConsole::cleanup() {
 		}
 	
 		// Wait for process to terminate.
-		WaitForSingleObject(m_hProcess, INFINITE);
+		WaitForSingleObject(m_hProcess, 2000);
 	
 		if (!CloseHandle(m_hProcess)) DisplayError(_T("CloseHandle"));
 

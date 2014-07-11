@@ -255,7 +255,6 @@ namespace BlackBerry.DebugEngine
 
         #region IDebugEngine2 Members
 
-
         /// <summary>
         /// Attach the debug engine to a program. (http://msdn.microsoft.com/en-us/library/bb145136.aspx)
         /// </summary>
@@ -824,7 +823,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppEnum = null;
+            return VSConstants.E_NOTIMPL;
         }
 
         /// <summary>
@@ -1089,7 +1089,7 @@ namespace BlackBerry.DebugEngine
             else if (sk == enum_STEPKIND.STEP_OUT)
             { 
                 // Equivalent to Shift-F11 hotkey.
-                if (EventDispatcher.getStackDepth(Threads[_currentThreadIndex]._id) > 1)
+                if (EventDispatcher.GetStackDepth(Threads[_currentThreadIndex]._id) > 1)
                 {
                     // Sends the GDB command that resumes the execution of the inferior program until the current function is exited.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
@@ -1480,7 +1480,6 @@ namespace BlackBerry.DebugEngine
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
 
-
         /// <summary>
         /// Retrieves a list of all programs being debugged by a debug engine (DE). Not implemented.
         /// (http://msdn.microsoft.com/en-us/library/bb146175.aspx)
@@ -1489,12 +1488,11 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         int IDebugEngine2.EnumPrograms(out IEnumDebugPrograms2 programs)
         {
-            Debug.Fail("This function is not called by the debugger");
-
             programs = null;
+
+            Debug.Fail("This function is not called by the debugger");
             return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary>
         /// Attaches to the program. Not implemented. (http://msdn.microsoft.com/en-us/library/bb161973.aspx)
@@ -1508,7 +1506,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_NOTIMPL;
         }
 
-
         /// <summary>
         /// Get the process that this program is running in. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145293.aspx)
         /// </summary>
@@ -1516,12 +1513,11 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         public int GetProcess(out IDebugProcess2 process)
         {
-            Debug.Fail("This function is not called by the debugger");
-
             process = null;
+
+            Debug.Fail("This function is not called by the debugger");
             return VSConstants.E_NOTIMPL;
         }
-
 
         /// <summary> TODO: Verify if this method is called or not by VS.
         /// Continues running this program from a stopped state. Any previous execution state (such as a step) is cleared, and the 

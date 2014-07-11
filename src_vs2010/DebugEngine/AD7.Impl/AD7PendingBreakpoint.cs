@@ -129,7 +129,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugPendingBreakpoint2.Bind()
         {
-            if (DebugEngineStatus.IsRunning == false)
+            if (!DebugEngineStatus.IsRunning)
             {
                 return VSConstants.S_FALSE;
             }

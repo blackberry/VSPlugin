@@ -184,7 +184,7 @@ namespace BlackBerry.DebugEngine
                         catch (FormatException)
                         {
                         }
-                        AD7StackFrame._dispatcher.deleteVar(_variableInfo._name, hasVsNDK);
+                        AD7StackFrame._dispatcher.DeleteVar(_variableInfo._name, hasVsNDK);
                     }
                     DEBUG_PROPERTY_INFO[] properties = new DEBUG_PROPERTY_INFO[_variableInfo._children.Count];
                     int i = 0;
@@ -353,7 +353,8 @@ namespace BlackBerry.DebugEngine
         public int SetValueAsString(string pszValue, uint dwRadix, uint dwTimeout)
         {
             string result;
-            return VariableInfo.EvaluateExpression(_variableInfo._name + "=" + pszValue, out result, null) ? VSConstants.S_OK : VSConstants.E_FAIL;
+            VariableInfo.EvaluateExpression(_variableInfo._name + "=" + pszValue, out result, null);
+            return VSConstants.S_OK;
         }
 
         #endregion

@@ -264,17 +264,17 @@ namespace BlackBerry.DebugEngine
         public const string IID = "989DB083-0D7C-40D1-A9D9-921BF611A4B2";
 
         private readonly AD7Module _module;
-        private readonly bool _fLoad;
+        private readonly bool _isLoad;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="module"> The IDebugModule2 object that represents the module which is loading or unloading. </param>
-        /// <param name="fLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
-        public AD7ModuleLoadEvent(AD7Module module, bool fLoad)
+        /// <param name="isLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
+        public AD7ModuleLoadEvent(AD7Module module, bool isLoad)
         {
             _module = module;
-            _fLoad = fLoad;
+            _isLoad = isLoad;
         }
 
         /// <summary>
@@ -283,13 +283,13 @@ namespace BlackBerry.DebugEngine
         /// <param name="module"> Returns an IDebugModule2 object that represents the module which is loading or unloading. </param>
         /// <param name="debugMessage"> Returns an optional message describing this event. If this parameter is a null value, no message 
         /// is requested. </param>
-        /// <param name="fIsLoad"> Nonzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. If this 
+        /// <param name="isLoad"> Nonzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. If this 
         /// parameter is a null value, no status is requested. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugModuleLoadEvent2.GetModule(out IDebugModule2 module, ref string debugMessage, ref int fIsLoad)
+        int IDebugModuleLoadEvent2.GetModule(out IDebugModule2 module, ref string debugMessage, ref int isLoad)
         {
             module = _module;
-            fIsLoad = _fLoad ? 1 : 0;
+            isLoad = _isLoad ? 1 : 0;
             return VSConstants.S_OK;
         }
 
@@ -298,10 +298,10 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="engine"> The AD7Engine object that represents the DE. </param>
         /// <param name="module"> The IDebugModule2 object that represents the module which is loading or unloading. </param>
-        /// <param name="fLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
-        internal static void Send(AD7Engine engine, AD7Module module, bool fLoad)
+        /// <param name="isLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
+        internal static void Send(AD7Engine engine, AD7Module module, bool isLoad)
         {
-            var eventObject = new AD7ModuleLoadEvent(module, fLoad);
+            var eventObject = new AD7ModuleLoadEvent(module, isLoad);
             engine.Callback.Send(eventObject, IID, null);
         }
     }
