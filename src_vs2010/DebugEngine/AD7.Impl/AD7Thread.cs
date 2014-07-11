@@ -31,6 +31,7 @@ namespace BlackBerry.DebugEngine
     public sealed class AD7Thread : IDebugThread2, IDebugThread100
     {
         #region Internal Types
+
         /// <summary>
         /// Thread's category, from http://social.msdn.microsoft.com/Forums/en-US/vsx/thread/807e26cc-4f3f-4e90-a9a8-b550d484b8c1
         /// </summary>
@@ -121,6 +122,9 @@ namespace BlackBerry.DebugEngine
         /// <param name="line"> Line number. </param>
         public AD7Thread(AD7Engine engine, string id, string targetID, string state, string priority, string name, string filename, string line)
         {
+            if (engine == null)
+                throw new ArgumentNullException("engine");
+
             _engine = engine;
             _suspendCount = 0;
             if (id == "1")
@@ -141,12 +145,11 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="filename">  Full short path file name. </param>
         /// <param name="line"> Line number. </param>
-        public void setCurrentLocation(string filename, uint line)
+        public void SetCurrentLocation(string filename, uint line)
         {
             _filename = NativeMethods.GetLongPathName(filename);
             _line = line;
         }
-
 
         /// <summary>
         /// Gets the function name.
@@ -195,12 +198,12 @@ namespace BlackBerry.DebugEngine
         /// Determines whether the next statement can be set to the given stack frame and code context. Not implemented.
         /// (http://msdn.microsoft.com/en-ca/library/bb146582.aspx)
         /// </summary>
-        /// <param name="pStackFrame"> Reserved for future use; set to a null value. If this is a null value, use the current 
+        /// <param name="stackFrame"> Reserved for future use; set to a null value. If this is a null value, use the current 
         /// stack frame. </param>
-        /// <param name="pCodeContext"> An IDebugCodeContext2 object that describes the code location about to be executed and 
+        /// <param name="codeContext"> An IDebugCodeContext2 object that describes the code location about to be executed and 
         /// its context. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugThread2.CanSetNextStatement(IDebugStackFrame2 pStackFrame, IDebugCodeContext2 pCodeContext)
+        int IDebugThread2.CanSetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext)
         {
             return VSConstants.S_OK;
         }
@@ -208,24 +211,22 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Retrieves a list of the stack frames for this thread. (http://msdn.microsoft.com/en-ca/library/bb145138.aspx)
         /// </summary>
-        /// <param name="dwFieldSpec"> A combination of flags from the FRAMEINFO_FLAGS enumeration that specifies which fields of the 
-        /// FRAMEINFO structures are to be filled out. </param>
-        /// <param name="nRadix"> Radix used in formatting numerical information in the enumerator. </param>
-        /// <param name="ppEnum"> Returns an IEnumDebugFrameInfo2 object that contains a list of FRAMEINFO structures describing the 
-        /// stack frame. </param>
+        /// <param name="flags"> A combination of flags from the FRAMEINFO_FLAGS enumeration that specifies which fields of the FRAMEINFO structures are to be filled out. </param>
+        /// <param name="radix"> Radix used in formatting numerical information in the enumerator. </param>
+        /// <param name="ppEnum"> Returns an IEnumDebugFrameInfo2 object that contains a list of FRAMEINFO structures describing the stack frame. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS dwFieldSpec, uint nRadix, out IEnumDebugFrameInfo2 ppEnum)
+        int IDebugThread2.EnumFrameInfo(enum_FRAMEINFO_FLAGS flags, uint radix, out IEnumDebugFrameInfo2 ppEnum)
         {
             if (_id == "")
             {
                 ppEnum = null;
-                return Constants.S_FALSE;
+                return VSConstants.S_FALSE;
             }
 
-            if (_engine.evaluatedTheseFlags(_id, dwFieldSpec))
+            if (_engine.EvaluatedTheseFlags(_id, flags))
             {
                 ppEnum = new AD7FrameInfoEnum(previousFrameInfoArray);
-                return Constants.S_OK;
+                return VSConstants.S_OK;
             }
 
             // Ask for general stack information.
@@ -236,7 +237,7 @@ namespace BlackBerry.DebugEngine
             if (stackResponse == "")
             {
                 ppEnum = null;
-                return Constants.S_FALSE;
+                return VSConstants.S_FALSE;
             }
             string[] frameStrings = stackResponse.Split('#');
 
@@ -258,7 +259,7 @@ namespace BlackBerry.DebugEngine
                     {
                         frameInfo[3] = NativeMethods.GetLongPathName(frameInfo[3]);
                         AD7StackFrame frame = AD7StackFrame.Create(_engine, this, frameInfo, ref created);
-                        frame.SetFrameInfo(dwFieldSpec, out frameInfoArray[i]);
+                        frame.SetFrameInfo(flags, out frameInfoArray[i]);
                     }
                 }
                 if ((previousFrameInfoArray.Length != frameInfoArray.Length) || created)
@@ -301,19 +302,19 @@ namespace BlackBerry.DebugEngine
                 if ((_id != "") && (_id != _engine.CurrentThread()._id))
                     _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
 
-                return Constants.S_OK;
+                return VSConstants.S_OK;
             }
-            catch (ComponentException e)
+            catch (ComponentException ex)
             {
                 if ((_id != "") && (_id != _engine.CurrentThread()._id))
                     _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
-                return e.HResult;
+                return ex.HResult;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 if ((_id != "") && (_id != _engine.CurrentThread()._id))
                     _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
-                return EngineUtils.UnexpectedException(e);
+                return EngineUtils.UnexpectedException(ex);
             }
         }
 
@@ -321,11 +322,11 @@ namespace BlackBerry.DebugEngine
         /// Gets the logical thread associated with this physical thread. Not implemented. 
         /// (http://msdn.microsoft.com/en-ca/library/bb161676.aspx)
         /// </summary>
-        /// <param name="pStackFrame"> An IDebugStackFrame2 object that represents the stack frame. </param>
+        /// <param name="stackFrame"> An IDebugStackFrame2 object that represents the stack frame. </param>
         /// <param name="ppLogicalThread"> Returns an IDebugLogicalThread2 interface that represents the associated logical 
         /// thread. A debug engine implementation should set this to a null value. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugThread2.GetLogicalThread(IDebugStackFrame2 pStackFrame, out IDebugLogicalThread2 ppLogicalThread)
+        int IDebugThread2.GetLogicalThread(IDebugStackFrame2 stackFrame, out IDebugLogicalThread2 ppLogicalThread)
         {
             ppLogicalThread = null;
             return VSConstants.S_OK;
@@ -356,17 +357,17 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Gets the system thread identifier. (http://msdn.microsoft.com/en-ca/library/bb161964.aspx)
         /// </summary>
-        /// <param name="pdwThreadId"> Returns the system thread identifier. </param>
+        /// <param name="pThreadId"> Returns the system thread identifier. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugThread2.GetThreadId(out uint pdwThreadId)
+        int IDebugThread2.GetThreadId(out uint pThreadId)
         {
             try
             {
-                pdwThreadId = Convert.ToUInt32(_id);
+                pThreadId = Convert.ToUInt32(_id);
             }
             catch
             {
-                pdwThreadId = 0;
+                pThreadId = 0;
             }
             return VSConstants.S_OK;
         }
@@ -374,90 +375,90 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Gets the properties that describe this thread. (http://msdn.microsoft.com/en-ca/library/bb145602.aspx)
         /// </summary>
-        /// <param name="dwFields"> A combination of flags from the THREADPROPERTY_FIELDS enumeration that determines which fields of 
+        /// <param name="fields"> A combination of flags from the THREADPROPERTY_FIELDS enumeration that determines which fields of 
         /// ptp are to be filled in. </param>
-        /// <param name="ptp"> A THREADPROPERTIES structure that that is filled in with the properties of the thread. </param>
+        /// <param name="pThreadProperties"> A THREADPROPERTIES structure that that is filled in with the properties of the thread. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        int IDebugThread2.GetThreadProperties(enum_THREADPROPERTY_FIELDS dwFields, THREADPROPERTIES[] ptp)
+        int IDebugThread2.GetThreadProperties(enum_THREADPROPERTY_FIELDS fields, THREADPROPERTIES[] pThreadProperties)
         {
             try
             {
-                if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_ID) != 0)
+                if ((fields & enum_THREADPROPERTY_FIELDS.TPF_ID) != 0)
                 {
                     try
                     {
-                        ptp[0].dwThreadId = Convert.ToUInt32(_id);
+                        pThreadProperties[0].dwThreadId = Convert.ToUInt32(_id);
                     }
                     catch
                     {
-                        ptp[0].dwThreadId = 0;
+                        pThreadProperties[0].dwThreadId = 0;
                     }
-                    ptp[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_ID;
+                    pThreadProperties[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_ID;
                 }
-                if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT) != 0)
+                if ((fields & enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT) != 0)
                 {
                     // VSNDK debug engine doesn't support suspending threads
-                    ptp[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT;
+                    pThreadProperties[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_SUSPENDCOUNT;
                 }
-                if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_STATE) != 0)
+                if ((fields & enum_THREADPROPERTY_FIELDS.TPF_STATE) != 0)
                 {
                     if (_state == "running")
-                        ptp[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_RUNNING;
+                        pThreadProperties[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_RUNNING;
                     else
-                        ptp[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_STOPPED;
-                    ptp[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_STATE;
+                        pThreadProperties[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_STOPPED;
+                    pThreadProperties[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_STATE;
                 }
-                if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_PRIORITY) != 0)
+                if ((fields & enum_THREADPROPERTY_FIELDS.TPF_PRIORITY) != 0)
                 {
-                    ptp[0].bstrPriority = "Normal";
-                    ptp[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_PRIORITY;
+                    pThreadProperties[0].bstrPriority = "Normal";
+                    pThreadProperties[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_PRIORITY;
                 }
-                if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_NAME) != 0)
+                if ((fields & enum_THREADPROPERTY_FIELDS.TPF_NAME) != 0)
                 {
-                    ptp[0].bstrName = _threadDisplayName;
-                    ptp[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_NAME;
+                    pThreadProperties[0].bstrName = _threadDisplayName;
+                    pThreadProperties[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_NAME;
                 }
-                if ((dwFields & enum_THREADPROPERTY_FIELDS.TPF_LOCATION) != 0)
+                if ((fields & enum_THREADPROPERTY_FIELDS.TPF_LOCATION) != 0)
                 {
-                    ptp[0].bstrLocation = "";
+                    pThreadProperties[0].bstrLocation = "";
                     if (__stackFrames != null)
                     {
                         foreach (AD7StackFrame frame in __stackFrames)
                         {
                             if (frame._functionName != "")
                             {
-                                ptp[0].bstrLocation = frame._functionName;
+                                pThreadProperties[0].bstrLocation = frame._functionName;
                                 break;
                             }
                         }
                     }
-                    if (ptp[0].bstrLocation == "")
-                        ptp[0].bstrLocation = "[External Code]";
+                    if (pThreadProperties[0].bstrLocation == "")
+                        pThreadProperties[0].bstrLocation = "[External Code]";
 
-                    ptp[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_LOCATION;
+                    pThreadProperties[0].dwFields |= enum_THREADPROPERTY_FIELDS.TPF_LOCATION;
                 }
 
-                return Constants.S_OK;
+                return VSConstants.S_OK;
             }
-            catch (ComponentException e)
+            catch (ComponentException ex)
             {
-                return e.HResult;
+                return ex.HResult;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return EngineUtils.UnexpectedException(e);
+                return EngineUtils.UnexpectedException(ex);
             }
         }
 
         /// <summary>
         /// Resumes execution of a thread. (http://msdn.microsoft.com/en-ca/library/bb145813.aspx)
         /// </summary>
-        /// <param name="pdwSuspendCount"> Returns the suspend count after the resume operation. </param>
+        /// <param name="pSuspendCount"> Returns the suspend count after the resume operation. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugThread2.Resume(out uint pdwSuspendCount)
+        int IDebugThread2.Resume(out uint pSuspendCount)
         {
             _suspendCount--;
-            pdwSuspendCount = _suspendCount;
+            pSuspendCount = _suspendCount;
             if (_suspendCount == 0)
             {
                 // Send GDB command to resume execution of thread
@@ -469,11 +470,11 @@ namespace BlackBerry.DebugEngine
         /// Sets the next statement to the given stack frame and code context. Not implemented. 
         /// (http://msdn.microsoft.com/en-ca/library/bb160944.aspx)
         /// </summary>
-        /// <param name="pStackFrame"> Reserved for future use; set to a null value. </param>
-        /// <param name="pCodeContext"> An IDebugCodeContext2 object that describes the code location about to be executed and 
+        /// <param name="stackFrame"> Reserved for future use; set to a null value. </param>
+        /// <param name="codeContext"> An IDebugCodeContext2 object that describes the code location about to be executed and 
         /// its context. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugThread2.SetNextStatement(IDebugStackFrame2 pStackFrame, IDebugCodeContext2 pCodeContext)
+        int IDebugThread2.SetNextStatement(IDebugStackFrame2 stackFrame, IDebugCodeContext2 codeContext)
         {
             return VSConstants.S_OK;
         }
@@ -481,23 +482,23 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Sets the name of the thread. (http://msdn.microsoft.com/en-ca/library/bb162322.aspx)
         /// </summary>
-        /// <param name="pszName"> The name of the thread. </param>
+        /// <param name="name"> The name of the thread. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugThread2.SetThreadName(string pszName)
+        int IDebugThread2.SetThreadName(string name)
         {
-            _threadDisplayName = pszName;
+            _threadDisplayName = name;
             return VSConstants.S_OK;
         }
 
         /// <summary>
         /// Suspends a thread. (http://msdn.microsoft.com/en-us/library/bb145297.aspx)
         /// </summary>
-        /// <param name="pdwSuspendCount"> Returns the suspend count after the suspend operation. </param>
+        /// <param name="pSuspendCount"> Returns the suspend count after the suspend operation. </param>
         /// <returns> VSConstants.S_OK </returns>
-        int IDebugThread2.Suspend(out uint pdwSuspendCount)
+        int IDebugThread2.Suspend(out uint pSuspendCount)
         {
             _suspendCount++;
-            pdwSuspendCount = _suspendCount;
+            pSuspendCount = _suspendCount;
             return VSConstants.S_OK;
         }
 
@@ -512,7 +513,7 @@ namespace BlackBerry.DebugEngine
         int IDebugThread100.SetThreadDisplayName(string name)
         {
             _threadDisplayName = name;
-            return Constants.S_OK;
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -524,7 +525,7 @@ namespace BlackBerry.DebugEngine
         int IDebugThread100.GetThreadDisplayName(out string name)
         {
             name = _threadDisplayName;
-            return Constants.S_OK;
+            return VSConstants.S_OK;
         }
 
         /// <summary>
@@ -534,7 +535,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_FALSE. </returns>
         int IDebugThread100.CanDoFuncEval()
         {
-            return Constants.S_FALSE;
+            return VSConstants.S_FALSE;
         }
 
         /// <summary>
@@ -546,7 +547,7 @@ namespace BlackBerry.DebugEngine
         int IDebugThread100.SetFlags(uint flags)
         {
             // Not necessary to implement in the debug engine. Instead it is implemented in the SDM.
-            return Constants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -559,119 +560,119 @@ namespace BlackBerry.DebugEngine
         {
             // Not necessary to implement in the debug engine. Instead it is implemented in the SDM.
             flags = 0;
-            return Constants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
         /// Gets the properties that describe this thread.
         /// (http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.debugger.interop.idebugthread100.getthreadproperties100.aspx)
         /// </summary>
-        /// <param name="dwFields"> A combination of flags from the THREADPROPERTIES100 enumeration that determines which fields of 
+        /// <param name="fields"> A combination of flags from the THREADPROPERTIES100 enumeration that determines which fields of 
         /// ptp are to be filled in. </param>
-        /// <param name="ptp"> A THREADPROPERTIES100 structure that that is filled in with the properties of the thread. </param>
+        /// <param name="pThreadproperties"> A THREADPROPERTIES100 structure that that is filled in with the properties of the thread. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        int IDebugThread100.GetThreadProperties100(uint dwFields, THREADPROPERTIES100[] ptp)
+        int IDebugThread100.GetThreadProperties100(uint fields, THREADPROPERTIES100[] pThreadproperties)
         {
             try
             {
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID) != 0)
                 {
                     try
                     {
-                        ptp[0].dwThreadId = Convert.ToUInt32(_id);
+                        pThreadproperties[0].dwThreadId = Convert.ToUInt32(_id);
                     }
                     catch
                     {
-                        ptp[0].dwThreadId = 0;
+                        pThreadproperties[0].dwThreadId = 0;
                     }
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_ID;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_SUSPENDCOUNT) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_SUSPENDCOUNT) != 0)
                 {
                     // VSNDK debug engine doesn't support suspending threads
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_SUSPENDCOUNT;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_SUSPENDCOUNT;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_STATE) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_STATE) != 0)
                 {
                     if (_state == "running")
-                        ptp[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_RUNNING;
+                        pThreadproperties[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_RUNNING;
                     else
-                        ptp[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_STOPPED;
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_STATE;
+                        pThreadproperties[0].dwThreadState = (uint)enum_THREADSTATE.THREADSTATE_STOPPED;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_STATE;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY) != 0)
                 {
-                    ptp[0].bstrPriority = "Normal";
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY;
+                    pThreadproperties[0].bstrPriority = "Normal";
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_NAME) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_NAME) != 0)
                 {
-                    ptp[0].bstrName = _threadDisplayName;
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_NAME;
+                    pThreadproperties[0].bstrName = _threadDisplayName;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_NAME;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME) != 0)
                 {
                     // Thread display name is being requested
-                    ptp[0].bstrDisplayName = _threadDisplayName;
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME;
+                    pThreadproperties[0].bstrDisplayName = _threadDisplayName;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME;
 
                     // Give this display name a higher priority than the default (0)
                     // so that it will actually be displayed
-                    ptp[0].DisplayNamePriority = 10;
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME_PRIORITY;
+                    pThreadproperties[0].DisplayNamePriority = 10;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_DISPLAY_NAME_PRIORITY;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_LOCATION) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_LOCATION) != 0)
                 {
-                    ptp[0].bstrLocation = "";
+                    pThreadproperties[0].bstrLocation = "";
                     if (__stackFrames != null)
                     {
                         foreach (AD7StackFrame frame in __stackFrames)
                         {
                             if ((frame._functionName != "") && (frame._functionName != "??"))
                             {
-                                ptp[0].bstrLocation = frame._functionName;
+                                pThreadproperties[0].bstrLocation = frame._functionName;
                                 break;
                             }
                         }
                     }
                     else
-                        ptp[0].bstrLocation = GetFunctionName();
+                        pThreadproperties[0].bstrLocation = GetFunctionName();
 
-                    if (ptp[0].bstrLocation == "")
-                        ptp[0].bstrLocation = "[External Code]";
+                    if (pThreadproperties[0].bstrLocation == "")
+                        pThreadproperties[0].bstrLocation = "[External Code]";
 
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_LOCATION;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_LOCATION;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY) != 0)
                 {
                     if (_id == "1")
-                        ptp[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Main;
+                        pThreadproperties[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Main;
                     else
-                        ptp[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Worker;
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY;
+                        pThreadproperties[0].dwThreadCategory = (uint)enum_THREADCATEGORY.THREADCATEGORY_Worker;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_CATEGORY;
                 }
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_AFFINITY) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_AFFINITY) != 0)
                 {
                     // Thread cpu affinity is being requested
-                    ptp[0].AffinityMask = 0;
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_AFFINITY;
+                    pThreadproperties[0].AffinityMask = 0;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_AFFINITY;
                 }
 
-                if ((dwFields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID) != 0)
+                if ((fields & (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID) != 0)
                 {
                     // Thread display name is being requested
-                    ptp[0].priorityId = 0;
-                    ptp[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID;
+                    pThreadproperties[0].priorityId = 0;
+                    pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID;
                 }
-                return Constants.S_OK;
+                return VSConstants.S_OK;
             }
-            catch (ComponentException e)
+            catch (ComponentException ex)
             {
-                return e.HResult;
+                return ex.HResult;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return EngineUtils.UnexpectedException(e);
+                return EngineUtils.UnexpectedException(ex);
             }
         }
 

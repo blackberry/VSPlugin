@@ -13,7 +13,6 @@
 //* limitations under the License.
 
 using System;
-using System.Text;
 using BlackBerry.NativeCore;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -40,8 +39,7 @@ namespace BlackBerry.DebugEngine
 
         public uint m_bpLocationType;
         public string m_filename = "";
-        public string m_fullPath = "";
-        public uint m_line = 0;
+        public uint m_line;
         public string m_func = "";
 
         /// <summary> 
@@ -236,12 +234,12 @@ namespace BlackBerry.DebugEngine
                 {
                     if ((int)((bpPassCount.dwPassCount - _hitCount)) >= 0)
                     {
-                        if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
+                        if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
                             result = VSConstants.S_OK;
                     }
                     else
                     {
-                        if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, 1))
+                        if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, 1))
                             result = VSConstants.S_OK;
                     }
 
@@ -255,7 +253,7 @@ namespace BlackBerry.DebugEngine
                 _isHitCountEqual = true;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
+                    if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
                         result = VSConstants.S_OK;
                 }
                 else
@@ -267,7 +265,7 @@ namespace BlackBerry.DebugEngine
                 _hitCountMultiple = bpPassCount.dwPassCount;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, (int)(_hitCountMultiple - (_hitCount % _hitCountMultiple))))
+                    if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, (int)(_hitCountMultiple - (_hitCount % _hitCountMultiple))))
                         result = VSConstants.S_OK;
                 }
                 else
@@ -279,7 +277,7 @@ namespace BlackBerry.DebugEngine
                 _hitCountMultiple = 0;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.EventDispatcher.ignoreHitCount(GDB_ID, 1)) // ignoreHitCount decrement by 1 automatically, so sending 1 means to stop ignoring (or ignore 0)
+                    if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, 1)) // ignoreHitCount decrement by 1 automatically, so sending 1 means to stop ignoring (or ignore 0)
                         result = VSConstants.S_OK;
                 }
                 else
@@ -316,7 +314,7 @@ namespace BlackBerry.DebugEngine
 
             if (_hitCount != 0)
             {
-                _engine.EventDispatcher.resetHitCount(this, false);
+                _engine.EventDispatcher.ResetHitCount(this, false);
             }
 
             while (!_engine.EventDispatcher.EnterCriticalRegion())
@@ -344,15 +342,15 @@ namespace BlackBerry.DebugEngine
                     _breakWhenCondChanged = false;
 
                 _previousCondEvaluation = "";
-                if (_engine.EventDispatcher.setBreakpointCondition(GDB_ID, bpCondition.bstrCondition))
+                if (_engine.EventDispatcher.SetBreakpointCondition(GDB_ID, bpCondition.bstrCondition))
                     result = VSConstants.S_OK;
             }
             else if (bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED)
             {
                 _breakWhenCondChanged = true;
                 _previousCondEvaluation = bpCondition.bstrCondition; // just to initialize this variable
-                _engine.EventDispatcher.ignoreHitCount(GDB_ID, 1); // have to break always to evaluate this option because GDB doesn't support it.
-                _engine.EventDispatcher.setBreakpointCondition(GDB_ID, "");
+                _engine.EventDispatcher.IgnoreHitCount(GDB_ID, 1); // have to break always to evaluate this option because GDB doesn't support it.
+                _engine.EventDispatcher.SetBreakpointCondition(GDB_ID, "");
 
                 result = VSConstants.S_OK;
             }
@@ -367,7 +365,7 @@ namespace BlackBerry.DebugEngine
                     _breakWhenCondChanged = false;
 
                 _previousCondEvaluation = "";
-                if (_engine.EventDispatcher.setBreakpointCondition(GDB_ID, ""))
+                if (_engine.EventDispatcher.SetBreakpointCondition(GDB_ID, ""))
                     result = VSConstants.S_OK;
             }
 
@@ -387,7 +385,7 @@ namespace BlackBerry.DebugEngine
                 _engine.EventDispatcher.ResumeFromInterrupt();
             }
 
-            this._engine._updatingConditionalBreakpoint.Set();
+            _engine._updatingConditionalBreakpoint.Set();
 
             return result;
         }
@@ -536,7 +534,7 @@ namespace BlackBerry.DebugEngine
                 if ((dwHitCount == 0) && (_hitCount != 0))
                 {
                     _hitCount = dwHitCount;
-                    _engine.EventDispatcher.resetHitCount(this, true);
+                    _engine.EventDispatcher.ResetHitCount(this, true);
                 }
                 else
                     _hitCount = dwHitCount;

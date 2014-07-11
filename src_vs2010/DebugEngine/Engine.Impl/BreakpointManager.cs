@@ -55,12 +55,12 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// A helper method used to construct a new pending breakpoint.
         /// </summary>
-        /// <param name="pBPRequest"> An IDebugBreakpointRequest2 object that describes the pending breakpoint to create. </param>
-        /// <param name="ppPendingBP"> Returns an IDebugPendingBreakpoint2 object that represents the pending breakpoint. </param>
-        public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
+        /// <param name="request"> An IDebugBreakpointRequest2 object that describes the pending breakpoint to create. </param>
+        /// <param name="ppPendingBreakpoint"> Returns an IDebugPendingBreakpoint2 object that represents the pending breakpoint. </param>
+        public void CreatePendingBreakpoint(IDebugBreakpointRequest2 request, out IDebugPendingBreakpoint2 ppPendingBreakpoint)
         {
-            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(_engine, pBPRequest);
-            ppPendingBP = pendingBreakpoint;
+            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(_engine, request);
+            ppPendingBreakpoint = pendingBreakpoint;
             _pendingBreakpoints.Add(pendingBreakpoint);
         }
 
@@ -71,11 +71,11 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns the active bound breakpoint; otherwise, returns null. </returns>
         public AD7BoundBreakpoint GetBoundBreakpointForGDBID(uint gdbID)
         {
-            foreach (AD7BoundBreakpoint bbp in _activeBPs)
+            foreach (AD7BoundBreakpoint breakpoint in _activeBPs)
             {
-                if (bbp != null && bbp.GDB_ID == gdbID)
+                if (breakpoint != null && breakpoint.GDB_ID == gdbID)
                 {
-                    return bbp;
+                    return breakpoint;
                 }
             }
             return null;
@@ -86,18 +86,18 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void ClearBoundBreakpoints()
         {
-            foreach (AD7PendingBreakpoint pendingBreakpoint in _pendingBreakpoints)
+            foreach (AD7PendingBreakpoint breakpoint in _pendingBreakpoints)
             {
-                pendingBreakpoint.ClearBoundBreakpoints();
+                breakpoint.ClearBoundBreakpoints();
             }
         }
 
         /// <summary>
         /// Creates an entry and remotely enables the breakpoint in the debug stub.
         /// </summary>
-        /// <param name="aBBP"> The bound breakpoint to add. </param>
+        /// <param name="breakpoint"> The bound breakpoint to add. </param>
         /// <returns> Breakpoint ID Number. </returns>
-        public int RemoteAdd(AD7BoundBreakpoint aBBP)
+        public int RemoteAdd(AD7BoundBreakpoint breakpoint)
         {
             // Call GDB to set a breakpoint based on filename and line no. in aBBP
             uint GDB_ID = 0;
@@ -106,23 +106,23 @@ namespace BlackBerry.DebugEngine
             string GDB_address = "";
             bool ret = false;
 
-            if (aBBP.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
+            if (breakpoint.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
             {
-                ret = _engine.EventDispatcher.SetBreakpoint(aBBP.m_filename, aBBP.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = _engine.EventDispatcher.SetBreakpoint(breakpoint.m_filename, breakpoint.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
             }
-            else if (aBBP.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
+            else if (breakpoint.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
-                ret = _engine.EventDispatcher.SetBreakpoint(aBBP.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = _engine.EventDispatcher.SetBreakpoint(breakpoint.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
             }
 
             if (ret)
             {
-                _activeBPs.Add(aBBP);
+                _activeBPs.Add(breakpoint);
 
-                aBBP.GDB_ID = GDB_ID;
-                aBBP.GDB_FileName = GDB_Filename;
-                aBBP.GDB_LinePos = GDB_LinePos;
-                aBBP.GDB_Address = GDB_address;
+                breakpoint.GDB_ID = GDB_ID;
+                breakpoint.GDB_FileName = GDB_Filename;
+                breakpoint.GDB_LinePos = GDB_LinePos;
+                breakpoint.GDB_Address = GDB_address;
             }
             return (int)GDB_ID;
         }

@@ -36,11 +36,6 @@ namespace BlackBerry.DebugEngine
     public sealed class AD7Process : IDebugProcess2, IDebugProcessEx2
     {
         /// <summary>
-        /// Identifies the session in which this process is attached to.
-        /// </summary>
-        private IDebugSession2 _session;
-
-        /// <summary>
         /// The name and ID of the process running on target device.
         /// </summary>
         private readonly ProcessInfo _details;
@@ -255,19 +250,21 @@ namespace BlackBerry.DebugEngine
                     pProcessInfo[0].ProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_PROCESS_ID;
                 }
+
                 if ((fields & enum_PROCESS_INFO_FIELDS.PIF_SESSION_ID) != 0)
                 {
-//                    pProcessInfo[0].dwSessionId = 0;
+                    //pProcessInfo[0].dwSessionId = 0;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_SESSION_ID;
                 }
                 if ((fields & enum_PROCESS_INFO_FIELDS.PIF_ATTACHED_SESSION_NAME) != 0)
                 {
-//                    pProcessInfo[0].bstrAttachedSessionName = null;
+                    //pProcessInfo[0].bstrAttachedSessionName = null;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_ATTACHED_SESSION_NAME;
                 }
                 if ((fields & enum_PROCESS_INFO_FIELDS.PIF_CREATION_TIME) != 0)
                 {
-//                    pProcessInfo[0].CreationTime = null;
+                    //pProcessInfo[0].CreationTime.dwHighDateTime = 0;
+                    //pProcessInfo[0].CreationTime.dwLowDateTime = 0;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_CREATION_TIME;
                 }
 
@@ -282,10 +279,10 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Gets the name of the process. (http://msdn.microsoft.com/en-us/library/bb161270.aspx)
         /// </summary>
-        /// <param name="gnType"> A value from the GETNAME_TYPE enumeration that specifies what type of name to return. </param>
+        /// <param name="type"> A value from the GETNAME_TYPE enumeration that specifies what type of name to return. </param>
         /// <param name="pbstrName"> Returns the name of the process. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetName(enum_GETNAME_TYPE gnType, out string pbstrName)
+        public int GetName(enum_GETNAME_TYPE type, out string pbstrName)
         {
             pbstrName = _details.Name;
             return VSConstants.S_OK;
@@ -300,11 +297,13 @@ namespace BlackBerry.DebugEngine
         {
             if (_attaching)
             {
+                // attaching to existing process on the target
                 pProcessId[0].dwProcessId = _details.ID;
                 pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
             }
             else
             {
+                // running in app in debug
                 pProcessId[0].guidProcessId = UID;
                 pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
             }
@@ -365,7 +364,6 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int Attach(IDebugSession2 session)
         {
-            _session = session;
             return VSConstants.S_OK;
         }
 
@@ -376,7 +374,6 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int Detach(IDebugSession2 session)
         {
-            _session = session;
             return VSConstants.S_OK;
         }
 

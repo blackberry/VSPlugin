@@ -99,6 +99,10 @@
     <Compile Include="Engine.Impl\EngineCallback.cs" />
     <Compile Include="Engine.Impl\EngineUtils.cs" />
     <Compile Include="Engine.Impl\EventDispatcher.cs" />
+    <Compile Include="Engine.Impl\HandleBreakpoints.cs" />
+    <Compile Include="Engine.Impl\HandleOutputs.cs" />
+    <Compile Include="Engine.Impl\HandleProcessExecution.cs" />
+    <Compile Include="Engine.Impl\VariableInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

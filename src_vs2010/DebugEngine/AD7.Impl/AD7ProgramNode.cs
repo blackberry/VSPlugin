@@ -120,12 +120,12 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Gets the name of the process hosting a program. (http://msdn.microsoft.com/en-us/library/bb145135.aspx)
         /// </summary>
-        /// <param name="dwHostNameType"> A value from the GETHOSTNAME_TYPE enumeration that specifies the type of name to return. </param>
+        /// <param name="type"> A value from the GETHOSTNAME_TYPE enumeration that specifies the type of name to return. </param>
         /// <param name="processName"> Returns the name of the hosting process. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugProgramNode2.GetHostName(enum_GETHOSTNAME_TYPE dwHostNameType, out string processName)
+        int IDebugProgramNode2.GetHostName(enum_GETHOSTNAME_TYPE type, out string processName)
         {
-            if (dwHostNameType == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
+            if (type == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
                 processName = "(BB-pid = " + _details.ID + ") " + _details.ExecutablePath;
             else
                 processName = _details.Name;
@@ -151,11 +151,11 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161399.aspx)
         /// </summary>
-        /// <param name="pMDMProgram"> The IDebugProgram2 interface that represents the program to attach to. </param>
+        /// <param name="program"> The IDebugProgram2 interface that represents the program to attach to. </param>
         /// <param name="pCallback"> The IDebugEventCallback2 interface to be used to send debug events to the SDM. </param>
-        /// <param name="dwReason"> A value from the ATTACH_REASON enumeration that specifies the reason for attaching. </param>
+        /// <param name="reason"> A value from the ATTACH_REASON enumeration that specifies the reason for attaching. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        int IDebugProgramNode2.Attach_V7(IDebugProgram2 pMDMProgram, IDebugEventCallback2 pCallback, uint dwReason)
+        int IDebugProgramNode2.Attach_V7(IDebugProgram2 program, IDebugEventCallback2 pCallback, uint reason)
         {
             return EngineUtils.NotImplemented();
         }

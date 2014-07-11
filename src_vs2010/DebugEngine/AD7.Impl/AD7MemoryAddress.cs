@@ -172,7 +172,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int GetInfo(enum_CONTEXT_INFO_FIELDS dwFields, CONTEXT_INFO[] pinfo)
         {
-            return EngineUtils.NotImplemented();
+            return EngineUtils.NotImplemented(false);
         }
 
         /// <summary>

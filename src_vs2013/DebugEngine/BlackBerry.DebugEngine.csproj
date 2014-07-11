@@ -158,6 +158,18 @@
     <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\EventDispatcher.cs">
       <Link>Engine.Impl\EventDispatcher.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\HandleBreakpoints.cs">
+      <Link>Engine.Impl\HandleBreakpoints.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\HandleOutputs.cs">
+      <Link>Engine.Impl\HandleOutputs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\HandleProcessExecution.cs">
+      <Link>Engine.Impl\HandleProcessExecution.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\VariableInfo.cs">
+      <Link>Engine.Impl\VariableInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2010\DebugEngine\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>

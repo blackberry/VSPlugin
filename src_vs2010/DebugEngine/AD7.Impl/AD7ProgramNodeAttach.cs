@@ -285,7 +285,7 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Attaches to the program. Not implemented. (http://msdn.microsoft.com/en-us/library/bb161973.aspx)
         /// </summary>
-        /// <param name="programs"> An IDebugEventCallback2 object to be used for debug event notification. </param>
+        /// <param name="callback"> An IDebugEventCallback2 object to be used for debug event notification. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         public int Attach(IDebugEventCallback2 callback)
         {
@@ -339,12 +339,12 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Gets the name of the process hosting a program. (http://msdn.microsoft.com/en-us/library/bb145135.aspx)
         /// </summary>
-        /// <param name="dwHostNameType"> A value from the GETHOSTNAME_TYPE enumeration that specifies the type of name to return. </param>
+        /// <param name="type"> A value from the GETHOSTNAME_TYPE enumeration that specifies the type of name to return. </param>
         /// <param name="processName"> Returns the name of the hosting process. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetHostName(enum_GETHOSTNAME_TYPE dwHostNameType, out string processName)
+        public int GetHostName(enum_GETHOSTNAME_TYPE type, out string processName)
         {
-            if (dwHostNameType == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
+            if (type == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
                 processName = "(BB-pid = " + _process.Details.ID + ") " + _process.Details.ExecutablePath;
             else
                 processName = _process.Details.Name;
@@ -361,7 +361,7 @@ namespace BlackBerry.DebugEngine
             programName = _process.Details.Name;
             return VSConstants.S_OK;
         }
-        
+
         #endregion
 
         #region Deprecated interface methods

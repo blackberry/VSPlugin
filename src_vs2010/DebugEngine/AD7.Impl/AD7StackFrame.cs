@@ -21,571 +21,6 @@ using Microsoft.VisualStudio.Debugger.Interop;
 namespace BlackBerry.DebugEngine
 {
     /// <summary>
-    /// This class contains all information about a variable / expression.
-    /// </summary>
-    public sealed class VariableInfo
-    {
-        /// <summary>
-        /// Variable's name or expression.
-        /// </summary>
-        public readonly string _name;
-
-        /// <summary>
-        /// Variable's data type.
-        /// </summary>
-        public string _type;
-
-        /// <summary>
-        /// Variable's value or the result of an expression.
-        /// </summary>
-        public string _value;
-
-        /// <summary>
-        /// Variable's name to be used by GDB.
-        /// </summary>
-        public string _GDBName;
-
-        /// <summary>
-        /// List of variable's children.
-        /// </summary>
-        public ArrayList _children;
-
-
-        /// <summary>
-        /// Evaluate an expression / Get the value of a variable. This method basically send a "-data-evaluate-expression" command to GDB
-        /// and evaluate the result.
-        /// </summary>
-        /// <param name="name"> The expression/variable to be evaluated. </param>
-        /// <param name="result"> The result of the expression/ value of variable. </param>
-        /// <param name="gdbName"> The GDB Name of the variable. </param>
-        /// <returns> A boolean value indicating if the expression evaluation was successful  or not. </returns>
-        public static bool EvaluateExpression(string name, out string result, string gdbName)
-        {
-            if (name[name.Length - 1] == '.')
-                name = name.Remove(name.Length - 1);
-
-            // Waits for the parsed response for the GDB/MI command that evaluates "name" as an expression.
-            // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Data-Manipulation.html)
-            result = GDBParser.parseCommand("-data-evaluate-expression \"" + name + "\"", 2);
-            if (result.Substring(0, 2) == "61") // If result starts with 61, it means that there is an error.
-            {
-                if (gdbName != null) // Maybe that error was caused because GDB didn't accept the VS name. Use the GDBName if there is one.
-                {
-                    // Gets the parsed response for the GDB/MI command that evaluates "GDBName" as an expression.
-                    // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Data-Manipulation.html)
-                    string result2 = GDBParser.parseCommand("-data-evaluate-expression \"" + gdbName + "\"", 2);
-                    if (result2.Substring(0, 2) == "60")
-                        result = result2;
-                }
-            }
-
-            bool valid = true;
-
-            if (result.Substring(0, 2) == "61") // If result starts with 61, it means that there is an error. So, expression is not valid.
-                valid = false;
-
-            result = result.Substring(3);
-            result = result.Substring(1, result.Length - 2); // remove the quotes located in the beginning and at the end
-            result = result.Replace("\\\"", "\"");
-
-            if (valid)
-            {
-                int endString = result.IndexOf("\\\\000");
-                int ini, end = 0;
-                while (endString != -1)  // remove garbage from strings
-                {
-                    ini = result.IndexOf("\"", end);
-                    while ((ini > 0) && (result[ini - 1] == '\\'))
-                        ini = result.IndexOf("\"", ini + 1);
-                    if (ini == -1)
-                        break;
-                    end = result.IndexOf("\"", ini + 1);
-                    while ((end > 0) && (result[end - 1] == '\\'))
-                        end = result.IndexOf("\"", end + 1);
-                    if (end == -1)
-                        break;
-                    while ((endString != -1) && (endString < ini))
-                        endString = result.IndexOf("\\\\000", endString + 1);
-                    if ((endString > ini) && (endString < end))
-                    {
-                        result = result.Substring(0, endString) + result.Substring(end, (result.Length - end));
-                        end = endString;
-                        endString = result.IndexOf("\\\\000", end);
-                    }
-                    end++;
-                };
-            }
-            return valid;
-        }
-
-        /// <summary>
-        /// Gets the information about a variable/expression.
-        /// </summary>
-        /// <param name="name"> Variable name / expression. </param>
-        /// <param name="eventDispatcher"> The event dispatcher. </param>
-        /// <param name="frame"> Current stack frame. </param>
-        /// <returns> Return the VariableInfo object. </returns>
-        public static VariableInfo Get(string name, EventDispatcher eventDispatcher, AD7StackFrame frame)
-        {
-            VariableInfo vi = null;
-            string search = "";
-            string separator = "";
-            bool isArray = false;
-            bool isRoot = true;
-
-            do
-            {
-                int dot = name.IndexOf('.');
-                int squareBracket = name.IndexOf('[');
-                int pos = name.IndexOf("->", StringComparison.Ordinal);
-                if (dot == -1)
-                    dot = name.Length;
-                if (squareBracket == -1)
-                    squareBracket = name.Length;
-                if (pos == -1)
-                    pos = name.Length;
-                int stop = dot < squareBracket ? dot : squareBracket;
-                stop = stop < pos ? stop : pos;
-
-                search = search + separator + name.Substring(0, stop);
-                separator = "";
-
-                if (stop < name.Length)
-                {
-                    separator = name.Substring(stop, 1);
-                    if (separator == "-")
-                    {
-                        separator = "->";
-                        name = name.Substring(stop + 2, name.Length - (stop + 2));
-                    }
-                    else if (separator == "[")
-                    {
-                        int aux = name.IndexOf("]");
-                        isArray = true;
-                        separator = name.Substring(stop, (aux - stop) + 1);
-                        name = name.Substring(aux + 1, name.Length - (aux + 1));
-                    }
-                    else
-                        name = name.Substring(stop + 1, name.Length - (stop + 1));
-                }
-                else
-                    name = "";
-
-                if (vi == null)
-                {
-                    if (frame._locals != null)
-                    {
-                        foreach (VariableInfo var in frame._locals)
-                        {
-                            if (var._name == search)
-                            { // if the "search" expression is a local variable, it doesn't need to create a VariableInfo object for that.
-                                vi = var;
-                                break;
-                            }
-                        }
-                    }
-
-                    if (vi == null)
-                    {
-                        if (frame._arguments != null)
-                        {
-                            foreach (VariableInfo var in frame._arguments)
-                            { // if the "search" expression is an argument, it doesn't need to create a VariableInfo object for that.
-                                if (var._name == search)
-                                {
-                                    vi = var;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    isRoot = false;
-                    VariableInfo vi_child = null;
-                    if (vi._children != null)
-                    {
-                        foreach (VariableInfo var in vi._children)
-                        {
-                            if (var._name == search)
-                            {
-                                vi_child = var;
-                                break;
-                            }
-                        }
-                    }
-                    vi = vi_child;
-                }
-            } while ((vi != null) && ((isArray) || (name != "")));
-
-
-            if (name != "") // variable not found probably because it is in an expression, so return to the original name to evaluate it.
-                search = search + separator + name;
-
-            string result = "";
-            bool valid;
-            if (vi == null)
-                valid = EvaluateExpression(search, out result, null);
-            else
-                valid = EvaluateExpression(search, out result, vi._GDBName);
-            
-            if (vi != null)
-            {
-                if ((vi._value != result) || (!isRoot))  // if is not root means that it can be expanded...
-                {
-                    vi._value = result;
-                    if (vi._value == null || (vi._type.Contains("*") && (vi._value != "0x0")))
-                    {
-                        // This is an array, struct, union, or pointer.
-                        // Create a variable object so we can list this variable's children.
-                        ArrayList GDBNames = new ArrayList();
-                        ArrayList VSNames = new ArrayList();
-                        bool hasVsNdK;
-                        eventDispatcher.CreateVar(vi._name, out hasVsNdK);
-                        if (hasVsNdK)
-                        {
-                            GDBNames.Add("VsNdK_" + vi._name);
-                            VSNames.Add(vi._name);
-                        }
-                        vi._children = new ArrayList();
-                        if (vi._type.Contains("struct"))
-                            if (vi._type[vi._type.Length - 1] == '*')
-                                vi.ListChildren(eventDispatcher, "*", GDBNames, VSNames, hasVsNdK, null);
-                            else if (vi._type.Contains("["))
-                                vi.ListChildren(eventDispatcher, "struct[]", GDBNames, VSNames, hasVsNdK, null);
-                            else
-                                vi.ListChildren(eventDispatcher, "struct", GDBNames, VSNames, hasVsNdK, null);
-                        else if (vi._type.Contains("["))
-                            vi.ListChildren(eventDispatcher, "[]", GDBNames, VSNames, hasVsNdK, null);
-                        else if (vi._type.Contains("*"))
-                            vi.ListChildren(eventDispatcher, "*", GDBNames, VSNames, hasVsNdK, null);
-                        else
-                            vi.ListChildren(eventDispatcher, "", GDBNames, VSNames, hasVsNdK, null);
-                        eventDispatcher.DeleteVar(vi._name, hasVsNdK);
-                    }
-                }
-            }
-            else
-            {
-                if (!valid)
-                    vi = new VariableInfo(search, "", result, null);
-                else
-                {
-                    string aux_exp = search.Replace(" ", "");
-                    string datatype;
-
-                    // Sending 2 GDB commands to get the data type of "aux_exp" because it is not known, at this moment, if "aux_exp"
-                    // is an expression, a primitive or a compound variable.
-
-                    // Gets the parsed response for the GDB command that returns the data type of "aux_exp".
-                    // (http://sourceware.org/gdb/onlinedocs/gdb/Symbols.html)
-                    string firstDatatype = GDBParser.parseCommand("whatis " + aux_exp, 3);
-
-                    // Gets the parsed response for the GDB command that returns a detailed description of the type.
-                    // (http://sourceware.org/gdb/onlinedocs/gdb/Symbols.html)
-                    string baseDatatype = GDBParser.parseCommand("ptype " + aux_exp, 4);
-
-                    if ((baseDatatype[baseDatatype.Length - 1] == '{') && (baseDatatype[baseDatatype.Length - 2] == ' '))
-                        baseDatatype = baseDatatype.Remove(baseDatatype.Length - 2);
-                    if (baseDatatype.Length < firstDatatype.Length)
-                    {
-                        if (firstDatatype.Contains(baseDatatype))
-                        {
-                            baseDatatype = firstDatatype;
-                        }
-                    }
-                    if ((baseDatatype == firstDatatype) || ((baseDatatype.Contains("::")) && (!baseDatatype.Contains("union"))))
-                    {
-                        baseDatatype = "";
-                        datatype = firstDatatype;
-                    }
-                    else
-                    {
-                        datatype = baseDatatype;
-                    }
-                    if (datatype[datatype.Length - 1] == '*')
-                        if (result == "0x0")
-                        {
-                            vi = new VariableInfo(search, firstDatatype, result, null);
-                        }
-                        else
-                        {
-                            vi = new VariableInfo(search, firstDatatype, baseDatatype, result, eventDispatcher, null, null);
-                        }
-                    else if ((datatype.Contains("struct")) || (datatype.Contains("[")))
-                    {
-                        vi = new VariableInfo(search, firstDatatype, baseDatatype, null, eventDispatcher, null, null);
-                    }
-                    else
-                    {
-                        vi = new VariableInfo(search, firstDatatype, result, null);
-                    }
-                }
-            }
-            return vi;
-        }
-
-        /// <summary>
-        /// Call the right VariableInfo constructor for locals and arguments.
-        /// </summary>
-        /// <param name="name"> The name of the variable. </param>
-        /// <param name="type"> The data type of the variable. </param>
-        /// <param name="value"> The value of the variable. </param>
-        /// <param name="dispatcher"> The event dispatcher. </param>
-        /// <returns> Return the VariableInfo created object. </returns>
-        public static VariableInfo Create(string name, string type, string value, EventDispatcher dispatcher)
-        {
-            VariableInfo newVar = new VariableInfo(name, type, "", value, dispatcher, null, null);
-            return newVar;
-        }
-
-        /// <summary>
-        /// Constructor for Variable Info Object without inquiring for the variable's children.
-        /// </summary>
-        /// <param name="name"> The name of the variable. </param>
-        /// <param name="type"> The data type of the variable. </param>
-        /// <param name="value"> The value of the variable. </param>
-        /// <param name="gdbName"> The GDB Name of the variable. </param>
-        public VariableInfo(string name, string type, string value, string gdbName)
-        {
-            _name = name;
-            _type = type;
-            _value = value;
-            _children = null;
-            _GDBName = gdbName;
-        }
-
-        /// <summary>
-        /// Constructor for Variable Info Object inquiring for the variable's children
-        /// </summary>
-        /// <param name="name"> The name of the variable. </param>
-        /// <param name="type"> The data type of the variable. </param>
-        /// <param name="baseType"> The base type of the variable. </param>
-        /// <param name="value"> The value of the variable. </param>
-        /// <param name="dispatcher"> The event dispatcher. </param>
-        /// <param name="gdbNames"> The names of the variables used by GDB. </param>
-        /// <param name="vsNames"> The Names of the variables used by VS. </param>
-        public VariableInfo(string name, string type, string baseType, string value, EventDispatcher dispatcher, ArrayList gdbNames, ArrayList vsNames)
-        {
-            // numChildren - The result of the createvar returns ERROR or a number from 0 to "n" where "n" is the number of children of the variable.
-
-            _name = name;
-            _type = type;
-            _value = value;
-            _children = null;
-            _GDBName = null;
-
-            if (baseType != "")
-                type = baseType;
-
-            if (gdbNames == null)
-            {
-                gdbNames = new ArrayList();
-                vsNames = new ArrayList();
-            }
-
-            if (value == null || (type.Contains("*") && (value != "0x0")))
-            {
-                // This is an array, struct, union, or pointer.
-                // Create a variable object so we can list this variable's children.
-
-                // Some VS variable names cannot be used by GDB. When that happens, it is added the prefix VsNdK_ to the GDB variable 
-                // name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
-                // same index position. This bool variable just indicate if this prefix is used or not.
-                bool hasVsNdK; 
-                string numChildren = dispatcher.CreateVar(_name, out hasVsNdK);
-
-                if (hasVsNdK)
-                {
-                    _GDBName = "VsNdK_" + _name;
-                    gdbNames.Add("VsNdK_" + _name);
-                    vsNames.Add(_name);
-                }
-
-                try // Catch non-numerical data
-                {
-                    if (Convert.ToInt32(numChildren) > 0) // If the variable has children, evaluate them.
-                    {
-                        _children = new ArrayList();
-                        if (type.Contains("struct"))
-                            if (type[type.Length - 1] == '*')
-                                ListChildren(dispatcher, "*", gdbNames, vsNames, hasVsNdK, null);
-                            else if (type.Contains("["))
-                                ListChildren(dispatcher, "struct[]", gdbNames, vsNames, hasVsNdK, null);
-                            else
-                                ListChildren(dispatcher, "struct", gdbNames, vsNames, hasVsNdK, null);
-                        else if (type.Contains("["))
-                            ListChildren(dispatcher, "[]", gdbNames, vsNames, hasVsNdK, null);
-                        else if (type.Contains("*"))
-                            ListChildren(dispatcher, "*", gdbNames, vsNames, hasVsNdK, null);
-                        else
-                            ListChildren(dispatcher, "", gdbNames, vsNames, hasVsNdK, null);
-                    }
-                }
-                catch (FormatException)
-                {
-
-                }
-
-                dispatcher.DeleteVar(_name, hasVsNdK);
-            }
-
-            if (value == null)
-                EvaluateExpression(name, out _value, null);
-        }
-
-        /// <summary>
-        /// Gets the list of children for a given variable.
-        /// </summary>
-        /// <param name="dispatcher"> The event dispatcher. </param>
-        /// <param name="parentType"> The variable's parent data type. "*" means it is a pointer; "struct[]" means it is an array of
-        /// structures; "struct" means it is a structure; and "[]" means it is an array. </param>
-        /// <param name="gdbNames"> The names of the variables used by GDB. </param>
-        /// <param name="vsNames"> The Names of the variables used by VS. </param>
-        /// <param name="hasVsNdK"> Indicate if the variable name uses or not the prefix "VsNdK_". </param>
-        /// <param name="gdbName"> The GDB Name of the variable. </param>
-        public void ListChildren(EventDispatcher dispatcher, string parentType, ArrayList gdbNames, ArrayList vsNames, bool hasVsNdK, string gdbName)
-        {
-            string childListResponse;
-            if (gdbName == null)
-            {
-                if (hasVsNdK)
-                {
-                    childListResponse = dispatcher.listChildren(_GDBName);
-                }
-                else
-                {
-                    childListResponse = dispatcher.listChildren(_name);
-                    if ((childListResponse == "ERROR") && (_GDBName != null))
-                    {
-                        childListResponse = dispatcher.listChildren(_GDBName);
-                    }
-                }
-            }
-            else
-                childListResponse = dispatcher.listChildren(gdbName);
-
-            if (childListResponse != "ERROR")
-            {
-                childListResponse = (childListResponse.Substring(3)).Replace("#;;;", "");
-                
-                string[] childList = childListResponse.Split('#');
-                foreach (string childString in childList)
-                {
-                    string name = null;
-                    string type = null;
-                    string value = null;
-                    int numChildren = 0;
-                    bool valid = true;
-
-                    string[] childProperties = childString.Split(';');
-
-                    if (childProperties[0] == "")
-                        continue;
-
-                    name = childProperties[0];
-
-                    if (name.Contains("::")) // discard this GDB expression.
-                    {
-                        continue;
-                    }
-
-                    gdbName = name;
-
-                    int end = name.Length;
-                    if (name[end - 1] == '"')
-                        end--;
-                    if (((name.Length > 8) && (name.Substring(end - 8, 8) == ".private")) || 
-                        ((name.Length > 7) && (name.Substring(end - 7, 7) == ".public")) || 
-                        ((name.Length > 10) && (name.Substring(end - 10, 10) == ".protected")) || 
-                        ((name.Length > 9) && (name.Substring(end - 9, 9) == ".private.")) || 
-                        ((name.Length > 8) && (name.Substring(end - 8, 8) == ".public.")) || 
-                        ((name.Length > 11) && (name.Substring(end - 11, 11) == ".protected.")))
-                    {
-                        // GDB is using an intermediate representation for the variable. Inquire GDB again using this intermediate name.
-                        int index = vsNames.IndexOf(_name);
-                        if (index != -1)
-                            gdbNames[index] = gdbName;
-                        else
-                        {
-                            gdbNames.Add(gdbName);
-                            vsNames.Add(_name);
-                        }
-                        ListChildren(dispatcher, parentType, gdbNames, vsNames, hasVsNdK, gdbName);
-                        continue;
-                    }
-                    else
-                    {
-                        int dot = name.LastIndexOf(".");
-                        if (dot != -1)
-                        {
-                            int index = gdbNames.IndexOf(name.Substring(0, dot));
-                            if (index != -1)
-                            {
-                                name = vsNames[index].ToString() + name.Substring(dot);
-                            }
-                        }
-
-                        name = name.Replace(".private", "");
-                        name = name.Replace(".public", "");
-                        name = name.Replace(".protected", "");
-                        name = name.Replace("..", ".");
-
-                        dot = name.LastIndexOf(".*");
-                        if (dot != -1)
-                        {
-                            name = "*(" + name.Remove(dot) + ")";
-                        }
-
-                        if (parentType == "*")
-                        {
-                            dot = name.LastIndexOf('.');
-                            if (dot != -1)
-                            {
-                                name = name.Substring(0, dot) + "->" + name.Substring(dot + 1, name.Length - (dot + 1));
-                            }
-                        }
-                        else if (parentType == "[]")
-                        {
-                            dot = name.LastIndexOf('.');
-                            name = name.Substring(0, dot) + "[" + name.Substring(dot + 1, name.Length - (dot + 1));
-                            name = name + "]";
-                        }
-                        gdbNames.Add(gdbName);
-                        vsNames.Add(name);
-                    }
-
-                    if (childProperties[1] != "")
-                        numChildren = Convert.ToInt32(childProperties[1]);
-
-                    value = childProperties[2];
-                    if ((value == "") || (value.Contains("{...}")) || 
-                        ((value.Length >= 2) && (value[0] == '[') && (value[value.Length - 1] == ']')))
-                        valid = EvaluateExpression(name, out value, gdbName);
-
-                    type = childProperties[3];
-                                        
-                    VariableInfo child = new VariableInfo(name, type, value, gdbName);
-
-                    if ((valid) && (numChildren > 0 && value != "0x0"))
-                    {
-                        child._children = new ArrayList();
-                    }
-                    if (vsNames.Contains(name))
-                    {
-                        int index = vsNames.IndexOf(name);
-                        vsNames.RemoveAt(index);
-                        gdbNames.RemoveAt(index);
-                    }
-                    _children.Add(child); // If VS knows that there are children, it will inquiries again if those children data 
-                                          // were not filled.
-                }
-            }
-        }
-    }
-
-    /// <summary>
     /// Represents a logical stack frame on the thread stack. 
     /// 
     /// It implements:
@@ -654,11 +89,6 @@ namespace BlackBerry.DebugEngine
         public ArrayList _arguments;
 
         /// <summary>
-        /// 
-        /// </summary>
-        public VariableInfo _lastEvaluatedExpression;
-
-        /// <summary>
         /// Search the __stackframes cache for the internal representation of the stack frame associated to the GDB frameInfo 
         /// information. If successful, returns the stack frame; otherwise, creates a new one and return it.
         /// </summary>
@@ -689,7 +119,6 @@ namespace BlackBerry.DebugEngine
             created = true;
             return newFrame;
         }
-
 
         /// <summary>
         /// Constructor.
@@ -737,7 +166,6 @@ namespace BlackBerry.DebugEngine
 
             foreach (string variableString in variableStrings)
             {
-                string name = null;
                 bool arg = false;
                 string type = null;
                 string value = null;
@@ -748,7 +176,7 @@ namespace BlackBerry.DebugEngine
                 {
                     if (!evaluatedVars.Contains(variableProperties[0]))
                     {
-                        name = variableProperties[0];
+                        string name = variableProperties[0];
                         evaluatedVars.Add(variableProperties[0]);
                         if (variableProperties[1] != "")
                             arg = true;
@@ -766,7 +194,6 @@ namespace BlackBerry.DebugEngine
         }
 
         #region Non-interface methods
-
 
         /// <summary>
         /// Construct a FRAMEINFO for this stack frame with the requested information.
@@ -868,8 +295,8 @@ namespace BlackBerry.DebugEngine
                     // No source information, so only return the module name and the instruction pointer.
                     if ((flags & enum_FRAMEINFO_FLAGS.FIF_FUNCNAME_MODULE) != 0)
                     {
-                        if ((this._functionName != "") && (this._functionName != "??"))
-                            frameInfo.m_bstrFuncName = this._functionName;
+                        if ((_functionName != "") && (_functionName != "??"))
+                            frameInfo.m_bstrFuncName = _functionName;
                         else
                             frameInfo.m_bstrFuncName = "[External Code]";
                     }
@@ -1021,11 +448,11 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Construct an instance of IEnumDebugPropertyInfo2 for the combined locals and parameters.
         /// </summary>
-        /// <param name="dwFields"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
+        /// <param name="flags"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
         /// the enumObject are to be filled in.</param>
         /// <param name="elementsReturned"> Returns the number of elements in the enumeration. </param>
         /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
-        public void CreateLocalsPlusArgsProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
+        public void CreateLocalsPlusArgsProperties(enum_DEBUGPROP_INFO_FLAGS flags, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = 0;
             int localsLength = 0;
@@ -1048,7 +475,7 @@ namespace BlackBerry.DebugEngine
                 foreach(VariableInfo var in _locals)
                 {
                     AD7Property property = new AD7Property(var);
-                    propInfo[i] = property.ConstructDebugPropertyInfo(dwFields);
+                    propInfo[i] = property.ConstructDebugPropertyInfo(flags);
                     i++;
                 }
             }
@@ -1059,7 +486,7 @@ namespace BlackBerry.DebugEngine
                 foreach (VariableInfo arg in _arguments)
                 {
                     AD7Property property = new AD7Property(arg);
-                    propInfo[localsLength + i] = property.ConstructDebugPropertyInfo(dwFields);
+                    propInfo[localsLength + i] = property.ConstructDebugPropertyInfo(flags);
                     i++;
                 }
             }
@@ -1067,15 +494,14 @@ namespace BlackBerry.DebugEngine
             enumObject = new AD7PropertyInfoEnum(propInfo);
         }
 
-
         /// <summary>
         /// Construct an instance of IEnumDebugPropertyInfo2 for the locals collection only.
         /// </summary>
-        /// <param name="dwFields"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
+        /// <param name="flags"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
         /// the enumObject are to be filled in.</param>
         /// <param name="elementsReturned"> Returns the number of elements in the enumeration. </param>
         /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
-        private void CreateLocalProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
+        private void CreateLocalProperties(enum_DEBUGPROP_INFO_FLAGS flags, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = (uint)_locals.Count;
             DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[_locals.Count];
@@ -1084,22 +510,21 @@ namespace BlackBerry.DebugEngine
             foreach (VariableInfo var in _locals)
             {
                 AD7Property property = new AD7Property(var);
-                propInfo[i] = property.ConstructDebugPropertyInfo(dwFields);
+                propInfo[i] = property.ConstructDebugPropertyInfo(flags);
                 i++;
             }
 
             enumObject = new AD7PropertyInfoEnum(propInfo);
         }
 
-
         /// <summary>
         /// Construct an instance of IEnumDebugPropertyInfo2 for the parameters collection only.
         /// </summary>
-        /// <param name="dwFields"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
+        /// <param name="flags"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
         /// the enumObject are to be filled in.</param>
         /// <param name="elementsReturned"> Returns the number of elements in the enumeration. </param>
         /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
-        private void CreateParameterProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
+        private void CreateParameterProperties(enum_DEBUGPROP_INFO_FLAGS flags, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = (uint)_arguments.Count;
             DEBUG_PROPERTY_INFO[] propInfo = new DEBUG_PROPERTY_INFO[_arguments.Count];
@@ -1108,7 +533,7 @@ namespace BlackBerry.DebugEngine
             foreach (VariableInfo arg in _arguments)
             {
                 AD7Property property = new AD7Property(arg);
-                propInfo[i] = property.ConstructDebugPropertyInfo(dwFields);
+                propInfo[i] = property.ConstructDebugPropertyInfo(flags);
                 i++;
             }
 
@@ -1119,23 +544,19 @@ namespace BlackBerry.DebugEngine
 
         #region IDebugStackFrame2 Members
 
-
         /// <summary>
         /// Creates an enumerator for properties associated with the stack frame, such as local variables.
         /// (http://msdn.microsoft.com/en-us/library/bb145607.aspx).
         /// </summary>
-        /// <param name="dwFields"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
+        /// <param name="flags"> A combination of flags from the DEBUGPROP_INFO_FLAGS enumeration that specifies which fields in 
         /// the enumerated DEBUG_PROPERTY_INFO structures are to be filled in. </param>
-        /// <param name="nRadix"> The radix to be used in formatting any numerical information. </param>
-        /// <param name="guidFilter"> A GUID of a filter used to select which DEBUG_PROPERTY_INFO structures are to be enumerated, 
-        /// such as guidFilterLocals. </param>
-        /// <param name="dwTimeout"> Maximum time, in milliseconds, to wait before returning from this method. Use INFINITE to wait 
-        /// indefinitely. </param>
-        /// <param name="elementsReturned"> Returns the number of properties enumerated. This is the same as calling the 
-        /// IEnumDebugPropertyInfo2::GetCount method. </param>
+        /// <param name="radix"> The radix to be used in formatting any numerical information. </param>
+        /// <param name="guidFilter"> A GUID of a filter used to select which DEBUG_PROPERTY_INFO structures are to be enumerated, such as guidFilterLocals. </param>
+        /// <param name="timeout"> Maximum time, in milliseconds, to wait before returning from this method. Use INFINITE to wait indefinitely. </param>
+        /// <param name="elementsReturned"> Returns the number of properties enumerated. This is the same as calling the IEnumDebugPropertyInfo2::GetCount method. </param>
         /// <param name="enumObject"> Returns an IEnumDebugPropertyInfo2 object containing a list of the desired properties. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        int IDebugStackFrame2.EnumProperties(enum_DEBUGPROP_INFO_FLAGS dwFields, uint nRadix, ref Guid guidFilter, uint dwTimeout, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
+        int IDebugStackFrame2.EnumProperties(enum_DEBUGPROP_INFO_FLAGS flags, uint radix, ref Guid guidFilter, uint timeout, out uint elementsReturned, out IEnumDebugPropertyInfo2 enumObject)
         {
             elementsReturned = 0;
             enumObject = null;
@@ -1146,17 +567,17 @@ namespace BlackBerry.DebugEngine
                         guidFilter == AD7Guids.guidFilterAllLocalsPlusArgs ||
                         guidFilter == AD7Guids.guidFilterAllLocals)
                 {
-                    CreateLocalsPlusArgsProperties(dwFields, out elementsReturned, out enumObject);
+                    CreateLocalsPlusArgsProperties(flags, out elementsReturned, out enumObject);
                     return VSConstants.S_OK;
                 }
                 if (guidFilter == AD7Guids.guidFilterLocals)
                 {
-                    CreateLocalProperties(dwFields, out elementsReturned, out enumObject);
+                    CreateLocalProperties(flags, out elementsReturned, out enumObject);
                     return VSConstants.S_OK;
                 }
                 if (guidFilter == AD7Guids.guidFilterArgs)
                 {
-                    CreateParameterProperties(dwFields, out elementsReturned, out enumObject);
+                    CreateParameterProperties(flags, out elementsReturned, out enumObject);
                     return VSConstants.S_OK;
                 }
                 return EngineUtils.NotImplemented();
@@ -1171,14 +592,14 @@ namespace BlackBerry.DebugEngine
         /// Gets the code context for this stack frame. The code context represents the current instruction pointer in this stack frame.
         /// (http://msdn.microsoft.com/en-us/library/bb147046.aspx)
         /// </summary>
-        /// <param name="memoryAddress"> Returns an IDebugCodeContext2 object that represents the current instruction pointer in this stack frame. </param>
+        /// <param name="pMemoryAddress"> Returns an IDebugCodeContext2 object that represents the current instruction pointer in this stack frame. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        int IDebugStackFrame2.GetCodeContext(out IDebugCodeContext2 memoryAddress)
+        int IDebugStackFrame2.GetCodeContext(out IDebugCodeContext2 pMemoryAddress)
         {
-            memoryAddress = null;
+            pMemoryAddress = null;
             try
             {
-                memoryAddress = new AD7MemoryAddress(_engine, _address);
+                pMemoryAddress = new AD7MemoryAddress(_engine, _address);
                 return VSConstants.S_OK;
             }
             catch (Exception e)
@@ -1191,11 +612,11 @@ namespace BlackBerry.DebugEngine
         /// Gets a description of the properties associated with a stack frame.
         /// (http://msdn.microsoft.com/en-us/library/bb144920.aspx)
         /// </summary>
-        /// <param name="property"> Returns an IDebugProperty2 object that describes the properties of this stack frame. </param>
+        /// <param name="pProperty"> Returns an IDebugProperty2 object that describes the properties of this stack frame. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugStackFrame2.GetDebugProperty(out IDebugProperty2 property)
+        int IDebugStackFrame2.GetDebugProperty(out IDebugProperty2 pProperty)
         {
-            property = new AD7Property(this);
+            pProperty = new AD7Property(this);
             return VSConstants.S_OK;
         }
 
@@ -1203,13 +624,13 @@ namespace BlackBerry.DebugEngine
         /// Gets the document context for this stack frame. The debugger will call this when the current stack frame is changed and 
         /// will use it to open the correct source document for this stack frame. (http://msdn.microsoft.com/en-us/library/bb146338.aspx)
         /// </summary>
-        /// <param name="docContext"> Returns an IDebugDocumentContext2 object that represents the current position in a source 
+        /// <param name="pDocContext"> Returns an IDebugDocumentContext2 object that represents the current position in a source 
         /// document. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 docContext)
+        int IDebugStackFrame2.GetDocumentContext(out IDebugDocumentContext2 pDocContext)
         {
-            _engine.cleanEvaluatedThreads();
-            docContext = null;
+            _engine.CleanEvaluatedThreads();
+            pDocContext = null;
 
             try
             {
@@ -1227,12 +648,12 @@ namespace BlackBerry.DebugEngine
                 else
                     endTp.dwLine = 0;
 
-                docContext = new AD7DocumentContext(_documentName, begTp, endTp, null);
+                pDocContext = new AD7DocumentContext(_documentName, begTp, endTp, null);
                 return VSConstants.S_OK;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return EngineUtils.UnexpectedException(e);
+                return EngineUtils.UnexpectedException(ex);
             }
         }
 
@@ -1286,7 +707,7 @@ namespace BlackBerry.DebugEngine
                 if (_thread._id != _engine.CurrentThread()._id)
                     _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
 
-                _engine.cleanEvaluatedThreads();
+                _engine.CleanEvaluatedThreads();
                 
                 return VSConstants.S_OK;
             }
@@ -1334,24 +755,24 @@ namespace BlackBerry.DebugEngine
         /// Gets a machine-dependent representation of the range of physical addresses associated with a stack frame.
         /// Not implemented. (http://msdn.microsoft.com/en-us/library/bb145597.aspx)
         /// </summary>
-        /// <param name="addrMin"> Returns the lowest physical address associated with this stack frame. </param>
-        /// <param name="addrMax"> Returns the highest physical address associated with this stack frame. </param>
+        /// <param name="addressMin"> Returns the lowest physical address associated with this stack frame. </param>
+        /// <param name="addressMax"> Returns the highest physical address associated with this stack frame. </param>
         /// <returns> Not implemented. </returns>
-        int IDebugStackFrame2.GetPhysicalStackRange(out ulong addrMin, out ulong addrMax)
+        int IDebugStackFrame2.GetPhysicalStackRange(out ulong addressMin, out ulong addressMax)
         {
-            addrMin = 0;
-            addrMax = 0;
+            addressMin = 0;
+            addressMax = 0;
             return EngineUtils.NotImplemented();
         }
 
         /// <summary>
         /// Gets the thread associated with a stack frame. (http://msdn.microsoft.com/en-us/library/bb161776.aspx)
         /// </summary>
-        /// <param name="thread"> Returns an IDebugThread2 object that represents the thread. </param>
+        /// <param name="pThread"> Returns an IDebugThread2 object that represents the thread. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugStackFrame2.GetThread(out IDebugThread2 thread)
+        int IDebugStackFrame2.GetThread(out IDebugThread2 pThread)
         {
-            thread = _thread;
+            pThread = _thread;
             return VSConstants.S_OK;
         }
 
@@ -1381,8 +802,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="pszCode"> The expression to be parsed. </param>
         /// <param name="dwFlags"> A combination of flags from the PARSEFLAGS enumeration that controls parsing. </param>
         /// <param name="nRadix"> The radix to be used in parsing any numerical information in pszCode. </param>
-        /// <param name="ppExpr"> Returns the IDebugExpression2 object that represents the parsed expression, which is ready for 
-        /// binding and evaluation. </param>
+        /// <param name="ppExpr"> Returns the IDebugExpression2 object that represents the parsed expression, which is ready for binding and evaluation. </param>
         /// <param name="pbstrError"> Returns the error message if the expression contains an error. </param>
         /// <param name="pichError"> Returns the character index of the error in pszCode if the expression contains an error. </param>
         /// <returns> VSConstants.S_OK. </returns>

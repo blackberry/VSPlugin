@@ -15,7 +15,6 @@
 using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Threading;
 
 namespace BlackBerry.DebugEngine
 {
@@ -28,7 +27,7 @@ namespace BlackBerry.DebugEngine
     public sealed class AD7Expression : IDebugExpression2
     {
         /// <summary>
-        ///  The expression to be evaluated. 
+        ///  The expression to be evaluated.
         /// </summary>
         private readonly string _expression;
 
@@ -114,7 +113,6 @@ namespace BlackBerry.DebugEngine
         {
             VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
             ppResult = new AD7Property(vi);
-            _frame._lastEvaluatedExpression = vi;
             return VSConstants.S_OK;
         }
 

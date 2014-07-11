@@ -14,11 +14,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using Microsoft.VisualStudio.Debugger.Interop;
 using VSNDK.Parser;
 using System.Threading;
-using System.Windows.Forms;
 
 namespace BlackBerry.DebugEngine
 {    
@@ -112,7 +110,6 @@ namespace BlackBerry.DebugEngine
             // Notify the AddIn that this debug session has ended.
             DebugEngineStatus.IsRunning = false;
         }
-
 
         /// <summary>
         /// Constructor. Starts the thread responsible for handling asynchronous GDB output.
@@ -236,10 +233,9 @@ namespace BlackBerry.DebugEngine
                             }
                         }
                     }
-                }          
+                }
             }
         }
-
 
         /// <summary>
         /// Interrupt the debugged process if necessary before changing a breakpoint.
@@ -386,7 +382,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="GDB_ID"> Breakpoint ID in GDB. </param>
         /// <param name="ignore"> Number of hit counts to ignore. </param>
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
-        public bool ignoreHitCount(uint GDB_ID, int ignore)
+        public bool IgnoreHitCount(uint GDB_ID, int ignore)
         {
             ignore -= 1; // The given number is decreased by one, because the VS command means to break when hit count is equal or greater
                          // than X hits. So, the equivalent GDB command is to break after (X - 1) hit counts.
@@ -411,7 +407,6 @@ namespace BlackBerry.DebugEngine
             return true;
         }
 
-
         /// <summary>
         /// Reset current hit count in GDB. There is no way to reset hit counts in GDB. To implement this functionality, the specified GDB 
         /// breakpoint is deleted and a new one is created with the same conditions, substituting the GDB_ID of the VS breakpoint.
@@ -420,12 +415,12 @@ namespace BlackBerry.DebugEngine
         /// <param name="resetCondition"> Is false when this method is called by SetCondition, true if not. Used to avoid setting
         /// breakpoint conditions again in case it is called by SetCondition method. </param>
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
-        public bool resetHitCount(AD7BoundBreakpoint bbp, bool resetCondition)
+        public bool ResetHitCount(AD7BoundBreakpoint bbp, bool resetCondition)
         {
             // Declare local Variables
-            uint GDB_LinePos = 0;
-            string GDB_Filename = "";
-            string GDB_address = "";
+            uint GDB_LinePos;
+            string GDB_Filename;
+            string GDB_address;
 
             uint GDB_ID = bbp.GDB_ID;
 
@@ -462,7 +457,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="GDB_ID"> Breakpoint ID in GDB. </param>
         /// <param name="condition"> Condition to be set. When empty (""), means to remove any previous condition. </param>
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
-        public bool setBreakpointCondition(uint GDB_ID, string condition)
+        public bool SetBreakpointCondition(uint GDB_ID, string condition)
         {
             string cmd;
 
@@ -482,7 +477,6 @@ namespace BlackBerry.DebugEngine
             hBreakpoints.Handle(response);
             return true;
         }
-
 
         /// <summary>
         /// Delete a breakpoint in GDB.
@@ -518,7 +512,6 @@ namespace BlackBerry.DebugEngine
 
             return true;
         }
-
 
         /// <summary>
         /// Enable or disable a breakpoint.
@@ -556,13 +549,12 @@ namespace BlackBerry.DebugEngine
             return true;
         }
 
-
         /// <summary>
         /// Update hit count.
         /// </summary>
         /// <param name="ID"> Breakpoint ID in GDB. </param>
         /// <param name="hitCount"> Hit count. </param>
-        public void updateHitCount(uint ID, uint hitCount)
+        public void UpdateHitCount(uint ID, uint hitCount)
         {
             var bbp = Engine.BreakpointManager.GetBoundBreakpointForGDBID(ID);
             if (bbp != null)
@@ -571,7 +563,6 @@ namespace BlackBerry.DebugEngine
                     ((IDebugBoundBreakpoint2)bbp).SetHitCount(hitCount);
             }
         }
-
 
         /// <summary>
         /// Lock a breakpoint before updating its hit counts and/or condition. This is done to avoid a race condition that can happen when
@@ -745,7 +736,7 @@ namespace BlackBerry.DebugEngine
                             // Sends the GDB command that resumes the execution of the inferior program. 
                             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
                             GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
-                            EventDispatcher._GDBRunMode = true;
+                            _GDBRunMode = true;
                             Engine._running.Set();
                         }
                     }
@@ -755,7 +746,7 @@ namespace BlackBerry.DebugEngine
                             bbp._hitCount += 1;
 
                         // Transition DE state
-                        EventDispatcher._GDBRunMode = false;
+                        _GDBRunMode = false;
                         Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
 
                         // Found a bound breakpoint
@@ -764,11 +755,11 @@ namespace BlackBerry.DebugEngine
                         if (bbp._isHitCountEqual)
                         {
                             // Have to ignore the biggest number of times to keep the breakpoint enabled and to avoid stopping on it.
-                            ignoreHitCount(ID, int.MaxValue); 
+                            IgnoreHitCount(ID, int.MaxValue); 
                         }
                         else if (bbp._hitCountMultiple != 0)
                         {
-                            ignoreHitCount(ID, (int)(bbp._hitCountMultiple - (bbp._hitCount % bbp._hitCountMultiple)));
+                            IgnoreHitCount(ID, (int)(bbp._hitCountMultiple - (bbp._hitCount % bbp._hitCountMultiple)));
                         }
                     }
                     LeaveCriticalRegion();
@@ -789,7 +780,7 @@ namespace BlackBerry.DebugEngine
                         // Sends the GDB command that resumes the execution of the inferior program. 
                         // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
                         GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
-                        EventDispatcher._GDBRunMode = true;
+                        _GDBRunMode = true;
                         Engine._running.Set();
                     }
 
@@ -797,7 +788,6 @@ namespace BlackBerry.DebugEngine
                 }
             }
         }
-
 
         /// <summary>
         /// Returns the document context needed for showing the location of the current instruction pointer.
@@ -820,7 +810,6 @@ namespace BlackBerry.DebugEngine
 
             return new AD7DocumentContext(filename, startPosition[0], endPosition[0], codeContext);
         }
-
 
         /// <summary>
         /// Return the depth of the stack.
@@ -920,7 +909,6 @@ namespace BlackBerry.DebugEngine
             return GDBParser.parseCommand("-var-list-children --all-values " + name + " 0 50", 15); 
         }
 
-
         /// <summary>
         /// Kill the child process in which your program is running under gdb.
         /// </summary>
@@ -930,7 +918,6 @@ namespace BlackBerry.DebugEngine
             // (http://sourceware.org/gdb/onlinedocs/gdb/Kill-Process.html#Kill-Process)
             GDBParser.parseCommand("kill", 16);
         }
-
 
         /// <summary>
         /// Called after the debug engine has set the initial breakpoints, or to resume a process that was interrupted.
@@ -946,940 +933,8 @@ namespace BlackBerry.DebugEngine
                 // Sends the GDB command that resumes the execution of the inferior program. 
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
                 GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
-                EventDispatcher._GDBRunMode = true;
+                _GDBRunMode = true;
                 Engine._running.Set();
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// This class manages breakpoints events.
-    /// </summary>
-    public class HandleBreakpoints
-    {
-        /// <summary>
-        /// GDB breakpoint ID.
-        /// </summary>
-        private int _number = -1;
-
-        /// <summary>
-        /// Boolean variable that indicates if this breakpoint is enable (true) or disable (false).
-        /// </summary>
-        private bool _enabled;
-
-        /// <summary>
-        /// Breakpoint address.
-        /// </summary>
-        private string _address = "";
-
-        /// <summary>
-        /// Name of the function that contains this breakpoint.
-        /// </summary>
-        private string _functionName = "";
-
-        /// <summary>
-        /// File name that contains this breakpoint.
-        /// </summary>
-        private string _fileName = "";
-
-        /// <summary>
-        /// Line number for this breakpoint.
-        /// </summary>
-        private int _line = -1;
-
-        /// <summary>
-        /// Number of hits for this breakpoint.
-        /// </summary>
-        private int _hits = -1;
-
-        /// <summary>
-        /// Number of hits to be ignored by this breakpoint.
-        /// </summary>
-        private int _ignoreHits = -1;
-
-        /// <summary>
-        /// Condition associated to this breakpoint.
-        /// </summary>
-        private string _condition = "";
-
-        /// <summary>
-        /// Thread ID that was interrupted when this breakpoint was hit.
-        /// </summary>
-        private string _threadID = "";
-
-        /// <summary>
-        /// This object manages debug events in the engine.
-        /// </summary>
-        private EventDispatcher _eventDispatcher;
-
-        /// <summary>
-        /// GDB_ID Property
-        /// </summary>
-        public int Number 
-        {
-            get { return _number; }
-        }
-
-        /// <summary>
-        /// GDB Line Position Property
-        /// </summary>
-        public int LinePosition
-        {
-            get { return _line; }
-        }
-
-        /// <summary>
-        /// GDB File name
-        /// </summary>
-        public string FileName
-        {
-            get { return _fileName; }
-        }
-
-        /// <summary>
-        /// GDB Address
-        /// </summary>
-        public string Address
-        {
-            get { return _address; }
-        }
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="ed"> This object manages debug events in the engine. </param>
-        public HandleBreakpoints(EventDispatcher ed)
-        {
-            _eventDispatcher = ed;
-        }
-        
-        /// <summary>
-        /// This method manages breakpoints events by classifying each of them by sub-type (e.g. breakpoint inserted, modified, etc.).
-        /// </summary>
-        /// <param name="ev"> String that contains the event description. </param>
-        public void Handle(string ev)
-        {
-            int ini = 0;
-            int end = 0;
-            switch (ev[1])
-            {
-                case '0':  
-                // Breakpoint inserted (synchronous). 
-                // Example: 20,1,y,0x0804d843,main,C:/Users/xxxxx/vsplugin-ndk/samples/Square/Square/main.c,319,0       
-                    ini = 3;
-                    end = ev.IndexOf(';', 3);
-                    _number = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                    if (ev[end + 1] == 'y')
-                        _enabled = true;
-                    else
-                        _enabled = false;
-
-                    ini = end + 3;
-                    end = ev.IndexOf(';', ini);
-                    _address = ev.Substring(ini, (end - ini));
-                    if (_address == "<PENDING>")
-                    {
-                        _functionName = "??";
-                        EventDispatcher._unknownCode = true;
-                        _fileName = "";
-                        _line = 0;
-                        _hits = 0;
-                        return;
-                    }
-
-                    ini = end + 1;
-                    end = ev.IndexOf(';', ini);
-                    _functionName = ev.Substring(ini, end - ini);
-
-                    ini = end + 1;
-                    end = ev.IndexOf(';', ini);
-                    _fileName = ev.Substring(ini, end - ini);
-
-                    ini = end + 1;
-                    end = ev.IndexOf(';', ini);
-                    _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                    ini = end + 1;
-                    _hits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));                   
-
-                    break;
-                case '1':  
-                // Breakpoint modified (asynchronous). 
-                // Example: 21,1,y,0x0804d843,main,C:/Users/xxxxxx/vsplugin-ndk/samples/Square/Square/main.c,318,1
-                    ini = 3;
-                    end = ev.IndexOf(';', 3);
-                    _number = Convert.ToInt32(ev.Substring(ini, (end - ini))); ;
-
-                    if (ev[end + 1] == 'y')
-                        _enabled = true;
-                    else
-                        _enabled = false;
-
-                    ini = end + 3;
-                    end = ev.IndexOf(';', ini);
-                    _address = ev.Substring(ini, (end - ini));
-
-                    ini = end + 1;
-                    end = ev.IndexOf(';', ini);
-                    _functionName = ev.Substring(ini, end - ini);
-
-                    // Need to set the flag for unknown code if necessary.
-                    if (_functionName == "??")
-                    {
-                        EventDispatcher._unknownCode = true;
-                    }
-                    else
-                    {
-                        EventDispatcher._unknownCode = false;
-                    }
-
-                    ini = end + 1;
-                    end = ev.IndexOf(';', ini);
-                    _fileName = ev.Substring(ini, end - ini);
-
-                    ini = end + 1;
-                    end = ev.IndexOf(';', ini);
-                    _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                    ini = end + 1;
-                    _hits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-
-                    // Update hit count on affected bound breakpoint.
-                    _eventDispatcher.updateHitCount((uint)_number, (uint)_hits);
-
-                    break;
-                case '2':  
-                // Breakpoint deleted asynchronously (a temporary breakpoint). Example: 22,2\r\n
-                    _number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
-
-                    break;
-                case '3':  
-                // Breakpoint enabled. Example: 23 (enabled all) or 23,1 (enabled only breakpoint 1)
-                    if (ev.Length > 2)
-                        _number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
-                    else
-                        _number = 0;  // 0 means ALL breakpoints.
-
-                    break;
-                case '4':  
-                // Breakpoint disabled. Example: 24 (disabled all) or 24,1 (disabled only breakpoint 1)
-                    if (ev.Length > 2)
-                        _number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
-                    else
-                        _number = 0;  // 0 means ALL breakpoints.
-
-                    break;
-                case '5':  
-                // Breakpoint deleted. Example: 25 (deleted all) or 25,1 (deleted only breakpoint 1)
-                    if (ev.Length > 2)
-                        _number = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
-                    else
-                        _number = 0;  // 0 means ALL breakpoints.
-
-                    break;
-                case '6':  
-                // Break after "n" hits (or ignore n hits). Example: 26;1;100
-                    ini = 3;
-                    end = ev.IndexOf(';', 3);
-                    _number = Convert.ToInt32(ev.Substring(3, (end - 3)));
-
-                    ini = end + 1;
-                    _ignoreHits = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-
-                    break;
-                case '7':  
-                // Breakpoint hit. 
-                // Example: 27,1,C:/Users/xxxxxx/vsplugin-ndk/samples/Square/Square/main.c,319;1\r\n
-                    bool updatingCondBreak = _eventDispatcher.Engine._updatingConditionalBreakpoint.WaitOne(0);
-                    if (updatingCondBreak)
-                    {
-
-                        _eventDispatcher.Engine.resetStackFrames();
-
-                        ini = 3;
-                        end = ev.IndexOf(';', 3);
-                        _number = Convert.ToInt32(ev.Substring(3, (end - 3)));
-
-                        ini = end + 1;
-                        end = ev.IndexOf(';', ini);
-                        _fileName = ev.Substring(ini, end - ini);
-
-                        ini = end + 1;
-                        end = ev.IndexOf(';', ini);
-                        _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                        ini = end + 1;
-                        _threadID = ev.Substring(ini, (ev.Length - ini));
-
-                        _eventDispatcher.Engine.cleanEvaluatedThreads();
-
-                        // Call the method/event that will stop SDM because a breakpoint was hit here.
-                        if (_eventDispatcher.Engine._updateThreads)
-                        {
-                            _eventDispatcher.Engine.UpdateListOfThreads();
-                        }
-                        _eventDispatcher.Engine.SelectThread(_threadID).setCurrentLocation(_fileName, (uint)_line);
-                        _eventDispatcher.Engine.SetAsCurrentThread(_threadID);
-
-                        // A breakpoint can be hit during a step
-                        if (_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
-                        {
-                            HandleProcessExecution.OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
-                        }
-                        else
-                        {
-                            // Visual Studio shows the line position one more than it actually is
-                            _eventDispatcher.Engine._docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint)(_line - 1));
-                            _eventDispatcher.BreakpointHit((uint)_number, _threadID);
-                        }
-                        _eventDispatcher.Engine._updatingConditionalBreakpoint.Set();
-                    }
-                    break;
-                case '8':  
-                // Breakpoint condition set. Example: 28;1;expression
-                    ini = 3;
-                    end = ev.IndexOf(';', 3);
-                    if (end != -1)
-                    {
-                        _number = Convert.ToInt32(ev.Substring(3, (end - 3)));
-
-                        ini = end + 1;
-                        _condition = ev.Substring(ini, (ev.Length - ini));
-                    }
-                    else
-                    {
-                        _number = Convert.ToInt32(ev.Substring(3));
-                        _condition = "";
-                    }
-                    break;
-                case '9':  // Error in testing breakpoint condition
-                    break;
-            }
-        }
-    }
-
-
-    /// <summary>
-    /// This class manages events related to execution control (processes, threads, programs).
-    /// </summary>
-    public sealed class HandleProcessExecution
-    {
-        /// <summary>
-        /// Thread ID.
-        /// </summary>
-        private int _threadId = -1; // when threadId is 0, it means all threads.
-
-        /// <summary>
-        /// Process ID.
-        /// </summary>
-        private int _processId = -1;
-
-        /// <summary>
-        /// Name of the signal that caused an interruption.
-        /// </summary>
-        private string _signalName = "";
-
-        /// <summary>
-        /// Meaning of the signal that caused an interruption.
-        /// </summary>
-        private string _signalMeaning = "";
-
-        /// <summary>
-        /// File name.
-        /// </summary>
-        private string _fileName = "";
-
-        /// <summary>
-        /// Line number.
-        /// </summary>
-        private int _line = -1;
-
-        /// <summary>
-        /// Address.
-        /// </summary>
-        private int _address = -1;
-
-        /// <summary>
-        /// Function name.
-        /// </summary>
-        private string _functionName = "";
-
-        /// <summary>
-        /// Error caused by a GDB command that failed.
-        /// </summary>
-        private string _error = "";
-
-        /// <summary>
-        /// This object manages debug events in the engine.
-        /// </summary>
-        private readonly EventDispatcher _eventDispatcher;
-
-        /// <summary>
-        /// Boolean variable that indicates if GDB has to resume execution after handling what caused it to enter in break mode.
-        /// </summary>
-        public static bool NeedsResumeAfterInterrupt;
-
-        /// <summary>
-        /// Used as a communication signal between the Event Dispatcher and the debug engine method responsible for stopping GDB 
-        /// execution (IDebugEngine2.CauseBreak()). So, VS is able to wait for GDB's interruption before entering in break mode.
-        /// </summary>
-        public static ManualResetEvent m_mre = new ManualResetEvent(false);
-        
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="ed"> This object manages debug events in the engine. </param>
-        public HandleProcessExecution(EventDispatcher ed)
-        {
-            _eventDispatcher = ed;
-        }
-
-        /// <summary>
-        /// This method manages events related to execution control by classifying each of them by sub-type (e.g. thread created, program interrupted, etc.).
-        /// </summary>
-        /// <param name="ev"> String that contains the event description. </param>
-        public void Handle(string ev)
-        {
-            int ini = 0;
-            int end = 0;
-            int numCommas = 0;
-            switch (ev[0])
-            {
-                case '4':
-                    switch (ev[1])
-                    {
-                        case '0':  
-                        // Thread created. Example: 40,2,20537438
-                            EventDispatcher._GDBRunMode = true;
-                            ini = 3;
-                            end = ev.IndexOf(";", 3);
-                            _threadId = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                            ini = end + 1;
-                            try
-                            {
-                                _processId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                            }
-                            catch
-                            {
-                                _processId = 0;
-                            }
-
-                            _eventDispatcher.Engine._updateThreads = true;
-
-                            break;
-                        case '1':  
-                        // Process running. Example: 41,1     (when threadId is 0 means "all threads": example: 41,0)
-                            EventDispatcher._GDBRunMode = true;
-                            _threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
-
-                            break;
-                        case '2':  
-                        // Program exited normally. Example: 42
-                            _eventDispatcher.EndDebugSession(0);
-
-                            break;
-                        case '3':  
-                        // Program was exited with an exit code. Example: 43,1;1 (not sure if there is a threadID, but the last ";" exist)   
-                            // TODO: not tested yet
-                            end = ev.IndexOf(";", 3);
-                            uint exitCode = Convert.ToUInt32(ev.Substring(3, (end - 3)));
-                            _eventDispatcher.EndDebugSession(exitCode);
-
-                            break;
-                        case '4':  
-                        // Program interrupted. 
-                            // Examples:
-                            // 44,ADDR,FUNC,THREAD-ID         
-                            // 44,ADDR,FUNC,FILENAME,LINE,THREAD-ID
-
-                            _eventDispatcher.Engine.resetStackFrames();
-                            EventDispatcher._GDBRunMode = false;
-                            numCommas = 0;
-                            foreach (char c in ev)
-                            {
-                                if (c == ';')
-                                    numCommas++;
-                            }
-
-                            ini = 3;
-                            end = ev.IndexOf(';', ini);
-                            _address = Convert.ToInt32(ev.Substring(ini, (end - ini)), 16);
-
-                            ini = end + 1;
-                            end = ev.IndexOf(';', ini);
-                            _functionName = ev.Substring(ini, (end - ini));
-
-                            if (_functionName == "??")
-                            {
-                                EventDispatcher._unknownCode = true;
-                            }
-                            else
-                            {
-                                EventDispatcher._unknownCode = false;
-                            }
-
-                            switch (numCommas)
-                            {
-                                case 3:
-                                    // Thread ID
-                                    ini = end + 1;
-                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    EventDispatcher._unknownCode = true;
-                                    break;
-                                case 4:
-                                    // Filename and line number
-                                    ini = end + 1;
-                                    end = ev.IndexOf(';', ini);
-                                    _fileName = ev.Substring(ini, (end - ini));
-
-                                    ini = end + 1;
-                                    _line = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    break;
-                                case 5:
-                                    //  Filename, line number and thread ID
-                                    ini = end + 1;
-                                    end = ev.IndexOf(';', ini);
-                                    _fileName = ev.Substring(ini, (end - ini));
-
-                                    ini = end + 1;
-                                    end = ev.IndexOf(';', ini);
-                                    _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                                    ini = end + 1;
-                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    break;
-                            }
-
-                            _eventDispatcher.Engine.cleanEvaluatedThreads();
-
-
-                            if (_eventDispatcher.Engine._updateThreads)
-                            {
-                                _eventDispatcher.Engine.UpdateListOfThreads();
-                            }
-                            if (_threadId > 0)
-                            {
-                                _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
-                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
-                            }
-                            
-                            // Call the method/event that will let SDM know that the debugged program was interrupted.
-                            OnInterrupt(_threadId);
-
-                            // Signal that interrupt is processed 
-                            m_mre.Set();
-
-                            break;
-
-                        case '5':  
-                        // End-stepping-range.
-                            _eventDispatcher.Engine.resetStackFrames();
-                            EventDispatcher._GDBRunMode = false;
-                            ini = 3;
-                            end = ev.IndexOf(';', 3);
-                            if (end == -1)
-                                end = ev.Length;
-                            string temp = ev.Substring(ini, (end - ini));
-
-                            ini = end + 1;
-
-                            if (ev.Length > ini)
-                                end = ev.IndexOf(';', ini);
-                            else
-                                end = -1;
-
-                            if (end == -1)
-                            {
-                                // Set sane default values for the missing file and line information 
-                                _fileName = "";
-                                _line = 1;
-                                _threadId = Convert.ToInt32(temp);
-                                EventDispatcher._unknownCode = true;
-                            }
-                            else
-                            {
-                                _fileName = temp;
-                                _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                                ini = end + 1;
-                                _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                EventDispatcher._unknownCode = false;
-                            }
-
-                            _eventDispatcher.Engine.cleanEvaluatedThreads();
-
-
-                            if (_eventDispatcher.Engine._updateThreads)
-                            {
-                                _eventDispatcher.Engine.UpdateListOfThreads();
-                            }
-                            if (_threadId > 0)
-                            {
-                                if ((EventDispatcher._unknownCode == false) && (_fileName != ""))
-                                    _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
-                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
-                            }
-
-                            OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
-
-                            break;
-                        case '6':  
-                        // Function-finished.
-                            _eventDispatcher.Engine.resetStackFrames();
-                            EventDispatcher._GDBRunMode = false;
-                            ini = 3;
-                            end = ev.IndexOf(';', 3);
-                            if (end == -1)
-                            {
-                                // Set sane default values for the missing file and line information 
-                                _fileName = "";
-                                _line = 1;
-                                _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                EventDispatcher._unknownCode = true;
-                            }
-                            else
-                            {
-                                _fileName = ev.Substring(ini, (end - ini));
-                                ini = end + 1;
-                                end = ev.IndexOf(';', ini);
-                                _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                                ini = end + 1;
-                                _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                EventDispatcher._unknownCode = false;
-                            }
-
-                            _eventDispatcher.Engine.cleanEvaluatedThreads();
-
-                            if (_eventDispatcher.Engine._updateThreads)
-                            {
-                                _eventDispatcher.Engine.UpdateListOfThreads();
-                            }
-                            if (_threadId > 0)
-                            {
-                                if ((EventDispatcher._unknownCode == false) && (_fileName != ""))
-                                    _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
-                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
-                            }
-
-                            OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
-
-                            break;
-                        case '7':  
-                        // -exec-interrupt or signal-meaning="Killed". There's nothing to do in this case.
-                            _eventDispatcher.Engine.resetStackFrames();
-                            EventDispatcher._GDBRunMode = false;
-
-                            _eventDispatcher.Engine.cleanEvaluatedThreads();
-
-                            _threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
-
-                            if (_eventDispatcher.Engine._updateThreads)
-                            {
-                                _eventDispatcher.Engine.UpdateListOfThreads();
-                            }
-                            if (_threadId > 0)
-                            {
-                                if ((EventDispatcher._unknownCode == false) && (_fileName != ""))
-                                    _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
-                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
-                            }
-
-                            if (_eventDispatcher.Engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
-                            {
-                                OnInterrupt(_threadId);
-                            }
-                            // Signal that interrupt is processed 
-                            m_mre.Set();
-
-                            break;
-                        case '8':  
-                        // SIGKILL
-                            _eventDispatcher.EndDebugSession(0);
-                            break;
-                        case '9':  
-                        // ERROR, ex: 49,Cannot find bounds of current function
-                            _eventDispatcher.Engine.resetStackFrames();
-                            _eventDispatcher.Engine.cleanEvaluatedThreads();
-
-                            if (_eventDispatcher.Engine._updateThreads)
-                            {
-                                _eventDispatcher.Engine.UpdateListOfThreads();
-                            }
-
-                            if (ev.Length >= 3)
-                            {
-                                _error = ev.Substring(3, (ev.Length - 3));
-                                if (_error == "Cannot find bounds of current function")
-                                {
-                                    // We don't have symbols for this function so further stepping won't be possible. Return from this function.
-                                    EventDispatcher._unknownCode = true;
-                                    _eventDispatcher.Engine.Step(_eventDispatcher.Engine.CurrentThread(), enum_STEPKIND.STEP_OUT, enum_STEPUNIT.STEP_LINE);
-                                }
-                            }
-                            break;
-                    }
-                    break;
-                case '5':
-                    switch (ev[1])
-                    {
-                        case '0':  
-                        // Quit (expect signal SIGINT when the program is resumed)
-                            _eventDispatcher.countSIGINT += 1;
-                            if (_eventDispatcher.countSIGINT > 5)
-                            {
-                                _eventDispatcher.EndDebugSession(0);
-                                MessageBox.Show("Lost communication with GDB. Please refer to documentation for more details.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            }
-                            break;
-                        case '1':  
-                        // Thread exited. Example: 51,2
-                            ini = 3;
-                            _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-
-                            _eventDispatcher.Engine._updateThreads = true;
-
-                            break;
-                        case '2':  
-                        // GDB Bugs, like "... 2374: internal-error: frame_cleanup_after_sniffer ...". Example: 52
-                            _eventDispatcher.EndDebugSession(0);
-                            MessageBox.Show("This is a known issue that can happen when interrupting GDB's execution by hitting the \"break all\" or toggling a breakpoint in run mode. \n\n GDB CRASHED. Details: \"../../gdb/frame.c:2374: internal-error: frame_cleanup_after_sniffer: Assertion `frame->prologue_cache == NULL' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                            break;
-                        case '3':  
-                        // Lost communication with device/simulator: ^error,msg="Remote communication error: No error."
-                            MessageBox.Show("Lost communication with the device/simulator.", "Communication lost", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                            _eventDispatcher.EndDebugSession(0);
-
-                            break;
-                        case '4':  
-                        // Program interrupted due to a segmentation fault. 
-                            // Examples:
-                            // 54,ADDR,FUNC,THREAD-ID         
-                            // 54,ADDR,FUNC,FILENAME,LINE,THREAD-ID
-
-                            _eventDispatcher.Engine.resetStackFrames();
-                            EventDispatcher._GDBRunMode = false;
-                            numCommas = 0;
-                            foreach (char c in ev)
-                            {
-                                if (c == ';')
-                                    numCommas++;
-                            }
-
-                            ini = 3;
-                            end = ev.IndexOf(';', ini);
-                            _address = Convert.ToInt32(ev.Substring(ini, (end - ini)), 16);
-
-                            ini = end + 1;
-                            end = ev.IndexOf(';', ini);
-                            _functionName = ev.Substring(ini, (end - ini));
-
-                            if (_functionName == "??")
-                            {
-                                EventDispatcher._unknownCode = true;
-                            }
-                            else
-                            {
-                                EventDispatcher._unknownCode = false;
-                            }
-
-                            switch (numCommas)
-                            {
-                                case 3:
-                                    // Thread ID
-                                    ini = end + 1;
-                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    EventDispatcher._unknownCode = true;
-                                    break;
-                                case 5:
-                                    //  Filename, line number and thread ID
-                                    ini = end + 1;
-                                    end = ev.IndexOf(';', ini);
-                                    _fileName = ev.Substring(ini, (end - ini));
-
-                                    ini = end + 1;
-                                    end = ev.IndexOf(';', ini);
-                                    _line = Convert.ToInt32(ev.Substring(ini, (end - ini)));
-
-                                    ini = end + 1;
-                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                                    break;
-                            }
-
-                            MessageBox.Show("Segmentation Fault: If you continue debugging could take the environment to an unstable state.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-
-                            _eventDispatcher.Engine.cleanEvaluatedThreads();
-
-                            if (_eventDispatcher.Engine._updateThreads)
-                            {
-                                _eventDispatcher.Engine.UpdateListOfThreads();
-                            }
-                            if (_threadId > 0)
-                            {
-                                _eventDispatcher.Engine.SelectThread(_threadId.ToString()).setCurrentLocation(_fileName, (uint)_line);
-                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
-                            }
-
-                            OnInterrupt(_threadId);
-
-                            break;
-
-                        case '5':  
-                        // Exited-signaled. Ex: 55;SIGSEGV;Segmentation fault
-                        // or Aborted. Ex: 55;SIGABRT;Aborted
-                            ini = 3;
-                            end = ev.IndexOf(';', ini);
-                            _signalName = ev.Substring(ini, (end - ini));
-
-                            ini = end + 1;
-                            end = ev.IndexOf(';', ini);
-                            _signalMeaning = ev.Substring(ini, (end - ini));
-
-                            ini = end + 1;
-                            try
-                            {
-                                _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
-                            }
-                            catch
-                            {
-                            }
-
-                            if (_signalMeaning == "Segmentation fault")
-                            {
-                                MessageBox.Show("Segmentation Fault: Closing debugger.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                _eventDispatcher.EndDebugSession(0);
-                            }
-
-                            if (_signalMeaning == "Aborted")
-                            {
-                                MessageBox.Show("Program aborted: Closing debugger.", "Program Aborted", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                _eventDispatcher.EndDebugSession(0);
-                            }
-
-                            break;
-                        case '6':  
-                        // GDB Bugs, like "... 3550: internal-error: handle_inferior_event ...". Example: 56
-                            _eventDispatcher.EndDebugSession(0);
-                            MessageBox.Show("This is a known issue that can happen while debugging multithreaded programs. \n\n GDB CRASHED. Details: \"../../gdb/infrun.c:3550: internal-error: handle_inferior_event: Assertion ptid_equal (singlestep_ptid, ecs->ptid)' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                            break;
-                        case '7':  // Not used
-                            break;
-                        case '8':  // Not used
-                            break;
-                        case '9':  // Not used
-                            break;
-                    }
-                    break;
-            }
-        }
-
-
-        /// <summary>
-        /// Update VS when a step action is completed in GDB.
-        /// </summary>
-        /// <param name="eventDispatcher"> This object manages debug events in the engine. </param>
-        /// <param name="file"> File name. </param>
-        /// <param name="line"> Line number. </param>
-        public static void OnStepCompleted(EventDispatcher eventDispatcher, string file, uint line)
-        {
-            if (eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
-            {
-                eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
-
-                // Visual Studio shows the line position one more than it actually is
-                eventDispatcher.Engine._docContext = eventDispatcher.GetDocumentContext(file, line - 1);
-                AD7StepCompletedEvent.Send(eventDispatcher.Engine);
-            }
-        }
-
-
-        /// <summary>
-        /// Update VS when the debugging process is interrupted in GDB.
-        /// </summary>
-        /// <param name="threadID"> Thread ID. </param>
-        private void OnInterrupt(int threadID)
-        {
-            Debug.Assert(_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.RUN_MODE);
-            _eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
-
-            if (_fileName != "" && _line > 0)
-            {
-                // Visual Studio shows the line position one more than it actually is
-                _eventDispatcher.Engine._docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint)(_line - 1));
-            }
-
-            // Only send OnAsyncBreakComplete if break-all was requested by the user
-            if (!NeedsResumeAfterInterrupt)
-            {
-                _eventDispatcher.Engine.Callback.OnAsyncBreakComplete(_eventDispatcher.Engine.SelectThread(threadID.ToString()));
-            }
-        }
-    }
-
-    /// <summary>
-    /// This class manages events related to output messages.
-    /// </summary>
-    public class HandleOutputs
-    {
-        /// <summary>
-        /// GDB textual output from the running target to be presented in the VS standard output window.
-        /// </summary>
-        private string _stdOut = "";
-
-        /// <summary>
-        /// Other GDB messages to be presented in the VS standard output window.
-        /// </summary>
-        private string _console = "";
-
-        /// <summary>
-        /// This object manages debug events in the engine.
-        /// </summary>
-        private EventDispatcher _eventDispatcher;
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="ed"> This object manages debug events in the engine. </param>
-        public HandleOutputs(EventDispatcher ed)
-        {
-            _eventDispatcher = ed;
-        }
-
-        /// <summary>
-        /// This method manages events related to output messages by classifying each of them by sub-type.
-        /// </summary>
-        /// <param name="ev"> String that contains the event description. </param>
-        public void Handle(string ev)
-        {
-            int ini = 0;
-            int end = 0;
-            switch (ev[1])
-            {
-                case '0':  // Display the m_console message in the VS output window. Example: 80,\"\"[New pid 15380494 tid 2]\\n\"\"!80
-                    ini = 4;
-                    end = ev.IndexOf("\"!80", 4);
-                    if (end == -1)
-                        end = ev.Length;
-                    _console = ev.Substring(ini, (end - ini));
-
-                // TODO: Call the method/event that will output this message in the VS output window.
-
-                    break;
-                case '1':  // Display the m_stdOut message in the VS standard output window. Instruction should look like this: 81,\"\" ... "\"!81
-                    ini = 4;
-                    end = ev.IndexOf("\"!81", 4);
-                    if (end == -1)
-                        end = ev.Length;
-                    _stdOut = ev.Substring(ini, (end - ini));
-
-                // TODO: Call the method/event that will output this message in the VS standar output window.
-
-                    break;
             }
         }
     }

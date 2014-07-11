@@ -103,19 +103,19 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Adds a port. (http://msdn.microsoft.com/en-ca/library/bb161980.aspx)
         /// </summary>
-        /// <param name="pRequest"> An IDebugPortRequest2 object that describes the port to be added. </param>
+        /// <param name="request"> An IDebugPortRequest2 object that describes the port to be added. </param>
         /// <param name="ppPort"> Returns an IDebugPort2 object that represents the port. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugPortSupplier2.AddPort(IDebugPortRequest2 pRequest, out IDebugPort2 ppPort)
+        int IDebugPortSupplier2.AddPort(IDebugPortRequest2 request, out IDebugPort2 ppPort)
         {
-            if (pRequest == null || _ndk == null)
+            if (request == null || _ndk == null)
             {
                 ppPort = null;
                 return VSConstants.S_OK;
             }
 
             // is it one of the default requests created by the AD7PortSupplier?
-            var portRequest = pRequest as AD7PortRequest;
+            var portRequest = request as AD7PortRequest;
             if (portRequest != null)
             {
                 var port = CreatePort(this, portRequest, _ndk);
@@ -125,7 +125,7 @@ namespace BlackBerry.DebugEngine
             }
 
             string requestName;
-            if (pRequest.GetPortName(out requestName) == VSConstants.S_OK)
+            if (request.GetPortName(out requestName) == VSConstants.S_OK)
             {
                 requestName = requestName.Trim();
                 var port = FindPort(requestName);
@@ -297,9 +297,9 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Removes a port. Not implemented. (http://msdn.microsoft.com/en-ca/library/bb162306.aspx)
         /// </summary>
-        /// <param name="pPort"> An IDebugPort2 object that represents the port to be removed. </param>
+        /// <param name="port"> An IDebugPort2 object that represents the port to be removed. </param>
         /// <returns> Not implemented. It should returns S_OK if successful; or an error code. </returns>
-        int IDebugPortSupplier2.RemovePort(IDebugPort2 pPort)
+        int IDebugPortSupplier2.RemovePort(IDebugPort2 port)
         {
             return EngineUtils.NotImplemented();
         }

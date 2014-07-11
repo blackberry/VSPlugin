@@ -97,4 +97,4 @@ namespace BlackBerry.DebugEngine
         public static readonly ulong DBG_ATTRIB_CHILD_ALL = 0x0000ff0000000000;
 
     }
-}   
+}

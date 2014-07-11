@@ -21,7 +21,7 @@ namespace BlackBerry.DebugEngine
     /// <summary>
     /// Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
     /// </summary>
-    public class EngineCallback
+    public sealed class EngineCallback
     {
         /// <summary>
         ///  The IDebugEventCallback2 object that receives debugger events. 
@@ -149,7 +149,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void OnException()
         {
-            throw new Exception("The method or operation is not implemented.");
+            EngineUtils.NotImplemented();
         }
 
         /// <summary>
@@ -157,7 +157,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void OnStepComplete()
         {
-            throw new Exception("The method or operation is not implemented.");
+            EngineUtils.NotImplemented();
             // AD7StepCompletedEvent.Send(m_engine);
             // TODO: implement this method...
         }

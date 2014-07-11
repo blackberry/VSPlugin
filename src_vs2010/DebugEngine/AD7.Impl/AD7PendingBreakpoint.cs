@@ -40,7 +40,6 @@ namespace BlackBerry.DebugEngine
         private bool _enabled;
         private bool _deleted;
 
-
         /// <summary>
         /// Constructor.
         /// </summary>
