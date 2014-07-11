@@ -623,7 +623,7 @@ namespace BlackBerry.Package.Components
         /// <returns> TRUE if successful, False if not. </returns>
         private bool LaunchDebugTarget(string pidOrTargetAppName, NdkInfo ndk, DeviceDefinition target, string sshPublicKeyPath, string executablePath)
         {
-            TraceLog.WriteLine("BUILD: Starting debugger ('{0}', {1})", pidOrTargetAppName, executablePath);
+            TraceLog.WriteLine("BUILD: Starting debugger (\"{0}\", \"{1}\")", pidOrTargetAppName, executablePath);
 
             IVsDebugger dbg;
             IVsUIShell shell;

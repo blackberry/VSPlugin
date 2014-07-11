@@ -49,13 +49,45 @@ namespace BlackBerry.DebugEngine
             return VSConstants.E_FAIL;
         }
 
+        /// <summary>
+        /// Default handler for 'non-implemented' method.
+        /// It will conditionally stop the debugger, when called.
+        /// </summary>
+        [DebuggerStepThrough]
+        public static int NotImplemented(bool canBreak)
+        {
+            TraceLog.WriteLine("Hit non implemented method \"{0}\"!", GetMethodName(2));
+            if (canBreak && Debugger.IsAttached)
+                Debugger.Break();
+
+            return VSConstants.E_NOTIMPL;
+        }
+
+        /// <summary>
+        /// Default handler for 'non-implemented' method.
+        /// It will stop the debugger, when called, as the original place was not supposed to be called by Visual Studio.
+        /// </summary>
+        [DebuggerStepThrough]
         public static int NotImplemented()
         {
-            TraceLog.WriteLine("Hit non implemented method!");
+            TraceLog.WriteLine("Hit non implemented method \"{0}\"!", GetMethodName(2));
             if (Debugger.IsAttached)
                 Debugger.Break();
 
             return VSConstants.E_NOTIMPL;
+        }
+
+        /// <summary>
+        /// Gets the name of the method from stack.
+        /// </summary>
+        [DebuggerStepThrough]
+        private static string GetMethodName(int backCalls)
+        {
+            StackTrace stack = new StackTrace();
+            StackFrame frame = stack.GetFrame(backCalls);
+
+            var method = frame.GetMethod();
+            return string.Concat(method.DeclaringType.Name, "::", method.Name, "()");
         }
     }
 }
