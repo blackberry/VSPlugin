@@ -24,9 +24,7 @@ namespace BlackBerry.BuildTasks
     /// </summary>
     public sealed class RemoveFlagFile : Task
     {
-        #region Member Variables and Constants.
         private string _flagFile;
-        #endregion
 
         /// <summary>
         /// Execute the MSBuild Task
