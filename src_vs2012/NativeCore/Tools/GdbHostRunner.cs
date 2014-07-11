@@ -15,6 +15,8 @@ namespace BlackBerry.NativeCore.Tools
         private EventWaitHandle _eventCtrlC;
         private EventWaitHandle _eventTerminate;
 
+        private static int HostID = 1;
+
         /// <summary>
         /// Init constructor.
         /// </summary>
@@ -24,8 +26,10 @@ namespace BlackBerry.NativeCore.Tools
             : base(gdbHostFileName, gdb)
         {
             int currentPID = Process.GetCurrentProcess().Id;
-            string eventCtrlCName = "Ctrl-C-" + currentPID;
-            string eventTerminateName = "Terminate-" + currentPID;
+            int currentHostID = Interlocked.Increment(ref HostID);
+            string eventCtrlCName = string.Concat("HostCtrlC-", currentHostID, "-", currentPID);
+            string eventTerminateName = string.Concat("HostTerminate-", currentHostID, "-", currentPID);
+
             _eventCtrlC = new EventWaitHandle(false, EventResetMode.AutoReset, eventCtrlCName);
             _eventTerminate = new EventWaitHandle(false, EventResetMode.AutoReset, eventTerminateName);
 
