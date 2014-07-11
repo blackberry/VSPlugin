@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using BlackBerry.NativeCore.Model;
 
 namespace BlackBerry.NativeCore.Helpers
 {
@@ -85,6 +86,69 @@ namespace BlackBerry.NativeCore.Helpers
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Appends info about the device into the dictionary.
+        /// </summary>
+        public static void AppendDevice(Dictionary<string, string> data, DeviceDefinition device)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            data["target.name"] = device.Name;
+            data["target.IP"] = device.IP;
+            data["target.password"] = device.Password;
+            data["target.type"] = DeviceHelper.GetTypeToString(device.Type);
+        }
+
+        /// <summary>
+        /// Gets the info about target device from the specified dictionary.
+        /// </summary>
+        public static DeviceDefinition GetDevice(Dictionary<string, string> data)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            // data about the device is missing:
+            if (!data.ContainsKey("target.IP") || !data.ContainsKey("target.type") || !data.ContainsKey("target.password"))
+                return null;
+
+            var name = data.ContainsKey("target.name") ? data["target.name"] : "Ad-hoc device";
+
+            return new DeviceDefinition(name, data["target.IP"], data["target.password"], DeviceHelper.GetTypeFromString(data["target.type"]));
+        }
+
+        /// <summary>
+        /// Appends info about the NDK into the dictionary.
+        /// </summary>
+        public static void AppendNDK(Dictionary<string, string> data, NdkDefinition ndk)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (ndk == null)
+                throw new ArgumentNullException("ndk");
+
+            data["ndk.type"] = DeviceHelper.GetFamilyTypeToString(ndk.Type); 
+            data["ndk.path.host"] = ndk.HostPath;
+            data["ndk.path.target"] = ndk.TargetPath;
+        }
+
+        /// <summary>
+        /// Gets the info about NDK from the specified dictionary.
+        /// </summary>
+        public static NdkDefinition GetNDK(Dictionary<string, string> data)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            // data about the NDK is missing:
+            if (!data.ContainsKey("ndk.type") || !data.ContainsKey("ndk.path.host") || !data.ContainsKey("ndk.path.target"))
+                return null;
+
+            return new NdkDefinition(data["ndk.path.host"], data["ndk.path.target"], DeviceHelper.GetFamilyTypeFromString(data["ndk.type"]));
         }
     }
 }

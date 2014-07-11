@@ -126,10 +126,10 @@ namespace BlackBerry.NativeCore.Model
         {
             if (string.IsNullOrEmpty(Name))
             {
-                return string.Concat(IP, " (", Type == DeviceDefinitionType.Device ? "device" : "simulator", ")");
+                return string.Concat(IP, " (", DeviceHelper.GetTypeToString(Type), ")");
             }
 
-            return string.Concat(Name, " (", IP, ", ", Type == DeviceDefinitionType.Device ? "device" : "simulator", ")");
+            return string.Concat(Name, " (", IP, ", ", DeviceHelper.GetTypeToString(Type), ")");
         }
 
         /// <summary>
@@ -367,7 +367,7 @@ namespace BlackBerry.NativeCore.Model
             {
                 var device = new DeviceDefinition(string.IsNullOrEmpty(values[i]) ? null : values[i],
                                                   values[i + 2], GlobalHelper.Decrypt(values[i + 3]),
-                                                  values[i + 1] == "S" ? DeviceDefinitionType.Simulator : DeviceDefinitionType.Device);
+                                                  DeviceHelper.GetTypeFromString(values[i + 1]));
                 result.Add(device);
             }
 
@@ -383,7 +383,7 @@ namespace BlackBerry.NativeCore.Model
                 foreach (var device in devices)
                 {
                     result.Add(device.Name ?? string.Empty);
-                    result.Add(device.Type == DeviceDefinitionType.Device ? "D" : "S");
+                    result.Add(DeviceHelper.GetTypeToString(device.Type));
                     result.Add(device.IP);
                     result.Add(GlobalHelper.Encrypt(device.Password));
                 }

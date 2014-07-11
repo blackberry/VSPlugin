@@ -101,7 +101,7 @@ namespace BlackBerry.NativeCore.Model
             {
                 var xType = settings.GetValue(FieldFamilyType);
                 if (xType != null)
-                    type = DeviceFamilyHelper.GetTypeFromString(xType.ToString());
+                    type = DeviceHelper.GetFamilyTypeFromString(xType.ToString());
             }
             catch
             {
@@ -159,7 +159,7 @@ namespace BlackBerry.NativeCore.Model
 
                 settings.SetValue(FieldHostPath, HostPath);
                 settings.SetValue(FieldTargetPath, TargetPath);
-                settings.SetValue(FieldFamilyType, DeviceFamilyHelper.GetTypeToString(Type));
+                settings.SetValue(FieldFamilyType, DeviceHelper.GetFamilyTypeToString(Type));
             }
             finally
             {

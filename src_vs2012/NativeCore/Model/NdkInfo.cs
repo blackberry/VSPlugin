@@ -287,7 +287,7 @@ namespace BlackBerry.NativeCore.Model
                             targetPath = Path.GetFullPath(reader.ReadString());
                             break;
                         case "edition":
-                            type = DeviceFamilyHelper.GetTypeFromString(reader.ReadString());
+                            type = DeviceHelper.GetFamilyTypeFromString(reader.ReadString());
                             allowTypeOverride = false;
                             break;
                     }
@@ -657,7 +657,7 @@ namespace BlackBerry.NativeCore.Model
                 inst["version"].InnerText = version;
                 inst["host"].InnerText = hostPath;
                 inst["target"].InnerText = targetPath;
-                inst["edition"].InnerText = DeviceFamilyHelper.GetTypeToString(Type); // VS-Plugin extension
+                inst["edition"].InnerText = DeviceHelper.GetFamilyTypeToString(Type); // VS-Plugin extension
             }
             else
             {

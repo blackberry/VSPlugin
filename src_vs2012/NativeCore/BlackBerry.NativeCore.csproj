@@ -66,7 +66,7 @@
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />
     <Compile Include="Diagnostics\TraceLog.cs" />
-    <Compile Include="Helpers\DeviceFamilyHelper.cs" />
+    <Compile Include="Helpers\DeviceHelper.cs" />
     <Compile Include="Helpers\GlobalHelper.cs" />
     <Compile Include="Helpers\NameValueCollectionHelper.cs" />
     <Compile Include="Model\ApiInfo.cs" />
