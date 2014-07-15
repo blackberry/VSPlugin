@@ -61,24 +61,24 @@ namespace BlackBerry.DebugEngine
             uint attributes; 
             Guid riidEvent = new Guid(iidEvent);
 
-            EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
+            EngineUtils.RequireOK(eventObject.GetAttributes(out attributes));
 
             if ((thread == null) && (_engine != null) && (_engine.Threads != null) && (program != null) && (eventObject != null) && (riidEvent != null) && (attributes != 0))
             {
                 if (_engine._currentThreadIndex != -1)
                 {
-                    EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, _engine.Threads[_engine._currentThreadIndex], eventObject, ref riidEvent, attributes));
+                    EngineUtils.RequireOK(_ad7Callback.Event(_engine, null, program, _engine.Threads[_engine._currentThreadIndex], eventObject, ref riidEvent, attributes));
                 }
                 else
                 {
                     if (_engine.Threads != null)
-                        EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, _engine.Threads[0], eventObject, ref riidEvent, attributes));
+                        EngineUtils.RequireOK(_ad7Callback.Event(_engine, null, program, _engine.Threads[0], eventObject, ref riidEvent, attributes));
                     else
-                        EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, null, eventObject, ref riidEvent, attributes));
+                        EngineUtils.RequireOK(_ad7Callback.Event(_engine, null, program, null, eventObject, ref riidEvent, attributes));
                 }
             }
             else
-                EngineUtils.RequireOk(_ad7Callback.Event(_engine, null, program, thread, eventObject, ref riidEvent, attributes));
+                EngineUtils.RequireOK(_ad7Callback.Event(_engine, null, program, thread, eventObject, ref riidEvent, attributes));
         }
 
         /// <summary>

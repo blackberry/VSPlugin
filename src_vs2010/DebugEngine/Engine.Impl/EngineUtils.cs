@@ -27,8 +27,8 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="hr"> An integer value. </param>
-        public static void RequireOk(int hr)
+        /// <param name="hr"> An integer result of COM operation. </param>
+        public static void RequireOK(int hr)
         {
             if (hr != VSConstants.S_OK)
             {
@@ -87,7 +87,9 @@ namespace BlackBerry.DebugEngine
             StackFrame frame = stack.GetFrame(backCalls);
 
             var method = frame.GetMethod();
-            return string.Concat(method.DeclaringType.Name, "::", method.Name, "()");
+            if (method != null && method.DeclaringType != null)
+                return string.Concat(method.DeclaringType.Name, "::", method.Name, "()");
+            return "<unknown>";
         }
     }
 }

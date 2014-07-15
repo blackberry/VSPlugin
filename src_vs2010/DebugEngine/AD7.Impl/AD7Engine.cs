@@ -267,7 +267,6 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint aCeltPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason)
         {
-
             if (aCeltPrograms != 1)
             {
                 Debug.Fail("VSNDK Debugger only supports one debug target at a time.");
@@ -276,7 +275,7 @@ namespace BlackBerry.DebugEngine
 
             try
             {
-                EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out _programGuid));
+                EngineUtils.RequireOK(rgpPrograms[0].GetProgramId(out _programGuid));
 
                 _program = rgpPrograms[0];
 
@@ -710,14 +709,14 @@ namespace BlackBerry.DebugEngine
                 // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
                 // which will complete the hookup with AD7
                 IDebugPort2 port;
-                EngineUtils.RequireOk(process.GetPort(out port));
+                EngineUtils.RequireOK(process.GetPort(out port));
                 
                 IDebugDefaultPort2 defaultPort = (IDebugDefaultPort2)port;
                 
                 IDebugPortNotify2 portNotify;
-                EngineUtils.RequireOk(defaultPort.GetPortNotify(out portNotify));
+                EngineUtils.RequireOK(defaultPort.GetPortNotify(out portNotify));
 
-                EngineUtils.RequireOk(portNotify.AddProgramNode(_progNode));
+                EngineUtils.RequireOK(portNotify.AddProgramNode(_progNode));
 
                 Callback.OnModuleLoad(_module);
 
