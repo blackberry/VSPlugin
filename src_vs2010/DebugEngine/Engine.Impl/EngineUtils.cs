@@ -56,7 +56,7 @@ namespace BlackBerry.DebugEngine
         [DebuggerStepThrough]
         public static int NotImplemented(bool canBreak)
         {
-            TraceLog.WriteLine("Hit non implemented method \"{0}\"!", GetMethodName(2));
+            TraceLog.WriteLine("Hit not implemented method \"{0}\"!", GetMethodName(2));
             if (canBreak && Debugger.IsAttached)
                 Debugger.Break();
 
@@ -70,7 +70,7 @@ namespace BlackBerry.DebugEngine
         [DebuggerStepThrough]
         public static int NotImplemented()
         {
-            TraceLog.WriteLine("Hit non implemented method \"{0}\"!", GetMethodName(2));
+            TraceLog.WriteLine("Hit not implemented method \"{0}\"!", GetMethodName(2));
             if (Debugger.IsAttached)
                 Debugger.Break();
 
