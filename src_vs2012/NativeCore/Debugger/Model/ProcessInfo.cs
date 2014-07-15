@@ -91,5 +91,10 @@ namespace BlackBerry.NativeCore.Debugger.Model
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return string.Concat("0x", ID.ToString("X8"), " ", Name, " (", ExecutablePath, ")");
+        }
     }
 }

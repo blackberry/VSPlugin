@@ -23,6 +23,7 @@ namespace BlackBerry.NativeCore.Tools
 
             GDB = gdb;
             _processor = new GdbProcessor(this);
+            Arguments = gdb.Arguments;
         }
 
         /// <summary>
@@ -40,6 +41,7 @@ namespace BlackBerry.NativeCore.Tools
 
             GDB = gdb;
             _processor = new GdbProcessor(this);
+            Arguments = gdb.Arguments;
         }
 
         #region Properties

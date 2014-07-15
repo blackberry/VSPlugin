@@ -14,12 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using BlackBerry.NativeCore;
-using BlackBerry.NativeCore.Debugger.Model;
+using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
-using VSNDK.Parser;
 using System.Windows.Forms;
 
 namespace BlackBerry.DebugEngine
@@ -128,69 +126,34 @@ namespace BlackBerry.DebugEngine
         /// <returns> Returns the list of processes running on this port. </returns>
         private AD7Process[] GetProcesses()
         {
-            var result = new List<AD7Process>();
-            string publicKeyPath = ConfigDefaults.SshPublicKeyPath;
+            var processesRequest = GdbWrapper.ListProcesses(null, NDK, Device);
 
-            string response = GDBParser.GetPIDsThroughGDB(Device.IP, Device.Password, Device.Type == DeviceDefinitionType.Simulator, NDK.ToolsPath, publicKeyPath, 12);
-
-            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
+            // timeout or other problem?
+            if (processesRequest == null || processesRequest.Response == null || processesRequest.Response.Name == "error")
             {
-                if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
-                {
-                    MessageBox.Show("Please, verify if the Device/Simulator IP in \"BlackBerry -> Settings\" menu is correct and check if it is connected.", "Device/Simulator not connected or not configured properly", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                else if (response.IndexOf("1^error,msg=", 0) != -1) // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
-                {
-                    string txt = "";
-                    int pos = response.IndexOf('"');
-                    if (pos != -1)
-                    {
-                        txt = response.Substring(pos);
-                    }
-//                    string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
-                    string caption = "";
-                    if (txt.IndexOf("The requested address is not valid in its context.") != -1)
-                    {
-                        txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
-                        caption = "Invalid IP";
-                    }
-                    else
-                    {
-                        txt += "\n\nPlease, verify if the device/simulator is connected.";
-                        caption = "Connection failed";
-                    }
-                    MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                response = "";
-            }
-            else if (response.Contains("^done"))
-            {
-                response = response.Remove(response.IndexOf("^done"));
-                string[] tempListOfProcesses = response.Split('\n');
+                // when error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
+                // the msg part is stored as Content property then
 
-                int ind = (response[0] == '&') ? 1 : 0; // ignore the first if it starts with & (&"info pidlist")
-                while (ind < tempListOfProcesses.Length - 1)
-                {
-                    string process = tempListOfProcesses[ind];
-                    int pos = process.LastIndexOf('/');
-                    if (pos == -1)
-                    {
-                        ind++;
-                        continue;
-                    }
-                    process = process.Remove(pos).Substring(2);
-                    for (ind = ind + 1; ind < tempListOfProcesses.Length - 1; ind++) // ignore the duplicates
-                    {
-                        int pos2 = tempListOfProcesses[ind].LastIndexOf('/');
-                        if ((pos2 <= 2) || (tempListOfProcesses[ind].Substring(2, pos2 - 2) != process))
-                            break;
-                    }
-                    AD7Process proc = new AD7Process(this, new ProcessInfo(uint.Parse(process.Substring(process.IndexOf("- ") + 2)), process.Remove(process.IndexOf(" "))));
-                    result.Add(proc);
-                }
+                string deviceType = Device.Type == DeviceDefinitionType.Device ? "device" : "simulator";
+                MessageBox.Show(string.Concat("Please, verify if the ", deviceType, " (", Device.IP, ") is defined correctly. It can be modified at \"BlackBerry -> Settings\" menu."),
+                    "Connection failure or timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                return new AD7Process[0];
             }
 
-            return result.ToArray();
+            // ok, got the valid response
+            if (processesRequest.Response.Name == "done")
+            {
+                var result = new List<AD7Process>();
+                foreach (var p in processesRequest.Processes)
+                {
+                    result.Add(new AD7Process(this, p));
+                }
+
+                return result.ToArray();
+            }
+
+            return new AD7Process[0];
         }
 
         #region Implementation of IDebugPort2
@@ -242,17 +205,18 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Returns the specified process running on a port. (http://msdn.microsoft.com/en-us/library/bb145867.aspx)
         /// </summary>
-        /// <param name="ProcessId"> An AD_PROCESS_ID structure that specifies the process identifier. </param>
+        /// <param name="processId"> An AD_PROCESS_ID structure that specifies the process identifier. </param>
         /// <param name="ppProcess"> Returns an IDebugProcess2 object representing the process. </param>
         /// <returns> If successful, returns VSConstants.S_OK; otherwise, returns VSConstants.S_FALSE. </returns>
-        public int GetProcess(AD_PROCESS_ID ProcessId, out IDebugProcess2 ppProcess)
+        public int GetProcess(AD_PROCESS_ID processId, out IDebugProcess2 ppProcess)
         {
             IEnumerable<AD7Process> list = GetProcesses();
+            uint id = processId.dwProcessId;
 
             ppProcess = null;
             foreach (var process in list)
             {
-                if (process.ID == ProcessId.dwProcessId)
+                if (process.ID == id)
                 {
                     ppProcess = process;
                     break;
