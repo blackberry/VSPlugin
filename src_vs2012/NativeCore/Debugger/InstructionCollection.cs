@@ -9,7 +9,7 @@ namespace BlackBerry.NativeCore.Debugger
 {
     public sealed class InstructionCollection
     {
-        private List<Instruction> _items;
+        private readonly List<Instruction> _items;
 
         public InstructionCollection()
         {
@@ -32,6 +32,20 @@ namespace BlackBerry.NativeCore.Debugger
         public int Count
         {
             get { return _items.Count; }
+        }
+
+        /// <summary>
+        /// Gets the instruction at specified index.
+        /// </summary>
+        public Instruction this[int index]
+        {
+            get
+            {
+                if (index < 0 || index >= _items.Count)
+                    return null;
+
+                return _items[index];
+            }
         }
 
         #endregion
