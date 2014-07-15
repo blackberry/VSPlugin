@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 using VSNDK.Parser;
 using System.Threading;
@@ -276,16 +277,11 @@ namespace BlackBerry.DebugEngine
         /// <param name="GDB_filename"> Returns the breakpoint File Name. </param>
         /// <param name="GDB_address"> Returns the Breakpoint Address. </param>
         /// <returns> If successful, returns true; otherwise, returns false. </returns>
-        private bool SetBreakpointImpl(string command, string command2, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
+        private bool SetBreakpointImpl(string command, string command2, out BreakpointInfo breakpointInfo)
         {
             string response;
             string bpointAddress;
             string bpointStopPoint;
-
-            GDB_ID = 0;
-            GDB_filename = "";
-            GDB_address = "";
-            GDB_line = 0;
 
             if (DebugEngineStatus.IsRunning)
             {
@@ -302,78 +298,71 @@ namespace BlackBerry.DebugEngine
 
                 if (((response.Length < 2) && (DebugEngineStatus.IsRunning == false)) || (response == "Function not found!"))
                 {
+                    breakpointInfo = null;
                     ResumeFromInterrupt();
                     return false;
                 }
 
                 HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
                 hBreakpoints.Handle(response);
-                GDB_ID = (uint)hBreakpoints.Number;
-                GDB_filename = hBreakpoints.FileName;
-                GDB_address = hBreakpoints.Address;
 
-                if ((GDB_address != "<PENDING>") && (GDB_address != ""))
+                if (hBreakpoints.Address != "<PENDING>" && hBreakpoints.Address != "")
                 {
                     //** Run Code to verify breakpoint stop point.
 
                     // Gets the parsed response for the GDB command that print information about the specified breakpoint, in this 
                     // case, only its address. (http://sourceware.org/gdb/onlinedocs/gdb/Set-Breaks.html)
-                    bpointAddress = GDBParser.parseCommand("info b " + GDB_ID, 18);
+                    bpointAddress = GDBParser.parseCommand("info b " + hBreakpoints.Number, 18);
 
                     // Gets the parsed response for the GDB command that inquire what source line covers a particular address.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/Machine-Code.html)
                     bpointStopPoint = GDBParser.parseCommand("info line *" + bpointAddress, 18);
 
-                    GDB_line = (uint)Convert.ToInt64(bpointStopPoint.Trim());
+                    var line = (uint)Convert.ToInt64(bpointStopPoint.Trim());
+                    breakpointInfo = new BreakpointInfo((uint)hBreakpoints.Number, hBreakpoints.FileName, line, UInt32.Parse(hBreakpoints.Address.Substring(2), System.Globalization.NumberStyles.HexNumber));
                 }
                 else
                 {
-                    GDB_address = "0x0";
-                    GDB_line = (uint)hBreakpoints.LinePosition;
+                    var line = (uint)hBreakpoints.LinePosition;
+                    breakpointInfo = new BreakpointInfo((uint)hBreakpoints.Number, hBreakpoints.FileName, line, 0);
                 }
 
                 ResumeFromInterrupt();
-
                 return true;
             }
-            else
-                return false;
+
+            breakpointInfo = null;
+            return false;
         }
 
 
         /// <summary>
         /// Set a breakpoint given a filename and line number.
         /// </summary>
-        /// <param name="filename"> Full path and filename for the code source. </param>
-        /// <param name="line"> The line number for the breakpoint. </param>
-        /// <param name="GDB_ID"> Returns the breakpoint ID in GDB. </param>
-        /// <param name="GDB_line"> Returns the breakpoint Line Number. </param>
-        /// <param name="GDB_filename"> Returns the breakpoint File Name. </param>
-        /// <param name="GDB_address"> Returns the Breakpoint Address. </param>
+        /// <param name="filename">Full path and filename for the code source.</param>
+        /// <param name="line">The line number for the breakpoint.</param>
+        /// <param name="breakpoint">Info of GDB breakpoint.</param>
         /// <returns> If successful, returns true; otherwise, returns false. </returns>
-        public bool SetBreakpoint(string filename, uint line, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
+        public bool SetBreakpoint(string filename, uint line, out BreakpointInfo breakpoint)
         {
             string cmd = @"-break-insert --thread-group i1 -f " + filename + ":" + line;
             int i = filename.LastIndexOf('\\');
             if ((i != -1) && (i + 1 < filename.Length))
                 filename = filename.Substring(i + 1);
             string cmd2 = @"-break-insert --thread-group i1 -f " + filename + ":" + line;
-            return SetBreakpointImpl(cmd, cmd2, out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
+            return SetBreakpointImpl(cmd, cmd2, out breakpoint);
         }
 
         /// <summary>
         /// Set a breakpoint given a function name.
         /// </summary>
-        /// <param name="func"> Function name. </param>
-        /// <param name="GDB_ID"> Returns the breakpoint ID in GDB. </param>
-        /// <param name="GDB_line"> Returns the breakpoint Line Number. </param>
-        /// <param name="GDB_filename"> Returns the breakpoint File Name. </param>
-        /// <param name="GDB_address"> Returns the Breakpoint Address. </param>
+        /// <param name="functionName"> Function name. </param>
+        /// <param name="breakpoint">Info of GDB breakpoint.</param>
         /// <returns> If successful, returns true; otherwise, returns false. </returns>
-        public bool SetBreakpoint(string func, out uint GDB_ID, out uint GDB_line, out string GDB_filename, out string GDB_address)
+        public bool SetBreakpoint(string functionName, out BreakpointInfo breakpoint)
         {
-            string cmd = @"-break-insert " + func;
-            return SetBreakpointImpl(cmd, "", out GDB_ID, out GDB_line, out GDB_filename, out GDB_address);
+            string cmd = @"-break-insert " + functionName;
+            return SetBreakpointImpl(cmd, "", out breakpoint);
         }
 
         /// <summary>
@@ -418,29 +407,25 @@ namespace BlackBerry.DebugEngine
         public bool ResetHitCount(AD7BoundBreakpoint bbp, bool resetCondition)
         {
             // Declare local Variables
-            uint GDB_LinePos;
-            string GDB_Filename;
-            string GDB_address;
-
-            uint GDB_ID = bbp.GDB_ID;
+            BreakpointInfo info = null;
 
             // Deleting GDB breakpoint.
-            DeleteBreakpoint(GDB_ID);
+            DeleteBreakpoint(bbp.GdbInfo.ID);
 
             // Creating a new GDB breakpoint.
             bool ret = false;
             if (bbp.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
             {
-                ret = SetBreakpoint(bbp.m_filename, bbp.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = SetBreakpoint(bbp.m_filename, bbp.m_line, out info);
             }
             else if (bbp.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
-                ret = SetBreakpoint(bbp.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = SetBreakpoint(bbp.m_func, out info);
             }
 
-            if (ret)
+            if (ret && info != null)
             {
-                bbp.GDB_ID = GDB_ID;
+                bbp.GdbInfo = info;
                 bbp._hitCount = 0;
                 bbp.SetPassCount(bbp.m_bpPassCount);
                 if (resetCondition)

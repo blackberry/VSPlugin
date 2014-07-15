@@ -14,6 +14,7 @@
 
 using System;
 using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Runtime.InteropServices;
@@ -41,15 +42,6 @@ namespace BlackBerry.DebugEngine
         public string m_filename = "";
         public uint m_line;
         public string m_func = "";
-
-        /// <summary> 
-        /// This breakpoint's index in the list of active bound breakpoints. 
-        /// </summary>
-        private int m_remoteID = -1;
-        public int RemoteID
-        {
-            get { return m_remoteID; }
-        }
 
         public BP_PASSCOUNT m_bpPassCount;
         public BP_CONDITION m_bpCondition;
@@ -79,48 +71,12 @@ namespace BlackBerry.DebugEngine
         /// <summary> 
         /// GDB member variables. 
         /// </summary>
-        private uint _GDB_ID;
-        private string _GDB_filename = "";
-        private uint _GDB_linePos;
-        private string _GDB_Address = "";
+        private BreakpointInfo _gdbInfo;
 
-
-        /// <summary> 
-        /// GDB_ID Property. 
-        /// </summary>
-        public uint GDB_ID
+        public BreakpointInfo GdbInfo
         {
-            get { return _GDB_ID; }
-            set { _GDB_ID = value; }
-        }
-
-        /// <summary> 
-        /// GDB_FileName Property. 
-        /// </summary>
-        public string GDB_FileName
-        {
-            get { return _GDB_filename; }
-            set { _GDB_filename = value; }
-        }
-
-        
-        /// <summary> 
-        /// GDB_LinePos Property. 
-        /// </summary>
-        public uint GDB_LinePos
-        {
-            get { return _GDB_linePos; }
-            set { _GDB_linePos = value; }
-        }
-
-        
-        /// <summary> 
-        /// GDB_Address Property. 
-        /// </summary>
-        public string GDB_Address
-        {
-            get { return _GDB_Address; }
-            set { _GDB_Address = value; }
+            get { return _gdbInfo; }
+            set { _gdbInfo = value; }
         }
 
         /// <summary> 
@@ -157,7 +113,7 @@ namespace BlackBerry.DebugEngine
                 _enabled = true;
                 _deleted = false;
                 _hitCount = 0;
-                m_remoteID = _engine.BreakpointManager.RemoteAdd(this);
+                _engine.BreakpointManager.RemoteAdd(this, out _gdbInfo);
             }
             else if (requestInfo.bpLocation.bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
@@ -173,34 +129,33 @@ namespace BlackBerry.DebugEngine
                 _hitCount = 0;
                 m_bpLocationType = (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET;
                 _pendingBreakpoint = pendingBreakpoint;
-                m_remoteID = _engine.BreakpointManager.RemoteAdd(this);
+                _engine.BreakpointManager.RemoteAdd(this, out _gdbInfo);
             }
 
-            if (m_remoteID == 0)
+            if (_gdbInfo != null)
             {
-                return;
+                // Set the hit count and condition
+                if (requestInfo.bpPassCount.stylePassCount != enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE)
+                    SetPassCount(requestInfo.bpPassCount);
+                if (requestInfo.bpCondition.styleCondition != enum_BP_COND_STYLE.BP_COND_NONE)
+                    SetCondition(requestInfo.bpCondition);
+
+                // Get the Line Position sent back from GDB
+                TEXT_POSITION tpos = new TEXT_POSITION();
+                tpos.dwLine = _gdbInfo.Line - 1;
+
+                AD7MemoryAddress codeContext = new AD7MemoryAddress(_engine, _gdbInfo.Address);
+                AD7DocumentContext documentContext = new AD7DocumentContext(_gdbInfo.FileName, tpos, tpos, codeContext);
+
+                _breakpointResolution = new AD7BreakpointResolution(_engine, _gdbInfo.Address, documentContext);
+
+                _engine.Callback.OnBreakpointBound(this, 0);
             }
-
-            // Set the hit count and condition
-            if (requestInfo.bpPassCount.stylePassCount != enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE)
-                SetPassCount(requestInfo.bpPassCount);
-            if (requestInfo.bpCondition.styleCondition != enum_BP_COND_STYLE.BP_COND_NONE)
-                SetCondition(requestInfo.bpCondition);
-
-            // Get the Line Position sent back from GDB
-            TEXT_POSITION tpos = new TEXT_POSITION();
-            tpos.dwLine = _GDB_linePos - 1;
-
-            uint xAddress = UInt32.Parse(_GDB_Address.Substring(2), System.Globalization.NumberStyles.HexNumber);
-
-            AD7MemoryAddress codeContext = new AD7MemoryAddress(_engine, xAddress);
-            AD7DocumentContext documentContext = new AD7DocumentContext(_GDB_filename, tpos, tpos, codeContext);
-
-            _breakpointResolution = new AD7BreakpointResolution(_engine, xAddress, documentContext);
-
-            _engine.Callback.OnBreakpointBound(this, 0);
+            else
+            {
+                _gdbInfo = new BreakpointInfo(0, null, 0, 0);
+            }
         }
-
 
         /// <summary>
         ///  Sets the count and conditions upon which a breakpoint is fired. 
@@ -234,12 +189,12 @@ namespace BlackBerry.DebugEngine
                 {
                     if ((int)((bpPassCount.dwPassCount - _hitCount)) >= 0)
                     {
-                        if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
+                        if (_engine.EventDispatcher.IgnoreHitCount(_gdbInfo.ID, (int)(bpPassCount.dwPassCount - _hitCount)))
                             result = VSConstants.S_OK;
                     }
                     else
                     {
-                        if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, 1))
+                        if (_engine.EventDispatcher.IgnoreHitCount(_gdbInfo.ID, 1))
                             result = VSConstants.S_OK;
                     }
 
@@ -253,7 +208,7 @@ namespace BlackBerry.DebugEngine
                 _isHitCountEqual = true;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, (int)(bpPassCount.dwPassCount - _hitCount)))
+                    if (_engine.EventDispatcher.IgnoreHitCount(_gdbInfo.ID, (int)(bpPassCount.dwPassCount - _hitCount)))
                         result = VSConstants.S_OK;
                 }
                 else
@@ -265,7 +220,7 @@ namespace BlackBerry.DebugEngine
                 _hitCountMultiple = bpPassCount.dwPassCount;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, (int)(_hitCountMultiple - (_hitCount % _hitCountMultiple))))
+                    if (_engine.EventDispatcher.IgnoreHitCount(_gdbInfo.ID, (int)(_hitCountMultiple - (_hitCount % _hitCountMultiple))))
                         result = VSConstants.S_OK;
                 }
                 else
@@ -277,7 +232,7 @@ namespace BlackBerry.DebugEngine
                 _hitCountMultiple = 0;
                 if (!_breakWhenCondChanged)
                 {
-                    if (_engine.EventDispatcher.IgnoreHitCount(GDB_ID, 1)) // ignoreHitCount decrement by 1 automatically, so sending 1 means to stop ignoring (or ignore 0)
+                    if (_engine.EventDispatcher.IgnoreHitCount(_gdbInfo.ID, 1)) // ignoreHitCount decrement by 1 automatically, so sending 1 means to stop ignoring (or ignore 0)
                         result = VSConstants.S_OK;
                 }
                 else
@@ -342,15 +297,15 @@ namespace BlackBerry.DebugEngine
                     _breakWhenCondChanged = false;
 
                 _previousCondEvaluation = "";
-                if (_engine.EventDispatcher.SetBreakpointCondition(GDB_ID, bpCondition.bstrCondition))
+                if (_engine.EventDispatcher.SetBreakpointCondition(_gdbInfo.ID, bpCondition.bstrCondition))
                     result = VSConstants.S_OK;
             }
             else if (bpCondition.styleCondition == enum_BP_COND_STYLE.BP_COND_WHEN_CHANGED)
             {
                 _breakWhenCondChanged = true;
                 _previousCondEvaluation = bpCondition.bstrCondition; // just to initialize this variable
-                _engine.EventDispatcher.IgnoreHitCount(GDB_ID, 1); // have to break always to evaluate this option because GDB doesn't support it.
-                _engine.EventDispatcher.SetBreakpointCondition(GDB_ID, "");
+                _engine.EventDispatcher.IgnoreHitCount(_gdbInfo.ID, 1); // have to break always to evaluate this option because GDB doesn't support it.
+                _engine.EventDispatcher.SetBreakpointCondition(_gdbInfo.ID, "");
 
                 result = VSConstants.S_OK;
             }
@@ -365,7 +320,7 @@ namespace BlackBerry.DebugEngine
                     _breakWhenCondChanged = false;
 
                 _previousCondEvaluation = "";
-                if (_engine.EventDispatcher.SetBreakpointCondition(GDB_ID, ""))
+                if (_engine.EventDispatcher.SetBreakpointCondition(_gdbInfo.ID, ""))
                     result = VSConstants.S_OK;
             }
 
@@ -403,9 +358,9 @@ namespace BlackBerry.DebugEngine
             {
                 _enabled = false;
                 _deleted = true;
-                _pendingBreakpoint.OnBoundBreakpointDeleted(this);                
+                _pendingBreakpoint.OnBoundBreakpointDeleted(this);
                 _engine.BreakpointManager.RemoteDelete(this);
-                m_remoteID = -1;
+                _gdbInfo = null;
             }
             return VSConstants.S_OK;
         }

@@ -57,6 +57,7 @@
     <Compile Include="Debugger\IGdbSender.cs" />
     <Compile Include="Debugger\Instruction.cs" />
     <Compile Include="Debugger\InstructionCollection.cs" />
+    <Compile Include="Debugger\Model\BreakpointInfo.cs" />
     <Compile Include="Debugger\Model\IResult.cs" />
     <Compile Include="Debugger\Model\ProcessInfo.cs" />
     <Compile Include="Debugger\Request.cs" />

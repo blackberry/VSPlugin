@@ -144,7 +144,7 @@ namespace BlackBerry.DebugEngine
                     // Visual Studio returns a start position that is one less than it actually is
                     var boundBreakpoint = new AD7BoundBreakpoint(_engine, _breakpointRequestInfo, this);
 
-                    if (boundBreakpoint.GDB_ID == 0)
+                    if (boundBreakpoint.GdbInfo.ID == 0)
                     {
                         return VSConstants.S_FALSE;
                     }

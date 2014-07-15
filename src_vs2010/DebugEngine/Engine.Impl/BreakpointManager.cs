@@ -14,6 +14,8 @@
 
 using System;
 using System.Collections.Generic;
+using BlackBerry.NativeCore.Debugger.Model;
+using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace BlackBerry.DebugEngine
@@ -73,7 +75,7 @@ namespace BlackBerry.DebugEngine
         {
             foreach (AD7BoundBreakpoint breakpoint in _activeBPs)
             {
-                if (breakpoint != null && breakpoint.GDB_ID == gdbID)
+                if (breakpoint != null && breakpoint.GdbInfo.ID == gdbID)
                 {
                     return breakpoint;
                 }
@@ -95,36 +97,27 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Creates an entry and remotely enables the breakpoint in the debug stub.
         /// </summary>
-        /// <param name="breakpoint"> The bound breakpoint to add. </param>
-        /// <returns> Breakpoint ID Number. </returns>
-        public int RemoteAdd(AD7BoundBreakpoint breakpoint)
+        /// <param name="breakpoint">The bound breakpoint to add.</param>
+        /// <param name="info">Info about GDB breakpoint.</param>
+        public void RemoteAdd(AD7BoundBreakpoint breakpoint, out BreakpointInfo info)
         {
             // Call GDB to set a breakpoint based on filename and line no. in aBBP
-            uint GDB_ID = 0;
-            uint GDB_LinePos = 0;
-            string GDB_Filename = "";
-            string GDB_address = "";
             bool ret = false;
 
+            info = null;
             if (breakpoint.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
             {
-                ret = _engine.EventDispatcher.SetBreakpoint(breakpoint.m_filename, breakpoint.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = _engine.EventDispatcher.SetBreakpoint(breakpoint.m_filename, breakpoint.m_line, out info);
             }
             else if (breakpoint.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
-                ret = _engine.EventDispatcher.SetBreakpoint(breakpoint.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = _engine.EventDispatcher.SetBreakpoint(breakpoint.m_func, out info);
             }
 
-            if (ret)
+            if (ret && info != null)
             {
                 _activeBPs.Add(breakpoint);
-
-                breakpoint.GDB_ID = GDB_ID;
-                breakpoint.GDB_FileName = GDB_Filename;
-                breakpoint.GDB_LinePos = GDB_LinePos;
-                breakpoint.GDB_Address = GDB_address;
             }
-            return (int)GDB_ID;
         }
 
         /// <summary>
@@ -133,7 +126,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="breakpoint"> The Bound breakpoint to enable. </param>
         public void RemoteEnable(AD7BoundBreakpoint breakpoint)
         {            
-            _engine.EventDispatcher.EnableBreakpoint(breakpoint.GDB_ID, true);
+            _engine.EventDispatcher.EnableBreakpoint(breakpoint.GdbInfo.ID, true);
         }
 
         /// <summary>
@@ -142,7 +135,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="breakpoint"> The Bound breakpoint to disable. </param>
         public void RemoteDisable(AD7BoundBreakpoint breakpoint)
         {            
-            _engine.EventDispatcher.EnableBreakpoint(breakpoint.GDB_ID, false);
+            _engine.EventDispatcher.EnableBreakpoint(breakpoint.GdbInfo.ID, false);
         }
 
         /// <summary>
@@ -152,7 +145,7 @@ namespace BlackBerry.DebugEngine
         public void RemoteDelete(AD7BoundBreakpoint breakpoint)
         {
             _activeBPs.Remove(breakpoint);
-            _engine.EventDispatcher.DeleteBreakpoint(breakpoint.GDB_ID);
+            _engine.EventDispatcher.DeleteBreakpoint(breakpoint.GdbInfo.ID);
         }
     }
 }

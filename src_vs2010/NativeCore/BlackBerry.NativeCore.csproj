@@ -71,6 +71,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\GdbProcessor.cs">
       <Link>Debugger\GdbProcessor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\GdbWrapper.cs">
+      <Link>Debugger\GdbWrapper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\IGdbSender.cs">
       <Link>Debugger\IGdbSender.cs</Link>
     </Compile>
@@ -79,6 +82,12 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\InstructionCollection.cs">
       <Link>Debugger\InstructionCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Model\BreakpointInfo.cs">
+      <Link>Debugger\Model\BreakpointInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Model\IResult.cs">
+      <Link>Debugger\Model\IResult.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Model\ProcessInfo.cs">
       <Link>Debugger\Model\ProcessInfo.cs</Link>
