@@ -1,7 +1,7 @@
-﻿namespace BlackBerry.NativeCore.Debugger
+﻿namespace BlackBerry.NativeCore.Debugger.Requests
 {
     /// <summary>
-    /// Class wrapping the regular command send to the GDB.
+    /// Class wrapping the regular CLI-command send to the GDB.
     /// </summary>
     public class CliRequest : Request
     {

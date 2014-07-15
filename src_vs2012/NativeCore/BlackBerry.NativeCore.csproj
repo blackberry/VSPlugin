@@ -51,7 +51,6 @@
     <Compile Include="Components\UpdateManager.cs" />
     <Compile Include="Components\UpdateManagerCompletedEventArgs.cs" />
     <Compile Include="ConfigDefaults.cs" />
-    <Compile Include="Debugger\CliRequest.cs" />
     <Compile Include="Debugger\GdbProcessor.cs" />
     <Compile Include="Debugger\GdbWrapper.cs" />
     <Compile Include="Debugger\IGdbSender.cs" />
@@ -62,6 +61,8 @@
     <Compile Include="Debugger\Model\ProcessInfo.cs" />
     <Compile Include="Debugger\Request.cs" />
     <Compile Include="Debugger\RequestGroup.cs" />
+    <Compile Include="Debugger\Requests\CliRequest.cs" />
+    <Compile Include="Debugger\Requests\MiRequest.cs" />
     <Compile Include="Debugger\Requests\ProcessListRequest.cs" />
     <Compile Include="Debugger\Response.cs" />
     <Compile Include="Debugger\ResponseReceivedEventArgs.cs" />

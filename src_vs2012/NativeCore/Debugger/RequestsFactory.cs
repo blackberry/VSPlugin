@@ -14,17 +14,17 @@ namespace BlackBerry.NativeCore.Debugger
     {
         public static Request Exit()
         {
-            return new Request("gdb-exit");
+            return new MiRequest("gdb-exit");
         }
 
         public static Request ListFeatures()
         {
-            return new Request("list-features");
+            return new MiRequest("list-features");
         }
 
         public static Request ListTargetFeatures()
         {
-            return new Request("list-target-features");
+            return new MiRequest("list-target-features");
         }
 
         public static Request SetTargetDevice(string ip)
@@ -32,7 +32,7 @@ namespace BlackBerry.NativeCore.Debugger
             if (string.IsNullOrEmpty(ip))
                 throw new ArgumentNullException("ip");
 
-            return new Request(string.Concat("target-select qnx ", ip, ":8000"));
+            return new MiRequest(string.Concat("target-select qnx ", ip, ":8000"));
         }
 
         public static Request SetTargetDevice(DeviceDefinition device)
@@ -50,7 +50,7 @@ namespace BlackBerry.NativeCore.Debugger
 
         public static Request SetPendingBreakpoints(bool on)
         {
-            return new Request("gdb-set breakpoint pending " + (on ? "on" : "off"));
+            return new MiRequest("gdb-set breakpoint pending " + (on ? "on" : "off"));
         }
 
         public static Request SetExecutable(string exeFileName, bool hasSymbols)
@@ -61,8 +61,8 @@ namespace BlackBerry.NativeCore.Debugger
                 throw new FileNotFoundException("Specified executable doesn't exist", exeFileName);
 
             if (hasSymbols)
-                return new Request("file-exec-and-symbols " + exeFileName.Replace("\\", "\\\\"));
-            return new Request("file-exec-file " + exeFileName.Replace("\\", "\\\\"));
+                return new MiRequest("file-exec-and-symbols " + exeFileName.Replace("\\", "\\\\"));
+            return new MiRequest("file-exec-file " + exeFileName.Replace("\\", "\\\\"));
         }
 
         public static Request SetLibrarySearchPath(string[] searchPaths)
@@ -99,7 +99,7 @@ namespace BlackBerry.NativeCore.Debugger
 
         public static Request AttachTargetProcess(uint pid)
         {
-            return new Request("target-attach " + pid);
+            return new MiRequest("target-attach " + pid);
         }
 
         public static Request InfoThreads()
@@ -109,19 +109,19 @@ namespace BlackBerry.NativeCore.Debugger
 
         public static Request DetachTargetProcess()
         {
-            return new Request("target-detach");
+            return new MiRequest("target-detach");
         }
 
         public static Request SetStackTraceDepth(int threadID, int depth)
         {
             if (depth < 0)
-                return new Request("stack-info-depth --thread " + threadID + " --frame 0");
-            return new Request("stack-info-depth " + depth + " --thread " + threadID + " --frame 0");
+                return new MiRequest("stack-info-depth --thread " + threadID + " --frame 0");
+            return new MiRequest("stack-info-depth " + depth + " --thread " + threadID + " --frame 0");
         }
 
         public static Request StackTraceListFrames()
         {
-            return new Request("stack-list-frames");
+            return new MiRequest("stack-list-frames");
         }
 
         public static Request InsertBreakPoint(string fileName, uint line)
@@ -129,7 +129,7 @@ namespace BlackBerry.NativeCore.Debugger
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException("fileName");
 
-            return new Request("break-insert --thread-group i1 -f " + fileName + ":" + line);
+            return new MiRequest("break-insert --thread-group i1 -f " + fileName + ":" + line);
         }
 
         public static Request InsertBreakpoint(string functionName)
@@ -137,7 +137,7 @@ namespace BlackBerry.NativeCore.Debugger
             if (string.IsNullOrEmpty(functionName))
                 throw new ArgumentNullException("functionName");
 
-            return new Request("break-insert --thread-group i1 -f " + functionName);
+            return new MiRequest("break-insert --thread-group i1 -f " + functionName);
         }
 
         public static Request DeleteBreakpoint(params uint[] breakpointIDs)
@@ -146,7 +146,7 @@ namespace BlackBerry.NativeCore.Debugger
                 throw new ArgumentNullException("breakpointIDs");
 
             if (breakpointIDs.Length == 1)
-                return new Request("break-delete " + breakpointIDs[0]);
+                return new MiRequest("break-delete " + breakpointIDs[0]);
 
             var identifiers = new StringBuilder();
             for (int i = 0; i < identifiers.Length; i++)
@@ -154,17 +154,17 @@ namespace BlackBerry.NativeCore.Debugger
                 identifiers.Append(i).Append(' ');
             }
 
-            return new Request("break-delete " + identifiers);
+            return new MiRequest("break-delete " + identifiers);
         }
 
         public static Request Continue()
         {
-            return new Request("exec-continue");
+            return new MiRequest("exec-continue");
         }
         
         public static Request Run()
         {
-            return new Request("exec-run");
+            return new MiRequest("exec-run");
         }
 
         /// <summary>
