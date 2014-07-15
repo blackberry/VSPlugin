@@ -1,4 +1,5 @@
-﻿using System.Runtime.InteropServices;
+﻿using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace BlackBerry.NativeCore
@@ -107,6 +108,8 @@ namespace BlackBerry.NativeCore
                     continue;
                 }
 
+                if (Path.DirectorySeparatorChar != '/')
+                    buffer.Replace('/', Path.DirectorySeparatorChar);
                 return buffer.ToString(0, result);
             } while (false);
 
