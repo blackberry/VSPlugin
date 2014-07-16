@@ -319,7 +319,13 @@ namespace BlackBerry.DebugEngine
                     bpointStopPoint = GDBParser.parseCommand("info line *" + bpointAddress, 18);
 
                     var line = (uint)Convert.ToInt64(bpointStopPoint.Trim());
-                    breakpointInfo = new BreakpointInfo((uint)hBreakpoints.Number, hBreakpoints.FileName, line, UInt32.Parse(hBreakpoints.Address.Substring(2), System.Globalization.NumberStyles.HexNumber));
+                    uint address = 0;
+
+                    if (hBreakpoints.Address != null && hBreakpoints.Address.Length > 2)
+                    {
+                        uint.TryParse(hBreakpoints.Address.Substring(2), System.Globalization.NumberStyles.HexNumber, null, out address);
+                    }
+                    breakpointInfo = new BreakpointInfo((uint)hBreakpoints.Number, hBreakpoints.FileName, line, address);
                 }
                 else
                 {
