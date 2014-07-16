@@ -126,7 +126,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> Returns the list of processes running on this port. </returns>
         private AD7Process[] GetProcesses()
         {
-            var processesRequest = GdbWrapper.ListProcesses(null, NDK, Device);
+            var processesRequest = GdbWrapper.ListProcesses(NDK, Device);
 
             // timeout or other problem?
             if (processesRequest == null || processesRequest.Response == null || processesRequest.Response.Name == "error")

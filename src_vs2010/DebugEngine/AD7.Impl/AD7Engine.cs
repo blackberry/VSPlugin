@@ -633,9 +633,11 @@ namespace BlackBerry.DebugEngine
                     return VSConstants.E_FAIL;
                 }
 
+
+                // var result = GdbWrapper.AttachToProcess(pidOrName, exe, ndk, target);
+
                 Targets.Connect(target, publicKeyPath, null);
                 CreateGdb(null, target, null);
-
                 if (!uint.TryParse(pidOrName, out pidNumber))
                 {
                     var listRequest = RequestsFactory.ListProcesses();
