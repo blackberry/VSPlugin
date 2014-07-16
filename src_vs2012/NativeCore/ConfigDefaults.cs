@@ -28,6 +28,23 @@ namespace BlackBerry.NativeCore
         public static readonly string PluginInstallationConfigDirectory;
         public static readonly string RegistryPath;
 
+#if DEBUG
+        /// <summary>
+        /// Full path to the DebugEngine library in build in debug, to help in easy debuggin whole stack.
+        /// It will not be used in release builds, as then the assumption is that the DE is next to the package.
+        /// </summary>
+        public const string DebugEngineDebugablePath =
+#               if PLATFORM_VS2010
+                    @"S:\vs-plugin\src_vs2010\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+#               elif PLATFORM_VS2012
+                    @"S:\vs-plugin\src_vs2012\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+#               elif PLATFORM_VS2013
+                    @"S:\vs-plugin\src_vs2013\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+#               else
+#                   error Define path to debug version of the DebugEngine.dll to make the debugging working.
+#               endif
+#endif
+
         static ConfigDefaults()
         {
             var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);

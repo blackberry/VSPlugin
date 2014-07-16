@@ -69,15 +69,7 @@ namespace BlackBerry.Package
         ProgramProviderClassGUID = AD7ProgramProvider.ClassGuid, ProgramProviderClassName = AD7ProgramProvider.ClassName,
         PortSupplierClassGUID = AD7PortSupplier.ClassGuid, PortSupplierClassName = AD7PortSupplier.ClassName,
 #if DEBUG
-#   if PLATFORM_VS2010
-        AssemblyName = @"S:\vs-plugin\src_vs2010\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll"
-#   elif PLATFORM_VS2012
-        AssemblyName = @"S:\vs-plugin\src_vs2012\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll"
-#   elif PLATFORM_VS2013
-        AssemblyName = @"S:\vs-plugin\src_vs2013\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll"
-#else
-#   error Define path to debug version of the DebugEngine.dll to make the debugging working.
-#endif
+        AssemblyName = ConfigDefaults.DebugEngineDebugablePath
 #else
         AssemblyName = "BlackBerry.DebugEngine.dll"
 #endif
