@@ -5,7 +5,6 @@ using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using NUnit.Framework;
-using VSNDK.Parser;
 
 namespace UnitTests
 {
@@ -293,15 +292,6 @@ namespace UnitTests
             var detachProcess = RequestsFactory.DetachTargetProcess();
             runner.Send(detachProcess);
             detachProcess.Wait();
-        }
-
-        [Test]
-        [Ignore]
-        public void LoadListOfProcessesOld()
-        {
-            string response = GDBParser.GetPIDsThroughGDB(Defaults.IP, Defaults.Password, false, Defaults.ToolsDirectory, Defaults.SshPublicKeyPath, 12);
-
-            Assert.IsNotNull(response);
         }
     }
 }
