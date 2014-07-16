@@ -752,7 +752,6 @@ namespace BlackBerry.DebugEngine
 
         #region IDebugProgram2 Members
 
-
         /// <summary>
         /// Determines if a debug engine (DE) can detach from the program. (http://msdn.microsoft.com/en-us/library/bb161967.aspx)
         /// </summary>
@@ -762,7 +761,6 @@ namespace BlackBerry.DebugEngine
             // The VSNDK debug engine always supports detach
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Requests that the program stop execution the next time one of its threads attempts to run. The debugger calls CauseBreak 
@@ -774,7 +772,6 @@ namespace BlackBerry.DebugEngine
         {
             return ((IDebugEngine2)this).CauseBreak();
         }
-
 
         /// <summary>
         /// Continues running this program from a stopped state. Any previous execution state (such as a step) is preserved, and 
@@ -1028,11 +1025,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetProgramId(out Guid guidProgramId)
         {
-            if (_programGuid != null)
-                guidProgramId = _programGuid;
-            else
-                guidProgramId = _process.UID;
-
+            guidProgramId = _programGuid;
             return VSConstants.S_OK;
         }
 
@@ -1212,6 +1205,7 @@ namespace BlackBerry.DebugEngine
         {
             return VSConstants.S_OK;
         }
+
         #endregion
 
         #region Thread methods

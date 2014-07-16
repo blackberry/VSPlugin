@@ -15,7 +15,6 @@
 using System;
 using System.Collections.Generic;
 using BlackBerry.NativeCore.Debugger.Model;
-using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace BlackBerry.DebugEngine
