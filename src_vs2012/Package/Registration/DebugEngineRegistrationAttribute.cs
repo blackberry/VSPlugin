@@ -23,6 +23,7 @@ namespace BlackBerry.Package.Registration
 
             Name = name;
             DebugEngineGUID = debugEngineGUID;
+            AllowUserEnteredPorts = true;
         }
 
         #region Properties
@@ -141,6 +142,15 @@ namespace BlackBerry.Package.Registration
             set;
         }
 
+        /// <summary>
+        /// Gets or sets if developer can input any text in 'Qualifier' field in 'Attach to...' window of Visual Studio.
+        /// </summary>
+        public bool AllowUserEnteredPorts
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         public override void Register(RegistrationContext context)
@@ -168,7 +178,7 @@ namespace BlackBerry.Package.Registration
 
                 key.SetValue("PortSupplier", portSupplierFormattedGuid);
                 var supplierDetailsKey = context.CreateKey(@"AD7Metrics\PortSupplier\" + portSupplierFormattedGuid);
-                supplierDetailsKey.SetValue("DisallowUserEnteredPorts", 0u);
+                supplierDetailsKey.SetValue("DisallowUserEnteredPorts", AllowUserEnteredPorts ? 0u : 1u);
                 supplierDetailsKey.SetValue("CLSID", portSupplierFormattedGuid);
                 supplierDetailsKey.SetValue("PortPickerCLSID", portSupplierFormattedGuid);
                 supplierDetailsKey.Close();
