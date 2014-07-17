@@ -16,16 +16,20 @@ namespace BlackBerry.NativeCore.Debugger
         /// <summary>
         /// Init constructor.
         /// </summary>
+        /// <param name="rawData">Optional original response received from GDB, before parsing.</param>
         /// <param name="id">Identifier of the response (it should match the ID of the request)</param>
         /// <param name="type">Type of the response</param>
         /// <param name="content">Name and content of the response. This value can not be empty.</param>
         /// <param name="notifications">Additional asynchronous notifications received along with the content</param>
         /// <param name="comments">Additional comments received along with the content</param>
-        public Response(string id, ResponseType type, string content, string[] notifications, string[] comments)
+        public Response(string[] rawData, string id, ResponseType type, string content, string[] notifications, string[] comments)
         {
+            if (rawData == null || rawData.Length == 0)
+                throw new ArgumentOutOfRangeException("rawData");
             if (string.IsNullOrEmpty(content))
                 throw new ArgumentNullException("content");
 
+            RawData = rawData;
             ID = id;
             Type = type;
 
@@ -47,13 +51,15 @@ namespace BlackBerry.NativeCore.Debugger
         /// <summary>
         /// Init constructor.
         /// </summary>
+        /// <param name="rawData">Optional original response received from GDB, before parsing.</param>
         /// <param name="notifications">Additional asynchronous notifications received along with the content</param>
         /// <param name="comments">Set of comments. This value can not be empty</param>
-        public Response(string[] notifications, string[] comments)
+        public Response(string[] rawData, string[] notifications, string[] comments)
         {
             if (comments == null || comments.Length == 0)
                 throw new ArgumentOutOfRangeException("comments");
 
+            RawData = rawData;
             ID = null;
             Type = ResponseType.StreamRecord;
             Name = null;
@@ -63,6 +69,15 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         #region Properties
+
+        /// <summary>
+        /// The original response received from GDB, before parsing.
+        /// </summary>
+        public string[] RawData
+        {
+            get;
+            private set;
+        }
 
         public string ID
         {
@@ -164,10 +179,10 @@ namespace BlackBerry.NativeCore.Debugger
             // found comments only message:
             if (resultRecord == null)
             {
-                return streamRecords == null ? null : new Response(notificationRecords.ToArray(), streamRecords.ToArray());
+                return streamRecords == null ? null : new Response(message, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords.ToArray());
             }
 
-            return new Response(resultID, resultType, resultRecord, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords != null ? streamRecords.ToArray() : null);
+            return new Response(message, resultID, resultType, resultRecord, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords != null ? streamRecords.ToArray() : null);
         }
 
         private static ResponseType GetResponseType(char typeChar)

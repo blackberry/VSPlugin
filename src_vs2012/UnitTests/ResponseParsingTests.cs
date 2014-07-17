@@ -21,7 +21,7 @@ namespace UnitTests
                 "~\"accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/native/FallingBlocks - 75714795/3\\n",
                 "~\"accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/native/FallingBlocks - 75714795/4\\n"
             };
-            var response = new Response(null, data);
+            var response = new Response(null, null, data);
             var request = RequestsFactory.ListProcesses();
             var result = request.Complete(response);
 

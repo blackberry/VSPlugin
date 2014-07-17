@@ -229,8 +229,6 @@ namespace BlackBerry.DebugEngine
                                     break;
                                 case '9':  // Not used.
                                     break;
-                                default:   // Event that was not parsed correctly, or not handled completely.
-                                    break;
                             }
                         }
                     }
@@ -251,7 +249,6 @@ namespace BlackBerry.DebugEngine
             }
         }
 
-
         /// <summary>
         /// If the process was running when the breakpoint was changed, resume the process.
         /// </summary>
@@ -263,7 +260,6 @@ namespace BlackBerry.DebugEngine
                 ContinueExecution();
             }
         }
-
 
         /// <summary>
         /// Code to set the breakpoint in GDB and then confirm and set in Visual Studio
@@ -340,7 +336,6 @@ namespace BlackBerry.DebugEngine
             breakpointInfo = null;
             return false;
         }
-
 
         /// <summary>
         /// Set a breakpoint given a filename and line number.
@@ -488,7 +483,7 @@ namespace BlackBerry.DebugEngine
                     ResumeFromInterrupt();
                     return false;
                 }
-            
+
                 HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
                 hBreakpoints.Handle(response);
                 uint retID = (uint)hBreakpoints.Number;
@@ -551,7 +546,9 @@ namespace BlackBerry.DebugEngine
             if (bbp != null)
             {
                 if (!bbp._breakWhenCondChanged)
-                    ((IDebugBoundBreakpoint2)bbp).SetHitCount(hitCount);
+                {
+                    ((IDebugBoundBreakpoint2) bbp).SetHitCount(hitCount);
+                }
             }
         }
 

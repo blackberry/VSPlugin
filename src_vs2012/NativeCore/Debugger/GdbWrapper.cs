@@ -165,7 +165,14 @@ namespace BlackBerry.NativeCore.Debugger
             _gdbRunner.Send(request);
             var hasResponse = request.Wait();
 
-            return null;
+            // check if data was received:
+            if (!hasResponse || request.Response == null || request.Response.RawData == null)
+            {
+                return "TIMEOUT!";
+            }
+
+            // forward the data received from GDB:
+            return string.Join("\r\n", request.Response.RawData);
         }
 
         /// <summary>
