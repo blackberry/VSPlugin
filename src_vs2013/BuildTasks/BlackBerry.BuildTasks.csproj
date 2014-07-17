@@ -1,0 +1,338 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{328CAD98-F4E5-444A-B5DF-AD102C67BA3C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BlackBerry.BuildTasks</RootNamespace>
+    <AssemblyName>BlackBerry.BuildTasks</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <PublishUrl>publish\</PublishUrl>
+    <Install>true</Install>
+    <InstallFrom>Disk</InstallFrom>
+    <UpdateEnabled>false</UpdateEnabled>
+    <UpdateMode>Foreground</UpdateMode>
+    <UpdateInterval>7</UpdateInterval>
+    <UpdateIntervalUnits>Days</UpdateIntervalUnits>
+    <UpdatePeriodically>false</UpdatePeriodically>
+    <UpdateRequired>false</UpdateRequired>
+    <MapFileExtensions>true</MapFileExtensions>
+    <ApplicationRevision>0</ApplicationRevision>
+    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <IsWebBootstrapper>false</IsWebBootstrapper>
+    <UseApplicationTrust>false</UseApplicationTrust>
+    <BootstrapperEnabled>true</BootstrapperEnabled>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2013</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PLATFORM_VS2013</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Microsoft.Build" />
+    <Reference Include="Microsoft.Build.CPPTasks.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Tasks.v12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\MSBuild\12.0\Bin\Microsoft.Build.Tasks.v12.0.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Build.Utilities.v12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\Program Files (x86)\MSBuild\12.0\Bin\Microsoft.Build.Utilities.v12.0.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src_vs2010\BuildTasks\AsyncExec.cs">
+      <Link>AsyncExec.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Parser.cs">
+      <Link>BarDescriptor\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.cs</Link>
+      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\BBDeploy.cs">
+      <Link>BBDeploy.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\BBNativePackager.cs">
+      <Link>BBNativePackager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\BBSigner.cs">
+      <Link>BBSigner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\BBTask.cs">
+      <Link>BBTask.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\CheckIfInstalled.cs">
+      <Link>CheckIfInstalled.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\DiffManifests.cs">
+      <Link>DiffManifests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\GenerateMakefile.cs">
+      <Link>GenerateMakefile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\GetAppInfo.cs">
+      <Link>GetAppInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\MakeAllAndFormatOutputMessages.cs">
+      <Link>MakeAllAndFormatOutputMessages.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\PackagerCmdBuilder.cs">
+      <Link>PackagerCmdBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\Properties\Resources.Designer.cs">
+      <Link>Properties\Resources.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\QccCompiler.cs">
+      <Link>QccCompiler.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\QccLib.cs">
+      <Link>QccLib.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\QccLink.cs">
+      <Link>QccLink.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\QccTask.cs">
+      <Link>QccTask.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\RemoveFlagFile.cs">
+      <Link>RemoveFlagFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\BuildTasks\SSHDelete.cs">
+      <Link>SSHDelete.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
+      <Link>ConfigDefaults.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\GlobalHelper.cs">
+      <Link>Helpers\GlobalHelper.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xsd">
+      <Link>BarDescriptor\Schema\bar-descriptor.xsd</Link>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets">
+      <Link>BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets">
+      <Link>BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\src_vs2010\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
+      <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\src_vs2010\BuildTasks\BlackBerry\Microsoft.CppBuild.BlackBerry.targets">
+      <Link>BlackBerry\Microsoft.CppBuild.BlackBerry.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerry\Platform.default.props">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerry\Platform.props">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerry\Platform.targets">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.targets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerrySimulator\Platform.default.props">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerrySimulator\Platform.props">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerrySimulator\Platform.targets">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="BlackBerrySimulator\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerrySimulator.qcc.props">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="BlackBerrySimulator\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerrySimulator.qcc.targets">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xml">
+      <Link>BarDescriptor\Schema\bar-descriptor.xml</Link>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\debugger_ndk.xml">
+      <Link>BlackBerrySimulator\Rules\debugger_ndk.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml">
+      <Link>BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\ndk_directories.xml">
+      <Link>BlackBerrySimulator\Rules\ndk_directories.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\ndk_general.xml">
+      <Link>BlackBerrySimulator\Rules\ndk_general.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\ndk_general_ps.xml">
+      <Link>BlackBerrySimulator\Rules\ndk_general_ps.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\packager.xml">
+      <Link>BlackBerrySimulator\Rules\packager.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\qcc_cl.xml">
+      <Link>BlackBerrySimulator\Rules\qcc_cl.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\qcc_lib.xml">
+      <Link>BlackBerrySimulator\Rules\qcc_lib.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\qcc_link.xml">
+      <Link>BlackBerrySimulator\Rules\qcc_link.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\debugger_ndk.xml">
+      <Link>BlackBerry\Rules\debugger_ndk.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\ndkProjectItemsSchema.xml">
+      <Link>BlackBerry\Rules\ndkProjectItemsSchema.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\ndk_directories.xml">
+      <Link>BlackBerry\Rules\ndk_directories.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\ndk_general.xml">
+      <Link>BlackBerry\Rules\ndk_general.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\ndk_general_ps.xml">
+      <Link>BlackBerry\Rules\ndk_general_ps.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\packager.xml">
+      <Link>BlackBerry\Rules\packager.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\qcc_cl.xml">
+      <Link>BlackBerry\Rules\qcc_cl.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\qcc_lib.xml">
+      <Link>BlackBerry\Rules\qcc_lib.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\qcc_link.xml">
+      <Link>BlackBerry\Rules\qcc_link.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <BootstrapperPackage Include=".NETFramework,Version=v4.0">
+      <Visible>False</Visible>
+      <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1 Client Profile</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Net.Framework.3.5.SP1">
+      <Visible>False</Visible>
+      <ProductName>.NET Framework 3.5 SP1</ProductName>
+      <Install>false</Install>
+    </BootstrapperPackage>
+    <BootstrapperPackage Include="Microsoft.Windows.Installer.3.1">
+      <Visible>False</Visible>
+      <ProductName>Windows Installer 3.1</ProductName>
+      <Install>true</Install>
+    </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\src_vs2010\BuildTasks\Properties\Resources.resx">
+      <Link>Properties\Resources.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <!--  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup> -->
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+    </PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

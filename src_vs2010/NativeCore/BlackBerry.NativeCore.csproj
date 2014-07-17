@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>BlackBerry.NativeCore</RootNamespace>
+    <AssemblyName>BlackBerry.NativeCore</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;PLATFORM_VS2010;MAKE_CONFIG_DEFAULTS_PUBLIC</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;PLATFORM_VS2010;MAKE_CONFIG_DEFAULTS_PUBLIC</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Management" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\src_vs2012\NativeCore\Components\TokenProcessor.cs">
+      <Link>Components\TokenProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Components\UpdateManager.cs">
+      <Link>Components\UpdateManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Components\UpdateManagerCompletedEventArgs.cs">
+      <Link>Components\UpdateManagerCompletedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
+      <Link>ConfigDefaults.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\BlackBerryTraceListener.cs">
+      <Link>Diagnostics\BlackBerryTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\TimeTracker.cs">
+      <Link>Diagnostics\TimeTracker.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\TraceLog.cs">
+      <Link>Diagnostics\TraceLog.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\DeviceFamilyHelper.cs">
+      <Link>Helpers\DeviceFamilyHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\GlobalHelper.cs">
+      <Link>Helpers\GlobalHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiInfo.cs">
+      <Link>Model\ApiInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiInfoArray.cs">
+      <Link>Model\ApiInfoArray.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiLevelAction.cs">
+      <Link>Model\ApiLevelAction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiLevelListTypes.cs">
+      <Link>Model\ApiLevelListTypes.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiLevelTarget.cs">
+      <Link>Model\ApiLevelTarget.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiLevelTask.cs">
+      <Link>Model\ApiLevelTask.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\CertificateInfo.cs">
+      <Link>Model\CertificateInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\CskTokenInfo.cs">
+      <Link>Model\CskTokenInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DebugTokenInfo.cs">
+      <Link>Model\DebugTokenInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DeveloperDefinition.cs">
+      <Link>Model\DeveloperDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceDebugTokenInfo.cs">
+      <Link>Model\DeviceDebugTokenInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceDefinition.cs">
+      <Link>Model\DeviceDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceDefinitionType.cs">
+      <Link>Model\DeviceDefinitionType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceFamilyType.cs">
+      <Link>Model\DeviceFamilyType.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceInfo.cs">
+      <Link>Model\DeviceInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceTheme.cs">
+      <Link>Model\DeviceTheme.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\NdkDefinition.cs">
+      <Link>Model\NdkDefinition.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\NdkInfo.cs">
+      <Link>Model\NdkInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\PermissionInfo.cs">
+      <Link>Model\PermissionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\RuntimeInfo.cs">
+      <Link>Model\RuntimeInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\SimulatorInfo.cs">
+      <Link>Model\SimulatorInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\Size.cs">
+      <Link>Model\Size.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Properties\AssemblyInfo.cs">
+      <Link>Properties\AssemblyInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\ApiLevelListLoadRunner.cs">
+      <Link>Tools\ApiLevelListLoadRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\ApiLevelUpdateLogEventArgs.cs">
+      <Link>Tools\ApiLevelUpdateLogEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\ApiLevelUpdateRunner.cs">
+      <Link>Tools\ApiLevelUpdateRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\ApplicationRemoveRunner.cs">
+      <Link>Tools\ApplicationRemoveRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\DebugTokenCreateRunner.cs">
+      <Link>Tools\DebugTokenCreateRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\DebugTokenInfoRunner.cs">
+      <Link>Tools\DebugTokenInfoRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\DebugTokenUploadRunner.cs">
+      <Link>Tools\DebugTokenUploadRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\DeviceInfoRunner.cs">
+      <Link>Tools\DeviceInfoRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\EventDispatcher.cs">
+      <Link>Tools\EventDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\IEventDispatcher.cs">
+      <Link>Tools\IEventDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\KeyToolGenRunner.cs">
+      <Link>Tools\KeyToolGenRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\KeyToolInfoRunner.cs">
+      <Link>Tools\KeyToolInfoRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\KeyToolRegisterRunner.cs">
+      <Link>Tools\KeyToolRegisterRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\KeyToolRemoveRunner.cs">
+      <Link>Tools\KeyToolRemoveRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\ToolRunner.cs">
+      <Link>Tools\ToolRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\ToolRunnerEventArgs.cs">
+      <Link>Tools\ToolRunnerEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\ToolRunnerStartupEventArgs.cs">
+      <Link>Tools\ToolRunnerStartupEventArgs.cs</Link>
+    </Compile>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

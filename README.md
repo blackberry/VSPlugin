@@ -24,7 +24,7 @@ Examples:
 
  **build.bat** - default, builds everything  
  **build.bat vs2010** - to build only for Visual Studio 2010  
- **build.bat vs2012 "/out:D:\Shared folder\_BuildResults"** - to build only for Visual Studio 2012 into specified directory  
+ **build.bat vs2012 "/out:D:\Shared folder\\_BuildResults"** - to build only for Visual Studio 2012 into specified directory  
  
  **setup.bat** - installs plugin for all Visual Studio versions  
  **setup.bat vs2010** - installs only for Visual Studio 2010  

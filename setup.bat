@@ -115,10 +115,11 @@ if not "%VSSelector%" == "" set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Micros
 REM Skip installation of custom tools (in case upgrading only plugin during development)
 if %ActionSkipTools% neq 0 goto skip_tools
 call :processTools "%thisDir%" "%PluginRoot%" "%SystemDrive%"
+set /a actionNo += 1
 :skip_tools
 
-call :processAddIn "%BuildPath%" "%AllUsersRoot%\Microsoft\MSEnvShared\Addins"
 call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%" "%MSBuildTargetPath%" "%VSWizardsPath%"
+set /a actionNo += 1
 
 if %ActionUninstall% neq 0 (goto uninstall_reg)
 
@@ -134,41 +135,6 @@ REGEDIT.EXE /S "%BuildResults%\setup_VS%VSYear%_uninstall.reg"
 :processSetup_End
 endlocal
 exit /b
-
-REM ********************************************************************************************
-REM Setup AddIn Files
-REM ********************************************************************************************
-REM $1 - from
-REM $2 - to
-:processAddIn
-setlocal EnableDelayedExpansion
-
-set InputPath=%~1
-set OutputPath=%~2
-
-if %ActionUninstall% neq 0 (goto uninstall_AddIn)
-
-REM Install add-in
-echo %actionNo%: Installing Add-in
-mkdir "%OutputPath%
-echo Copy "%InputPath%\VSNDK.AddIn.AddIn" to "%OutputPath%\VSNDK.AddIn.AddIn" 
-copy "%InputPath%\VSNDK.AddIn.AddIn" "%OutputPath%\VSNDK.AddIn.AddIn" 
-echo Copy "%InputPath%\VSNDK.AddIn.dll" to "%OutputPath%\VSNDK.AddIn.dll" 
-copy "%InputPath%\VSNDK.AddIn.dll" "%OutputPath%\VSNDK.AddIn.dll" 
-goto processAddIn_End
-
-:uninstall_AddIn
-REM Remove add-in
-echo %actionNo%: Removing Add-in
-echo Deleting "%OutputPath%\VSNDK.AddIn.AddIn" 
-del "%OutputPath%\VSNDK.AddIn.AddIn" 
-echo Deleting "%OutputPath%\VSNDK.AddIn.dll" 
-del "%OutputPath%\VSNDK.AddIn.dll" 
-
-:processAddIn_End
-endlocal
-exit /b
-
 
 REM ********************************************************************************************
 REM Copy GDBParser and DebugEngine Files
@@ -203,24 +169,26 @@ echo Copy "%InputPath%\GDBWrapper.exe" to "%OutputPluginPath%\GDBWrapper.exe"
 copy "%InputPath%\GDBWrapper.exe" "%OutputPluginPath%\GDBWrapper.exe" 
 echo Copy "%InputPath%\Instructions.txt" to "%OutputPluginPath%\Instructions.txt"
 copy "%InputPath%\Instructions.txt" "%OutputPluginPath%\Instructions.txt" 
-echo Copy "%InputPath%\VSNDK.DebugEngine.dll" to "%OutputPluginPath%\VSNDK.DebugEngine.dll"
-copy "%InputPath%\VSNDK.DebugEngine.dll" "%OutputPluginPath%\VSNDK.DebugEngine.dll" 
+echo Copy "%InputPath%\BlackBerry.DebugEngine.dll" to "%OutputPluginPath%\BlackBerry.DebugEngine.dll"
+copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputPluginPath%\BlackBerry.DebugEngine.dll" 
 
 REM Install Package Files
 echo "%InputPath%\extension.vsixmanifest" to "%OutputVsPath%\extension.vsixmanifest"
 copy "%InputPath%\extension.vsixmanifest" "%OutputVsPath%\extension.vsixmanifest" 
-echo "%InputPath%\VSNDK.Package.dll" to "%OutputVsPath%\VSNDK.Package.dll"
-copy "%InputPath%\VSNDK.Package.dll" "%OutputVsPath%\VSNDK.Package.dll"
-echo "%InputPath%\VSNDK.Package.pkgdef" to "%OutputVsPath%\VSNDK.Package.pkgdef"
-copy "%InputPath%\VSNDK.Package.pkgdef" "%OutputVsPath%\VSNDK.Package.pkgdef" 
+echo "%InputPath%\BlackBerry.NativeCore.dll" to "%OutputVsPath%\BlackBerry.NativeCore.dll"
+copy "%InputPath%\BlackBerry.NativeCore.dll" "%OutputVsPath%\BlackBerry.NativeCore.dll"
+echo "%InputPath%\BlackBerry.Package.dll" to "%OutputVsPath%\BlackBerry.Package.dll"
+copy "%InputPath%\BlackBerry.Package.dll" "%OutputVsPath%\BlackBerry.Package.dll"
+echo "%InputPath%\BlackBerry.Package.pkgdef" to "%OutputVsPath%\BlackBerry.Package.pkgdef"
+copy "%InputPath%\BlackBerry.Package.pkgdef" "%OutputVsPath%\BlackBerry.Package.pkgdef" 
 
 REM MSBuild Files
-echo Copy BlackBerry MSBuild directory
+echo Copy BlackBerry MSBuild directory [%OutputMsBuildTargetsPath%]
 xcopy "%InputPath%\BlackBerry" "%OutputMsBuildTargetsPath%\BlackBerry" /e /i /y
-copy "%InputPath%\VSNDK.Tasks.dll" "%OutputMsBuildTargetsPath%\BlackBerry\VSNDK.Tasks.dll"
-echo Copy BlackBerrySimulator MSBuild directory
+copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerry\BlackBerry.BuildTasks.dll"
+echo Copy BlackBerrySimulator MSBuild directory [%OutputMsBuildTargetsPath%]
 xcopy "%InputPath%\BlackBerrySimulator" "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /e /i /y
-copy "%InputPath%\VSNDK.Tasks.dll" "%OutputMsBuildTargetsPath%\BlackBerrySimulator\VSNDK.Tasks.dll"
+copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerrySimulator\BlackBerry.BuildTasks.dll"
 
 REM Templates
 echo Copy BlackBerry VCWizards directory
@@ -239,16 +207,18 @@ echo Deleting "%OutputPluginPath%\GDBWrapper.exe"
 del  "%OutputPluginPath%\GDBWrapper.exe" 
 echo Deleting "%OutputPluginPath%\Instructions.txt"
 del "%OutputPluginPath%\Instructions.txt" 
-echo Deleting "%OutputPluginPath%\VSNDK.DebugEngine.dll"
-del "%OutputPluginPath%\VSNDK.DebugEngine.dll" 
+echo Deleting "%OutputPluginPath%\BlackBerry.DebugEngine.dll"
+del "%OutputPluginPath%\BlackBerry.DebugEngine.dll" 
 
 REM Uninstall Package Files
 echo Deleting "%OutputVsPath%\extension.vsixmanifest"
 del "%OutputVsPath%\extension.vsixmanifest" 
-echo Deleting  "%OutputVsPath%\VSNDK.Package.dll"
-del "%OutputVsPath%\VSNDK.Package.dll"
-echo Deleting  "%OutputVsPath%\VSNDK.Package.pkgdef"
-del "%OutputVsPath%\VSNDK.Package.pkgdef" 
+echo Deleting  "%OutputVsPath%\BlackBerry.NativeCore.dll"
+del "%OutputVsPath%\BlackBerry.NativeCore.dll"
+echo Deleting  "%OutputVsPath%\BlackBerry.Package.dll"
+del "%OutputVsPath%\BlackBerry.Package.dll"
+echo Deleting  "%OutputVsPath%\BlackBerry.Package.pkgdef"
+del "%OutputVsPath%\BlackBerry.Package.pkgdef" 
 
 REM Remove folders
 echo Remove Directory "%OutputPluginPath%"

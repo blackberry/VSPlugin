@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <!--  This is the file that defines the actual layout and type of the commands.
+        It is divided in different sections (e.g. command definition, command
+        placement, ...), with each defining a specific set of properties.
+        See the comment before each section for more details about how to
+        use it. -->
+
+    <!--  The VSCT compiler (the tool that translates this file into the binary 
+        format that VisualStudio will consume) has the ability to run a preprocessor 
+        on the vsct file; this preprocessor is (usually) the C++ preprocessor, so 
+        it is possible to define includes and macros with the same syntax used 
+        in C++ files. Using this ability of the compiler here, we include some files 
+        defining some of the constants that we will use inside the file. -->
+
+    <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
+    <Extern href="stdidcmd.h" />
+
+    <!--This header contains the command ids for the menus provided by the shell. -->
+    <Extern href="vsshlids.h" />
+
+    <!--Definition of some VSCT specific constants. In this sample we use it for the IDs inside the guidOfficeIcon group. -->
+    <!--<Extern href="msobtnid.h" xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" />-->
+
+
+    <!--Defines VK_INSERT -->
+    <Extern href="virtkeys.h" />
+
+
+    <Include href="Package.Bitmaps.vsct"/>
+    <Include href="Package.Menu.vsct"/>
+
+
+    <!--The Commands section is where we the commands, menus and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+    <Commands package="guidVSNDK_PackageString">
+        <!-- Inside this section we have different sub-sections: one for the menus, another  
+    for the menu groups, one for the buttons (the actual commands), one for the combos 
+    and the last one for the bitmaps used. Each element is identified by a command id that  
+    is a unique pair of guid and numeric identifier; the guid part of the identifier is usually  
+    called "command set" and is used to group different command inside a logically related  
+    group; your package should define its own command set in order to avoid collisions  
+    with command ids defined by other packages. -->
+
+        <!--This is the sub-section that defines the menus and toolbars.-->
+        <Menus>
+            <!-- BlackBerry top-menu inside IDE -->
+            <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" priority="0x0100" type="Menu">
+                <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
+                <Strings>
+                    <ButtonText>&amp;BlackBerry</ButtonText>
+                </Strings>
+            </Menu>
+        </Menus>
+
+    </Commands>
+
+
+    <!--  Within this section you can specify the set of commands defined somewhere else that your  
+        packages uses; for instance if your package uses the standard ‘Copy’ command, you don’t  
+        need to define it, because it is defined by the shell, but you have to use this section  
+        of the VSCT file to notify the shell that your package uses it using this section. -->
+    <!--  Note that with combo boxes we have effectively two commands in one. Below 
+        we have two pairs of commands; 1st pair commandIDFontName and commandIDFontNameHandler, 
+        2nd pair commandIDFontSize and commandIDFontSizeHandler. Note that: 
+        
+        - commandIDFontName and commandIDFontSize handle the displaying and setting of the font 
+          name and font size respectively 
+        - commandIDFontNameHandler and commandIDFontSizeHandler fill the drop down menus 
+          with the available font names and font sizes respectively 
+     -->
+    <!-- Note also that VS will call QueryStatus only on commandIDFontName and  
+       commandIDFontSize, but not on cmdFontNameHandler and commandIDFontSizeHandler whereas 
+       Exec will be called on all four commands. 
+       Note also that Exec will be called for commandIDFontName and commandIDFontSize for 
+       two cases; first to get the current font name or size and second to 
+       set the font name or size whereas the Exec call for commandIDFontNameHandler and  
+       commandIDFontSizeHandler always have the same meaning - fill the drop down menu. 
+       Finally, note that placement for the combo boxes is defined in the combo 
+       section below by the priority and not in the CommandPlacements section. -->
+    <UsedCommands>
+        <UsedCommand guid="guidVSStd97" id="cmdidBold" />
+        <UsedCommand guid="guidVSStd97" id="cmdidItalic" />
+        <UsedCommand guid="guidVSStd97" id="cmdidUnderline" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyLeft" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyCenter" />
+        <UsedCommand guid="guidVSStd97" id="cmdidJustifyRight" />
+        <UsedCommand guid="guidVSStd97" id="cmdidFontName" />
+        <UsedCommand guid="guidVSStd97" id="cmdidFontSize" />
+        <UsedCommand guid="guidVSStd97" id="cmdidCut" />
+        <UsedCommand guid="guidVSStd97" id="cmdidCopy" />
+        <UsedCommand guid="guidVSStd97" id="cmdidPaste" />
+        <UsedCommand guid="guidVSStd97" id="cmdidDelete" />
+        <UsedCommand guid="guidVSStd2K" id="ECMD_INSERT" />
+        <UsedCommand guid="guidVSStd2K" id="ECMD_BULLETEDLIST" />
+    </UsedCommands>
+
+</CommandTable>
