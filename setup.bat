@@ -13,7 +13,6 @@ if "%~1" == "" (
   set ActionUninstall=0
   set ActionSkipTools=0
   set ActionMSBuildOnly=0
-  set ActionUseRegistry=0
 ) else (
   set ActionVS2010=0
   set ActionVS2012=0
@@ -21,7 +20,6 @@ if "%~1" == "" (
   set ActionUninstall=0
   set ActionSkipTools=0
   set ActionMSBuildOnly=0
-  set ActionUseRegistry=0
   for %%a in (%*) do (
     if /i "%%a" == "/all"          set ActionVS2010=1 && set ActionVS2012=1 && set ActionVS2013=1
     if /i "%%a" == "/uninstall"    set ActionUninstall=1
@@ -36,9 +34,6 @@ if "%~1" == "" (
     if /i "%%a" == "/msbuildonly"  set ActionMSBuildOnly=1
     if /i "%%a" == "/only-msbuild" set ActionMSBuildOnly=1
     if /i "%%a" == "/onlymsbuild"  set ActionMSBuildOnly=1
-    if /i "%%a" == "/registry"     set ActionUseRegistry=1
-    if /i "%%a" == "/reg"          set ActionUseRegistry=1
-    if /i "%%a" == "/noregistry"   set ActionUseRegistry=1
     if /i "%%a" == "vs2010"        set ActionVS2010=1
     if /i "%%a" == "vs2012"        set ActionVS2012=1
     if /i "%%a" == "vs2013"        set ActionVS2013=1
@@ -124,6 +119,8 @@ set VSWizardsPath=%ProgFilesRoot%\Microsoft Visual Studio %VSVersion%\VC\VCWizar
 set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms
 if not "%VSSelector%" == "" set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\%VSSelector%\Platforms
 
+set /a actionNo += 1
+
 REM Skip tools&plugin, if only upgrading MSBuild (in case of debugger development)
 if %ActionMSBuildOnly% neq 0 goto msbuild_only
 
@@ -139,11 +136,6 @@ set /a actionNo += 1
 
 call :processMSBuild "%BuildPath%" "%MSBuildTargetPath%"
 set /a actionNo += 1
-
-if %ActionUseRegistry% neq 1 goto skip_registry
-call :processRegistry
-set /a actionNo += 1
-:skip_registry
 
 call :processTemplates "%BuildPath%" "%VSWizardsPath%"
 set /a actionNo += 1
@@ -166,7 +158,7 @@ set OutputWizardsPath=%~2
 if %ActionUninstall% neq 0 (goto uninstall_Templates)
 
 REM Templates
-echo Copy BlackBerry VCWizards directory
+echo %actionNo%: Installing BlackBerry Wizards
 xcopy "%InputPath%\Templates\VCWizards" "%OutputWizardsPath%" /e /i /y
 
 goto processTemplates_End
@@ -174,7 +166,7 @@ goto processTemplates_End
 :uninstall_Templates
 
 REM Remove Templates
-echo Delete BlackBerry VCWizards directory
+echo %actionNo%: Removing BlackBerry Wizards
 rd "%OutputWizardsPath%\BlackBerry" /s /q 
 
 :processTemplates_End
@@ -195,6 +187,7 @@ set OutputMsBuildTargetsPath=%~2
 if %ActionUninstall% neq 0 (goto uninstall_MSBuild)
 
 REM MSBuild Files
+echo %actionNo%: Installing build targets
 echo Copy BlackBerry MSBuild directory [%OutputMsBuildTargetsPath%]
 xcopy "%InputPath%\BlackBerry" "%OutputMsBuildTargetsPath%\BlackBerry" /e /i /y
 copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerry\BlackBerry.BuildTasks.dll"
@@ -207,6 +200,7 @@ goto processMSBuild_End
 :uninstall_MSBuild
 
 REM Remove MSBuild Files
+echo %actionNo%: Removing build targets
 echo Delete BlackBerry MSBuild directory
 rd "%OutputMsBuildTargetsPath%\BlackBerry" /s /q
 echo Delete BlackBerrySimulator MSBuild directory
@@ -215,29 +209,6 @@ rd "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /s /q
 :processMSBuild_End
 endlocal
 exit /b
-
-
-REM ********************************************************************************************
-REM Upgrade system registry
-REM ********************************************************************************************
-:processRegistry
-setlocal
-
-if %ActionUninstall% neq 0 (goto uninstall_reg)
-
-REM Registering debug-ending and other support classes
-echo %actionNo%: Registering debug-engine [%BuildResults%\setup_VS%VSYear%_install_%SystemArch%.reg]
-REGEDIT.EXE /S "%BuildResults%\setup_VS%VSYear%_install_%SystemArch%.reg"
-goto processRegistry_End
-
-:uninstall_reg
-echo %actionNo%: Unregistering debug-engine [%BuildResults%\setup_VS%VSYear%_uninstall.reg]
-REGEDIT.EXE /S "%BuildResults%\setup_VS%VSYear%_uninstall.reg"
-
-:processRegistry_End
-endlocal
-exit /b
-
 
 REM ********************************************************************************************
 REM Copy GDBParser and DebugEngine Files
