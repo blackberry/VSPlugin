@@ -1,6 +1,6 @@
 using System;
 using System.Collections;
-using VSNDK.Parser;
+using BlackBerry.NativeCore.Debugger;
 
 namespace BlackBerry.DebugEngine
 {
@@ -56,14 +56,14 @@ namespace BlackBerry.DebugEngine
 
             // Waits for the parsed response for the GDB/MI command that evaluates "name" as an expression.
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Data-Manipulation.html)
-            result = GDBParser.parseCommand("-data-evaluate-expression \"" + name + "\"", 2);
+            result = GdbWrapper.SendCommand("-data-evaluate-expression \"" + name + "\"", 2);
             if (result.Substring(0, 2) == "61") // If result starts with 61, it means that there is an error.
             {
                 if (gdbName != null) // Maybe that error was caused because GDB didn't accept the VS name. Use the GDBName if there is one.
                 {
                     // Gets the parsed response for the GDB/MI command that evaluates "GDBName" as an expression.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Data-Manipulation.html)
-                    string result2 = GDBParser.parseCommand("-data-evaluate-expression \"" + gdbName + "\"", 2);
+                    string result2 = GdbWrapper.SendCommand("-data-evaluate-expression \"" + gdbName + "\"", 2);
                     if (result2.Substring(0, 2) == "60")
                         result = result2;
                 }
@@ -270,11 +270,11 @@ namespace BlackBerry.DebugEngine
 
                     // Gets the parsed response for the GDB command that returns the data type of "aux_exp".
                     // (http://sourceware.org/gdb/onlinedocs/gdb/Symbols.html)
-                    string firstDatatype = GDBParser.parseCommand("whatis " + aux_exp, 3);
+                    string firstDatatype = GdbWrapper.SendCommand("whatis " + aux_exp, 3);
 
                     // Gets the parsed response for the GDB command that returns a detailed description of the type.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/Symbols.html)
-                    string baseDatatype = GDBParser.parseCommand("ptype " + aux_exp, 4);
+                    string baseDatatype = GdbWrapper.SendCommand("ptype " + aux_exp, 4);
 
                     if ((baseDatatype[baseDatatype.Length - 1] == '{') && (baseDatatype[baseDatatype.Length - 2] == ' '))
                         baseDatatype = baseDatatype.Remove(baseDatatype.Length - 2);

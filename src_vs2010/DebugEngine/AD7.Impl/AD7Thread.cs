@@ -16,7 +16,6 @@ using System;
 using BlackBerry.NativeCore;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using VSNDK.Parser;
 using System.Collections;
 
 namespace BlackBerry.DebugEngine
@@ -304,12 +303,6 @@ namespace BlackBerry.DebugEngine
 
                 return VSConstants.S_OK;
             }
-            catch (ComponentException ex)
-            {
-                if ((_id != "") && (_id != _engine.CurrentThread()._id))
-                    _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
-                return ex.HResult;
-            }
             catch (Exception ex)
             {
                 if ((_id != "") && (_id != _engine.CurrentThread()._id))
@@ -439,10 +432,6 @@ namespace BlackBerry.DebugEngine
                 }
 
                 return VSConstants.S_OK;
-            }
-            catch (ComponentException ex)
-            {
-                return ex.HResult;
             }
             catch (Exception ex)
             {
@@ -665,10 +654,6 @@ namespace BlackBerry.DebugEngine
                     pThreadproperties[0].dwFields |= (uint)enum_THREADPROPERTY_FIELDS100.TPF100_PRIORITY_ID;
                 }
                 return VSConstants.S_OK;
-            }
-            catch (ComponentException ex)
-            {
-                return ex.HResult;
             }
             catch (Exception ex)
             {

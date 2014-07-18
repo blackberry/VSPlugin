@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Diagnostics;
+using System.IO;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger.Requests;
 using BlackBerry.NativeCore.Model;
@@ -12,6 +14,9 @@ namespace BlackBerry.NativeCore.Debugger
     public static class GdbWrapper
     {
         private static GdbRunner _gdbRunner;
+        private static readonly InstructionCollection Instructions = InstructionCollection.Load();
+
+        private const uint LastSyncInstructionID = 50;
 
         /// <summary>
         /// Event send each time a response is received by GDB processor created during attaching to process.
@@ -26,14 +31,16 @@ namespace BlackBerry.NativeCore.Debugger
         /// <param name="ndk">Location of the NDK used to compile the binary.</param>
         /// <param name="device">Target device to connect to.</param>
         /// <param name="runtime">Path to the runtime with matching device libraries. Used to decipher OS callstacks.</param>
+        /// <param name="pidNumber">Numerical PID of the process the GDB attached to.</param>
         /// <returns>Returns 'true', when attaching succeeded, otherwise 'false'. It will automatically close GDB, if anything failed.</returns>
-        public static bool AttachToProcess(string pidOrBinaryName, string localBinaryPath, NdkDefinition ndk, DeviceDefinition device, RuntimeDefinition runtime)
+        public static bool AttachToProcess(string pidOrBinaryName, string localBinaryPath, NdkDefinition ndk, DeviceDefinition device, RuntimeDefinition runtime, out uint pidNumber)
         {
             if (ndk == null)
                 throw new ArgumentNullException("device");
             if (device == null)
                 throw new ArgumentNullException("device");
 
+            pidNumber = 0;
             Targets.Connect(device, ConfigDefaults.SshPublicKeyPath, null);
 
             // establish GDB connection:
@@ -49,9 +56,13 @@ namespace BlackBerry.NativeCore.Debugger
 
             // select device:
             // and select current target device:
-            _gdbRunner.Send(RequestsFactory.SetTargetDevice(_gdbRunner.Device));
-
-            uint pidNumber;
+            var setTarget = RequestsFactory.SetTargetDevice(_gdbRunner.Device);
+            _gdbRunner.Send(setTarget);
+            if (!setTarget.Wait())
+            {
+                _gdbRunner.Send(RequestsFactory.Exit());
+                return false;
+            }
 
             // load PID of the process to attach:
             if (!uint.TryParse(pidOrBinaryName, out pidNumber))
@@ -76,7 +87,7 @@ namespace BlackBerry.NativeCore.Debugger
 
             // and attach:
             var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(_gdbRunner);
-            var setExecutable = string.IsNullOrEmpty(localBinaryPath) ? null : RequestsFactory.SetExecutable(localBinaryPath, true);
+            var setExecutable = string.IsNullOrEmpty(localBinaryPath) || !File.Exists(localBinaryPath) ? null : RequestsFactory.SetExecutable(localBinaryPath, true);
             var attachProcess = RequestsFactory.AttachTargetProcess(pidNumber);
 
             var attachGroup = RequestsFactory.Group(setLibSearchPath, setExecutable, attachProcess);
@@ -129,6 +140,14 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         /// <summary>
+        /// Gets the parsing instruction at given index.
+        /// </summary>
+        public static Instruction GetInstruction(uint index)
+        {
+            return index < Instructions.Count ? Instructions[(int) index] : null;
+        }
+
+        /// <summary>
         /// Lists all running processes from specified target device.
         /// </summary>
         public static ProcessListRequest ListProcesses(NdkDefinition ndk, DeviceDefinition device)
@@ -175,10 +194,12 @@ namespace BlackBerry.NativeCore.Debugger
         {
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
+            if (instructionID >= LastSyncInstructionID)
+                throw new ArgumentOutOfRangeException("instructionID");
             if (_gdbRunner == null)
                 throw new InvalidOperationException("Unable to send the command");
 
-            var request = new Request(string.Concat(instructionID.ToString("D2"), command));
+            var request = new Request(instructionID, command);
 
             _gdbRunner.Send(request);
             var hasResponse = request.Wait();
@@ -189,8 +210,20 @@ namespace BlackBerry.NativeCore.Debugger
                 return "TIMEOUT!";
             }
 
-            // forward the data received from GDB:
-            return string.Join("\r\n", request.Response.RawData);
+            // get the raw response message received from GDB:
+            var response = string.Join("\r\n", request.Response.RawData);
+
+            // parse it:
+            var instruction = GetInstruction(instructionID);
+            Debug.Assert(instruction != null, "Invalid instruction requested");
+
+            var parsedResponse = instruction.Parse(response);
+
+            // This string means that both GDB and the parser worked well and returned an empty string.
+            if (string.Compare(parsedResponse, "$#@EMPTY@#$", StringComparison.Ordinal) == 0)
+                return string.Empty;
+
+            return parsedResponse;
         }
 
         /// <summary>

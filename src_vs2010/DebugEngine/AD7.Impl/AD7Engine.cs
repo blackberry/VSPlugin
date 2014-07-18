@@ -26,7 +26,6 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
-using VSNDK.Parser;
 using System.Windows.Forms;
 
 namespace BlackBerry.DebugEngine
@@ -290,7 +289,6 @@ namespace BlackBerry.DebugEngine
                     AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)_program;
                     _process = pnt.Process;
                     AD7Port port = pnt.Process.Port as AD7Port;
-                    string publicKeyPath = ConfigDefaults.SshPublicKeyPath;
                     string progName = _process.Details.Name;
 
                     string exePath;
@@ -323,7 +321,8 @@ namespace BlackBerry.DebugEngine
                         exePath = "CannotAttachToRunningProcess";
                     }
 
-                    if (GDBParser.LaunchProcess(pnt.Process.ID.ToString(), exePath.Replace("\\", "\\\\\\\\"), port.Device.IP, port.Device.Type == DeviceDefinitionType.Simulator, port.NDK.ToolsPath, publicKeyPath, port.Device.Password))
+                    uint aux;
+                    if (GdbWrapper.AttachToProcess(pnt.Process.ID.ToString(), exePath, port.NDK, port.Device, null, out aux))
                     {
                         if (exePath == "CannotAttachToRunningProcess")
                         {
@@ -336,7 +335,6 @@ namespace BlackBerry.DebugEngine
                     }
                     else
                     {
-                        GDBParser.exitGDB();
                         DebugEngineStatus.IsRunning = false;
                         return VSConstants.E_FAIL;
                     }
@@ -382,7 +380,7 @@ namespace BlackBerry.DebugEngine
 
                     // Sends the GDB command that interrupts the background execution of the target.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                    GDBParser.addGDBCommand(@"-exec-interrupt");
+                    GdbWrapper.PostCommand(@"-exec-interrupt");
 
                     // Ensure the process is interrupted before returning
                     HandleProcessExecution.m_mre.WaitOne(1000);
@@ -634,37 +632,8 @@ namespace BlackBerry.DebugEngine
                 }
 
 
-                // var result = GdbWrapper.AttachToProcess(pidOrName, exe, ndk, target);
-
-                Targets.Connect(target, publicKeyPath, null);
-                CreateGdb(null, target, null);
-                if (!uint.TryParse(pidOrName, out pidNumber))
-                {
-                    var listRequest = RequestsFactory.ListProcesses();
-                    _gdb.Send(listRequest);
-
-                    // wait for response:
-                    listRequest.Wait();
-                    var existingProcess = listRequest.Find(pidOrName);
-                    if (existingProcess != null)
-                    {
-                        // doesn't run
-                        pidNumber = existingProcess.ID;
-                    }
-                }
-
-                // attach to this process:
-                /*
-                var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(_gdb);
-                var setExecutable = RequestsFactory.SetExecutable(exePath, true);
-                var attachProcess = RequestsFactory.AttachTargetProcess(pidNumber);
-
-                var attachGroup = RequestsFactory.Group(setLibSearchPath, setExecutable, attachProcess);
-                _gdb.Send(attachGroup);
-                attachGroup.Wait();
-                */
-
-                if (GDBParser.LaunchProcess(pidNumber.ToString(), exe.Replace("\\", "\\\\"), target.IP, target.Type == DeviceDefinitionType.Simulator, ndk.ToolsPath, publicKeyPath, target.Password))
+                var result = GdbWrapper.AttachToProcess(pidOrName, exe, ndk, target, null, out pidNumber);
+                if (result)
                 {
                     process = _process = new AD7Process(port, new ProcessInfo(pidNumber, exe), target);
                     EventDispatcher = new EventDispatcher(this);
@@ -679,7 +648,6 @@ namespace BlackBerry.DebugEngine
                 }
                 else
                 {
-                    GDBParser.exitGDB();
                     DebugEngineStatus.IsRunning = false;
                     return VSConstants.E_FAIL;
                 }
@@ -1055,14 +1023,14 @@ namespace BlackBerry.DebugEngine
                 // Equivalent to F11 hotkey.
                 // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, diving 
                 // into function if it is a function call. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                GDBParser.addGDBCommand("-exec-step --thread " + Threads[_currentThreadIndex]._id);
+                GdbWrapper.PostCommand("-exec-step --thread " + Threads[_currentThreadIndex]._id);
             }
             else if (kind == enum_STEPKIND.STEP_OVER)
             { 
                 // Equivalent to F10 hotkey.
                 // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, but 
                 // without diving into functions. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                GDBParser.addGDBCommand("-exec-next --thread " + Threads[_currentThreadIndex]._id);
+                GdbWrapper.PostCommand("-exec-next --thread " + Threads[_currentThreadIndex]._id);
             }
             else if (kind == enum_STEPKIND.STEP_OUT)
             { 
@@ -1071,14 +1039,14 @@ namespace BlackBerry.DebugEngine
                 {
                     // Sends the GDB command that resumes the execution of the inferior program until the current function is exited.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                    GDBParser.addGDBCommand("-exec-finish --thread " + Threads[_currentThreadIndex]._id + " --frame 0");
+                    GdbWrapper.PostCommand("-exec-finish --thread " + Threads[_currentThreadIndex]._id + " --frame 0");
                 }
                 else
                 {
                     // If this the only frame left, do a step-over.
                     // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, but 
                     // without diving into functions. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                    GDBParser.addGDBCommand("-exec-next --thread " + Threads[_currentThreadIndex]._id);
+                    GdbWrapper.PostCommand("-exec-next --thread " + Threads[_currentThreadIndex]._id);
                 }
             }
             else if (kind == enum_STEPKIND.STEP_BACKWARDS)
@@ -1319,7 +1287,7 @@ namespace BlackBerry.DebugEngine
         {
             // Gets the parsed response for the GDB/MI command that ask for information about all threads.
             // (http://www.sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Thread-Commands.html)
-            string threadResponse = GDBParser.parseCommand(@"-thread-info", 22);
+            string threadResponse = GdbWrapper.SendCommand(@"-thread-info", 22);
             string[] threadStrings = threadResponse.Split('#');
             CleanEvaluatedThreads();
 
@@ -1356,11 +1324,6 @@ namespace BlackBerry.DebugEngine
                         threadObjects[i] = new AD7Thread(this, threadInfo[0], threadInfo[2], threadInfo[1], "Normal", threadInfo[4], "", "");
                 }
                 return currentThreadIndex;
-            }
-            catch (ComponentException)
-            {
-                threadObjects = null;
-                return -1;
             }
             catch (Exception)
             {

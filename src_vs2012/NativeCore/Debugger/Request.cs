@@ -37,6 +37,20 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public Request(uint id, string command)
+        {
+            if (string.IsNullOrEmpty(command))
+                throw new ArgumentNullException("command");
+
+            _command = string.Concat(id.ToString("D2"), command);
+            _event = new AutoResetEvent(false);
+
+            _id = id.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
         /// Dedicated constructor for a group of requests.
         /// </summary>
         protected Request()

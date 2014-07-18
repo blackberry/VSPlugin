@@ -14,9 +14,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
-using VSNDK.Parser;
 using System.Threading;
 
 namespace BlackBerry.DebugEngine
@@ -106,7 +107,7 @@ namespace BlackBerry.DebugEngine
             AD7ProgramDestroyEvent.Send(Engine, exitCode);
 
             // Exit GDB.
-            GDBParser.exitGDB();
+            GdbWrapper.Exit();
 
             // Notify the AddIn that this debug session has ended.
             DebugEngineStatus.IsRunning = false;
@@ -124,8 +125,6 @@ namespace BlackBerry.DebugEngine
             Engine = engine;
 
             _gdbOutput = new GDBOutput(this);
-            var processingThread = new Thread(_gdbOutput.ProcessingGDBOutput);
-            processingThread.Start();
         }
 
         /// <summary>
@@ -161,6 +160,13 @@ namespace BlackBerry.DebugEngine
             {
                 _eventDispatcher = ed;
                 IsRunning = true;
+                GdbWrapper.Received += GdbOnReceivedResponse;
+            }
+
+            private void GdbOnReceivedResponse(object sender, ResponseReceivedEventArgs e)
+            {
+                Debug.Assert(e != null && e.Response != null && e.Response.RawData != null, "Invalid response object received");
+                ProcessingGDBOutput(e.Response.RawData);
             }
 
             #region Properties
@@ -179,57 +185,46 @@ namespace BlackBerry.DebugEngine
             /// <summary>
             /// Thread responsible for handling asynchronous GDB output.
             /// </summary>
-            public void ProcessingGDBOutput()
+            private void ProcessingGDBOutput(string[] response)
             {
-                while (IsRunning)
+                string[] events = response; // PH: FIXME: .Split('@');
+                foreach (string ev in events)
                 {
-                    string response = "";
-                    while ((response = GDBParser.removeGDBResponse()) == ""  && IsRunning)
+                    if (ev.Length > 1) // only to avoid empty events, when there are two delimiters characters together.
                     {
-                    };
-
-                    // Creating a char delimiter that will be used to split the response in more than one event
-                    response = response.Replace("\r\n", "@"); 
-
-                    string[] events = response.Split('@');
-                    foreach (string ev in events)
-                    {
-                        if (ev.Length > 1)  // only to avoid empty events, when there are two delimiters characters together.
+                        if (_eventDispatcher.countSIGINT > 0)
+                            if ((ev.Substring(0, 2) != "50") && (ev.Substring(0, 2) != "80"))
+                                _eventDispatcher.countSIGINT = 0; // Reset the counter, if GDB has recovered from a GDB bug.
+                        switch (ev[0])
                         {
-                            if (_eventDispatcher.countSIGINT > 0)
-                                if ((ev.Substring(0, 2) != "50") && (ev.Substring(0, 2) != "80"))
-                                    _eventDispatcher.countSIGINT = 0; // Reset the counter, if GDB has recovered from a GDB bug.
-                            switch (ev[0])
-                            {
-                                case '0':  // Events related to starting GDB.
-                                    break;
-                                case '1':  // Not used.
-                                    break;
-                                case '2':  // Events related to breakpoints (including breakpoint hits).
-                                    _hBreakpoints = new HandleBreakpoints(_eventDispatcher);
-                                    _hBreakpoints.Handle(ev);
-                                    break;
-                                case '3':  // Not used.
-                                    break;
-                                case '4':  // Events related to execution control (processes, threads, programs) 1.
-                                    _hProcExe = new HandleProcessExecution(_eventDispatcher);
-                                    _hProcExe.Handle(ev);
-                                    break;
-                                case '5':  // Events related to execution control (processes, threads, programs and GDB Bugs) 2.
-                                    _hProcExe = new HandleProcessExecution(_eventDispatcher);
-                                    _hProcExe.Handle(ev);
-                                    break;
-                                case '6':  // Events related to evaluating expressions. Not used.
-                                    break;
-                                case '7':  // Events related to stack frames. Not used.
-                                    break;
-                                case '8':  // Events related to output.
-                                    _hOutputs = new HandleOutputs(_eventDispatcher);
-                                    _hOutputs.Handle(ev);
-                                    break;
-                                case '9':  // Not used.
-                                    break;
-                            }
+                            case '0': // Events related to starting GDB.
+                                break;
+                            case '1': // Not used.
+                                break;
+                            case '2': // Events related to breakpoints (including breakpoint hits).
+                                _hBreakpoints = new HandleBreakpoints(_eventDispatcher);
+                                _hBreakpoints.Handle(ev);
+                                break;
+                            case '3': // Not used.
+                                break;
+                            case '4': // Events related to execution control (processes, threads, programs) 1.
+                                _hProcExe = new HandleProcessExecution(_eventDispatcher);
+                                _hProcExe.Handle(ev);
+                                break;
+                            case '5': // Events related to execution control (processes, threads, programs and GDB Bugs) 2.
+                                _hProcExe = new HandleProcessExecution(_eventDispatcher);
+                                _hProcExe.Handle(ev);
+                                break;
+                            case '6': // Events related to evaluating expressions. Not used.
+                                break;
+                            case '7': // Events related to stack frames. Not used.
+                                break;
+                            case '8': // Events related to output.
+                                _hOutputs = new HandleOutputs(_eventDispatcher);
+                                _hOutputs.Handle(ev);
+                                break;
+                            case '9': // Not used.
+                                break;
                         }
                     }
                 }
@@ -285,11 +280,11 @@ namespace BlackBerry.DebugEngine
 
                 // Gets the parsed response for the GDB/MI command that inserts breakpoint in a given line or a given function.
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
-                response = GDBParser.parseCommand(command, 6);
+                response = GdbWrapper.SendCommand(command, 6);
 
                 if ((command2 != "") && ((response.Contains("<PENDING>"))))
                 {
-                    response = GDBParser.parseCommand(command2, 6);
+                    response = GdbWrapper.SendCommand(command2, 6);
                 }
 
                 if (((response.Length < 2) && (DebugEngineStatus.IsRunning == false)) || (response == "Function not found!"))
@@ -308,11 +303,11 @@ namespace BlackBerry.DebugEngine
 
                     // Gets the parsed response for the GDB command that print information about the specified breakpoint, in this 
                     // case, only its address. (http://sourceware.org/gdb/onlinedocs/gdb/Set-Breaks.html)
-                    bpointAddress = GDBParser.parseCommand("info b " + hBreakpoints.Number, 18);
+                    bpointAddress = GdbWrapper.SendCommand("info b " + hBreakpoints.Number, 18);
 
                     // Gets the parsed response for the GDB command that inquire what source line covers a particular address.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/Machine-Code.html)
-                    bpointStopPoint = GDBParser.parseCommand("info line *" + bpointAddress, 18);
+                    bpointStopPoint = GdbWrapper.SendCommand("info line *" + bpointAddress, 18);
 
                     var line = (uint)Convert.ToInt64(bpointStopPoint.Trim());
                     uint address = 0;
@@ -385,8 +380,7 @@ namespace BlackBerry.DebugEngine
 
             // Gets the parsed response for the GDB/MI command that makes the breakpoint "GDB_ID" ignore "ignore" hit counts.
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
-            string cmd = @"-break-after " + GDB_ID + " " + ignore;
-            string response = GDBParser.parseCommand(cmd, 18);
+            string response = GdbWrapper.SendCommand(@"-break-after " + GDB_ID + " " + ignore, 18);
 
             if (response == "")
                 return false;
@@ -445,16 +439,10 @@ namespace BlackBerry.DebugEngine
         /// <returns>  If successful, returns true; otherwise, returns false. </returns>
         public bool SetBreakpointCondition(uint GDB_ID, string condition)
         {
-            string cmd;
-
             // Gets the parsed response for the GDB/MI command that sets a condition to the breakpoint "GDB_ID". If there is no 
             // condition, any previous one associated to this breakpoint will be removed.
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
-            if (condition != "")
-                cmd = @"-break-condition " + GDB_ID + " " + condition;
-            else
-                cmd = @"-break-condition " + GDB_ID;
-            string response = GDBParser.parseCommand(cmd, 19);
+            string response = GdbWrapper.SendCommand(string.Concat(@"-break-condition ", GDB_ID, string.IsNullOrEmpty(condition) ? string.Empty : " ", condition ?? string.Empty), 19);
 
             if (response == "")
                 return false;
@@ -477,8 +465,8 @@ namespace BlackBerry.DebugEngine
 
                 // Gets the parsed response for the GDB/MI command that deletes the breakpoint "GDB_ID".
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
-                string response = GDBParser.parseCommand(@"-break-delete " + GDB_ID, 7);
-                if (response == null || response == "")
+                string response = GdbWrapper.SendCommand(@"-break-delete " + GDB_ID, 7);
+                if (string.IsNullOrEmpty(response))
                 {
                     ResumeFromInterrupt();
                     return false;
@@ -509,18 +497,9 @@ namespace BlackBerry.DebugEngine
         {
             PrepareToModifyBreakpoint();
 
-            string inputCommand;
-            string sEnable = "enable";
-
-            if (!enable)
-            {
-                sEnable = "disable";
-            }
-
             // Gets the parsed response for the GDB/MI command that enables or disables the breakpoint "GDB_ID".
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Breakpoint-Commands.html)
-            inputCommand = @"-break-" + sEnable + " " + GDB_ID;
-            string response = GDBParser.parseCommand(inputCommand, 8);
+            string response = GdbWrapper.SendCommand(@"-break-" + (enable ? "enable" : "disable") + " " + GDB_ID, 8);
  
             HandleBreakpoints hBreakpoints = new HandleBreakpoints(this);
             hBreakpoints.Handle(response);
@@ -723,7 +702,7 @@ namespace BlackBerry.DebugEngine
 
                             // Sends the GDB command that resumes the execution of the inferior program. 
                             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                            GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
+                            GdbWrapper.PostCommand(@"-exec-continue --thread-group i1");
                             _GDBRunMode = true;
                             Engine._running.Set();
                         }
@@ -767,7 +746,7 @@ namespace BlackBerry.DebugEngine
 
                         // Sends the GDB command that resumes the execution of the inferior program. 
                         // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                        GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
+                        GdbWrapper.PostCommand(@"-exec-continue --thread-group i1");
                         _GDBRunMode = true;
                         Engine._running.Set();
                     }
@@ -808,7 +787,7 @@ namespace BlackBerry.DebugEngine
         {
             // Returns the parsed response for the GDB/MI command that inquires about the depth of the stack. 
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
-            return Convert.ToInt32(GDBParser.parseCommand(@"-stack-info-depth --thread " + threadID + " --frame 0", 9));
+            return Convert.ToInt32(GdbWrapper.SendCommand(@"-stack-info-depth --thread " + threadID + " --frame 0", 9));
         }
 
         /// <summary>
@@ -819,7 +798,7 @@ namespace BlackBerry.DebugEngine
         {
             // Returns the parsed response for the GDB/MI command that list the frames currently on the stack. 
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
-            return GDBParser.parseCommand(@"-stack-list-frames", 10);
+            return GdbWrapper.SendCommand(@"-stack-list-frames", 10);
         }
 
         /// <summary>
@@ -832,7 +811,7 @@ namespace BlackBerry.DebugEngine
         {
             // Returns the parsed response for the GDB/MI command that list the names of local variables and function arguments for the 
             // selected frame. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
-            return GDBParser.parseCommand(@"-stack-list-variables --thread " + threadID + " --frame " + frameIndex + " --simple-values", 11);
+            return GdbWrapper.SendCommand(@"-stack-list-variables --thread " + threadID + " --frame " + frameIndex + " --simple-values", 11);
         }
 
         /// <summary>
@@ -843,7 +822,7 @@ namespace BlackBerry.DebugEngine
         {
             // Waits for the parsed response for the GDB/MI command that make "id" the current thread.
             // (http://www.sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Thread-Commands.html)
-            GDBParser.parseCommand(@"-thread-select " + id, 12);
+            GdbWrapper.SendCommand(@"-thread-select " + id, 12);
         }
 
         /// <summary>
@@ -858,12 +837,12 @@ namespace BlackBerry.DebugEngine
 
             // Gets the variable's number of children after sending the following GDB/MI command to create a variable object. 
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Variable-Objects.html)
-            string response = GDBParser.parseCommand("-var-create " + name + " \"*\" " + name, 13);
+            string response = GdbWrapper.SendCommand("-var-create " + name + " \"*\" " + name, 13);
             if (response == "ERROR")
             {
                 // The -var-create GDB/MI command can return an error when the variable name starts with some characters, like '_'.
                 // So, in case of an error, add the prefix VsNdK_ to the variable name and try to create it again. 
-                response = GDBParser.parseCommand("-var-create VsNdK_" + name + " \"*\" " + name, 13);
+                response = GdbWrapper.SendCommand("-var-create VsNdK_" + name + " \"*\" " + name, 13);
                 if (response != "ERROR")
                     hasVsNdK = true;
             }
@@ -880,9 +859,9 @@ namespace BlackBerry.DebugEngine
             // Waits for the parsed response for the GDB/MI command that deletes a previously created variable object and all of 
             // its children. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Variable-Objects.html)
             if (!hasVsNdK)
-                GDBParser.parseCommand("-var-delete " + name, 14);
+                GdbWrapper.SendCommand("-var-delete " + name, 14);
             else
-                GDBParser.parseCommand("-var-delete VsNdK_" + name, 14);
+                GdbWrapper.SendCommand("-var-delete VsNdK_" + name, 14);
         }
 
         /// <summary>
@@ -894,7 +873,7 @@ namespace BlackBerry.DebugEngine
         {
             // Returns the parsed response for the GDB/MI command that list the children of the specified variable object.
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Variable-Objects.html)
-            return GDBParser.parseCommand("-var-list-children --all-values " + name + " 0 50", 15); 
+            return GdbWrapper.SendCommand("-var-list-children --all-values " + name + " 0 50", 15); 
         }
 
         /// <summary>
@@ -904,7 +883,7 @@ namespace BlackBerry.DebugEngine
         {
             // Waits for the parsed response for the GDB command that kills the child process in which your program is running. 
             // (http://sourceware.org/gdb/onlinedocs/gdb/Kill-Process.html#Kill-Process)
-            GDBParser.parseCommand("kill", 16);
+            GdbWrapper.SendCommand("kill", 16);
         }
 
         /// <summary>
@@ -920,7 +899,7 @@ namespace BlackBerry.DebugEngine
 
                 // Sends the GDB command that resumes the execution of the inferior program. 
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                GDBParser.addGDBCommand(@"-exec-continue --thread-group i1");
+                GdbWrapper.PostCommand(@"-exec-continue --thread-group i1");
                 _GDBRunMode = true;
                 Engine._running.Set();
             }

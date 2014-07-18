@@ -14,8 +14,8 @@
 
 using System;
 using System.Collections;
+using BlackBerry.NativeCore.Debugger;
 using Microsoft.VisualStudio;
-using VSNDK.Parser;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace BlackBerry.DebugEngine
@@ -702,7 +702,7 @@ namespace BlackBerry.DebugEngine
 
                 // Waits for the parsed response for the GDB/MI command that changes the selected frame.
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Stack-Manipulation.html)
-                GDBParser.parseCommand("-stack-select-frame " + frame, 5);
+                GdbWrapper.SendCommand("-stack-select-frame " + frame, 5);
 
                 if (_thread._id != _engine.CurrentThread()._id)
                     _engine.EventDispatcher.SelectThread(_engine.CurrentThread()._id);
