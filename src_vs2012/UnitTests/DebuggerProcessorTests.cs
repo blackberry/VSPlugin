@@ -165,11 +165,27 @@ namespace UnitTests
             }
         }
 
+        sealed class UnitTestRequest : Request
+        {
+            /// <summary>
+            /// Init constructor.
+            /// </summary>
+            public UnitTestRequest(string command)
+                : base(command)
+            {
+            }
+
+            public override string ID
+            {
+                get { return null; }
+            }
+        }
+
         #endregion
 
         private static Request CreateRequest(string command)
         {
-            return new Request(command); // create request with disabled ID check, when receiving response
+            return new UnitTestRequest(command); // create request with disabled ID check, when receiving response
         }
 
         [Test]
@@ -202,7 +218,7 @@ namespace UnitTests
             sender.ExpectRequest("-sync", "^done");
 
             // execute actions:
-            processor.Send(CreateRequest("sync"));
+            processor.Send(CreateRequest("-sync"));
             bool result = processor.Wait(out response);
             
             // verify:
@@ -225,14 +241,14 @@ namespace UnitTests
             processor.Received += (s, e) => e.Handled = true; // since we setup the 
 
             // execute actions:
-            request = CreateRequest("sync");
+            request = CreateRequest("-sync");
             processor.Send(request);
-            bool result = processor.Wait(500, out response); // wait 500ms for the response, that should never arrive
+            bool result = processor.Wait(500, out response); // wait 500ms for the response, that should never arrive (as we setup a Received handler marking all all as processed)
 
             // verify:
             Assert.IsFalse(result, "Should never receive any response");
             Assert.IsNull(response);
-            Assert.IsNotNull(request.Response, "Response should be received by response");
+            Assert.IsNotNull(request.Response, "Response should be received by request");
             Assert.AreEqual("done", request.Response.Name, "Invalid response received");
             Assert.IsTrue(sender.CheckIfMetAllExpectations(), "Not all requests were processed");
         }

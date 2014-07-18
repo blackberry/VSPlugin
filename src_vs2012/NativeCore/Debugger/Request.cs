@@ -12,7 +12,7 @@ namespace BlackBerry.NativeCore.Debugger
         private static int _globalID = 1000;
 
 
-        private string _id;
+        private readonly string _id;
         private string _command;
         private AutoResetEvent _event;
 
@@ -54,7 +54,6 @@ namespace BlackBerry.NativeCore.Debugger
         public virtual string ID
         {
             get { return _id; }
-            private set { _id = value; }
         }
 
         public virtual string Command
