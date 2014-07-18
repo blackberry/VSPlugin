@@ -9,13 +9,16 @@ namespace BlackBerry.NativeCore.Debugger
     /// </summary>
     public class Request : IDisposable
     {
-        private static int _globalID;
+        private static int _globalID = 1000;
 
 
         private string _id;
         private string _command;
         private AutoResetEvent _event;
 
+        /// <summary>
+        /// Event fired each time a response is received.
+        /// </summary>
         public event EventHandler<ResponseReceivedEventArgs> Received;
 
         /// <summary>
@@ -70,6 +73,9 @@ namespace BlackBerry.NativeCore.Debugger
 
         #region IDisposable Implementation
 
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
         public void Dispose()
         {
             Dispose(true);
@@ -128,14 +134,13 @@ namespace BlackBerry.NativeCore.Debugger
             if (_event == null)
                 throw new ObjectDisposedException("Request");
 
-            var receivedHandler = Received;
-
             // reset the state:
             retry = false;
             Response = response;
             ProcessResponse(response);
 
             // notify all listeners synchronously:
+            var receivedHandler = Received;
             if (receivedHandler != null)
                 receivedHandler(this, new ResponseReceivedEventArgs(response, false));
 
