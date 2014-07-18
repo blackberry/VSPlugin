@@ -79,6 +79,8 @@ namespace BlackBerry.NativeCore.Debugger
 
             if (dispose)
             {
+                Received = null;
+
                 if (_eventMessageAvailable != null)
                 {
                     _eventMessageAvailable.Dispose();

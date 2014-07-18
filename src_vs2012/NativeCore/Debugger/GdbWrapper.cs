@@ -14,6 +14,11 @@ namespace BlackBerry.NativeCore.Debugger
         private static GdbRunner _gdbRunner;
 
         /// <summary>
+        /// Event send each time a response is received by GDB processor created during attaching to process.
+        /// </summary>
+        public static event EventHandler<ResponseReceivedEventArgs> Received;
+
+        /// <summary>
         /// Attaches to the process with given PID or binary name on a target device.
         /// </summary>
         /// <param name="pidOrBinaryName">PID of the process or name of the binary.</param>
@@ -39,6 +44,7 @@ namespace BlackBerry.NativeCore.Debugger
             }
             _gdbRunner = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
             _gdbRunner.Finished += GdbRunnerFinished;
+            _gdbRunner.Processor.Received += GdbRunnerResponseReceived;
             _gdbRunner.ExecuteAsync();
 
             // select device:
@@ -84,6 +90,18 @@ namespace BlackBerry.NativeCore.Debugger
             }
 
             return true;
+        }
+
+        private static void GdbRunnerResponseReceived(object sender, ResponseReceivedEventArgs e)
+        {
+            var handler = Received;
+            if (handler != null)
+            {
+                handler(null, e);
+            }
+
+            // schedule all responses to be removed from the source queue:
+            e.Handled = true;
         }
 
         private static void GdbRunnerFinished(object sender, ToolRunnerEventArgs e)
