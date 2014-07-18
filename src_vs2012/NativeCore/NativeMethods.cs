@@ -10,7 +10,7 @@ namespace BlackBerry.NativeCore
     static class NativeMethods
     {
         /// <summary>
-        /// Indicates whether the file type is binary or not.
+        /// Indicates type of the Windows Exe binary (x86 or x64) or not executable at all.
         /// </summary>
         /// <param name="applicationName">Full path to the file to check</param>
         /// <param name="binaryType">If file is binary the bitness of the app is indicated by lpBinaryType value.</param>
