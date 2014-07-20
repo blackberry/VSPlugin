@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger.Requests;
@@ -112,13 +111,14 @@ namespace BlackBerry.NativeCore.Debugger
                 if (instruction != null)
                 {
                     var parsedResponse = instruction.Parse(e.Response);
-                }
-            }
 
-            var handler = Received;
-            if (handler != null)
-            {
-                handler(null, e);
+                    // notify about the response:
+                    var handler = Received;
+                    if (handler != null)
+                    {
+                        handler(null, e);
+                    }
+                }
             }
 
             // schedule all responses to be removed from the source queue:
@@ -198,8 +198,7 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         /// <summary>
-        /// Sends a synchronous GDB command and waiting for the respective GDB response. This 
-        /// method is called by the Debug Engine whenever it needs a GDB response for a given GDB command. 
+        /// Sends a synchronous GDB command and waiting for the respective GDB response. This method is called by the Debug Engine whenever it needs a GDB response for a given GDB command.
         /// </summary>
         /// <param name="command">Command to be sent to GDB.</param>
         /// <param name="instructionID">Instruction ID.</param>
@@ -234,8 +233,7 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         /// <summary>
-        /// Sends an asynchronous GDB command. This method is called by the Debug Engine whenever 
-        /// it needs to send a GDB command without having to wait for the respective GDB response. 
+        /// Sends an asynchronous GDB command. This method is called by the Debug Engine whenever it needs to send a GDB command without having to wait for the respective GDB response.
         /// </summary>
         /// <param name="command">Command to be sent to GDB.</param>
         public static void PostCommand(string command)
@@ -245,7 +243,17 @@ namespace BlackBerry.NativeCore.Debugger
             if (_gdbRunner == null)
                 throw new InvalidOperationException("Unable to send the command");
 
-            var request = new Request(command);
+            Request request;
+
+            // schedule execution of a request, but don't wait for a response:
+            if (string.Compare("-exec-interrupt", command, StringComparison.Ordinal) == 0)
+            {
+                request = RequestsFactory.Break();
+            }
+            else
+            {
+                request = new Request(command);
+            }
             _gdbRunner.Send(request);
         }
     }
