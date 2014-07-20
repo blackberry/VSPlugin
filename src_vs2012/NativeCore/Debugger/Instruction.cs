@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace BlackBerry.NativeCore.Debugger
 {
     /// <summary>
-    /// Class representing single GDB instruction.
+    /// Class representing single GDB-response parsing instruction.
     /// </summary>
     [DebuggerDisplay("{ID}: {Command}")]
     public sealed class Instruction
@@ -54,6 +54,21 @@ namespace BlackBerry.NativeCore.Debugger
 
         #endregion
 
+        /// <summary>
+        /// Checks if given parsing instruction is about the same GDB command.
+        /// </summary>
+        /// <param name="command">Command to check</param>
+        /// <returns>Returns 'true', when given instruction is about the same GDB command.</returns>
+        public bool HasCommand(string command)
+        {
+            if (string.IsNullOrEmpty(Command) && string.IsNullOrEmpty(command))
+                return true;
+            if (string.IsNullOrEmpty(Command) != string.IsNullOrEmpty(command))
+                return false;
+
+            return string.CompareOrdinal(Command, command) == 0;
+        }
+
         #region Instantiation
 
         /// <summary>
@@ -81,6 +96,26 @@ namespace BlackBerry.NativeCore.Debugger
         #endregion
 
         #region Parsing - PH: just copied from GDBParserAPI.cpp, gdb-connect.cpp and converted to C# - it's not MY CODE!
+
+        /// <summary>
+        /// Function used to call the parser that will process a GDB response according to the stored parsing instruction, returning this parsed response.
+        /// </summary>
+        /// <param name="response">Received GDB response (must have raw response from GDB set)</param>
+        public string Parse(Response response)
+        {
+            if (response == null)
+                throw new ArgumentNullException("response");
+            if (response.RawData == null || response.RawData.Length == 0)
+                throw new ArgumentOutOfRangeException("response");
+
+            var parsedResponse = Parse(string.Join("\r\n", response.RawData));
+
+            // This string means that both GDB and the parser worked well and returned an empty string.
+            if (string.Compare(parsedResponse, "$#@EMPTY@#$", StringComparison.Ordinal) == 0)
+                return string.Empty;
+
+            return parsedResponse;
+        }
 
         /// <summary>
         /// Function used to call the parser that will process a GDB response according to the stored parsing instruction, returning this parsed response.

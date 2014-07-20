@@ -166,7 +166,10 @@ namespace BlackBerry.DebugEngine
             private void GdbOnReceivedResponse(object sender, ResponseReceivedEventArgs e)
             {
                 Debug.Assert(e != null && e.Response != null && e.Response.RawData != null, "Invalid response object received");
-                ProcessingGDBOutput(e.Response.RawData);
+                if (GdbWrapper.IsAsync(e.Response))
+                {
+                    ProcessingGDBOutput(e.Response.RawData);
+                }
             }
 
             #region Properties

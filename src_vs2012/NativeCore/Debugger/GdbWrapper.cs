@@ -105,6 +105,16 @@ namespace BlackBerry.NativeCore.Debugger
 
         private static void GdbRunnerResponseReceived(object sender, ResponseReceivedEventArgs e)
         {
+            if (IsAsync(e.Response))
+            {
+                string param;
+                var instruction = Instructions.Find(e.Response.Name, out param);
+                if (instruction != null)
+                {
+                    var parsedResponse = instruction.Parse(e.Response);
+                }
+            }
+
             var handler = Received;
             if (handler != null)
             {
@@ -140,11 +150,14 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         /// <summary>
-        /// Gets the parsing instruction at given index.
+        /// Gets an indication, if specified response is asynchronous.
         /// </summary>
-        public static Instruction GetInstruction(uint index)
+        public static bool IsAsync(Response response)
         {
-            return index < Instructions.Count ? Instructions[(int) index] : null;
+            if (response == null)
+                return false;
+
+            return response.ID == 0 || response.ID >= LastSyncInstructionID;
         }
 
         /// <summary>
@@ -199,6 +212,11 @@ namespace BlackBerry.NativeCore.Debugger
             if (_gdbRunner == null)
                 throw new InvalidOperationException("Unable to send the command");
 
+            string parsingParam;
+            var instruction = Instructions.Find(command, out parsingParam);
+            if (instruction == null)
+                throw new ArgumentOutOfRangeException("command", "Specified command has no matching parsing instruction");
+
             var request = new Request(instructionID, command);
 
             _gdbRunner.Send(request);
@@ -210,19 +228,8 @@ namespace BlackBerry.NativeCore.Debugger
                 return "TIMEOUT!";
             }
 
-            // get the raw response message received from GDB:
-            var response = string.Join("\r\n", request.Response.RawData);
-
-            // parse it:
-            var instruction = GetInstruction(instructionID);
-            Debug.Assert(instruction != null, "Invalid instruction requested");
-
-            var parsedResponse = instruction.Parse(response);
-
-            // This string means that both GDB and the parser worked well and returned an empty string.
-            if (string.Compare(parsedResponse, "$#@EMPTY@#$", StringComparison.Ordinal) == 0)
-                return string.Empty;
-
+            // parse response:
+            var parsedResponse = instruction.Parse(request.Response);
             return parsedResponse;
         }
 

@@ -93,5 +93,44 @@ namespace BlackBerry.NativeCore.Debugger
                 }
             }
         }
+
+        /// <summary> 
+        /// Get the associated instruction ID from the command to be sent to GDB.
+        /// </summary>
+        /// <param name="command"> Command to be sent to GDB. </param>
+        /// <param name="param"> When the instruction code stored in "map" is negative, it means that the commands parameters must be saved to 
+        /// be used by the listeningGDB thread. When that happens, update and return variable "param". </param>
+        /// <returns> Returns the instruction code for the command to be sent to GDB or -1 in case of an error. It can also return the command 
+        /// parameters, as it was described above. </returns>
+        public Instruction Find(string command, out string param)
+        {
+            param = string.Empty;
+
+            if (string.IsNullOrEmpty(command))
+                return null;
+
+            // everything separated by space are treated as params:
+            int pos = command.IndexOf(' ');
+            if (pos != -1)
+            {
+                param = command.Substring(pos, (command.Length - pos)).Replace(' ', ';');
+                command = command.Substring(0, pos);
+            }
+
+            foreach (var instruction in _items)
+            {
+                if (instruction.HasCommand(command))
+                {
+                    if (!instruction.ExpectsParameter)
+                    {
+                        param = string.Empty;
+                    }
+
+                    return instruction;
+                }
+            }
+
+            return null;
+        }
     }
 }

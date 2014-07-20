@@ -118,6 +118,32 @@ namespace UnitTests
             StringAssert.AreEqualIgnoringCase("The number of the words in the following text is smaller than the number of the letters in the same text\r\n", Instruction.SubstituteVariables("$0$ $9$ of $5$ words in $5$ following $1$ is smaller $3$than $5$ $9$ of $5$ letters in $5$ same $1$$EOL$", v), "Error: string '', Variables array not printed.");
         }
 
+        [Test]
+        public void GetInstructionCode()
+        {
+            var instructions = InstructionCollection.Load();
+
+            // The instruction code returned from get_Instruction_Code() function depends on the position the associated parsing instruction
+            // was stored in the respective data structure. That's why the following unit tests just compares the instruction code with -1
+            // (-1 means that the instruction was not found).
+            string param = "";
+            // Add the values you want to test.
+            Assert.AreEqual(null, instructions.Find("", out param), "Error: string '', string ''");
+            StringAssert.AreEqualIgnoringCase("", param, "Param should be empty.");
+
+            param = "";
+            Assert.AreNotEqual(null, instructions.Find("-exec-continue --thread-group i1", out param), "Error: string '-exec-continue --thread-group i1', string ''");
+            StringAssert.AreEqualIgnoringCase("", param, "Param should be empty for command '-exec-continue --thread-group i1'.");
+
+            param = "";
+            Assert.AreNotEqual(null, instructions.Find("-break-delete 3", out param), "Error: string '-break-delete 3', string ''");
+            StringAssert.AreEqualIgnoringCase(";3", param, "Param should not be empty for command '-break-delete 3'.");
+
+            param = "";
+            Assert.AreNotEqual(null, instructions.Find("-break-after 4 10", out param), "Error: string '-break-after 4 10', string ''");
+            StringAssert.AreEqualIgnoringCase(";4;10", param, "Param should not be empty for command '-break-after 4 10'.");
+        }
+
         public static string ParseGDB(string response, string parsingInstruction)
         {
             if (string.IsNullOrEmpty(parsingInstruction))
