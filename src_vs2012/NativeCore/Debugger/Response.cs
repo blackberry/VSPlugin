@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace BlackBerry.NativeCore.Debugger
 {
+    /// <summary>
+    /// Class representing any response received from GDB.
+    /// </summary>
     public class Response
     {
         /// <summary>
@@ -16,13 +19,13 @@ namespace BlackBerry.NativeCore.Debugger
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="rawData">Optional original response received from GDB, before parsing.</param>
+        /// <param name="rawData">Optional original response received from GDB, before parsing</param>
         /// <param name="id">Identifier of the response (it should match the ID of the request)</param>
         /// <param name="type">Type of the response</param>
-        /// <param name="content">Name and content of the response. This value can not be empty.</param>
+        /// <param name="content">Name and content of the response (this value can not be empty)</param>
         /// <param name="notifications">Additional asynchronous notifications received along with the content</param>
         /// <param name="comments">Additional comments received along with the content</param>
-        public Response(string[] rawData, string id, ResponseType type, string content, string[] notifications, string[] comments)
+        public Response(string[] rawData, uint id, ResponseType type, string content, string[] notifications, string[] comments)
         {
             if (rawData == null || rawData.Length == 0)
                 throw new ArgumentOutOfRangeException("rawData");
@@ -60,7 +63,7 @@ namespace BlackBerry.NativeCore.Debugger
                 throw new ArgumentOutOfRangeException("comments");
 
             RawData = rawData;
-            ID = null;
+            ID = 0;
             Type = ResponseType.StreamRecord;
             Name = null;
             Content = null;
@@ -79,7 +82,7 @@ namespace BlackBerry.NativeCore.Debugger
             private set;
         }
 
-        public string ID
+        public uint ID
         {
             get;
             private set;
@@ -182,7 +185,15 @@ namespace BlackBerry.NativeCore.Debugger
                 return streamRecords == null ? null : new Response(message, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords.ToArray());
             }
 
-            return new Response(message, resultID, resultType, resultRecord, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords != null ? streamRecords.ToArray() : null);
+            // get the response identifier
+            uint id = 0;
+            if (!string.IsNullOrEmpty(resultID))
+            {
+                // this should be a valid number, otherwise check, why it failed:
+                id = uint.Parse(resultID);
+            }
+
+            return new Response(message, id, resultType, resultRecord, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords != null ? streamRecords.ToArray() : null);
         }
 
         private static ResponseType GetResponseType(char typeChar)

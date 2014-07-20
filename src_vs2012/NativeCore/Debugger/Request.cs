@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Globalization;
 using System.Threading;
 
 namespace BlackBerry.NativeCore.Debugger
@@ -12,7 +11,7 @@ namespace BlackBerry.NativeCore.Debugger
         private static int _globalID = 1000;
 
 
-        private readonly string _id;
+        private readonly uint _id;
         private string _command;
         private AutoResetEvent _event;
 
@@ -33,7 +32,7 @@ namespace BlackBerry.NativeCore.Debugger
             _event = new AutoResetEvent(false);
 
             // make sure IDs never repeats, even if request created from different threads:
-            _id = Interlocked.Add(ref _globalID, 1).ToString(CultureInfo.InvariantCulture);
+            _id = (uint)Interlocked.Add(ref _globalID, 1);
         }
 
         /// <summary>
@@ -47,7 +46,7 @@ namespace BlackBerry.NativeCore.Debugger
             _command = string.Concat(id.ToString("D2"), command);
             _event = new AutoResetEvent(false);
 
-            _id = id.ToString(CultureInfo.InvariantCulture);
+            _id = id;
         }
 
         /// <summary>
@@ -65,7 +64,7 @@ namespace BlackBerry.NativeCore.Debugger
 
         #region Properties
 
-        public virtual string ID
+        public virtual uint ID
         {
             get { return _id; }
         }
@@ -118,11 +117,9 @@ namespace BlackBerry.NativeCore.Debugger
         /// <summary>
         /// Checks if the request has identical ID as specified one.
         /// </summary>
-        public bool HasIdenticalID(string id)
+        public bool HasIdenticalID(uint id)
         {
-            if (ID == null && id == null)
-                return true;
-            return string.Compare(id, ID, StringComparison.Ordinal) == 0;
+            return ID == id;
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Threading;
 using BlackBerry.NativeCore.Tools;
 
@@ -110,7 +111,7 @@ namespace BlackBerry.NativeCore.Debugger
             lock (_sync)
             {
                 currentRequest = _currentRequest;
-                var currentID = currentRequest != null ? currentRequest.ID : null;
+                var currentID = currentRequest != null ? currentRequest.ID.ToString(CultureInfo.InvariantCulture) : null;
                 var currentIDLength = string.IsNullOrEmpty(currentID) ? 0 : currentID.Length;
 
                 // is it an end of the message?

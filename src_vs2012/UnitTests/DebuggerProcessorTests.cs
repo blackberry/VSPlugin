@@ -175,9 +175,9 @@ namespace UnitTests
             {
             }
 
-            public override string ID
+            public override uint ID
             {
-                get { return null; }
+                get { return 0; }
             }
         }
 

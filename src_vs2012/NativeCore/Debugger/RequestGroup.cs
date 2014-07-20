@@ -24,7 +24,7 @@ namespace BlackBerry.NativeCore.Debugger
             get { return _activeIndex >= 0 && _activeIndex < _requests.Count ? _requests[_activeIndex] : null; }
         }
 
-        public override string ID
+        public override uint ID
         {
             get
             {
