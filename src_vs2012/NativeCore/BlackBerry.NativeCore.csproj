@@ -61,6 +61,7 @@
     <Compile Include="Debugger\Model\ProcessInfo.cs" />
     <Compile Include="Debugger\Request.cs" />
     <Compile Include="Debugger\RequestGroup.cs" />
+    <Compile Include="Debugger\Requests\BreakRequest.cs" />
     <Compile Include="Debugger\Requests\CliRequest.cs" />
     <Compile Include="Debugger\Requests\MiRequest.cs" />
     <Compile Include="Debugger\Requests\ProcessListRequest.cs" />

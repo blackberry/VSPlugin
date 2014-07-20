@@ -168,14 +168,16 @@ namespace BlackBerry.NativeCore.Debugger
             // or the next stored one:
             if (retryRequest)
             {
-                Send(currentRequest);
+                if (!Send(currentRequest))
+                    return false;
             }
             else
             {
                 if (clearCurrentRequest)
                 {
                     _currentRequest = null;
-                    SendNextRequest();
+                    if (!SendNextRequest())
+                        return false;
                 }
             }
 
@@ -295,7 +297,7 @@ namespace BlackBerry.NativeCore.Debugger
             if (canSend)
             {
                 // serialize the request into string and send it to GDB:
-                return _sender.Send(request.ToString());
+                return request.Execute(_sender);
             }
 
             return true;
@@ -304,7 +306,7 @@ namespace BlackBerry.NativeCore.Debugger
         /// <summary>
         /// Gets next request from the queue and sends it to the GDB.
         /// </summary>
-        private void SendNextRequest()
+        private bool SendNextRequest()
         {
             Request next = null;
 
@@ -319,8 +321,10 @@ namespace BlackBerry.NativeCore.Debugger
             if (next != null)
             {
                 // serialize the request into string and send it to GDB:
-                _sender.Send(next.ToString()); // PH: FIXME: this might swallow the transmission error to GDB...
+                return next.Execute(_sender);
             }
+
+            return true;
         }
     }
 }

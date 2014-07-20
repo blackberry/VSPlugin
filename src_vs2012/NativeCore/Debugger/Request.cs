@@ -123,6 +123,17 @@ namespace BlackBerry.NativeCore.Debugger
         }
 
         /// <summary>
+        /// Method executed to perform request's action. It should return 'true', when all succeeded.
+        /// </summary>
+        public virtual bool Execute(IGdbSender sender)
+        {
+            if (sender == null)
+                throw new ArgumentNullException("sender");
+
+            return sender.Send(ToString());
+        }
+
+        /// <summary>
         /// Mostly for parser testing.
         /// </summary>
         public bool Complete(Response response)

@@ -98,6 +98,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\RequestsFactory.cs">
       <Link>Debugger\RequestsFactory.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Requests\BreakRequest.cs">
+      <Link>Debugger\Requests\BreakRequest.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Requests\CliRequest.cs">
       <Link>Debugger\Requests\CliRequest.cs</Link>
     </Compile>

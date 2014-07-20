@@ -17,6 +17,11 @@ namespace BlackBerry.NativeCore.Debugger
             return new MiRequest("gdb-exit");
         }
 
+        public static Request Break()
+        {
+            return new BreakRequest();
+        }
+
         public static Request ListFeatures()
         {
             return new MiRequest("list-features");
