@@ -81,6 +81,10 @@ namespace BlackBerry.Package
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
+#if !PLATFORM_VS2010
+    // PH: HINT: somehow, when in VS2010, the plugin might be loaded too early and it fails on access to some UI services (like OutputWindow).
+    [ProvideAutoLoad(UIContextGuids80.NoSolution)]
+#endif
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackageString)]
 
@@ -159,7 +163,7 @@ namespace BlackBerry.Package
                     }
                 };
 
-            //Create Editor Factory. Note that the base Package class will call Dispose on it.
+            // Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new BarDescriptorEditorFactory());
             TraceLog.WriteLine(" * registered editors");
 
@@ -398,7 +402,6 @@ namespace BlackBerry.Package
             }
 
             MessageBoxHelper.Show("You might now:\r\n * restart Visual Studio, as it has the 'deploy' option disabled\r\n * update the Author Information within the bar-descriptor.xml", "BlackBerry and BlackBerrySimulator targets have been added to solution configurations.", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
         }
 
         private void ImportBlackBerryProject(object sender, EventArgs e)
