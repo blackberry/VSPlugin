@@ -57,25 +57,28 @@ namespace BlackBerry.DebugEngine
             // Waits for the parsed response for the GDB/MI command that evaluates "name" as an expression.
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Data-Manipulation.html)
             result = GdbWrapper.SendCommand("-data-evaluate-expression \"" + name + "\"", 2);
-            if (result.Substring(0, 2) == "61") // If result starts with 61, it means that there is an error.
+            if (string.IsNullOrEmpty(result) || result.Length < 2)
+            {
+                result = string.Empty;
+                return false;
+            }
+
+            if (result.StartsWith("61")) // If result starts with 61, it means that there is an error.
             {
                 if (gdbName != null) // Maybe that error was caused because GDB didn't accept the VS name. Use the GDBName if there is one.
                 {
                     // Gets the parsed response for the GDB/MI command that evaluates "GDBName" as an expression.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Data-Manipulation.html)
                     string result2 = GdbWrapper.SendCommand("-data-evaluate-expression \"" + gdbName + "\"", 2);
-                    if (result2.Substring(0, 2) == "60")
+                    if (result2.StartsWith("60"))
                         result = result2;
                 }
             }
 
-            bool valid = true;
-
-            if (result.Substring(0, 2) == "61") // If result starts with 61, it means that there is an error. So, expression is not valid.
-                valid = false;
+            // If result starts with 61, it means that there is an error. So, expression is not valid.
+            bool valid = !result.StartsWith("61");
 
             result = result.Substring(3);
-            result = result.Substring(1, result.Length - 2); // remove the quotes located in the beginning and at the end
             result = result.Replace("\\\"", "\"");
 
             if (valid)
