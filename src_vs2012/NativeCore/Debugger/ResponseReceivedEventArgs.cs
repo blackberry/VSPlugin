@@ -5,7 +5,7 @@ namespace BlackBerry.NativeCore.Debugger
     /// <summary>
     /// Arguments broadcased along with response received by given components.
     /// </summary>
-    public sealed class ResponseReceivedEventArgs : EventArgs
+    public class ResponseReceivedEventArgs : EventArgs
     {
         private bool _handled;
 
@@ -18,6 +18,7 @@ namespace BlackBerry.NativeCore.Debugger
                 throw new ArgumentNullException("response");
 
             Response = response;
+            _handled = handled;
         }
 
         #region Properties

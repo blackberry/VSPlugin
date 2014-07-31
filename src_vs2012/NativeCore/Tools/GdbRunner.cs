@@ -166,6 +166,29 @@ namespace BlackBerry.NativeCore.Tools
         }
 
         /// <summary>
+        /// This method sends a request to the GDB, waits for a response and parses it following specified parsing instruction.
+        /// Returns parsed response or empty string in case of error.
+        /// </summary>
+        public string Send(Request request, Instruction instruction)
+        {
+            if (request == null)
+                throw new ArgumentNullException("request");
+            if (instruction == null)
+                throw new ArgumentNullException("instruction");
+            if (_processor == null)
+                throw new ObjectDisposedException("GdbRunner");
+
+
+            _processor.Send(request);
+            if (!request.Wait())
+            {
+                return string.Empty;
+            }
+
+            return instruction.Parse(request.Response);
+        }
+
+        /// <summary>
         /// Waits until a valid message was not received.
         /// </summary>
         /// <returns>Returns 'true', if the signal was received and data is valid, 'false' in case of timeout.</returns>

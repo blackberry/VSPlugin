@@ -43,7 +43,7 @@ namespace BlackBerry.NativeCore.Debugger
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
 
-            _command = string.Concat(id.ToString("D2"), command);
+            _command = command;
             _event = new AutoResetEvent(false);
 
             _id = id;
@@ -110,7 +110,9 @@ namespace BlackBerry.NativeCore.Debugger
 
         public override string ToString()
         {
-            // just send the RAW command
+            // just serialize as the RAW command (with optional ID)
+            if (_id != 0)
+                return string.Concat(_id.ToString("D2"), _command);
             return _command;
         }
 

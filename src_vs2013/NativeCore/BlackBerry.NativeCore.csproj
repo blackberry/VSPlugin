@@ -108,6 +108,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Response.cs">
       <Link>Debugger\Response.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\ResponseParsedEventArgs.cs">
+      <Link>Debugger\ResponseParsedEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Debugger\ResponseReceivedEventArgs.cs">
       <Link>Debugger\ResponseReceivedEventArgs.cs</Link>
     </Compile>

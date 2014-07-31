@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger.Requests;
@@ -12,15 +13,58 @@ namespace BlackBerry.NativeCore.Debugger
     /// </summary>
     public static class GdbWrapper
     {
+        #region Internal Classes
+
+        /// <summary>
+        /// Class to store context for specified requests, that expect async responses.
+        /// </summary>
+        sealed class AsyncContext
+        {
+            public AsyncContext(Request request, Instruction instruction)
+            {
+                if (request == null)
+                    throw new ArgumentNullException("request");
+                if (instruction == null)
+                    throw new ArgumentNullException("instruction");
+
+                Request = request;
+                Instruction = instruction;
+            }
+
+            #region Properties
+
+            public Request Request
+            {
+                get;
+                private set;
+            }
+
+            public Instruction Instruction
+            {
+                get;
+                private set;
+            }
+
+            #endregion
+
+            public override string ToString()
+            {
+                return Request.ToString();
+            }
+        }
+
+        #endregion
+
         private static GdbRunner _gdbRunner;
         private static readonly InstructionCollection Instructions = InstructionCollection.Load();
+        private static readonly Dictionary<uint, AsyncContext> Context = new Dictionary<uint, AsyncContext>(); 
 
         private const uint LastSyncInstructionID = 50;
 
         /// <summary>
         /// Event send each time a response is received by GDB processor created during attaching to process.
         /// </summary>
-        public static event EventHandler<ResponseReceivedEventArgs> Received;
+        public static event EventHandler<ResponseParsedEventArgs> Received;
 
         /// <summary>
         /// Attaches to the process with given PID or binary name on a target device.
@@ -53,11 +97,17 @@ namespace BlackBerry.NativeCore.Debugger
             _gdbRunner.Processor.Received += GdbRunnerResponseReceived;
             _gdbRunner.ExecuteAsync();
 
+            var parsed = _gdbRunner.Send(RequestsFactory.SetPendingBreakpoints(true), Instructions[8]);
+            if (parsed == string.Empty || parsed[0] == '!')
+            {
+                _gdbRunner.Send(RequestsFactory.Exit());
+                return false;
+            }
+
             // select device:
             // and select current target device:
-            var setTarget = RequestsFactory.SetTargetDevice(_gdbRunner.Device);
-            _gdbRunner.Send(setTarget);
-            if (!setTarget.Wait())
+            parsed = _gdbRunner.Send(RequestsFactory.SetTargetDevice(_gdbRunner.Device), Instructions[3]);
+            if (parsed == string.Empty || parsed[0] == '!')
             {
                 _gdbRunner.Send(RequestsFactory.Exit());
                 return false;
@@ -84,16 +134,27 @@ namespace BlackBerry.NativeCore.Debugger
                 }
             }
 
+            // symbols paths:
+            parsed = _gdbRunner.Send(RequestsFactory.SetLibrarySearchPath(_gdbRunner), Instructions[7]);
+            if (parsed == string.Empty || parsed[0] == '!')
+            {
+                _gdbRunner.Send(RequestsFactory.Exit());
+                return false;
+            }
+
+            if (!string.IsNullOrEmpty(localBinaryPath) && File.Exists(localBinaryPath))
+            {
+                parsed = _gdbRunner.Send(RequestsFactory.SetExecutable(localBinaryPath, true), Instructions[8]);
+                if (parsed == string.Empty || parsed[0] == '!')
+                {
+                    _gdbRunner.Send(RequestsFactory.Exit());
+                    return false;
+                }
+            }
+
             // and attach:
-            var setLibSearchPath = RequestsFactory.SetLibrarySearchPath(_gdbRunner);
-            var setExecutable = string.IsNullOrEmpty(localBinaryPath) || !File.Exists(localBinaryPath) ? null : RequestsFactory.SetExecutable(localBinaryPath, true);
-            var attachProcess = RequestsFactory.AttachTargetProcess(pidNumber);
-
-            var attachGroup = RequestsFactory.Group(setLibSearchPath, setExecutable, attachProcess);
-            _gdbRunner.Send(attachGroup);
-
-            // wait till attached:
-            if (!attachGroup.Wait())
+            parsed = _gdbRunner.Send(RequestsFactory.AttachTargetProcess(pidNumber), Instructions[6]);
+            if (parsed == string.Empty || parsed[0] == '!')
             {
                 _gdbRunner.Send(RequestsFactory.Exit());
                 return false;
@@ -106,17 +167,19 @@ namespace BlackBerry.NativeCore.Debugger
         {
             if (IsAsync(e.Response))
             {
-                string param;
-                var instruction = Instructions.Find(e.Response.Name, out param);
-                if (instruction != null)
-                {
-                    var parsedResponse = instruction.Parse(e.Response);
+                var context = GetContext(e.Response);
+                Instruction instruction = context != null ? context.Instruction : Instructions[0];
 
+                // parse async data:
+                var parsedResponse = instruction.Parse(e.Response);
+
+                if (!string.IsNullOrEmpty(parsedResponse) && parsedResponse != ";")
+                {
                     // notify about the response:
                     var handler = Received;
                     if (handler != null)
                     {
-                        handler(null, e);
+                        handler(null, new ResponseParsedEventArgs(e, parsedResponse));
                     }
                 }
             }
@@ -243,6 +306,11 @@ namespace BlackBerry.NativeCore.Debugger
             if (_gdbRunner == null)
                 throw new InvalidOperationException("Unable to send the command");
 
+            string parsingParam;
+            var instruction = Instructions.Find(command, out parsingParam);
+            if (instruction == null)
+                throw new ArgumentOutOfRangeException("command", "Specified command has no matching parsing instruction");
+
             Request request;
 
             // schedule execution of a request, but don't wait for a response:
@@ -254,7 +322,39 @@ namespace BlackBerry.NativeCore.Debugger
             {
                 request = new Request(command);
             }
+
+            SetContext(request, instruction);
             _gdbRunner.Send(request);
+        }
+
+        private static void SetContext(Request request, Instruction instruction)
+        {
+            if (request == null)
+                throw new ArgumentNullException("request");
+            if (instruction == null)
+                throw new ArgumentNullException("instruction");
+
+            lock (Context)
+            {
+                Context[request.ID] = new AsyncContext(request, instruction);
+            }
+        }
+
+        private static AsyncContext GetContext(uint id)
+        {
+            AsyncContext result;
+                
+            lock (Context)
+            {
+                Context.TryGetValue(id, out result);
+            }
+
+            return result;
+        }
+
+        private static AsyncContext GetContext(Response response)
+        {
+            return response != null ? GetContext(response.ID) : null;
         }
     }
 }

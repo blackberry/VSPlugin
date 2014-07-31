@@ -64,9 +64,6 @@
     <Compile Include="..\..\src_vs2012\UnitTests\DiagnosticTests.cs">
       <Link>DiagnosticTests.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\UnitTests\GDBParserTests.cs">
-      <Link>GDBParserTests.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\MakeAllAndFormatOutputMessagesTestClass.cs">
       <Link>MakeAllAndFormatOutputMessagesTestClass.cs</Link>
     </Compile>
@@ -90,10 +87,6 @@
     <ProjectReference Include="..\BuildTasks\BlackBerry.BuildTasks.csproj">
       <Project>{328CAD98-F4E5-444A-B5DF-AD102C67BA3C}</Project>
       <Name>BlackBerry.BuildTasks</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
-      <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
-      <Name>GDBParser</Name>
     </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</Project>

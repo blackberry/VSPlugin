@@ -163,12 +163,12 @@ namespace BlackBerry.DebugEngine
                 GdbWrapper.Received += GdbOnReceivedResponse;
             }
 
-            private void GdbOnReceivedResponse(object sender, ResponseReceivedEventArgs e)
+            private void GdbOnReceivedResponse(object sender, ResponseParsedEventArgs e)
             {
                 Debug.Assert(e != null && e.Response != null && e.Response.RawData != null, "Invalid response object received");
                 if (GdbWrapper.IsAsync(e.Response))
                 {
-                    ProcessingGDBOutput(e.Response.RawData);
+                    ProcessingGDBOutput(e.ParsedResult);
                 }
             }
 
@@ -188,9 +188,9 @@ namespace BlackBerry.DebugEngine
             /// <summary>
             /// Thread responsible for handling asynchronous GDB output.
             /// </summary>
-            private void ProcessingGDBOutput(string[] response)
+            private void ProcessingGDBOutput(string parsedResponse)
             {
-                string[] events = response; // PH: FIXME: .Split('@');
+                string[] events = parsedResponse.Replace("\r\n", "@").Split('@');
                 foreach (string ev in events)
                 {
                     if (ev.Length > 1) // only to avoid empty events, when there are two delimiters characters together.

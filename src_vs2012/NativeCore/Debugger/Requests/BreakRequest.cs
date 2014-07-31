@@ -29,13 +29,14 @@ namespace BlackBerry.NativeCore.Debugger.Requests
             try
             {
                 sender.Break();
-                return true;
             }
             catch (Exception ex)
             {
                 TraceLog.WriteException(ex);
                 return false;
             }
+
+            return sender.Send(ToString());
         }
     }
 }

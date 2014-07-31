@@ -234,21 +234,17 @@ md "%OutputVsPath%"
 
 REM Install Package Files
 echo "%InputPath%\extension.vsixmanifest" to "%OutputVsPath%\extension.vsixmanifest"
-copy "%InputPath%\extension.vsixmanifest" "%OutputVsPath%\extension.vsixmanifest" 
+copy "%InputPath%\extension.vsixmanifest" "%OutputVsPath%\extension.vsixmanifest"
 echo "%InputPath%\BlackBerry.GDBHost.exe" to "%OutputVsPath%\BlackBerry.GDBHost.exe"
-copy "%InputPath%\BlackBerry.GDBHost.exe" "%OutputVsPath%\BlackBerry.GDBHost.exe" 
+copy "%InputPath%\BlackBerry.GDBHost.exe" "%OutputVsPath%\BlackBerry.GDBHost.exe"
 echo "%InputPath%\BlackBerry.NativeCore.dll" to "%OutputVsPath%\BlackBerry.NativeCore.dll"
 copy "%InputPath%\BlackBerry.NativeCore.dll" "%OutputVsPath%\BlackBerry.NativeCore.dll"
 echo "%InputPath%\BlackBerry.Package.dll" to "%OutputVsPath%\BlackBerry.Package.dll"
 copy "%InputPath%\BlackBerry.Package.dll" "%OutputVsPath%\BlackBerry.Package.dll"
 echo "%InputPath%\BlackBerry.Package.pkgdef" to "%OutputVsPath%\BlackBerry.Package.pkgdef"
-copy "%InputPath%\BlackBerry.Package.pkgdef" "%OutputVsPath%\BlackBerry.Package.pkgdef" 
-echo "%InputPath%\GDBParser.dll" to "%OutputVsPath%\GDBParser.dll"
-copy "%InputPath%\GDBParser.dll" "%OutputVsPath%\GDBParser.dll" 
-echo "%InputPath%\Instructions.txt" to "%OutputVsPath%\Instructions.txt"
-copy "%InputPath%\Instructions.txt" "%OutputVsPath%\Instructions.txt" 
+copy "%InputPath%\BlackBerry.Package.pkgdef" "%OutputVsPath%\BlackBerry.Package.pkgdef"
 echo "%InputPath%\BlackBerry.DebugEngine.dll" to "%OutputVsPath%\BlackBerry.DebugEngine.dll"
-copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputVsPath%\BlackBerry.DebugEngine.dll" 
+copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputVsPath%\BlackBerry.DebugEngine.dll"
 
 goto processPlugin_End
 
@@ -259,21 +255,17 @@ echo %actionNo%: Removing plugin binaries
 REM Uninstall Package Files
 
 echo Deleting "%OutputVsPath%\extension.vsixmanifest"
-del "%OutputVsPath%\extension.vsixmanifest" 
+del "%OutputVsPath%\extension.vsixmanifest"
 echo Deleting "%OutputVsPath%\BlackBerry.GDBHost.exe"
-del  "%OutputVsPath%\BlackBerry.GDBHost.exe" 
+del  "%OutputVsPath%\BlackBerry.GDBHost.exe"
 echo Deleting  "%OutputVsPath%\BlackBerry.NativeCore.dll"
 del "%OutputVsPath%\BlackBerry.NativeCore.dll"
 echo Deleting  "%OutputVsPath%\BlackBerry.Package.dll"
 del "%OutputVsPath%\BlackBerry.Package.dll"
 echo Deleting  "%OutputVsPath%\BlackBerry.Package.pkgdef"
-del "%OutputVsPath%\BlackBerry.Package.pkgdef" 
-echo Deleting "%OutputVsPath%\GDBParser.dll"
-del "%OutputVsPath%\GDBParser.dll" 
-echo Deleting "%OutputVsPath%\Instructions.txt"
-del "%OutputVsPath%\Instructions.txt" 
+del "%OutputVsPath%\BlackBerry.Package.pkgdef"
 echo Deleting "%OutputVsPath%\BlackBerry.DebugEngine.dll"
-del "%OutputVsPath%\BlackBerry.DebugEngine.dll" 
+del "%OutputVsPath%\BlackBerry.DebugEngine.dll"
 
 REM Remove folders
 echo Remove Directory "%OutputPluginPath%"

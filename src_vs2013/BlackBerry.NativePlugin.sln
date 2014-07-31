@@ -5,8 +5,6 @@ VisualStudioVersion = 12.0.30501.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBerry.Package", "Package\BlackBerry.Package.csproj", "{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GDBParser", "GDBParser\GDBParser.vcxproj", "{CC7B28E0-CB31-44F7-A380-E7072F670F38}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBerry.DebugEngine", "DebugEngine\BlackBerry.DebugEngine.csproj", "{59A7B188-E307-4495-A3AF-4ED76B086A87}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlackBerry.BuildTasks", "BuildTasks\BlackBerry.BuildTasks.csproj", "{328CAD98-F4E5-444A-B5DF-AD102C67BA3C}"
@@ -37,16 +35,6 @@ Global
 		{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}.Release|Win32.ActiveCfg = Release|Any CPU
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Debug|Mixed Platforms.Build.0 = Debug|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Debug|Win32.ActiveCfg = Debug|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Debug|Win32.Build.0 = Debug|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Release|Any CPU.ActiveCfg = Release|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Release|Mixed Platforms.Build.0 = Release|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Release|Win32.ActiveCfg = Release|Win32
-		{CC7B28E0-CB31-44F7-A380-E7072F670F38}.Release|Win32.Build.0 = Release|Win32
 		{59A7B188-E307-4495-A3AF-4ED76B086A87}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{59A7B188-E307-4495-A3AF-4ED76B086A87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59A7B188-E307-4495-A3AF-4ED76B086A87}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

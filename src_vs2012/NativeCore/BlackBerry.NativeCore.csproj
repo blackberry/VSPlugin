@@ -66,6 +66,7 @@
     <Compile Include="Debugger\Requests\MiRequest.cs" />
     <Compile Include="Debugger\Requests\ProcessListRequest.cs" />
     <Compile Include="Debugger\Response.cs" />
+    <Compile Include="Debugger\ResponseParsedEventArgs.cs" />
     <Compile Include="Debugger\ResponseReceivedEventArgs.cs" />
     <Compile Include="Debugger\ResponseType.cs" />
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
