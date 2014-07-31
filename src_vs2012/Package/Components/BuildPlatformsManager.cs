@@ -193,7 +193,8 @@ namespace BlackBerry.Package.Components
 
             foreach (Command command in _dte.Commands)
             {
-                if (command.Guid == expectedGuid && command.ID == expectedID)
+                if (string.Compare(command.Guid, expectedGuid, StringComparison.OrdinalIgnoreCase) == 0
+                        && command.ID == expectedID)
                 {
                     sp = command;
                     break;
@@ -696,7 +697,7 @@ namespace BlackBerry.Package.Components
                 {
                     foreach (Project project in projects)
                     {
-                        var platformName = project.ConfigurationManager != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
+                        var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
                         if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
                             return true;
                     }
