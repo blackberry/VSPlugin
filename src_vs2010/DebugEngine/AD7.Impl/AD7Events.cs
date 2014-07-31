@@ -12,6 +12,7 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -434,6 +435,9 @@ namespace BlackBerry.DebugEngine
         /// <param name="thread"> The AD7Thread object that represents the thread. </param>
         internal static void Send(AD7Engine engine, AD7Thread thread)
         {
+            if (thread == null)
+                throw new ArgumentNullException("thread");
+
             var message = new AD7LoadCompleteEvent();
             engine.Callback.Send(message, IID, thread);
         }
