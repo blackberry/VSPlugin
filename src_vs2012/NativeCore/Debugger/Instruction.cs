@@ -108,7 +108,10 @@ namespace BlackBerry.NativeCore.Debugger
             if (response.RawData == null || response.RawData.Length == 0)
                 throw new ArgumentOutOfRangeException("response");
 
-            var parsedResponse = Parse(string.Join("\r\n", response.RawData));
+            if (response.StatusOutputs.Length == 0)
+                return string.Empty;
+
+            var parsedResponse = Parse(string.Join("\r\n", response.StatusOutputs));
 
             // This string means that both GDB and the parser worked well and returned an empty string.
             if (string.Compare(parsedResponse, "$#@EMPTY@#$", StringComparison.Ordinal) == 0)
@@ -211,7 +214,15 @@ namespace BlackBerry.NativeCore.Debugger
                     }
                     parsePos = end + 1;
 
-                    result += Parse(response, repeatInstruction, respBegin, true, variables, separator);
+                    var nextChunk = Parse(response, repeatInstruction, respBegin, true, variables, separator);
+                    if (string.IsNullOrEmpty(nextChunk))
+                    {
+                        found = false;
+                    }
+                    else
+                    {
+                        result += nextChunk;
+                    }
                     continue;
                 }
 

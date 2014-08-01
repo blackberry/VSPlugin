@@ -94,6 +94,7 @@ namespace BlackBerry.NativeCore.Debugger
             }
             _gdbRunner = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
             _gdbRunner.Finished += GdbRunnerFinished;
+            _gdbRunner.Processor.Dispatcher = EventDispatcher.NewAsync("Default GDB events dispatcher");
             _gdbRunner.Processor.Received += GdbRunnerResponseReceived;
             _gdbRunner.ExecuteAsync();
 
@@ -165,27 +166,61 @@ namespace BlackBerry.NativeCore.Debugger
 
         private static void GdbRunnerResponseReceived(object sender, ResponseReceivedEventArgs e)
         {
+            Instruction instruction;
+            string parsedResponse;
+
+            // process the data only of asychronous responses:
             if (IsAsync(e.Response))
             {
-                var context = GetContext(e.Response);
-                Instruction instruction = context != null ? context.Instruction : Instructions[0];
-
-                // parse async data:
-                var parsedResponse = instruction.Parse(e.Response);
-
-                if (!string.IsNullOrEmpty(parsedResponse) && parsedResponse != ";")
+                // process notifications:
+                foreach (var notification in e.Response.Notifications)
                 {
-                    // notify about the response:
-                    var handler = Received;
-                    if (handler != null)
+                    var name = GetNotificationName(notification);
+                    string param;
+
+                    if (!string.IsNullOrEmpty(name))
                     {
-                        handler(null, new ResponseParsedEventArgs(e, parsedResponse));
+                        instruction = Instructions.Find(name, out param);
+                        if (instruction != null)
+                        {
+                            parsedResponse = instruction.Parse(notification + "\r\n");
+                            NotifyParsedResponse(e, parsedResponse);
+                        }
                     }
                 }
+
+                // process result records and status changes:
+                var context = GetContext(e.Response);
+                instruction = context != null ? context.Instruction : Instructions[0];
+
+                parsedResponse = instruction.Parse(e.Response);
+                NotifyParsedResponse(e, parsedResponse);
             }
 
             // schedule all responses to be removed from the source queue:
             e.Handled = true;
+        }
+
+        private static string GetNotificationName(string notification)
+        {
+            if (string.IsNullOrEmpty(notification))
+                return null;
+
+            int endAt = notification.IndexOf(',');
+            return endAt < 0 ? notification : notification.Substring(0, endAt);
+        }
+
+        private static void NotifyParsedResponse(ResponseReceivedEventArgs e, string parsedResponse)
+        {
+            if (!string.IsNullOrEmpty(parsedResponse) && parsedResponse != ";")
+            {
+                // notify about the response:
+                var handler = Received;
+                if (handler != null)
+                {
+                    handler(null, new ResponseParsedEventArgs(e, parsedResponse));
+                }
+            }
         }
 
         private static void GdbRunnerFinished(object sender, ToolRunnerEventArgs e)
@@ -215,7 +250,7 @@ namespace BlackBerry.NativeCore.Debugger
         /// <summary>
         /// Gets an indication, if specified response is asynchronous.
         /// </summary>
-        public static bool IsAsync(Response response)
+        private static bool IsAsync(Response response)
         {
             if (response == null)
                 return false;
