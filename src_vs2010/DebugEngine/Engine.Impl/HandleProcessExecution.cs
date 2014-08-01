@@ -210,8 +210,13 @@ namespace BlackBerry.DebugEngine
                             }
                             if (_threadId > 0)
                             {
-                                _eventDispatcher.Engine.SelectThread(_threadId.ToString()).SetCurrentLocation(_fileName, (uint)_line);
-                                _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
+                                var thread =_eventDispatcher.Engine.SelectThread(_threadId.ToString());
+
+                                if (thread != null)
+                                {
+                                    thread.SetCurrentLocation(_fileName, (uint) _line);
+                                    _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
+                                }
                             }
                             
                             // Call the method/event that will let SDM know that the debugged program was interrupted.
@@ -552,19 +557,21 @@ namespace BlackBerry.DebugEngine
         /// <param name="threadID"> Thread ID. </param>
         private void OnInterrupt(int threadID)
         {
-            Debug.Assert(_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.RUN_MODE);
-            _eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
-
-            if (_fileName != "" && _line > 0)
+            if (_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.RUN_MODE)
             {
-                // Visual Studio shows the line position one more than it actually is
-                _eventDispatcher.Engine._docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint)(_line - 1));
-            }
+                _eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
 
-            // Only send OnAsyncBreakComplete if break-all was requested by the user
-            if (!NeedsResumeAfterInterrupt)
-            {
-                _eventDispatcher.Engine.Callback.OnAsyncBreakComplete(_eventDispatcher.Engine.SelectThread(threadID.ToString()));
+                if (_fileName != "" && _line > 0)
+                {
+                    // Visual Studio shows the line position one more than it actually is
+                    _eventDispatcher.Engine._docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint) (_line - 1));
+                }
+
+                // Only send OnAsyncBreakComplete if break-all was requested by the user
+                if (!NeedsResumeAfterInterrupt)
+                {
+                    _eventDispatcher.Engine.Callback.OnAsyncBreakComplete(_eventDispatcher.Engine.SelectThread(threadID.ToString()));
+                }
             }
         }
     }

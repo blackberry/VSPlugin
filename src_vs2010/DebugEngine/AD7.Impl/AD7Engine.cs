@@ -15,7 +15,6 @@
 using System;
 using System.Runtime.InteropServices;
 using BlackBerry.NativeCore;
-using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
@@ -1237,12 +1236,15 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void ResetStackFrames()
         {
-            foreach (AD7Thread t in Threads)
+            if (Threads != null)
             {
-                if (t.__stackFrames != null)
+                foreach (AD7Thread t in Threads)
                 {
-                    t.__stackFrames.Clear();
-                    t.__stackFrames = null;
+                    if (t.__stackFrames != null)
+                    {
+                        t.__stackFrames.Clear();
+                        t.__stackFrames = null;
+                    }
                 }
             }
         }
@@ -1253,13 +1255,16 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void UpdateListOfThreads()
         {
-            foreach (AD7Thread t in Threads)
+            if (Threads != null)
             {
-                // Send events to VS to destroy its current debugged threads.
-                AD7ThreadDestroyEvent.Send(this, 0, t);
-            }
+                foreach (AD7Thread t in Threads)
+                {
+                    // Send events to VS to destroy its current debugged threads.
+                    AD7ThreadDestroyEvent.Send(this, 0, t);
+                }
 
-            Threads = null;
+                Threads = null;
+            }
 
             // Get the current list of threads and store them into a temporary variable listThreads.
             AD7Thread[] threads;
@@ -1350,6 +1355,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns the selected thread; otherwise, returns NULL. </returns>
         public AD7Thread SelectThread(string id)
         {
+            if (Threads == null)
+                return null;
+
             for (int i = 0; i < Threads.Length; i++)
             {
                 if (Threads[i]._id == id)
@@ -1364,12 +1372,15 @@ namespace BlackBerry.DebugEngine
         /// <param name="id"> The ID of the thread. </param>
         public void SetAsCurrentThread(string id)
         {
-            for (int i = 0; i < Threads.Length; i++)
+            if (Threads != null)
             {
-                if (Threads[i]._id == id)
+                for (int i = 0; i < Threads.Length; i++)
                 {
-                    _currentThreadIndex = i;
-                    break;
+                    if (Threads[i]._id == id)
+                    {
+                        _currentThreadIndex = i;
+                        break;
+                    }
                 }
             }
         }
