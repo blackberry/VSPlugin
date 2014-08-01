@@ -65,9 +65,10 @@ namespace BlackBerry.NativeCore.Debugger
             if (!File.Exists(exeFileName))
                 throw new FileNotFoundException("Specified executable doesn't exist", exeFileName);
 
-            if (hasSymbols)
-                return new MiRequest("file-exec-and-symbols " + exeFileName.Replace("\\", "\\\\"));
-            return new MiRequest("file-exec-file " + exeFileName.Replace("\\", "\\\\"));
+            string command = hasSymbols
+                ? string.Concat("file-exec-and-symbols \"", exeFileName.Replace("\\", "\\\\"), "\"")
+                : string.Concat("file-exec-file \"", exeFileName.Replace("\\", "\\\\"), "\"");
+            return new MiRequest(command);
         }
 
         public static Request SetLibrarySearchPath(string[] searchPaths)
