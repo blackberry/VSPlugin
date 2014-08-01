@@ -417,6 +417,7 @@ namespace BlackBerry.DebugEngine
                     Callback = null;
                     BreakpointManager = null;
                     _docContext = null;
+                    EventDispatcher.Dispose();
                     EventDispatcher = null;
                     _module = null;
                     _progNode = null;

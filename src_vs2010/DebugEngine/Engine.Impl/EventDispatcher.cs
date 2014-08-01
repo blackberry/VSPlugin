@@ -30,102 +30,9 @@ namespace BlackBerry.DebugEngine
     /// inserted).
     /// Call debug engine methods to notify the SDM of an event (e.g. if a breakpoint is hit, call EngineCallback.OnBreakpoint()).
     /// </summary>
-    public sealed class EventDispatcher
+    public sealed class EventDispatcher : IDisposable
     {
-        /// <summary>
-        /// Represents the object that process asynchronous GDB's output by classifying it by type (e.g. breakpoint event).
-        /// </summary>
-        private readonly GDBOutput _gdbOutput;
-
-        /// <summary>
-        /// Boolean variable that indicates if the current code is known or unknown, i.e., if there is a source code file associated.
-        /// </summary>
-        public static bool _unknownCode;
-
-        /// <summary>
-        /// Object used to control the access to the critical section that exists in the "lockedBreakpoint" method.
-        /// </summary>
-        private readonly object _lockBreakpoint = new object();
-
-        /// <summary>
-        /// Object used to control the access to the critical section that exists in the "unlockBreakpoint" method.
-        /// </summary>
-        private readonly object _unlockBreakpoint = new object();
-
-        /// <summary>
-        /// Object used to control the access to the critical section that exists in the "enterCriticalRegion" method.
-        /// </summary>
-        private readonly object _criticalRegion = new object(); 
-
-        /// <summary>
-        /// Object used to control the access to the critical section that exists in the "leaveCriticalRegion" method.
-        /// </summary>
-        private readonly object _leaveCriticalRegion = new object();
-        
-        /// <summary>
-        /// Boolean variable that indicates the GDB state: TRUE -> run mode; FALSE -> break mode.
-        /// </summary>
-        public static bool _GDBRunMode = true;
-
-        /// <summary>
-        /// Variable that is manipulated only in methods enterCriticalRegion and leaveCriticalRegion        
-        /// </summary>
-        public bool _inCriticalRegion;
-
-        /// <summary>
-        /// There is a GDB bug that causes a message "Quit (expect signal SIGINT when the program is resumed)". If this message occurs
-        /// 5 times, VSNDK will end the debug session. That's why this variable is needed, to count the amount of this kind of message
-        /// that is received in a sequence.
-        /// </summary>
-        public int countSIGINT;
-
-        #region Properties
-
-        /// <summary>
-        /// The public AD7Engine object that represents the DE.
-        /// </summary>
-        public AD7Engine Engine
-        {
-            get;
-            private set;
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Ends the debug session by closing GDB, sending the appropriate events to the SDM, and breaking out of all 
-        /// buffer- and event-listening loops.
-        /// </summary>
-        /// <param name="exitCode">The exit code. </param>
-        public void EndDebugSession(uint exitCode)
-        {
-            // Exit the event dispatch loop.
-            _gdbOutput.IsRunning = false;
-
-            // Send events to the SDM.
-            AD7ThreadDestroyEvent.Send(Engine, exitCode, null);
-            AD7ProgramDestroyEvent.Send(Engine, exitCode);
-
-            // Exit GDB.
-            GdbWrapper.Exit();
-
-            // Notify the AddIn that this debug session has ended.
-            DebugEngineStatus.IsRunning = false;
-        }
-
-        /// <summary>
-        /// Constructor. Starts the thread responsible for handling asynchronous GDB output.
-        /// </summary>
-        /// <param name="engine"> The AD7Engine object that represents the DE. </param>
-        public EventDispatcher(AD7Engine engine)
-        {
-            if (engine == null)
-                throw new ArgumentNullException("engine");
-
-            Engine = engine;
-
-            _gdbOutput = new GDBOutput(this);
-        }
+        #region Internal Classes
 
         /// <summary>
         /// Process asynchronous GDB's output by classifying it by type (e.g. breakpoint event).
@@ -167,6 +74,11 @@ namespace BlackBerry.DebugEngine
             {
                 Debug.Assert(e != null && e.Response != null && e.Response.RawData != null, "Invalid response object received");
                 ProcessingGDBOutput(e.ParsedResult);
+            }
+
+            public void Dispose()
+            {
+                GdbWrapper.Received -= GdbOnReceivedResponse;
             }
 
             #region Properties
@@ -229,6 +141,127 @@ namespace BlackBerry.DebugEngine
                     }
                 }
             }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Represents the object that process asynchronous GDB's output by classifying it by type (e.g. breakpoint event).
+        /// </summary>
+        private readonly GDBOutput _gdbOutput;
+
+        /// <summary>
+        /// Boolean variable that indicates if the current code is known or unknown, i.e., if there is a source code file associated.
+        /// </summary>
+        public static bool _unknownCode;
+
+        /// <summary>
+        /// Object used to control the access to the critical section that exists in the "lockedBreakpoint" method.
+        /// </summary>
+        private readonly object _lockBreakpoint = new object();
+
+        /// <summary>
+        /// Object used to control the access to the critical section that exists in the "unlockBreakpoint" method.
+        /// </summary>
+        private readonly object _unlockBreakpoint = new object();
+
+        /// <summary>
+        /// Object used to control the access to the critical section that exists in the "enterCriticalRegion" method.
+        /// </summary>
+        private readonly object _criticalRegion = new object(); 
+
+        /// <summary>
+        /// Object used to control the access to the critical section that exists in the "leaveCriticalRegion" method.
+        /// </summary>
+        private readonly object _leaveCriticalRegion = new object();
+        
+        /// <summary>
+        /// Boolean variable that indicates the GDB state: TRUE -> run mode; FALSE -> break mode.
+        /// </summary>
+        public static bool _GDBRunMode = true;
+
+        /// <summary>
+        /// Variable that is manipulated only in methods enterCriticalRegion and leaveCriticalRegion        
+        /// </summary>
+        public bool _inCriticalRegion;
+
+        /// <summary>
+        /// There is a GDB bug that causes a message "Quit (expect signal SIGINT when the program is resumed)". If this message occurs
+        /// 5 times, VSNDK will end the debug session. That's why this variable is needed, to count the amount of this kind of message
+        /// that is received in a sequence.
+        /// </summary>
+        public int countSIGINT;
+
+        #region Properties
+
+        /// <summary>
+        /// The public AD7Engine object that represents the DE.
+        /// </summary>
+        public AD7Engine Engine
+        {
+            get;
+            private set;
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Constructor. Starts the thread responsible for handling asynchronous GDB output.
+        /// </summary>
+        /// <param name="engine"> The AD7Engine object that represents the DE. </param>
+        public EventDispatcher(AD7Engine engine)
+        {
+            if (engine == null)
+                throw new ArgumentNullException("engine");
+
+            Engine = engine;
+
+            _gdbOutput = new GDBOutput(this);
+        }
+
+        #region IDisposable Implementation
+
+        ~EventDispatcher()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            _gdbOutput.Dispose();
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Ends the debug session by closing GDB, sending the appropriate events to the SDM, and breaking out of all 
+        /// buffer- and event-listening loops.
+        /// </summary>
+        /// <param name="exitCode">The exit code. </param>
+        public void EndDebugSession(uint exitCode)
+        {
+            // Exit the event dispatch loop.
+            _gdbOutput.IsRunning = false;
+
+            // Send events to the SDM.
+            AD7ThreadDestroyEvent.Send(Engine, exitCode, null);
+            AD7ProgramDestroyEvent.Send(Engine, exitCode);
+
+            // Exit GDB.
+            GdbWrapper.Exit();
+
+            // Notify the AddIn that this debug session has ended.
+            DebugEngineStatus.IsRunning = false;
         }
 
         /// <summary>
