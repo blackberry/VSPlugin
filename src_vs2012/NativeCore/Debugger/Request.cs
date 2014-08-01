@@ -165,7 +165,7 @@ namespace BlackBerry.NativeCore.Debugger
             // notify all listeners synchronously:
             var receivedHandler = Received;
             if (receivedHandler != null)
-                receivedHandler(this, new ResponseReceivedEventArgs(response, false));
+                receivedHandler(this, new ResponseReceivedEventArgs(this, response, false));
 
             // wake up one waiting for response thread:
             _event.Set();

@@ -8,8 +8,8 @@
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public ResponseParsedEventArgs(Response response, bool handled, string parsedResult)
-            : base(response, handled)
+        public ResponseParsedEventArgs(Request request, Response response, bool handled, string parsedResult)
+            : base(request, response, handled)
         {
             ParsedResult = parsedResult;
         }
@@ -18,7 +18,7 @@
         /// Init constructor.
         /// </summary>
         public ResponseParsedEventArgs(ResponseReceivedEventArgs e, string parsedResult)
-            : base(e != null ? e.Response : null, e != null && e.Handled)
+            : base(e != null ? e.Request : null, e != null ? e.Response : null, e != null && e.Handled)
         {
             ParsedResult = parsedResult;
         }

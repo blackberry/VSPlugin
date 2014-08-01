@@ -154,7 +154,7 @@ namespace BlackBerry.NativeCore.Debugger
 
                 // if response was not handled by listeners of Received event
                 // than add it to the queue for to be processed by waiting thread:
-                if (!NotifyResponseReceived(response))
+                if (!NotifyResponseReceived(clearCurrentRequest ? currentRequest : null, response))
                 {
                     lock (_sync)
                     {
@@ -184,7 +184,7 @@ namespace BlackBerry.NativeCore.Debugger
             return response != null;
         }
 
-        private bool NotifyResponseReceived(Response response)
+        private bool NotifyResponseReceived(Request request, Response response)
         {
             var receivedHandler = Received;
             var dispatcher = Dispatcher;
@@ -192,14 +192,14 @@ namespace BlackBerry.NativeCore.Debugger
 
             if (dispatcher != null)
             {
-                e = new ResponseReceivedEventArgs(response, !dispatcher.IsSynchronous); // this call doesn't guarantee sync exec (so don't allow non-handling of the response)
+                e = new ResponseReceivedEventArgs(request, response, false);
                 dispatcher.Invoke(receivedHandler, this, e); 
             }
             else
             {
                 if (receivedHandler != null)
                 {
-                    e = new ResponseReceivedEventArgs(response, false);
+                    e = new ResponseReceivedEventArgs(request, response, false);
                     receivedHandler(this, e);
                 }
             }

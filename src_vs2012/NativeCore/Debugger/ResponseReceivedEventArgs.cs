@@ -12,16 +12,26 @@ namespace BlackBerry.NativeCore.Debugger
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public ResponseReceivedEventArgs(Response response, bool handled)
+        public ResponseReceivedEventArgs(Request request, Response response, bool handled)
         {
             if (response == null)
                 throw new ArgumentNullException("response");
 
+            Request = request;
             Response = response;
             _handled = handled;
         }
 
         #region Properties
+
+        /// <summary>
+        /// Optional request, that was supposed to issue the response.
+        /// </summary>
+        public Request Request
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Received response.
