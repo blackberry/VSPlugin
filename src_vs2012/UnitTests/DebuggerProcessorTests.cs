@@ -254,6 +254,17 @@ namespace UnitTests
         }
 
         [Test]
+        public void CreateResponse()
+        {
+            var response = Response.Parse(new[]
+            {
+                "*stopped,reason=\"end-stepping-range\",frame={addr=\"0x78f5349a\",func=\"update\",args=[],file=\"S:/temp/FALLIN~1/FALLIN~1/main.c\",fullname=\"S:\\temp\\FALLIN~1\\FALLIN~1\\main.c\",line=\"158\"},thread-id=\"1\",stopped-threads=\"all\""
+            });
+
+            Assert.IsNotNull(response);
+        }
+
+        [Test]
         public void ParseCString()
         {
             

@@ -183,7 +183,7 @@ namespace BlackBerry.NativeCore.Debugger
             // found comments only message:
             if (resultRecord == null)
             {
-                return streamRecords == null ? null : new Response(message, 0, null, asyncOutputRecords != null ? asyncOutputRecords.ToArray() : null, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords.ToArray());
+                return new Response(message, 0, null, asyncOutputRecords != null ? asyncOutputRecords.ToArray() : null, notificationRecords != null ? notificationRecords.ToArray() : null, streamRecords != null ? streamRecords.ToArray() : null);
             }
 
             // get the response identifier
