@@ -92,12 +92,25 @@ namespace BlackBerry.NativeCore.Debugger
             {
                 _gdbRunner.Dispose();
             }
+
+            // PH: INFO:
+            // Here create a dedicated runner to let us communicate with GDB. We use a 'hosted' version
+            // as communication is done via BlackBerry.GDBHost.exe (not directly as it would be done using GdbRunner).
+            // The reason is simple - this is the ONLY way to send BreakRequest (aka Ctrl+C) to the GDB, while
+            // it's running program. This allows to pause current binary execution at any time and inject other commands.
+            // Second trick we do here is using a dedicated 'event dispatcher'. This async dispacher simply instantiates
+            // single background-thread and all event notifications from GDB are sent from that thread with order kept.
+            // It is required since the current DE architecture assumes that blocking calls of SendCommand() can be
+            // send immediatelly when processing asynchronous GDB notification. That, without an extra thread,
+            // would lead to a total blockage of whole communication, as we would block in the reading thread
+            // and wait for data it was supposed to produce.
             _gdbRunner = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
             _gdbRunner.Finished += GdbRunnerFinished;
             _gdbRunner.Processor.Dispatcher = EventDispatcher.NewAsync("Default GDB events dispatcher");
             _gdbRunner.Processor.Received += GdbRunnerResponseReceived;
             _gdbRunner.ExecuteAsync();
 
+            // setup environment:
             var parsed = _gdbRunner.Send(RequestsFactory.SetPendingBreakpoints(true), Instructions[8]);
             if (parsed == string.Empty || parsed[0] == '!')
             {
@@ -166,20 +179,20 @@ namespace BlackBerry.NativeCore.Debugger
 
         private static void GdbRunnerResponseReceived(object sender, ResponseReceivedEventArgs e)
         {
-            Instruction instruction;
-            string parsedResponse;
-
             // process the data only of asychronous responses:
             if (IsAsync(e.Response))
             {
+                Instruction instruction;
+                string parsedResponse;
+
                 // process notifications:
                 foreach (var notification in e.Response.Notifications)
                 {
                     var name = GetNotificationName(notification);
-                    string param;
 
                     if (!string.IsNullOrEmpty(name))
                     {
+                        string param;
                         instruction = Instructions.Find(name, out param);
                         if (instruction != null)
                         {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 
 namespace BlackBerry.NativeCore.Debugger
@@ -111,8 +112,9 @@ namespace BlackBerry.NativeCore.Debugger
         public override string ToString()
         {
             // just serialize as the RAW command (with optional ID)
+            // INFO: the current implementation of DebugEngine assumes the IDs are at least 2-digit numbers
             if (_id != 0)
-                return string.Concat(_id.ToString("D2"), _command);
+                return string.Concat(_id.ToString("D2", CultureInfo.InvariantCulture), _command);
             return _command;
         }
 
