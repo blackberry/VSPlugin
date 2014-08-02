@@ -20,7 +20,6 @@ using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
-using BlackBerry.NativeCore.Tools;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
@@ -55,7 +54,7 @@ namespace BlackBerry.DebugEngine
     /// </summary>
     [ComVisible(true)]
     [Guid(ClassGuid)]
-    public sealed class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2, IDebugSymbolSettings100, IDisposable
+    public sealed class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2, IDebugSymbolSettings100
     {
         public const string ClassGuid = "904AA6E0-942C-4D11-9094-7BAAEB3EE4B9";
         public const string ClassName = "BlackBerry.DebugEngine.AD7Engine";
@@ -172,8 +171,6 @@ namespace BlackBerry.DebugEngine
             set;
         }
 
-        private GdbRunner _gdb;
-        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -190,58 +187,7 @@ namespace BlackBerry.DebugEngine
         {
             // Transition DE state
             State = DebugEngineState.Done;
-            Dispose(false);
         }
-
-        #region IDisposable Implementation
-
-        public void Dispose()
-        {
-            Dispose(true);
-        }
-
-        private void Dispose(bool dispose)
-        {
-            if (dispose)
-            {
-                if (_gdb != null)
-                {
-                    _gdb.Dispose();
-                    _gdb = null;
-                }
-            }
-        }
-
-        private GdbRunner CreateGdb(NdkDefinition ndk, DeviceDefinition device, RuntimeDefinition runtime)
-        {
-            if (ndk == null)
-                ndk = NdkDefinition.Load(); // load from system registry
-            if (device == null)
-                device = DeviceDefinition.LoadDevice(); // load from registry
-            if (runtime == null)
-                runtime = RuntimeDefinition.Load(); // load from registry
-
-            var gdbInfo = new GdbInfo(ndk, device, runtime, null);
-            if (_gdb != null)
-            {
-                _gdb.Dispose();
-            }
-            _gdb = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
-            _gdb.Finished += GdbRunnerFinished;
-            _gdb.ExecuteAsync();
-
-            // and select current target device:
-            _gdb.Send(RequestsFactory.SetTargetDevice(_gdb.Device));
-
-            return _gdb;
-        }
-
-        private void GdbRunnerFinished(object sender, ToolRunnerEventArgs e)
-        {
-            _gdb = null;
-        }
-
-        #endregion
 
         #region Properties
 
