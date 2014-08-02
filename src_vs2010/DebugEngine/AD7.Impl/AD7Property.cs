@@ -149,7 +149,7 @@ namespace BlackBerry.DebugEngine
                         // name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
                         // same index position. This bool variable just indicate if this prefix is used or not.
                         bool hasVsNDK;
-                        string numChildren = AD7StackFrame._dispatcher.CreateVar(_variableInfo._name, out hasVsNDK);
+                        string numChildren = AD7StackFrame._dispatcher.CreateVariable(_variableInfo._name, out hasVsNDK);
 
                         ArrayList GDBNames = new ArrayList();
                         ArrayList VSNames = new ArrayList();
@@ -184,7 +184,7 @@ namespace BlackBerry.DebugEngine
                         catch (FormatException)
                         {
                         }
-                        AD7StackFrame._dispatcher.DeleteVar(_variableInfo._name, hasVsNDK);
+                        AD7StackFrame._dispatcher.DeleteVariable(_variableInfo._name, hasVsNDK);
                     }
                     DEBUG_PROPERTY_INFO[] properties = new DEBUG_PROPERTY_INFO[_variableInfo._children.Count];
                     int i = 0;

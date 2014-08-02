@@ -235,7 +235,7 @@ namespace BlackBerry.DebugEngine
                         ArrayList GDBNames = new ArrayList();
                         ArrayList VSNames = new ArrayList();
                         bool hasVsNdK;
-                        eventDispatcher.CreateVar(vi._name, out hasVsNdK);
+                        eventDispatcher.CreateVariable(vi._name, out hasVsNdK);
                         if (hasVsNdK)
                         {
                             GDBNames.Add("VsNdK_" + vi._name);
@@ -255,7 +255,7 @@ namespace BlackBerry.DebugEngine
                             vi.ListChildren(eventDispatcher, "*", GDBNames, VSNames, hasVsNdK, null);
                         else
                             vi.ListChildren(eventDispatcher, "", GDBNames, VSNames, hasVsNdK, null);
-                        eventDispatcher.DeleteVar(vi._name, hasVsNdK);
+                        eventDispatcher.DeleteVariable(vi._name, hasVsNdK);
                     }
                 }
             }
@@ -387,7 +387,7 @@ namespace BlackBerry.DebugEngine
                 // name and it is stored in the GDBNames array. At the same time, the VS name is stored in the VSNames array using the 
                 // same index position. This bool variable just indicate if this prefix is used or not.
                 bool hasVsNdK; 
-                string numChildren = dispatcher.CreateVar(_name, out hasVsNdK);
+                string numChildren = dispatcher.CreateVariable(_name, out hasVsNdK);
 
                 if (hasVsNdK)
                 {
@@ -421,7 +421,7 @@ namespace BlackBerry.DebugEngine
 
                 }
 
-                dispatcher.DeleteVar(_name, hasVsNdK);
+                dispatcher.DeleteVariable(_name, hasVsNdK);
             }
 
             if (value == null)
@@ -445,19 +445,19 @@ namespace BlackBerry.DebugEngine
             {
                 if (hasVsNdK)
                 {
-                    childListResponse = dispatcher.listChildren(_GDBName);
+                    childListResponse = dispatcher.ListChildren(_GDBName);
                 }
                 else
                 {
-                    childListResponse = dispatcher.listChildren(_name);
+                    childListResponse = dispatcher.ListChildren(_name);
                     if ((childListResponse == "ERROR") && (_GDBName != null))
                     {
-                        childListResponse = dispatcher.listChildren(_GDBName);
+                        childListResponse = dispatcher.ListChildren(_GDBName);
                     }
                 }
             }
             else
-                childListResponse = dispatcher.listChildren(gdbName);
+                childListResponse = dispatcher.ListChildren(gdbName);
 
             if (childListResponse != "ERROR")
             {

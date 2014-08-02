@@ -861,7 +861,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="name"> Name of the variable. </param>
         /// <param name="hasVsNdK"> Boolean value that indicates if the variable name has the prefix VsNdK_. </param>
         /// <returns> If successful, returns the variable's number of children; otherwise, returns string "ERROR". </returns>
-        public string CreateVar(string name, out bool hasVsNdK)
+        public string CreateVariable(string name, out bool hasVsNdK)
         {
             hasVsNdK = false;
 
@@ -884,7 +884,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="name"> Name of the variable. </param>
         /// <param name="hasVsNdK"> Boolean value that indicates if the variable name has the prefix VsNdK_. </param>
-        public void DeleteVar(string name, bool hasVsNdK)
+        public void DeleteVariable(string name, bool hasVsNdK)
         {
             // Waits for the parsed response for the GDB/MI command that deletes a previously created variable object and all of 
             // its children. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Variable-Objects.html)
@@ -899,7 +899,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="name"> Variable name. </param>
         /// <returns> Return a string that contains the list of the children of the specified variable object. </returns>
-        public string listChildren(string name)
+        public string ListChildren(string name)
         {
             // Returns the parsed response for the GDB/MI command that list the children of the specified variable object.
             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Variable-Objects.html)
