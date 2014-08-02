@@ -136,13 +136,11 @@ namespace BlackBerry.DebugEngine
         /// The position in the m_threads array that corresponds to the current thread.
         /// </summary>
         public int _currentThreadIndex = -1;
-
         
         /// <summary>
         /// Allows IDE to show current position in a source file
         /// </summary>
         public AD7DocumentContext _docContext;
-
 
         /// <summary>
         /// Used to avoid race condition when there are conditional breakpoints and the user hit break all. Both events will pause 
@@ -150,7 +148,6 @@ namespace BlackBerry.DebugEngine
         /// time, the Debug Engine could resume the execution instead of pausing it.
         /// </summary>
         public ManualResetEvent _running = new ManualResetEvent(true); 
-
 
         /// <summary>
         /// Used to avoid race condition when there are conditional breakpoints and a breakpoint is hit. This situation is similar to the above one.
@@ -160,15 +157,20 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Keeps track of debug engine states
         /// </summary>
-        public enum DE_STATE
+        public enum DebugEngineState
         {                
-            DESIGN_MODE = 0,
-            RUN_MODE,
-            BREAK_MODE,
-            STEP_MODE,
-            DONE
+            Design = 0,
+            Run,
+            Break,
+            Step,
+            Done
         }
-        public DE_STATE m_state = 0;
+
+        public DebugEngineState State
+        {
+            get;
+            set;
+        }
 
         private GdbRunner _gdb;
         
@@ -178,9 +180,8 @@ namespace BlackBerry.DebugEngine
         public AD7Engine()
         {
             BreakpointManager = new BreakpointManager(this);
-            m_state = DE_STATE.DESIGN_MODE;
+            State = DebugEngineState.Design;
         }
-
 
         /// <summary>
         /// Destructor.
@@ -188,7 +189,7 @@ namespace BlackBerry.DebugEngine
         ~AD7Engine()
         {
             // Transition DE state
-            m_state = DE_STATE.DONE;
+            State = DebugEngineState.Done;
             Dispose(false);
         }
 
@@ -370,7 +371,7 @@ namespace BlackBerry.DebugEngine
         int IDebugEngine2.CauseBreak()
         {
             // If not already broken, send the interrupt
-            if (m_state != DE_STATE.DESIGN_MODE && m_state != DE_STATE.BREAK_MODE && m_state != DE_STATE.STEP_MODE)
+            if (State != DebugEngineState.Design && State != DebugEngineState.Break && State != DebugEngineState.Step)
             {
                 if (EventDispatcher._GDBRunMode)
                 {
@@ -828,7 +829,7 @@ namespace BlackBerry.DebugEngine
             AD7Thread[] listThreads = null;
             int currentThread = 0;
 
-            if (m_state != DE_STATE.RUN_MODE)
+            if (State != DebugEngineState.Run)
                 currentThread = GetListOfThreads(out listThreads);
 
             // the following code seems to be weird but I had to update each field of this.m_process._threads because, when using
@@ -1012,7 +1013,7 @@ namespace BlackBerry.DebugEngine
             // Don't allow stepping through unknown code because it can lead to future problems with stepping and break-all.
             if (EventDispatcher._unknownCode)
             {
-                m_state = AD7Engine.DE_STATE.STEP_MODE;
+                State = AD7Engine.DebugEngineState.Step;
                 EventDispatcher.ContinueExecution();
 
                 return VSConstants.S_OK;
@@ -1059,7 +1060,7 @@ namespace BlackBerry.DebugEngine
             }
 
             // Transition DE state
-            m_state = DE_STATE.STEP_MODE;
+            State = DebugEngineState.Step;
 
             return VSConstants.S_OK;
         }

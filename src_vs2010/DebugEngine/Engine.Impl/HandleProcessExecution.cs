@@ -97,7 +97,7 @@ namespace BlackBerry.DebugEngine
                 case '4':
                     switch (ev[1])
                     {
-                        case '0':  
+                        case '0':
                             // Thread created. Example: 40,2,20537438
                             EventDispatcher._GDBRunMode = true;
                             ini = 3;
@@ -117,18 +117,18 @@ namespace BlackBerry.DebugEngine
                             _eventDispatcher.Engine._updateThreads = true;
 
                             break;
-                        case '1':  
+                        case '1':
                             // Process running. Example: 41,1     (when threadId is 0 means "all threads": example: 41,0)
                             EventDispatcher._GDBRunMode = true;
                             _threadId = Convert.ToInt32(ev.Substring(3, (ev.Length - 3)));
 
                             break;
-                        case '2':  
+                        case '2':
                             // Program exited normally. Example: 42
                             _eventDispatcher.EndDebugSession(0);
 
                             break;
-                        case '3':  
+                        case '3':
                             // Program was exited with an exit code. Example: 43,1;1 (not sure if there is a threadID, but the last ";" exist)
                             // TODO: not tested yet
                             end = ev.IndexOf(";", 3);
@@ -136,10 +136,10 @@ namespace BlackBerry.DebugEngine
                             _eventDispatcher.EndDebugSession(exitCode);
 
                             break;
-                        case '4':  
-                            // Program interrupted. 
+                        case '4':
+                            // Program interrupted.
                             // Examples:
-                            // 44,ADDR,FUNC,THREAD-ID         
+                            // 44,ADDR,FUNC,THREAD-ID
                             // 44,ADDR,FUNC,FILENAME,LINE,THREAD-ID
 
                             _eventDispatcher.Engine.ResetStackFrames();
@@ -226,7 +226,7 @@ namespace BlackBerry.DebugEngine
 
                             break;
 
-                        case '5':  
+                        case '5':
                             // End-stepping-range.
                             _eventDispatcher.Engine.ResetStackFrames();
                             EventDispatcher._GDBRunMode = false;
@@ -278,7 +278,7 @@ namespace BlackBerry.DebugEngine
                             OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
 
                             break;
-                        case '6':  
+                        case '6':
                             // Function-finished.
                             _eventDispatcher.Engine.ResetStackFrames();
                             EventDispatcher._GDBRunMode = false;
@@ -320,7 +320,7 @@ namespace BlackBerry.DebugEngine
                             OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
 
                             break;
-                        case '7':  
+                        case '7':
                             // -exec-interrupt or signal-meaning="Killed". There's nothing to do in this case.
                             _eventDispatcher.Engine.ResetStackFrames();
                             EventDispatcher._GDBRunMode = false;
@@ -340,7 +340,7 @@ namespace BlackBerry.DebugEngine
                                 _eventDispatcher.Engine.SetAsCurrentThread(_threadId.ToString());
                             }
 
-                            if (_eventDispatcher.Engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
+                            if (_eventDispatcher.Engine.State != AD7Engine.DebugEngineState.Break)
                             {
                                 OnInterrupt(_threadId);
                             }
@@ -348,11 +348,11 @@ namespace BlackBerry.DebugEngine
                             m_mre.Set();
 
                             break;
-                        case '8':  
+                        case '8':
                             // SIGKILL
                             _eventDispatcher.EndDebugSession(0);
                             break;
-                        case '9':  
+                        case '9':
                             // ERROR, ex: 49,Cannot find bounds of current function
                             _eventDispatcher.Engine.ResetStackFrames();
                             _eventDispatcher.Engine.CleanEvaluatedThreads();
@@ -378,7 +378,7 @@ namespace BlackBerry.DebugEngine
                 case '5':
                     switch (ev[1])
                     {
-                        case '0':  
+                        case '0':
                             // Quit (expect signal SIGINT when the program is resumed)
                             _eventDispatcher.countSIGINT += 1;
                             if (_eventDispatcher.countSIGINT > 5)
@@ -395,7 +395,7 @@ namespace BlackBerry.DebugEngine
                             _eventDispatcher.Engine._updateThreads = true;
 
                             break;
-                        case '2':  
+                        case '2':
                             // GDB Bugs, like "... 2374: internal-error: frame_cleanup_after_sniffer ...". Example: 52
                             _eventDispatcher.EndDebugSession(0);
                             MessageBox.Show("This is a known issue that can happen when interrupting GDB's execution by hitting the \"break all\" or toggling a breakpoint in run mode. \n\n GDB CRASHED. Details: \"../../gdb/frame.c:2374: internal-error: frame_cleanup_after_sniffer: Assertion `frame->prologue_cache == NULL' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -539,9 +539,9 @@ namespace BlackBerry.DebugEngine
         /// <param name="line"> Line number. </param>
         public static void OnStepCompleted(EventDispatcher eventDispatcher, string file, uint line)
         {
-            if (eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
+            if (eventDispatcher.Engine.State == AD7Engine.DebugEngineState.Step)
             {
-                eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
+                eventDispatcher.Engine.State = AD7Engine.DebugEngineState.Break;
 
                 // Visual Studio shows the line position one more than it actually is
                 eventDispatcher.Engine._docContext = eventDispatcher.GetDocumentContext(file, line - 1);
@@ -556,9 +556,9 @@ namespace BlackBerry.DebugEngine
         /// <param name="threadID"> Thread ID. </param>
         private void OnInterrupt(int threadID)
         {
-            if (_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.RUN_MODE)
+            if (_eventDispatcher.Engine.State == AD7Engine.DebugEngineState.Run)
             {
-                _eventDispatcher.Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
+                _eventDispatcher.Engine.State = AD7Engine.DebugEngineState.Break;
 
                 if (_fileName != "" && _line > 0)
                 {

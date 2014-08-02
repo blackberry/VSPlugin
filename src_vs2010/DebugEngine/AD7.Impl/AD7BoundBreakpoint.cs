@@ -175,7 +175,7 @@ namespace BlackBerry.DebugEngine
             {
                 Thread.Sleep(0);
             }
-            if ((_engine.m_state == AD7Engine.DE_STATE.RUN_MODE) && (EventDispatcher._GDBRunMode == true))
+            if ((_engine.State == AD7Engine.DebugEngineState.Run) && (EventDispatcher._GDBRunMode == true))
             {
                 isRunning = true;
                 _engine.EventDispatcher.PrepareToModifyBreakpoint();
@@ -277,11 +277,11 @@ namespace BlackBerry.DebugEngine
                 Thread.Sleep(0);
             }
 
-            if ((_engine.m_state == AD7Engine.DE_STATE.RUN_MODE) && (EventDispatcher._GDBRunMode == true))
+            if ((_engine.State == AD7Engine.DebugEngineState.Run) && (EventDispatcher._GDBRunMode == true))
             {
                 isRunning = true;
                 _engine.EventDispatcher.PrepareToModifyBreakpoint();
-                _engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
+                _engine.State = AD7Engine.DebugEngineState.Break;
             }
 
             m_bpCondition = bpCondition;
@@ -336,7 +336,7 @@ namespace BlackBerry.DebugEngine
             if (isRunning)
             {
                 isRunning = false;
-                _engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
+                _engine.State = AD7Engine.DebugEngineState.Run;
                 _engine.EventDispatcher.ResumeFromInterrupt();
             }
 

@@ -37,7 +37,7 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Process asynchronous GDB's output by classifying it by type (e.g. breakpoint event).
         /// </summary>
-        public sealed class GDBOutput
+        sealed class GdbOutput
         {
             /// <summary>
             /// This object manages debug events in the engine.
@@ -63,7 +63,7 @@ namespace BlackBerry.DebugEngine
             /// Constructor.
             /// </summary>
             /// <param name="ed"> This object manages debug events in the engine. </param>
-            public GDBOutput(EventDispatcher ed)
+            public GdbOutput(EventDispatcher ed)
             {
                 _eventDispatcher = ed;
                 IsRunning = true;
@@ -73,7 +73,7 @@ namespace BlackBerry.DebugEngine
             private void GdbOnReceivedResponse(object sender, ResponseParsedEventArgs e)
             {
                 Debug.Assert(e != null && e.Response != null && e.Response.RawData != null, "Invalid response object received");
-                ProcessingGDBOutput(e.ParsedResult);
+                ProcessingGdbOutput(e.ParsedResult);
             }
 
             public void Dispose()
@@ -97,7 +97,7 @@ namespace BlackBerry.DebugEngine
             /// <summary>
             /// Thread responsible for handling asynchronous GDB output.
             /// </summary>
-            private void ProcessingGDBOutput(string parsedResponse)
+            private void ProcessingGdbOutput(string parsedResponse)
             {
                 string[] events = parsedResponse.Replace("\r\n", "@").Split('@');
                 foreach (string ev in events)
@@ -148,7 +148,7 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Represents the object that process asynchronous GDB's output by classifying it by type (e.g. breakpoint event).
         /// </summary>
-        private readonly GDBOutput _gdbOutput;
+        private readonly GdbOutput _gdbOutput;
 
         /// <summary>
         /// Boolean variable that indicates if the current code is known or unknown, i.e., if there is a source code file associated.
@@ -216,7 +216,7 @@ namespace BlackBerry.DebugEngine
 
             Engine = engine;
 
-            _gdbOutput = new GDBOutput(this);
+            _gdbOutput = new GdbOutput(this);
         }
 
         #region IDisposable Implementation
@@ -269,8 +269,8 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void PrepareToModifyBreakpoint()
         {
-            if (Engine.m_state != AD7Engine.DE_STATE.DESIGN_MODE 
-             && Engine.m_state != AD7Engine.DE_STATE.BREAK_MODE)
+            if (Engine.State != AD7Engine.DebugEngineState.Design
+             && Engine.State != AD7Engine.DebugEngineState.Break)
             {
                 HandleProcessExecution.NeedsResumeAfterInterrupt = true;
                 Engine.CauseBreak();
@@ -296,10 +296,7 @@ namespace BlackBerry.DebugEngine
         /// a breakpoint in a given line number. </param>
         /// <param name="command2"> Initial command to set the breakpoint in GDB, with only the file name when setting
         /// a breakpoint in a given line number, or "" when setting a breakpoint in a function. </param>
-        /// <param name="GDB_ID"> Returns the breakpoint ID in GDB. </param>
-        /// <param name="GDB_line"> Returns the breakpoint Line Number. </param>
-        /// <param name="GDB_filename"> Returns the breakpoint File Name. </param>
-        /// <param name="GDB_address"> Returns the Breakpoint Address. </param>
+        /// <param name="breakpointInfo"> Returns the breakpoint info from GDB. </param>
         /// <returns> If successful, returns true; otherwise, returns false. </returns>
         private bool SetBreakpointImpl(string command, string command2, out BreakpointInfo breakpointInfo)
         {
@@ -550,11 +547,11 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Update hit count.
         /// </summary>
-        /// <param name="ID"> Breakpoint ID in GDB. </param>
+        /// <param name="id"> Breakpoint ID in GDB. </param>
         /// <param name="hitCount"> Hit count. </param>
-        public void UpdateHitCount(uint ID, uint hitCount)
+        public void UpdateHitCount(uint id, uint hitCount)
         {
-            var bbp = Engine.BreakpointManager.GetBoundBreakpointForGDBID(ID);
+            var bbp = Engine.BreakpointManager.GetBoundBreakpointForGDBID(id);
             if (bbp != null)
             {
                 if (!bbp._breakWhenCondChanged)
@@ -673,19 +670,19 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Update VS when a breakpoint is hit in GDB.
         /// </summary>
-        /// <param name="ID"> Breakpoint ID from GDB. </param>
+        /// <param name="id"> Breakpoint ID from GDB. </param>
         /// <param name="threadID"> Thread ID. </param>
-        public void BreakpointHit(uint ID, string threadID)
+        public void BreakpointHit(uint id, string threadID)
         {
             var xBoundBreakpoints = new List<IDebugBoundBreakpoint2>();
 
             // Search the active bound BPs and find ones that match the ID.
-            var bbp = Engine.BreakpointManager.GetBoundBreakpointForGDBID(ID);
+            var bbp = Engine.BreakpointManager.GetBoundBreakpointForGDBID(id);
 
             if (bbp != null)
                 xBoundBreakpoints.Add(bbp);
 
-            if ((bbp == null) || (xBoundBreakpoints.Count == 0))
+            if (bbp == null || xBoundBreakpoints.Count == 0)
             {
                 // if no matching breakpoints are found then its one of the following:
                 //   - Stepping operation
@@ -731,7 +728,7 @@ namespace BlackBerry.DebugEngine
                         bool hitBreakAll = Engine._running.WaitOne(0);
                         if (hitBreakAll)
                         {
-                            Engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
+                            Engine.State = AD7Engine.DebugEngineState.Run;
 
                             // Sends the GDB command that resumes the execution of the inferior program. 
                             // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
@@ -747,7 +744,7 @@ namespace BlackBerry.DebugEngine
 
                         // Transition DE state
                         _GDBRunMode = false;
-                        Engine.m_state = AD7Engine.DE_STATE.BREAK_MODE;
+                        Engine.State = AD7Engine.DebugEngineState.Break;
 
                         // Found a bound breakpoint
                         Engine.Callback.OnBreakpoint(Engine.SelectThread(threadID), xBoundBreakpoints.AsReadOnly());
@@ -755,11 +752,11 @@ namespace BlackBerry.DebugEngine
                         if (bbp._isHitCountEqual)
                         {
                             // Have to ignore the biggest number of times to keep the breakpoint enabled and to avoid stopping on it.
-                            IgnoreHitCount(ID, int.MaxValue); 
+                            IgnoreHitCount(id, int.MaxValue); 
                         }
                         else if (bbp._hitCountMultiple != 0)
                         {
-                            IgnoreHitCount(ID, (int)(bbp._hitCountMultiple - (bbp._hitCount % bbp._hitCountMultiple)));
+                            IgnoreHitCount(id, (int)(bbp._hitCountMultiple - (bbp._hitCount % bbp._hitCountMultiple)));
                         }
                     }
                     LeaveCriticalRegion();
@@ -775,7 +772,7 @@ namespace BlackBerry.DebugEngine
                     bool hitBreakAll = Engine._running.WaitOne(0);
                     if (hitBreakAll)
                     {
-                        Engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
+                        Engine.State = AD7Engine.DebugEngineState.Run;
 
                         // Sends the GDB command that resumes the execution of the inferior program. 
                         // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
@@ -928,7 +925,7 @@ namespace BlackBerry.DebugEngine
             bool hitBreakAll = Engine._running.WaitOne(0);
             if (hitBreakAll)
             {
-                Engine.m_state = AD7Engine.DE_STATE.RUN_MODE;
+                Engine.State = AD7Engine.DebugEngineState.Run;
 
                 // Sends the GDB command that resumes the execution of the inferior program. 
                 // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)

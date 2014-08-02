@@ -273,7 +273,7 @@ namespace BlackBerry.DebugEngine
                         _eventDispatcher.Engine.SetAsCurrentThread(_threadID);
 
                         // A breakpoint can be hit during a step
-                        if (_eventDispatcher.Engine.m_state == AD7Engine.DE_STATE.STEP_MODE)
+                        if (_eventDispatcher.Engine.State == AD7Engine.DebugEngineState.Step)
                         {
                             HandleProcessExecution.OnStepCompleted(_eventDispatcher, _fileName, (uint)_line);
                         }
