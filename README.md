@@ -6,11 +6,15 @@ All assets in this repository, unless otherwise stated through sub-directory LIC
 
 ##Build requirements
 Install
+* [Microsoft Visual Studio Professional 2013 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=40758)
+
+or
+
 * [Microsoft Visual Studio Professional 2012 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=30668)
 
 or
 
-* [Microsoft Visual Studio Professional 2013 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=40758)
+* [Microsoft Visual Studio Professional 2010 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=21835)
 
 Please note, that currently there is a bug in DIA SDK of Visual Studio 2013.
 If Visual Studio 2013 is installed on a machine, where Visual Studio 2012 did already existed, DIA SDK will be by placed inside it.
@@ -29,6 +33,7 @@ Examples:
  **setup.bat** - installs plugin for all Visual Studio versions  
  **setup.bat vs2010** - installs only for Visual Studio 2010  
  **setup.bat vs2012 /no-tools** - installs plugin for Visual Studio 2012 without bbndk_vs and qnxtools folders copied  
+ **setup.bat vs2012 /msbuild-only** - updates only local MSBuild for Visual Studio 2012 adding 'BlackBerry' and 'BlackBerrySimulator' target platforms
 
 ##Contributing
 The BlackBerry Native Plug-in for Microsoft Visual Studio project currently contains the following code branches: 
@@ -57,4 +62,4 @@ The BlackBerry Native Plug-in for Microsoft Visual Studio project currently cont
 
 ## Reference material
 * [Using Microsoft Visual Studio] (https://developer.blackberry.com/native/documentation/core/vs_using_microsoft_visual_studio.html)
-* Although Microsoft Visual Studio 2010 is no longer supported, you can still [download the plug-in and the docs] (http://developer.blackberry.com/native/downloads/) from the Downloads page. 
+* [GDB Commands] (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI.html)
