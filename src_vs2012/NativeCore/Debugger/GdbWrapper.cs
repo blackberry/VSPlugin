@@ -67,6 +67,11 @@ namespace BlackBerry.NativeCore.Debugger
         public static event EventHandler<ResponseParsedEventArgs> Received;
 
         /// <summary>
+        /// Event send, when GDB unexpectedly crashed or was killed by developer.
+        /// </summary>
+        public static event EventHandler UnexpectedlyClosed;
+
+        /// <summary>
         /// Attaches to the process with given PID or binary name on a target device.
         /// </summary>
         /// <param name="pidOrBinaryName">PID of the process or name of the binary.</param>
@@ -105,7 +110,7 @@ namespace BlackBerry.NativeCore.Debugger
             // would lead to a total blockage of whole communication, as we would block in the reading thread
             // and wait for data it was supposed to produce.
             _gdbRunner = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
-            _gdbRunner.Finished += GdbRunnerFinished;
+            _gdbRunner.Finished += GdbRunnerUnexpectedlyFinished;
             _gdbRunner.Processor.Dispatcher = EventDispatcher.NewAsync("Default GDB events dispatcher");
             _gdbRunner.Processor.Received += GdbRunnerResponseReceived;
             _gdbRunner.ExecuteAsync();
@@ -236,9 +241,16 @@ namespace BlackBerry.NativeCore.Debugger
             }
         }
 
-        private static void GdbRunnerFinished(object sender, ToolRunnerEventArgs e)
+        private static void GdbRunnerUnexpectedlyFinished(object sender, ToolRunnerEventArgs e)
         {
             _gdbRunner = null;
+
+            // notify, that it unexpectedly closed:
+            var handler = UnexpectedlyClosed;
+            if (handler != null)
+            {
+                handler(null, EventArgs.Empty);
+            }
         }
 
         /// <summary>
@@ -248,7 +260,9 @@ namespace BlackBerry.NativeCore.Debugger
         {
             if (_gdbRunner != null)
             {
+                _gdbRunner.Finished -= GdbRunnerUnexpectedlyFinished;
                 _gdbRunner.Dispose();
+                _gdbRunner = null;
             }
         }
 

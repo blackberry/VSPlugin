@@ -68,6 +68,13 @@ namespace BlackBerry.DebugEngine
                 _eventDispatcher = ed;
                 IsRunning = true;
                 GdbWrapper.Received += GdbOnReceivedResponse;
+                GdbWrapper.UnexpectedlyClosed += GdbOnUnexpectedlyClosed;
+            }
+
+            private void GdbOnUnexpectedlyClosed(object sender, EventArgs e)
+            {
+                Dispose();
+                _eventDispatcher.EndDebugSession(0);
             }
 
             private void GdbOnReceivedResponse(object sender, ResponseParsedEventArgs e)
@@ -78,6 +85,7 @@ namespace BlackBerry.DebugEngine
 
             public void Dispose()
             {
+                GdbWrapper.UnexpectedlyClosed -= GdbOnUnexpectedlyClosed;
                 GdbWrapper.Received -= GdbOnReceivedResponse;
             }
 
