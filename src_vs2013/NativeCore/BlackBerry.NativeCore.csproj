@@ -275,7 +275,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\src_vs2010\GDBParser\Instructions.txt">
+    <EmbeddedResource Include="..\..\src_vs2012\NativeCore\Resources\Instructions.txt">
       <Link>Resources\Instructions.txt</Link>
     </EmbeddedResource>
   </ItemGroup>

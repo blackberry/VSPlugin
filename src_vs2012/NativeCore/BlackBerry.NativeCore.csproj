@@ -124,11 +124,8 @@
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\src_vs2010\GDBParser\Instructions.txt">
-      <Link>Resources\Instructions.txt</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Instructions.txt" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

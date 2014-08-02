@@ -280,11 +280,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\GDBParser\Instructions.txt">
+    <EmbeddedResource Include="..\..\src_vs2012\NativeCore\Resources\Instructions.txt">
       <Link>Resources\Instructions.txt</Link>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
