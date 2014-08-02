@@ -847,7 +847,6 @@ namespace BlackBerry.DebugEngine
                         else
                             Threads[i]._filename = listThreads[i]._filename;
                     }
-                    Threads[i].__stackFrames = listThreads[i].__stackFrames;
                     Threads[i]._suspendCount = listThreads[i]._suspendCount;
                 } 
 
