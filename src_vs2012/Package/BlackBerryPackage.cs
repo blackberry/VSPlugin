@@ -392,9 +392,12 @@ namespace BlackBerry.Package
 
             if (projects == null || projects.Length == 0)
             {
-                MessageBoxHelper.Show("Please open a solution with Visual C++ projects", "Unable to add BlackBerry Platforms.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Unable to add BlackBerry Platforms.", "Please open a solution with Visual C++ projects", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
+
+            if (MessageBoxHelper.Show("Do you want to add BlackBerry target platforms for all C/C++ projects?", null, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
 
             foreach (var project in projects)
             {
