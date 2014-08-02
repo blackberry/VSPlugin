@@ -14,7 +14,6 @@
 
 using System;
 using System.Runtime.InteropServices;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
@@ -267,8 +266,10 @@ namespace BlackBerry.DebugEngine
                         exePath = "CannotAttachToRunningProcess";
                     }
 
+                    var runtime = RuntimeDefinition.Load(); // load from registry
+
                     uint aux;
-                    if (GdbWrapper.AttachToProcess(pnt.Process.ID.ToString(), exePath, port.NDK, port.Device, null, out aux))
+                    if (GdbWrapper.AttachToProcess(pnt.Process.ID.ToString(), exePath, port.NDK, port.Device, runtime, out aux))
                     {
                         if (exePath == "CannotAttachToRunningProcess")
                         {
@@ -563,10 +564,10 @@ namespace BlackBerry.DebugEngine
 
                 uint pidNumber;
                 string pidOrName = nvc["pidOrName"];
-                string publicKeyPath = nvc.ContainsKey("sshKeyPath") ? nvc["sshKeyPath"] : ConfigDefaults.SshPublicKeyPath;
-                
+
                 var target = CollectionHelper.GetDevice(nvc);
                 var ndk = CollectionHelper.GetNDK(nvc);
+                var runtime = CollectionHelper.GetRuntime(nvc);
                 if (target == null)
                 {
                     TraceLog.WriteLine("LaunchSuspended: Missing info about target device");
@@ -578,8 +579,7 @@ namespace BlackBerry.DebugEngine
                     return VSConstants.E_FAIL;
                 }
 
-
-                var result = GdbWrapper.AttachToProcess(pidOrName, exe, ndk, target, null, out pidNumber);
+                var result = GdbWrapper.AttachToProcess(pidOrName, exe, ndk, target, runtime, out pidNumber);
                 if (result)
                 {
                     process = _process = new AD7Process(port, new ProcessInfo(pidNumber, exe), target);

@@ -42,6 +42,7 @@ namespace BlackBerry.Package.ViewModels
         private DeviceDefinition[] _targetDevices;
         private DeviceDefinition _activeDevice;
         private DeviceDefinition _activeSimulator;
+        private RuntimeInfo _activeRuntime;
 
         public PackageViewModel()
         {
@@ -315,6 +316,57 @@ namespace BlackBerry.Package.ViewModels
             }
         }
 
+        /// <summary>
+        /// Gets the reference to currently active runtime libraries.
+        /// </summary>
+        public RuntimeInfo ActiveRuntime
+        {
+            get
+            {
+                if (_activeRuntime != null)
+                    return _activeRuntime;
+
+                // or try to find it, by reading from registry:
+                var settings = RuntimeDefinition.Load();
+                if (settings == null)
+                    return null;
+
+                // find matching installed runtime by comparing paths:
+                foreach (var info in InstalledRuntimes)
+                    if (info.Matches(settings.Folder))
+                    {
+                        _activeRuntime = info;
+
+                        TraceLog.WriteLine("Found active runtime libraries: \"{0}\" ({1})", _activeRuntime, _activeRuntime.Folder);
+                        return info;
+                    }
+
+                return null;
+            }
+            set
+            {
+                if (value != null && !value.Matches(_activeRuntime) && InstalledRuntimes.Length > 0)
+                {
+                    var index = IndexOfInstalledRuntime(value.Version);
+                    if (index >= 0)
+                    {
+                        _activeRuntime = _installedRuntimes[index];
+                        TraceLog.WriteLine("Changed active runtime libraries to: \"{0}\" ({1})", _activeRuntime, _activeRuntime.Folder);
+                        SaveActiveRuntime();
+                    }
+                    else
+                    {
+                        if (_activeNDK != null)
+                        {
+                            TraceLog.WriteLine("Removed active runtime libraries: \"{0}\"", _activeRuntime);
+                            _activeRuntime = null;
+                            SaveActiveRuntime();
+                        }
+                    }
+                }
+            }
+        }
+
         #endregion
 
         /// <summary>
@@ -455,6 +507,29 @@ namespace BlackBerry.Package.ViewModels
             }
         }
 
+        /// <summary>
+        /// Persists info about currently selected runtime libraries into the registry.
+        /// </summary>
+        private void SaveActiveRuntime()
+        {
+            if (_activeRuntime == null || !_activeRuntime.IsInstalled)
+            {
+                RuntimeDefinition.Delete();
+                TraceLog.WarnLine("Invalid runtime libraries to set as active!");
+                return;
+            }
+
+            try
+            {
+                var setting = _activeRuntime.ToDefinition();
+                setting.Save();
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to activate runtime libraries \"{0}\"", _activeRuntime);
+            }
+        }
+
         private void UpdateManagerOnCompleted(object sender, UpdateManagerCompletedEventArgs e)
         {
             Reset(e.Target);
@@ -468,11 +543,27 @@ namespace BlackBerry.Package.ViewModels
             // need to select anything?
             if (ActiveNDK == null)
             {
-                // make sure invalid info from registry is removed:
+                // make sure invalid info is removed from registry:
                 NdkDefinition.Delete();
 
                 // then select correct NDK:
                 ActiveNDK = GetLatestInstalledNDK();
+            }
+        }
+
+        /// <summary>
+        /// Makes sure any BlackBerry 10 runtime libraries is selected and its paths are stored inside registry.
+        /// </summary>
+        public void EnsureActiveRuntime()
+        {
+            // need to select anything?
+            if (ActiveRuntime == null)
+            {
+                // make sure invalid info is removed from registry:
+                RuntimeDefinition.Delete();
+
+                // then select correct runtime:
+                ActiveRuntime = GetLatestInstalledRuntime();
             }
         }
 
@@ -486,6 +577,21 @@ namespace BlackBerry.Package.ViewModels
             if (length > 0)
             {
                 return InstalledNDKs[length - 1];
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the reference to the latest version of the installed locally runtime libraries.
+        /// </summary>
+        public RuntimeInfo GetLatestInstalledRuntime()
+        {
+            // get the last one, as this list is already sorted by version:
+            int length = InstalledRuntimes.Length;
+            if (length > 0)
+            {
+                return InstalledRuntimes[length - 1];
             }
 
             return null;

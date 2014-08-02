@@ -22,17 +22,18 @@ namespace BlackBerry.Package
         public const int cmdidBlackBerryOptions = 0x301;
         public const int cmdidBlackBerryTargetsDevicesPlaceholder = 0x501;
         public const int cmdidBlackBerryTargetsApiLevelsPlaceholder = 0x601;
-        public const int cmdidBlackBerryTargetsConfigure = 0x701;
+        public const int cmdidBlackBerryTargetsRuntimeLibrariesPlaceholder = 0x701;
+        public const int cmdidBlackBerryTargetsConfigure = 0x801;
 
-        public const int cmdidBlackBerryHelpWelcomePage = 0x901;
-        public const int cmdidBlackBerryHelpSupportForum = 0x902;
-        public const int cmdidBlackBerryHelpDocNative = 0x1001;
-        public const int cmdidBlackBerryHelpDocCascades = 0x1002;
-        public const int cmdidBlackBerryHelpDocPlayBook = 0x1003;
-        public const int cmdidBlackBerryHelpSamplesNative = 0x1101;
-        public const int cmdidBlackBerryHelpSamplesCascades = 0x1102;
-        public const int cmdidBlackBerryHelpSamplesPlayBook = 0x1103;
-        public const int cmdidBlackBerryHelpSamplesOpenSource = 0x1104;
-        public const int cmdidBlackBerryHelpAbout = 0x1201;
+        public const int cmdidBlackBerryHelpWelcomePage = 0x1001;
+        public const int cmdidBlackBerryHelpSupportForum = 0x1002;
+        public const int cmdidBlackBerryHelpDocNative = 0x1101;
+        public const int cmdidBlackBerryHelpDocCascades = 0x1102;
+        public const int cmdidBlackBerryHelpDocPlayBook = 0x1103;
+        public const int cmdidBlackBerryHelpSamplesNative = 0x1201;
+        public const int cmdidBlackBerryHelpSamplesCascades = 0x1202;
+        public const int cmdidBlackBerryHelpSamplesPlayBook = 0x1203;
+        public const int cmdidBlackBerryHelpSamplesOpenSource = 0x1204;
+        public const int cmdidBlackBerryHelpAbout = 0x1301;
     }
 }

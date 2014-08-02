@@ -126,6 +126,14 @@ namespace BlackBerry.Package.Components
         }
 
         /// <summary>
+        /// Gets the currently selected runtime libraries of the device to debug against.
+        /// </summary>
+        private RuntimeInfo ActiveRuntime
+        {
+            get { return PackageViewModel.Instance.ActiveRuntime; }
+        }
+
+        /// <summary>
         /// Gets the active target, where the application will be deployed and run on.
         /// </summary>
         private DeviceDefinition ActiveTarget
@@ -597,6 +605,7 @@ namespace BlackBerry.Package.Components
             var executablePath = Path.Combine(DteHelper.GetOutputPath(_startProject), targetName);
             var ndk = ActiveNDK;
             var device = ActiveTarget;
+            var runtime = ActiveRuntime;
 
             if (ndk == null)
             {
@@ -613,7 +622,7 @@ namespace BlackBerry.Package.Components
 
             if (_startDebugger)
             {
-                LaunchDebugTarget(targetName, ndk, device, null, executablePath);
+                LaunchDebugTarget(targetName, ndk, device, runtime, null, executablePath);
             }
         }
 
@@ -622,7 +631,7 @@ namespace BlackBerry.Package.Components
         /// </summary>
         /// <param name="pidOrTargetAppName">Process ID in string format or the binary name for debugger to attach to.</param>
         /// <returns> TRUE if successful, False if not. </returns>
-        private bool LaunchDebugTarget(string pidOrTargetAppName, NdkInfo ndk, DeviceDefinition target, string sshPublicKeyPath, string executablePath)
+        private bool LaunchDebugTarget(string pidOrTargetAppName, NdkInfo ndk, DeviceDefinition target, RuntimeInfo runtime, string sshPublicKeyPath, string executablePath)
         {
             TraceLog.WriteLine("BUILD: Starting debugger (\"{0}\", \"{1}\")", pidOrTargetAppName, executablePath);
 
@@ -648,6 +657,10 @@ namespace BlackBerry.Package.Components
             }
             CollectionHelper.AppendDevice(nvc, target);
             CollectionHelper.AppendNDK(nvc, ndk.ToDefinition());
+            if (runtime != null)
+            {
+                CollectionHelper.AppendRuntime(nvc, runtime.ToDefinition());
+            }
             info.bstrArg = CollectionHelper.Serialize(nvc);
 
             info.bstrRemoteMachine = null; // debug locally

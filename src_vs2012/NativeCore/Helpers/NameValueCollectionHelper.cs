@@ -150,5 +150,32 @@ namespace BlackBerry.NativeCore.Helpers
 
             return new NdkDefinition(data["ndk.path.host"], data["ndk.path.target"], DeviceHelper.GetFamilyTypeFromString(data["ndk.type"]));
         }
+
+        /// <summary>
+        /// Appends info about the runtime libraries into the dictionary.
+        /// </summary>
+        public static void AppendRuntime(Dictionary<string, string> data, RuntimeDefinition runtime)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (runtime == null)
+                throw new ArgumentNullException("runtime");
+
+            data["runtime.path"] = runtime.Folder;
+        }
+
+        /// <summary>
+        /// Gets the info about runtime libraries from the specified dictionary.
+        /// </summary>
+        public static RuntimeDefinition GetRuntime(Dictionary<string, string> data)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            if (data.ContainsKey("runtime.path"))
+                return new RuntimeDefinition(data["runtime.path"]);
+
+            return null;
+        }
     }
 }

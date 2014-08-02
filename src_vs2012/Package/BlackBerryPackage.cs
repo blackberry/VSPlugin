@@ -197,6 +197,7 @@ namespace BlackBerry.Package
                                                                             },
                                                                         devicesCommandID);
                 mcs.AddCommand(devicesMenu);
+
                 // Create dynamic command for the 'api-level-list' menu
                 CommandID apiLevelCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryTargetsApiLevelsPlaceholder);
                 DynamicMenuCommand apiLevelMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledNDKs,
@@ -214,6 +215,24 @@ namespace BlackBerry.Package
                                                                              },
                                                                          apiLevelCommandID);
                 mcs.AddCommand(apiLevelMenu);
+
+                // Create dynamic command for the 'runtime-libraries' menu
+                CommandID runtimeCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryTargetsRuntimeLibrariesPlaceholder);
+                DynamicMenuCommand runtimeMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledRuntimes,
+                                                                         (cmd, collection, index) =>
+                                                                             {
+                                                                                 var item = index >= 0 && index < collection.Count ? ((RuntimeInfo[]) collection)[index] : null;
+                                                                                 PackageViewModel.Instance.ActiveRuntime = item;
+                                                                             },
+                                                                         (cmd, collection, index) =>
+                                                                             {
+                                                                                 var item = index >= 0 && index < collection.Count ? ((RuntimeInfo[])collection)[index] : null;
+                                                                                 cmd.Checked = item != null && item == PackageViewModel.Instance.ActiveRuntime;
+                                                                                 cmd.Visible = item != null;
+                                                                                 cmd.Text = item != null ? item.Name : "-";
+                                                                             },
+                                                                         runtimeCommandID);
+                mcs.AddCommand(runtimeMenu);
 
                 // Create command for 'Help' menus
                 var helpCmdIDs = new[] {
@@ -379,11 +398,13 @@ namespace BlackBerry.Package
         }
 
         /// <summary>
-        /// Makes sure the NDK is selected and its paths are stored inside registry for build toolset.
+        /// Makes sure the NDK and runtime libraries are selected
+        /// and their paths are stored inside registry for build toolset.
         /// </summary>
         private void EnsureActiveNDK()
         {
             PackageViewModel.Instance.EnsureActiveNDK();
+            PackageViewModel.Instance.EnsureActiveRuntime();
         }
 
         private void AddBlackBerryTargetPlatforms(object sender, EventArgs e)
