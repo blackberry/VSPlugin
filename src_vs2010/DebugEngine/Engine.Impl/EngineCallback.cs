@@ -21,19 +21,17 @@ namespace BlackBerry.DebugEngine
     /// <summary>
     /// Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
     /// </summary>
-    public class EngineCallback
+    public sealed class EngineCallback
     {
-
         /// <summary>
         ///  The IDebugEventCallback2 object that receives debugger events. 
         /// </summary>
-        readonly IDebugEventCallback2 m_ad7Callback;
+        private readonly IDebugEventCallback2 _ad7Callback;
 
         /// <summary>
         /// The AD7Engine object that represents the DE.
         /// </summary>
-        readonly AD7Engine m_engine;
-
+        private readonly AD7Engine _engine;
 
         /// <summary>
         /// Constructor.
@@ -42,10 +40,14 @@ namespace BlackBerry.DebugEngine
         /// <param name="ad7Callback"> The IDebugEventCallback2 object that receives debugger events. </param>
         public EngineCallback(AD7Engine engine, IDebugEventCallback2 ad7Callback)
         {
-            m_ad7Callback = ad7Callback;
-            m_engine = engine;
-        }
+            if (engine == null)
+                throw new ArgumentNullException("engine");
+            if (ad7Callback == null)
+                throw new ArgumentNullException("ad7Callback");
 
+            _engine = engine;
+            _ad7Callback = ad7Callback;
+        }
 
         /// <summary>
         /// Send events to the debugger.
@@ -59,26 +61,25 @@ namespace BlackBerry.DebugEngine
             uint attributes; 
             Guid riidEvent = new Guid(iidEvent);
 
-            EngineUtils.RequireOk(eventObject.GetAttributes(out attributes));
+            EngineUtils.RequireOK(eventObject.GetAttributes(out attributes));
 
-            if ((thread == null) && (m_engine != null) && (m_engine.thread != null) && (program != null) && (eventObject != null) && (riidEvent != null) && (attributes != 0))
+            if ((thread == null) && (_engine != null) && (_engine.Threads != null) && (program != null) && (eventObject != null) && (riidEvent != null) && (attributes != 0))
             {
-                if (m_engine._currentThreadIndex != -1)
+                if (_engine._currentThreadIndex != -1)
                 {
-                    EngineUtils.RequireOk(m_ad7Callback.Event(m_engine, null, program, m_engine.thread[m_engine._currentThreadIndex], eventObject, ref riidEvent, attributes));
+                    EngineUtils.RequireOK(_ad7Callback.Event(_engine, null, program, _engine.Threads[_engine._currentThreadIndex], eventObject, ref riidEvent, attributes));
                 }
                 else
                 {
-                    if (m_engine.thread != null)
-                        EngineUtils.RequireOk(m_ad7Callback.Event(m_engine, null, program, m_engine.thread[0], eventObject, ref riidEvent, attributes));
+                    if (_engine.Threads != null)
+                        EngineUtils.RequireOK(_ad7Callback.Event(_engine, null, program, _engine.Threads[0], eventObject, ref riidEvent, attributes));
                     else
-                        EngineUtils.RequireOk(m_ad7Callback.Event(m_engine, null, program, null, eventObject, ref riidEvent, attributes));
+                        EngineUtils.RequireOK(_ad7Callback.Event(_engine, null, program, null, eventObject, ref riidEvent, attributes));
                 }
             }
             else
-                EngineUtils.RequireOk(m_ad7Callback.Event(m_engine, null, program, thread, eventObject, ref riidEvent, attributes));
+                EngineUtils.RequireOK(_ad7Callback.Event(_engine, null, program, thread, eventObject, ref riidEvent, attributes));
         }
-
 
         /// <summary>
         /// Call the method that will send the event to the debugger with all the arguments.
@@ -88,9 +89,8 @@ namespace BlackBerry.DebugEngine
         /// <param name="thread"> A thread running in a program. </param>
         public void Send(IDebugEvent2 eventObject, string iidEvent, IDebugThread2 thread)
         {
-            Send(eventObject, iidEvent, m_engine, thread);
+            Send(eventObject, iidEvent, _engine, thread);
         }
-
 
         /// <summary>
         /// IDebugErrorEvent2 is used to report error messages to the user when something goes wrong in the debug engine.
@@ -101,7 +101,6 @@ namespace BlackBerry.DebugEngine
         {
         }
 
-
         /// <summary>
         /// The VSNDK debug engine does not support binding breakpoints as modules load since the primary exe is the only module
         /// symbols are loaded for. A production debugger will need to bind breakpoints when a new module is loaded.
@@ -109,14 +108,9 @@ namespace BlackBerry.DebugEngine
         /// <param name="debuggedModule"> A module loaded in the debugged process. </param>
         public void OnModuleLoad(AD7Module debuggedModule)
         {
-            // AD7Module ad7Module = new AD7Module(debuggedModule);
             AD7ModuleLoadEvent eventObject = new AD7ModuleLoadEvent(debuggedModule, true /* this is a module load */);
-
-            // debuggedModule.Client = ad7Module;
-
             Send(eventObject, AD7ModuleLoadEvent.IID, null);
         }
-
 
         /// <summary>
         /// Send to the session debug manager (SDM) an event to output a string.
@@ -126,10 +120,8 @@ namespace BlackBerry.DebugEngine
         public void OnOutputString(string outputString)
         {
             AD7OutputDebugStringEvent eventObject = new AD7OutputDebugStringEvent(outputString);
-
             Send(eventObject, AD7OutputDebugStringEvent.IID, null);
         }
-
 
         /// <summary>
         /// Send an event to SDM with the breakpoint that was hit.
@@ -141,18 +133,15 @@ namespace BlackBerry.DebugEngine
             IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[clients.Count];
 
             int i = 0;
-            foreach (object objCurrentBreakpoint in clients)
+            foreach (var breakpoint in clients)
             {
-                boundBreakpoints[i] = (IDebugBoundBreakpoint2)objCurrentBreakpoint;
-                i++;
+                boundBreakpoints[i++] = breakpoint;
             }
 
             AD7BoundBreakpointsEnum boundBreakpointsEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
-            AD7BreakpointEvent eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);            
-
+            AD7BreakpointEvent eventObject = new AD7BreakpointEvent(boundBreakpointsEnum);
             Send(eventObject, AD7BreakpointEvent.IID, thread);
         }
-
 
         /// <summary>
         // Exception events are sent when an exception occurs in the debugged that the debugger was not expecting.
@@ -160,20 +149,18 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void OnException()
         {
-            throw new Exception("The method or operation is not implemented.");
+            EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Step complete is sent when a step has finished. Not implemented.
         /// </summary>
         public void OnStepComplete()
         {
-            throw new Exception("The method or operation is not implemented.");
-//            AD7StepCompletedEvent.Send(m_engine);
+            EngineUtils.NotImplemented();
+            // AD7StepCompletedEvent.Send(m_engine);
             // TODO: implement this method...
         }
-
 
         /// <summary>
         /// This will get called when the engine receives the breakpoint event that is created when the user
@@ -186,7 +173,6 @@ namespace BlackBerry.DebugEngine
             Send(eventObject, AD7AsyncBreakCompleteEvent.IID, thread);
         }
 
-
         /// <summary>
         /// Engines notify the debugger about the results of a symbol search by sending an instance of IDebugSymbolSearchEvent2.
         /// Not used.
@@ -196,12 +182,11 @@ namespace BlackBerry.DebugEngine
         /// <param name="dwStatusFlags"></param>
         public void OnSymbolSearch(AD7Module module, string status, uint dwStatusFlags)
         {
-            string statusString = (dwStatusFlags == 1 ? "Symbols Loaded - " : "No symbols loaded") + status;
+            string statusString = (dwStatusFlags == 1 ? "Symbols loaded - " : "No symbols loaded - ") + status;
 
             AD7SymbolSearchEvent eventObject = new AD7SymbolSearchEvent(module, statusString, dwStatusFlags);
             Send(eventObject, AD7SymbolSearchEvent.IID, null);
         }
-
 
         /// <summary>
         /// Engines notify the debugger that a breakpoint has bound through the breakpoint bound event.
@@ -217,7 +202,6 @@ namespace BlackBerry.DebugEngine
             AD7BreakpointBoundEvent eventObject = new AD7BreakpointBoundEvent((AD7PendingBreakpoint)pendingBreakpoint, boundBreakpoint);
             Send(eventObject, AD7BreakpointBoundEvent.IID, null);
         }
-
 
         /// <summary>
         /// Send an event to notify the SDM that this thread was created.

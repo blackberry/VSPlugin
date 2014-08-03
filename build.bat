@@ -9,13 +9,11 @@ REM ****************************************************************************
 :: Process parameters, to limit the solutions to build
 if "%~1" == "" (
   set ActionClean=1
-  set ActionGenScripts=1
   set ActionBuildVS2010=1
   set ActionBuildVS2012=1
   set ActionBuildVS2013=1
 ) else (
   set ActionClean=1
-  set ActionGenScripts=0
   set ActionBuildVS2010=0
   set ActionBuildVS2012=0
   set ActionBuildVS2013=0
@@ -23,17 +21,14 @@ if "%~1" == "" (
 
 :args_parsing
 set arg=%~1
-if "%arg%" == ""               (goto args_parsing_done)
-if /i "%arg%" == "/all"        set ActionBuildVS2010=1 && set ActionBuildVS2012=1 && set ActionBuildVS2013=1
-if /i "%arg%" == "/noclean"    set ActionClean=0
-if /i "%arg%" == "/no-clean"   set ActionClean=0
-if /i "%arg%" == "/scripts"    set ActionGenScripts=2
-if /i "%arg%" == "/noscripts"  set ActionGenScripts=0
-if /i "%arg%" == "/no-scripts" set ActionGenScripts=0
-if /i "%arg%" == "vs2010"      set ActionBuildVS2010=1 && set ActionGenScripts=1
-if /i "%arg%" == "vs2012"      set ActionBuildVS2012=1 && set ActionGenScripts=1
-if /i "%arg%" == "vs2013"      set ActionBuildVS2013=1 && set ActionGenScripts=1
-if /i "%arg:~0,5%" == "/out:"  set CustomOutputDir=%arg:~5%
+if "%arg%" == ""                 (goto args_parsing_done)
+if /i "%arg%" == "/all"          set ActionBuildVS2010=1 && set ActionBuildVS2012=1 && set ActionBuildVS2013=1
+if /i "%arg%" == "/noclean"      set ActionClean=0
+if /i "%arg%" == "/no-clean"     set ActionClean=0
+if /i "%arg%" == "vs2010"        set ActionBuildVS2010=1
+if /i "%arg%" == "vs2012"        set ActionBuildVS2012=1
+if /i "%arg%" == "vs2013"        set ActionBuildVS2013=1
+if /i "%arg:~0,5%" == "/out:"    set CustomOutputDir=%arg:~5%
 
 shift /1
 goto args_parsing
@@ -131,115 +126,7 @@ set /a actionNo += 1
 
 :skip_vs2013
 
-REM ********************************************************************************************
-REM Create Installation/Uninstallation Registry Scripts
-REM ********************************************************************************************
-if %ActionGenScripts% equ 0 (goto skip_scripts)
-
-echo %actionNo%: Creating installation scripts
-
-if %ActionBuildVS2010% equ 0 (if %ActionGenScripts% neq 2 (goto skip_vs2010_scripts))
-call :processTemplates 2010 10.0
-:skip_vs2010_scripts
-
-if %ActionBuildVS2012% equ 0 (if %ActionGenScripts% neq 2 (goto skip_vs2012_scripts))
-call :processTemplates 2012 11.0
-:skip_vs2012_scripts
-
-if %ActionBuildVS2013% equ 0 (if %ActionGenScripts% neq 2 (goto skip_vs2013_scripts))
-call :processTemplates 2013 12.0
-:skip_vs2013_scripts
-
-echo %actionNo%: Writing - DONE
-set /a actionNo += 1
-
-:skip_scripts
-
-REM ********************************************************************************************
-REM Helper functions
-REM ********************************************************************************************
 goto EOF
-
-REM ********************************************************************************************
-REM Generates a set of templates for specified Visual Studio version
-REM $1 - Visual Studio number (2010)
-REM $2 - Visual Studio version (10.0)
-:processTemplates
-setlocal EnableDelayedExpansion
-
-set InstallTemplate="%thisDir%\setup_install.template"
-set UninstallTemplate="%thisDir%\setup_uninstall.template"
-
-set VSYear=%~1
-set VSVersion=%~2
-set PluginRegistryNodeName=BlackBerryVSPlugin
-set PluginPathX86="C:\Program Files\BlackBerry\VSPlugin-NDK"
-set PluginPathX64="C:\Program Files (x86)\BlackBerry\VSPlugin-NDK"
-set DebuggerRegistryNodeX86="HKEY_LOCAL_MACHINE\SOFTWARE"
-set DebuggerRegistryNodeX64="HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node"
-
-set InstallOutputFileX86="%BuildResults%\setup_VS%VSYear%_install_x86.reg"
-set InstallOutputFileX64="%BuildResults%\setup_VS%VSYear%_install_x64.reg"
-set UninstallOutputFile="%BuildResults%\setup_VS%VSYear%_uninstall.reg"
-
-call :processTemplate %InstallTemplate% %InstallOutputFileX86% %VSYear% %VSVersion% %PluginRegistryNodeName% %PluginPathX86% %DebuggerRegistryNodeX86%
-call :processTemplate %InstallTemplate% %InstallOutputFileX64% %VSYear% %VSVersion% %PluginRegistryNodeName% %PluginPathX64% %DebuggerRegistryNodeX64%
-
-call :processTemplate %UninstallTemplate% %UninstallOutputFile% %VSYear% %VSVersion% %PluginRegistryNodeName% "" ""
-
-endlocal
-exit /b
-
-REM ********************************************************************************************
-REM Generates single file from specified template
-REM $1 - input template path
-REM $2 - output name
-REM $3 - Visual Studio number (2010)
-REM $4 - Visual Studio version (10.0)
-REM $5 - registry node name of the plugin (BlackBerryVSPlugin)
-REM $6 - plugin installation directory (C:\Program Files (x86)\BlackBerry\VSPlugin-NDK)
-REM $7 - registry root node for debugger info (HKEY_LOCAL_MACHINE\SOFTWARE or HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node)
-:processTemplate
-setlocal EnableDelayedExpansion
-
-set InputFile=%~1
-set OutputFile=%~2
-set OutputShortFileName=%~n2%~x2
-set VSYear=%~3
-set VSVersion=%~4
-set PluginRegistryNodeName=%~5
-set PluginPath=%~6
-set DebuggerRegistryRoot=%~7
-
-REM Tweak a bit the path, to be better consumed by delayed evaluation
-REM and printed correctly into output (preserve parenthesis and double path-chars)
-set PluginPath=!PluginPath:\=\\!
-set PluginPath=!PluginPath:(=^^(!
-set PluginPath=!PluginPath:)=^^)!
-
-REM Create empty file
-type nul > "%OutputFile%"
-
-for /f "tokens=* delims=" %%l in (%InputFile%) do (
-  set line=%%l
-
-  REM Inject empty line, so the sections are easier visible
-  set first=!line:~0,1!
-  if "!first!" == "[" echo.>> "%OutputFile%"
-  
-  REM Replace markers within the template
-  set line=!line:#VSVersion#=%VSVersion%!
-  set line=!line:#VSYear#=%VSYear%!
-  set line=!line:#PluginRegistryNodeName#=%PluginRegistryNodeName%!
-  set line=!line:#PluginPath#=%PluginPath%!
-  set line=!line:#DebuggerRegistryRoot#=%DebuggerRegistryRoot%!
-  echo.!line! >> "%OutputFile%"
-)
-echo.>> "%OutputFile%"
-echo %actionNo%: Completed template "%OutputShortFileName%"
-
-endlocal
-exit /b
 
 REM ********************************************************************************************
 REM DONE

@@ -42,8 +42,7 @@
   <StringProperty Name="TargetExt" DisplayName="Target Extension"
                   Description="Specifies a file extension that this project will generate. (Example: .exe or .dll)"
                   F1Keyword="VC.Project.VCConfiguration.TargetExt"
-                  Category="General"
-                  >
+                  Category="General">
                   <StringProperty.DataSource>
                      <DataSource Persistence="ProjectFile" Label="" />
                   </StringProperty.DataSource>

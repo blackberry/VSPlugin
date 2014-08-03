@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Management;
 using System.Text;
 using BlackBerry.NativeCore.Diagnostics;
 
 namespace BlackBerry.NativeCore.Tools
 {
     /// <summary>
-    /// Class that runs specified executable, captures its output and error messages, then provides to parsers.
+    /// Class that runs specified executable, captures its output and error messages, then provides to parsers (implemented in child classes! by overriding ConsumeResults() method).
+    /// 
+    /// Note: The outputs are assumed to be small. They are all accumulated inside internal buffers and at process exit just flushed.
+    /// If this behavior doesn't suit specific tool needs, override the ProcessOutputLine() and ProcessErrorLine() methods to process them as they arrive.
     /// </summary>
     public class ToolRunner : IDisposable
     {
@@ -28,8 +32,9 @@ namespace BlackBerry.NativeCore.Tools
 
             _process.StartInfo.UseShellExecute = false;
             _process.StartInfo.CreateNoWindow = true;
-            _process.StartInfo.RedirectStandardError = true;
             _process.StartInfo.RedirectStandardOutput = true;
+            _process.StartInfo.RedirectStandardError = true;
+            _process.StartInfo.RedirectStandardInput = true;
 
             _process.OutputDataReceived += OutputDataReceived;
             _process.ErrorDataReceived += ErrorDataReceived;
@@ -114,6 +119,36 @@ namespace BlackBerry.NativeCore.Tools
 
         #endregion
 
+        #region Internal Properties
+
+        protected int PID
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the indication, if started process should display a main application window.
+        /// Please note, that showing a console window for CUI tools will disable any output redirection.
+        /// </summary>
+        protected bool ShowWindow
+        {
+            get { return _process != null && !_process.StartInfo.CreateNoWindow; }
+            set
+            {
+                if (_process == null)
+                    throw new ObjectDisposedException("ToolRunner");
+
+                _process.StartInfo.CreateNoWindow = !value;
+
+                // and don't redirect anything, to have the data displayed inside that window:
+                _process.StartInfo.RedirectStandardOutput = !value;
+                _process.StartInfo.RedirectStandardError = !value;
+            }
+        }
+
+        #endregion
+
         protected virtual void ProcessOutputLine(string text)
         {
             if (_output != null && text != null)
@@ -142,6 +177,24 @@ namespace BlackBerry.NativeCore.Tools
             }
         }
 
+        private void InternalPrepareStarted()
+        {
+            if (_process.StartInfo.RedirectStandardError)
+                _process.BeginErrorReadLine();
+            if (_process.StartInfo.RedirectStandardOutput)
+                _process.BeginOutputReadLine();
+            if (_process.StartInfo.RedirectStandardInput)
+                _process.StandardInput.AutoFlush = true;
+
+            PID = _process.Id;
+            PrepareStarted(PID);
+        }
+
+        /// <summary>
+        /// Starts the tool and waits until it completes. It will block the current thread until that time.
+        /// The executable file name and all arguments are required to be setup earlier.
+        /// </summary>
+        /// <returns>Returns 'true', if tool returned exit code '0', otherwise 'false'.</returns>
         public bool Execute()
         {
             if (_isProcessing)
@@ -152,17 +205,13 @@ namespace BlackBerry.NativeCore.Tools
                 throw new InvalidOperationException("No executable to start");
 
             PrepareExecution();
-            ExitCode = int.MinValue;
 
             try
             {
                 _process.EnableRaisingEvents = false;
                 _process.Start();
+                InternalPrepareStarted();
 
-                _process.BeginErrorReadLine();
-                _process.BeginOutputReadLine();
-
-                PrepareStarted(_process.Id);
                 _process.WaitForExit();
                 ExitCode = _process.ExitCode;
 
@@ -183,6 +232,10 @@ namespace BlackBerry.NativeCore.Tools
             }
         }
 
+        /// <summary>
+        /// Starts the tool asynchronously. It will not block the current thread.
+        /// Subscribe to Finished event before, to know, when tool's process completed execution.
+        /// </summary>
         public void ExecuteAsync()
         {
             if (_isProcessing)
@@ -191,7 +244,6 @@ namespace BlackBerry.NativeCore.Tools
                 throw new ObjectDisposedException("ToolRunner");
 
             PrepareExecution();
-            ExitCode = int.MinValue;
 
             try
             {
@@ -199,10 +251,7 @@ namespace BlackBerry.NativeCore.Tools
                 _process.EnableRaisingEvents = true;
 
                 _process.Start();
-                _process.BeginErrorReadLine();
-                _process.BeginOutputReadLine();
-
-                PrepareStarted(_process.Id);
+                InternalPrepareStarted();
             }
             catch (Exception ex)
             {
@@ -230,13 +279,14 @@ namespace BlackBerry.NativeCore.Tools
         private void NotifyFinished(int exitCode, string output, string error)
         {
             var finishedHandler = Finished;
+            var dispatcher = Dispatcher;
 
             if (finishedHandler != null)
             {
                 // perform a cross-thread notification (in case we want to update UI directly from the handler)
-                if (Dispatcher != null)
+                if (dispatcher != null)
                 {
-                    Dispatcher.Invoke(finishedHandler, this, new ToolRunnerEventArgs(exitCode, output, error, Tag));
+                    dispatcher.Invoke(finishedHandler, this, new ToolRunnerEventArgs(exitCode, output, error, Tag));
                 }
                 else
                 {
@@ -247,6 +297,7 @@ namespace BlackBerry.NativeCore.Tools
 
         private void PrepareExecution()
         {
+            ExitCode = int.MinValue;
             _isProcessing = true;
             LastOutput = null;
             LastError = null;
@@ -287,6 +338,7 @@ namespace BlackBerry.NativeCore.Tools
             NotifyFinished(ExitCode, outputText, errorText);
 
             _isProcessing = false;
+            Cleanup();
         }
 
         /// <summary>
@@ -305,11 +357,62 @@ namespace BlackBerry.NativeCore.Tools
         /// </summary>
         protected virtual void PrepareStarted(int pid)
         {
+            // do nothing, subclasses should handle it, if needed
         }
 
         protected virtual void ConsumeResults(string output, string error)
         {
             // do nothing, subclasses should handle parsing output
+        }
+
+        protected virtual void Cleanup()
+        {
+            // do nothing, subclasses should handle it, when needed
+        }
+
+        /// <summary>
+        /// Sends given text to the process.
+        /// </summary>
+        /// <returns>Returns 'true', when sending succeeded, otherwise 'false'.</returns>
+        public virtual bool SendInput(string text)
+        {
+            if (_process != null && IsProcessing)
+            {
+                _process.StandardInput.WriteLine(text);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Sends given char to the process.
+        /// </summary>
+        /// <returns>Returns 'true', when sending succeeded, otherwise 'false'.</returns>
+        public virtual bool SendInput(char c)
+        {
+            if (_process != null)
+            {
+                _process.StandardInput.Write(c);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Sends given chars to the process.
+        /// </summary>
+        /// <returns>Returns 'true', when sending succeeded, otherwise 'false'.</returns>
+        public virtual bool SendInput(char[] buffer, int startIndex, int count)
+        {
+            if (_process != null)
+            {
+                _process.StandardInput.Write(buffer, startIndex, count);
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -326,11 +429,53 @@ namespace BlackBerry.NativeCore.Tools
             {
                 if (line.StartsWith("error:", StringComparison.InvariantCultureIgnoreCase))
                 {
-                    result.AppendLine(line.Substring(6).Trim());
+                    if (result.Length > 0)
+                        result.AppendLine();
+                    result.Append(line.Substring(6).Trim());
                 }
             }
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Aborts the process and all its child processes.
+        /// </summary>
+        public virtual bool Abort()
+        {
+            if (!IsProcessing)
+                return false;
+            if (_process == null)
+                throw new ObjectDisposedException("ToolRunner");
+
+            // kill current process and all child ones:
+            if (IsProcessing)
+            {
+                try
+                {
+                    _process.Kill(); // PH: INFO: somehow, it gets automatically killed for command-line tools...
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to kill current tool");
+                }
+            }
+
+            var searcher = new ManagementObjectSearcher("SELECT * FROM Win32_Process WHERE ParentProcessId=" + PID);
+            foreach (var item in searcher.Get())
+            {
+                try
+                {
+                    var childProcess = Process.GetProcessById(Convert.ToInt32(item["ProcessId"].ToString()));
+                    childProcess.Kill();
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to kill current tool child-process");
+                }
+            }
+
+            return true;
         }
 
         #region IDisposable Implementation
@@ -348,6 +493,7 @@ namespace BlackBerry.NativeCore.Tools
                 _process.OutputDataReceived -= OutputDataReceived;
                 _process.ErrorDataReceived -= ErrorDataReceived;
 
+                Abort();
                 _process.Dispose();
                 _process = null;
             }

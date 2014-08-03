@@ -24,7 +24,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,7 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -63,8 +63,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Security" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
@@ -143,6 +141,9 @@
     <Compile Include="..\..\src_vs2010\DebugEngine\AD7.Impl\AD7Thread.cs">
       <Link>AD7.Impl\AD7Thread.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\DebugEngineStatus.cs">
+      <Link>DebugEngineStatus.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\BreakpointManager.cs">
       <Link>Engine.Impl\BreakpointManager.cs</Link>
     </Compile>
@@ -155,21 +156,29 @@
     <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\EventDispatcher.cs">
       <Link>Engine.Impl\EventDispatcher.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\HandleBreakpoints.cs">
+      <Link>Engine.Impl\HandleBreakpoints.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\HandleOutputs.cs">
+      <Link>Engine.Impl\HandleOutputs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\HandleProcessExecution.cs">
+      <Link>Engine.Impl\HandleProcessExecution.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2010\DebugEngine\Engine.Impl\VariableInfo.cs">
+      <Link>Engine.Impl\VariableInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2010\DebugEngine\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
-      <Link>ConfigDefaults.cs</Link>
+    <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
-      <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
-      <Name>GDBParser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
-      <Project>{3d6effaf-ff39-497d-b6f8-0b6169e90c6d}</Project>
-      <Name>BlackBerry.Package</Name>
+    <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
+      <Project>{ae6bee3e-3273-4214-a215-2924e33246ca}</Project>
+      <Name>BlackBerry.NativeCore</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

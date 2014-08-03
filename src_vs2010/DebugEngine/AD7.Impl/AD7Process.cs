@@ -14,7 +14,8 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using BlackBerry.NativeCore.Debugger.Model;
+using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -32,80 +33,100 @@ namespace BlackBerry.DebugEngine
     /// This interface is implemented by a custom port supplier to manage programs as a group. An IDebugProcess2 contains one or more 
     /// IDebugProgram2 interfaces.
     /// </summary>
-    public class AD7Process : IDebugProcess2, IDebugProcessEx2
+    public sealed class AD7Process : IDebugProcess2, IDebugProcessEx2
     {
         /// <summary>
-        /// Identifies the session in which this process is attached to.
+        /// The name and ID of the process running on target device.
         /// </summary>
-        private IDebugSession2 session;
-        
-        /// <summary>
-        /// The name of the process. Not used till now. Has no value assigned to it.
-        /// </summary>
-        public string _name;
+        private readonly ProcessInfo _details;
 
         /// <summary>
-        /// The AD7Port object that represents the port used in Attach to Process UI.
-        /// </summary>
-        public AD7Port _portAttach = null;
-
-        /// <summary>
-        /// The IDebugPort2 object that represents the port on which the process was launched.
+        /// The object that represents the port used in Attach to Process UI or on which the process was launched.
         /// </summary>
         private IDebugPort2 _port;
-        
-        /// <summary>
-        /// Process GUID.
-        /// </summary>
-        public Guid _processGUID = Guid.NewGuid();
 
-        /// <summary>
-        /// Process ID.
-        /// </summary>
-        public string _processID;
-
-        /// <summary>
-        /// The AD7Engine object that represents the DE.
-        /// </summary>
-        protected AD7Engine _engine = null;
-
-        /// <summary>
-        /// A program that is running in this process. It should be an array of programs, as a process "is a container for 
-        /// a set of programs" but, at this moment, the VSNDK supports only one program at a time.
-        /// </summary>
-        public IDebugProgram2 m_program = null;
+        private readonly bool _attaching;
 
         /// <summary>
         /// The list of programs that are running in this process.
         /// </summary>
-        List<IDebugProgram2> m_listOfPrograms = new List<IDebugProgram2>();
+        private readonly List<IDebugProgram2> _listOfPrograms;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="aEngine"> The AD7Engine object that represents the DE. </param>
-        /// <param name="aPort"> The IDebugPort2 object that represents the port on which the process was launched. </param>
-        public AD7Process(AD7Engine aEngine, IDebugPort2 aPort)
+        /// <param name="port">The IDebugPort2 object that represents the port on which the process was launched.</param>
+        /// <param name="details">The ID of the process running on the device and local path to the executable.</param>
+        /// <param name="device">Description of the device the process is running programs on.</param>
+        public AD7Process(IDebugPort2 port, ProcessInfo details, DeviceDefinition device)
         {
-            _engine = aEngine;
-            _port = aPort;
-            m_program = aEngine.m_program;
-        }
+            if (port == null)
+                throw new ArgumentNullException("port");
+            if (details == null)
+                throw new ArgumentNullException("details");
+            if (device == null)
+                throw new ArgumentNullException("device");
 
+            _port = port;
+            _attaching = false;
+            _details = details;
+            Device = device;
+            _listOfPrograms = new List<IDebugProgram2>();
+            UID = Guid.NewGuid();
+        }
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="aPort"> The AD7Port object that represents the port used in Attach to Process UI. </param>
-        /// <param name="ID"> The process ID. </param>
-        /// <param name="name"> The process name. </param>
-        public AD7Process(AD7Port aPort, string ID, string name)
+        /// <param name="port">The AD7Port object that represents the port used in Attach to Process UI.</param>
+        /// <param name="details">The name and ID of the process running on device.</param>
+        public AD7Process(AD7Port port, ProcessInfo details)
         {
-            _portAttach = aPort;
-            _processID = ID;
-            _name = name;
+            if (port == null)
+                throw new ArgumentNullException("port");
+            if (port.Device == null)
+                throw new ArgumentOutOfRangeException("port");
+            if (details == null)
+                throw new ArgumentNullException("details");
+
+            _port = port;
+            _attaching = true;
+            _details = details;
+            Device = port.Device;
+            _listOfPrograms = new List<IDebugProgram2>();
+            UID = Guid.NewGuid();
         }
 
+        #region Properties
+
+        public uint ID
+        {
+            get { return _details.ID; }
+        }
+
+        public Guid UID
+        {
+            get;
+            private set;
+        }
+
+        public ProcessInfo Details
+        {
+            get { return _details; }
+        }
+
+        public IDebugPort2 Port
+        {
+            get { return _port; }
+        }
+
+        public DeviceDefinition Device
+        {
+            get;
+            private set;
+        }
+
+        #endregion
 
         /// <summary>
         /// Attaches the session debug manager (SDM) to the process. Not implemented. Currently using IDebugEngine2.Attach.
@@ -123,7 +144,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Determines if the session debug manager (SDM) can detach the process. Not implemented. 
         /// (http://msdn.microsoft.com/en-us/library/bb145567.aspx)
@@ -133,7 +153,6 @@ namespace BlackBerry.DebugEngine
         {
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Requests that the next program that is running code in this process halt and send an IDebugBreakEvent2 event object.
@@ -145,7 +164,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Detaches the debugger from this process by detaching all of the programs in the process. 
         /// (http://msdn.microsoft.com/en-us/library/bb162197.aspx)
@@ -154,12 +172,8 @@ namespace BlackBerry.DebugEngine
         public int Detach()
         {
             _port = null;
-            _portAttach = null;
-            _engine = null;
-            m_program = null;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Retrieves a list of all the programs contained by this process.
@@ -169,22 +183,15 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumPrograms(out IEnumDebugPrograms2 ppEnum)
         {
-            if (m_listOfPrograms.Count == 0)
+            if (_listOfPrograms.Count == 0)
             {
-                AD7ProgramNodeAttach pn = new AD7ProgramNodeAttach(this, new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}"));
-                m_listOfPrograms.Add((IDebugProgram2)pn);
+                AD7ProgramNodeAttach pn = new AD7ProgramNodeAttach(this);
+                _listOfPrograms.Add(pn);
             }
-            IDebugProgram2[] p = new IDebugProgram2[m_listOfPrograms.Count()];
-            int i = 0;
-            foreach (var prog in m_listOfPrograms)
-            {
-                p[i] = prog;
-                i++;
-            }
-            ppEnum = new AD7ProgramEnum(p);
+
+            ppEnum = new AD7ProgramEnum(_listOfPrograms.ToArray());
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Retrieves a list of all the threads running in all programs in the process. Not implemented.
@@ -199,7 +206,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets the name of the session that is debugging the process. [DEPRECATED. SHOULD ALWAYS RETURN E_NOTIMPL.]
         /// (http://msdn.microsoft.com/en-us/library/bb146718.aspx)
@@ -209,55 +215,56 @@ namespace BlackBerry.DebugEngine
         public int GetAttachedSessionName(out string pbstrSessionName)
         {
             pbstrSessionName = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Gets a description of the process. (http://msdn.microsoft.com/en-us/library/bb145895.aspx)
         /// </summary>
-        /// <param name="Fields"> A combination of values from the PROCESS_INFO_FIELDS enumeration that specifies which fields of 
+        /// <param name="fields"> A combination of values from the PROCESS_INFO_FIELDS enumeration that specifies which fields of 
         /// the pProcessInfo parameter are to be filled in. </param>
         /// <param name="pProcessInfo"> A PROCESS_INFO structure that is filled in with a description of the process. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetInfo(enum_PROCESS_INFO_FIELDS Fields, PROCESS_INFO[] pProcessInfo)
+        public int GetInfo(enum_PROCESS_INFO_FIELDS fields, PROCESS_INFO[] pProcessInfo)
         {
             try
             {
-                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_FILE_NAME) != 0)
+                if ((fields & enum_PROCESS_INFO_FIELDS.PIF_FILE_NAME) != 0)
                 {
-                    pProcessInfo[0].bstrFileName = _name;
+                    pProcessInfo[0].bstrFileName = _details.ExecutablePath;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_FILE_NAME;
                 }
-                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_BASE_NAME) != 0)
+                if ((fields & enum_PROCESS_INFO_FIELDS.PIF_BASE_NAME) != 0)
                 {
-                    pProcessInfo[0].bstrBaseName = _name.Substring(_name.LastIndexOf('/') + 1);
+                    pProcessInfo[0].bstrBaseName = _details.Name;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_BASE_NAME;
                 }
-                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_TITLE) != 0)
+                if ((fields & enum_PROCESS_INFO_FIELDS.PIF_TITLE) != 0)
                 {
-                    pProcessInfo[0].bstrTitle = _name;
+                    pProcessInfo[0].bstrTitle = _details.ShortExecutablePath;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_TITLE;
                 }
-                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_PROCESS_ID) != 0)
+                if ((fields & enum_PROCESS_INFO_FIELDS.PIF_PROCESS_ID) != 0)
                 {
-                    pProcessInfo[0].ProcessId.dwProcessId = Convert.ToUInt32(_processID);
+                    pProcessInfo[0].ProcessId.dwProcessId = _details.ID;
                     pProcessInfo[0].ProcessId.ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_PROCESS_ID;
                 }
-                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_SESSION_ID) != 0)
+
+                if ((fields & enum_PROCESS_INFO_FIELDS.PIF_SESSION_ID) != 0)
                 {
-//                    pProcessInfo[0].dwSessionId = 0;
+                    //pProcessInfo[0].dwSessionId = 0;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_SESSION_ID;
                 }
-                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_ATTACHED_SESSION_NAME) != 0)
+                if ((fields & enum_PROCESS_INFO_FIELDS.PIF_ATTACHED_SESSION_NAME) != 0)
                 {
-//                    pProcessInfo[0].bstrAttachedSessionName = null;
+                    //pProcessInfo[0].bstrAttachedSessionName = null;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_ATTACHED_SESSION_NAME;
                 }
-                if ((Fields & enum_PROCESS_INFO_FIELDS.PIF_CREATION_TIME) != 0)
+                if ((fields & enum_PROCESS_INFO_FIELDS.PIF_CREATION_TIME) != 0)
                 {
-//                    pProcessInfo[0].CreationTime = null;
+                    //pProcessInfo[0].CreationTime.dwHighDateTime = 0;
+                    //pProcessInfo[0].CreationTime.dwLowDateTime = 0;
                     pProcessInfo[0].Fields |= enum_PROCESS_INFO_FIELDS.PIF_CREATION_TIME;
                 }
 
@@ -269,19 +276,17 @@ namespace BlackBerry.DebugEngine
             }
         }
 
-
         /// <summary>
         /// Gets the name of the process. (http://msdn.microsoft.com/en-us/library/bb161270.aspx)
         /// </summary>
-        /// <param name="gnType"> A value from the GETNAME_TYPE enumeration that specifies what type of name to return. </param>
+        /// <param name="type"> A value from the GETNAME_TYPE enumeration that specifies what type of name to return. </param>
         /// <param name="pbstrName"> Returns the name of the process. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetName(enum_GETNAME_TYPE gnType, out string pbstrName)
+        public int GetName(enum_GETNAME_TYPE type, out string pbstrName)
         {
-            pbstrName = _name;
+            pbstrName = _details.Name;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the system process identifier. (http://msdn.microsoft.com/en-us/library/bb146648.aspx)
@@ -290,20 +295,21 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPhysicalProcessId(AD_PROCESS_ID[] pProcessId)
         {
-            if (_engine == null)
+            if (_attaching)
             {
-                pProcessId[0].dwProcessId = Convert.ToUInt32(_processID);
+                // attaching to existing process on the target
+                pProcessId[0].dwProcessId = _details.ID;
                 pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_SYSTEM;
             }
             else
             {
-                pProcessId[0].guidProcessId = _processGUID;
+                // running in app in debug
+                pProcessId[0].guidProcessId = UID;
                 pProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
             }
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the port that the process is running on. (http://msdn.microsoft.com/en-us/library/bb162121.aspx)
@@ -316,7 +322,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets the GUID for this process. (http://msdn.microsoft.com/en-us/library/bb161938.aspx)
         /// </summary>
@@ -324,10 +329,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetProcessId(out Guid pguidProcessId)
         {
-            pguidProcessId = _processGUID;
+            pguidProcessId = UID;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the server that this process is running on. Not implemented completely because _server has no value assigned to it.
@@ -351,32 +355,27 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         #region IDebugProcessEx2 Members
 
         /// <summary>
         /// Informs the process that a session is now debugging the process. (http://msdn.microsoft.com/en-us/library/bb162300.aspx)
         /// </summary>
-        /// <param name="pSession"> A value that uniquely identifies the session attaching to this process. </param>
+        /// <param name="session"> A value that uniquely identifies the session attaching to this process. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int Attach(IDebugSession2 pSession)
+        public int Attach(IDebugSession2 session)
         {
-            session = pSession;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Informs the process that a session is no longer debugging the process. (http://msdn.microsoft.com/en-us/library/bb146313.aspx)
         /// </summary>
-        /// <param name="pSession"> A value that uniquely identifies the session to detach this process from. </param>
+        /// <param name="session"> A value that uniquely identifies the session to detach this process from. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int Detach(IDebugSession2 pSession)
+        public int Detach(IDebugSession2 session)
         {
-            session = pSession;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Adds program nodes for a list of debug engines. (http://msdn.microsoft.com/en-us/library/bb146990.aspx)
@@ -389,11 +388,10 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int AddImplicitProgramNodes(ref Guid guidLaunchingEngine, Guid[] rgguidSpecificEngines, uint celtSpecificEngines)
         {
-            guidLaunchingEngine = new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}");
+            guidLaunchingEngine = new Guid(AD7Engine.DebugEngineGuid);
             return VSConstants.S_OK;
         }
 
         #endregion
-        
     }
 }

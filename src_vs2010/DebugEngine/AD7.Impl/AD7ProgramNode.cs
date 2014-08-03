@@ -12,10 +12,10 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
+using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Diagnostics;
+using System;
 
 namespace BlackBerry.DebugEngine
 {
@@ -25,33 +25,14 @@ namespace BlackBerry.DebugEngine
     /// A running process is viewed as a ProgramNode by VS. 
     /// A debug engine (DE) or a custom port supplier implements this interface to represent a program that can be debugged. 
     /// </summary>
-    public class AD7ProgramNode : IDebugProgramNode2
+    public sealed class AD7ProgramNode : IDebugProgramNode2
     {
         /// <summary>
         ///  The GUID of the hosting process. 
         /// </summary>
-        readonly Guid m_processGuid;
+        private readonly Guid _processGuid;
 
-        /// <summary>
-        ///  The ID of the program to be debugged. 
-        /// </summary>
-        public string m_programID;
-
-        /// <summary>
-        /// The program friendly name.
-        /// </summary>
-        public string m_programName;
-
-        /// <summary>
-        ///  The file name of the program to be debugged.
-        /// </summary>
-        readonly string m_exePath;
-
-        /// <summary>
-        /// The GUID of the VSNDK debug engine. 
-        /// </summary>
-        readonly Guid m_engineGuid;
-
+        private readonly ProcessInfo _details;
 
         /// <summary>
         /// Constructor.
@@ -60,41 +41,47 @@ namespace BlackBerry.DebugEngine
         /// <param name="processGuid"> The GUID for this process. </param>
         public AD7ProgramNode(Guid processGuid)
         {
-            m_processGuid = processGuid;
-            m_programID = "";
-            m_exePath = "";
-            m_programName = "";
-            m_engineGuid = new Guid(AD7Engine.Id);
+            _processGuid = processGuid;
         }
-
 
         /// <summary>
         /// Constructor.
         /// </summary>
+        /// <param name="details"> The description of the the debugged program. </param>
         /// <param name="processGuid"> The GUID for this process. </param>
-        /// <param name="programID"> The ID of the program to be debugged. </param>
-        /// <param name="exePath"> The name of the executable to be debugged. </param>
         /// <param name="engineGuid"> The GUID of the VSNDK debug engine. </param>
-        public AD7ProgramNode(Guid processGuid, string programID, string exePath, Guid engineGuid)
+        public AD7ProgramNode(ProcessInfo details, Guid processGuid)
         {
-            m_processGuid = processGuid;
-            m_programID = programID;
+            if (details == null)
+                throw new ArgumentNullException("details");
 
-            m_exePath = exePath;
-            do
-            {
-                m_exePath = m_exePath.Replace("\\\\", "\\");
-            }
-            while (m_exePath.IndexOf("\\\\") != -1);
-
-            int i = exePath.LastIndexOf('\\');
-            if ((i != -1) && (i < (exePath.Length - 1)))
-                m_programName = exePath.Substring(i + 1);
-            else
-                m_programName = exePath;
-
-            m_engineGuid = engineGuid;
+            _details = details;
+            _processGuid = processGuid;
         }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="process">The process associated with the node.</param>
+        public AD7ProgramNode(AD7Process process)
+        {
+            if (process == null)
+                throw new ArgumentNullException("process");
+            if (process.Details == null)
+                throw new ArgumentOutOfRangeException("process");
+
+            _details = process.Details;
+            _processGuid = process.UID;
+        }
+
+        #region Properties
+
+        public string Name
+        {
+            get { return _details.Name; }
+        }
+
+        #endregion
 
         #region IDebugProgramNode2 Members
 
@@ -109,12 +96,11 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugProgramNode2.GetEngineInfo(out string engineName, out Guid engineGuid)
         {
-            engineName = "";
-            engineGuid = m_engineGuid;
+            engineName = string.Empty;
+            engineGuid = new Guid(AD7Engine.DebugEngineGuid);
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the system process identifier for the process hosting a program. (http://msdn.microsoft.com/en-us/library/bb162159.aspx)
@@ -125,28 +111,26 @@ namespace BlackBerry.DebugEngine
         {
             // According to the MSDN documentation (http://msdn.microsoft.com/en-us/library/bb162159.aspx),
             // it should return the process id of the hosting process, but what is expected is the program ID...
-            pHostProcessId[0].ProcessIdType = (uint)enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
-            pHostProcessId[0].guidProcessId = m_processGuid;
+            pHostProcessId[0].ProcessIdType = (uint) enum_AD_PROCESS_ID.AD_PROCESS_ID_GUID;
+            pHostProcessId[0].guidProcessId = _processGuid;
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the name of the process hosting a program. (http://msdn.microsoft.com/en-us/library/bb145135.aspx)
         /// </summary>
-        /// <param name="dwHostNameType"> A value from the GETHOSTNAME_TYPE enumeration that specifies the type of name to return. </param>
+        /// <param name="type"> A value from the GETHOSTNAME_TYPE enumeration that specifies the type of name to return. </param>
         /// <param name="processName"> Returns the name of the hosting process. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugProgramNode2.GetHostName(enum_GETHOSTNAME_TYPE dwHostNameType, out string processName)
+        int IDebugProgramNode2.GetHostName(enum_GETHOSTNAME_TYPE type, out string processName)
         {
-            if (dwHostNameType == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
-                processName = "(BB-pid = " + m_programID + ") " + m_exePath;
+            if (type == enum_GETHOSTNAME_TYPE.GHN_FILE_NAME)
+                processName = "(BB-pid = " + _details.ID + ") " + _details.ExecutablePath;
             else
-                processName = m_programName;
+                processName = _details.Name;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the name of a program. (http://msdn.microsoft.com/en-us/library/bb145928.aspx)
@@ -155,7 +139,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugProgramNode2.GetProgramName(out string programName)
         {
-            programName = m_programName;
+            programName = _details.Name;
             return VSConstants.S_OK;
         }
 
@@ -164,20 +148,17 @@ namespace BlackBerry.DebugEngine
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
 
-
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161399.aspx)
         /// </summary>
-        /// <param name="pMDMProgram"> The IDebugProgram2 interface that represents the program to attach to. </param>
+        /// <param name="program"> The IDebugProgram2 interface that represents the program to attach to. </param>
         /// <param name="pCallback"> The IDebugEventCallback2 interface to be used to send debug events to the SDM. </param>
-        /// <param name="dwReason"> A value from the ATTACH_REASON enumeration that specifies the reason for attaching. </param>
+        /// <param name="reason"> A value from the ATTACH_REASON enumeration that specifies the reason for attaching. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        int IDebugProgramNode2.Attach_V7(IDebugProgram2 pMDMProgram, IDebugEventCallback2 pCallback, uint dwReason)
+        int IDebugProgramNode2.Attach_V7(IDebugProgram2 program, IDebugEventCallback2 pCallback, uint reason)
         {
-            Debug.Fail("This function is not called by the debugger");
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161803.aspx)
@@ -185,10 +166,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         int IDebugProgramNode2.DetachDebugger_V7()
         {
-            Debug.Fail("This function is not called by the debugger");
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// DEPRECATED. DO NOT USE. (http://msdn.microsoft.com/en-us/library/bb161297.aspx)
@@ -197,12 +176,10 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         int IDebugProgramNode2.GetHostMachineName_V7(out string hostMachineName)
         {
-            Debug.Fail("This function is not called by the debugger");
             hostMachineName = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         #endregion
     }
-
 }

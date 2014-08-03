@@ -14,11 +14,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
-using VSNDK.Parser;
 using System.Windows.Forms;
 
 namespace BlackBerry.DebugEngine
@@ -33,173 +32,129 @@ namespace BlackBerry.DebugEngine
     ///   connectable and provides the IConnectionPoint interface. (http://msdn.microsoft.com/en-CA/library/ms683857.aspx)
     /// - IConnectionPoint - Supports connection points for connectable objects. (http://msdn.microsoft.com/en-us/library/ms694318.aspx)
     /// </summary>
-    public class AD7Port : IDebugPort2
+    public sealed class AD7Port : IDebugPort2
     {
-
-        /// <summary>
-        /// The name of the port.
-        /// </summary>
-        private readonly string m_name;
-
-        /// <summary>
-        /// The IP of the port.
-        /// </summary>
-        public readonly string m_IP;
-
-        /// <summary>
-        /// The password needed to have access to the port.
-        /// </summary>
-        public readonly string m_password;
-
-        /// <summary>
-        /// Boolean variable that indicates if the port is associated to the Simulator or the Device.
-        /// </summary>
-        public readonly bool m_isSimulator;
-
-        /// <summary>
-        /// The NDK host path.
-        /// </summary>
-        public readonly string m_toolsPath;
-
-        /// <summary>
-        /// List of processes running on this port.
-        /// </summary>
-        private readonly List<AD7Process> m_processes = new List<AD7Process>();
-
-        /// <summary>
-        /// The GUID that identifies the port.
-        /// </summary>
-        private readonly Guid m_guid;
-
         /// <summary>
         /// Represents the request that was used to create the port.
         /// </summary>
-        private readonly AD7PortRequest m_request;
+        private readonly AD7PortRequest _request;
 
         /// <summary>
         /// Represents the port supplier for this port.
         /// </summary>
-        private readonly AD7PortSupplier m_supplier;
+        private readonly AD7PortSupplier _supplier;
 
         /// <summary>
         /// Stores the last time that the list of running processes was refreshed. 
         /// Used to avoid issues in case the user spams the refresh button.
         /// </summary>
-        private DateTime lastTimeRefresh = DateTime.Now;
+        private DateTime _lastTimeRefresh = DateTime.MinValue;
 
         /// <summary>
         /// Stores the list of running processes in the simulator/device.
         /// </summary>
-        private IDebugProcess2[] processes = null;
+        private IDebugProcess2[] _processes;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="supplier"> The port supplier for this port. </param>
-        /// <param name="request"> The request used to create the port. </param>
-        /// <param name="guid"> The GUID that identifies the port. </param>
-        /// <param name="portName"> The name of the port. </param>
-        /// <param name="password"> The password needed to have access to the port. </param>
-        /// <param name="isSimulator"> Variable that indicates if the port is associated to the Simulator or the Device. </param>
-        /// <param name="toolsPath"> The NDK host path. </param>
-        public AD7Port(AD7PortSupplier supplier, AD7PortRequest request, Guid guid, string portName, string password, bool isSimulator, string toolsPath)
+        /// <param name="supplier">The port supplier for this port.</param>
+        /// <param name="request">The request used to create the port.</param>
+        /// <param name="guid">The GUID that identifies the port.</param>
+        /// <param name="name">The name of the port.</param>
+        /// <param name="device">Description of the device it should communicate with.</param>
+        /// <param name="ndk">The description of NDK installed on host machine.</param>
+        public AD7Port(AD7PortSupplier supplier, AD7PortRequest request, Guid guid, string name, DeviceDefinition device, NdkDefinition ndk)
         {
-            m_name = portName;
-            m_request = request;
-            m_supplier = supplier;
-            m_guid = guid;
-            if (m_name != "")
-            {
-                if (isSimulator)
-                    m_IP = m_name.Substring(11);
-                else
-                    m_IP = m_name.Substring(8);
-            }
-            else
-            {
-                m_name = " ";
-                m_IP = "";
-            }
-            m_password = password;
-            m_isSimulator = isSimulator;
-            m_toolsPath = toolsPath;
+            if (supplier == null)
+                throw new ArgumentNullException("supplier");
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (ndk == null)
+                throw new ArgumentNullException("ndk");
+
+            Name = name;
+            _request = request;
+            _supplier = supplier;
+            Guid = guid;
+            Device = device;
+            NDK = ndk;
         }
 
+        #region Properties
+
+        /// <summary>
+        /// Gets or set the GUID that identifies the port.
+        /// </summary>
+        public Guid Guid
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets the name of the port.
+        /// </summary>
+        public string Name
+        {
+            get;
+            private set;
+        }
+
+        public DeviceDefinition Device
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets or sets the NDK reference.
+        /// </summary>
+        public NdkDefinition NDK
+        {
+            get;
+            private set;
+        }
+
+        #endregion
 
         /// <summary>
         /// Gets the list of processes running on this port.
         /// </summary>
         /// <returns> Returns the list of processes running on this port. </returns>
-        IEnumerable<AD7Process> GetProcesses()
+        private AD7Process[] GetProcesses()
         {
-            if (m_processes.Count != 0)
+            var processesRequest = GdbWrapper.ListProcesses(NDK, Device);
+
+            // timeout or other problem?
+            if (processesRequest == null || processesRequest.Response == null || processesRequest.Response.Name == "error")
             {
-                m_processes.Clear();
+                // when error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
+                // the msg part is stored as Content property then
+
+                string deviceType = Device.Type == DeviceDefinitionType.Device ? "device" : "simulator";
+                MessageBox.Show(string.Concat("Please, verify if the ", deviceType, " (", Device.IP, ") is defined correctly. It can be modified at \"BlackBerry -> Settings\" menu."),
+                    "Connection failure or timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                return new AD7Process[0];
             }
 
-            string publicKeyPath = ConfigDefaults.SshPublicKeyPath;
-
-            string response = GDBParser.GetPIDsThroughGDB(m_IP, m_password, m_isSimulator, m_toolsPath, publicKeyPath, 12);
-
-            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0) != -1)) //found an error
+            // ok, got the valid response
+            if (processesRequest.Response.Name == "done")
             {
-                if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
+                var result = new List<AD7Process>();
+                foreach (var p in processesRequest.Processes)
                 {
-                    MessageBox.Show("Please, verify if the Device/Simulator IP in \"BlackBerry -> Settings\" menu is correct and check if it is connected.", "Device/Simulator not connected or not configured properly", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    result.Add(new AD7Process(this, p));
                 }
-                else if (response.IndexOf("1^error,msg=", 0) != -1) // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
-                {
-                    string txt = "";
-                    int pos = response.IndexOf('"');
-                    if (pos != -1)
-                    {
-                        txt = response.Substring(pos);
-                    }
-//                    string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
-                    string caption = "";
-                    if (txt.IndexOf("The requested address is not valid in its context.") != -1)
-                    {
-                        txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
-                        caption = "Invalid IP";
-                    }
-                    else
-                    {
-                        txt += "\n\nPlease, verify if the device/simulator is connected.";
-                        caption = "Connection failed";
-                    }
-                    MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                response = "";
-            }
-            else if (response.Contains("^done"))
-            {
-                response = response.Remove(response.IndexOf("^done"));
-                string[] tempListOfProcesses = response.Split('\n');
 
-                int ind = (response[0] == '&') ? 1 : 0; // ignore the first if it starts with & (&"info pidlist")
-                while (ind < tempListOfProcesses.Length - 1)
-                {
-                    string process = tempListOfProcesses[ind];
-                    int pos = process.LastIndexOf('/');
-                    if (pos == -1)
-                    {
-                        ind++;
-                        continue;
-                    }
-                    process = process.Remove(pos).Substring(2);
-                    for (ind = ind + 1; ind < tempListOfProcesses.Length - 1; ind++) // ignore the duplicates
-                    {
-                        int pos2 = tempListOfProcesses[ind].LastIndexOf('/');
-                        if ((pos2 <= 2) || (tempListOfProcesses[ind].Substring(2, pos2 - 2) != process))
-                            break;
-                    }
-                    AD7Process proc = new AD7Process(this, process.Substring(process.IndexOf("- ") + 2), process.Remove(process.IndexOf(" ")));
-                    m_processes.Add(proc);
-                }
+                return result.ToArray();
             }
-            return m_processes;
+
+            return new AD7Process[0];
         }
-
 
         #region Implementation of IDebugPort2
 
@@ -210,10 +165,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPortName(out string pbstrName)
         {
-            pbstrName = m_name;
+            pbstrName = Name;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Returns the port identifier. (http://msdn.microsoft.com/en-us/library/bb146747.aspx)
@@ -222,10 +176,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPortId(out Guid pguidPort)
         {
-            pguidPort = m_guid;
+            pguidPort = Guid;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Returns the request used to create a port. (http://msdn.microsoft.com/en-us/library/bb145127.aspx)
@@ -234,10 +187,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPortRequest(out IDebugPortRequest2 ppRequest)
         {
-            ppRequest = m_request;
+            ppRequest = _request;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Returns the port supplier for this port. (http://msdn.microsoft.com/en-us/library/bb146688.aspx)
@@ -246,27 +198,32 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetPortSupplier(out IDebugPortSupplier2 ppSupplier)
         {
-            ppSupplier = m_supplier;
+            ppSupplier = _supplier;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Returns the specified process running on a port. (http://msdn.microsoft.com/en-us/library/bb145867.aspx)
         /// </summary>
-        /// <param name="ProcessId"> An AD_PROCESS_ID structure that specifies the process identifier. </param>
+        /// <param name="processId"> An AD_PROCESS_ID structure that specifies the process identifier. </param>
         /// <param name="ppProcess"> Returns an IDebugProcess2 object representing the process. </param>
         /// <returns> If successful, returns VSConstants.S_OK; otherwise, returns VSConstants.S_FALSE. </returns>
-        public int GetProcess(AD_PROCESS_ID ProcessId, out IDebugProcess2 ppProcess)
+        public int GetProcess(AD_PROCESS_ID processId, out IDebugProcess2 ppProcess)
         {
-            IEnumerable<AD7Process> procList = GetProcesses();
-            var proc = from p in procList
-                       where p._processID == ProcessId.dwProcessId.ToString()
-                       select p;
-            ppProcess = proc.FirstOrDefault();
+            IEnumerable<AD7Process> list = GetProcesses();
+            uint id = processId.dwProcessId;
+
+            ppProcess = null;
+            foreach (var process in list)
+            {
+                if (process.ID == id)
+                {
+                    ppProcess = process;
+                    break;
+                }
+            }
             return ppProcess != null ? VSConstants.S_OK : VSConstants.S_FALSE;
         }
-
 
         /// <summary>
         /// Enumerates all the processes running on a port. (http://msdn.microsoft.com/en-us/library/bb161302.aspx)
@@ -275,36 +232,35 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumProcesses(out IEnumDebugProcesses2 ppEnum)
         {
-            if (this.m_IP == "")
+            if (string.IsNullOrEmpty(Device.IP))
             {
-                processes = new IDebugProcess2[0];
+                _processes = new IDebugProcess2[0];
             }
             else
             {
                 DateTime now = DateTime.Now;
 
-                TimeSpan diff = now - lastTimeRefresh;
+                TimeSpan diff = now - _lastTimeRefresh;
                 double seconds = diff.TotalSeconds;
 
                 if (seconds > 1)
                 {
-                    IEnumerable<AD7Process> procList = GetProcesses();
-                    processes = new IDebugProcess2[procList.Count()];
+                    var processlist = GetProcesses();
+                    _processes = new IDebugProcess2[processlist.Length];
                     int i = 0;
-                    foreach (var debugProcess in procList)
+                    foreach (var debugProcess in processlist)
                     {
-                        processes[i] = debugProcess;
+                        _processes[i] = debugProcess;
                         i++;
                     }
-                    lastTimeRefresh = DateTime.Now;
+                    _lastTimeRefresh = DateTime.Now;
                 }
             }
-            ppEnum = new AD7ProcessEnum(processes);
 
+            ppEnum = new AD7ProcessEnum(_processes);
             return VSConstants.S_OK;
         }
 
         #endregion
-
     }
 }

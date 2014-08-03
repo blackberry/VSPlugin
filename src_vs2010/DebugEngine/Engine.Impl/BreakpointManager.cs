@@ -12,7 +12,9 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+using System;
 using System.Collections.Generic;
+using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace BlackBerry.DebugEngine
@@ -20,24 +22,22 @@ namespace BlackBerry.DebugEngine
     /// <summary>
     /// This class manages breakpoints for the engine. 
     /// </summary>
-    public class BreakpointManager
+    public sealed class BreakpointManager
     {
-
         /// <summary>
         /// The AD7Engine object that represents the DE.
         /// </summary>
-        private AD7Engine m_engine;        
+        private readonly AD7Engine _engine;
 
         /// <summary>
         /// List of pending breakpoints.
         /// </summary>
-        private List<AD7PendingBreakpoint> m_pendingBreakpoints;
+        private readonly List<AD7PendingBreakpoint> _pendingBreakpoints;
 
         /// <summary>
         /// List of active breakpoints.
         /// </summary>
-        private List<AD7BoundBreakpoint> m_activeBPs;
-
+        private readonly List<AD7BoundBreakpoint> _activeBPs;
 
         /// <summary>
         /// Breakpoint manager constructor.
@@ -45,117 +45,106 @@ namespace BlackBerry.DebugEngine
         /// <param name="engine"> Associated Debug Engine. </param>
         public BreakpointManager(AD7Engine engine)
         {
-            m_engine = engine;
-            m_pendingBreakpoints = new System.Collections.Generic.List<AD7PendingBreakpoint>();
-            m_activeBPs = new System.Collections.Generic.List<AD7BoundBreakpoint>();
-        }
+            if (engine == null)
+                throw new ArgumentNullException("engine");
 
+            _engine = engine;
+            _pendingBreakpoints = new List<AD7PendingBreakpoint>();
+            _activeBPs = new List<AD7BoundBreakpoint>();
+        }
 
         /// <summary>
         /// A helper method used to construct a new pending breakpoint.
         /// </summary>
-        /// <param name="pBPRequest"> An IDebugBreakpointRequest2 object that describes the pending breakpoint to create. </param>
-        /// <param name="ppPendingBP"> Returns an IDebugPendingBreakpoint2 object that represents the pending breakpoint. </param>
-        public void CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
+        /// <param name="request"> An IDebugBreakpointRequest2 object that describes the pending breakpoint to create. </param>
+        /// <param name="ppPendingBreakpoint"> Returns an IDebugPendingBreakpoint2 object that represents the pending breakpoint. </param>
+        public void CreatePendingBreakpoint(IDebugBreakpointRequest2 request, out IDebugPendingBreakpoint2 ppPendingBreakpoint)
         {
-            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(pBPRequest, m_engine, this);
-            ppPendingBP = (IDebugPendingBreakpoint2)pendingBreakpoint;
-            m_pendingBreakpoints.Add(pendingBreakpoint);
+            AD7PendingBreakpoint pendingBreakpoint = new AD7PendingBreakpoint(_engine, request);
+            ppPendingBreakpoint = pendingBreakpoint;
+            _pendingBreakpoints.Add(pendingBreakpoint);
         }
-
 
         /// <summary>
         /// Return the active bound breakpoint matching the given GDB ID.
         /// </summary>
-        /// <param name="GDB_ID"> Breakpoint ID in GDB. </param>
+        /// <param name="gdbID"> Breakpoint ID in GDB. </param>
         /// <returns> If successful, returns the active bound breakpoint; otherwise, returns null. </returns>
-        public AD7BoundBreakpoint getBoundBreakpointForGDBID(uint GDB_ID)
+        public AD7BoundBreakpoint GetBoundBreakpointForGDBID(uint gdbID)
         {
-            foreach (AD7BoundBreakpoint bbp in m_activeBPs)
+            foreach (AD7BoundBreakpoint breakpoint in _activeBPs)
             {
-                if ((bbp != null) && (bbp.GDB_ID == GDB_ID))
+                if (breakpoint != null && breakpoint.GdbInfo.ID == gdbID)
                 {
-                    return bbp;                    
+                    return breakpoint;
                 }
             }
             return null;
         }
-
 
         /// <summary>
         /// Called from the engine's detach method to remove the debugger's breakpoint instructions.
         /// </summary>
         public void ClearBoundBreakpoints()
         {
-            foreach (AD7PendingBreakpoint pendingBreakpoint in m_pendingBreakpoints)
+            foreach (AD7PendingBreakpoint breakpoint in _pendingBreakpoints)
             {
-                pendingBreakpoint.ClearBoundBreakpoints();
+                breakpoint.ClearBoundBreakpoints();
             }
         }
 
         /// <summary>
         /// Creates an entry and remotely enables the breakpoint in the debug stub.
         /// </summary>
-        /// <param name="aBBP"> The bound breakpoint to add. </param>
-        /// <returns> Breakpoint ID Number. </returns>
-        public int RemoteAdd(AD7BoundBreakpoint aBBP)
+        /// <param name="breakpoint">The bound breakpoint to add.</param>
+        /// <param name="info">Info about GDB breakpoint.</param>
+        public void RemoteAdd(AD7BoundBreakpoint breakpoint, out BreakpointInfo info)
         {
-            // Call GDB to set a breakpoint based on filename and line no. in aBBP                                                           
-            uint GDB_ID = 0;
-            uint GDB_LinePos = 0;
-            string GDB_Filename = "";
-            string GDB_address = "";
+            // Call GDB to set a breakpoint based on filename and line no. in aBBP
             bool ret = false;
 
-            if (aBBP.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
+            info = null;
+            if (breakpoint.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE)
             {
-                ret = m_engine.eDispatcher.setBreakpoint(aBBP.m_filename, aBBP.m_line, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = _engine.EventDispatcher.SetBreakpoint(breakpoint.m_filename, breakpoint.m_line, out info);
             }
-            else if (aBBP.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
+            else if (breakpoint.m_bpLocationType == (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FUNC_OFFSET)
             {
-                ret = m_engine.eDispatcher.setBreakpoint(aBBP.m_func, out GDB_ID, out GDB_LinePos, out GDB_Filename, out GDB_address);
+                ret = _engine.EventDispatcher.SetBreakpoint(breakpoint.m_func, out info);
             }
 
-            if (ret)
+            if (ret && info != null)
             {
-                m_activeBPs.Add(aBBP);
-
-                aBBP.GDB_ID = GDB_ID;
-                aBBP.GDB_FileName = GDB_Filename;
-                aBBP.GDB_LinePos = GDB_LinePos;
-                aBBP.GDB_Address = GDB_address;
+                _activeBPs.Add(breakpoint);
             }
-            return (int)GDB_ID;
         }
 
         /// <summary>
         /// Enable bound breakpoint.
         /// </summary>
-        /// <param name="aBBP"> The Bound breakpoint to enable. </param>
-        public void RemoteEnable(AD7BoundBreakpoint aBBP)
+        /// <param name="breakpoint"> The Bound breakpoint to enable. </param>
+        public void RemoteEnable(AD7BoundBreakpoint breakpoint)
         {            
-            m_engine.eDispatcher.enableBreakpoint(aBBP.GDB_ID, true);
+            _engine.EventDispatcher.EnableBreakpoint(breakpoint.GdbInfo.ID, true);
         }
 
-        
         /// <summary>
         /// Disable bound breakpoint.
         /// </summary>
-        /// <param name="aBBP"> The Bound breakpoint to disable. </param>
-        public void RemoteDisable(AD7BoundBreakpoint aBBP)
+        /// <param name="breakpoint"> The Bound breakpoint to disable. </param>
+        public void RemoteDisable(AD7BoundBreakpoint breakpoint)
         {            
-            m_engine.eDispatcher.enableBreakpoint(aBBP.GDB_ID, false);
+            _engine.EventDispatcher.EnableBreakpoint(breakpoint.GdbInfo.ID, false);
         }
 
-        
         /// <summary>
         /// Remove the associated bound breakpoint.
         /// </summary>
-        /// <param name="aBBP"> The breakpoint to remove. </param>
-        public void RemoteDelete(AD7BoundBreakpoint aBBP)
+        /// <param name="breakpoint"> The breakpoint to remove. </param>
+        public void RemoteDelete(AD7BoundBreakpoint breakpoint)
         {
-            m_activeBPs.Remove(aBBP);        
-            m_engine.eDispatcher.deleteBreakpoint(aBBP.GDB_ID);
+            _activeBPs.Remove(breakpoint);
+            _engine.EventDispatcher.DeleteBreakpoint(breakpoint.GdbInfo.ID);
         }
     }
 }

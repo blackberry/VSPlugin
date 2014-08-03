@@ -23,6 +23,24 @@ namespace BlackBerry.Package.Helpers
         }
 
         /// <summary>
+        /// Returns preconfigured window for opening .cproject files.
+        /// </summary>
+        public static OpenFileDialog OpenNativeCoreProject(string title, string startupPath)
+        {
+            var openFile = new OpenFileDialog();
+            openFile.Title = title;
+            openFile.InitialDirectory = startupPath;
+            openFile.DefaultExt = ".cproject";
+            openFile.Filter = "Native Core Project|*.cproject;*.project|All files|*.*";
+
+            openFile.FilterIndex = 0;
+            openFile.CheckFileExists = true;
+            openFile.CheckPathExists = true;
+
+            return openFile;
+        }
+
+        /// <summary>
         /// Returns preconfigured window for opening BAR files.
         /// </summary>
         public static OpenFileDialog OpenBarFile(string title, string startupPath)

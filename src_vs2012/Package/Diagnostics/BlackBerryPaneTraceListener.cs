@@ -85,12 +85,18 @@ namespace BlackBerry.Package.Diagnostics
             if (string.CompareOrdinal(category, TraceLog.Category) != 0)
                 return;
 
-            var timeString = _time != null ? _time.GetCurrentAndReset() : null;
-            if (!string.IsNullOrEmpty(timeString))
-                ErrorHandler.ThrowOnFailure(_outputPane.OutputString(timeString));
+            try
+            {
+                var timeString = _time != null ? _time.GetCurrentAndReset() : null;
+                if (!string.IsNullOrEmpty(timeString))
+                    ErrorHandler.ThrowOnFailure(_outputPane.OutputString(timeString));
 
-            ErrorHandler.ThrowOnFailure(_outputPane.OutputString(message));
-            ErrorHandler.ThrowOnFailure(_outputPane.OutputString(Environment.NewLine));
+                ErrorHandler.ThrowOnFailure(_outputPane.OutputString(message));
+                ErrorHandler.ThrowOnFailure(_outputPane.OutputString(Environment.NewLine));
+            }
+            catch
+            {
+            }
         }
 
         #endregion

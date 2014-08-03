@@ -38,7 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -48,7 +48,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -112,9 +112,6 @@
     <Compile Include="..\..\src_vs2010\BuildTasks\MakeAllAndFormatOutputMessages.cs">
       <Link>MakeAllAndFormatOutputMessages.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\NativeMethods.cs">
-      <Link>NativeMethods.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\PackagerCmdBuilder.cs">
       <Link>PackagerCmdBuilder.cs</Link>
     </Compile>
@@ -150,6 +147,9 @@
     </Compile>
     <Compile Include="..\NativeCore\Helpers\GlobalHelper.cs">
       <Link>Helpers\GlobalHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\NativeCore\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
     </Compile>
   </ItemGroup>
   <ItemGroup>

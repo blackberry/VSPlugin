@@ -15,7 +15,6 @@
 using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-using System.Threading;
 
 namespace BlackBerry.DebugEngine
 {
@@ -25,63 +24,66 @@ namespace BlackBerry.DebugEngine
     /// It allows the debugger to obtain the values of an expression in the debuggee. 
     /// (http://msdn.microsoft.com/en-ca/library/bb162308.aspx)
     /// </summary>
-    public class AD7Expression : IDebugExpression2
+    public sealed class AD7Expression : IDebugExpression2
     {
         /// <summary>
-        ///  The expression to be evaluated. 
+        ///  The expression to be evaluated.
         /// </summary>
-        private string exp;
+        private readonly string _expression;
 
         /// <summary>
         /// The class that manages debug events for the debug engine.
         /// </summary>
-        private EventDispatcher m_eventDispatcher;
+        private readonly EventDispatcher _eventDispatcher;
 
         /// <summary>
         /// Current stack frame.
         /// </summary>
-        private AD7StackFrame m_frame;
-
+        private readonly AD7StackFrame _frame;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="exp"> The expression to be evaluated. </param>
+        /// <param name="expression"> The expression to be evaluated. </param>
         /// <param name="frame"> Current stack frame. </param>
         /// <param name="dispatcher"> Represents the class that manages debug events for the debug engine. </param>
-        public AD7Expression(string exp, AD7StackFrame frame, EventDispatcher dispatcher)
+        public AD7Expression(string expression, AD7StackFrame frame, EventDispatcher dispatcher)
         {
-            this.exp = exp;
-            this.m_eventDispatcher = dispatcher;
-            this.m_frame = frame;
+            _expression = expression;
+            _eventDispatcher = dispatcher;
+            _frame = frame;
         }
 
         #region IDebugExpression2 Members
 
-
         /// <summary>
         /// This method cancels asynchronous expression evaluation as started by a call to the IDebugExpression2::EvaluateAsync method.
-        /// Not implemented yet because it was not needed till now. (http://msdn.microsoft.com/en-ca/library/bb145924.aspx)
+        /// Not implemented yet because it was not needed yet. (http://msdn.microsoft.com/en-ca/library/bb145924.aspx)
         /// </summary>
         /// <returns> Not implemented. </returns>
         int IDebugExpression2.Abort()
         {
-            throw new NotImplementedException();
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Thread responsible for evaluating expressions asynchronously.
         /// </summary>
-        public void evaluatingAsync()
+        public void EvaluatingAsync()
         {
-            VariableInfo vi = VariableInfo.get(exp, m_eventDispatcher, m_frame);
+            VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
             AD7Property ppResult = new AD7Property(vi);
 
-            m_frame.m_engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, ppResult), AD7ExpressionEvaluationCompleteEvent.IID, m_frame.m_engine, m_frame.m_thread);
+            _frame._engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, ppResult), AD7ExpressionEvaluationCompleteEvent.IID, _frame._engine, _frame._thread);
         }
 
-        
+        private void EvaluateAsyncCompleted(IAsyncResult ar)
+        {
+            // release async-call system resources:
+            var action = (Action) ar.AsyncState;
+            action.EndInvoke(ar);
+        }
+
         /// <summary>
         /// This method evaluates the expression asynchronously.
         /// This is primarily used for the immediate window. (http://msdn.microsoft.com/en-ca/library/bb146752.aspx)
@@ -91,14 +93,12 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugExpression2.EvaluateAsync(enum_EVALFLAGS dwFlags, IDebugEventCallback2 pExprCallback)
         {
-            // Creating a thread to evaluate the expression asynchronously.
-            Thread m_processingThread;
-            m_processingThread = new Thread(evaluatingAsync);
-            m_processingThread.Start();            
+            // Evaluate the expression asynchronously
+            var action = new Action(EvaluatingAsync);
+            action.BeginInvoke(EvaluateAsyncCompleted, action);
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// This method evaluates the expression synchronously. (http://msdn.microsoft.com/en-ca/library/bb146982.aspx)
@@ -111,9 +111,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult)
         {
-            VariableInfo vi = VariableInfo.get(exp, m_eventDispatcher, m_frame);
+            VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
             ppResult = new AD7Property(vi);
-            m_frame._lastEvaluatedExpression = vi;
             return VSConstants.S_OK;
         }
 

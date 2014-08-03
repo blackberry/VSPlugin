@@ -16,7 +16,7 @@ using System;
 using System.Globalization;
 using Microsoft.VisualStudio.Shell;
 
-namespace BlackBerry.Package
+namespace BlackBerry.Package.Editors
 {
     /// <summary>
     /// This attribute adds a File Extension for a Project System so that the Project

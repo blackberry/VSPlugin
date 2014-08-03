@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
     <RunRegRiched>true</RunRegRiched>
     <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -61,10 +61,12 @@
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <RunRegRiched>true</RunRegRiched>
     <Prefer32Bit>false</Prefer32Bit>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.Debugger.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Package.LanguageService.11.0, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -81,9 +83,7 @@
     <Reference Include="Microsoft.VisualStudio.Shell.Immutable.10.0" />
     <Reference Include="Microsoft.VisualStudio.TextManager.Interop.8.0, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.VCProjectEngine, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>True</EmbedInteropTypes>
-      <HintPath>..\..\..\..\..\Program Files (x86)\Microsoft Visual Studio 11.0\Common7\IDE\PublicAssemblies\Microsoft.VisualStudio.VCProjectEngine.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.VisualStudio.XmlEditor, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\Windows\Microsoft.NET\assembly\GAC_MSIL\Microsoft.VisualStudio.XmlEditor\v4.0_11.0.0.0__b03f5f7f11d50a3a\Microsoft.VisualStudio.XmlEditor.dll</HintPath>
@@ -151,9 +151,6 @@
     </COMReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src_vs2010\Package\ControlDebugEngine.cs">
-      <Link>ControlDebugEngine.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
@@ -182,13 +179,13 @@
     <Compile Include="Editors\BarDescriptorEditorFactory.cs" />
     <Compile Include="Editors\BarDescriptorEditorPane.cs" />
     <Compile Include="Editors\EditorFactoryNotifyForProject.cs" />
-    <Compile Include="Editors\XmlEditorDesignerViewRegistration.cs" />
     <Compile Include="GuidList.cs" />
+    <Compile Include="Helpers\AttributeHelper.cs" />
     <Compile Include="Helpers\CertHelper.cs" />
     <Compile Include="Helpers\CommandHelper.cs" />
     <Compile Include="Helpers\DialogHelper.cs" />
+    <Compile Include="Helpers\DteHelper.cs" />
     <Compile Include="Helpers\MessageBoxHelper.cs" />
-    <Compile Include="Helpers\NameValueCollectionHelper.cs" />
     <Compile Include="Model\bar-descriptor.cs" />
     <Compile Include="Model\Integration\ComboBoxItem.cs" />
     <Compile Include="Model\Integration\DynamicMenuCommand.cs" />
@@ -325,6 +322,8 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="PackageCommands.cs" />
+    <Compile Include="Registration\DebugEngineRegistrationAttribute.cs" />
+    <Compile Include="Registration\XmlEditorDesignerViewRegistrationAttribute.cs" />
     <Compile Include="StandardCommands.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\BarEditorViewModel.cs" />
@@ -509,17 +508,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="RichEditObjectModel">
-      <Guid>{8CC497C9-A1DF-11CE-8098-00AA0047BE5D}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <Page Include="..\..\src_vs2010\Package\Import\Import.xaml">
       <Link>Import\Import.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
@@ -553,9 +541,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
-      <Project>{cc7b28e0-cb31-44f7-a380-e7072f670f38}</Project>
-      <Name>GDBParser</Name>
+    <ProjectReference Include="..\DebugEngine\BlackBerry.DebugEngine.csproj">
+      <Project>{59a7b188-e307-4495-a3af-4ed76b086a87}</Project>
+      <Name>BlackBerry.DebugEngine</Name>
     </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{faddd789-6cb5-4f9d-8481-1c0c72e5f19f}</Project>

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using BlackBerry.NativeCore.Helpers;
 using Microsoft.Win32;
@@ -30,7 +31,7 @@ namespace BlackBerry.NativeCore.Model
                 throw new ArgumentNullException("password");
 
             Name = name;
-            IP = ip;
+            IP = ip.Trim();
             Password = password;
             Type = type;
         }
@@ -67,6 +68,25 @@ namespace BlackBerry.NativeCore.Model
         public string ShortName
         {
             get { return string.IsNullOrEmpty(Name) ? IP : Name; }
+        }
+
+        /// <summary>
+        /// Gets the name of the processor architecture on that device.
+        /// </summary>
+        public string Architecture
+        {
+            get
+            {
+                switch (Type)
+                {
+                    case DeviceDefinitionType.Device:
+                        return "ARMv7";
+                    case DeviceDefinitionType.Simulator:
+                        return "x86";
+                    default:
+                        throw new InvalidEnumArgumentException("Unsupported enum value (" + Type + ")");
+                }
+            }
         }
 
         #endregion
@@ -106,10 +126,10 @@ namespace BlackBerry.NativeCore.Model
         {
             if (string.IsNullOrEmpty(Name))
             {
-                return string.Concat(IP, " (", Type == DeviceDefinitionType.Device ? "device" : "simulator", ")");
+                return string.Concat(IP, " (", DeviceHelper.GetTypeToString(Type), ")");
             }
 
-            return string.Concat(Name, " (", IP, ", ", Type == DeviceDefinitionType.Device ? "device" : "simulator", ")");
+            return string.Concat(Name, " (", IP, ", ", DeviceHelper.GetTypeToString(Type), ")");
         }
 
         /// <summary>
@@ -347,7 +367,7 @@ namespace BlackBerry.NativeCore.Model
             {
                 var device = new DeviceDefinition(string.IsNullOrEmpty(values[i]) ? null : values[i],
                                                   values[i + 2], GlobalHelper.Decrypt(values[i + 3]),
-                                                  values[i + 1] == "S" ? DeviceDefinitionType.Simulator : DeviceDefinitionType.Device);
+                                                  DeviceHelper.GetTypeFromString(values[i + 1]));
                 result.Add(device);
             }
 
@@ -363,7 +383,7 @@ namespace BlackBerry.NativeCore.Model
                 foreach (var device in devices)
                 {
                     result.Add(device.Name ?? string.Empty);
-                    result.Add(device.Type == DeviceDefinitionType.Device ? "D" : "S");
+                    result.Add(DeviceHelper.GetTypeToString(device.Type));
                     result.Add(device.IP);
                     result.Add(GlobalHelper.Encrypt(device.Password));
                 }

@@ -48,7 +48,10 @@
             <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_ApiLevels" priority="0x0200">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
             </Group>
-            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Configuration" priority="0x0300">
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_RuntimeLibraries" priority="0x0300">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_Configuration" priority="0x0400">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Targets" />
             </Group>
 
@@ -66,18 +69,26 @@
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" />
             </Group>
 
-            <!-- Context Menu -->
-            <Group guid="guidVSNDK_PackageCmdSet" id="BlackBerryContextMenuGroup" priority="0x0600">
-                <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_PROJNODE" />
-            </Group>
-
         </Groups>
 
         <Buttons>
 
-            <!-- Common Action Buttons -->
+          <!-- Common Action Buttons -->
+          <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonAddPlatformTargets" priority="0x0100" type="Button">
+            <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
+            <Strings>
+              <ButtonText>Add BlackBerry Pla&amp;tforms...</ButtonText>
+            </Strings>
+          </Button>
 
-            <!-- Settings Action Buttons -->
+          <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonProjectImport" priority="0x0100" type="Button">
+            <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
+            <Strings>
+              <ButtonText>Import &amp;Core Native Project...</ButtonText>
+            </Strings>
+          </Button>
+
+          <!-- Settings Action Buttons -->
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryOptions" priority="0x0100" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" />
                 <Strings>
@@ -109,6 +120,18 @@
                 <Strings>
                     <ButtonText>[Target API Levels]</ButtonText>
                     <ToolTipText>Select a NDK with desired API Level to run the application against</ToolTipText>
+                </Strings>
+            </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsRuntimeLibrariesPlaceholder" priority="0x0100" type="Button">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsGroup_RuntimeLibraries" />
+                <CommandFlag>DynamicItemStart</CommandFlag>
+                <CommandFlag>DynamicVisibility</CommandFlag>
+                <CommandFlag>DefaultInvisible</CommandFlag>
+                <CommandFlag>TextChanges</CommandFlag>
+                <CommandFlag>NoButtonCustomize</CommandFlag>
+                <Strings>
+                    <ButtonText>[Target Runtime Libraries]</ButtonText>
+                    <ToolTipText>Select version of runtime libraries on a target device to debug application against</ToolTipText>
                 </Strings>
             </Button>
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTargetsConfigure" priority="0x0100" type="Button">
@@ -185,16 +208,6 @@
                     <ButtonText>&amp;About...</ButtonText>
                 </Strings>
             </Button>
-
-            <!-- Others -->
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidfooLocalBox" priority="0x0100" type="Button">
-                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryContextMenuGroup" />
-                <CommandFlag>DynamicVisibility</CommandFlag>
-                <Strings>
-                    <CommandName>cmdidfooLocalBox</CommandName>
-                    <ButtonText>Import BlackBerry Core Native Project</ButtonText>
-                </Strings>
-            </Button>
         </Buttons>
 
     </Commands>
@@ -255,33 +268,33 @@
             <IDSymbol name="BlackBerrySubMenu_Targets" value="0x400" />
             <IDSymbol name="cmdidBlackBerryTargetsGroup_Devices" value="0x500" />
             <IDSymbol name="cmdidBlackBerryTargetsGroup_ApiLevels" value="0x600" />
-            <IDSymbol name="cmdidBlackBerryTargetsGroup_Configuration" value="0x700" />
+            <IDSymbol name="cmdidBlackBerryTargetsGroup_RuntimeLibraries" value="0x700"/>
+            <IDSymbol name="cmdidBlackBerryTargetsGroup_Configuration" value="0x800" />
 
-            <IDSymbol name="BlackBerrySubMenu_Help" value="0x800" />
-            <IDSymbol name="cmdidBlackBerryHelpGroup_Start" value="0x900"/>
-            <IDSymbol name="cmdidBlackBerryHelpGroup_Documentation" value="0x1000"/>
-            <IDSymbol name="cmdidBlackBerryHelpGroup_Samples" value="0x1100"/>
-            <IDSymbol name="cmdidBlackBerryHelpGroup_About" value="0x1200"/>
+            <IDSymbol name="BlackBerrySubMenu_Help" value="0x900" />
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Start" value="0x1000"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Documentation" value="0x1100"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_Samples" value="0x1200"/>
+            <IDSymbol name="cmdidBlackBerryHelpGroup_About" value="0x1300"/>
 
             <IDSymbol name="cmdidBlackBerryOptions" value="0x0301" />
             <IDSymbol name="cmdidBlackBerryTargetsDevicesPlaceholder" value="0x501" />
             <IDSymbol name="cmdidBlackBerryTargetsApiLevelsPlaceholder" value="0x601" />
-            <IDSymbol name="cmdidBlackBerryTargetsConfigure" value="0x701" />
+            <IDSymbol name="cmdidBlackBerryTargetsRuntimeLibrariesPlaceholder" value="0x701" />
+            <IDSymbol name="cmdidBlackBerryTargetsConfigure" value="0x801" />
 
-            <IDSymbol name="cmdidBlackBerryHelpWelcomePage" value="0x901" />
-            <IDSymbol name="cmdidBlackBerryHelpSupportForum" value="0x902" />
-            <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x1001" />
-            <IDSymbol name="cmdidBlackBerryHelpDocCascades" value="0x1002" />
-            <IDSymbol name="cmdidBlackBerryHelpDocPlayBook" value="0x1003" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesNative" value="0x1101" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesCascades" value="0x1102" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesPlayBook" value="0x1103" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesOpenSource" value="0x1104" />
-            <IDSymbol name="cmdidBlackBerryHelpAbout" value="0x1201" />
-
-            <IDSymbol name="cmdidBlackBerryProjectImport" value="0x104" />
-            <IDSymbol name="cmdidfooLocalBox" value="0x105" />
-            <IDSymbol name="BlackBerryContextMenuGroup" value="0x106" />
+            <IDSymbol name="cmdidBlackBerryCommonAddPlatformTargets" value="0x201" />
+            <IDSymbol name="cmdidBlackBerryCommonProjectImport" value="0x202" />
+            <IDSymbol name="cmdidBlackBerryHelpWelcomePage" value="0x1001" />
+            <IDSymbol name="cmdidBlackBerryHelpSupportForum" value="0x1002" />
+            <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x1101" />
+            <IDSymbol name="cmdidBlackBerryHelpDocCascades" value="0x1102" />
+            <IDSymbol name="cmdidBlackBerryHelpDocPlayBook" value="0x1103" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesNative" value="0x1201" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesCascades" value="0x1202" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesPlayBook" value="0x1203" />
+            <IDSymbol name="cmdidBlackBerryHelpSamplesOpenSource" value="0x1204" />
+            <IDSymbol name="cmdidBlackBerryHelpAbout" value="0x1301" />
         </GuidSymbol>
 
     </Symbols>

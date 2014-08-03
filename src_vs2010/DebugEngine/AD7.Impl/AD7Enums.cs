@@ -12,14 +12,13 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+using System;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
-
 
 namespace BlackBerry.DebugEngine
 {
     #region Base Class
-
 
     /// <summary>
     /// These classes use a generic enumerator implementation to create the various enumerators required by the engine.
@@ -29,9 +28,8 @@ namespace BlackBerry.DebugEngine
     /// <typeparam name="I"> Enumerator interface. </typeparam>
     class AD7Enum<T,I> where I: class
     {
-        readonly T[] m_data;
-        uint m_position;
-
+        private readonly T[] _data;
+        private uint _position;
 
         /// <summary>
         /// Constructor.
@@ -39,10 +37,14 @@ namespace BlackBerry.DebugEngine
         /// <param name="data"> Array of T elements. </param>
         public AD7Enum(T[] data)
         {
-            m_data = data;
-            m_position = 0;
-        }
+#if DEBUG
+            if (data == null)
+                throw new ArgumentNullException("data");
+#endif
 
+            _data = data;
+            _position = 0;
+        }
 
         /// <summary>
         /// Returns a copy of the current enumeration as a separate object. Not implemented.
@@ -52,9 +54,8 @@ namespace BlackBerry.DebugEngine
         public int Clone(out I ppEnum)
         {
             ppEnum = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Returns the number of elements in the enumeration.
@@ -63,10 +64,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetCount(out uint pcelt)
         {
-            pcelt = (uint)m_data.Length;
+            pcelt = (uint)_data.Length;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration.
@@ -80,7 +80,6 @@ namespace BlackBerry.DebugEngine
             return Move(celt, rgelt, out celtFetched);
         }
 
-
         /// <summary>
         /// Resets the enumeration to the first element.
         /// </summary>
@@ -89,12 +88,11 @@ namespace BlackBerry.DebugEngine
         {
             lock (this)
             {
-                m_position = 0;
+                _position = 0;
 
                 return VSConstants.S_OK;
             }
         }
-
 
         /// <summary>
         /// Skips over the specified number of elements.
@@ -108,7 +106,6 @@ namespace BlackBerry.DebugEngine
             return Move(celt, null, out celtFetched);
         }
 
-
         /// <summary>
         /// Returns/Skips over the specified number of elements.
         /// </summary>
@@ -121,7 +118,7 @@ namespace BlackBerry.DebugEngine
             lock (this)
             {
                 int hr = VSConstants.S_OK;
-                celtFetched = (uint)m_data.Length - m_position;
+                celtFetched = (uint)_data.Length - _position;
 
                 if (celt > celtFetched)
                 {
@@ -136,27 +133,24 @@ namespace BlackBerry.DebugEngine
                 {
                     for (int c = 0; c < celtFetched; c++)
                     {
-                        rgelt[c] = m_data[m_position + c];
+                        rgelt[c] = _data[_position + c];
                     }
                 }
 
-                m_position += celtFetched;
+                _position += celtFetched;
 
                 return hr;
             }
         }
     }
-    #endregion Base Class
 
-
-
+    #endregion
 
     /// <summary>
     /// This class enumerates the processes running on a debug port. (http://msdn.microsoft.com/en-ca/library/bb145005.aspx)
     /// </summary>
-    class AD7ProcessEnum : AD7Enum<IDebugProcess2, IEnumDebugProcesses2>, IEnumDebugProcesses2
+    sealed class AD7ProcessEnum : AD7Enum<IDebugProcess2, IEnumDebugProcesses2>, IEnumDebugProcesses2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -165,7 +159,6 @@ namespace BlackBerry.DebugEngine
             : base(data)
         {
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb147027.aspx)
@@ -180,13 +173,11 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This class enumerates the ports of a machine or port supplier. (http://msdn.microsoft.com/en-ca/library/bb145137.aspx)
     /// </summary>
-    class AD7PortEnum : AD7Enum<IDebugPort2, IEnumDebugPorts2>, IEnumDebugPorts2
+    sealed class AD7PortEnum : AD7Enum<IDebugPort2, IEnumDebugPorts2>, IEnumDebugPorts2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -195,7 +186,6 @@ namespace BlackBerry.DebugEngine
             : base(data)
         {
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb147027.aspx)
@@ -210,23 +200,19 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
-    
-    
     /// <summary>
     /// This class enumerates the programs running in the current debug session. (http://msdn.microsoft.com/en-ca/library/bb146727.aspx)
     /// </summary>
-    class AD7ProgramEnum : AD7Enum<IDebugProgram2, IEnumDebugPrograms2>, IEnumDebugPrograms2
+    sealed class AD7ProgramEnum : AD7Enum<IDebugProgram2, IEnumDebugPrograms2>, IEnumDebugPrograms2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="data"> Array of IDebugProgram2 elements. </param>
-        public AD7ProgramEnum(IDebugProgram2[] data) : base(data)
+        public AD7ProgramEnum(IDebugProgram2[] data)
+            : base(data)
         {
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb147027.aspx)
@@ -241,13 +227,11 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This class enumerates FRAMEINFO structures. (http://msdn.microsoft.com/en-us/library/bb147119.aspx)
     /// </summary>
-    class AD7FrameInfoEnum : AD7Enum<FRAMEINFO, IEnumDebugFrameInfo2>, IEnumDebugFrameInfo2
+    sealed class AD7FrameInfoEnum : AD7Enum<FRAMEINFO, IEnumDebugFrameInfo2>, IEnumDebugFrameInfo2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -256,7 +240,6 @@ namespace BlackBerry.DebugEngine
             : base(data)
         {
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-us/library/bb146293.aspx)
@@ -271,13 +254,11 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This class enumerates DEBUG_PROPERTY_INFO structures. (http://msdn.microsoft.com/en-ca/library/bb162336.aspx)
     /// </summary>
-    class AD7PropertyInfoEnum : AD7Enum<DEBUG_PROPERTY_INFO, IEnumDebugPropertyInfo2>, IEnumDebugPropertyInfo2
+    sealed class AD7PropertyInfoEnum : AD7Enum<DEBUG_PROPERTY_INFO, IEnumDebugPropertyInfo2>, IEnumDebugPropertyInfo2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -288,13 +269,11 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This class enumerates the threads running in the current debug session. (http://msdn.microsoft.com/en-ca/library/bb145142.aspx)
     /// </summary>
-    class AD7ThreadEnum : AD7Enum<IDebugThread2, IEnumDebugThreads2>, IEnumDebugThreads2
+    sealed class AD7ThreadEnum : AD7Enum<IDebugThread2, IEnumDebugThreads2>, IEnumDebugThreads2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -302,9 +281,7 @@ namespace BlackBerry.DebugEngine
         public AD7ThreadEnum(IDebugThread2[] threads)
             : base(threads)
         {
-            
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb161679.aspx)
@@ -319,13 +296,11 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This class enumerates a list of modules. (http://msdn.microsoft.com/en-ca/library/bb145925.aspx)
     /// </summary>
-    class AD7ModuleEnum : AD7Enum<IDebugModule2, IEnumDebugModules2>, IEnumDebugModules2
+    sealed class AD7ModuleEnum : AD7Enum<IDebugModule2, IEnumDebugModules2>, IEnumDebugModules2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -333,9 +308,7 @@ namespace BlackBerry.DebugEngine
         public AD7ModuleEnum(IDebugModule2[] modules)
             : base(modules)
         {
-
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb145898.aspx)
@@ -350,13 +323,11 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This class enumerates DEBUG_PROPERTY_INFO structures. (http://msdn.microsoft.com/en-ca/library/bb162336.aspx)
     /// </summary>
-    class AD7PropertyEnum : AD7Enum<DEBUG_PROPERTY_INFO, IEnumDebugPropertyInfo2>, IEnumDebugPropertyInfo2
+    sealed class AD7PropertyEnum : AD7Enum<DEBUG_PROPERTY_INFO, IEnumDebugPropertyInfo2>, IEnumDebugPropertyInfo2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -364,18 +335,15 @@ namespace BlackBerry.DebugEngine
         public AD7PropertyEnum(DEBUG_PROPERTY_INFO[] properties)
             : base(properties)
         {
-
         }
     }
-
 
     /// <summary>
     /// This class enumerates the code contexts associated with the debug session, or with a particular program or document.
     /// (http://msdn.microsoft.com/en-us/library/bb146612.aspx)
     /// </summary>
-    class AD7CodeContextEnum : AD7Enum<IDebugCodeContext2, IEnumDebugCodeContexts2>, IEnumDebugCodeContexts2
+    sealed class AD7CodeContextEnum : AD7Enum<IDebugCodeContext2, IEnumDebugCodeContexts2>, IEnumDebugCodeContexts2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -383,12 +351,10 @@ namespace BlackBerry.DebugEngine
         public AD7CodeContextEnum(IDebugCodeContext2[] codeContexts)
             : base(codeContexts)
         {
-
         }
 
-
         /// <summary>
-        /// Returns the next set of elements from the enumeration. ()http://msdn.microsoft.com/en-us/library/bb145085.aspx
+        /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-us/library/bb145085.aspx)
         /// </summary>
         /// <param name="celt"> The number of elements to retrieve. Also specifies the maximum size of the rgelt array. </param>
         /// <param name="rgelt"> Array of IDebugCodeContext2 elements to be filled in. </param>
@@ -400,14 +366,12 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This class enumerates the bound breakpoints associated with a pending breakpoint or breakpoint bound event.
     /// (http://msdn.microsoft.com/en-ca/library/bb162182.aspx)
     /// </summary>
-    class AD7BoundBreakpointsEnum : AD7Enum<IDebugBoundBreakpoint2, IEnumDebugBoundBreakpoints2>, IEnumDebugBoundBreakpoints2
+    sealed class AD7BoundBreakpointsEnum : AD7Enum<IDebugBoundBreakpoint2, IEnumDebugBoundBreakpoints2>, IEnumDebugBoundBreakpoints2
     {
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -415,9 +379,7 @@ namespace BlackBerry.DebugEngine
         public AD7BoundBreakpointsEnum(IDebugBoundBreakpoint2[] breakpoints)
             : base(breakpoints)
         {
-
         }
-
 
         /// <summary>
         /// Returns the next set of elements from the enumeration. (http://msdn.microsoft.com/en-ca/library/bb161772.aspx)
@@ -430,6 +392,5 @@ namespace BlackBerry.DebugEngine
         {
             return Next(celt, rgelt, out celtFetched);
         }
-    }  
-
+    }
 }

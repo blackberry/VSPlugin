@@ -81,8 +81,8 @@
                 F1Keyword="VC.Project.VCConfiguration.ConfigurationType">
     <EnumValue Name="Makefile" DisplayName="Makefile" Description="Makefile" />
     <EnumValue Name="Application" DisplayName="Application" Description="Application" />
-    <EnumValue Name="DynamicLibrary" DisplayName="Dynamic Library (.so)" Description="Dynamic Library (.so)" />
-    <EnumValue Name="StaticLibrary" DisplayName="Static library (.a)" Description="Static Library (.a)" />
+    <EnumValue Name="DynamicLibrary" DisplayName="Dynamic Library" Description="Dynamic Library (.so)" />
+    <EnumValue Name="StaticLibrary" DisplayName="Static library" Description="Static Library (.a)" />
     <EnumValue Name="Utility" DisplayName="Utility" Description="Utility" />
   </EnumProperty>
   <EnumProperty Name="CharacterSet" DisplayName="Character Set"
@@ -113,14 +113,12 @@
   <EnumProperty Name="CPUVARDIR" DisplayName="Target CPU"
                 Description="Specifies that the compiler target is simulator or device."
                 Category="ProjectDefaults" Visible="false" >
-    <EnumValue Name="x86" DisplayName="Simulator"
-               Description="Build for simulator" />
-    <EnumValue Name="armle-v7" DisplayName="Device"
-               Description="Build for device"/>
+    <EnumValue Name="x86" DisplayName="Simulator" Description="Build for simulator" />
+    <EnumValue Name="armle-v7" DisplayName="Device" Description="Build for device"/>
   </EnumProperty>
   
   <EnumProperty Name="TargetOS" DisplayName="Target OS" Description="Select target OS" Category="General" Visible="false">
-    <EnumValue Name="QNX6" DisplayName="QNX6" Description="QNX6" ></EnumValue>
+    <EnumValue Name="QNX6" DisplayName="QNX6" Description="QNX6" />
   </EnumProperty>
   
   <BoolProperty Name="UseDebugLibraries" DisplayName="Use Debug Libraries"
@@ -134,22 +132,5 @@
       <DataSource Persistence="ProjectFile" />
     </StringProperty.DataSource>
   </StringProperty>
-
-  <EnumProperty Name="CLRSupport" DisplayName="Common Language Runtime Support"
-                Description="Specifies whether this configuration supports the Common Language Runtime. This is incompatible with some other settings, e.g. runtime checks. See help for /clr family of C++ compiler switches for full list of conflicts."
-                Category="ProjectDefaults"
-                F1Keyword="VC.Project.VCConfiguration.ManagedExtensions"
-                Visible="false">
-    <EnumValue Name="false" DisplayName="No Common Language Runtime Support"
-               Description="No Common Language Runtime Support" />
-    <EnumValue Name="true" DisplayName="Common Language Runtime Support (/clr)"
-               Description="Common Language Runtime Support (/clr)"/>
-    <EnumValue Name="Pure" DisplayName="Pure MSIL Common Language Runtime Support (/clr:pure)"
-               Description="Pure MSIL Common Language Runtime Support (/clr:pure)" />
-    <EnumValue Name="Safe" DisplayName="Safe MSIL Common Language Runtime Support (/clr:safe)"
-               Description="Safe MSIL Common Language Runtime Support (/clr:safe)" />
-    <EnumValue Name="OldSyntax" DisplayName="Common Language Runtime Support, Old Syntax (/clr:oldSyntax)"
-               Description="Common Language Runtime Support, Old Syntax (/clr:oldSyntax)" />
-  </EnumProperty>
 </Rule>
 

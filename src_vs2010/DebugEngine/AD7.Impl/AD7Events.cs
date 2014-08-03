@@ -25,8 +25,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace BlackBerry.DebugEngine
 {
-    #region Event base classes
-
+    #region Event Base Classes
 
     /// <summary>
     /// Used to communicate both critical debug information and non-critical information.
@@ -34,8 +33,7 @@ namespace BlackBerry.DebugEngine
     /// </summary>
     class AD7AsynchronousEvent : IDebugEvent2
     {
-        public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_ASYNCHRONOUS;
-
+        private const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_ASYNCHRONOUS;
 
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
@@ -48,7 +46,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
     }
-
 
     /// <summary>
     /// Used to communicate both critical debug information and non-critical information.
@@ -58,7 +55,6 @@ namespace BlackBerry.DebugEngine
     {
         public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_ASYNC_STOP;
 
-
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
         /// </summary>
@@ -70,7 +66,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
     }
-
 
     /// <summary>
     /// Used to communicate both critical debug information and non-critical information.
@@ -80,7 +75,6 @@ namespace BlackBerry.DebugEngine
     {
         public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_SYNCHRONOUS;
 
-
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
         /// </summary>
@@ -92,7 +86,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
     }
-
 
     /// <summary>
     /// Used to communicate both critical debug information and non-critical information.
@@ -102,7 +95,6 @@ namespace BlackBerry.DebugEngine
     {
         public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING | (uint)enum_EVENTATTRIBUTES.EVENT_SYNCHRONOUS;
 
-
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
         /// </summary>
@@ -114,9 +106,8 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
     }
-    
-    #endregion
 
+    #endregion
 
     /// <summary>
     /// The debug engine (DE) sends this interface to the session debug manager (SDM) when an instance of the DE is created.
@@ -125,18 +116,17 @@ namespace BlackBerry.DebugEngine
     sealed class AD7EngineCreateEvent : AD7AsynchronousEvent, IDebugEngineCreateEvent2
     {
         public const string IID = "FE5B734C-759D-4E59-AB04-F103343BDD06";
-        private IDebugEngine2 m_engine;
 
-        
+        private readonly IDebugEngine2 _engine;
+
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="engine"> The AD7Engine object that represents the DE. </param>
         AD7EngineCreateEvent(AD7Engine engine)
         {
-            m_engine = engine;
+            _engine = engine;
         }
-
 
         /// <summary>
         /// Sends the event.
@@ -147,7 +137,6 @@ namespace BlackBerry.DebugEngine
             AD7EngineCreateEvent eventObject = new AD7EngineCreateEvent(engine);
             engine.Callback.Send(eventObject, IID, null, null);
         }
-        
 
         /// <summary>
         /// Retrieves the object that represents the newly created debug engine (DE). 
@@ -157,29 +146,18 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugEngineCreateEvent2.GetEngine(out IDebugEngine2 engine)
         {
-            engine = m_engine;
-            
+            engine = _engine;
             return VSConstants.S_OK;
         }
     }
 
-
     /// <summary>
     /// This interface is sent when a process is launched. (http://msdn.microsoft.com/en-ca/library/bb161755.aspx)
     /// </summary>
-    class AD7ProcessCreateEvent : IDebugEvent2, IDebugProcessCreateEvent2
+    sealed class AD7ProcessCreateEvent : IDebugEvent2, IDebugProcessCreateEvent2
     {
-        private Guid IID = new Guid("9020DEE3-362D-4FF2-8CA9-8F6791F0EC85");
+        public const string IID = "9020DEE3-362D-4FF2-8CA9-8F6791F0EC85";
         public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_IMMEDIATE;
-
-        /// <summary>
-        /// Gets the GUID of this event. 
-        /// </summary>
-        /// <returns> Returns the GUID of this event. </returns>
-        public Guid getGuid()
-        {
-            return IID;
-        }
 
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
@@ -192,25 +170,15 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
     }
-
 
     /// <summary>
     /// This interface is sent when a process is terminated, exits atypically, or is detached from.
     /// (http://msdn.microsoft.com/en-us/library/bb145152.aspx)
     /// </summary>
-    class AD7ProcessDestroyEvent : IDebugEvent2, IDebugProcessDestroyEvent2
+    sealed class AD7ProcessDestroyEvent : IDebugEvent2, IDebugProcessDestroyEvent2
     {
-        private Guid IID = new Guid("29DAA0AC-C718-4F93-A11E-6D15681476C7");
+        public const string IID = "29DAA0AC-C718-4F93-A11E-6D15681476C7";
         public const uint Attributes = (uint)enum_EVENTATTRIBUTES.EVENT_IMMEDIATE;
-
-        /// <summary>
-        /// Gets the GUID of this event. 
-        /// </summary>
-        /// <returns> Returns the GUID of this event. </returns>
-        public Guid getGuid()
-        {
-            return IID;
-        }
 
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
@@ -223,7 +191,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
     }
-
 
     /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a program is attached to.
@@ -232,8 +199,7 @@ namespace BlackBerry.DebugEngine
     sealed class AD7ProgramCreateEvent : AD7AsynchronousEvent, IDebugProgramCreateEvent2
     {
         public const string IID = "96CD11EE-ECD4-4E89-957E-B5D496FC4139";
-        
-        
+
         /// <summary>
         /// Sends the event.
         /// </summary>
@@ -245,7 +211,6 @@ namespace BlackBerry.DebugEngine
         }
     }
 
-
     /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when asynchronous expression evaluation 
     /// is complete. (http://msdn.microsoft.com/en-ca/library/bb161810.aspx)
@@ -253,9 +218,9 @@ namespace BlackBerry.DebugEngine
     sealed class AD7ExpressionEvaluationCompleteEvent : AD7AsynchronousEvent, IDebugExpressionEvaluationCompleteEvent2 
     {
         public const string IID = "C0E13A85-238A-4800-8315-D947C960A843";
-        private readonly IDebugExpression2 m_expression;
-        private readonly IDebugProperty2 m_property;
- 
+
+        private readonly IDebugExpression2 _expression;
+        private readonly IDebugProperty2 _property;
 
         /// <summary>
         /// Constructor.
@@ -264,10 +229,9 @@ namespace BlackBerry.DebugEngine
         /// <param name="property"> The IDebugProperty2 object that represents the result of the expression evaluation. </param>
         public AD7ExpressionEvaluationCompleteEvent(IDebugExpression2 expression, IDebugProperty2 property) 
         {
-            this.m_expression = expression;
-            this.m_property = property;
+            _expression = expression;
+            _property = property;
         }
- 
 
         /// <summary>
         /// Gets the original expression. (http://msdn.microsoft.com/en-ca/library/bb162323.aspx)
@@ -276,10 +240,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetExpression(out IDebugExpression2 ppExpr) 
         {
-            ppExpr = m_expression;
+            ppExpr = _expression;
             return VSConstants.S_OK;
         }
- 
 
         /// <summary>
         /// Gets the result of expression evaluation. (http://msdn.microsoft.com/en-ca/library/bb161962.aspx)
@@ -288,11 +251,10 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetResult(out IDebugProperty2 ppResult) 
         {
-            ppResult = m_property;
+            ppResult = _property;
             return VSConstants.S_OK;
         }
     }
-
 
     /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a module is loaded or unloaded.
@@ -301,22 +263,20 @@ namespace BlackBerry.DebugEngine
     sealed class AD7ModuleLoadEvent : AD7AsynchronousEvent, IDebugModuleLoadEvent2
     {
         public const string IID = "989DB083-0D7C-40D1-A9D9-921BF611A4B2";
-        
-        readonly AD7Module m_module;
-        readonly bool m_fLoad;
 
-        
+        private readonly AD7Module _module;
+        private readonly bool _isLoad;
+
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="module"> The IDebugModule2 object that represents the module which is loading or unloading. </param>
-        /// <param name="fLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
-        public AD7ModuleLoadEvent(AD7Module module, bool fLoad)
+        /// <param name="isLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
+        public AD7ModuleLoadEvent(AD7Module module, bool isLoad)
         {
-            m_module = module;
-            m_fLoad = fLoad;
+            _module = module;
+            _isLoad = isLoad;
         }
-
 
         /// <summary>
         /// Gets the module that is being loaded or unloaded. (http://msdn.microsoft.com/en-ca/library/bb161763.aspx)
@@ -324,39 +284,28 @@ namespace BlackBerry.DebugEngine
         /// <param name="module"> Returns an IDebugModule2 object that represents the module which is loading or unloading. </param>
         /// <param name="debugMessage"> Returns an optional message describing this event. If this parameter is a null value, no message 
         /// is requested. </param>
-        /// <param name="fIsLoad"> Nonzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. If this 
+        /// <param name="isLoad"> Nonzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. If this 
         /// parameter is a null value, no status is requested. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugModuleLoadEvent2.GetModule(out IDebugModule2 module, ref string debugMessage, ref int fIsLoad)
+        int IDebugModuleLoadEvent2.GetModule(out IDebugModule2 module, ref string debugMessage, ref int isLoad)
         {
-            module = m_module;
-
-            if (m_fLoad)
-            {
-                fIsLoad = 1;
-            }
-            else
-            {
-                fIsLoad = 0;
-            }
-
+            module = _module;
+            isLoad = _isLoad ? 1 : 0;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Sends the event.
         /// </summary>
         /// <param name="engine"> The AD7Engine object that represents the DE. </param>
-        /// <param name="aModule"> The IDebugModule2 object that represents the module which is loading or unloading. </param>
-        /// <param name="fLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
-        internal static void Send(AD7Engine engine, AD7Module aModule, bool fLoad)
+        /// <param name="module"> The IDebugModule2 object that represents the module which is loading or unloading. </param>
+        /// <param name="isLoad"> onzero (TRUE) if the module is loading and zero (FALSE) if the module is unloading. </param>
+        internal static void Send(AD7Engine engine, AD7Module module, bool isLoad)
         {
-            var eventObject = new AD7ModuleLoadEvent(aModule, fLoad);
+            var eventObject = new AD7ModuleLoadEvent(module, isLoad);
             engine.Callback.Send(eventObject, IID, null);
         }
     }
-
 
     /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a program has run to completion
@@ -366,8 +315,7 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "E147E9E3-6440-4073-A7B7-A65592C714B5";
 
-        readonly uint m_exitCode;
-
+        private readonly uint _exitCode;
 
         /// <summary>
         /// Constructor.
@@ -375,11 +323,10 @@ namespace BlackBerry.DebugEngine
         /// <param name="exitCode"> The program's exit code. </param>
         public AD7ProgramDestroyEvent(uint exitCode)
         {
-            m_exitCode = exitCode;
+            _exitCode = exitCode;
         }
 
         #region IDebugProgramDestroyEvent2 Members
-
 
         /// <summary>
         /// Gets the program's exit code. (http://msdn.microsoft.com/en-ca/library/bb146724.aspx)
@@ -388,10 +335,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugProgramDestroyEvent2.GetExitCode(out uint exitCode)
         {
-            exitCode = m_exitCode;
+            exitCode = _exitCode;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Sends the event.
@@ -407,7 +353,6 @@ namespace BlackBerry.DebugEngine
         #endregion
     }
 
-
     /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a thread is created in a program 
     /// being debugged. (http://msdn.microsoft.com/en-ca/library/bb161327.aspx)
@@ -417,7 +362,6 @@ namespace BlackBerry.DebugEngine
         public const string IID = "2090CCFC-70C5-491D-A5E8-BAD2DD9EE3EA";
     }
 
-
     /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a thread has run to completion.
     /// (http://msdn.microsoft.com/en-ca/library/bb162330.aspx)
@@ -426,8 +370,7 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "2C3B7532-A36F-4A6E-9072-49BE649B8541";
 
-        readonly uint m_exitCode;
-
+        private readonly uint _exitCode;
 
         /// <summary>
         /// Constructor.
@@ -435,11 +378,10 @@ namespace BlackBerry.DebugEngine
         /// <param name="exitCode"> The thread's exit code. </param>
         public AD7ThreadDestroyEvent(uint exitCode)
         {
-            m_exitCode = exitCode;
+            _exitCode = exitCode;
         }
 
         #region IDebugThreadDestroyEvent2 Members
-
 
         /// <summary>
         /// Gets the exit code for a thread. (http://msdn.microsoft.com/en-ca/library/bb146996.aspx)
@@ -448,11 +390,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugThreadDestroyEvent2.GetExitCode(out uint exitCode)
         {
-            exitCode = m_exitCode;
-            
+            exitCode = _exitCode;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Sends the event.
@@ -465,7 +405,7 @@ namespace BlackBerry.DebugEngine
             var eventObject = new AD7ThreadDestroyEvent(exitCode);
             if (thread == null)
             {
-                foreach (AD7Thread t in engine.thread)
+                foreach (AD7Thread t in engine.Threads)
                 {
                     engine.Callback.Send(eventObject, IID, t);
                 }
@@ -480,7 +420,6 @@ namespace BlackBerry.DebugEngine
         #endregion
     }
 
-
     /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) when a program is loaded, but before 
     /// any code is executed. (http://msdn.microsoft.com/en-ca/library/bb145834.aspx)
@@ -489,27 +428,20 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "B1844850-1349-45D4-9F12-495212F5EB0B";
 
-        
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AD7LoadCompleteEvent()
-        {
-        }
-
-
         /// <summary>
         /// Sends the event.
         /// </summary>
-        /// <param name="aEngine"> The AD7Engine object that represents the DE. </param>
-        /// <param name="aThread"> The AD7Thread object that represents the thread. </param>
-        internal static void Send(AD7Engine aEngine, AD7Thread aThread)
+        /// <param name="engine"> The AD7Engine object that represents the DE. </param>
+        /// <param name="thread"> The AD7Thread object that represents the thread. </param>
+        internal static void Send(AD7Engine engine, AD7Thread thread)
         {
-            var xMessage = new AD7LoadCompleteEvent();
-            aEngine.Callback.Send(xMessage, IID, aThread);
+            if (thread == null)
+                throw new ArgumentNullException("thread");
+
+            var message = new AD7LoadCompleteEvent();
+            engine.Callback.Send(message, IID, thread);
         }
     }
-
 
     /// <summary>
     /// This interface tells the session debug manager (SDM) that an asynchronous break has been successfully completed.
@@ -520,7 +452,6 @@ namespace BlackBerry.DebugEngine
         public const string IID = "c7405d1d-e24b-44e0-b707-d8a5a4e1641b";
     }
 
-
     /// <summary>
     /// This interface is sent by the debug engine (DE) to the session debug manager (SDM) to output a string.
     /// (http://msdn.microsoft.com/en-ca/library/bb146756.aspx)
@@ -529,16 +460,15 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "569c4bb1-7b82-46fc-ae28-4536ddad753e";
 
-        private string m_str;
-
+        private readonly string _message;
 
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="str"> The displayable message. </param>
-        public AD7OutputDebugStringEvent(string str)
+        /// <param name="message"> The displayable message. </param>
+        public AD7OutputDebugStringEvent(string message)
         {
-            m_str = str;
+            _message = message;
         }
 
         #region IDebugOutputStringEvent2 Members
@@ -550,13 +480,12 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugOutputStringEvent2.GetString(out string pbstrString)
         {
-            pbstrString = m_str;
+            pbstrString = _message;
             return VSConstants.S_OK;
         }
 
         #endregion
     }
-
 
     /// <summary>
     /// This interface is sent by the debug engine (DE) to indicate that the debugging symbols for a module being debugged have 
@@ -566,11 +495,10 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "638F7C54-C160-4c7b-B2D0-E0337BC61F8C";
 
-        private AD7Module m_module;
-        private string m_searchInfo;
-        private uint m_symbolFlags;
+        private readonly AD7Module _module;
+        private readonly string _searchInfo;
+        private readonly uint _symbolFlags;
 
-        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -580,9 +508,9 @@ namespace BlackBerry.DebugEngine
         /// symbols were loaded. </param>
         public AD7SymbolSearchEvent(AD7Module module, string searchInfo, uint symbolFlags)
         {
-            m_module = module;
-            m_searchInfo = searchInfo;
-            m_symbolFlags = symbolFlags;
+            _module = module;
+            _searchInfo = searchInfo;
+            _symbolFlags = symbolFlags;
         }
 
         #region IDebugSymbolSearchEvent2 Members
@@ -599,16 +527,15 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugSymbolSearchEvent2.GetSymbolSearchInfo(out IDebugModule3 pModule, ref string pbstrDebugMessage, enum_MODULE_INFO_FLAGS[] pdwModuleInfoFlags)
         {
-            pModule = m_module;
-            pbstrDebugMessage = m_searchInfo;
-            pdwModuleInfoFlags[0] = (enum_MODULE_INFO_FLAGS)m_symbolFlags;
+            pModule = _module;
+            pbstrDebugMessage = _searchInfo;
+            pdwModuleInfoFlags[0] = (enum_MODULE_INFO_FLAGS)_symbolFlags;
 
             return VSConstants.S_OK;
         }
 
         #endregion
     }
-    
 
     /// <summary>
     /// This interface tells the session debug manager (SDM) that a pending breakpoint has been successfully bound to a loaded program.
@@ -618,10 +545,9 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "1dddb704-cf99-4b8a-b746-dabb01dd13a0";
 
-        private AD7PendingBreakpoint m_pendingBreakpoint;
-        private AD7BoundBreakpoint m_boundBreakpoint;
+        private readonly AD7PendingBreakpoint _pendingBreakpoint;
+        private readonly AD7BoundBreakpoint _boundBreakpoint;
 
-        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -629,8 +555,8 @@ namespace BlackBerry.DebugEngine
         /// <param name="boundBreakpoint"> The AD7BoundBreakpoint object that represents the breakpoint being bound. </param>
         public AD7BreakpointBoundEvent(AD7PendingBreakpoint pendingBreakpoint, AD7BoundBreakpoint boundBreakpoint)
         {
-            m_pendingBreakpoint = pendingBreakpoint;
-            m_boundBreakpoint = boundBreakpoint;
+            _pendingBreakpoint = pendingBreakpoint;
+            _boundBreakpoint = boundBreakpoint;
         }
 
         #region IDebugBreakpointBoundEvent2 Members
@@ -644,11 +570,10 @@ namespace BlackBerry.DebugEngine
         int IDebugBreakpointBoundEvent2.EnumBoundBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
         {
             IDebugBoundBreakpoint2[] boundBreakpoints = new IDebugBoundBreakpoint2[1];
-            boundBreakpoints[0] = m_boundBreakpoint;
+            boundBreakpoints[0] = _boundBreakpoint;
             ppEnum = new AD7BoundBreakpointsEnum(boundBreakpoints);
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the pending breakpoint that is being bound. (http://msdn.microsoft.com/en-us/library/bb146558.aspx)
@@ -658,13 +583,12 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugBreakpointBoundEvent2.GetPendingBreakpoint(out IDebugPendingBreakpoint2 ppPendingBP)
         {
-            ppPendingBP = m_pendingBreakpoint;
+            ppPendingBP = _pendingBreakpoint;
             return VSConstants.S_OK;
         }
 
         #endregion
     }
-
 
     /// <summary>
     /// The debug engine (DE) sends this interface to the session debug manager (SDM) when a program stops at a breakpoint.
@@ -674,9 +598,8 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "501C1E21-C557-48B8-BA30-A1EAB0BC4A74";
 
-        IEnumDebugBoundBreakpoints2 m_boundBreakpoints;
+        private readonly IEnumDebugBoundBreakpoints2 _boundBreakpoints;
 
-        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -684,7 +607,7 @@ namespace BlackBerry.DebugEngine
         /// the current code location. </param>
         public AD7BreakpointEvent(IEnumDebugBoundBreakpoints2 boundBreakpoints)
         {
-            m_boundBreakpoints = boundBreakpoints;
+            _boundBreakpoints = boundBreakpoints;
         }
 
         #region IDebugBreakpointEvent2 Members
@@ -698,7 +621,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugBreakpointEvent2.EnumBreakpoints(out IEnumDebugBoundBreakpoints2 ppEnum)
         {
-            ppEnum = m_boundBreakpoints;
+            ppEnum = _boundBreakpoints;
             return VSConstants.S_OK;
         }
 
@@ -715,15 +638,14 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "0F7F24C1-74D9-4EA6-A3EA-7EDB2D81441D";
 
-        
         /// <summary>
         /// Sends the event.
         /// </summary>
         /// <param name="engine"> The AD7Engine object that represents the DE. </param>
         public static void Send(AD7Engine engine)
         {
-            var xEvent = new AD7StepCompletedEvent();
-            engine.Callback.Send(xEvent, IID, engine.CurrentThread());
+            var eventObject = new AD7StepCompletedEvent();
+            engine.Callback.Send(eventObject, IID, engine.CurrentThread());
         }
 
         #region IDebugEvent2 Members
@@ -731,17 +653,16 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// Gets the attributes for this debug event. (http://msdn.microsoft.com/en-us/library/bb145575.aspx)
         /// </summary>
-        /// <param name="pdwAttrib"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
+        /// <param name="pdwAttributes"> A combination of flags from the enum_EVENTATTRIBUTES enumeration. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int GetAttributes(out uint pdwAttrib)
+        public int GetAttributes(out uint pdwAttributes)
         {
-            pdwAttrib = (uint)(enum_EVENTATTRIBUTES.EVENT_ASYNC_STOP);
+            pdwAttributes = (uint)(enum_EVENTATTRIBUTES.EVENT_ASYNC_STOP);
             return VSConstants.S_OK;
         }
 
         #endregion
     }
-
 
     /// <summary>
     /// The debug engine (DE) sends this interface to the session debug manager (SDM) when the program is about to execute its 
@@ -751,15 +672,14 @@ namespace BlackBerry.DebugEngine
     {
         public const string IID = "86D5A99E-C721-4625-A401-4D052DF38475";
 
-
         /// <summary>
         /// Sends the event.
         /// </summary>
         /// <param name="engine"> The AD7Engine object that represents the DE. </param>
         public static void Send(AD7Engine engine)
         {
-            var xEvent = new AD7EntryPointEvent();
-            engine.Callback.Send(xEvent, IID, engine.CurrentThread());
+            var eventObject = new AD7EntryPointEvent();
+            engine.Callback.Send(eventObject, IID, engine.CurrentThread());
         }
     }
 }

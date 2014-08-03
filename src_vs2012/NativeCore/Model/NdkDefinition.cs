@@ -40,6 +40,11 @@ namespace BlackBerry.NativeCore.Model
             private set;
         }
 
+        public string ToolsPath
+        {
+            get { return string.IsNullOrEmpty(HostPath) ? null : Path.Combine(HostPath, "usr", "bin"); }
+        }
+
         public DeviceFamilyType Type
         {
             get;
@@ -66,7 +71,7 @@ namespace BlackBerry.NativeCore.Model
             }
             catch
             {
-                // no pluging info found at all...
+                // no plugin info found at all...
                 return null;
             }
             if (settings == null)
@@ -96,7 +101,7 @@ namespace BlackBerry.NativeCore.Model
             {
                 var xType = settings.GetValue(FieldFamilyType);
                 if (xType != null)
-                    type = DeviceFamilyHelper.GetTypeFromString(xType.ToString());
+                    type = DeviceHelper.GetFamilyTypeFromString(xType.ToString());
             }
             catch
             {
@@ -154,7 +159,7 @@ namespace BlackBerry.NativeCore.Model
 
                 settings.SetValue(FieldHostPath, HostPath);
                 settings.SetValue(FieldTargetPath, TargetPath);
-                settings.SetValue(FieldFamilyType, DeviceFamilyHelper.GetTypeToString(Type));
+                settings.SetValue(FieldFamilyType, DeviceHelper.GetFamilyTypeToString(Type));
             }
             finally
             {

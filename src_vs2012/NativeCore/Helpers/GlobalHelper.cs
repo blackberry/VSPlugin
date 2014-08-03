@@ -21,7 +21,7 @@ namespace BlackBerry.NativeCore.Helpers
             {
                 try
                 {
-                    var ipHostEntry = Dns.GetHostEntry("downloads.blackberry.com");
+                    Dns.GetHostEntry("downloads.blackberry.com");
                     return true;
                 }
                 catch (SocketException)
