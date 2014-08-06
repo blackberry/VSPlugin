@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
+using System.Security.Cryptography;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
+using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Requests;
 using BlackBerry.NativeCore.QConn.Response;
 
@@ -64,6 +67,83 @@ namespace BlackBerry.NativeCore.QConn
                 throw new SecureTargetConnectionException(HResult.Fail, "Unable to close connection with target");
         }
 
+        /// <summary>
+        /// Authenticates on a target.
+        /// </summary>
+        public void Authenticate(string sshPublicKeyFileName)
+        {
+            if (string.IsNullOrEmpty(sshPublicKeyFileName))
+                throw new ArgumentNullException("sshPublicKeyFileName");
+
+            Authenticate(File.ReadAllBytes(sshPublicKeyFileName));
+        }
+
+        /// <summary>
+        /// Authenticates on a target.
+        /// </summary>
+        public void Authenticate(byte[] sshKey)
+        {
+            if (sshKey == null || sshKey.Length == 0)
+                throw new ArgumentNullException("sshKey");
+
+            byte[] publicKey;
+            byte[] privateKey;
+
+            using (var rsa = new RSACryptoServiceProvider(1024))
+            {
+                try
+                {
+                    // don't store any keys in persistent storages of current Windows account:
+                    rsa.PersistKeyInCsp = false;
+
+                    var rsaParams = rsa.ExportParameters(true);
+                    // more info about parameters and their meaning is here:
+                    // http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsaparameters%28v=vs.90%29.aspx
+
+                    privateKey = rsaParams.D;
+                    publicKey = rsaParams.Modulus;
+                }
+                catch (Exception ex)
+                {
+                    QTraceLog.WriteException(ex, "Unable to generate encryption keys");
+                    throw new SecureTargetConnectionException(HResult.Fail, "Unable to generate encryption key");
+                }
+
+                // initialize encryption negotiation:
+                Send(new SecureTargetChallengeRequest(publicKey));
+                var response = Receive();
+                VerifyResponse(response);
+
+                var encryptedChallenge = response as SecureTargetEncryptedChallengeResponse;
+                if (encryptedChallenge == null)
+                {
+                    QTraceLog.WriteLine("Unexpected response for encryption challenge");
+                    throw new SecureTargetConnectionException(HResult.Fail, "Unexpected response for encryption challenge");
+                }
+
+                if (encryptedChallenge.Challenge.ExpectedSignatureType != 1)
+                {
+                    throw new Exception("Invalid signature type in encryption challenge: 0x" + encryptedChallenge.Challenge.ExpectedSignatureType.ToString("X"));
+                }
+
+                // decrypt the message:
+                var decryptedChallenge = encryptedChallenge.Challenge.Decrypt(rsa);
+                if (decryptedChallenge == null)
+                {
+                    throw new SecureTargetConnectionException(HResult.Fail, "Unable to decipher encrption challenge data");
+                }
+
+                if (encryptedChallenge.Challenge.ExpectedSignatureLength != decryptedChallenge.Signature.Length)
+                {
+                    throw new Exception("Invalid signature length in encryption challenge: " + encryptedChallenge.Challenge.ExpectedSignatureLength);
+                }
+
+                // confirm encrypted channel:
+                Send(new SecureTargetDecryptedChallengeResponse(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
+                response = Receive();
+            }
+        }
+
         private void Send(SecureTargetRequest request)
         {
             if (request == null)
@@ -91,8 +171,11 @@ namespace BlackBerry.NativeCore.QConn
 
             if (result != null && result.Length > 0)
             {
-                ushort packetLength = BitHelper.GetUInt16(result, 0);
+                ushort packetLength = BitHelper.BigEndian_ToUInt16(result, 0);
 
+                // PH: HINT: don't know why, but on PlayBook packageLength doesn't define the number
+                // of bytes received, that's why we compare it with buffer;
+                // on Z10 and Z30 the packageLength equals returned result.Length
                 if (packetLength > buffer.Length)
                 {
                     QTraceLog.WriteLine("Packet length larger than buffer, expected size: " + packetLength);

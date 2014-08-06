@@ -10,7 +10,9 @@ namespace UnitTests
         public void Connect()
         {
             var qdoor = new QConnDoor();
-            qdoor.Connect("192.168.9.152", QConnDoor.DefaultPort);
+            qdoor.Connect("192.168.9.150", QConnDoor.DefaultPort);
+            qdoor.Authenticate(@"C:\Users\Pawel\AppData\Local\Research In Motion\bbt_id_rsa.pub");
+            qdoor.Close();
         }
     }
 }

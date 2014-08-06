@@ -61,9 +61,9 @@ namespace BlackBerry.NativeCore.QConn.Requests
 
             // prepare header:
             var data = new byte[payloadSize + 6];
-            BitHelper.Set(data, 0, (ushort) data.Length);
-            BitHelper.Set(data, 2, Version);
-            BitHelper.Set(data, 4, Code);
+            BitHelper.BigEndian_Set(data, 0, (ushort) data.Length);
+            BitHelper.BigEndian_Set(data, 2, Version);
+            BitHelper.BigEndian_Set(data, 4, Code);
 
             // copy the payload, if given:
             if (payload != null && payloadSize > 0)
