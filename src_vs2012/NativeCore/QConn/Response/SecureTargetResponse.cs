@@ -13,9 +13,16 @@ namespace BlackBerry.NativeCore.QConn.Response
         public SecureTargetResponse(byte[] data, ushort version, ushort code)
             : base(data, HResult.OK)
         {
-            if (data == null)
-                throw new ArgumentNullException("data");
+            Version = version;
+            Code = code;
+        }
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public SecureTargetResponse(byte[] data, HResult status, ushort version, ushort code)
+            : base(data, status)
+        {
             Version = version;
             Code = code;
         }

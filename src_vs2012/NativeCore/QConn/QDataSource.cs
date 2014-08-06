@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Net.Sockets;
-using System.Windows.Forms.Layout;
 using BlackBerry.NativeCore.Diagnostics;
 
 namespace BlackBerry.NativeCore.QConn
@@ -104,7 +103,7 @@ namespace BlackBerry.NativeCore.QConn
             if (buffer == null)
                 throw new ArgumentNullException("buffer");
             if (buffer.Length == 0)
-                throw new ArgumentOutOfRangeException("size");
+                throw new ArgumentOutOfRangeException("buffer");
 
             if (!IsConnected)
             {
@@ -116,6 +115,7 @@ namespace BlackBerry.NativeCore.QConn
             try
             {
                 var length = _socket.Receive(buffer, 0, buffer.Length, SocketFlags.None);
+
                 result = new byte[length];
                 Array.Copy(buffer, 0, result, 0, length);
             }

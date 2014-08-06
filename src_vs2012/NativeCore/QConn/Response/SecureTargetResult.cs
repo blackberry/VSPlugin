@@ -45,19 +45,16 @@ namespace BlackBerry.NativeCore.QConn.Response
         {
             if (status != HResult.OK)
                 return new SecureTargetResult(result, status);
+            if (result == null || result.Length < 6)
+            {
+                QTraceLog.WriteLine("Packet length was too small: " + (result != null ? result.Length : 0));
+                return new SecureTargetResult(result, HResult.InvalidData);
+            }
 
             try
             {
-                ushort packetLength = BitHelper.GetUInt16(result, 0);
                 ushort version = BitHelper.GetUInt16(result, 2);
                 ushort code = BitHelper.GetUInt16(result, 4);
-
-                // verify length:
-                if (packetLength > result.Length)
-                {
-                    QTraceLog.WriteLine("Packet length larger than byte array size: " + code);
-                    return new SecureTargetResult(result, HResult.InvalidData);
-                }
 
                 // verify response code:
                 switch (code)
@@ -81,7 +78,7 @@ namespace BlackBerry.NativeCore.QConn.Response
                         }
                     default:
                         QTraceLog.WriteLine("Invalid code received in target response: " + code);
-                        return new SecureTargetResult(result, HResult.InvalidFrameCode);
+                        return new SecureTargetResponse(result, HResult.InvalidFrameCode, version, code);
                 }
             }
             catch (Exception ex)

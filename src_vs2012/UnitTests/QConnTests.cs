@@ -10,7 +10,7 @@ namespace UnitTests
         public void Connect()
         {
             var qdoor = new QConnDoor();
-            qdoor.Open("192.168.9.150", QConnDoor.DefaultPort);
+            qdoor.Connect("192.168.9.152", QConnDoor.DefaultPort);
         }
     }
 }

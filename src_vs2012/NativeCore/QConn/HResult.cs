@@ -8,6 +8,7 @@
         InvalidFrameCode,
         InvalidRedirect,
         Fail,
-        BadLogin
+        BadLogin,
+        BufferTooSmall
     }
 }

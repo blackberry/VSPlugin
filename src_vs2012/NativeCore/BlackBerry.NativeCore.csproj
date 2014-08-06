@@ -106,8 +106,10 @@
     <Compile Include="QConn\HResult.cs" />
     <Compile Include="QConn\QConnDoor.cs" />
     <Compile Include="QConn\QDataSource.cs" />
+    <Compile Include="QConn\Requests\SecureTargetClose.cs" />
     <Compile Include="QConn\Requests\SecureTargetHello.cs" />
     <Compile Include="QConn\Requests\SecureTargetRequest.cs" />
+    <Compile Include="QConn\Requests\SecureTargetStartServices.cs" />
     <Compile Include="QConn\Response\SecureTargetFeedback.cs" />
     <Compile Include="QConn\Response\SecureTargetFeedbackMismatchedVersion.cs" />
     <Compile Include="QConn\Response\SecureTargetFeedbackNoPasswordRequired.cs" />
@@ -115,6 +117,7 @@
     <Compile Include="QConn\Response\SecureTargetFeedbackRejected.cs" />
     <Compile Include="QConn\Response\SecureTargetResult.cs" />
     <Compile Include="QConn\Response\SecureTargetResponse.cs" />
+    <Compile Include="QConn\SecureTargetConnectionException.cs" />
     <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
     <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
     <Compile Include="Tools\ApiLevelUpdateRunner.cs" />
