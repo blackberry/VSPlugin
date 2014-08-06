@@ -127,7 +127,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Converts exception data into a single string.
         /// </summary>
         [DebuggerStepThrough]
-        private static string FlatException(Exception ex, string message)
+        internal static string FlatException(Exception ex, string message)
         {
             var result = new StringBuilder();
 
