@@ -52,26 +52,6 @@ namespace BlackBerry.NativeCore.QConn
         #endregion
 
         /// <summary>
-        /// Initiates connection with specified target.
-        /// </summary>
-        public void Connect(string host, int port)
-        {
-            if (_source == null)
-                throw new ObjectDisposedException("QConnDoor");
-
-            var result = _source.Connect(host, port);
-            if (result != HResult.OK)
-            {
-                throw new SecureTargetConnectionException(result, string.Concat("Unable to connect to target ", host, ":", port));
-            }
-
-            // try to initialize communication:
-            Send(new SecureTargetHelloRequest());
-            var response = Receive();
-            VerifyResponse(response);
-        }
-
-        /// <summary>
         /// Closes connection with current target.
         /// </summary>
         public void Close()
@@ -87,7 +67,6 @@ namespace BlackBerry.NativeCore.QConn
 
             // request a close of the connection on target:
             Send(new SecureTargetCloseRequest());
-            var response = Receive();
             // ignore the result of CLOSE-request...
 
             // close connection:
@@ -99,32 +78,47 @@ namespace BlackBerry.NativeCore.QConn
         /// <summary>
         /// Authenticates on a target.
         /// </summary>
-        public void Authenticate(string password, string sshPublicKeyFileName)
+        public void Connect(string host, int port, string password, string sshPublicKeyFileName)
         {
+            if (string.IsNullOrEmpty(host))
+                throw new ArgumentNullException("host");
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentNullException("password");
             if (string.IsNullOrEmpty(sshPublicKeyFileName))
                 throw new ArgumentNullException("sshPublicKeyFileName");
 
-            Authenticate(password, File.ReadAllBytes(sshPublicKeyFileName));
+            Connect(host, port, password, File.ReadAllBytes(sshPublicKeyFileName));
         }
 
         /// <summary>
         /// Authenticates on a target.
         /// </summary>
-        public void Authenticate(string password, byte[] sshKey)
+        public void Connect(string host, int port, string password, byte[] sshKey)
         {
+            if (string.IsNullOrEmpty(host))
+                throw new ArgumentNullException("host");
             if (string.IsNullOrEmpty(password))
                 throw new ArgumentNullException("password");
             if (sshKey == null || sshKey.Length == 0)
                 throw new ArgumentNullException("sshKey");
 
-            if (!_source.IsConnected)
-                throw new SecureTargetConnectionException(HResult.Fail, "Not connected to the target, invoke Connect() first");
+            if (_source == null)
+                throw new ObjectDisposedException("QConnDoor");
 
             // is already connected?
-            if (_isAuthenticated)
+            if (IsAuthenticated)
                 return;
+
+            var result = _source.Connect(host, port);
+            if (result != HResult.OK)
+            {
+                throw new SecureTargetConnectionException(result, string.Concat("Unable to connect to target ", host, ":", port));
+            }
+
+            // try to initialize communication:
+            Send(new SecureTargetHelloRequest());
+            var response = Receive();
+            VerifyResponse(response);
 
             RSAParameters publicKey;
             RSAParameters privateKey;
@@ -151,7 +145,7 @@ namespace BlackBerry.NativeCore.QConn
 
             // initialize encryption negotiation:
             Send(new SecureTargetChallengeRequest(publicKey.Modulus));
-            var response = Receive();
+            response = Receive();
             VerifyResponse(response);
 
             var encryptedChallenge = response as SecureTargetEncryptedChallengeResponse;
@@ -224,7 +218,7 @@ namespace BlackBerry.NativeCore.QConn
                 throw new ObjectDisposedException("QConnDoor");
 
             if (!IsAuthenticated)
-                throw new SecureTargetConnectionException(HResult.Fail, "Not authenticated to target, call Connect() and Authenticate() first");
+                throw new SecureTargetConnectionException(HResult.Fail, "Not authenticated to target, call Connect() first");
 
             Send(new SecureTargetKeepAliveRequest());
             var response = Receive();
