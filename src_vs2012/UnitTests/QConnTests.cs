@@ -1,4 +1,6 @@
-﻿using BlackBerry.NativeCore.QConn;
+﻿using System;
+using System.Threading;
+using BlackBerry.NativeCore.QConn;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -10,9 +12,33 @@ namespace UnitTests
         public void Connect()
         {
             var qdoor = new QConnDoor();
-            qdoor.Connect("192.168.9.150", QConnDoor.DefaultPort, "qwer", @"C:\Users\Pawel\AppData\Local\Research In Motion\bbt_id_rsa.pub");
+            qdoor.Authenticated += QConnDoorOnAuthenticated;
+
+            // verify connection is not established:
+            Assert.IsFalse(qdoor.IsAuthenticated);
+            Assert.IsFalse(qdoor.IsConnected);
+
+            // connect:
+            qdoor.Connect("192.168.9.150", QConnDoor.DefaultPort, "xyz", @"C:\Users\Pawel\AppData\Local\Research In Motion\bbt_id_rsa.pub");
+
+            Assert.IsTrue(qdoor.IsAuthenticated);
+            Assert.IsTrue(qdoor.IsConnected);
+
+            // keep the connection alive for some time:
             qdoor.KeepAlive();
+            qdoor.KeepAlive(200);
+            Thread.Sleep(1000); // can sleep here, as 'keep-alive' uses a thread-pool to work...
+
+            // and close:
             qdoor.Close();
+
+            Assert.IsFalse(qdoor.IsAuthenticated);
+            Assert.IsFalse(qdoor.IsConnected);
+        }
+
+        private void QConnDoorOnAuthenticated(object sender, QConnAuthenticationEventArgs e)
+        {
+            Console.WriteLine("Is authenticated: {0}", e.IsAuthenticated);
         }
     }
 }

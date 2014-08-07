@@ -106,6 +106,7 @@
     <Compile Include="QConn\HResult.cs" />
     <Compile Include="QConn\Model\DecryptResponse.cs" />
     <Compile Include="QConn\Model\EncryptionChallenge.cs" />
+    <Compile Include="QConn\QConnAuthenticationEventArgs.cs" />
     <Compile Include="QConn\QConnDoor.cs" />
     <Compile Include="QConn\QDataSource.cs" />
     <Compile Include="QConn\Requests\SecureTargetAuthenticateRequest.cs" />

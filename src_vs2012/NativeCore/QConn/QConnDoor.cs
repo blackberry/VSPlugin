@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Security.Cryptography;
+using System.Threading;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Requests;
 using BlackBerry.NativeCore.QConn.Response;
+using BlackBerry.NativeCore.Tools;
 
 namespace BlackBerry.NativeCore.QConn
 {
@@ -12,7 +14,7 @@ namespace BlackBerry.NativeCore.QConn
     /// Manager class that connects securely with a target device and allows several unsecured connections.
     /// It requires a public SSH key (4kB) and a device password.
     /// </summary>
-    public sealed class QConnDoor
+    public sealed class QConnDoor : IDisposable
     {
         /// <summary>
         /// Default port the service is operating on the device.
@@ -20,8 +22,15 @@ namespace BlackBerry.NativeCore.QConn
         public const int DefaultPort = 4455;
         private const int DefaultResponseSize = 255;
 
-        private readonly QDataSource _source;
+        private QDataSource _source;
+        private readonly object _lock;
+        private Timer _keepAliveTimer;
         private bool _isAuthenticated;
+
+        /// <summary>
+        /// Event raised each time status of an encrypted-channel to target is changed.
+        /// </summary>
+        public event EventHandler<QConnAuthenticationEventArgs> Authenticated;
 
         /// <summary>
         /// Default constructor.
@@ -29,6 +38,12 @@ namespace BlackBerry.NativeCore.QConn
         public QConnDoor()
         {
             _source = new QDataSource();
+            _lock = new object();
+        }
+
+        ~QConnDoor()
+        {
+            Dispose(false);
         }
 
         #region Properties
@@ -49,6 +64,15 @@ namespace BlackBerry.NativeCore.QConn
             get { return IsConnected && _isAuthenticated; }
         }
 
+        /// <summary>
+        /// Gets or sets the event dispatcher responsible for thread managment of raised events.
+        /// </summary>
+        public IEventDispatcher EventDispatcher
+        {
+            get;
+            set;
+        }
+
         #endregion
 
         /// <summary>
@@ -58,10 +82,12 @@ namespace BlackBerry.NativeCore.QConn
         {
             if (_source == null)
                 throw new ObjectDisposedException("QConnDoor");
-            _isAuthenticated = false;
+
+            KeepAlive(0); // stop keep-alive timer
 
             if (!_source.IsConnected)
             {
+                NotifyAuthenticationChanged(false);
                 return;
             }
 
@@ -71,6 +97,8 @@ namespace BlackBerry.NativeCore.QConn
 
             // close connection:
             var result = _source.Close();
+
+            NotifyAuthenticationChanged(false);
             if (result != HResult.OK)
                 throw new SecureTargetConnectionException(HResult.Fail, "Unable to close connection with target");
         }
@@ -204,7 +232,7 @@ namespace BlackBerry.NativeCore.QConn
             VerifyResponse(response);
 
             QTraceLog.WriteLine("Successfully connected. This application must remain running in order to use debug tools. Exiting the application will terminate this connection.");
-            _isAuthenticated = true;
+            NotifyAuthenticationChanged(true);
         }
 
         /// <summary>
@@ -216,13 +244,93 @@ namespace BlackBerry.NativeCore.QConn
         {
             if (_source == null)
                 throw new ObjectDisposedException("QConnDoor");
-
             if (!IsAuthenticated)
                 throw new SecureTargetConnectionException(HResult.Fail, "Not authenticated to target, call Connect() first");
 
-            Send(new SecureTargetKeepAliveRequest());
-            var response = Receive();
+            var response = InternalSendKeepAlive();
             VerifyResponse(response);
+        }
+
+        /// <summary>
+        /// Starts a timer issuing a keep-alive request to the target on given internals.
+        /// It will stop only, if connection is closed or when this method is invoked with zero.
+        /// </summary>
+        /// <param name="millisecInterval">Number of milliseconds the keep-alive request should be issued</param>
+        public void KeepAlive(uint millisecInterval)
+        {
+            if (_source == null)
+                throw new ObjectDisposedException("QConnDoor");
+            if (!IsAuthenticated)
+                throw new SecureTargetConnectionException(HResult.Fail, "Not authenticated to target, call Connect() first");
+
+            // stop the timer, if running:
+            if (millisecInterval == 0)
+            {
+                lock (_lock)
+                {
+                    if (_keepAliveTimer != null)
+                    {
+                        _keepAliveTimer.Dispose();
+                        _keepAliveTimer = null;
+                    }
+                }
+
+                return;
+            }
+
+            // start or update the timer:
+            lock (_lock)
+            {
+                if (_keepAliveTimer == null)
+                    _keepAliveTimer = new Timer(OnAliveTick, this, millisecInterval, millisecInterval);
+                else
+                    _keepAliveTimer.Change(0, millisecInterval);
+            }
+        }
+
+        private void OnAliveTick(object state)
+        {
+            var response = InternalSendKeepAlive();
+
+            // did the delivery failed?
+            if (response == null || response.Status != HResult.OK)
+            {
+                // stop the timer, as no more needed:
+                lock (_lock)
+                {
+                    if (_keepAliveTimer != null)
+                    {
+                        _keepAliveTimer.Dispose();
+                        _keepAliveTimer = null;
+                    }
+                }
+
+                // and notify about failure:
+                QTraceLog.WriteLine("Failed to deliver keep-alive request ({0})", response != null ? response.ToString() : "Connection already closed");
+                NotifyAuthenticationChanged(false);
+            }
+        }
+
+        /// <summary>
+        /// Sends keep-alive request to the target and returns its response.
+        /// </summary>
+        private SecureTargetResult InternalSendKeepAlive()
+        {
+            if (!IsAuthenticated)
+                return null;
+
+            QTraceLog.WriteLine("Sending keep-alive");
+
+            try
+            {
+                Send(new SecureTargetKeepAliveRequest());
+                return Receive();
+            }
+            catch (Exception ex)
+            {
+                QTraceLog.WriteException(ex, "Unable to send keep-alive request");
+                return null;
+            }
         }
 
         private void Send(SecureTargetRequest request)
@@ -308,5 +416,64 @@ namespace BlackBerry.NativeCore.QConn
 
             // all was OK... finally!
         }
+
+        private void NotifyAuthenticationChanged(bool isAuthenticated)
+        {
+            if (isAuthenticated != _isAuthenticated)
+            {
+                _isAuthenticated = isAuthenticated;
+
+                // notify using dispatcher or just by calling handlers from the same thread:
+                var dispatcher = EventDispatcher;
+                if (dispatcher != null)
+                {
+                    dispatcher.Invoke(Authenticated, this, new QConnAuthenticationEventArgs(this, _isAuthenticated));
+                }
+                else
+                {
+                    var handler = Authenticated;
+                    if (handler != null)
+                    {
+                        handler(this, new QConnAuthenticationEventArgs(this, _isAuthenticated));
+                    }
+                }
+            }
+        }
+
+        #region IDisposable Implementation
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                // stop sending keep-alive:
+                if (_keepAliveTimer != null)
+                {
+                    _keepAliveTimer.Dispose();
+                    _keepAliveTimer = null;
+                }
+
+                // release data-source:
+                if (_source != null)
+                {
+                    Close();
+                    _source = null;
+                }
+
+                // clear handlers:
+                Authenticated = null;
+            }
+        }
+        #endregion
     }
 }
