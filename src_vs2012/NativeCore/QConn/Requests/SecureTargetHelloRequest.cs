@@ -3,12 +3,12 @@
     /// <summary>
     /// Initial request.
     /// </summary>
-    sealed class SecureTargetHello : SecureTargetRequest
+    sealed class SecureTargetHelloRequest : SecureTargetRequest
     {
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public SecureTargetHello()
+        public SecureTargetHelloRequest()
             : base(1)
         {
         }

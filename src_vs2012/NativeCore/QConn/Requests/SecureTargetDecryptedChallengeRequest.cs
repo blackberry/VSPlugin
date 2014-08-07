@@ -3,9 +3,15 @@ using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.QConn.Requests
 {
-    sealed class SecureTargetDecryptedChallengeResponse : SecureTargetEncryptedRequest
+    /// <summary>
+    /// Request confirming used RSA keys and establishing secured communication channel.
+    /// </summary>
+    sealed class SecureTargetDecryptedChallengeRequest : SecureTargetEncryptedRequest
     {
-        public SecureTargetDecryptedChallengeResponse(byte[] decryptedBlob, byte[] signature, byte[] sessionKey)
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public SecureTargetDecryptedChallengeRequest(byte[] decryptedBlob, byte[] signature, byte[] sessionKey)
             : base(5, sessionKey)
         {
             if (decryptedBlob == null || decryptedBlob.Length == 0)

@@ -66,7 +66,7 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             // try to initialize communication:
-            Send(new SecureTargetHello());
+            Send(new SecureTargetHelloRequest());
             var response = Receive();
             VerifyResponse(response);
         }
@@ -86,7 +86,7 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             // request a close of the connection on target:
-            Send(new SecureTargetClose());
+            Send(new SecureTargetCloseRequest());
             var response = Receive();
             // ignore the result of CLOSE-request...
 
@@ -179,7 +179,7 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             // confirm encrypted channel:
-            Send(new SecureTargetDecryptedChallengeResponse(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
+            Send(new SecureTargetDecryptedChallengeRequest(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
             response = Receive();
             VerifyResponse(response);
 
@@ -200,12 +200,12 @@ namespace BlackBerry.NativeCore.QConn
             QTraceLog.WriteLine("Successfully authenticated with target credentials.");
 
             QTraceLog.WriteLine("Sending ssh key to target");
-            Send(new SecureTargetSendSshPublicKey(sshKey, decryptedChallenge.SessionKey));
+            Send(new SecureTargetSendSshPublicKeyRequest(sshKey, decryptedChallenge.SessionKey));
             response = Receive();
             VerifyResponse(response);
 
             // and start all services:
-            Send(new SecureTargetStartServices());
+            Send(new SecureTargetStartServicesRequest());
             response = Receive();
             VerifyResponse(response);
 

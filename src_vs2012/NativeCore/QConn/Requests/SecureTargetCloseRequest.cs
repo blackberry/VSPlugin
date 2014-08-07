@@ -3,12 +3,12 @@
     /// <summary>
     /// Request to close the communication channel on target side. 
     /// </summary>
-    sealed class SecureTargetClose : SecureTargetRequest
+    sealed class SecureTargetCloseRequest : SecureTargetRequest
     {
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public SecureTargetClose()
+        public SecureTargetCloseRequest()
             : base(12)
         {
         }

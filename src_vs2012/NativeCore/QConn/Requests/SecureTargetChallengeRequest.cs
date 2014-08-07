@@ -3,20 +3,26 @@ using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.QConn.Requests
 {
+    /// <summary>
+    /// Request to initiate session-key and exchange of RSA public key with target.
+    /// </summary>
     sealed class SecureTargetChallengeRequest : SecureTargetRequest
     {
-        public SecureTargetChallengeRequest(byte[] publicKey)
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public SecureTargetChallengeRequest(byte[] publicRsaKey)
             : base(3)
         {
-            if (publicKey == null || publicKey.Length == 0)
-                throw new ArgumentNullException("publicKey");
+            if (publicRsaKey == null || publicRsaKey.Length == 0)
+                throw new ArgumentNullException("publicRsaKey");
 
-            PublicKey = publicKey;
+            PublicRsaKey = publicRsaKey;
         }
 
         #region Properties
 
-        public byte[] PublicKey
+        public byte[] PublicRsaKey
         {
             get;
             private set;
@@ -26,10 +32,10 @@ namespace BlackBerry.NativeCore.QConn.Requests
 
         protected override byte[] GetPayload()
         {
-            var payload = new byte[2 + PublicKey.Length];
+            var payload = new byte[2 + PublicRsaKey.Length];
 
-            BitHelper.BigEndian_Set(payload, 0, (ushort) PublicKey.Length);
-            Array.Copy(PublicKey, 0, payload, 2, PublicKey.Length);
+            BitHelper.BigEndian_Set(payload, 0, (ushort) PublicRsaKey.Length);
+            Array.Copy(PublicRsaKey, 0, payload, 2, PublicRsaKey.Length);
 
             return payload;
         }

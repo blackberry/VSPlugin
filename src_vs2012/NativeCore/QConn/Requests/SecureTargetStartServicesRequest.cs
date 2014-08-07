@@ -3,12 +3,12 @@
     /// <summary>
     /// Request to start other dependant services.
     /// </summary>
-    sealed class SecureTargetStartServices : SecureTargetRequest
+    sealed class SecureTargetStartServicesRequest : SecureTargetRequest
     {
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public SecureTargetStartServices()
+        public SecureTargetStartServicesRequest()
             : base(11)
         {
         }

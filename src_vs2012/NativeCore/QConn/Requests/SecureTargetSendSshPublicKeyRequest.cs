@@ -5,14 +5,14 @@ using BlackBerry.NativeCore.Helpers;
 namespace BlackBerry.NativeCore.QConn.Requests
 {
     /// <summary>
-    /// Request that transfers SSH public key to the target.
+    /// Request to transfer SSH public key to the target.
     /// </summary>
-    sealed class SecureTargetSendSshPublicKey : SecureTargetEncryptedRequest
+    sealed class SecureTargetSendSshPublicKeyRequest : SecureTargetEncryptedRequest
     {
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public SecureTargetSendSshPublicKey(byte[] sshKey, byte[] sessionKey)
+        public SecureTargetSendSshPublicKeyRequest(byte[] sshKey, byte[] sessionKey)
             : base(7, sessionKey)
         {
             if (sshKey == null || sshKey.Length == 0)
