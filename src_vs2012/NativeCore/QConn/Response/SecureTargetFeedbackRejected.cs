@@ -1,4 +1,6 @@
-﻿namespace BlackBerry.NativeCore.QConn.Response
+﻿using System;
+
+namespace BlackBerry.NativeCore.QConn.Response
 {
     /// <summary>
     /// Negative result about last request.
@@ -9,8 +11,11 @@
         /// Init constructor.
         /// </summary>
         public SecureTargetFeedbackRejected(byte[] data, ushort version, ushort code, ushort feedbackCode, string reason)
-            : base(data, version, code, feedbackCode)
+            : base(data, HResult.Fail, version, code, feedbackCode)
         {
+            if (string.IsNullOrEmpty(reason))
+                throw new ArgumentNullException("reason");
+
             Reason = reason;
         }
 
@@ -23,5 +28,10 @@
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return Reason;
+        }
     }
 }

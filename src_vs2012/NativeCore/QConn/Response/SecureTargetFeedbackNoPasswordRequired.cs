@@ -9,7 +9,7 @@
         /// Init constructor.
         /// </summary>
         public SecureTargetFeedbackNoPasswordRequired(byte[] data, ushort version, ushort code, ushort feedbackCode)
-            : base(data, version, code, feedbackCode)
+            : base(data, HResult.OK, version, code, feedbackCode)
         {
         }
     }

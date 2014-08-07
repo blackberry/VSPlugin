@@ -8,8 +8,8 @@
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public SecureTargetFeedback(byte[] data, ushort version, ushort code, ushort feedbackCode)
-            : base(data, version, code)
+        public SecureTargetFeedback(byte[] data, HResult status, ushort version, ushort code, ushort feedbackCode)
+            : base(data, status, version, code)
         {
             FeedbackCode = feedbackCode;
         }

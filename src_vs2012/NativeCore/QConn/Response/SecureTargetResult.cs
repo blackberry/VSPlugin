@@ -39,6 +39,14 @@ namespace BlackBerry.NativeCore.QConn.Response
         #endregion
 
         /// <summary>
+        /// Returns a string that represents the current object.
+        /// </summary>
+        public override string ToString()
+        {
+            return Status.ToString();
+        }
+
+        /// <summary>
         /// Loads response from specified array of bytes.
         /// </summary>
         public static SecureTargetResult Load(byte[] result, HResult status)

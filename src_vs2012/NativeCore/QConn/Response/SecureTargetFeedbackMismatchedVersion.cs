@@ -9,7 +9,7 @@
         /// Init constructor.
         /// </summary>
         public SecureTargetFeedbackMismatchedVersion(byte[] data, ushort version, ushort code, ushort feedbackCode, string message)
-            : base(data, version, code, feedbackCode)
+            : base(data, HResult.InvalidData, version, code, feedbackCode)
         {
         }
 

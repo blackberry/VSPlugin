@@ -5,8 +5,11 @@
     /// </summary>
     sealed class SecureTargetFeedbackOK : SecureTargetFeedback
     {
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public SecureTargetFeedbackOK(byte[] data, ushort version, ushort code, ushort feedbackCode)
-            : base(data, version, code, feedbackCode)
+            : base(data, HResult.OK, version, code, feedbackCode)
         {
         }
     }
