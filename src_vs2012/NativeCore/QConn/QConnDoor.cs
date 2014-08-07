@@ -8,6 +8,10 @@ using BlackBerry.NativeCore.QConn.Response;
 
 namespace BlackBerry.NativeCore.QConn
 {
+    /// <summary>
+    /// Manager class that connects securely with a target device and allows several unsecured connections.
+    /// It requires a public SSH key (4kB) and a device password.
+    /// </summary>
     public sealed class QConnDoor
     {
         /// <summary>
@@ -17,11 +21,35 @@ namespace BlackBerry.NativeCore.QConn
         private const int DefaultResponseSize = 255;
 
         private readonly QDataSource _source;
+        private bool _isAuthenticated;
 
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
         public QConnDoor()
         {
             _source = new QDataSource();
         }
+
+        #region Properties
+
+        /// <summary>
+        /// Gets an indication, if connection to target has been established.
+        /// </summary>
+        public bool IsConnected
+        {
+            get { return _source != null && _source.IsConnected; }
+        }
+
+        /// <summary>
+        /// Gets an indication, if secured communication channel has been established to the device and SSH keys are transmitted.
+        /// </summary>
+        public bool IsAuthenticated
+        {
+            get { return IsConnected && _isAuthenticated; }
+        }
+
+        #endregion
 
         /// <summary>
         /// Initiates connection with specified target.
@@ -50,6 +78,8 @@ namespace BlackBerry.NativeCore.QConn
         {
             if (_source == null)
                 throw new ObjectDisposedException("QConnDoor");
+            _isAuthenticated = false;
+
             if (!_source.IsConnected)
             {
                 return;
@@ -88,6 +118,13 @@ namespace BlackBerry.NativeCore.QConn
                 throw new ArgumentNullException("password");
             if (sshKey == null || sshKey.Length == 0)
                 throw new ArgumentNullException("sshKey");
+
+            if (!_source.IsConnected)
+                throw new SecureTargetConnectionException(HResult.Fail, "Not connected to the target, invoke Connect() first");
+
+            // is already connected?
+            if (_isAuthenticated)
+                return;
 
             RSAParameters publicKey;
             RSAParameters privateKey;
@@ -173,6 +210,25 @@ namespace BlackBerry.NativeCore.QConn
             VerifyResponse(response);
 
             QTraceLog.WriteLine("Successfully connected. This application must remain running in order to use debug tools. Exiting the application will terminate this connection.");
+            _isAuthenticated = true;
+        }
+
+        /// <summary>
+        /// Sends a keep-alive request to the target.
+        /// Without it the secured and unsecured connections will be automatically closed by the target.
+        /// Suggestion is to transmit it each 5sec.
+        /// </summary>
+        public void KeepAlive()
+        {
+            if (_source == null)
+                throw new ObjectDisposedException("QConnDoor");
+
+            if (!IsAuthenticated)
+                throw new SecureTargetConnectionException(HResult.Fail, "Not authenticated to target, call Connect() and Authenticate() first");
+
+            Send(new SecureTargetKeepAliveRequest());
+            var response = Receive();
+            VerifyResponse(response);
         }
 
         private void Send(SecureTargetRequest request)

@@ -115,6 +115,7 @@
     <Compile Include="QConn\Requests\SecureTargetDecryptedChallengeResponse.cs" />
     <Compile Include="QConn\Requests\SecureTargetEncryptedRequest.cs" />
     <Compile Include="QConn\Requests\SecureTargetHello.cs" />
+    <Compile Include="QConn\Requests\SecureTargetKeepAliveRequest.cs" />
     <Compile Include="QConn\Requests\SecureTargetRequest.cs" />
     <Compile Include="QConn\Requests\SecureTargetSendSshPublicKey.cs" />
     <Compile Include="QConn\Requests\SecureTargetStartServices.cs" />

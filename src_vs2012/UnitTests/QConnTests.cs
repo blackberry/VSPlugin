@@ -12,6 +12,7 @@ namespace UnitTests
             var qdoor = new QConnDoor();
             qdoor.Connect("192.168.9.150", QConnDoor.DefaultPort);
             qdoor.Authenticate("xyz", @"C:\Users\Pawel\AppData\Local\Research In Motion\bbt_id_rsa.pub");
+            qdoor.KeepAlive();
             qdoor.Close();
         }
     }
