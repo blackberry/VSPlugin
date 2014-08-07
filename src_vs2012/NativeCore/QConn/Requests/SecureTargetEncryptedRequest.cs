@@ -9,7 +9,6 @@ namespace BlackBerry.NativeCore.QConn.Requests
     /// </summary>
     abstract class SecureTargetEncryptedRequest : SecureTargetRequest
     {
-        private readonly static RandomNumberGenerator Randomizer = RNGCryptoServiceProvider.Create();
         private byte[] _cachedPayload;
 
         /// <summary>
@@ -45,34 +44,44 @@ namespace BlackBerry.NativeCore.QConn.Requests
             if (unencryptedPayload == null)
                 throw new Exception("Missing payload to encrypt");
 
-            byte[] iv = new byte[16];
-            Randomizer.GetBytes(iv);
-
-            byte[] encryptedPayload = Encrypt(unencryptedPayload, iv);
+            byte[] iv;
+            byte[] encryptedPayload = Encrypt(unencryptedPayload, out iv);
 
             // and prepare the data to send:
             var result = _cachedPayload = new byte[4 + iv.Length + encryptedPayload.Length];
 
             BitHelper.BigEndian_Set(result, 0, (ushort)encryptedPayload.Length);
             BitHelper.BigEndian_Set(result, 2, (ushort)unencryptedPayload.Length);
-
-            Array.Copy(iv, 0, result, 4, iv.Length);
-            Array.Copy(encryptedPayload, 0, result, 4 + iv.Length, encryptedPayload.Length);
+            BitHelper.Copy(result, 4, iv, encryptedPayload);
             return result;
         }
 
-        private byte[] Encrypt(byte[] payload, byte[] iv)
+        private byte[] Encrypt(byte[] payload, out byte[] iv)
         {
+            byte[] result;
+
             using (var cipher = new RijndaelManaged())
             {
                 cipher.Mode = CipherMode.CBC;
                 cipher.Padding = PaddingMode.PKCS7;
+                cipher.Key = SessionKey;
+                cipher.GenerateIV();
+                iv = cipher.IV;
 
-                using (var encryptor = cipher.CreateEncryptor(SessionKey, iv))
+                using (var encryptor = cipher.CreateEncryptor())
                 {
-                    return encryptor.TransformFinalBlock(payload, 0, payload.Length);
+                    result = encryptor.TransformFinalBlock(payload, 0, payload.Length);
                 }
             }
+
+            /*
+            QTraceLog.PrintArray("payload", payload);
+            QTraceLog.PrintArray("key", SessionKey);
+            QTraceLog.PrintArray("iv", iv);
+            QTraceLog.PrintArray("result", result);
+             */
+
+            return result;
         }
 
         /// <summary>
