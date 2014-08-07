@@ -89,7 +89,8 @@ namespace BlackBerry.NativeCore.QConn
             if (sshKey == null || sshKey.Length == 0)
                 throw new ArgumentNullException("sshKey");
 
-            byte[] publicKey;
+            RSAParameters publicKey;
+            RSAParameters privateKey;
 
             using (var rsa = new RSACryptoServiceProvider(1024))
             {
@@ -98,66 +99,67 @@ namespace BlackBerry.NativeCore.QConn
                     // don't store any keys in persistent storages of current Windows account:
                     rsa.PersistKeyInCsp = false;
 
-                    var rsaParams = rsa.ExportParameters(false);
+                    publicKey = rsa.ExportParameters(false);
+                    privateKey = rsa.ExportParameters(true);
                     // more info about parameters and their meaning is here:
                     // http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsaparameters%28v=vs.90%29.aspx
 
-                    publicKey = rsaParams.Modulus;
                 }
                 catch (Exception ex)
                 {
                     QTraceLog.WriteException(ex, "Unable to generate encryption keys");
                     throw new SecureTargetConnectionException(HResult.Fail, "Unable to generate encryption key");
                 }
-
-                // initialize encryption negotiation:
-                Send(new SecureTargetChallengeRequest(publicKey));
-                var response = Receive();
-                VerifyResponse(response);
-
-                var encryptedChallenge = response as SecureTargetEncryptedChallengeResponse;
-                if (encryptedChallenge == null)
-                {
-                    QTraceLog.WriteLine("Unexpected response for encryption challenge");
-                    throw new SecureTargetConnectionException(HResult.Fail, "Unexpected response for encryption challenge");
-                }
-
-                if (encryptedChallenge.Challenge.ExpectedSignatureType != 1)
-                {
-                    throw new Exception("Invalid signature type in encryption challenge: 0x" + encryptedChallenge.Challenge.ExpectedSignatureType.ToString("X"));
-                }
-
-                // decrypt the message:
-                var decryptedChallenge = encryptedChallenge.Challenge.Decrypt(rsa.ExportParameters(true), rsa.ExportParameters(false));
-                if (decryptedChallenge == null)
-                {
-                    throw new SecureTargetConnectionException(HResult.Fail, "Unable to decipher encrption challenge data");
-                }
-
-                if (encryptedChallenge.Challenge.ExpectedSignatureLength != decryptedChallenge.Signature.Length)
-                {
-                    throw new Exception("Invalid signature length in encryption challenge: " + encryptedChallenge.Challenge.ExpectedSignatureLength);
-                }
-
-                // confirm encrypted channel:
-                Send(new SecureTargetDecryptedChallengeResponse(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
-                response = Receive();
-                VerifyResponse(response);
-
-                // prepare for sending password and ssh-public-key:
-                Send(new SecureTargetAuthenticateChallengeRequest());
-                response = Receive();
-                VerifyResponse(response);
-
-                var authenticateResponse = response as SecureTargetAuthenticateChallengeResponse;
-                if (authenticateResponse == null)
-                {
-                    throw new SecureTargetConnectionException(HResult.InvalidFrameCode, "Authentication negotiation failed");
-                }
-
-                Send(new SecureTargetAuthenticateRequest(password, authenticateResponse.Algorithm, authenticateResponse.Iterations, authenticateResponse.Salt, authenticateResponse.Challenge, decryptedChallenge.SessionKey));
-                response = Receive();
             }
+
+            // initialize encryption negotiation:
+            Send(new SecureTargetChallengeRequest(publicKey.Modulus));
+            var response = Receive();
+            VerifyResponse(response);
+
+            var encryptedChallenge = response as SecureTargetEncryptedChallengeResponse;
+            if (encryptedChallenge == null)
+            {
+                QTraceLog.WriteLine("Unexpected response for encryption challenge");
+                throw new SecureTargetConnectionException(HResult.Fail, "Unexpected response for encryption challenge");
+            }
+
+            if (encryptedChallenge.Challenge.ExpectedSignatureType != 1)
+            {
+                throw new Exception("Invalid signature type in encryption challenge: 0x" + encryptedChallenge.Challenge.ExpectedSignatureType.ToString("X"));
+            }
+
+            // decrypt the message:
+            var decryptedChallenge = encryptedChallenge.Challenge.Decrypt(publicKey, privateKey);
+            if (decryptedChallenge == null)
+            {
+                throw new SecureTargetConnectionException(HResult.Fail, "Unable to decipher encrption challenge data");
+            }
+
+            if (encryptedChallenge.Challenge.ExpectedSignatureLength != decryptedChallenge.Signature.Length)
+            {
+                throw new Exception("Invalid signature length in encryption challenge: " + encryptedChallenge.Challenge.ExpectedSignatureLength);
+            }
+
+            // confirm encrypted channel:
+            Send(new SecureTargetDecryptedChallengeResponse(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
+            response = Receive();
+            VerifyResponse(response);
+
+            // prepare for sending password and ssh-public-key:
+            Send(new SecureTargetAuthenticateChallengeRequest());
+            response = Receive();
+            VerifyResponse(response);
+
+            var authenticateResponse = response as SecureTargetAuthenticateChallengeResponse;
+            if (authenticateResponse == null)
+            {
+                throw new SecureTargetConnectionException(HResult.InvalidFrameCode, "Authentication negotiation failed");
+            }
+
+            Send(new SecureTargetAuthenticateRequest(password, authenticateResponse.Algorithm, authenticateResponse.Iterations, authenticateResponse.Salt, authenticateResponse.Challenge, decryptedChallenge.SessionKey));
+            response = Receive();
+            VerifyResponse(response);
         }
 
         private void Send(SecureTargetRequest request)

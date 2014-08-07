@@ -102,7 +102,7 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         #endregion
 
-        public DecryptResponse Decrypt(RSAParameters privateRsaKeyInfo, RSAParameters publicRsaKeyInfo)
+        public DecryptResponse Decrypt(RSAParameters publicKey, RSAParameters privateKey)
         {
             byte[] QCONNDOOR_PERMISSIONS = { 3, 4, 0x76, 0x83, 1 };
 
@@ -111,7 +111,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             using (var rsa = new RSACryptoServiceProvider(1024))
             {
                 rsa.PersistKeyInCsp = false;
-                rsa.ImportParameters(privateRsaKeyInfo);
+                rsa.ImportParameters(privateKey);
                 decryptedChallengeBlob = rsa.Decrypt(EncryptedBlob, false);
             }
 
@@ -132,7 +132,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             using (var rsa = new RSACryptoServiceProvider(1024))
             {
                 rsa.PersistKeyInCsp = false;
-                rsa.ImportParameters(privateRsaKeyInfo);
+                rsa.ImportParameters(privateKey);
 
                 using (var sha = new SHA1CryptoServiceProvider())
                 {
