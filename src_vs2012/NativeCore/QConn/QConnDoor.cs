@@ -58,7 +58,7 @@ namespace BlackBerry.NativeCore.QConn
             // request a close of the connection on target:
             Send(new SecureTargetClose());
             var response = Receive();
-            VerifyResponse(response);
+            // ignore the result of CLOSE-request...
 
             // close connection:
             var result = _source.Close();
@@ -160,6 +160,19 @@ namespace BlackBerry.NativeCore.QConn
             Send(new SecureTargetAuthenticateRequest(password, authenticateResponse.Algorithm, authenticateResponse.Iterations, authenticateResponse.Salt, authenticateResponse.Challenge, decryptedChallenge.SessionKey));
             response = Receive();
             VerifyResponse(response);
+            QTraceLog.WriteLine("Successfully authenticated with target credentials.");
+
+            QTraceLog.WriteLine("Sending ssh key to target");
+            Send(new SecureTargetSendSshPublicKey(sshKey, decryptedChallenge.SessionKey));
+            response = Receive();
+            VerifyResponse(response);
+
+            // and start all services:
+            Send(new SecureTargetStartServices());
+            response = Receive();
+            VerifyResponse(response);
+
+            QTraceLog.WriteLine("Successfully connected. This application must remain running in order to use debug tools. Exiting the application will terminate this connection.");
         }
 
         private void Send(SecureTargetRequest request)

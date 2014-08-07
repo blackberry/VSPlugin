@@ -9,7 +9,7 @@
         /// Default constructor.
         /// </summary>
         public SecureTargetStartServices()
-            : base(13)
+            : base(11)
         {
         }
 
