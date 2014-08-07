@@ -69,19 +69,23 @@ namespace BlackBerry.NativeCore.QConn
         /// <summary>
         /// Authenticates on a target.
         /// </summary>
-        public void Authenticate(string sshPublicKeyFileName)
+        public void Authenticate(string password, string sshPublicKeyFileName)
         {
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException("password");
             if (string.IsNullOrEmpty(sshPublicKeyFileName))
                 throw new ArgumentNullException("sshPublicKeyFileName");
 
-            Authenticate(File.ReadAllBytes(sshPublicKeyFileName));
+            Authenticate(password, File.ReadAllBytes(sshPublicKeyFileName));
         }
 
         /// <summary>
         /// Authenticates on a target.
         /// </summary>
-        public void Authenticate(byte[] sshKey)
+        public void Authenticate(string password, byte[] sshKey)
         {
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException("password");
             if (sshKey == null || sshKey.Length == 0)
                 throw new ArgumentNullException("sshKey");
 
@@ -137,6 +141,21 @@ namespace BlackBerry.NativeCore.QConn
 
                 // confirm encrypted channel:
                 Send(new SecureTargetDecryptedChallengeResponse(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
+                response = Receive();
+                VerifyResponse(response);
+
+                // prepare for sending password and ssh-public-key:
+                Send(new SecureTargetAuthenticateChallengeRequest());
+                response = Receive();
+                VerifyResponse(response);
+
+                var authenticateResponse = response as SecureTargetAuthenticateChallengeResponse;
+                if (authenticateResponse == null)
+                {
+                    throw new SecureTargetConnectionException(HResult.InvalidFrameCode, "Authentication negotiation failed");
+                }
+
+                Send(new SecureTargetAuthenticateRequest(password, authenticateResponse.Algorithm, authenticateResponse.Iterations, authenticateResponse.Salt, authenticateResponse.Challenge, decryptedChallenge.SessionKey));
                 response = Receive();
             }
         }

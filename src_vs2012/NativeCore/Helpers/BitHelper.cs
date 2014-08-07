@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
 
 namespace BlackBerry.NativeCore.Helpers
 {
@@ -47,6 +49,19 @@ namespace BlackBerry.NativeCore.Helpers
                 throw new ArgumentOutOfRangeException("at");
 
             return (ushort)((data[at] << 8) | data[at + 1]);
+        }
+
+        /// <summary>
+        /// Gets unsigned integer value from specified index of an array.
+        /// </summary>
+        public static ushort BigEndian_ToUInt32(byte[] data, int at)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (at + 4 >= data.Length || at < 0)
+                throw new ArgumentOutOfRangeException("at");
+
+            return (ushort)((data[at] << 24) | (data[at + 1] << 16) | (data[at + 2] << 8) | data[at + 3]);
         }
 
         /// <summary>
@@ -104,5 +119,26 @@ namespace BlackBerry.NativeCore.Helpers
 
             return (ushort)(data[at] | (data[at + 1] << 8) | (data[at + 2] << 16) | (data[at + 3] << 24));
         }
+
+        /// <summary>
+        /// Converts given byte array to hex number.
+        /// </summary>
+        public static string Enconde(IEnumerable<byte> data)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            StringBuilder result = new StringBuilder();
+            char[] HexChars = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+
+            foreach (var v in data)
+            {
+                result.Append(HexChars[(v & 0xF0) >> 4]);
+                result.Append(HexChars[v & 0x0F]);
+            }
+
+            return result.ToString();
+        }
+
     }
 }

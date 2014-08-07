@@ -61,6 +61,7 @@ namespace BlackBerry.NativeCore.QConn.Response
                 switch (code)
                 {
                     case 2:
+                    {
                         ushort feedbackCode = BitHelper.BigEndian_ToUInt16(result, 6);
                         ushort feedbackLength = BitHelper.BigEndian_ToUInt16(result, 8);
                         switch (feedbackCode)
@@ -77,16 +78,36 @@ namespace BlackBerry.NativeCore.QConn.Response
                                 return new SecureTargetFeedbackRejected(result, version, code, feedbackCode, reason);
 
                         }
+                    }
                     case 4:
+                    {
                         var challenge = new byte[packageLength - 6];
                         // this is tricky, as packageLenght might be different from result.Lenght on PlayBook,
                         // so we allocate more bytes, but copying will just leave them zeroed
                         Array.Copy(result, 6, challenge, 0, result.Length - 6);
 
                         return new SecureTargetEncryptedChallengeResponse(result, version, code, challenge);
+                    }
+                    case 9:
+                    {
+                        uint algorithm = BitHelper.BigEndian_ToUInt32(result, 6);
+                        uint iterations = BitHelper.BigEndian_ToUInt32(result, 10);
+                        ushort saltLength = BitHelper.BigEndian_ToUInt16(result, 14);
+                        ushort challengeLength = BitHelper.BigEndian_ToUInt16(result, 16);
+
+                        var salt = new byte[saltLength];
+                        var challenge = new byte[challengeLength];
+
+                        Array.Copy(result, 18, salt, 0, salt.Length);
+                        Array.Copy(result, 18 + salt.Length, challenge, 0, challenge.Length);
+
+                        return new SecureTargetAuthenticateChallengeResponse(result, version, code, algorithm, iterations, salt, challenge);
+                    }
                     default:
+                    {
                         QTraceLog.WriteLine("Invalid code received in target response: " + code);
                         return new SecureTargetResponse(result, HResult.InvalidFrameCode, version, code);
+                    }
                 }
             }
             catch (Exception ex)

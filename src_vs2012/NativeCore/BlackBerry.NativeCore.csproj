@@ -108,6 +108,8 @@
     <Compile Include="QConn\Model\EncryptionChallenge.cs" />
     <Compile Include="QConn\QConnDoor.cs" />
     <Compile Include="QConn\QDataSource.cs" />
+    <Compile Include="QConn\Requests\SecureTargetAuthenticateRequest.cs" />
+    <Compile Include="QConn\Requests\SecureTargetAuthenticateChallengeRequest.cs" />
     <Compile Include="QConn\Requests\SecureTargetChallengeRequest.cs" />
     <Compile Include="QConn\Requests\SecureTargetClose.cs" />
     <Compile Include="QConn\Requests\SecureTargetDecryptedChallengeResponse.cs" />
@@ -115,6 +117,7 @@
     <Compile Include="QConn\Requests\SecureTargetHello.cs" />
     <Compile Include="QConn\Requests\SecureTargetRequest.cs" />
     <Compile Include="QConn\Requests\SecureTargetStartServices.cs" />
+    <Compile Include="QConn\Response\SecureTargetAuthenticateChallengeResponse.cs" />
     <Compile Include="QConn\Response\SecureTargetEncryptedChallengeResponse.cs" />
     <Compile Include="QConn\Response\SecureTargetFeedback.cs" />
     <Compile Include="QConn\Response\SecureTargetFeedbackMismatchedVersion.cs" />
