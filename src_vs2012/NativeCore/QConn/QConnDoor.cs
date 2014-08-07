@@ -3,7 +3,6 @@ using System.IO;
 using System.Security.Cryptography;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
-using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Requests;
 using BlackBerry.NativeCore.QConn.Response;
 
@@ -87,7 +86,6 @@ namespace BlackBerry.NativeCore.QConn
                 throw new ArgumentNullException("sshKey");
 
             byte[] publicKey;
-            byte[] privateKey;
 
             using (var rsa = new RSACryptoServiceProvider(1024))
             {
@@ -96,11 +94,10 @@ namespace BlackBerry.NativeCore.QConn
                     // don't store any keys in persistent storages of current Windows account:
                     rsa.PersistKeyInCsp = false;
 
-                    var rsaParams = rsa.ExportParameters(true);
+                    var rsaParams = rsa.ExportParameters(false);
                     // more info about parameters and their meaning is here:
                     // http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsaparameters%28v=vs.90%29.aspx
 
-                    privateKey = rsaParams.D;
                     publicKey = rsaParams.Modulus;
                 }
                 catch (Exception ex)
@@ -127,7 +124,7 @@ namespace BlackBerry.NativeCore.QConn
                 }
 
                 // decrypt the message:
-                var decryptedChallenge = encryptedChallenge.Challenge.Decrypt(rsa);
+                var decryptedChallenge = encryptedChallenge.Challenge.Decrypt(rsa.ExportParameters(true), rsa.ExportParameters(false));
                 if (decryptedChallenge == null)
                 {
                     throw new SecureTargetConnectionException(HResult.Fail, "Unable to decipher encrption challenge data");
