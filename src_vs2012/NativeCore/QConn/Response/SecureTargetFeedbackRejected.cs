@@ -1,5 +1,8 @@
 ﻿namespace BlackBerry.NativeCore.QConn.Response
 {
+    /// <summary>
+    /// Negative result about last request.
+    /// </summary>
     sealed class SecureTargetFeedbackRejected : SecureTargetFeedback
     {
         /// <summary>

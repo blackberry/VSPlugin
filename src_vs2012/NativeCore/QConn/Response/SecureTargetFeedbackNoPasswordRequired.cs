@@ -1,5 +1,8 @@
 ﻿namespace BlackBerry.NativeCore.QConn.Response
 {
+    /// <summary>
+    /// Result informing that target doesn't require password.
+    /// </summary>
     sealed class SecureTargetFeedbackNoPasswordRequired : SecureTargetFeedback
     {
         /// <summary>

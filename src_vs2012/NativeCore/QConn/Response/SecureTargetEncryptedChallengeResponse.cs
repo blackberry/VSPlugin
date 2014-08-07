@@ -4,7 +4,7 @@ using BlackBerry.NativeCore.QConn.Model;
 namespace BlackBerry.NativeCore.QConn.Response
 {
     /// <summary>
-    /// Response to a initial encryption challenge request.
+    /// Response to an initial encryption challenge request.
     /// </summary>
     sealed class SecureTargetEncryptedChallengeResponse : SecureTargetResponse
     {

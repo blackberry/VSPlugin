@@ -1,5 +1,8 @@
 ﻿namespace BlackBerry.NativeCore.QConn.Response
 {
+    /// <summary>
+    /// Result informing that target supports different version of the QConnDoor service protocol.
+    /// </summary>
     sealed class SecureTargetFeedbackMismatchedVersion : SecureTargetFeedback
     {
         /// <summary>

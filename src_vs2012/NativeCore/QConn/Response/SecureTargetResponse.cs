@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BlackBerry.NativeCore.QConn.Response
+﻿namespace BlackBerry.NativeCore.QConn.Response
 {
     /// <summary>
     /// Base class for all types for correct responses received from QConnDoor service running on target.

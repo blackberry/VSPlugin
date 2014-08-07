@@ -2,8 +2,14 @@
 
 namespace BlackBerry.NativeCore.QConn.Response
 {
+    /// <summary>
+    /// Response to authentication request, informing about the way password should be prepared before transmitted to target.
+    /// </summary>
     sealed class SecureTargetAuthenticateChallengeResponse : SecureTargetResponse
     {
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public SecureTargetAuthenticateChallengeResponse(byte[] data, ushort version, ushort code, uint algorithm, uint iterations, byte[] salt, byte[] challenge)
             : base(data, version, code)
         {
