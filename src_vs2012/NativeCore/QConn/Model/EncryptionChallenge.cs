@@ -5,8 +5,14 @@ using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.QConn.Model
 {
+    /// <summary>
+    /// Class describing encryption challenge.
+    /// </summary>
     sealed class EncryptionChallenge
     {
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public EncryptionChallenge(byte[] challenge)
         {
             if (challenge == null || challenge.Length == 0)
@@ -102,6 +108,9 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         #endregion
 
+        /// <summary>
+        /// Decripts encryption-challenge data and provides signatures for response.
+        /// </summary>
         public DecryptResponse Decrypt(RSAParameters publicKey, RSAParameters privateKey)
         {
             byte[] QCONNDOOR_PERMISSIONS = { 3, 4, 0x76, 0x83, 1 };
@@ -156,7 +165,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             QTraceLog.PrintArray("signature", signature);
              */
 
-            return new DecryptResponse(2, 0x8008, decryptedChallengeBlob, signature);
+            return new DecryptResponse(decryptedChallengeBlob, signature);
         }
     }
 }
