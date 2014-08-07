@@ -104,7 +104,6 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         public DecryptResponse Decrypt(RSAParameters privateRsaKeyInfo, RSAParameters publicRsaKeyInfo)
         {
-            //byte[] EMSA_SHA1_HASH = { 48, 33, 48, 9, 6, 5, 43, 14, 3, 2, 26, 5, 0, 4, 20 };
             byte[] QCONNDOOR_PERMISSIONS = { 3, 4, 0x76, 0x83, 1 };
 
             // decrypt message:
@@ -121,17 +120,6 @@ namespace BlackBerry.NativeCore.QConn.Model
             BitHelper.Copy(buffer, 0, decryptedChallengeBlob, QCONNDOOR_PERMISSIONS);
             decryptedChallengeBlob = buffer;
 
-            byte[] decryptedChallengeHash;
-            using (var hash = SHA1.Create())
-            {
-                decryptedChallengeHash = hash.ComputeHash(decryptedChallengeBlob);
-            }
-
-            /*
-            var hashBuffer = new byte[EMSA_SHA1_HASH.Length + decryptedChallengeHash.Length];
-            BitHelper.Copy(hashBuffer, 0, EMSA_SHA1_HASH, decryptedChallengeHash);
-             */
-
             // get signature of the hash:
             byte[] signature;
 
@@ -145,7 +133,11 @@ namespace BlackBerry.NativeCore.QConn.Model
             {
                 rsa.PersistKeyInCsp = false;
                 rsa.ImportParameters(privateRsaKeyInfo);
-                signature = rsa.SignHash(decryptedChallengeHash, CryptoConfig.MapNameToOID("SHA1"));
+
+                using (var sha = new SHA1CryptoServiceProvider())
+                {
+                    signature = rsa.SignData(decryptedChallengeBlob, sha);
+                }
             }
 
             if (signature.Length != ExpectedSignatureLength)
@@ -161,10 +153,8 @@ namespace BlackBerry.NativeCore.QConn.Model
             QTraceLog.PrintArray("publicKeyExponentBytes", publicRsaKeyInfo.Exponent);
 
             QTraceLog.PrintArray("decryptedChallengeBlob", decryptedChallengeBlob);
-            QTraceLog.PrintArray("decryptedChallengeHash", decryptedChallengeHash);
-            //QTraceLog.PrintArray("hashBuffer", hashBuffer);
             QTraceLog.PrintArray("signature", signature);
-            */
+             */
 
             return new DecryptResponse(2, 0x8008, decryptedChallengeBlob, signature);
         }
