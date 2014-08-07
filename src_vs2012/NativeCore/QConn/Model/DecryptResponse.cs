@@ -20,8 +20,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             BitHelper.LittleEndian_Set(buffer, 0, (uint)buffer.Length);
             BitHelper.LittleEndian_Set(buffer, 4, code);
             BitHelper.LittleEndian_Set(buffer, 6, version);
-            Array.Copy(decryptedBlob, 0, buffer, 8, decryptedBlob.Length);
-            Array.Copy(signature, 0, buffer, 8 + decryptedBlob.Length, signature.Length);
+            BitHelper.Copy(buffer, 8, decryptedBlob, signature);
 
             // and store:
             Data = buffer;

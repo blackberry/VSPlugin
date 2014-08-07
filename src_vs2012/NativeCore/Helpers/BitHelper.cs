@@ -8,6 +8,21 @@ namespace BlackBerry.NativeCore.Helpers
     static class BitHelper
     {
         /// <summary>
+        /// Appends values from specified arrays one-by-one, starting at the given index.
+        /// </summary>
+        public static void Copy(byte[] data, int at, params byte[][] arrays)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            foreach (byte[] values in arrays)
+            {
+                Array.Copy(values, 0, data, at, values.Length);
+                at += values.Length;
+            }
+        }
+
+        /// <summary>
         /// Sets unsigned short value at specified index of an array.
         /// </summary>
         public static void BigEndian_Set(byte[] data, int at, ushort value)
