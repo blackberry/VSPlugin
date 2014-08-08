@@ -42,7 +42,9 @@ namespace BlackBerry.NativeCore.QConn
                 {
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.SendTimeout = Timeout;
+                    _socket.ReceiveTimeout = Timeout;
                     _socket.DontFragment = true;
+                    _socket.NoDelay = true; // don't combine small TCP packets into one
                     _socket.Connect(host, port);
 
                     // make sure, the object is listed on the finalizers thread,
