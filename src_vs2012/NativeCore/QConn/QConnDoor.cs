@@ -264,6 +264,8 @@ namespace BlackBerry.NativeCore.QConn
 
             var response = InternalSendKeepAlive();
             VerifyResponse(response);
+
+            QTraceLog.WriteLine("Keep-alive confirmed [OK]");
         }
 
         /// <summary>

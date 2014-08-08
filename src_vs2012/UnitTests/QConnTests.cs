@@ -25,9 +25,9 @@ namespace UnitTests
             Assert.IsTrue(qdoor.IsConnected);
 
             // keep the connection alive for some time:
-            qdoor.KeepAlive();
-            qdoor.KeepAlive(200);
-            Thread.Sleep(1000); // can sleep here, as 'keep-alive' uses a thread-pool to work...
+            qdoor.KeepAlive();      // send immediatelly
+            qdoor.KeepAlive(200);   // first request will be sent after a delay
+            Thread.Sleep(1000);     // can sleep here, as 'keep-alive' uses a thread-pool to work...
 
             // and close:
             qdoor.Close();
