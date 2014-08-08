@@ -3,14 +3,14 @@
 namespace BlackBerry.NativeCore.QConn.Model
 {
     /// <summary>
-    /// Response for encryption challenge.
+    /// Result of decryption received encryption-challenge.
     /// </summary>
-    sealed class DecryptResponse
+    sealed class DecryptedChallenge
     {
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public DecryptResponse(byte[] decryptedBlob, byte[] signature)
+        public DecryptedChallenge(byte[] decryptedBlob, byte[] signature)
         {
             if (decryptedBlob == null || decryptedBlob.Length == 0)
                 throw new ArgumentNullException("decryptedBlob");

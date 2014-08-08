@@ -185,14 +185,14 @@ namespace BlackBerry.NativeCore.QConn
 
             if (encryptedChallenge.Challenge.ExpectedSignatureType != 1)
             {
-                throw new Exception("Invalid signature type in encryption challenge: 0x" + encryptedChallenge.Challenge.ExpectedSignatureType.ToString("X"));
+                throw new Exception("Invalid signature type in encryption challenge: 0x" + encryptedChallenge.Challenge.ExpectedSignatureType.ToString("X4"));
             }
 
             // decrypt the message:
             var decryptedChallenge = encryptedChallenge.Challenge.Decrypt(publicKey, privateKey);
             if (decryptedChallenge == null)
             {
-                throw new SecureTargetConnectionException(HResult.Fail, "Unable to decipher encrption challenge data");
+                throw new SecureTargetConnectionException(HResult.Fail, "Unable to decipher encryption challenge data");
             }
 
             if (encryptedChallenge.Challenge.ExpectedSignatureLength != decryptedChallenge.Signature.Length)

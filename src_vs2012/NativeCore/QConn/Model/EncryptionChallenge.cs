@@ -111,7 +111,7 @@ namespace BlackBerry.NativeCore.QConn.Model
         /// <summary>
         /// Decripts encryption-challenge data and provides signatures for response.
         /// </summary>
-        public DecryptResponse Decrypt(RSAParameters publicKey, RSAParameters privateKey)
+        public DecryptedChallenge Decrypt(RSAParameters publicKey, RSAParameters privateKey)
         {
             byte[] QCONNDOOR_PERMISSIONS = { 3, 4, 0x76, 0x83, 1 };
 
@@ -165,7 +165,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             QTraceLog.PrintArray("signature", signature);
              */
 
-            return new DecryptResponse(decryptedChallengeBlob, signature);
+            return new DecryptedChallenge(decryptedChallengeBlob, signature);
         }
     }
 }
