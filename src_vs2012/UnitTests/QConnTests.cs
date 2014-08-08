@@ -19,7 +19,7 @@ namespace UnitTests
             Assert.IsFalse(qdoor.IsConnected);
 
             // connect:
-            qdoor.Connect("192.168.9.150", QConnDoor.DefaultPort, "xyz", @"C:\Users\Pawel\AppData\Local\Research In Motion\bbt_id_rsa.pub");
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
 
             Assert.IsTrue(qdoor.IsAuthenticated);
             Assert.IsTrue(qdoor.IsConnected);

@@ -106,7 +106,7 @@ namespace BlackBerry.NativeCore.QConn
         /// <summary>
         /// Authenticates on a target.
         /// </summary>
-        public void Connect(string host, int port, string password, string sshPublicKeyFileName)
+        public void Open(string host, int port, string password, string sshPublicKeyFileName)
         {
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
@@ -115,13 +115,28 @@ namespace BlackBerry.NativeCore.QConn
             if (string.IsNullOrEmpty(sshPublicKeyFileName))
                 throw new ArgumentNullException("sshPublicKeyFileName");
 
-            Connect(host, port, password, File.ReadAllBytes(sshPublicKeyFileName));
+            Open(host, port, password, File.ReadAllBytes(sshPublicKeyFileName));
         }
 
         /// <summary>
         /// Authenticates on a target.
         /// </summary>
-        public void Connect(string host, int port, string password, byte[] sshKey)
+        public void Open(string host, string password, string sshPublicKeyFileName)
+        {
+            if (string.IsNullOrEmpty(host))
+                throw new ArgumentNullException("host");
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException("password");
+            if (string.IsNullOrEmpty(sshPublicKeyFileName))
+                throw new ArgumentNullException("sshPublicKeyFileName");
+
+            Open(host, DefaultPort, password, File.ReadAllBytes(sshPublicKeyFileName));
+        }
+
+        /// <summary>
+        /// Authenticates on a target.
+        /// </summary>
+        public void Open(string host, int port, string password, byte[] sshKey)
         {
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
@@ -309,6 +324,10 @@ namespace BlackBerry.NativeCore.QConn
                 QTraceLog.WriteLine("Failed to deliver keep-alive request ({0})", response != null ? response.ToString() : "Connection already closed");
                 NotifyAuthenticationChanged(false);
             }
+            else
+            {
+                QTraceLog.WriteLine("Keep-alive confirmed [OK]");
+            }
         }
 
         /// <summary>
@@ -387,19 +406,6 @@ namespace BlackBerry.NativeCore.QConn
                 throw new SecureTargetConnectionException(HResult.Abort, "No response received in expected time");
             }
 
-            // received correctly formatted response?
-            if (result.Status != HResult.OK)
-            {
-                // unknown response?
-                var response = result as SecureTargetResponse;
-                if (response != null && result.Status == HResult.InvalidFrameCode)
-                {
-                    throw new SecureTargetConnectionException(result.Status, "The target returned an improper response code: " + response.Code);
-                }
-
-                throw new SecureTargetConnectionException(result.Status, "A network error occurred while communicating with the target.");
-            }
-
             // does the protocol version match?
             var versionMismatch = result as SecureTargetFeedbackMismatchedVersion;
             if (versionMismatch != null)
@@ -412,6 +418,19 @@ namespace BlackBerry.NativeCore.QConn
             if (rejected != null)
             {
                 throw new SecureTargetConnectionException(result.Status, "Connection refused: " + rejected.Reason);
+            }
+
+            // received correctly formatted response?
+            if (result.Status != HResult.OK)
+            {
+                // unknown response?
+                var response = result as SecureTargetResponse;
+                if (response != null && result.Status == HResult.InvalidFrameCode)
+                {
+                    throw new SecureTargetConnectionException(result.Status, "The target returned an improper response code: " + response.Code);
+                }
+
+                throw new SecureTargetConnectionException(result.Status, "A network error occurred while communicating with the target.");
             }
 
             // all was OK... finally!
