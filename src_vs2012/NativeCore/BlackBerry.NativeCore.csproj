@@ -104,7 +104,7 @@
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="QConn\HResult.cs" />
-    <Compile Include="QConn\Model\DecryptResponse.cs" />
+    <Compile Include="QConn\Model\DecryptedChallenge.cs" />
     <Compile Include="QConn\Model\EncryptionChallenge.cs" />
     <Compile Include="QConn\QConnAuthenticationEventArgs.cs" />
     <Compile Include="QConn\QConnDoor.cs" />
