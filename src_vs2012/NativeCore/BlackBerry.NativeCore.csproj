@@ -103,11 +103,15 @@
     <Compile Include="Model\Size.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QConn\Model\Endianess.cs" />
     <Compile Include="QConn\HResult.cs" />
     <Compile Include="QConn\Model\DecryptedChallenge.cs" />
     <Compile Include="QConn\Model\EncryptionChallenge.cs" />
+    <Compile Include="QConn\Model\TargetSystemType.cs" />
     <Compile Include="QConn\QConnAuthenticationEventArgs.cs" />
+    <Compile Include="QConn\QConnClient.cs" />
     <Compile Include="QConn\QConnDoor.cs" />
+    <Compile Include="QConn\QConnException.cs" />
     <Compile Include="QConn\QDataSource.cs" />
     <Compile Include="QConn\Requests\SecureTargetAuthenticateRequest.cs" />
     <Compile Include="QConn\Requests\SecureTargetAuthenticateChallengeRequest.cs" />
@@ -130,6 +134,10 @@
     <Compile Include="QConn\Response\SecureTargetResult.cs" />
     <Compile Include="QConn\Response\SecureTargetResponse.cs" />
     <Compile Include="QConn\SecureTargetConnectionException.cs" />
+    <Compile Include="QConn\Services\TargetServiceSysInfo.cs" />
+    <Compile Include="QConn\Services\TargetServiceControl.cs" />
+    <Compile Include="QConn\Services\TargetService.cs" />
+    <Compile Include="QConn\Services\TargetServiceFile.cs" />
     <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
     <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
     <Compile Include="Tools\ApiLevelUpdateRunner.cs" />

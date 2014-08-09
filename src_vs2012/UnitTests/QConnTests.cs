@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using BlackBerry.NativeCore.QConn;
+using BlackBerry.NativeCore.QConn.Model;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -39,6 +40,39 @@ namespace UnitTests
         private void QConnDoorOnAuthenticated(object sender, QConnAuthenticationEventArgs e)
         {
             Console.WriteLine("Is authenticated: {0}", e.IsAuthenticated);
+        }
+
+        [Test]
+        public void LoadInfo()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            Assert.AreEqual(Endianess.Unknown, qclient.Endian);
+            Assert.AreEqual(TargetSystemType.Unknown, qclient.System);
+            Assert.IsNotNull(qclient.Services);
+            Assert.AreEqual(0, qclient.Services.Length);
+            Assert.IsNull(qclient.Version);
+            Assert.IsNull(qclient.Name);
+            Assert.IsNull(qclient.Locale);
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qdoor.KeepAlive(5000);
+            qclient.Connect(Defaults.IP);
+
+            // verify data was read:
+            Assert.AreEqual(Endianess.LittleEndian, qclient.Endian);
+            Assert.AreEqual(TargetSystemType.nto, qclient.System);
+            Assert.IsNotNull(qclient.Services);
+            Assert.AreEqual(3, qclient.Services.Length);
+            Assert.IsNotNull(qclient.Version);
+            Assert.IsNotNull(qclient.Name);
+            Assert.IsNotNull(qclient.Locale);
+
+            // and close
+            qclient.Close();
+            qclient.Close();
         }
     }
 }
