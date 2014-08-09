@@ -366,27 +366,20 @@ namespace BlackBerry.NativeCore.QConn
 
         private SecureTargetResult Receive()
         {
-            return Receive(new byte[DefaultResponseSize]);
-        }
-
-        private SecureTargetResult Receive(byte[] buffer)
-        {
             if (_source == null)
                 throw new ObjectDisposedException("QConnDoor");
-            if (buffer == null)
-                throw new ArgumentNullException("buffer");
 
             byte[] result;
-            var status = _source.Receive(buffer, out result);
+            var status = _source.Receive(DefaultResponseSize, out result);
 
             if (result != null && result.Length > 0)
             {
                 ushort packetLength = BitHelper.BigEndian_ToUInt16(result, 0);
 
-                // PH: HINT: don't know why, but on PlayBook packageLength doesn't define the number
-                // of bytes received, that's why we compare it with buffer;
+                // PH: HINT: don't know why, but on PlayBook packageLength doesn't correctly
+                // define the number of bytes received, that's why we compare it with buffer;
                 // on Z10 and Z30 the packageLength equals returned result.Length
-                if (packetLength > buffer.Length)
+                if (packetLength > DefaultResponseSize)
                 {
                     QTraceLog.WriteLine("Packet length larger than buffer, expected size: " + packetLength);
                     return new SecureTargetResult(result, HResult.BufferTooSmall);

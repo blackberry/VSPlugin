@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using BlackBerry.NativeCore.Diagnostics;
 
@@ -10,8 +11,30 @@ namespace BlackBerry.NativeCore.QConn
     public sealed class QDataSource : IDisposable
     {
         private const int Timeout = 10000;
+        private const int DefaultChunkSize = 512;
 
         private Socket _socket;
+        private byte[] _buffer;
+        private readonly int _chunkSize;
+
+        /// <summary>
+        /// Default constructor.
+        /// </summary>
+        public QDataSource()
+        {
+            _chunkSize = DefaultChunkSize;
+        }
+
+        /// <summary>
+        /// Init constructor.
+        /// Defines the chunk size, data from socket is read.
+        /// </summary>
+        public QDataSource(int chunkSize)
+        {
+            if (chunkSize < 0)
+                throw new ArgumentOutOfRangeException("chunkSize");
+            _chunkSize = chunkSize;
+        }
 
         ~QDataSource()
         {
@@ -23,6 +46,14 @@ namespace BlackBerry.NativeCore.QConn
         public bool IsConnected
         {
             get { return _socket != null && _socket.Connected; }
+        }
+
+        /// <summary>
+        /// Gets the size of the data read chunk.
+        /// </summary>
+        public int ChunkSize
+        {
+            get { return _chunkSize; }
         }
 
         #endregion
@@ -101,13 +132,8 @@ namespace BlackBerry.NativeCore.QConn
         /// <summary>
         /// Reads specified amount of data from target.
         /// </summary>
-        public HResult Receive(byte[] buffer, out byte[] result)
+        public HResult Receive(int maxLength, out byte[] result)
         {
-            if (buffer == null)
-                throw new ArgumentNullException("buffer");
-            if (buffer.Length == 0)
-                throw new ArgumentOutOfRangeException("buffer");
-
             if (!IsConnected)
             {
                 QTraceLog.WriteLine("Attempt to read data from closed source");
@@ -115,12 +141,72 @@ namespace BlackBerry.NativeCore.QConn
                 return HResult.Fail;
             }
 
+            // allocate new temp buffer for data:
+            if (_buffer == null)
+            {
+                _buffer = new byte[_chunkSize];
+            }
+
             try
             {
-                var length = _socket.Receive(buffer, 0, buffer.Length, SocketFlags.None);
+                int totalLength = 0;
+                int length;
+                List<byte[]> extraBytes = null;
 
-                result = new byte[length];
-                Array.Copy(buffer, 0, result, 0, length);
+                while (true)
+                {
+                    length = _socket.Receive(_buffer, 0, _buffer.Length, SocketFlags.None);
+
+                    // reading failed?
+                    if (length < 0)
+                    {
+                        break;
+                    }
+
+                    totalLength += length;
+
+                    // read enough or whole data?
+                    if (totalLength >= maxLength || _buffer.Length != length || _socket.Available == 0)
+                    {
+                        break;
+                    }
+
+                    // store read data and alloc new buffer for next chunk:
+                    if (extraBytes == null)
+                    {
+                        extraBytes = new List<byte[]>();
+                    }
+                    extraBytes.Add(_buffer);
+                    _buffer = new byte[_chunkSize];
+                }
+
+                // read the data correctly?
+                if (length <= 0)
+                {
+                    if (extraBytes == null)
+                    {
+                        QTraceLog.WriteLine("Unable to read data");
+                        result = new byte[0];
+                        return HResult.Fail;
+                    }
+
+                    // last buffer reading failed, then combine all other extra bytes:
+                    result = Combine(extraBytes, null, 0);
+                }
+                else
+                {
+                    // did we read exactly, what was expected?
+                    if (length == totalLength && length == _buffer.Length && extraBytes == null)
+                    {
+                        result = _buffer;
+                        _buffer = null;
+                    }
+                    else
+                    {
+                        // or just combine all results:
+                        result = Combine(extraBytes, _buffer, length);
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -130,6 +216,41 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             return HResult.OK;
+        }
+
+        private static byte[] Combine(List<byte[]> buffers, byte[] lastChunk, int lastChunkLength)
+        {
+            // calculate result length:
+            int resultLength = lastChunkLength;
+            if (buffers != null)
+            {
+                for (int i = 0; i < buffers.Count; i++)
+                {
+                    resultLength += buffers[i].Length;
+                }
+            }
+
+            // copy data:
+            var result = new byte[resultLength];
+            int index = 0;
+
+            if (buffers != null)
+            {
+                for (int i = 0; i < buffers.Count; i++)
+                {
+                    byte[] src = buffers[i];
+                    Array.Copy(src, 0, result, index, src.Length);
+                    index += src.Length;
+                }
+            }
+
+            if (lastChunk != null)
+            {
+                // and copy the last chunk:
+                Array.Copy(lastChunk, 0, result, index, lastChunkLength);
+            }
+
+            return result;
         }
 
         #region IDisposable Implementation
@@ -159,6 +280,7 @@ namespace BlackBerry.NativeCore.QConn
                     }
                     _socket = null;
                 }
+                _buffer = null;
             }
         }
 
