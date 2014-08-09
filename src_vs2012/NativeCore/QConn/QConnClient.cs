@@ -15,7 +15,7 @@ namespace BlackBerry.NativeCore.QConn
     ///   * list/start/kill processes
     ///   * transfer files.
     /// </summary>
-    public sealed class QConnClient : IDisposable
+    public sealed class QConnClient : IDisposable, IQConnReader
     {
         /// <summary>
         /// Default port the QConn service is running on the target.
@@ -81,6 +81,12 @@ namespace BlackBerry.NativeCore.QConn
             private set;
         }
 
+        public TargetServiceSysInfo SysInfoService
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         /// <summary>
@@ -135,7 +141,8 @@ namespace BlackBerry.NativeCore.QConn
         {
             if (_source == null)
                 throw new ObjectDisposedException("QConnClient");
-            
+
+            Clear();
             var status = _source.Close();
             if (status != HResult.OK)
                 throw new QConnException("Unable to close connection to QConn service (" + status + ")");
@@ -150,10 +157,20 @@ namespace BlackBerry.NativeCore.QConn
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
 
-            _source.Send(Encoding.UTF8.GetBytes(command + "\r\n"));
+            var status = _source.Send(Encoding.UTF8.GetBytes(command + "\r\n"));
+            if (status != HResult.OK)
+            {
+                throw new QConnException("Unable to send command \"" + command + "\"");
+            }
 
             int length;
-            return Receive(out length);
+            var response = Receive(out length);
+            if (response != null && response.StartsWith("error ", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new QConnException("Command \"" + command + "\" finished with error: " + response.Substring(6));
+            }
+
+            return response;
         }
 
         private string Receive(out int length)
@@ -277,29 +294,30 @@ namespace BlackBerry.NativeCore.QConn
                 throw new QConnException("Unable to load QConn services");
 
             string[] serviceNames = ParseServices(response.StartsWith("services: ") ? response.Substring(10) : response);
-            Services = GetDefaultServices(host, port, serviceNames);
+            Services = CreateDefaultServices(serviceNames);
         }
 
-        private TargetService[] GetDefaultServices(string host, int port, string[] serviceNames)
+        private TargetService[] CreateDefaultServices(string[] serviceNames)
         {
             List<TargetService> services = new List<TargetService>();
 
             if (HasService(serviceNames, "file"))
             {
-                var fileService = new TargetServiceFile(host, port, GetServiceVersion("file"));
+                var fileService = new TargetServiceFile(GetServiceVersion("file"), this);
                 services.Add(fileService);
             }
 
             if (HasService(serviceNames, "cntl"))
             {
-                var ctrlService = new TargetServiceControl(host, port, GetServiceVersion("cntl"));
+                var ctrlService = new TargetServiceControl(GetServiceVersion("cntl"), this);
                 services.Add(ctrlService);
             }
 
+            SysInfoService = null;
             if (HasService(serviceNames, "sinfo"))
             {
-                var sysInfoService = new TargetServiceSysInfo(host, port, GetServiceVersion("sinfo"));
-                services.Add(sysInfoService);
+                SysInfoService = new TargetServiceSysInfo(GetServiceVersion("sinfo"), this);
+                services.Add(SysInfoService);
             }
 
             return services.ToArray();
@@ -442,6 +460,39 @@ namespace BlackBerry.NativeCore.QConn
             return result;
         }
 
+        #region IQConnReader Implementation
+
+        void IQConnReader.Select(string serviceName)
+        {
+            if (string.IsNullOrEmpty(serviceName))
+                throw new ArgumentNullException("serviceName");
+
+            Send("service " + serviceName);
+        }
+
+        IDataReader IQConnReader.Send(string command)
+        {
+            if (_source == null)
+                throw new ObjectDisposedException("QConnClient");
+            if (string.IsNullOrEmpty(command))
+                throw new ArgumentNullException("command");
+            if (Endian == Endianess.Unknown)
+                throw new InvalidOperationException("Connection to QConn service was invalid, unable to determin target endianess");
+
+            var status = _source.Send(Encoding.UTF8.GetBytes(command + "\r\n"));
+            if (status != HResult.OK)
+            {
+                throw new QConnException("Unable to send command \"" + command + "\"");
+            }
+
+            // get response as proper stream-reader object with given endianess support:
+            if (Endian == Endianess.LittleEndian)
+                return new DataReaderLittleEndian(_source);
+            return new DataReaderBigEndian(_source);
+        }
+
+        #endregion
+
         #region IDisposable Implementation
 
         /// <summary>
@@ -458,12 +509,24 @@ namespace BlackBerry.NativeCore.QConn
         {
             if (disposing)
             {
+                Clear();
                 if (_source != null)
                 {
                     _source.Dispose();
                     _source = null;
                 }
             }
+        }
+
+        private void Clear()
+        {
+            Endian = Endianess.Unknown;
+            System = TargetSystemType.Unknown;
+            Name = null;
+            Locale = null;
+            Version = null;
+
+            SysInfoService = null;
         }
 
         #endregion

@@ -58,7 +58,6 @@ namespace UnitTests
 
             // connect:
             qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
-            qdoor.KeepAlive(5000);
             qclient.Connect(Defaults.IP);
 
             // verify data was read:
@@ -69,6 +68,29 @@ namespace UnitTests
             Assert.IsNotNull(qclient.Version);
             Assert.IsNotNull(qclient.Name);
             Assert.IsNotNull(qclient.Locale);
+
+            // and close
+            qclient.Close();
+            qclient.Close();
+        }
+
+        [Test]
+        public void LoadProcessesList()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Connect(Defaults.IP);
+
+            // load data:
+            Assert.IsNotNull(qclient.SysInfoService);
+            var processes = qclient.SysInfoService.LoadProcesses();
+
+            // verify:
+            Assert.IsNotNull(processes);
+            Assert.IsTrue(processes.Length > 0, "Invalid processes list, QConn should be at least running");
 
             // and close
             qclient.Close();

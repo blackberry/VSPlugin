@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Services
 {
@@ -12,25 +13,23 @@ namespace BlackBerry.NativeCore.QConn.Services
     /// </summary>
     public abstract class TargetService
     {
-        private readonly string _host;
-        private readonly int _port;
+        private readonly IQConnReader _source;
 
         /// <summary>
         /// Init constructor.
         /// </summary>
-        protected TargetService(string host, int port, string name, Version version)
+        protected TargetService(string name, Version version, IQConnReader source)
         {
-            if (string.IsNullOrEmpty(host))
-                throw new ArgumentNullException("host");
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
             if (version == null)
                 throw new ArgumentNullException("version");
+            if (source == null)
+                throw new ArgumentNullException("source");
 
-            _host = host;
-            _port = port;
             Name = name;
             Version = version;
+            _source = source;
         }
 
         #region Properties
@@ -48,5 +47,17 @@ namespace BlackBerry.NativeCore.QConn.Services
         }
 
         #endregion
+
+        protected void Select()
+        {
+            _source.Select(Name);
+        }
+
+        protected IDataReader Send(string command)
+        {
+            if (string.IsNullOrEmpty(command))
+                throw new ArgumentNullException("command");
+            return _source.Send(command);
+        }
     }
 }
