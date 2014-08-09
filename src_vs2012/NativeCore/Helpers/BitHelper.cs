@@ -54,14 +54,14 @@ namespace BlackBerry.NativeCore.Helpers
         /// <summary>
         /// Gets unsigned integer value from specified index of an array.
         /// </summary>
-        public static ushort BigEndian_ToUInt32(byte[] data, int at)
+        public static uint BigEndian_ToUInt32(byte[] data, int at)
         {
             if (data == null)
                 throw new ArgumentNullException("data");
-            if (at + 4 >= data.Length || at < 0)
+            if (at + 3 >= data.Length || at < 0)
                 throw new ArgumentOutOfRangeException("at");
 
-            return (ushort)((data[at] << 24) | (data[at + 1] << 16) | (data[at + 2] << 8) | data[at + 3]);
+            return (uint)((data[at] << 24) | (data[at + 1] << 16) | (data[at + 2] << 8) | data[at + 3]);
         }
 
         /// <summary>
@@ -85,7 +85,7 @@ namespace BlackBerry.NativeCore.Helpers
         {
             if (data == null)
                 throw new ArgumentNullException("data");
-            if (at + 4 >= data.Length || at < 0)
+            if (at + 3 >= data.Length || at < 0)
                 throw new ArgumentOutOfRangeException("at");
 
             data[at] = (byte)(value & 0xFF);
@@ -110,14 +110,14 @@ namespace BlackBerry.NativeCore.Helpers
         /// <summary>
         /// Gets unsigned integer value from specified index of an array.
         /// </summary>
-        public static ushort LittleEndian_ToUInt32(byte[] data, int at)
+        public static uint LittleEndian_ToUInt32(byte[] data, int at)
         {
             if (data == null)
                 throw new ArgumentNullException("data");
-            if (at + 4 >= data.Length || at < 0)
+            if (at + 3 >= data.Length || at < 0)
                 throw new ArgumentOutOfRangeException("at");
 
-            return (ushort)(data[at] | (data[at + 1] << 8) | (data[at + 2] << 16) | (data[at + 3] << 24));
+            return (uint)(data[at] | (data[at + 1] << 8) | (data[at + 2] << 16) | (data[at + 3] << 24));
         }
 
         /// <summary>
