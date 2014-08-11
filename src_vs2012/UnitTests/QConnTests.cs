@@ -96,5 +96,59 @@ namespace UnitTests
             qclient.Close();
             qclient.Close();
         }
+
+        [Test]
+        public void KillAnyProcess()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Connect(Defaults.IP);
+
+            // load data:
+            Assert.IsNotNull(qclient.SysInfoService);
+            var processes = qclient.SysInfoService.LoadProcesses();
+
+            // verify:
+            Assert.IsNotNull(processes);
+            Assert.IsTrue(processes.Length > 1, "Invalid processes list, QConn + 1 at least one other app should be still running");
+            int firstCount = processes.Length;
+
+            // find non-qconn application running:
+            SystemInfoProcess toKill = null;
+            foreach (var p in processes)
+            {
+                if (!p.Name.EndsWith("qconn"))
+                {
+                    toKill = p;
+                    break;
+                }
+            }
+
+            // kill the process:
+            Assert.IsNotNull(qclient.ControlService);
+            Assert.IsNotNull(toKill, "No application to terminate specified, please run anything on the device first");
+            qclient.ControlService.Kill(toKill);
+
+            // reload info:
+            processes = qclient.SysInfoService.LoadProcesses();
+
+            // verify:
+            Assert.IsNotNull(processes);
+            int secondCount = processes.Length;
+            Assert.IsTrue(secondCount < firstCount, "Application should be killed at this point");
+
+            foreach (var p in processes)
+            {
+                // check that killed app doesn't belong to reloaded processes list:
+                Assert.AreNotEqual(toKill.Name, p.Name);
+            }
+
+            // and close
+            qclient.Close();
+            qclient.Close();
+        }
     }
 }
