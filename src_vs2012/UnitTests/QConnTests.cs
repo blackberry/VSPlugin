@@ -112,7 +112,6 @@ namespace UnitTests
             // verify:
             Assert.IsNotNull(processes);
             Assert.IsTrue(processes.Length > 1, "Invalid processes list, QConn + 1 at least one other app should be still running");
-            int firstCount = processes.Length;
 
             // find non-qconn application running:
             SystemInfoProcess toKill = null;
@@ -135,8 +134,6 @@ namespace UnitTests
 
             // verify:
             Assert.IsNotNull(processes);
-            int secondCount = processes.Length;
-            Assert.IsTrue(secondCount < firstCount, "Application should be killed at this point");
 
             foreach (var p in processes)
             {

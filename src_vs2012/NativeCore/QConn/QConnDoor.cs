@@ -155,6 +155,7 @@ namespace BlackBerry.NativeCore.QConn
             var result = _source.Connect(host, port);
             if (result != HResult.OK)
             {
+                QTraceLog.WriteLine("Failed to connect to target");
                 throw new SecureTargetConnectionException(result, string.Concat("Unable to connect to target ", host, ":", port));
             }
 
@@ -251,6 +252,58 @@ namespace BlackBerry.NativeCore.QConn
         }
 
         /// <summary>
+        /// Asynchronously tries to authenticate on a target.
+        /// </summary>
+        public void OpenAsync(string host, string password, string sshPublicKeyFileName)
+        {
+            if (string.IsNullOrEmpty(host))
+                throw new ArgumentNullException("host");
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException("password");
+            if (string.IsNullOrEmpty(sshPublicKeyFileName))
+                throw new ArgumentNullException("sshPublicKeyFileName");
+
+            OpenAsync(host, DefaultPort, password, File.ReadAllBytes(sshPublicKeyFileName));
+        }
+
+        /// <summary>
+        /// Asynchronously tries to authenticate on a target.
+        /// </summary>
+        public void OpenAsync(string host, int port, string password, byte[] sshKey)
+        {
+            if (string.IsNullOrEmpty(host))
+                throw new ArgumentNullException("host");
+            if (string.IsNullOrEmpty(password))
+                throw new ArgumentNullException("password");
+            if (sshKey == null || sshKey.Length == 0)
+                throw new ArgumentNullException("sshKey");
+
+            if (_source == null)
+                throw new ObjectDisposedException("QConnDoor");
+
+            // is already connected?
+            if (IsAuthenticated)
+                return;
+
+            var action = new Action<string, int, string, byte[]>(Open);
+            action.BeginInvoke(host, port, password, sshKey, OpenAsyncCompleted, action);
+        }
+
+        private void OpenAsyncCompleted(IAsyncResult ar)
+        {
+            var action = (Action<string, int, string, byte[]>)ar.AsyncState;
+
+            try
+            {
+                action.EndInvoke(ar);
+            }
+            catch
+            {
+                NotifyAuthenticationChanged(false);
+            }
+        }
+
+        /// <summary>
         /// Sends a keep-alive request to the target.
         /// Without it the secured and unsecured connections will be automatically closed by the target.
         /// Suggestion is to transmit it each 5sec.
@@ -277,8 +330,6 @@ namespace BlackBerry.NativeCore.QConn
         {
             if (_source == null)
                 throw new ObjectDisposedException("QConnDoor");
-            if (!IsAuthenticated)
-                throw new SecureTargetConnectionException(HResult.Fail, "Not authenticated to target, call Connect() first");
 
             // stop the timer, if running:
             if (millisecInterval == 0)
@@ -294,6 +345,9 @@ namespace BlackBerry.NativeCore.QConn
 
                 return;
             }
+
+            if (!IsAuthenticated)
+                throw new SecureTargetConnectionException(HResult.Fail, "Not authenticated to target, call Connect() first");
 
             // start or update the timer:
             lock (_lock)
