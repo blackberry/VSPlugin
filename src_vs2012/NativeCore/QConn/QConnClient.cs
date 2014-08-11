@@ -433,7 +433,7 @@ namespace BlackBerry.NativeCore.QConn
                 return TargetSystemType.Unknown;
 
             if (string.Compare("nto", text, StringComparison.OrdinalIgnoreCase) == 0)
-                return TargetSystemType.nto;
+                return TargetSystemType.Neutrino;
 
             return TargetSystemType.Unknown;
         }

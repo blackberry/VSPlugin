@@ -6,6 +6,6 @@
     public enum TargetSystemType
     {
         Unknown,
-        nto
+        Neutrino /* nto */
     }
 }

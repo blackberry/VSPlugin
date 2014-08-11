@@ -62,7 +62,7 @@ namespace UnitTests
 
             // verify data was read:
             Assert.AreEqual(Endianess.LittleEndian, qclient.Endian);
-            Assert.AreEqual(TargetSystemType.nto, qclient.System);
+            Assert.AreEqual(TargetSystemType.Neutrino, qclient.System);
             Assert.IsNotNull(qclient.Services);
             Assert.AreEqual(3, qclient.Services.Length);
             Assert.IsNotNull(qclient.Version);
