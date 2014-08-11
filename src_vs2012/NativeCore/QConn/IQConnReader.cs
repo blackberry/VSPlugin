@@ -5,6 +5,9 @@ namespace BlackBerry.NativeCore.QConn
     public interface IQConnReader
     {
         void Select(string serviceName);
+
         IDataReader Send(string command);
+
+        string Command(string command);
     }
 }

@@ -59,5 +59,14 @@ namespace BlackBerry.NativeCore.QConn.Services
                 throw new ArgumentNullException("command");
             return _source.Send(command);
         }
+
+        protected string Command(string command)
+        {
+            if (string.IsNullOrEmpty(command))
+                throw new ArgumentNullException("command");
+
+            // send command and automatically verify received string response:
+            return _source.Command(command);
+        }
     }
 }

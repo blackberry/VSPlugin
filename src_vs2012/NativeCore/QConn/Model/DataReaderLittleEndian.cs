@@ -39,6 +39,9 @@ namespace BlackBerry.NativeCore.QConn.Model
             {
                 LoadNextDataBuffer();
             }
+
+            if (_finished)
+                throw new EndOfStreamException("Read all available data");
         }
 
         public int ReadInt32()

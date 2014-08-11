@@ -87,6 +87,12 @@ namespace BlackBerry.NativeCore.QConn
             private set;
         }
 
+        public TargetServiceControl ControlService
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         /// <summary>
@@ -157,15 +163,24 @@ namespace BlackBerry.NativeCore.QConn
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
 
+            // send request:
             var status = _source.Send(Encoding.UTF8.GetBytes(command + "\r\n"));
             if (status != HResult.OK)
             {
                 throw new QConnException("Unable to send command \"" + command + "\"");
             }
 
+            // receive response:
             int length;
             var response = Receive(out length);
-            if (response != null && response.StartsWith("error ", StringComparison.OrdinalIgnoreCase))
+
+            // verify response:
+            if (string.IsNullOrEmpty(response))
+            {
+                throw new QConnException("Unknown response for command \"" + command + "\"");
+            }
+
+            if (response.StartsWith("error ", StringComparison.OrdinalIgnoreCase))
             {
                 throw new QConnException("Command \"" + command + "\" finished with error: " + response.Substring(6));
             }
@@ -307,10 +322,11 @@ namespace BlackBerry.NativeCore.QConn
                 services.Add(fileService);
             }
 
+            ControlService = null;
             if (HasService(serviceNames, "cntl"))
             {
-                var ctrlService = new TargetServiceControl(GetServiceVersion("cntl"), this);
-                services.Add(ctrlService);
+                ControlService = new TargetServiceControl(GetServiceVersion("cntl"), this);
+                services.Add(ControlService);
             }
 
             SysInfoService = null;
@@ -491,6 +507,16 @@ namespace BlackBerry.NativeCore.QConn
             return new DataReaderBigEndian(_source);
         }
 
+        string IQConnReader.Command(string command)
+        {
+            if (_source == null)
+                throw new ObjectDisposedException("QConnClient");
+            if (string.IsNullOrEmpty(command))
+                throw new ArgumentNullException("command");
+
+            return Send(command);
+        }
+
         #endregion
 
         #region IDisposable Implementation
@@ -527,6 +553,7 @@ namespace BlackBerry.NativeCore.QConn
             Version = null;
 
             SysInfoService = null;
+            ControlService = null;
         }
 
         #endregion
