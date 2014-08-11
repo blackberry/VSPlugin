@@ -71,12 +71,15 @@ namespace BlackBerry.NativeCore.QConn.Services
             public long datasize;
             public long stacksize;
             public long vstacksize;
-            public string name;
+            public char name[128];
         }
          */
 
         #endregion
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public TargetServiceSysInfo(Version version, IQConnReader source)
             : base("sinfo", version, source)
         {
@@ -103,6 +106,12 @@ namespace BlackBerry.NativeCore.QConn.Services
                 uint id = reader.ReadUInt32();
                 reader.Skip(41 * 4); // some other non-interesting fields
                 string name = reader.ReadString();
+
+                // skip remaining name buffer:
+                if (name.Length + 1 < 128)
+                {
+                    reader.Skip(127 - name.Length);
+                }
 
                 result.Add(new SystemInfoProcess(id, name));
             }
