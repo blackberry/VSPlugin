@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Services
@@ -7,8 +8,8 @@ namespace BlackBerry.NativeCore.QConn.Services
     {
         private const int SIGKILL = 9;
 
-        public TargetServiceControl(Version version, IQConnReader source)
-            : base("cntl", version, source)
+        public TargetServiceControl(Version version, QConnConnection connection)
+            : base(version, connection)
         {
         }
 
@@ -32,8 +33,8 @@ namespace BlackBerry.NativeCore.QConn.Services
 
         public void Kill(uint pid, uint signal)
         {
-            Select();
-            var response = Command(string.Concat("kill ", pid, " ", signal));
+            var response = Connection.Send(string.Concat("kill ", pid, " ", signal));
+            QTraceLog.WriteLine("Killed process with PID: {0} - {1}", pid, response);
         }
     }
 }

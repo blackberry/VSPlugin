@@ -58,7 +58,7 @@ namespace UnitTests
 
             // connect:
             qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
-            qclient.Connect(Defaults.IP);
+            qclient.Load(Defaults.IP);
 
             // verify data was read:
             Assert.AreEqual(Endianess.LittleEndian, qclient.Endian);
@@ -70,8 +70,7 @@ namespace UnitTests
             Assert.IsNotNull(qclient.Locale);
 
             // and close
-            qclient.Close();
-            qclient.Close();
+            qdoor.Close();
         }
 
         [Test]
@@ -82,7 +81,7 @@ namespace UnitTests
 
             // connect:
             qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
-            qclient.Connect(Defaults.IP);
+            qclient.Load(Defaults.IP);
 
             // load data:
             Assert.IsNotNull(qclient.SysInfoService);
@@ -93,8 +92,7 @@ namespace UnitTests
             Assert.IsTrue(processes.Length > 0, "Invalid processes list, QConn should be at least running");
 
             // and close
-            qclient.Close();
-            qclient.Close();
+            qdoor.Close();
         }
 
         [Test]
@@ -105,7 +103,7 @@ namespace UnitTests
 
             // connect:
             qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
-            qclient.Connect(Defaults.IP);
+            qclient.Load(Defaults.IP);
 
             // load data:
             Assert.IsNotNull(qclient.SysInfoService);
@@ -147,8 +145,7 @@ namespace UnitTests
             }
 
             // and close
-            qclient.Close();
-            qclient.Close();
+            qdoor.Close();
         }
     }
 }

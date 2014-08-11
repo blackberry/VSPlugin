@@ -80,8 +80,8 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public TargetServiceSysInfo(Version version, IQConnReader source)
-            : base("sinfo", version, source)
+        public TargetServiceSysInfo(Version version, QConnConnection connection)
+            : base(version, connection)
         {
         }
 
@@ -90,10 +90,12 @@ namespace BlackBerry.NativeCore.QConn.Services
             return "SysInfoService";
         }
 
+        /// <summary>
+        /// Gets the list of running processes.
+        /// </summary>
         public SystemInfoProcess[] LoadProcesses()
         {
-            Select();
-            var reader = Send("get pids");
+            var reader = Connection.Request("get pids");
 
             // read info about payload:
             var header = new Header();

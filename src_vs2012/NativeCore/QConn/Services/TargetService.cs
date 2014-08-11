@@ -1,5 +1,4 @@
 ﻿using System;
-using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Services
 {
@@ -11,34 +10,25 @@ namespace BlackBerry.NativeCore.QConn.Services
     ///  * profiler
     ///  * ...
     /// </summary>
-    public abstract class TargetService
+    public abstract class TargetService : IDisposable
     {
-        private readonly IQConnReader _source;
+        private QConnConnection _connection;
 
         /// <summary>
         /// Init constructor.
         /// </summary>
-        protected TargetService(string name, Version version, IQConnReader source)
+        protected TargetService(Version version, QConnConnection connection)
         {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
             if (version == null)
                 throw new ArgumentNullException("version");
-            if (source == null)
-                throw new ArgumentNullException("source");
+            if (connection == null)
+                throw new ArgumentNullException("connection");
 
-            Name = name;
             Version = version;
-            _source = source;
+            _connection = connection;
         }
 
         #region Properties
-
-        public string Name
-        {
-            get;
-            private set;
-        }
 
         public Version Version
         {
@@ -46,27 +36,55 @@ namespace BlackBerry.NativeCore.QConn.Services
             private set;
         }
 
+        public QConnConnection Connection
+        {
+            get
+            {
+                if (_connection == null)
+                    throw new ObjectDisposedException("TargetService");
+                return _connection;
+            }
+        }
+
         #endregion
 
-        protected void Select()
+        public void Activate()
         {
-            _source.Select(Name);
+            if (_connection == null)
+                throw new ObjectDisposedException("TargetService");
+
+            _connection.Connect();
         }
 
-        protected IDataReader Send(string command)
+        public void Close()
         {
-            if (string.IsNullOrEmpty(command))
-                throw new ArgumentNullException("command");
-            return _source.Send(command);
+            if (_connection == null)
+                throw new ObjectDisposedException("TargetService");
+
+            _connection.Close();
         }
 
-        protected string Command(string command)
-        {
-            if (string.IsNullOrEmpty(command))
-                throw new ArgumentNullException("command");
+        #region IDisposable Implementation
 
-            // send command and automatically verify received string response:
-            return _source.Command(command);
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
+
+        private void Dispose(bool disposing)
+        {
+            if (_connection != null)
+            {
+                _connection.Dispose();
+                _connection = null;
+            }
+        }
+
+        #endregion
     }
 }

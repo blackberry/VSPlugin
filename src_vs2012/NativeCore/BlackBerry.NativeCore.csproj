@@ -103,7 +103,6 @@
     <Compile Include="Model\Size.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="QConn\IQConnReader.cs" />
     <Compile Include="QConn\Model\DataReaderBigEndian.cs" />
     <Compile Include="QConn\Model\DataReaderLittleEndian.cs" />
     <Compile Include="QConn\Model\Endianess.cs" />
@@ -139,6 +138,7 @@
     <Compile Include="QConn\Response\SecureTargetResult.cs" />
     <Compile Include="QConn\Response\SecureTargetResponse.cs" />
     <Compile Include="QConn\SecureTargetConnectionException.cs" />
+    <Compile Include="QConn\QConnConnection.cs" />
     <Compile Include="QConn\Services\TargetServiceSysInfo.cs" />
     <Compile Include="QConn\Services\TargetServiceControl.cs" />
     <Compile Include="QConn\Services\TargetService.cs" />

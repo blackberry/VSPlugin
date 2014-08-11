@@ -4,8 +4,8 @@ namespace BlackBerry.NativeCore.QConn.Services
 {
     public sealed class TargetServiceFile : TargetService
     {
-        public TargetServiceFile(Version version, IQConnReader source)
-            : base("file", version, source)
+        public TargetServiceFile(Version version, QConnConnection connection)
+            : base(version, connection)
         {
         }
 
