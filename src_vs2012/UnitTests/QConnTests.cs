@@ -144,5 +144,24 @@ namespace UnitTests
             // and close
             qdoor.Close();
         }
+
+        [Test]
+        public void ListDirectory()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            // list files within the folder:
+            Assert.IsNotNull(qclient.FileService);
+            var files = qclient.FileService.Stat("/abcde");
+
+
+            // and close
+            qdoor.Close();
+        }
     }
 }

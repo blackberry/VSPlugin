@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Services
 {
@@ -12,6 +13,16 @@ namespace BlackBerry.NativeCore.QConn.Services
         public override string ToString()
         {
             return "FileService";
+        }
+
+        public TargetFile Stat(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+
+            var response = Connection.Send(string.Concat("oc:\"", path, "\""));
+
+            return null;
         }
     }
 }

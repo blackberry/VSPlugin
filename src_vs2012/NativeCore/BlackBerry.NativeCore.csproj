@@ -111,6 +111,7 @@
     <Compile Include="QConn\Model\EncryptionChallenge.cs" />
     <Compile Include="QConn\Model\IDataReader.cs" />
     <Compile Include="QConn\Model\SystemInfoProcess.cs" />
+    <Compile Include="QConn\Model\TargetFile.cs" />
     <Compile Include="QConn\Model\TargetSystemType.cs" />
     <Compile Include="QConn\QConnAuthenticationEventArgs.cs" />
     <Compile Include="QConn\QConnClient.cs" />

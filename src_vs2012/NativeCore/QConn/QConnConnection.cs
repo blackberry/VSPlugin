@@ -26,7 +26,7 @@ namespace BlackBerry.NativeCore.QConn
             _source = new QDataSource();
             _endian = Endianess.Unknown;
 
-            Connect();
+            Open();
         }
 
         /// <summary>
@@ -61,14 +61,15 @@ namespace BlackBerry.NativeCore.QConn
         /// <summary>
         /// Opens the connection to target.
         /// </summary>
-        public QConnConnection Connect()
+        public void Open()
         {
             if (_source == null)
                 throw new ObjectDisposedException("QConnConnection");
 
+            // no need to do anything, if already connected
             if (IsConnected)
             {
-                return this;
+                return;
             }
 
             var status = _source.Connect(_host, _port);
@@ -94,8 +95,6 @@ namespace BlackBerry.NativeCore.QConn
             {
                 response = Send("service " + _serviceName);
             }
-
-            return this;
         }
 
         /// <summary>

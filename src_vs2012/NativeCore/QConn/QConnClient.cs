@@ -79,6 +79,12 @@ namespace BlackBerry.NativeCore.QConn
             private set;
         }
 
+        public TargetServiceFile FileService
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         /// <summary>
@@ -127,10 +133,11 @@ namespace BlackBerry.NativeCore.QConn
         {
             List<TargetService> services = new List<TargetService>();
 
+            FileService = null;
             if (HasService(serviceNames, "file"))
             {
-                var fileService = new TargetServiceFile(GetServiceVersion(connection, "file"), new QConnConnection(host, port, "file", Endian));
-                services.Add(fileService);
+                FileService = new TargetServiceFile(GetServiceVersion(connection, "file"), new QConnConnection(host, port, "file", Endian));
+                services.Add(FileService);
             }
 
             ControlService = null;
