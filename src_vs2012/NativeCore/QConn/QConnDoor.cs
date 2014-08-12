@@ -160,9 +160,7 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             // try to initialize communication:
-            Send(new SecureTargetHelloRequest());
-            var response = Receive();
-            VerifyResponse(response);
+            Execute(new SecureTargetHelloRequest());
 
             RSAParameters publicKey;
             RSAParameters privateKey;
@@ -178,7 +176,6 @@ namespace BlackBerry.NativeCore.QConn
                     privateKey = rsa.ExportParameters(true);
                     // more info about parameters and their meaning is here:
                     // http://msdn.microsoft.com/en-us/library/system.security.cryptography.rsaparameters%28v=vs.90%29.aspx
-
                 }
                 catch (Exception ex)
                 {
@@ -188,9 +185,7 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             // initialize encryption negotiation:
-            Send(new SecureTargetChallengeRequest(publicKey.Modulus));
-            response = Receive();
-            VerifyResponse(response);
+            var response = Execute(new SecureTargetChallengeRequest(publicKey.Modulus));
 
             var encryptedChallenge = response as SecureTargetEncryptedChallengeResponse;
             if (encryptedChallenge == null)
@@ -217,14 +212,10 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             // confirm encrypted channel:
-            Send(new SecureTargetDecryptedChallengeRequest(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
-            response = Receive();
-            VerifyResponse(response);
+            Execute(new SecureTargetDecryptedChallengeRequest(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
 
             // prepare for sending password and ssh-public-key:
-            Send(new SecureTargetAuthenticateChallengeRequest());
-            response = Receive();
-            VerifyResponse(response);
+            response = Execute(new SecureTargetAuthenticateChallengeRequest());
 
             var authenticateResponse = response as SecureTargetAuthenticateChallengeResponse;
             if (authenticateResponse == null)
@@ -232,20 +223,16 @@ namespace BlackBerry.NativeCore.QConn
                 throw new SecureTargetConnectionException(HResult.InvalidFrameCode, "Authentication negotiation failed");
             }
 
-            Send(new SecureTargetAuthenticateRequest(password, authenticateResponse.Algorithm, authenticateResponse.Iterations, authenticateResponse.Salt, authenticateResponse.Challenge, decryptedChallenge.SessionKey));
-            response = Receive();
-            VerifyResponse(response);
+            // send password-hash:
+            Execute(new SecureTargetAuthenticateRequest(password, authenticateResponse.Algorithm, authenticateResponse.Iterations, authenticateResponse.Salt, authenticateResponse.Challenge, decryptedChallenge.SessionKey));
             QTraceLog.WriteLine("Successfully authenticated with target credentials.");
 
+            // send ssh-key:
             QTraceLog.WriteLine("Sending ssh key to target");
-            Send(new SecureTargetSendSshPublicKeyRequest(sshKey, decryptedChallenge.SessionKey));
-            response = Receive();
-            VerifyResponse(response);
+            Execute(new SecureTargetSendSshPublicKeyRequest(sshKey, decryptedChallenge.SessionKey));
 
-            // and start all services:
-            Send(new SecureTargetStartServicesRequest());
-            response = Receive();
-            VerifyResponse(response);
+            // and start all services on target:
+            Execute(new SecureTargetStartServicesRequest());
 
             QTraceLog.WriteLine("Successfully connected. This application must remain running in order to use debug tools. Exiting the application will terminate this connection.");
             NotifyAuthenticationChanged(true);
@@ -406,6 +393,18 @@ namespace BlackBerry.NativeCore.QConn
                 QTraceLog.WriteException(ex, "Unable to send keep-alive request");
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Sends specified requests, waits for response and verifies it.
+        /// </summary>
+        private SecureTargetResult Execute(SecureTargetRequest request)
+        {
+            Send(request);
+            var response = Receive();
+
+            VerifyResponse(response);
+            return response;
         }
 
         private void Send(SecureTargetRequest request)
