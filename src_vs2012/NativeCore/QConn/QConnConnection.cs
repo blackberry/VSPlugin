@@ -123,7 +123,7 @@ namespace BlackBerry.NativeCore.QConn
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
 
-            Connect();
+            Open();
 
             // send request:
             var status = _source.Send(Encoding.UTF8.GetBytes(command + "\r\n"));
@@ -160,7 +160,7 @@ namespace BlackBerry.NativeCore.QConn
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
 
-            Connect();
+            Open();
 
             // send request:
             var status = _source.Send(Encoding.UTF8.GetBytes(command + "\r\n"));

@@ -53,7 +53,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (_connection == null)
                 throw new ObjectDisposedException("TargetService");
 
-            _connection.Connect();
+            _connection.Open();
         }
 
         public void Close()
