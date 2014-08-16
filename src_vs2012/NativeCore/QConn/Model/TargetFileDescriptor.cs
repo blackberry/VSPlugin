@@ -12,8 +12,6 @@ namespace BlackBerry.NativeCore.QConn.Model
         {
             if (service == null)
                 throw new ArgumentNullException("service");
-            if (string.IsNullOrEmpty(handle))
-                throw new ArgumentNullException("handle");
 
             _service = service;
             Handle = handle;

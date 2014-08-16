@@ -72,6 +72,9 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         public byte[] ReadBytes(int length)
         {
+            if (length <= 0)
+                throw new ArgumentOutOfRangeException("length");
+
             VerifyData();
 
             var result = new byte[length];

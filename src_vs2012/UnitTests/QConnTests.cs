@@ -166,6 +166,26 @@ namespace UnitTests
         }
 
         [Test]
+        public void StatSymlinkDirectory()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            // list files within the folder:
+            Assert.IsNotNull(qclient.FileService);
+            var info = qclient.FileService.Stat("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/shared");
+
+            Assert.IsNotNull(info);
+
+            // and close
+            qdoor.Close();
+        }
+
+        [Test]
         public void ListDirectory()
         {
             var qdoor = new QConnDoor();
@@ -179,9 +199,31 @@ namespace UnitTests
             Assert.IsNotNull(qclient.FileService);
             //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs");
             var files = qclient.FileService.List("/accounts/1000/appdata/"); // place where all apps are installed
+            //var files = qclient.FileService.List("/tmp/slogger2/"); // place where all apps are installed
 
             Assert.IsNotNull(files);
             Assert.IsTrue(files.Length > 2, "Invalid number of items loaded");
+
+            // and close
+            qdoor.Close();
+        }
+
+        [Test]
+        public void CreateDirectory()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            // list files within the folder:
+            Assert.IsNotNull(qclient.FileService);
+            var info = qclient.FileService.CreateFolder("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs/test", 0xFFF);
+            //var info = qclient.FileService.CreateFolder("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs/test2", 0xFFF);
+
+            Assert.IsNotNull(info);
 
             // and close
             qdoor.Close();

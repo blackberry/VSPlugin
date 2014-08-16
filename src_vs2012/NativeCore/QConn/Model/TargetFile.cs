@@ -5,8 +5,9 @@ namespace BlackBerry.NativeCore.QConn.Model
 {
     public class TargetFile
     {
+        internal const uint TypeMask = 0xFFFF0FFF;
         private const uint TypeCharacterDevice = 0x2000;
-        private const uint TypeDirectory = 0x4000;
+        internal const uint TypeDirectory = 0x4000;
         private const uint TypeNamedPipe = 0x5000;
         private const uint TypeBlockDevice = 0x6000;
         private const uint TypeRegularFile = 0x8000;
