@@ -112,7 +112,9 @@
     <Compile Include="QConn\Model\IDataReader.cs" />
     <Compile Include="QConn\Model\SystemInfoProcess.cs" />
     <Compile Include="QConn\Model\TargetFile.cs" />
+    <Compile Include="QConn\Model\TargetFileDescriptor.cs" />
     <Compile Include="QConn\Model\TargetSystemType.cs" />
+    <Compile Include="QConn\Model\Token.cs" />
     <Compile Include="QConn\QConnAuthenticationEventArgs.cs" />
     <Compile Include="QConn\QConnClient.cs" />
     <Compile Include="QConn\QConnDoor.cs" />

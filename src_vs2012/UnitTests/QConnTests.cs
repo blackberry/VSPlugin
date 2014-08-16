@@ -146,6 +146,26 @@ namespace UnitTests
         }
 
         [Test]
+        public void ParseFileStatResponse()
+        {
+            var result = Token.Parse("a");
+            Assert.AreEqual(1, result.Length);
+            Assert.AreEqual("a", result[0].StringValue);
+
+            result = Token.Parse(":");
+            Assert.AreEqual(2, result.Length);
+            Assert.AreEqual(string.Empty, result[0].StringValue);
+            Assert.AreEqual(string.Empty, result[1].StringValue);
+
+            result = Token.Parse("o+:0:FF:\"/abcdef\"");
+            Assert.AreEqual(4, result.Length);
+            Assert.AreEqual("o+", result[0].StringValue);
+            Assert.AreEqual(0u, result[1].UInt32Value);
+            Assert.AreEqual(255u, result[2].UInt32Value);
+            Assert.AreEqual("/abcdef", result[3].StringValue);
+        }
+
+        [Test]
         public void ListDirectory()
         {
             var qdoor = new QConnDoor();
@@ -157,7 +177,7 @@ namespace UnitTests
 
             // list files within the folder:
             Assert.IsNotNull(qclient.FileService);
-            var files = qclient.FileService.Stat("/abcde");
+            var files = qclient.FileService.List("/accounts/1000/appdata/");
 
 
             // and close

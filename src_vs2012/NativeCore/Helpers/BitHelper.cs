@@ -65,6 +65,21 @@ namespace BlackBerry.NativeCore.Helpers
         }
 
         /// <summary>
+        /// Gets unsigned long integer value from specified index of an array.
+        /// </summary>
+        public static ulong BigEndian_ToUInt64(byte[] data, int at)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (at + 7 >= data.Length || at < 0)
+                throw new ArgumentOutOfRangeException("at");
+
+            uint high = (uint)((data[at] << 24) | (data[at + 1] << 16) | (data[at + 2] << 8) | data[at + 3]);
+            uint low = (uint)((data[at + 4] << 24) | (data[at + 5] << 16) | (data[at + 6] << 8) | data[at + 7]);
+            return ((ulong)high << 32) | low;
+        }
+
+        /// <summary>
         /// Sets unsigned short value at specified index of an array.
         /// </summary>
         public static void LittleEndian_Set(byte[] data, int at, ushort value)
@@ -118,6 +133,21 @@ namespace BlackBerry.NativeCore.Helpers
                 throw new ArgumentOutOfRangeException("at");
 
             return (uint)(data[at] | (data[at + 1] << 8) | (data[at + 2] << 16) | (data[at + 3] << 24));
+        }
+
+        /// <summary>
+        /// Gets unsigned long integer value from specified index of an array.
+        /// </summary>
+        public static ulong LittleEndian_ToUInt64(byte[] data, int at)
+        {
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (at + 7 >= data.Length || at < 0)
+                throw new ArgumentOutOfRangeException("at");
+
+            uint low = (uint)(data[at] | (data[at + 1] << 8) | (data[at + 2] << 16) | (data[at + 3] << 24));
+            uint high = (uint)(data[at + 4] | (data[at + 5] << 8) | (data[at + 6] << 16) | (data[at + 7] << 24));
+            return ((ulong)high << 32) | low;
         }
 
         /// <summary>

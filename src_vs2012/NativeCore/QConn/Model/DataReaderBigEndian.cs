@@ -32,12 +32,17 @@ namespace BlackBerry.NativeCore.QConn.Model
             throw new NotImplementedException();
         }
 
+        public byte[] ReadBytes(int length)
+        {
+            throw new NotImplementedException();
+        }
+
         public void Skip(int bytes)
         {
             throw new NotImplementedException();
         }
 
-        public string ReadString()
+        public string ReadString(char terminatorChar)
         {
             throw new NotImplementedException();
         }

@@ -107,7 +107,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             {
                 uint id = reader.ReadUInt32();
                 reader.Skip(41 * 4); // some other non-interesting fields
-                string name = reader.ReadString();
+                string name = reader.ReadString('\0');
 
                 // skip remaining name buffer:
                 if (name.Length + 1 < 128)

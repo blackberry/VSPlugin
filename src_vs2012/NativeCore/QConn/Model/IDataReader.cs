@@ -8,8 +8,9 @@
         int ReadInt32();
         uint ReadUInt32();
         ulong ReadUInt64();
+        byte[] ReadBytes(int length);
 
         void Skip(int bytes);
-        string ReadString();
+        string ReadString(char terminatorChar);
     }
 }
