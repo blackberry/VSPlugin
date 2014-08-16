@@ -177,8 +177,11 @@ namespace UnitTests
 
             // list files within the folder:
             Assert.IsNotNull(qclient.FileService);
-            var files = qclient.FileService.List("/accounts/1000/appdata/");
+            //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs");
+            var files = qclient.FileService.List("/accounts/1000/appdata/"); // place where all apps are installed
 
+            Assert.IsNotNull(files);
+            Assert.IsTrue(files.Length > 2, "Invalid number of items loaded");
 
             // and close
             qdoor.Close();

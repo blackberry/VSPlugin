@@ -8,6 +8,11 @@ namespace BlackBerry.NativeCore.QConn.Services
 {
     public sealed class TargetServiceFile : TargetService
     {
+        public const int ModeOpenNone = 0;
+        public const int ModeOpenReadOnly= 1;
+        public const int ModeOpenWriteOnly = 2;
+        public const int ModeOpenReadWrite = 3;
+
         public TargetServiceFile(Version version, QConnConnection connection)
             : base(version, connection)
         {
@@ -49,7 +54,7 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             Token[] response;
 
-            if (mode == 0)
+            if (mode == ModeOpenNone)
             {
                 response = Send(string.Concat("oc:\"", path, "\":0"));
             }
@@ -123,21 +128,21 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// Gets the info about specified path.
         /// It throws exceptions in case of any errors or permission denies.
         /// </summary>
-        public TargetFileDescriptor Stat(string path)
+        private TargetFileDescriptor Stat(string path)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
-            using(var descriptor = Open(path, 0, uint.MaxValue))
+            using(var descriptor = Open(path, ModeOpenNone, uint.MaxValue))
             {
                 // ask for full description:
                 var response = Send("s:" + descriptor.Handle);
                 if (response[0].StringValue == "e")
                     throw new QConnException("Stat failed: " + response[1].StringValue);
-                var creationTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(response[9].UInt64Value).ToLocalTime();
 
                 // update creation-date, type and size:
-                descriptor.Update(creationTime, response[10].UInt32Value, response[2].UInt64Value);
+                var creationTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(response[9].UInt64Value).ToLocalTime();
+                descriptor.Update(response[5].UInt32Value, response[6].UInt32Value, creationTime, response[10].UInt32Value, response[2].UInt64Value);
                 return descriptor;
             }
         }
@@ -145,16 +150,25 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Lists files and folders at specified location.
         /// </summary>
-        public TargetFileDescriptor[] List(string path)
+        public TargetFile[] List(string path)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
             var descriptor = Stat(path);
+            if (descriptor == null)
+                throw new QConnException("Unable to determine path properties");
+            return List(descriptor);
+        }
 
-            if (descriptor.IsDirectory)
+        /// <summary>
+        /// Lists files and folders at specified location.
+        /// </summary>
+        public TargetFile[] List(TargetFile location)
+        {
+            if (location.IsDirectory)
             {
-                using (var directory = Open(path, 1, 0x4000))
+                using (var directory = Open(location.Path, ModeOpenReadOnly, 0x4000))
                 {
                     var data = Read(directory, 0, directory.Size);
                     if (data == null)
@@ -162,48 +176,45 @@ namespace BlackBerry.NativeCore.QConn.Services
                     string listing = Encoding.UTF8.GetString(data);
 
                     // parse names, as each is in separate line:
-                    List<TargetFileDescriptor> names = new List<TargetFileDescriptor>();
+                    List<TargetFile> result = new List<TargetFile>();
                     foreach (var item in listing.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         if (item != "." && item != "..")
                         {
-                            string itemPath = MakePath(path, item);
+                            string itemPath = location.CreateItemPath(item);
                             try
                             {
                                 // and try to load detailed info:
-                                names.Add(Stat(itemPath));
+                                result.Add(Stat(itemPath));
                             }
                             catch (Exception ex)
                             {
+                                // add a stub, just to keep the path only (as might lack permissions to read info even):
+                                result.Add(new TargetFile(itemPath));
                                 QTraceLog.WriteException(ex, "Unable to load info about path: \"" + itemPath + "\"");
                             }
                         }
                     }
 
-                    return names.ToArray();
+                    return result.ToArray();
                 }
             }
 
             throw new QConnException("Not a folder, unable to perform listing");
         }
 
-        private static string MakePath(string path, string name)
+        /// <summary>
+        /// Create a folder at specified location.
+        /// </summary>
+        public TargetFile CreateFolder(string path)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
 
-            if (path[path.Length - 1] == '/')
+            using (var descriptor = Open(path, 0x100, 0xFFF | 0x4000))
             {
-                if (name[0] == '/')
-                    return path + name.Substring(1);
-                return path + name;
+                return descriptor;
             }
-
-            if (name[0] == '/')
-                return path + name;
-            return string.Concat(path, "/", name);
         }
     }
 }
