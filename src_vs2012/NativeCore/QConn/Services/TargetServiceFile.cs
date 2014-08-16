@@ -293,5 +293,21 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (response[0].StringValue == "e")
                 throw new QConnException("Remove failed: " + response[1].StringValue);
         }
+
+        /// <summary>
+        /// Moves the file or folder from specified source location to the destination location.
+        /// </summary>
+        public void Move(string sourcePath, string destinationPath)
+        {
+            if (string.IsNullOrEmpty(sourcePath))
+                throw new ArgumentNullException("sourcePath");
+            if (string.IsNullOrEmpty(destinationPath))
+                throw new ArgumentNullException("destinationPath");
+
+            // ask to move:
+            var response = Send("m:\"" + sourcePath + "\":\"" + destinationPath + "\"");
+            if (response[0].StringValue == "e")
+                throw new QConnException("Move failed: " + response[1].StringValue);
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace UnitTests
             Assert.IsTrue(qdoor.IsConnected);
 
             // keep the connection alive for some time:
-            qdoor.KeepAlive();      // send immediatelly
+            qdoor.KeepAlive();      // send immediately
             qdoor.KeepAlive(200);   // first request will be sent after a delay
             Thread.Sleep(1000);     // can sleep here, as 'keep-alive' uses a thread-pool to work...
 
@@ -166,7 +166,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void StatSymlinkDirectory()
+        public void StatDirectory()
         {
             var qdoor = new QConnDoor();
             var qclient = new QConnClient();
@@ -177,8 +177,9 @@ namespace UnitTests
 
             // list files within the folder:
             Assert.IsNotNull(qclient.FileService);
+
+            // PH: FIXME: didn't find any symlink yet, could be valuable to add here... so this is just any folder for now
             var info = qclient.FileService.Stat("/accounts/1000/shared/");
-            //var info = qclient.FileService.Stat("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/shared");
 
             Assert.IsNotNull(info);
 

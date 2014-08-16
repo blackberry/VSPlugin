@@ -190,6 +190,8 @@ namespace BlackBerry.NativeCore.QConn.Model
                     return 'b';
                 case TypeRegularFile:
                     return '-';
+                case TypeSymlink:
+                    return 'l';
                 case TypeSocket:
                     return 's';
                 default:
