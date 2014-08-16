@@ -177,7 +177,8 @@ namespace UnitTests
 
             // list files within the folder:
             Assert.IsNotNull(qclient.FileService);
-            var info = qclient.FileService.Stat("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/shared");
+            var info = qclient.FileService.Stat("/accounts/1000/shared/");
+            //var info = qclient.FileService.Stat("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/shared");
 
             Assert.IsNotNull(info);
 
@@ -220,10 +221,12 @@ namespace UnitTests
 
             // list files within the folder:
             Assert.IsNotNull(qclient.FileService);
-            var info = qclient.FileService.CreateFolder("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs/test", 0xFFF);
+            var info = qclient.FileService.CreateFolder("/accounts/1000/shared/misc/test", 0xFFF);
             //var info = qclient.FileService.CreateFolder("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs/test2", 0xFFF);
 
             Assert.IsNotNull(info);
+
+            qclient.FileService.Remove(info.Path);
 
             // and close
             qdoor.Close();

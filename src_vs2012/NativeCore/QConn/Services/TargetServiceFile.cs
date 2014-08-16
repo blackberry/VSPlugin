@@ -268,5 +268,30 @@ namespace BlackBerry.NativeCore.QConn.Services
                 return descriptor;
             }
         }
+
+        /// <summary>
+        /// Removes the file or folder at specified location.
+        /// </summary>
+        public void Remove(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+
+            Remove(path, 0u);
+        }
+
+        /// <summary>
+        /// Removes the file or folder at specified location.
+        /// </summary>
+        public void Remove(string path, uint flags)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+
+            // ask to delete:
+            var response = Send("d:\"" + path + "\":" + flags.ToString("X"));
+            if (response[0].StringValue == "e")
+                throw new QConnException("Remove failed: " + response[1].StringValue);
+        }
     }
 }
