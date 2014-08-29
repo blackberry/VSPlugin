@@ -27,6 +27,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Writes a debug message.
         /// </summary>
         [Conditional("TRACE")]
+        [DebuggerStepThrough]
         public static void WriteLine(string message)
         {
             if (message == null)
@@ -39,6 +40,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Writes a debug message.
         /// </summary>
         [Conditional("TRACE")]
+        [DebuggerStepThrough]
         public static void WriteLine(string format, params object[] args)
         {
             if (format == null)
@@ -51,6 +53,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Writes a warning message.
         /// </summary>
         [Conditional("TRACE")]
+        [DebuggerStepThrough]
         public static void WarnLine(string message)
         {
             if (message == null)
@@ -63,6 +66,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Writes a warning message.
         /// </summary>
         [Conditional("TRACE")]
+        [DebuggerStepThrough]
         public static void WarnLine(string format, params object[] args)
         {
             if (format == null)
@@ -75,6 +79,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Writes info about the exception.
         /// </summary>
         [Conditional("TRACE")]
+        [DebuggerStepThrough]
         public static void WriteException(Exception ex)
         {
             if (ex == null)
@@ -87,6 +92,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Writes info about the exception.
         /// </summary>
         [Conditional("TRACE")]
+        [DebuggerStepThrough]
         public static void WriteException(Exception ex, string message)
         {
             if (ex == null)
@@ -103,6 +109,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Writes info about the exception.
         /// </summary>
         [Conditional("TRACE")]
+        [DebuggerStepThrough]
         public static void WriteException(Exception ex, string format, params object[] args)
         {
             if (ex == null)
@@ -119,6 +126,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// <summary>
         /// Converts exception data into a single string.
         /// </summary>
+        [DebuggerStepThrough]
         private static string FlatException(Exception ex, string message)
         {
             var result = new StringBuilder();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 
 namespace BlackBerry.NativeCore
 {
@@ -8,11 +9,6 @@ namespace BlackBerry.NativeCore
 #endif
     static class ConfigDefaults
     {
-#if MAKE_CONFIG_DEFAULTS_PUBLIC
-        public static readonly string TestToolsDirectory;
-        public static readonly string TestNdkDirectory;
-#endif
-
         public static readonly string ToolsDirectory;
         public static readonly string NdkDirectory;
         public static readonly string DataDirectory;
@@ -23,12 +19,31 @@ namespace BlackBerry.NativeCore
         public static readonly string JavaHome;
         public static readonly string SshPublicKeyPath;
         public static readonly string BuildDebugNativePath;
+        public static readonly string GdbHostPath;
+
 
         /// <summary>
         /// Plugin-owned installation cache config directory.
         /// </summary>
         public static readonly string PluginInstallationConfigDirectory;
         public static readonly string RegistryPath;
+
+#if DEBUG
+        /// <summary>
+        /// Full path to the DebugEngine library in build in debug, to help in easy debuggin whole stack.
+        /// It will not be used in release builds, as then the assumption is that the DE is next to the package.
+        /// </summary>
+        public const string DebugEngineDebugablePath =
+#               if PLATFORM_VS2010
+                    @"S:\vs-plugin\src_vs2010\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+#               elif PLATFORM_VS2012
+                    @"S:\vs-plugin\src_vs2012\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+#               elif PLATFORM_VS2013
+                    @"S:\vs-plugin\src_vs2013\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+#               else
+#                   error Define path to debug version of the DebugEngine.dll to make the debugging working.
+#               endif
+#endif
 
         static ConfigDefaults()
         {
@@ -62,11 +77,10 @@ namespace BlackBerry.NativeCore
             BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
 
-#if DEBUG && MAKE_CONFIG_DEFAULTS_PUBLIC
-            // TODO: PH: 2014-05-08: for now hardcoded my repository path:
-            TestToolsDirectory = @"S:\vs-plugin\qnxtools\bin";
-            TestNdkDirectory = NdkDirectory; // @"S:\vs-plugin\bbndk_vs";
-            ToolsDirectory = TestToolsDirectory;
+#if DEBUG
+            GdbHostPath = @"S:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
+#else
+            GdbHostPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "BlackBerry.GDBHost.exe");
 #endif
         }
 

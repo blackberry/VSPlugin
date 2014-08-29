@@ -44,15 +44,37 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\TargetConnectionEventArgs.cs" />
+    <Compile Include="Components\Targets.cs" />
+    <Compile Include="Components\TargetStatus.cs" />
     <Compile Include="Components\TokenProcessor.cs" />
     <Compile Include="Components\UpdateManager.cs" />
     <Compile Include="Components\UpdateManagerCompletedEventArgs.cs" />
     <Compile Include="ConfigDefaults.cs" />
+    <Compile Include="Debugger\GdbProcessor.cs" />
+    <Compile Include="Debugger\GdbWrapper.cs" />
+    <Compile Include="Debugger\IGdbSender.cs" />
+    <Compile Include="Debugger\Instruction.cs" />
+    <Compile Include="Debugger\InstructionCollection.cs" />
+    <Compile Include="Debugger\Model\BreakpointInfo.cs" />
+    <Compile Include="Debugger\Model\IResult.cs" />
+    <Compile Include="Debugger\Model\ProcessInfo.cs" />
+    <Compile Include="Debugger\Request.cs" />
+    <Compile Include="Debugger\RequestGroup.cs" />
+    <Compile Include="Debugger\Requests\BreakRequest.cs" />
+    <Compile Include="Debugger\Requests\CliRequest.cs" />
+    <Compile Include="Debugger\Requests\MiRequest.cs" />
+    <Compile Include="Debugger\Requests\ProcessListRequest.cs" />
+    <Compile Include="Debugger\Response.cs" />
+    <Compile Include="Debugger\ResponseParsedEventArgs.cs" />
+    <Compile Include="Debugger\ResponseReceivedEventArgs.cs" />
+    <Compile Include="Debugger\ResponseType.cs" />
     <Compile Include="Diagnostics\BlackBerryTraceListener.cs" />
     <Compile Include="Diagnostics\TimeTracker.cs" />
     <Compile Include="Diagnostics\TraceLog.cs" />
-    <Compile Include="Helpers\DeviceFamilyHelper.cs" />
+    <Compile Include="Helpers\DeviceHelper.cs" />
     <Compile Include="Helpers\GlobalHelper.cs" />
+    <Compile Include="Helpers\NameValueCollectionHelper.cs" />
     <Compile Include="Model\ApiInfo.cs" />
     <Compile Include="Model\ApiInfoArray.cs" />
     <Compile Include="Model\ApiLevelAction.cs" />
@@ -68,10 +90,12 @@
     <Compile Include="Model\DeviceDefinitionType.cs" />
     <Compile Include="Model\DeviceInfo.cs" />
     <Compile Include="Model\DeviceTheme.cs" />
+    <Compile Include="Model\GdbInfo.cs" />
     <Compile Include="Model\NdkDefinition.cs" />
     <Compile Include="Model\DeviceFamilyType.cs" />
     <Compile Include="Model\NdkInfo.cs" />
     <Compile Include="Model\PermissionInfo.cs" />
+    <Compile Include="Model\RuntimeDefinition.cs" />
     <Compile Include="Model\RuntimeInfo.cs" />
     <Compile Include="Model\SimulatorInfo.cs" />
     <Compile Include="Model\Size.cs" />
@@ -81,21 +105,27 @@
     <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
     <Compile Include="Tools\ApiLevelUpdateRunner.cs" />
     <Compile Include="Tools\ApplicationRemoveRunner.cs" />
+    <Compile Include="Tools\GdbHostRunner.cs" />
     <Compile Include="Tools\DebugTokenCreateRunner.cs" />
     <Compile Include="Tools\DebugTokenInfoRunner.cs" />
     <Compile Include="Tools\DebugTokenUploadRunner.cs" />
+    <Compile Include="Tools\DeviceConnectRunner.cs" />
     <Compile Include="Tools\DeviceInfoRunner.cs" />
     <Compile Include="Tools\EventDispatcher.cs" />
+    <Compile Include="Tools\GdbRunner.cs" />
     <Compile Include="Tools\IEventDispatcher.cs" />
     <Compile Include="Tools\KeyToolGenRunner.cs" />
     <Compile Include="Tools\KeyToolInfoRunner.cs" />
     <Compile Include="Tools\KeyToolRegisterRunner.cs" />
     <Compile Include="Tools\KeyToolRemoveRunner.cs" />
+    <Compile Include="Debugger\RequestsFactory.cs" />
     <Compile Include="Tools\ToolRunner.cs" />
     <Compile Include="Tools\ToolRunnerEventArgs.cs" />
     <Compile Include="Tools\ToolRunnerStartupEventArgs.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\Instructions.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

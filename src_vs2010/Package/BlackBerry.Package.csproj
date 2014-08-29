@@ -38,7 +38,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <RunRegRiched>true</RunRegRiched>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -49,10 +49,12 @@
     <WarningLevel>4</WarningLevel>
     <RunCodeAnalysis>true</RunCodeAnalysis>
     <RunRegRiched>true</RunRegRiched>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualStudio.Debugger.Interop.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
+    <Reference Include="Microsoft.VisualStudio.Debugger.InteropA, Version=9.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.VisualStudio.OLE.Interop" />
     <Reference Include="Microsoft.VisualStudio.Package.LanguageService.10.0, Version=10.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.VisualStudio.Shell.Interop" />
@@ -133,15 +135,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </COMReference>
-    <COMReference Include="stdole">
-      <Guid>{00020430-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>2</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </COMReference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\src_vs2012\Package\BlackBerryPackage.cs">
@@ -166,11 +159,11 @@
     <Compile Include="..\..\src_vs2012\Package\Editors\EditorFactoryNotifyForProject.cs">
       <Link>Editors\EditorFactoryNotifyForProject.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Editors\XmlEditorDesignerViewRegistration.cs">
-      <Link>Editors\XmlEditorDesignerViewRegistration.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2012\Package\GuidList.cs">
       <Link>GuidList.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\AttributeHelper.cs">
+      <Link>Helpers\AttributeHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\CertHelper.cs">
       <Link>Helpers\CertHelper.cs</Link>
@@ -181,11 +174,11 @@
     <Compile Include="..\..\src_vs2012\Package\Helpers\DialogHelper.cs">
       <Link>Helpers\DialogHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\DteHelper.cs">
+      <Link>Helpers\DteHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Helpers\NameValueCollectionHelper.cs">
-      <Link>Helpers\NameValueCollectionHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
       <Link>Model\bar-descriptor.cs</Link>
@@ -375,6 +368,12 @@
     <Compile Include="..\..\src_vs2012\Package\PackageCommands.cs">
       <Link>PackageCommands.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Registration\DebugEngineRegistrationAttribute.cs">
+      <Link>Registration\DebugEngineRegistrationAttribute.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Registration\XmlEditorDesignerViewRegistrationAttribute.cs">
+      <Link>Registration\XmlEditorDesignerViewRegistrationAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\StandardCommands.cs">
       <Link>StandardCommands.cs</Link>
     </Compile>
@@ -393,7 +392,6 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
     </Compile>
-    <Compile Include="ControlDebugEngine.cs" />
     <Compile Include="Import\Model\ImportModel.cs" />
     <Compile Include="Import\Import.xaml.cs">
       <DependentUpon>Import.xaml</DependentUpon>
@@ -554,17 +552,6 @@
     <Resource Include="Resources\Images_24bit.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="RichEditObjectModel">
-      <Guid>{8CC497C9-A1DF-11CE-8098-00AA0047BE5D}</Guid>
-      <VersionMajor>1</VersionMajor>
-      <VersionMinor>0</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>tlbimp</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Resources\File.ico" />
     <Content Include="Resources\Package.ico" />
   </ItemGroup>
@@ -602,10 +589,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
-      <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
-      <Name>GDBParser</Name>
-      <Private>False</Private>
+    <ProjectReference Include="..\DebugEngine\BlackBerry.DebugEngine.csproj">
+      <Project>{59A7B188-E307-4495-A3AF-4ED76B086A87}</Project>
+      <Name>BlackBerry.DebugEngine</Name>
     </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</Project>

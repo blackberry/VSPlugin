@@ -19,6 +19,9 @@ namespace BlackBerry.NativeCore.Model
 
         #region Properties
 
+        /// <summary>
+        /// Gets the local path, where the runtime libraries are installed.
+        /// </summary>
         public string Folder
         {
             get;
@@ -31,6 +34,34 @@ namespace BlackBerry.NativeCore.Model
         }
 
         #endregion
+
+        /// <summary>
+        /// Gets an indication, if current runtime points to the same location.
+        /// </summary>
+        public bool Matches(string folder)
+        {
+            return string.CompareOrdinal(folder, Folder) == 0;
+        }
+
+        /// <summary>
+        /// Gets an indication, if current runtime points to the same location.
+        /// </summary>
+        public bool Matches(RuntimeInfo info)
+        {
+            if (info == null)
+                return false;
+
+            return string.CompareOrdinal(info.Folder, Folder) == 0
+                && info.Version == Version;
+        }
+
+        /// <summary>
+        /// Creates the shimmed definition instance.
+        /// </summary>
+        public RuntimeDefinition ToDefinition()
+        {
+            return new RuntimeDefinition(Folder);
+        }
 
         /// <summary>
         /// Loads descriptions of installed runtimes from specified folders.
@@ -59,7 +90,7 @@ namespace BlackBerry.NativeCore.Model
 
                                 if (version != null)
                                 {
-                                    var runtimeInfo = new RuntimeInfo(runtimeDirectory, string.Concat("BlackBerry Runtime Libraries ", version.Major, ".", version.Minor), version);
+                                    var runtimeInfo = new RuntimeInfo(runtimeDirectory, string.Concat("Runtime Libraries for ", version), version);
 
                                     result.Add(runtimeInfo);
                                 }

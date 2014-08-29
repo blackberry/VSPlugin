@@ -21,28 +21,26 @@ using System.Runtime.InteropServices;
 
 namespace BlackBerry.DebugEngine
 {
-
     /// <summary>
     /// This class represents the information that describes a bound breakpoint. (http://msdn.microsoft.com/en-us/library/bb145894.aspx)
     /// </summary>
     public class AD7BreakpointResolution : IDebugBreakpointResolution2
     {
         /// <summary>
-        ///  AD7 Engine. 
+        ///  AD7 Engine.
         /// </summary>
-        private AD7Engine m_engine;
+        private readonly AD7Engine _engine;
 
         /// <summary>
         /// GDB Address
         /// </summary>
-        private uint m_address;
+        private readonly uint _address;
 
         /// <summary>
-        /// The document context to the debugger. A document context represents a location within a source file. 
+        /// The document context to the debugger. A document context represents a location within a source file.
         /// </summary>
-        private AD7DocumentContext m_documentContext;
+        private readonly AD7DocumentContext _documentContext;
 
-        
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -52,14 +50,16 @@ namespace BlackBerry.DebugEngine
         /// source file. </param>
         public AD7BreakpointResolution(AD7Engine engine, uint address, AD7DocumentContext documentContext)
         {
-            m_engine = engine;
-            m_address = address;
-            m_documentContext = documentContext;
+            if (engine == null)
+                throw new ArgumentNullException("engine");
+
+            _engine = engine;
+            _address = address;
+            _documentContext = documentContext;
         }
 
         #region IDebugBreakpointResolution2 Members
 
-        
         /// <summary>
         /// Gets the type of the breakpoint represented by this resolution. (http://msdn.microsoft.com/en-us/library/bb145576.aspx)
         /// </summary>
@@ -72,7 +72,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets the breakpoint resolution information that describes this breakpoint. 
         /// (http://msdn.microsoft.com/en-us/library/bb146743.aspx)
@@ -82,7 +81,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugBreakpointResolution2.GetResolutionInfo(enum_BPRESI_FIELDS dwFields, BP_RESOLUTION_INFO[] pBPResolutionInfo)
         {
-	        if ((dwFields & enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION) != 0) 
+            if ((dwFields & enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION) != 0) 
             {
                 // The sample engine only supports code breakpoints.
                 BP_RESOLUTION_LOCATION location = new BP_RESOLUTION_LOCATION();
@@ -90,64 +89,23 @@ namespace BlackBerry.DebugEngine
 
                 // The debugger will not QI the IDebugCodeContex2 interface returned here. We must pass the pointer
                 // to IDebugCodeContex2 and not IUnknown.
-                AD7MemoryAddress codeContext = new AD7MemoryAddress(m_engine, m_address);
-                codeContext.SetDocumentContext(m_documentContext);
+                AD7MemoryAddress codeContext = new AD7MemoryAddress(_engine, _address);
+                codeContext.SetDocumentContext(_documentContext);
                 location.unionmember1 = Marshal.GetComInterfaceForObject(codeContext, typeof(IDebugCodeContext2));
                 pBPResolutionInfo[0].bpResLocation = location;
                 pBPResolutionInfo[0].dwFields |= enum_BPRESI_FIELDS.BPRESI_BPRESLOCATION;
 
             }
-	        
+
             if ((dwFields & enum_BPRESI_FIELDS.BPRESI_PROGRAM) != 0) 
             {
-                pBPResolutionInfo[0].pProgram = (IDebugProgram2)m_engine;
+                pBPResolutionInfo[0].pProgram = _engine;
                 pBPResolutionInfo[0].dwFields |= enum_BPRESI_FIELDS.BPRESI_PROGRAM;
             }
-	       
+
             return VSConstants.S_OK;
         }
 
         #endregion
     }
-
-    /// <summary>
-    /// Represents the resolution of a breakpoint error. (http://msdn.microsoft.com/en-us/library/bb161341.aspx)
-    /// </summary>
-    class AD7ErrorBreakpointResolution : IDebugErrorBreakpointResolution2
-    {
-        #region IDebugErrorBreakpointResolution2 Members
-
-        
-        /// <summary>
-        /// Gets the breakpoint type. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145065.aspx)
-        /// </summary>
-        /// <param name="pBPType"> The type of this breakpoint. </param>
-        /// <returns> Not implemented. </returns>
-        int IDebugErrorBreakpointResolution2.GetBreakpointType(enum_BP_TYPE[] pBPType)
-        {
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-
-        /// <summary>
-        /// Gets the breakpoint error resolution information. Not implemented. (http://msdn.microsoft.com/en-us/library/bb161960.aspx)
-        /// </summary>
-        /// <param name="dwFields"> A combination of flags that determine which fields of pErrorResolutionInfo are to be filled out. </param>
-        /// <param name="pErrorResolutionInfo"> The BP_ERROR_RESOLUTION_INFO structure that is filled in with the description of the 
-        /// breakpoint resolution. </param>
-        /// <returns> Not implemented. </returns>
-        int IDebugErrorBreakpointResolution2.GetResolutionInfo(enum_BPERESI_FIELDS dwFields, BP_ERROR_RESOLUTION_INFO[] pErrorResolutionInfo)
-        {
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_BPRESLOCATION) != 0) { }
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_PROGRAM) != 0) { }
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_THREAD) != 0) { }
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_MESSAGE) != 0) { }
-            if (((uint)dwFields & (uint)enum_BPERESI_FIELDS.BPERESI_TYPE) != 0) { }
-
-            throw new Exception("The method or operation is not implemented.");
-        }
-
-        #endregion
-    }
-
 }

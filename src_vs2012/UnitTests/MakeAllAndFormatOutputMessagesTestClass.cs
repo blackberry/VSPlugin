@@ -26,6 +26,5 @@ namespace UnitTests
             MakeAllAndFormatOutputMessages target = new MakeAllAndFormatOutputMessages();
             Assert.IsNotNull(target);
         }
-
     }
 }

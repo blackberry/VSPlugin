@@ -44,6 +44,15 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src_vs2012\NativeCore\Components\TargetConnectionEventArgs.cs">
+      <Link>Components\TargetConnectionEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Components\Targets.cs">
+      <Link>Components\Targets.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Components\TargetStatus.cs">
+      <Link>Components\TargetStatus.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Components\TokenProcessor.cs">
       <Link>Components\TokenProcessor.cs</Link>
     </Compile>
@@ -56,6 +65,63 @@
     <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
       <Link>ConfigDefaults.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\GdbProcessor.cs">
+      <Link>Debugger\GdbProcessor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\GdbWrapper.cs">
+      <Link>Debugger\GdbWrapper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\IGdbSender.cs">
+      <Link>Debugger\IGdbSender.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Instruction.cs">
+      <Link>Debugger\Instruction.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\InstructionCollection.cs">
+      <Link>Debugger\InstructionCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Model\BreakpointInfo.cs">
+      <Link>Debugger\Model\BreakpointInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Model\IResult.cs">
+      <Link>Debugger\Model\IResult.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Model\ProcessInfo.cs">
+      <Link>Debugger\Model\ProcessInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Request.cs">
+      <Link>Debugger\Request.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\RequestGroup.cs">
+      <Link>Debugger\RequestGroup.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\RequestsFactory.cs">
+      <Link>Debugger\RequestsFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Requests\BreakRequest.cs">
+      <Link>Debugger\Requests\BreakRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Requests\CliRequest.cs">
+      <Link>Debugger\Requests\CliRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Requests\MiRequest.cs">
+      <Link>Debugger\Requests\MiRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Requests\ProcessListRequest.cs">
+      <Link>Debugger\Requests\ProcessListRequest.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\Response.cs">
+      <Link>Debugger\Response.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\ResponseParsedEventArgs.cs">
+      <Link>Debugger\ResponseParsedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\ResponseReceivedEventArgs.cs">
+      <Link>Debugger\ResponseReceivedEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Debugger\ResponseType.cs">
+      <Link>Debugger\ResponseType.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\BlackBerryTraceListener.cs">
       <Link>Diagnostics\BlackBerryTraceListener.cs</Link>
     </Compile>
@@ -65,11 +131,14 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Diagnostics\TraceLog.cs">
       <Link>Diagnostics\TraceLog.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\DeviceFamilyHelper.cs">
-      <Link>Helpers\DeviceFamilyHelper.cs</Link>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\DeviceHelper.cs">
+      <Link>Helpers\DeviceHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Helpers\GlobalHelper.cs">
       <Link>Helpers\GlobalHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Helpers\NameValueCollectionHelper.cs">
+      <Link>Helpers\NameValueCollectionHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiInfo.cs">
       <Link>Model\ApiInfo.cs</Link>
@@ -119,6 +188,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Model\DeviceTheme.cs">
       <Link>Model\DeviceTheme.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\GdbInfo.cs">
+      <Link>Model\GdbInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\NdkDefinition.cs">
       <Link>Model\NdkDefinition.cs</Link>
     </Compile>
@@ -127,6 +199,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\PermissionInfo.cs">
       <Link>Model\PermissionInfo.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\RuntimeDefinition.cs">
+      <Link>Model\RuntimeDefinition.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\RuntimeInfo.cs">
       <Link>Model\RuntimeInfo.cs</Link>
@@ -164,11 +239,20 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\DebugTokenUploadRunner.cs">
       <Link>Tools\DebugTokenUploadRunner.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\DeviceConnectRunner.cs">
+      <Link>Tools\DeviceConnectRunner.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\DeviceInfoRunner.cs">
       <Link>Tools\DeviceInfoRunner.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\EventDispatcher.cs">
       <Link>Tools\EventDispatcher.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\GdbHostRunner.cs">
+      <Link>Tools\GdbHostRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\GdbRunner.cs">
+      <Link>Tools\GdbRunner.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\IEventDispatcher.cs">
       <Link>Tools\IEventDispatcher.cs</Link>
@@ -194,6 +278,11 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\ToolRunnerStartupEventArgs.cs">
       <Link>Tools\ToolRunnerStartupEventArgs.cs</Link>
     </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\src_vs2012\NativeCore\Resources\Instructions.txt">
+      <Link>Resources\Instructions.txt</Link>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -14,20 +14,19 @@
 
 using System;
 using System.Runtime.InteropServices;
-using BlackBerry.NativeCore;
-using BlackBerry.Package;
-using BlackBerry.Package.Helpers;
+using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Debugger.Model;
+using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Helpers;
+using BlackBerry.NativeCore.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
-using VSNDK.Parser;
-using NameValueCollection = System.Collections.Specialized.NameValueCollection;
 using System.Windows.Forms;
 
 namespace BlackBerry.DebugEngine
 {
-    
     /// <summary>
     /// AD7Engine is the primary entrypoint object for the sample engine. 
     /// 
@@ -53,136 +52,132 @@ namespace BlackBerry.DebugEngine
     /// Program "Is a container for both a set of threads and a set of modules.".
     /// </summary>
     [ComVisible(true)]
-    [Guid("904AA6E0-942C-4D11-9094-7BAAEB3EE4B9")]
-    public class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2, IDebugSymbolSettings100
+    [Guid(ClassGuid)]
+    public sealed class AD7Engine : IDebugEngine2, IDebugEngineLaunch2, IDebugProgram3, IDebugEngineProgram2, IDebugSymbolSettings100
     {
+        public const string ClassGuid = "904AA6E0-942C-4D11-9094-7BAAEB3EE4B9";
+        public const string ClassName = "BlackBerry.DebugEngine.AD7Engine";
+
+        /// <summary>
+        /// This is the engine GUID of the VSNDK debug engine. It needs to be changed here and in the registration when creating a new engine.
+        /// </summary>
+        public const string DebugEngineGuid = "{E5A37609-2F43-4830-AA85-D94CFA035DD2}";
 
         /// <summary>
         /// Used to send events to the debugger. Some examples of these events are thread create, exception thrown, module load.
         /// </summary>
-        EngineCallback m_engineCallback;
-        internal EngineCallback Callback
+        public EngineCallback Callback
         {
-            get { return m_engineCallback; }
+            get;
+            private set;
         }
-
 
         /// <summary>
         /// This object manages breakpoints in the sample engine.
         /// </summary>
-        protected BreakpointManager m_breakpointManager = null;
-        public BreakpointManager BPMgr
+        public BreakpointManager BreakpointManager
         {
-            get { return m_breakpointManager; }
+            get;
+            private set;
         }
-
 
         /// <summary>
         /// This object manages debug events in the engine.
         /// </summary>
-        protected EventDispatcher m_eventDispatcher = null;
-        public EventDispatcher eDispatcher
+        public EventDispatcher EventDispatcher
         {
-            get { return m_eventDispatcher; }
+            get;
+            private set;
         }
-
 
         /// <summary>
         /// A unique identifier for the program being debugged.
         /// </summary>
-        private Guid _mProgramGuid;
+        private Guid _programGuid;
 
         /// <summary>
         /// A module loaded in the debuggee process to the debugger. It is always null because the AD7Module class is 
         /// not implemented yet.
         /// </summary>
-        internal AD7Module m_module = null;
+        internal AD7Module _module;
 
         /// <summary>
         /// A process running on a port. A process "Is a container for a set of programs".
         /// </summary>
-        public AD7Process m_process = null;
+        private AD7Process _process;
 
         /// <summary>
         /// A program that can be debugged.
         /// </summary>
-        public AD7ProgramNode m_progNode = null;
+        private AD7ProgramNode _progNode;
 
         /// <summary>
         /// A program that is running in a process.
         /// </summary>
-        internal IDebugProgram2 m_program = null;
+        internal IDebugProgram2 _program;
 
         /// <summary>
         /// TRUE whenever a thread is created/ended, so the debug engine can update the m_threads data structure.
         /// </summary>
-        public bool _updateThreads = false;
+        public bool _updateThreads;
 
         /// <summary>
         /// Array of threads of the program that is being debugged.
         /// </summary>
-        private AD7Thread[] _threads;
-        public AD7Thread[] thread
+        public AD7Thread[] Threads
         {
-            get { return _threads; }
+            get;
+            private set;
         }
 
         /// <summary>
         /// The position in the m_threads array that corresponds to the current thread.
         /// </summary>
         public int _currentThreadIndex = -1;
-
         
         /// <summary>
         /// Allows IDE to show current position in a source file
         /// </summary>
-        public AD7DocumentContext m_docContext = null;
-
+        public AD7DocumentContext _docContext;
 
         /// <summary>
         /// Used to avoid race condition when there are conditional breakpoints and the user hit break all. Both events will pause 
         /// the Debug Engine, but the one related to conditional breakpoint can resume execution. If both events happens at the same 
         /// time, the Debug Engine could resume the execution instead of pausing it.
         /// </summary>
-        public ManualResetEvent m_running = new ManualResetEvent(true); 
-
+        public ManualResetEvent _running = new ManualResetEvent(true); 
 
         /// <summary>
         /// Used to avoid race condition when there are conditional breakpoints and a breakpoint is hit. This situation is similar to the above one.
         /// </summary>
-        public ManualResetEvent m_updatingConditionalBreakpoint = new ManualResetEvent(true); 
-
-
-        /// <summary>
-        /// This is the engine GUID of the VSNDK debug engine. It needs to be changed here and in the registration when creating a 
-        /// new engine.
-        /// </summary>
-        public const string Id = "{E5A37609-2F43-4830-AA85-D94CFA035DD2}";
-
+        public ManualResetEvent _updatingConditionalBreakpoint = new ManualResetEvent(true); 
 
         /// <summary>
         /// Keeps track of debug engine states
         /// </summary>
-        public enum DE_STATE
+        public enum DebugEngineState
         {                
-            DESIGN_MODE = 0,
-            RUN_MODE,
-            BREAK_MODE,
-            STEP_MODE,
-            DONE
+            Design = 0,
+            Run,
+            Break,
+            Step,
+            Done
         }
-        public DE_STATE m_state = 0;
 
-        
+        public DebugEngineState State
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Constructor.
         /// </summary>
         public AD7Engine()
         {
-            m_breakpointManager = new BreakpointManager(this);            
-            m_state = DE_STATE.DESIGN_MODE;
+            BreakpointManager = new BreakpointManager(this);
+            State = DebugEngineState.Design;
         }
-
 
         /// <summary>
         /// Destructor.
@@ -190,11 +185,19 @@ namespace BlackBerry.DebugEngine
         ~AD7Engine()
         {
             // Transition DE state
-            m_state = DE_STATE.DONE;
+            State = DebugEngineState.Done;
         }
 
-        #region IDebugEngine2 Members
+        #region Properties
 
+        public bool HasProcess
+        {
+            get { return _process != null; }
+        }
+
+        #endregion
+
+        #region IDebugEngine2 Members
 
         /// <summary>
         /// Attach the debug engine to a program. (http://msdn.microsoft.com/en-us/library/bb145136.aspx)
@@ -208,7 +211,6 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugEngine2.Attach(IDebugProgram2[] rgpPrograms, IDebugProgramNode2[] rgpProgramNodes, uint aCeltPrograms, IDebugEventCallback2 ad7Callback, enum_ATTACH_REASON dwReason)
         {
-
             if (aCeltPrograms != 1)
             {
                 Debug.Fail("VSNDK Debugger only supports one debug target at a time.");
@@ -217,23 +219,22 @@ namespace BlackBerry.DebugEngine
 
             try
             {
-                EngineUtils.RequireOk(rgpPrograms[0].GetProgramId(out _mProgramGuid));
+                EngineUtils.RequireOK(rgpPrograms[0].GetProgramId(out _programGuid));
 
-                m_program = rgpPrograms[0];
+                _program = rgpPrograms[0];
 
                 // It is NULL when the user attached the debugger to a running process (by using Attach to Process UI). When that 
                 // happens, some objects must be instantiated, as well as GDB must be launched. Those ones are instantiated/launched
                 // by LaunchSuspended and ResumeProcess methods when debugging an open project.
-                if (m_engineCallback == null) 
+                if (Callback == null) 
                 {
-                    ControlDebugEngine.isDebugEngineRunning = true;
-                    m_engineCallback = new EngineCallback(this, ad7Callback);
+                    DebugEngineStatus.IsRunning = true;
+                    Callback = new EngineCallback(this, ad7Callback);
 
-                    AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)m_program;
-                    m_process = pnt.m_process;
-                    AD7Port port = pnt.m_process._portAttach;
-                    string publicKeyPath = ConfigDefaults.SshPublicKeyPath;
-                    string progName = pnt.m_programName.Substring(pnt.m_programName.LastIndexOf('/') + 1);
+                    AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)_program;
+                    _process = pnt.Process;
+                    AD7Port port = pnt.Process.Port as AD7Port;
+                    string progName = _process.Details.Name;
 
                     string exePath;
                     string processesPaths;
@@ -250,7 +251,7 @@ namespace BlackBerry.DebugEngine
                         processesPaths = "";
                     }
 
-                    string searchProgName = progName + "_" + port.m_isSimulator;
+                    string searchProgName = progName + "_" + (port.Device.Type == DeviceDefinitionType.Simulator);
                     int begin = processesPaths.IndexOf(searchProgName + ":>");
 
                     if (begin != -1)
@@ -265,29 +266,29 @@ namespace BlackBerry.DebugEngine
                         exePath = "CannotAttachToRunningProcess";
                     }
 
-                    exePath = exePath.Replace("\\", "\\\\\\\\");
+                    var runtime = RuntimeDefinition.Load(); // load from registry
 
-                    if (GDBParser.LaunchProcess(pnt.m_programID, exePath, port.m_IP, port.m_isSimulator, port.m_toolsPath, publicKeyPath, port.m_password))
+                    uint aux;
+                    if (GdbWrapper.AttachToProcess(pnt.Process.ID.ToString(), exePath, port.NDK, port.Device, runtime, out aux))
                     {
                         if (exePath == "CannotAttachToRunningProcess")
                         {
                             MessageBox.Show(progName + " is attached to the debugger. However, to be able to debug your application, you must build and deploy it from this computer first.", "No executable file with symbols found.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
-                        m_eventDispatcher = new EventDispatcher(this);
-                        m_module = new AD7Module();
-                        m_progNode = new AD7ProgramNode(m_process._processGUID, m_process._processID, exePath, new Guid(Id));
+                        EventDispatcher = new EventDispatcher(this);
+                        _module = new AD7Module();
+                        _progNode = new AD7ProgramNode(_process);
                         AddThreadsToProgram();
                     }
                     else
                     {
-                        GDBParser.exitGDB();
-                        ControlDebugEngine.isDebugEngineRunning = false;
+                        DebugEngineStatus.IsRunning = false;
                         return VSConstants.E_FAIL;
                     }
                 }
                 AD7EngineCreateEvent.Send(this);
                 AD7ProgramCreateEvent.Send(this);
-                AD7ModuleLoadEvent.Send(this, m_module, true);
+                AD7ModuleLoadEvent.Send(this, _module, true);
                 AD7LoadCompleteEvent.Send(this, CurrentThread());
 
                 // If the reason for attaching is ATTACH_REASON_LAUNCH, the DE needs to send the IDebugEntryPointEvent2 event.
@@ -297,7 +298,7 @@ namespace BlackBerry.DebugEngine
                     AD7EntryPointEvent ad7Event = new AD7EntryPointEvent();
                     Guid riidEvent = new Guid(AD7EntryPointEvent.IID);
                     uint attributes = (uint)enum_EVENTATTRIBUTES.EVENT_STOPPING | (uint)enum_EVENTATTRIBUTES.EVENT_SYNCHRONOUS;
-                    int rc = ad7Callback.Event(this, null, m_program, CurrentThread(), ad7Event, ref riidEvent, attributes);
+                    int rc = ad7Callback.Event(this, null, _program, CurrentThread(), ad7Event, ref riidEvent, attributes);
                     Debug.Assert(rc == VSConstants.S_OK);
                 }
             }
@@ -308,7 +309,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Requests that all programs being debugged by this DE stop execution the next time one of their threads attempts to run.
         /// This is normally called in response to the user clicking on the pause button in the debugger. When the break is complete, 
@@ -318,30 +318,29 @@ namespace BlackBerry.DebugEngine
         int IDebugEngine2.CauseBreak()
         {
             // If not already broken, send the interrupt
-            if (m_state != DE_STATE.DESIGN_MODE && m_state != DE_STATE.BREAK_MODE && m_state != DE_STATE.STEP_MODE)
+            if (State != DebugEngineState.Design && State != DebugEngineState.Break && State != DebugEngineState.Step)
             {
-                if (EventDispatcher.m_GDBRunMode)
+                if (EventDispatcher._GDBRunMode)
                 {
                     HandleProcessExecution.m_mre.Reset();
-                    m_running.WaitOne();
+                    _running.WaitOne();
 
                     // Sends the GDB command that interrupts the background execution of the target.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                    GDBParser.addGDBCommand(@"-exec-interrupt");
+                    GdbWrapper.PostCommand(@"-exec-interrupt");
 
                     // Ensure the process is interrupted before returning
                     HandleProcessExecution.m_mre.WaitOne(1000);
 
-                    m_running.Set();
+                    _running.Set();
 
-                    if (ControlDebugEngine.isDebugEngineRunning)
+                    if (DebugEngineStatus.IsRunning)
                         HandleProcessExecution.m_mre.Reset();
                 }
             }
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Called by the SDM to indicate that a synchronous debug event, previously sent by the DE to the SDM,
@@ -356,40 +355,39 @@ namespace BlackBerry.DebugEngine
             {
                 if (eventObject is AD7ProgramDestroyEvent)
                 {
-                    resetStackFrames();
-                    m_process.Detach();
-                    m_process = null;
+                    ResetStackFrames();
+                    _process.Detach();
+                    _process = null;
 
-                    m_program.Detach();
-                    m_program = null;
+                    _program.Detach();
+                    _program = null;
 
-                    m_engineCallback = null;
-                    m_breakpointManager = null;
-                    m_docContext = null;
-                    m_eventDispatcher = null;
-                    m_module = null;
-                    m_progNode = null;
-                    _mProgramGuid = Guid.Empty;
+                    Callback = null;
+                    BreakpointManager = null;
+                    _docContext = null;
+                    EventDispatcher.Dispose();
+                    EventDispatcher = null;
+                    _module = null;
+                    _progNode = null;
+                    _programGuid = Guid.Empty;
 
-                    _threads = null;
-                    GC.Collect();
+                    Threads = null;
                 }
                 else
                 {
                     Debug.Fail("Unknown synchronous event");
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                return EngineUtils.UnexpectedException(e);
+                return EngineUtils.UnexpectedException(ex);
             }
             
-            if (m_eventDispatcher != null)
-                m_eventDispatcher.continueExecution();
+            if (EventDispatcher != null)
+                EventDispatcher.ContinueExecution();
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Creates a pending breakpoint in the Debug Engine. A pending breakpoint is essentially a collection of all the information 
@@ -400,12 +398,12 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugEngine2.CreatePendingBreakpoint(IDebugBreakpointRequest2 pBPRequest, out IDebugPendingBreakpoint2 ppPendingBP)
         {
-            Debug.Assert(m_breakpointManager != null);
+            Debug.Assert(BreakpointManager != null);
             ppPendingBP = null;
 
             try
             {
-                m_breakpointManager.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
+                BreakpointManager.CreatePendingBreakpoint(pBPRequest, out ppPendingBP);
             }
             catch (Exception e)
             {
@@ -414,7 +412,6 @@ namespace BlackBerry.DebugEngine
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Informs a DE that the program specified has been atypically terminated and that the DE should clean up all references 
@@ -431,7 +428,6 @@ namespace BlackBerry.DebugEngine
             return (AD7_HRESULT.E_PROGRAM_DESTROY_PENDING);
         }
 
-
         /// <summary>
         /// Gets the GUID of the DE. (http://msdn.microsoft.com/en-us/library/bb145079.aspx)
         /// </summary>
@@ -439,10 +435,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugEngine2.GetEngineId(out Guid guidEngine)
         {
-            guidEngine = new Guid(Id);
+            guidEngine = new Guid(DebugEngineGuid);
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Removes the list of exceptions the IDE has set for a particular run-time architecture or language. The VSNDK debug engine 
@@ -457,7 +452,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Removes the specified exception so it is no longer handled by the debug engine. The VSNDK debug engine does not support 
         /// exceptions in the debuggee so this method is not actually implemented. (http://msdn.microsoft.com/en-us/library/bb161697.aspx)
@@ -471,7 +465,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Specifies how the DE should handle a given exception. The VSNDK debug engine does not support exceptions in the debuggee 
         /// so this method is not actually implemented. (http://msdn.microsoft.com/en-us/library/bb162170.aspx)
@@ -482,7 +475,6 @@ namespace BlackBerry.DebugEngine
         {           
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Sets the locale of the DE. This method is called by the session debug manager (SDM) to propagate the locale settings 
@@ -495,7 +487,6 @@ namespace BlackBerry.DebugEngine
         {
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// A metric is a registry value used to change a debug engine's behavior or to advertise supported functionality. 
@@ -510,7 +501,6 @@ namespace BlackBerry.DebugEngine
             // The VSNDK debug engine does not need to understand any metric settings.
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Sets the registry root currently in use by the DE. Different installations of Visual Studio can change where their 
@@ -529,17 +519,15 @@ namespace BlackBerry.DebugEngine
 
         #region IDebugEngineLaunch2 Members
 
-
         /// <summary>
         /// Determines if a process can be terminated. (http://msdn.microsoft.com/en-us/library/bb146673.aspx)
         /// </summary>
         /// <param name="process"> An IDebugProcess2 object that represents the process to be terminated. </param>
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugEngineLaunch2.CanTerminateProcess(IDebugProcess2 process)
-        {                        
+        {
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Launches a process by means of the debug engine. (http://msdn.microsoft.com/en-us/library/bb146223.aspx)
@@ -561,40 +549,44 @@ namespace BlackBerry.DebugEngine
         /// <param name="process"> Returns the resulting IDebugProcess2 object that represents the launched process. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
         int IDebugEngineLaunch2.LaunchSuspended(string pszServer, IDebugPort2 port, string exe, string args, string dir, string env, string options, enum_LAUNCH_FLAGS launchFlags, uint hStdInput, uint hStdOutput, uint hStdError, IDebugEventCallback2 ad7Callback, out IDebugProcess2 process)
-        {            
-            Debug.Assert(_mProgramGuid == Guid.Empty);
+        {
+            Debug.Assert(_programGuid == Guid.Empty);
 
             process = null;
 
             try
             {
-                ControlDebugEngine.isDebugEngineRunning = true;
-                m_engineCallback = new EngineCallback(this, ad7Callback);
+                DebugEngineStatus.IsRunning = true;
+                Callback = new EngineCallback(this, ad7Callback);
 
                 // Read arguments back from the args string
-                var nvc = new NameValueCollection();
-                NameValueCollectionHelper.LoadFromString(nvc, args);
+                var nvc = CollectionHelper.Deserialize(args);
 
-                string pid = nvc.GetValues("pid")[0];
-                string exePath = exe;
-                string targetIP = nvc.GetValues("targetIP")[0];
-                bool isSimulator = Convert.ToBoolean(nvc.GetValues("isSimulator")[0]);
-                string toolsPath = nvc.GetValues("ToolsPath")[0];
-                string publicKeyPath = nvc.GetValues("PublicKeyPath")[0];
+                uint pidNumber;
+                string pidOrName = nvc["pidOrName"];
 
-                string password = null;
-                string[] passwordArray = nvc.GetValues("Password");
-                if (passwordArray != null)
-                    password = passwordArray[0];
-
-                if (GDBParser.LaunchProcess(pid, exePath, targetIP, isSimulator, toolsPath, publicKeyPath, password))
+                var target = CollectionHelper.GetDevice(nvc);
+                var ndk = CollectionHelper.GetNDK(nvc);
+                var runtime = CollectionHelper.GetRuntime(nvc);
+                if (target == null)
                 {
-                    process = m_process = new AD7Process(this, port);
-                    m_eventDispatcher = new EventDispatcher(this);
-                    _mProgramGuid = m_process._processGUID;
-                    m_module = new AD7Module();
-//                    m_progNode = new AD7ProgramNode(m_process.PhysID, pid, exePath, new Guid(AD7Engine.Id));
-                    m_progNode = new AD7ProgramNode(m_process._processGUID, pid, exePath, new Guid(Id));
+                    TraceLog.WriteLine("LaunchSuspended: Missing info about target device");
+                    return VSConstants.E_FAIL;
+                }
+                if (ndk == null)
+                {
+                    TraceLog.WriteLine("LaunchSuspended: Missing info about NDK");
+                    return VSConstants.E_FAIL;
+                }
+
+                var result = GdbWrapper.AttachToProcess(pidOrName, exe, ndk, target, runtime, out pidNumber);
+                if (result)
+                {
+                    process = _process = new AD7Process(port, new ProcessInfo(pidNumber, exe), target);
+                    EventDispatcher = new EventDispatcher(this);
+                    _programGuid = _process.UID;
+                    _module = new AD7Module();
+                    _progNode = new AD7ProgramNode(_process);
                     AddThreadsToProgram();
 
                     AD7EngineCreateEvent.Send(this);
@@ -603,17 +595,16 @@ namespace BlackBerry.DebugEngine
                 }
                 else
                 {
-                    GDBParser.exitGDB();
-                    ControlDebugEngine.isDebugEngineRunning = false;
+                    DebugEngineStatus.IsRunning = false;
                     return VSConstants.E_FAIL;
                 }
             }
             catch (Exception e)
             {
-                return EngineUtils.UnexpectedException(e);
+                EngineUtils.UnexpectedException(e);
+                return VSConstants.E_FAIL;
             }
         }
-
 
         /// <summary>
         /// Resume a process launched by IDebugEngineLaunch2.LaunchSuspended. (http://msdn.microsoft.com/en-us/library/bb146261.aspx)
@@ -622,7 +613,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> An IDebugProcess2 object that represents the process to be resumed. </returns>
         int IDebugEngineLaunch2.ResumeProcess(IDebugProcess2 process)
         {
-            Debug.Assert(m_engineCallback != null);
+            Debug.Assert(Callback != null);
 
             try
             {
@@ -635,16 +626,16 @@ namespace BlackBerry.DebugEngine
                 // Send a program node to the SDM. This will cause the SDM to turn around and call IDebugEngine2.Attach
                 // which will complete the hookup with AD7
                 IDebugPort2 port;
-                EngineUtils.RequireOk(process.GetPort(out port));
+                EngineUtils.RequireOK(process.GetPort(out port));
                 
                 IDebugDefaultPort2 defaultPort = (IDebugDefaultPort2)port;
                 
                 IDebugPortNotify2 portNotify;
-                EngineUtils.RequireOk(defaultPort.GetPortNotify(out portNotify));
+                EngineUtils.RequireOK(defaultPort.GetPortNotify(out portNotify));
 
-                EngineUtils.RequireOk(portNotify.AddProgramNode(m_progNode));
+                EngineUtils.RequireOK(portNotify.AddProgramNode(_progNode));
 
-                Callback.OnModuleLoad(m_module);
+                Callback.OnModuleLoad(_module);
 
                 Callback.OnThreadStart(CurrentThread());
             }
@@ -665,10 +656,10 @@ namespace BlackBerry.DebugEngine
         int IDebugEngineLaunch2.TerminateProcess(IDebugProcess2 process)
         {
             CauseBreak();
-            if (eDispatcher != null)
+            if (EventDispatcher != null)
             {
-                eDispatcher.killProcess();
-                eDispatcher.endDebugSession(0);
+                EventDispatcher.KillProcess();
+                EventDispatcher.EndDebugSession(0);
             }
 
             return VSConstants.S_OK;
@@ -677,7 +668,6 @@ namespace BlackBerry.DebugEngine
         #endregion
 
         #region IDebugProgram2 Members
-
 
         /// <summary>
         /// Determines if a debug engine (DE) can detach from the program. (http://msdn.microsoft.com/en-us/library/bb161967.aspx)
@@ -688,7 +678,6 @@ namespace BlackBerry.DebugEngine
             // The VSNDK debug engine always supports detach
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Requests that the program stop execution the next time one of its threads attempts to run. The debugger calls CauseBreak 
@@ -701,7 +690,6 @@ namespace BlackBerry.DebugEngine
             return ((IDebugEngine2)this).CauseBreak();
         }
 
-
         /// <summary>
         /// Continues running this program from a stopped state. Any previous execution state (such as a step) is preserved, and 
         /// the program starts executing again. (http://msdn.microsoft.com/en-us/library/bb162148.aspx)
@@ -710,28 +698,26 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int Continue(IDebugThread2 pThread)
         {
-            m_eventDispatcher.continueExecution();
+            EventDispatcher.ContinueExecution();
 
-            return VSConstants.S_OK;            
+            return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Detaches a debug engine from the program. (http://msdn.microsoft.com/en-us/library/bb146228.aspx)
         /// </summary>
         /// <returns> VSConstants.S_OK. </returns>
         public int Detach()
-        {            
+        {
             CauseBreak();
-            if (m_breakpointManager != null)
-                m_breakpointManager.ClearBoundBreakpoints(); // TODO: Check if active bound BP list needs to be updated too?
-            
-            if (eDispatcher != null)
-                eDispatcher.endDebugSession(0);
-            
-            return VSConstants.S_OK;            
-        }
+            if (BreakpointManager != null)
+                BreakpointManager.ClearBoundBreakpoints(); // TODO: Check if active bound BP list needs to be updated too?
 
+            if (EventDispatcher != null)
+                EventDispatcher.EndDebugSession(0);
+
+            return VSConstants.S_OK;
+        }
 
         /// <summary>
         /// Retrieves a list of the code contexts for a given position in a source file. Not implemented. 
@@ -742,9 +728,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> Not implemented. </returns>
         public int EnumCodeContexts(IDebugDocumentPosition2 pDocPos, out IEnumDebugCodeContexts2 ppEnum)
         {
-            throw new Exception("The method or operation is not implemented.");
+            ppEnum = null;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Retrieves a list of the code paths for a given position in a source file. EnumCodePaths is used for the step-into specific 
@@ -764,9 +750,8 @@ namespace BlackBerry.DebugEngine
         {
             pathEnum = null;
             safetyContext = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Retrieves a list of the modules that this program has loaded and is executing. 
@@ -776,10 +761,9 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int EnumModules(out IEnumDebugModules2 ppEnum)
         {
-            ppEnum = new AD7ModuleEnum(new[] { m_module });
+            ppEnum = new AD7ModuleEnum(new[] { _module });
             return VSConstants.S_OK;            
         }
-
 
         /// <summary>
         /// Retrieves a list of the threads that are running in the program. (http://msdn.microsoft.com/en-us/library/bb145110.aspx)
@@ -791,7 +775,7 @@ namespace BlackBerry.DebugEngine
             AD7Thread[] listThreads = null;
             int currentThread = 0;
 
-            if (m_state != DE_STATE.RUN_MODE)
+            if (State != DebugEngineState.Run)
                 currentThread = GetListOfThreads(out listThreads);
 
             // the following code seems to be weird but I had to update each field of this.m_process._threads because, when using
@@ -804,21 +788,20 @@ namespace BlackBerry.DebugEngine
                 return currentThread == 0 ? VSConstants.S_OK : VSConstants.S_FALSE;
             }
 
-            if (listThreads.Length != _threads.Length)
+            if (listThreads.Length != Threads.Length)
             {
-                foreach (AD7Thread t in _threads)
+                foreach (AD7Thread t in Threads)
                 {
                     AD7ThreadDestroyEvent.Send(this, 0, t);
                 }
-                _threads = null;
-                _threads = new AD7Thread[listThreads.Length];
-                _threads = listThreads;
+                Threads = null;
+                Threads = listThreads;
                 _currentThreadIndex = currentThread;
-                foreach (AD7Thread t in _threads)
+                foreach (AD7Thread t in Threads)
                 {
-                    m_engineCallback.OnThreadStart(t);
+                    Callback.OnThreadStart(t);
                 }
-                ppEnum = new AD7ThreadEnum(_threads);
+                ppEnum = new AD7ThreadEnum(Threads);
             }
             else 
             {
@@ -829,50 +812,48 @@ namespace BlackBerry.DebugEngine
 
                 for (int i = 0; i < listThreads.Length; i++)
                 {
-                    if (_threads[i]._engine != listThreads[i]._engine)
+                    if (Threads[i]._engine != listThreads[i]._engine)
                     {
-                        _threads[i]._engine = listThreads[i]._engine;
+                        Threads[i]._engine = listThreads[i]._engine;
                     }
-                    if (_threads[i]._threadDisplayName != listThreads[i]._threadDisplayName)
+                    if (Threads[i]._threadDisplayName != listThreads[i]._threadDisplayName)
                     {
-                        _threads[i]._threadDisplayName = listThreads[i]._threadDisplayName;
+                        Threads[i]._threadDisplayName = listThreads[i]._threadDisplayName;
                     }
-                    if (_threads[i]._id != listThreads[i]._id)
+                    if (Threads[i]._id != listThreads[i]._id)
                     {
-                        _threads[i]._id = listThreads[i]._id;
+                        Threads[i]._id = listThreads[i]._id;
                     }
-                    if (_threads[i]._state != listThreads[i]._state)
+                    if (Threads[i]._state != listThreads[i]._state)
                     {
-                        _threads[i]._state = listThreads[i]._state;
+                        Threads[i]._state = listThreads[i]._state;
                     }
-                    if (_threads[i]._targetID != listThreads[i]._targetID)
+                    if (Threads[i]._targetID != listThreads[i]._targetID)
                     {
-                        _threads[i]._targetID = listThreads[i]._targetID;
+                        Threads[i]._targetID = listThreads[i]._targetID;
                     }
-                    if (_threads[i]._priority != listThreads[i]._priority)
+                    if (Threads[i]._priority != listThreads[i]._priority)
                     {
-                        _threads[i]._priority = listThreads[i]._priority;
+                        Threads[i]._priority = listThreads[i]._priority;
                     }
-                    if (_threads[i]._line != listThreads[i]._line)
+                    if (Threads[i]._line != listThreads[i]._line)
                     {
-                        _threads[i]._line = listThreads[i]._line;
+                        Threads[i]._line = listThreads[i]._line;
                     }
-                    if (_threads[i]._filename != listThreads[i]._filename)
+                    if (Threads[i]._filename != listThreads[i]._filename)
                     {
                         if (listThreads[i]._filename == "")
-                            _threads[i]._filename = "";
+                            Threads[i]._filename = "";
                         else
-                            _threads[i]._filename = listThreads[i]._filename;
+                            Threads[i]._filename = listThreads[i]._filename;
                     }
-                    _threads[i].__stackFrames = listThreads[i].__stackFrames;
-                    _threads[i]._suspendCount = listThreads[i]._suspendCount;
+                    Threads[i]._suspendCount = listThreads[i]._suspendCount;
                 } 
 
-                ppEnum = new AD7ThreadEnum(this._threads);
+                ppEnum = new AD7ThreadEnum(Threads);
             }
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the program's properties. The VSNDK debug engine does not support this. 
@@ -884,7 +865,6 @@ namespace BlackBerry.DebugEngine
         {
             throw new Exception("The method or operation is not implemented.");
         }
-
 
         /// <summary>
         /// Gets the disassembly stream for this program or a part of this program.
@@ -898,9 +878,8 @@ namespace BlackBerry.DebugEngine
         public int GetDisassemblyStream(enum_DISASSEMBLY_STREAM_SCOPE dwScope, IDebugCodeContext2 codeContext, out IDebugDisassemblyStream2 disassemblyStream)
         {
             disassemblyStream = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// This method gets the Edit and Continue (ENC) update for this program. A custom debug engine always returns E_NOTIMPL
@@ -911,9 +890,8 @@ namespace BlackBerry.DebugEngine
         {
             // The VSNDK debug engine does not participate in managed edit & continue.
             update = null;
-            return VSConstants.S_OK;            
+            return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the name and GUID of the debug engine running this program. (http://msdn.microsoft.com/en-us/library/bb145854.aspx)
@@ -923,12 +901,11 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetEngineInfo(out string engineName, out Guid engineGuid)
         {
-            engineName = "VSNDK Debug Engine";
-            engineGuid = new Guid(AD7Engine.Id);
+            engineName = AD7PortSupplier.PublicName;
+            engineGuid = new Guid(DebugEngineGuid);
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Retrieves the memory bytes occupied by the program. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145291.aspx)
@@ -940,7 +917,6 @@ namespace BlackBerry.DebugEngine
             throw new Exception("The method or operation is not implemented.");
         }
 
-
         /// <summary>
         /// Gets the name of the program. The name returned by this method is always a friendly, user-displayable name that describes 
         /// the program. (http://msdn.microsoft.com/en-us/library/bb161279.aspx)
@@ -949,13 +925,12 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetName(out string programName)
         {
-            if (this.m_progNode != null)
-                programName = this.m_progNode.m_programName;
+            if (_progNode != null)
+                programName = _progNode.Name;
             else
                 programName = null;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets a GUID for this program. A debug engine (DE) must return the program identifier originally passed to the 
@@ -966,80 +941,74 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int GetProgramId(out Guid guidProgramId)
         {
-            if (_mProgramGuid != null)
-                guidProgramId = _mProgramGuid;
-            else
-                guidProgramId = m_process._processGUID;
-
+            guidProgramId = _programGuid;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Performs a step. This method is deprecated. Use the IDebugProcess3::Step method instead. 
         /// (http://msdn.microsoft.com/en-us/library/bb162134.aspx)
         /// </summary>
-        /// <param name="pThread"> An IDebugThread2 object that represents the thread being stepped. </param>
-        /// <param name="sk"> A value from the STEPKIND enumeration that specifies the kind of step. </param>
-        /// <param name="Step"> A value from the STEPUNIT enumeration that specifies the unit of step. </param>
+        /// <param name="thread"> An IDebugThread2 object that represents the thread being stepped. </param>
+        /// <param name="kind"> A value from the STEPKIND enumeration that specifies the kind of step. </param>
+        /// <param name="step"> A value from the STEPUNIT enumeration that specifies the unit of step. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns an error code. </returns>
-        public int Step(IDebugThread2 pThread, enum_STEPKIND sk, enum_STEPUNIT Step)
+        public int Step(IDebugThread2 thread, enum_STEPKIND kind, enum_STEPUNIT step)
         {
             // Don't allow stepping through unknown code because it can lead to future problems with stepping and break-all.
-            if (EventDispatcher.m_unknownCode)
+            if (EventDispatcher._unknownCode)
             {
-                m_state = AD7Engine.DE_STATE.STEP_MODE;
-                m_eventDispatcher.continueExecution();                
+                State = AD7Engine.DebugEngineState.Step;
+                EventDispatcher.ContinueExecution();
 
                 return VSConstants.S_OK;
             }
 
-            if (sk == enum_STEPKIND.STEP_INTO)
+            if (kind == enum_STEPKIND.STEP_INTO)
             {
                 // Equivalent to F11 hotkey.
                 // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, diving 
                 // into function if it is a function call. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                GDBParser.addGDBCommand("-exec-step --thread " + this._threads[this._currentThreadIndex]._id);
+                GdbWrapper.PostCommand("-exec-step --thread " + Threads[_currentThreadIndex]._id);
             }
-            else if (sk == enum_STEPKIND.STEP_OVER)
+            else if (kind == enum_STEPKIND.STEP_OVER)
             { 
                 // Equivalent to F10 hotkey.
                 // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, but 
                 // without diving into functions. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                GDBParser.addGDBCommand("-exec-next --thread " + this._threads[this._currentThreadIndex]._id);
+                GdbWrapper.PostCommand("-exec-next --thread " + Threads[_currentThreadIndex]._id);
             }
-            else if (sk == enum_STEPKIND.STEP_OUT)
+            else if (kind == enum_STEPKIND.STEP_OUT)
             { 
                 // Equivalent to Shift-F11 hotkey.
-                if (eDispatcher.getStackDepth(this._threads[this._currentThreadIndex]._id) > 1)
+                if (EventDispatcher.GetStackDepth(Threads[_currentThreadIndex]._id) > 1)
                 {
                     // Sends the GDB command that resumes the execution of the inferior program until the current function is exited.
                     // (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                    GDBParser.addGDBCommand("-exec-finish --thread " + this._threads[this._currentThreadIndex]._id + " --frame 0");
+                    GdbWrapper.PostCommand("-exec-finish --thread " + Threads[_currentThreadIndex]._id + " --frame 0");
                 }
                 else
                 {
                     // If this the only frame left, do a step-over.
                     // Sends the GDB command that resumes the execution of the inferior program, stopping at the next instruction, but 
                     // without diving into functions. (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Program-Execution.html)
-                    GDBParser.addGDBCommand("-exec-next --thread " + this._threads[this._currentThreadIndex]._id);
+                    GdbWrapper.PostCommand("-exec-next --thread " + Threads[_currentThreadIndex]._id);
                 }
             }
-            else if (sk == enum_STEPKIND.STEP_BACKWARDS)
+            else if (kind == enum_STEPKIND.STEP_BACKWARDS)
             {
-                return VSConstants.E_NOTIMPL;
+                return EngineUtils.NotImplemented();
             }
             else
             {
-                m_engineCallback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
+                Callback.OnStepComplete(); // Have to call this otherwise VS gets "stuck"
             }
 
-            // Transition DE state                
-            m_state = AD7Engine.DE_STATE.STEP_MODE;
+            // Transition DE state
+            State = DebugEngineState.Step;
 
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Terminates the program. (http://msdn.microsoft.com/en-us/library/bb145919.aspx)
@@ -1050,45 +1019,42 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Writes a dump to a file. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145827.aspx)
         /// </summary>
-        /// <param name="DUMPTYPE"> A value from the DUMPTYPE enumeration that specifies the type of dump, for example, short or 
+        /// <param name="type"> A value from the DUMPTYPE enumeration that specifies the type of dump, for example, short or 
         /// long. </param>
-        /// <param name="pszDumpUrl"> The URL to write the dump to. Typically, this is in the form of file://c:\path\filename.ext, 
+        /// <param name="dumpUrl"> The URL to write the dump to. Typically, this is in the form of file://c:\path\filename.ext, 
         /// but may be any valid URL. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int WriteDump(enum_DUMPTYPE DUMPTYPE, string pszDumpUrl)
+        public int WriteDump(enum_DUMPTYPE type, string dumpUrl)
         {
             // The VSNDK debugger does not support creating or reading mini-dumps.
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
 
         #endregion
 
         #region IDebugProgram3 Members
 
-
         /// <summary>
         /// Executes the debugger program. The thread is returned to give the debugger information on which thread the user is 
         /// viewing when executing the program. ExecuteOnThread is called when the SDM wants execution to continue and have 
         /// stepping state cleared. (http://msdn.microsoft.com/en-us/library/bb145596.aspx)
         /// </summary>
-        /// <param name="pThread"> An IDebugThread2 object. </param>
+        /// <param name="thread"> An IDebugThread2 object. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int ExecuteOnThread(IDebugThread2 pThread)
+        public int ExecuteOnThread(IDebugThread2 thread)
         {
-            m_eventDispatcher.continueExecution();
+            EventDispatcher.ContinueExecution();
 
-            return VSConstants.S_OK;            
+            return VSConstants.S_OK;
         }
 
         #endregion
 
         #region IDebugEngineProgram2 Members
 
-        
         /// <summary>
         /// Stops all threads running in this program. This method is called when this program is being debugged in a multi-program 
         /// environment. When a stopping event from some other program is received, this method is called on this program. The 
@@ -1101,9 +1067,8 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.E_NOTIMPL. </returns>
         public int Stop()
         {
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Allows (or disallows) expression evaluation to occur on the given thread, even if the program has stopped.
@@ -1111,33 +1076,30 @@ namespace BlackBerry.DebugEngine
         /// The VSNDK debug engine doesn't cooperate with other engines, so it has nothing to do here. 
         /// (http://msdn.microsoft.com/en-us/library/bb144913.aspx)
         /// </summary>
-        /// <param name="pOriginatingProgram"> An IDebugProgram2 object representing the program that is evaluating an expression. </param>
-        /// <param name="dwTid"> Specifies the identifier of the thread. </param>
-        /// <param name="dwEvalFlags"> A combination of flags from the EVALFLAGS enumeration that specify how the evaluation is to be 
-        /// performed. </param>
-        /// <param name="pExprCallback"> An IDebugEventCallback2 object to be used to send debug events that occur during expression 
-        /// evaluation. </param>
-        /// <param name="fWatch"> If non-zero (TRUE), allows expression evaluation on the thread identified by dwTid; otherwise, zero 
+        /// <param name="program"> An IDebugProgram2 object representing the program that is evaluating an expression. </param>
+        /// <param name="threadID"> Specifies the identifier of the thread. </param>
+        /// <param name="flags"> A combination of flags from the EVALFLAGS enumeration that specify how the evaluation is to be performed. </param>
+        /// <param name="callback"> An IDebugEventCallback2 object to be used to send debug events that occur during expression evaluation. </param>
+        /// <param name="canWatch"> If non-zero (TRUE), allows expression evaluation on the thread identified by dwTid; otherwise, zero 
         /// (FALSE) disallows expression evaluation on that thread.</param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int WatchForExpressionEvaluationOnThread(IDebugProgram2 pOriginatingProgram, uint dwTid, uint dwEvalFlags, IDebugEventCallback2 pExprCallback, int fWatch)
+        public int WatchForExpressionEvaluationOnThread(IDebugProgram2 program, uint threadID, uint flags, IDebugEventCallback2 callback, int canWatch)
         {
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Watches for execution (or stops watching for execution) to occur on the given thread. WatchForThreadStep is used to 
         /// cooperate between two different engines debugging the same process. The VSNDK debug engine doesn't cooperate with other 
         /// engines, so it has nothing to do here. (http://msdn.microsoft.com/en-us/library/bb161406.aspx)
         /// </summary>
-        /// <param name="pOriginatingProgram"> An IDebugProgram2 object representing the program being stepped. </param>
+        /// <param name="program"> An IDebugProgram2 object representing the program being stepped. </param>
         /// <param name="dwTid"> Specifies the identifier of the thread to watch. </param>
-        /// <param name="fWatch"> Non-zero (TRUE) means start watching for execution on the thread identified by dwTid; otherwise, 
+        /// <param name="canWatch"> Non-zero (TRUE) means start watching for execution on the thread identified by dwTid; otherwise, 
         /// zero (FALSE) means stop watching for execution on dwTid. </param>
-        /// <param name="dwFrame"> Specifies a frame index that controls the step type. </param>
+        /// <param name="frame"> Specifies a frame index that controls the step type. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int WatchForThreadStep(IDebugProgram2 pOriginatingProgram, uint dwTid, int fWatch, uint dwFrame)
+        public int WatchForThreadStep(IDebugProgram2 program, uint dwTid, int canWatch, uint frame)
         {
             return VSConstants.S_OK;
         }
@@ -1146,24 +1108,23 @@ namespace BlackBerry.DebugEngine
 
         #region IDebugSymbolSettings100 members
 
-
         /// <summary>
         /// The SDM will call this method on the debug engine when it is created, to notify it of the user's
         /// symbol settings in Tools->Options->Debugging->Symbols. (http://msdn.microsoft.com/en-us/library/microsoft.visualstudio.debugger.interop.idebugsymbolsettings100.setsymbolloadstate.aspx)
         /// </summary>
-        /// <param name="bIsManual"> true if 'Automatically load symbols: Only for specified modules' is checked. </param>
-        /// <param name="bLoadAdjacent"> true if 'Specify modules'->'Always load symbols next to the modules' is checked. </param>
-        /// <param name="strIncludeList"> semicolon-delimited list of modules when automatically loading 'Only specified modules' </param>
-        /// <param name="strExcludeList"> semicolon-delimited list of modules when automatically loading 'All modules, unless excluded' </param>
+        /// <param name="isManual"> true if 'Automatically load symbols: Only for specified modules' is checked. </param>
+        /// <param name="loadAdjacent"> true if 'Specify modules'->'Always load symbols next to the modules' is checked. </param>
+        /// <param name="includeList"> semicolon-delimited list of modules when automatically loading 'Only specified modules' </param>
+        /// <param name="excludeList"> semicolon-delimited list of modules when automatically loading 'All modules, unless excluded' </param>
         /// <returns> VSConstants.S_OK. </returns>
-        public int SetSymbolLoadState(int bIsManual, int bLoadAdjacent, string strIncludeList, string strExcludeList)
+        int IDebugSymbolSettings100.SetSymbolLoadState(int isManual, int loadAdjacent, string includeList, string excludeList)
         {
             return VSConstants.S_OK;
         }
+
         #endregion
 
         #region Thread methods
-
 
         /// <summary>
         /// Verify if the stack frame information specified by "flags" were already evaluated.
@@ -1171,21 +1132,21 @@ namespace BlackBerry.DebugEngine
         /// <param name="threadId"> Thread ID. </param>
         /// <param name="flags"> Specifies the information to verify about a stack frame object. </param>
         /// <returns> If successful, returns TRUE; otherwise, returns FALSE. </returns>
-        public bool evaluatedTheseFlags(string threadId, enum_FRAMEINFO_FLAGS flags)
+        public bool EvaluatedTheseFlags(string threadId, enum_FRAMEINFO_FLAGS flags)
         {
-            if (this.thread != null)
+            if (Threads != null)
             {
                 int currentFlags = Convert.ToInt32(flags);
                 int i = 0;
                 // looking for the "threadId" thread.
-                for (; i < this.thread.Length; i++)
+                for (; i < Threads.Length; i++)
                 {
-                    if (this.thread[i]._id == threadId)
+                    if (Threads[i]._id == threadId)
                         break;
                 }
-                if (i < this.thread.Length)
+                if (i < Threads.Length)
                 {
-                    if (this.thread[i]._alreadyEvaluated == currentFlags)
+                    if (Threads[i]._alreadyEvaluated == currentFlags)
                     {
                         // This stack frame information were already evaluated.
                         return true;
@@ -1193,47 +1154,47 @@ namespace BlackBerry.DebugEngine
                     else
                     {
                         // This stack frame information were not evaluated before. Modifying the _alreadyEvaluated flag.
-                        this.thread[i]._alreadyEvaluated = currentFlags;
+                        Threads[i]._alreadyEvaluated = currentFlags;
                     }
                 }
             }
             return false;
         }
 
-
         /// <summary>
         /// Clean the "flags" data (_alreadyEvaluated) that are stored in each thread without resetting the stack frames. This operation
         /// must be done whenever the stack frames for a given thread have to be evaluated, like when the user changes the current frame
         /// or when he wants to investigate different threads in break mode, for example.
         /// </summary>
-        public void cleanEvaluatedThreads()
+        public void CleanEvaluatedThreads()
         {
-            if (this.thread != null)
+            if (Threads != null)
             {
-                for (int i = 0; i < this.thread.Length; i++)
+                for (int i = 0; i < Threads.Length; i++)
                 {
-                    this.thread[i]._alreadyEvaluated = 0;
+                    Threads[i]._alreadyEvaluated = 0;
                 }
             }
         }
-
 
         /// <summary>
         /// Reset stack frames for each thread. This operation must be performed before changing the state to break mode, like when a 
         /// breakpoint is hit, for example.
         /// </summary>
-        public void resetStackFrames()
+        public void ResetStackFrames()
         {
-            foreach (AD7Thread t in _threads)
+            if (Threads != null)
             {
-                if (t.__stackFrames != null)
+                foreach (AD7Thread t in Threads)
                 {
-                    t.__stackFrames.Clear();
-                    t.__stackFrames = null;
+                    if (t.__stackFrames != null)
+                    {
+                        t.__stackFrames.Clear();
+                        t.__stackFrames = null;
+                    }
                 }
             }
         }
-
 
         /// <summary>
         /// Update the list of threads. This operation must be performed whenever the list of threads changes (a thread exits or is
@@ -1241,41 +1202,46 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void UpdateListOfThreads()
         {
-            foreach (AD7Thread t in this._threads)
+            if (Threads != null)
             {
-                // Send events to VS to destroy its current debugged threads.
-                AD7ThreadDestroyEvent.Send(this, 0, t);
+                foreach (AD7Thread t in Threads)
+                {
+                    // Send events to VS to destroy its current debugged threads.
+                    AD7ThreadDestroyEvent.Send(this, 0, t);
+                }
+
+                Threads = null;
             }
 
-            this._threads = null;
             // Get the current list of threads and store them into a temporary variable listThreads.
-            this._currentThreadIndex = GetListOfThreads(out this._threads);
+            AD7Thread[] threads;
+            _currentThreadIndex = GetListOfThreads(out threads);
+            Threads = threads;
 
-            if ((this._currentThreadIndex == -1) || (this._threads == null))
+            if (_currentThreadIndex == -1 || Threads == null)
                 return;
 
             // Send events to VS to add this list of debugged threads.
-            foreach (AD7Thread t in this._threads)
+            foreach (AD7Thread t in Threads)
             {
-                m_engineCallback.OnThreadStart(t);
+                Callback.OnThreadStart(t);
             }
 
-            this._updateThreads = false;
+            _updateThreads = false;
         }
-
 
         /// <summary>
         /// Get the list of threads being debugged, also returning the index of the current thread (or -1 in case of error)
         /// </summary>
         /// <param name="threadObjects"> Returns the current list of threads that are being debugged. </param>
         /// <returns> Returns the index of the current thread in the list of threads (or -1 in case of error) </returns>
-        public int GetListOfThreads(out AD7Thread[] threadObjects)
+        private int GetListOfThreads(out AD7Thread[] threadObjects)
         {
             // Gets the parsed response for the GDB/MI command that ask for information about all threads.
             // (http://www.sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI-Thread-Commands.html)
-            string threadResponse = GDBParser.parseCommand(@"-thread-info", 22);
+            string threadResponse = GdbWrapper.SendCommand(@"-thread-info", 22);
             string[] threadStrings = threadResponse.Split('#');
-            cleanEvaluatedThreads();
+            CleanEvaluatedThreads();
 
             // Query the threads depth without inquiring GDB.
             int numThreads = threadStrings.Length - 1; // the last item in threadStrings is not a thread but the current thread ID.
@@ -1311,18 +1277,12 @@ namespace BlackBerry.DebugEngine
                 }
                 return currentThreadIndex;
             }
-            catch (ComponentException)
-            {
-                threadObjects = null;
-                return -1;
-            }
             catch (Exception)
             {
                 threadObjects = null;
                 return -1;
             }
         }
-
 
         /// <summary>
         /// Returns the current thread.
@@ -1331,10 +1291,9 @@ namespace BlackBerry.DebugEngine
         public AD7Thread CurrentThread()
         {
             if (_currentThreadIndex != -1)
-                return _threads[_currentThreadIndex];
+                return Threads[_currentThreadIndex];
             return null;
         }
-
 
         /// <summary>
         /// Returns the thread data structure with a given ID.
@@ -1343,14 +1302,16 @@ namespace BlackBerry.DebugEngine
         /// <returns> If successful, returns the selected thread; otherwise, returns NULL. </returns>
         public AD7Thread SelectThread(string id)
         {
-            for (int i = 0; i < _threads.Length; i++)
+            if (Threads == null)
+                return null;
+
+            for (int i = 0; i < Threads.Length; i++)
             {
-                if (_threads[i]._id == id)
-                    return (_threads[i]);
+                if (Threads[i]._id == id)
+                    return Threads[i];
             }
             return null;
         }
-
 
         /// <summary>
         /// Set a given thread as the current one.
@@ -1358,34 +1319,42 @@ namespace BlackBerry.DebugEngine
         /// <param name="id"> The ID of the thread. </param>
         public void SetAsCurrentThread(string id)
         {
-            for (int i = 0; i < _threads.Length; i++)
+            if (Threads != null)
             {
-                if (_threads[i]._id == id)
+                for (int i = 0; i < Threads.Length; i++)
                 {
-                    _currentThreadIndex = i;
-                    break;
+                    if (Threads[i]._id == id)
+                    {
+                        _currentThreadIndex = i;
+                        break;
+                    }
                 }
             }
         }
 
-
         /// <summary>
-        /// Add threads for a program when lauching it and the debugger (IDebugEngineLaunch2.LaunchSuspended).
+        /// Add threads for a program when launching it and the debugger (IDebugEngineLaunch2.LaunchSuspended).
         /// </summary>
         /// <returns> VSConstants.S_OK. </returns>
         public int AddThreadsToProgram()
         {
-            _threads = null;
-            _currentThreadIndex = GetListOfThreads(out _threads);
+            AD7Thread[] threads;
+            Threads = null;
+
+            _currentThreadIndex = GetListOfThreads(out threads);
+            Threads = threads;
+
             if (_currentThreadIndex != -1)
             {
-                foreach (AD7Thread t in _threads)
+                foreach (AD7Thread t in threads)
                 {
-                    m_engineCallback.OnThreadStart(t);
+                    Callback.OnThreadStart(t);
                 }
             }
             else
-                    m_engineCallback.OnThreadStart(null);
+            {
+                Callback.OnThreadStart(null);
+            }
             return VSConstants.S_OK;
         }
 
@@ -1394,48 +1363,38 @@ namespace BlackBerry.DebugEngine
         #region Deprecated interface methods
         // These methods are not called by the Visual Studio debugger, so they don't need to be implemented
 
-
         /// <summary>
         /// Retrieves a list of all programs being debugged by a debug engine (DE). Not implemented.
         /// (http://msdn.microsoft.com/en-us/library/bb146175.aspx)
         /// </summary>
-        /// <param name="pCallback"> Returns an object that contains a list of all programs being debugged by a DE. </param>
+        /// <param name="pPrograms"> Returns an object that contains a list of all programs being debugged by a DE. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        int IDebugEngine2.EnumPrograms(out IEnumDebugPrograms2 programs)
+        int IDebugEngine2.EnumPrograms(out IEnumDebugPrograms2 pPrograms)
         {
-            Debug.Fail("This function is not called by the debugger");
-
-            programs = null;
-            return VSConstants.E_NOTIMPL;
+            pPrograms = null;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Attaches to the program. Not implemented. (http://msdn.microsoft.com/en-us/library/bb161973.aspx)
         /// </summary>
-        /// <param name="programs"> An IDebugEventCallback2 object to be used for debug event notification. </param>
+        /// <param name="callback"> An IDebugEventCallback2 object to be used for debug event notification. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int Attach(IDebugEventCallback2 pCallback)
+        public int Attach(IDebugEventCallback2 callback)
         {
-            Debug.Fail("This function is not called by the debugger");
-
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Get the process that this program is running in. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145293.aspx)
         /// </summary>
-        /// <param name="process"> Returns the IDebugProcess2 interface that represents the process. </param>
+        /// <param name="pProcess"> Returns the IDebugProcess2 interface that represents the process. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        public int GetProcess(out IDebugProcess2 process)
+        public int GetProcess(out IDebugProcess2 pProcess)
         {
-            Debug.Fail("This function is not called by the debugger");
-
-            process = null;
-            return VSConstants.E_NOTIMPL;
+            pProcess = null;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary> TODO: Verify if this method is called or not by VS.
         /// Continues running this program from a stopped state. Any previous execution state (such as a step) is cleared, and the 
@@ -1444,11 +1403,10 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         public int Execute()
         {
-            m_eventDispatcher.continueExecution();
+            EventDispatcher.ContinueExecution();
             return VSConstants.S_OK;
         }
 
         #endregion
     }
 }
-

@@ -525,7 +525,7 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Aborts running update.
         /// </summary>
-        public bool Abort()
+        public override bool Abort()
         {
             if (!CanAbort)
                 return false;

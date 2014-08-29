@@ -15,13 +15,14 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using BlackBerry.DebugEngine;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.TextManager.Interop;
 using Microsoft.VisualStudio.OLE.Interop;
 
-using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
+using IOleIServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace BlackBerry.Package.Editors
 {
@@ -36,6 +37,11 @@ namespace BlackBerry.Package.Editors
 
         // Private Member Variables
         private ServiceProvider _vsServiceProvider;
+
+        ~BarDescriptorEditorFactory()
+        {
+            Dispose(false);
+        }
 
         /// <summary>
         /// Close the factory
@@ -106,7 +112,7 @@ namespace BlackBerry.Package.Editors
                         IObjectWithSite objWSite = (IObjectWithSite)textBuffer;
                         if (objWSite != null)
                         {
-                            Microsoft.VisualStudio.OLE.Interop.IServiceProvider oleServiceProvider = (Microsoft.VisualStudio.OLE.Interop.IServiceProvider)GetService(typeof(Microsoft.VisualStudio.OLE.Interop.IServiceProvider));
+                            var oleServiceProvider = (IOleIServiceProvider)GetService(typeof(IOleIServiceProvider));
                             objWSite.SetSite(oleServiceProvider);
                         }
                     }
@@ -166,18 +172,16 @@ namespace BlackBerry.Package.Editors
                 // primary view uses NULL as pbstrPhysicalView
                 return VSConstants.S_OK;        
             }
-            else
-            {
-                // you must return E_NOTIMPL for any unrecognized rguidLogicalView values
-                return VSConstants.E_NOTIMPL;
-            } 
+
+            // you must return E_NOTIMPL for any unrecognized rguidLogicalView values
+            return EngineUtils.NotImplemented();
         }
 
         /// <summary>
         /// Used for initialization of the editor in the environment
         /// </summary>
         /// <param name="psp">pointer to the service provider. Can be used to obtain instances of other interfaces</param>
-        public int SetSite(IOleServiceProvider psp)
+        public int SetSite(IOleIServiceProvider psp)
         {
             _vsServiceProvider = new ServiceProvider(psp);
             return VSConstants.S_OK;
@@ -189,6 +193,7 @@ namespace BlackBerry.Package.Editors
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -197,15 +202,13 @@ namespace BlackBerry.Package.Editors
         /// <param name="disposing"></param>
         private void Dispose(bool disposing)
         {
-            lock (this)
+            if (disposing)
             {
-                if (disposing)
-                { ///dispose all managed and unmanaged resources
-                    if (_vsServiceProvider != null)
-                    {
-                        _vsServiceProvider.Dispose();
-                        _vsServiceProvider = null;
-                    }
+                // dispose all managed and unmanaged resources
+                if (_vsServiceProvider != null)
+                {
+                    _vsServiceProvider.Dispose();
+                    _vsServiceProvider = null;
                 }
             }
         }

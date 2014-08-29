@@ -20,54 +20,48 @@ using Microsoft.VisualStudio.Debugger.Interop;
 namespace BlackBerry.DebugEngine
 {
     /// <summary>
-    /// This class implments IDebugProgramProvider2. (http://msdn.microsoft.com/en-us/library/bb161298.aspx)
-    /// This registered interface allows the session debug manager (SDM) to obtain information about programs 
+    /// This class implements IDebugProgramProvider2. (http://msdn.microsoft.com/en-us/library/bb161298.aspx)
+    /// This registered interface allows the session debug manager (SDM) to obtain information about programs
     /// that have been "published" through the IDebugProgramPublisher2 interface.
     /// 
     /// Partially implemented and not used at this moment.
     /// </summary>
     [ComVisible(true)]
-    [Guid("AD06FD46-C790-4D5C-A274-8815DF9511B8")]
-    public class AD7ProgramProvider : IDebugProgramProvider2
+    [Guid(ClassGuid)]
+    public sealed class AD7ProgramProvider : IDebugProgramProvider2
     {
-
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        public AD7ProgramProvider()
-        {
-        }
+        public const string ClassGuid = "AD06FD46-C790-4D5C-A274-8815DF9511B8";
+        public const string ClassName = "BlackBerry.DebugEngine.AD7ProgramProvider";
 
         #region IDebugProgramProvider2 Members
-
 
         /// <summary>
         /// Obtains information about programs running, filtered in a variety of ways. 
         /// (http://msdn.microsoft.com/en-us/library/bb147025.aspx)
         /// </summary>
-        /// <param name="Flags">  A combination of flags from the PROVIDER_FLAGS enumeration. </param>
+        /// <param name="flags">  A combination of flags from the PROVIDER_FLAGS enumeration. </param>
         /// <param name="port"> The port the calling process is running on. </param>
-        /// <param name="ProcessId"> An AD_PROCESS_ID structure holding the ID of the process that contains the program in question. </param>
-        /// <param name="EngineFilter"> An array of GUIDs for debug engines assigned to debug this process (these will be used to filter 
+        /// <param name="processId"> An AD_PROCESS_ID structure holding the ID of the process that contains the program in question. </param>
+        /// <param name="engineFilter"> An array of GUIDs for debug engines assigned to debug this process (these will be used to filter 
         /// the programs that are actually returned based on what the supplied engines support; if no engines are specified, then all 
         /// programs will be returned). </param>
         /// <param name="processArray"> A PROVIDER_PROCESS_DATA structure that is filled in with the requested information. </param>
         /// <returns> If successful, returns S_OK; otherwise, returns VSConstants.S_FALSE. </returns>
-        int IDebugProgramProvider2.GetProviderProcessData(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, PROVIDER_PROCESS_DATA[] processArray)
+        int IDebugProgramProvider2.GetProviderProcessData(enum_PROVIDER_FLAGS flags, IDebugDefaultPort2 port, AD_PROCESS_ID processId, CONST_GUID_ARRAY engineFilter, PROVIDER_PROCESS_DATA[] processArray)
         {
             processArray[0] = new PROVIDER_PROCESS_DATA();
 
-            if (((uint)Flags & (uint)enum_PROVIDER_FLAGS.PFLAG_GET_PROGRAM_NODES) != 0)
+            if (((uint)flags & (uint)enum_PROVIDER_FLAGS.PFLAG_GET_PROGRAM_NODES) != 0)
             {
                 // The debugger is asking the engine to return the program nodes it can debug. The VSNDK debug engine claims that it can 
                 // debug all processes, and returns exactly one program node for each process. A full-featured debugger may wish to 
                 // examine the target process and determine if it understands how to debug it.
 
-                IDebugProgramNode2 node = (IDebugProgramNode2)(new AD7ProgramNode(ProcessId.guidProcessId));             
+                IDebugProgramNode2 node = new AD7ProgramNode(processId.guidProcessId);
 
                 IntPtr[] programNodes = { Marshal.GetComInterfaceForObject(node, typeof(IDebugProgramNode2)) };
 
-                IntPtr destinationArray = Marshal.AllocCoTaskMem(IntPtr.Size * programNodes.Length);                
+                IntPtr destinationArray = Marshal.AllocCoTaskMem(IntPtr.Size * programNodes.Length);
                 Marshal.Copy(programNodes, 0, destinationArray, programNodes.Length);
 
                 processArray[0].Fields = enum_PROVIDER_FIELDS.PFIELD_PROGRAM_NODES;
@@ -85,45 +79,43 @@ namespace BlackBerry.DebugEngine
         /// Gets a program node, given a specific process ID. Not implemented. 
         /// (http://msdn.microsoft.com/en-us/library/bb162155.aspx)
         /// </summary>
-        /// <param name="Flags"> A combination of flags from the PROVIDER_FLAGS enumeration. </param>
+        /// <param name="flags"> A combination of flags from the PROVIDER_FLAGS enumeration. </param>
         /// <param name="port"> The port the calling process is running on. </param>
-        /// <param name="ProcessId"> An AD_PROCESS_ID structure holding the ID of the process that contains the program in question. </param>
+        /// <param name="processId"> An AD_PROCESS_ID structure holding the ID of the process that contains the program in question. </param>
         /// <param name="guidEngine"> GUID of the debug engine that the program is attached to (if any). </param>
         /// <param name="programId"> ID of the program for which to get the program node. </param>
         /// <param name="programNode"> An IDebugProgramNode2 object representing the requested program node. </param>
         /// <returns> VSConstants.E_NOTIMPL. </returns>
-        int IDebugProgramProvider2.GetProviderProgramNode(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, ref Guid guidEngine, ulong programId, out IDebugProgramNode2 programNode)
+        int IDebugProgramProvider2.GetProviderProgramNode(enum_PROVIDER_FLAGS flags, IDebugDefaultPort2 port, AD_PROCESS_ID processId, ref Guid guidEngine, ulong programId, out IDebugProgramNode2 programNode)
         {
             // This method is used for Just-In-Time debugging support, which this program provider does not support
             programNode = null;
-            return VSConstants.E_NOTIMPL;
+            return EngineUtils.NotImplemented();
         }
-
 
         /// <summary>
         /// Establishes a locale for any language-specific resources needed by the DE. Not implemented.
         /// (http://msdn.microsoft.com/en-us/library/bb161383.aspx)
         /// </summary>
-        /// <param name="wLangID"> Language ID to establish. For example, 1033 for English. </param>
+        /// <param name="langID"> Language ID to establish. For example, 1033 for English. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugProgramProvider2.SetLocale(ushort wLangID)
+        int IDebugProgramProvider2.SetLocale(ushort langID)
         {           
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Establishes a callback to watch for provider events associated with specific kinds of processes, allowing the process to 
         /// be notified of port events. Not implemented. (http://msdn.microsoft.com/en-us/library/bb145594.aspx)
         /// </summary>
-        /// <param name="Flags">  A combination of flags from the PROVIDER_FLAGS enumeration. </param>
+        /// <param name="flags">  A combination of flags from the PROVIDER_FLAGS enumeration. </param>
         /// <param name="port"> The port the calling process is running on. </param>
-        /// <param name="ProcessId"> An AD_PROCESS_ID structure holding the ID of the process that contains the program in question. </param>
-        /// <param name="EngineFilter"> An array of GUIDs of debug engines associated with the process. </param>
+        /// <param name="processId"> An AD_PROCESS_ID structure holding the ID of the process that contains the program in question. </param>
+        /// <param name="engineFilter"> An array of GUIDs of debug engines associated with the process. </param>
         /// <param name="guidLaunchingEngine"> GUID of the debug engine that launched this process (if any). </param>
-        /// <param name="ad7EventCallback"> An IDebugPortNotify2 object that receives the event notifications. </param>
+        /// <param name="eventCallback"> An IDebugPortNotify2 object that receives the event notifications. </param>
         /// <returns> VSConstants.S_OK. </returns>
-        int IDebugProgramProvider2.WatchForProviderEvents(enum_PROVIDER_FLAGS Flags, IDebugDefaultPort2 port, AD_PROCESS_ID ProcessId, CONST_GUID_ARRAY EngineFilter, ref Guid guidLaunchingEngine, IDebugPortNotify2 ad7EventCallback)
+        int IDebugProgramProvider2.WatchForProviderEvents(enum_PROVIDER_FLAGS flags, IDebugDefaultPort2 port, AD_PROCESS_ID processId, CONST_GUID_ARRAY engineFilter, ref Guid guidLaunchingEngine, IDebugPortNotify2 eventCallback)
         {
             // The VSNDK debug engine is a native debugger, and can therefore always provide a program node
             // in GetProviderProcessData. Non-native debuggers may wish to implement this method as a way

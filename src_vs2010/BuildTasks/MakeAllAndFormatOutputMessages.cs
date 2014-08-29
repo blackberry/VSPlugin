@@ -17,12 +17,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using BlackBerry.NativeCore;
 using Microsoft.Build.Framework;
 
 namespace BlackBerry.BuildTasks
 {
     /// <summary>
-    /// Cancelabe MSBuild Task for Running the Make file for the build.
+    /// Cancelable MSBuild Task for Running the Make file for the build.
     /// </summary>
     public sealed class MakeAllAndFormatOutputMessages : ICancelableTask
     {

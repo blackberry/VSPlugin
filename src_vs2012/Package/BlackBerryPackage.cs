@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
+using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
@@ -28,21 +29,15 @@ using BlackBerry.Package.Editors;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
 using BlackBerry.Package.Options;
+using BlackBerry.Package.Registration;
 using BlackBerry.Package.ViewModels;
-using Microsoft.Win32;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.IO;
-using System.Collections.Generic;
 using EnvDTE;
 using System.Windows.Forms;
 using EnvDTE80;
-using System.Text.RegularExpressions;
-using System.Collections.Specialized;
-using System.Security.Cryptography;
-using System.Text;
-using VSNDK.Parser;
 
 namespace BlackBerry.Package
 {
@@ -67,43 +62,47 @@ namespace BlackBerry.Package
     // Microsoft Visual C# Project
     [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", BarDescriptorEditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
+    // Registration of custom debugger
+    [DebugEngineRegistration(AD7PortSupplier.PublicName, AD7Engine.DebugEngineGuid,
+        Attach = true, AddressBreakpoints = false, CallstackBreakpoints = true, AlwaysLoadLocal = true, AutoSelectPriority = 4,
+        DebugEngineClassGUID = AD7Engine.ClassGuid, DebugEngineClassName = AD7Engine.ClassName,
+        ProgramProviderClassGUID = AD7ProgramProvider.ClassGuid, ProgramProviderClassName = AD7ProgramProvider.ClassName,
+        PortSupplierClassGUID = AD7PortSupplier.ClassGuid, PortSupplierClassName = AD7PortSupplier.ClassName,
+#if DEBUG
+        AssemblyName = ConfigDefaults.DebugEngineDebugablePath
+#else
+        AssemblyName = "BlackBerry.DebugEngine.dll"
+#endif
+)]
+
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
     [InstalledProductRegistration("#110", "#112", VersionString, IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
     // This attribute registers a tool window exposed by this package.
+#if !PLATFORM_VS2010
+    // PH: HINT: somehow, when in VS2010, the plugin might be loaded too early and it fails on access to some UI services (like OutputWindow).
+    [ProvideAutoLoad(UIContextGuids80.NoSolution)]
+#endif
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackageString)]
 
     // This attribute defines set of settings pages provided by this package.
     // They are automatically instantiated and displayed inside [Visual Studio -> Tools -> Options...] dialog.
-    [ProvideOptionPage(typeof(GeneralOptionPage), "BlackBerry", "General", 1001, 1002, true)]
-    [ProvideOptionPage(typeof(LogsOptionPage), "BlackBerry", "Logs", 1001, 1003, true)]
-    [ProvideOptionPage(typeof(ApiLevelOptionPage), "BlackBerry", "API Levels", 1001, 1004, true)]
-    [ProvideOptionPage(typeof(TargetsOptionPage), "BlackBerry", "Targets", 1001, 1005, true)]
-    [ProvideOptionPage(typeof(SigningOptionPage), "BlackBerry", "Signing", 1001, 1006, true)]
+    [ProvideOptionPage(typeof(GeneralOptionPage), OptionsCategoryName, "General", 1001, 1002, true)]
+    [ProvideOptionPage(typeof(LogsOptionPage), OptionsCategoryName, "Logs", 1001, 1003, true)]
+    [ProvideOptionPage(typeof(ApiLevelOptionPage), OptionsCategoryName, "API Levels", 1001, 1004, true)]
+    [ProvideOptionPage(typeof(TargetsOptionPage), OptionsCategoryName, "Targets", 1001, 1005, true)]
+    [ProvideOptionPage(typeof(SigningOptionPage), OptionsCategoryName, "Signing", 1001, 1006, true)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable
     {
-        public const string VersionString = "2.1.2014.0623";
-
-        #region private member variables
+        public const string VersionString = "2.1.2014.711";
+        public const string OptionsCategoryName = "BlackBerry";
 
         private BlackBerryPaneTraceListener _traceWindow;
         private DTE2 _dte;
         private BuildPlatformsManager _buildPlatformsManager;
-        private bool _isSimulator;
-        private BuildEvents _buildEvents;
-        private List<string[]> _targetDir;
-        private List<String> _buildThese;
-        private bool _hitPlay;
-        private int _amountOfProjects;
-        private bool _isDeploying;
-        private OutputWindowPane _owP;
-        private bool _isDebugConfiguration = true;
-        private string _processName = "";
-
-        #endregion
 
         #region Package Members
 
@@ -164,20 +163,13 @@ namespace BlackBerry.Package
                     }
                 };
 
-            //Create Editor Factory. Note that the base Package class will call Dispose on it.
+            // Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new BarDescriptorEditorFactory());
             TraceLog.WriteLine(" * registered editors");
+
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
-
-            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
-            CommandHelper.Register(_dte, GuidList.guidVSStd97String, StandardCommands.cmdidStartDebug, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
-            CommandHelper.Register(_dte, GuidList.guidVSStd2KString, StandardCommands.cmdidStartDebugContext, StartDebugCommandEvents_AfterExecute, StartDebugCommandEvents_BeforeExecute);
+            _buildPlatformsManager.Initialize();
             TraceLog.WriteLine(" * registered build-platforms manager");
-
-            _buildEvents = _dte.Events.BuildEvents;
-            _buildEvents.OnBuildBegin += OnBuildBegin;
-
-            TraceLog.WriteLine(" * subscribed to IDE events");
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
@@ -205,6 +197,7 @@ namespace BlackBerry.Package
                                                                             },
                                                                         devicesCommandID);
                 mcs.AddCommand(devicesMenu);
+
                 // Create dynamic command for the 'api-level-list' menu
                 CommandID apiLevelCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryTargetsApiLevelsPlaceholder);
                 DynamicMenuCommand apiLevelMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledNDKs,
@@ -222,6 +215,24 @@ namespace BlackBerry.Package
                                                                              },
                                                                          apiLevelCommandID);
                 mcs.AddCommand(apiLevelMenu);
+
+                // Create dynamic command for the 'runtime-libraries' menu
+                CommandID runtimeCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryTargetsRuntimeLibrariesPlaceholder);
+                DynamicMenuCommand runtimeMenu = new DynamicMenuCommand(() => PackageViewModel.Instance.InstalledRuntimes,
+                                                                         (cmd, collection, index) =>
+                                                                             {
+                                                                                 var item = index >= 0 && index < collection.Count ? ((RuntimeInfo[]) collection)[index] : null;
+                                                                                 PackageViewModel.Instance.ActiveRuntime = item;
+                                                                             },
+                                                                         (cmd, collection, index) =>
+                                                                             {
+                                                                                 var item = index >= 0 && index < collection.Count ? ((RuntimeInfo[])collection)[index] : null;
+                                                                                 cmd.Checked = item != null && item == PackageViewModel.Instance.ActiveRuntime;
+                                                                                 cmd.Visible = item != null;
+                                                                                 cmd.Text = item != null ? item.Name : "-";
+                                                                             },
+                                                                         runtimeCommandID);
+                mcs.AddCommand(runtimeMenu);
 
                 // Create command for 'Help' menus
                 var helpCmdIDs = new[] {
@@ -242,9 +253,14 @@ namespace BlackBerry.Package
                 MenuCommand configureMenu = new MenuCommand((s, e) => ShowOptionPage(typeof(TargetsOptionPage)), configureCommandID);
                 mcs.AddCommand(configureMenu);
 
-                // Create the command for the menu item.
-                CommandID projectCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidfooLocalBox);
-                OleMenuCommand projectItem = new OleMenuCommand(MenuItemCallback, projectCommandID);
+                // Create the command for 'Add BlackBerry Platforms' menu item
+                CommandID platformsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryCommonAddPlatformTargets);
+                OleMenuCommand platformsItem = new OleMenuCommand(AddBlackBerryTargetPlatforms, platformsCommandID);
+                mcs.AddCommand(platformsItem);
+
+                // Create the command for 'Import BlackBerry Native Project' menu item
+                CommandID projectCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryCommonProjectImport);
+                OleMenuCommand projectItem = new OleMenuCommand(ImportBlackBerryProject, projectCommandID);
                 mcs.AddCommand(projectItem);
 
                 TraceLog.WriteLine(" * initialized menus");
@@ -254,7 +270,7 @@ namespace BlackBerry.Package
 
             // make sure there is an NDK selected and developer knows about it:
             EnsureActiveNDK();
-            if (!HasActiveNDK)
+            if (_buildPlatformsManager.IsBlackBerrySolution() && ActiveNDK == null)
             {
                 var form = new MissingNdkInstalledForm();
                 form.ShowDialog();
@@ -373,38 +389,6 @@ namespace BlackBerry.Package
 
         #endregion
 
-        #region private methods
-
-        /// <summary>
-        /// Check to see if current solution is configured with a BlackBerry Configuration.
-        /// </summary>
-        private bool IsBlackBerrySolution(DTE2 dte)
-        {
-            if (dte.Solution != null)
-            {
-                var projects = dte.Solution.Projects;
-                if (projects != null)
-                {
-                    foreach (Project project in projects)
-                    {
-                        var platformName = project.ConfigurationManager != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
-                        if (platformName == "BlackBerry" || platformName == "BlackBerrySimulator")
-                            return true;
-                    }
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the number of installed NDKs.
-        /// </summary>
-        private int GetInstalledNdkCount()
-        {
-            return PackageViewModel.Instance.InstalledNDKs.Length;
-        }
-
         /// <summary>
         /// Gets the currently selected NDK to build against.
         /// </summary>
@@ -413,406 +397,55 @@ namespace BlackBerry.Package
             get { return PackageViewModel.Instance.ActiveNDK; }
         }
 
-        public bool HasActiveNDK
-        {
-            get
-            {
-#if DEBUG
-                TraceLog.WriteLine("Is BlackBerry solution: {0}\r\nNDK count: {1}\r\nActive NDK: {2}",
-                    IsBlackBerrySolution(_dte), GetInstalledNdkCount(),
-                    ActiveNDK != null ? ActiveNDK.ToString() : "(none)");
-#endif
-                return !IsBlackBerrySolution(_dte) || ActiveNDK != null;
-            }
-        }
-
-
         /// <summary>
-        /// Makes sure the NDK is selected and its paths are stored inside registry for build toolset.
+        /// Makes sure the NDK and runtime libraries are selected
+        /// and their paths are stored inside registry for build toolset.
         /// </summary>
         private void EnsureActiveNDK()
         {
             PackageViewModel.Instance.EnsureActiveNDK();
+            PackageViewModel.Instance.EnsureActiveRuntime();
         }
 
-        /// <summary> 
-        /// Identify the projects to be build and start the build process. 
-        /// </summary>
-        /// <returns> TRUE if successful, FALSE if not. </returns>
-        private bool BuildBar()
+        private void AddBlackBerryTargetPlatforms(object sender, EventArgs e)
         {
-            bool success = true;
-            try
-            {
-                if (_buildThese.Count != 0)
-                {
-                    RegistryKey key = Registry.CurrentUser.CreateSubKey("VSNDK");
-                    key.SetValue("Run", "True");
-                    key.Close();
+            var projects = DteHelper.GetProjects(_dte);
 
-                    _buildEvents.OnBuildDone += OnBuildDone;
-
-                    try
-                    {
-                        Solution2 solution = (Solution2)_dte.Solution;
-                        _hitPlay = true;
-                        _amountOfProjects = _buildThese.Count; // OnBuildDone will call build() only after receiving "amountOfProjects" events
-                        foreach (string projectName in _buildThese)
-                            solution.SolutionBuild.BuildProject("Debug", projectName, false);
-                    }
-                    catch (Exception ex)
-                    {
-                        Debug.WriteLine(ex.Message);
-                        success = false;
-                    }
-                }
-                else
-                {
-                    success = false;
-                }
-            }
-            catch (Exception e)
+            if (projects == null || projects.Length == 0)
             {
-                Debug.WriteLine(e.Message);
-                success = false;
+                MessageBoxHelper.Show("Unable to add BlackBerry Platforms.", "Please open a solution with Visual C++ projects", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
             }
-            return success;
+
+            if (MessageBoxHelper.Show("Do you want to add BlackBerry target platforms for all C/C++ projects?", null, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            foreach (var project in projects)
+            {
+                _buildPlatformsManager.AddPlatforms(project);
+            }
+
+            MessageBoxHelper.Show("You might now:\r\n * restart Visual Studio, as it has the 'deploy' option disabled\r\n * update the Author Information within the bar-descriptor.xml", "BlackBerry and BlackBerrySimulator targets have been added to solution configurations.", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        /// <summary> 
-        /// Verify if the build process was successful. If so, start deploying the app.
-        /// </summary>
-        private void Built()
+        private void ImportBlackBerryProject(object sender, EventArgs e)
         {
-            _owP.TextDocument.Selection.SelectAll();
-            string outputText = _owP.TextDocument.Selection.Text;
-
-            if ((outputText == "") || (Regex.IsMatch(outputText, ">Build succeeded.\r\n")) || (!outputText.Contains("): error :")))
+            var form = DialogHelper.OpenNativeCoreProject("Open Core Native Application Project", null);
+            if (form.ShowDialog() == DialogResult.OK)
             {
-                if (_isDebugConfiguration)
-                {
-                    // Write file to flag the deploy task that it should use the -debugNative option
-                    string fileContent = "Use -debugNative.\r\n";
-                    using (var file = new StreamWriter(ConfigDefaults.BuildDebugNativePath))
-                    {
-                        file.WriteLine(fileContent);
-                    }
+                string filename = form.FileName;
+                FileInfo fi = new FileInfo(filename);
+                string folderName = fi.DirectoryName;
 
-                    _buildEvents.OnBuildDone += OnBuildDone;
-                }
+                Array projects = (Array)_dte.ActiveSolutionProjects;
+                Project project = (Project)projects.GetValue(0);
+                string name = project.FullName;
 
-                foreach (String startupProject in (Array)_dte.Solution.SolutionBuild.StartupProjects)
-                {
-                    foreach (SolutionContext sc in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
-                    {
-                        if (sc.ProjectName == startupProject)
-                        {
-                            sc.ShouldDeploy = true;
-                        }
-                        else
-                        {
-                            sc.ShouldDeploy = false;
-                        }
-                    }
-                }
-                _isDeploying = true;
-                _dte.Solution.SolutionBuild.Deploy(true);
+                // Create the dialog instance without Help support.
+                var importSummary = new Import.Import(project, folderName, name);
+                importSummary.ShowModel2();
             }
         }
-
-        /// <summary> 
-        /// Get the process ID and launch an executable using the BlackBerry debug engine. 
-        /// </summary>
-        private void Deployed()
-        {
-            RegistryKey key = Registry.CurrentUser.CreateSubKey("VSNDK");
-            key.SetValue("Run", "False");
-            key.Close();
-
-            string pidString = "";
-            string toolsPath = "";
-            string publicKeyPath = "";
-            string targetIP = "";
-            string password = "";
-            string executablePath = "";
-            if (GetProcessInfo(_dte, ref pidString, ref toolsPath, ref publicKeyPath, ref targetIP, ref password, ref executablePath))
-            {
-                bool CancelDefault = LaunchDebugTarget(pidString, toolsPath, publicKeyPath, targetIP, password, executablePath);
-            }
-            else
-            {
-                MessageBox.Show("Failed to debug the application.\n\nPlease, close the app in case it was launched in the device/simulator.", "Failed to launch debugger", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        }
-
-        /// <summary> 
-        /// Launch an executable using the BlackBerry debug engine. 
-        /// </summary>
-        /// <param name="pidString"> Process ID in string format. </param>
-        /// <returns> TRUE if successful, False if not. </returns>
-        private bool LaunchDebugTarget(string pidString, string toolsPath, string publicKeyPath, string targetIP, string password, string executablePath)
-        {
-            ServiceProvider sp = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider)_dte);
-            IVsDebugger dbg = (IVsDebugger)sp.GetService(typeof(SVsShellDebugger));
-            VsDebugTargetInfo info = new VsDebugTargetInfo();
-
-            info.cbSize = (uint)Marshal.SizeOf(info);
-            info.dlo = DEBUG_LAUNCH_OPERATION.DLO_CreateProcess;
-
-            // Store all debugger arguments in a string
-            var nvc = new NameValueCollection();
-            nvc.Add("pid", pidString);
-            nvc.Add("targetIP", targetIP); // The device (IP address)
-            info.bstrExe = executablePath; // The executable path
-            nvc.Add("isSimulator", _isSimulator.ToString());
-            nvc.Add("ToolsPath", toolsPath);
-            nvc.Add("PublicKeyPath", publicKeyPath);
-            nvc.Add("Password", password);
-
-            info.bstrArg = NameValueCollectionHelper.DumpToString(nvc);
-
-            info.bstrRemoteMachine = null; // debug locally
-            info.fSendStdoutToOutputWindow = 0; // Let stdout stay with the application.
-            info.clsidCustom = new Guid("{E5A37609-2F43-4830-AA85-D94CFA035DD2}"); // Set the launching engine as the BlackBerry debug-engine
-            info.grfLaunch = 0;
-
-            IntPtr pInfo = Marshal.AllocCoTaskMem((int)info.cbSize);
-            Marshal.StructureToPtr(info, pInfo, false);
-
-            try
-            {
-                int result = dbg.LaunchDebugTargets(1, pInfo);
-
-                if (result != VSConstants.S_OK)
-                {
-                    string msg;
-                    IVsUIShell sh = (IVsUIShell)sp.GetService(typeof(SVsUIShell));
-                    sh.GetErrorInfo(out msg);
-                    Debug.WriteLine("LaunchDebugTargets: " + msg);
-
-                    return true;
-                }
-            }
-            finally
-            {
-                if (pInfo != IntPtr.Zero)
-                {
-                    Marshal.FreeCoTaskMem(pInfo);
-                }
-            }
-
-            return false;
-        }
-
-        /// <summary> 
-        /// Get the PID of the launched native app by parsing text from the output window. 
-        /// </summary>
-        /// <param name="dte"> Application Object. </param>
-        /// <param name="pidString"> Returns the Process ID as a string. </param>
-        /// <returns> TRUE if successful, False if not. </returns>
-        private bool GetProcessInfo(DTE2 dte, ref string pidString, ref string toolsPath, ref string publicKeyPath, ref string targetIP, ref string password, ref string executablePath)
-        {
-            string currentPath = "";
-
-            foreach (string[] paths in _targetDir)
-            {
-                if (paths[0] == _processName)
-                {
-                    currentPath = paths[1];
-                    break;
-                }
-            }
-
-            executablePath = currentPath + _processName; // The executable path
-            executablePath = executablePath.Replace('\\', '/');
-            publicKeyPath = ConfigDefaults.SshPublicKeyPath;
-            publicKeyPath = publicKeyPath.Replace('\\', '/');
-
-            try
-            {
-                RegistryKey rkHKCU = Registry.CurrentUser;
-                RegistryKey rkPluginRegKey = rkHKCU.OpenSubKey("Software\\BlackBerry\\BlackBerryVSPlugin");
-                toolsPath = rkPluginRegKey.GetValue("NDKHostPath") + "/usr/bin";
-                toolsPath = toolsPath.Replace('\\', '/');
-
-                if (_isSimulator)
-                {
-                    targetIP = rkPluginRegKey.GetValue("simulator_IP").ToString();
-                    password = rkPluginRegKey.GetValue("simulator_password").ToString();
-                }
-                else
-                {
-                    targetIP = rkPluginRegKey.GetValue("device_IP").ToString();
-                    password = rkPluginRegKey.GetValue("device_password").ToString();
-                }
-
-                // Decrypt stored password.
-                byte[] data = Convert.FromBase64String(password);
-                if (data.Length > 0)
-                {
-                    byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.LocalMachine);
-                    password = Encoding.Unicode.GetString(decrypted);
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message, "Microsoft Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-            pidString = GetPIDfromGDB(_processName, targetIP, password, _isSimulator, toolsPath, publicKeyPath);
-
-            if (pidString == "")
-            {
-                // Select all of the text
-                _owP.TextDocument.Selection.SelectAll();
-                string outputText = _owP.TextDocument.Selection.Text;
-
-                // Check for successful deployment
-                if (Regex.IsMatch(outputText, "Info: done"))
-                {
-                    string pattern = @"\s+result::(\d+)\r\n.+|\s+result::(\d+) \(TaskId:";
-                    Regex r = new Regex(pattern, RegexOptions.IgnoreCase);
-
-                    // Match the regular expression pattern against a text string.
-                    Match m = r.Match(outputText);
-
-                    // Take first match
-                    if (m.Success)
-                    {
-                        Group g = m.Groups[1];
-                        CaptureCollection cc = g.Captures;
-                        if (cc.Count == 0)
-                        {   // Diagnostic verbosity mode
-                            g = m.Groups[2];
-                            cc = g.Captures;
-                        }
-
-                        if (cc.Count != 0)
-                        {
-                            Capture c = cc[0];
-                            pidString = c.ToString();
-                        }
-                    }
-                }
-            }
-
-            if (pidString != "")
-            {
-
-                // Store process name and file location into ProcessesPath.txt, so "Attach To Process" would be able to find the 
-                // source code for a running process.
-                // First read the file.
-                _processName += "_" + _isSimulator;
-
-                string processesPaths;
-                try
-                {
-                    StreamReader readProcessesPathsFile = new StreamReader(Path.Combine(ConfigDefaults.DataDirectory, "ProcessesPath.txt"));
-                    processesPaths = readProcessesPathsFile.ReadToEnd();
-                    readProcessesPathsFile.Close();
-                }
-                catch (Exception)
-                {
-                    processesPaths = "";
-                }
-
-                // Updating the contents.
-                int begin = processesPaths.IndexOf(_processName + ":>", StringComparison.Ordinal);
-
-                if (begin != -1)
-                {
-                    begin += _processName.Length + 2;
-                    int end = processesPaths.IndexOf("\r\n", begin, System.StringComparison.Ordinal);
-                    processesPaths = processesPaths.Substring(0, begin) + currentPath + processesPaths.Substring(end);
-                }
-                else
-                {
-                    processesPaths = processesPaths + _processName + ":>" + currentPath + "\r\n";
-                }
-
-                // Writing contents to file.
-                try
-                {
-                    StreamWriter writeProcessesPathsFile = new StreamWriter(Path.Combine(ConfigDefaults.DataDirectory, "ProcessesPath.txt"), false);
-                    writeProcessesPathsFile.Write(processesPaths);
-                    writeProcessesPathsFile.Close();
-                }
-                catch (Exception)
-                {
-                }
-
-                return true;
-            }
-            return false;
-        }
-
-        private string GetPIDfromGDB(string processName, string ip, string password, bool isSimulator, string toolsPath, string publicKeyPath)
-        {
-            string pid = "";
-            string response = GDBParser.GetPIDsThroughGDB(ip, password, isSimulator, toolsPath, publicKeyPath, 7);
-
-            if ((response == "TIMEOUT!") || (response.IndexOf("1^error,msg=", 0, StringComparison.Ordinal) != -1)) //found an error
-            {
-                if (response == "TIMEOUT!") // Timeout error, normally happen when the device is not connected.
-                {
-                    MessageBox.Show("Please, verify if the Device/Simulator IP in \"BlackBerry -> Settings\" menu is correct and check if it is connected.", "Device/Simulator not connected or not configured properly", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
-                else
-                    if (response[29] == ':') // error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
-                    {
-                        string txt = response.Substring(13, response.IndexOf(':', 13) - 13) + response.Substring(29, response.IndexOf('"', 31) - 29);
-                        string caption;
-                        if (txt.IndexOf("The requested address is not valid in its context.") != -1)
-                        {
-                            txt += "\n\nPlease, verify the BlackBerry device/simulator IP settings.";
-                            caption = "Invalid IP";
-                        }
-                        else
-                        {
-                            txt += "\n\nPlease, verify if the device/simulator is connected.";
-                            caption = "Connection failed";
-                        }
-                        MessageBox.Show(txt, caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    }
-            }
-            else if (response.Contains("^done"))
-            {
-                int i = response.IndexOf(processName + " - ", StringComparison.Ordinal);
-                if (i != -1)
-                {
-                    i += processName.Length + 3;
-                    pid = response.Substring(i, response.IndexOf('/', i) - i);
-                }
-            }
-            return pid;
-        }
-
-
-        /// <summary>
-        /// Verify if the app configuration is Debug.
-        /// </summary>
-        /// <returns> True if Debug configuration; False otherwise. </returns>
-        private bool CheckDebugConfiguration()
-        {
-            Solution2 solution = (Solution2)_dte.Solution;
-            foreach (String startupProject in (Array)solution.SolutionBuild.StartupProjects)
-            {
-                foreach (Project p1 in solution.Projects)
-                {
-                    if (p1.UniqueName == startupProject)
-                    {
-                        ConfigurationManager config = p1.ConfigurationManager;
-                        Configuration active = config.ActiveConfiguration;
-
-                        return active.ConfigurationName.ToUpper() == "DEBUG";
-                    }
-                }
-            }
-            return (false);
-        }
-
-
-        #endregion
 
         #region IDisposable Implementation
 
@@ -826,220 +459,6 @@ namespace BlackBerry.Package
             Dispose(true);
         }
 
-        #endregion
-
-        #region Event Handlers
-
-        /// <summary> 
-        /// New Start Debug Command Events After Execution Event Handler. 
-        /// </summary>
-        /// <param name="guid">Command GUID. </param>
-        /// <param name="id">Command ID. </param>
-        /// <param name="customIn">Custom IN Object. </param>
-        /// <param name="customOut">Custom OUT Object. </param>
-        private void StartDebugCommandEvents_AfterExecute(string guid, int id, object customIn, object customOut)
-        {
-            Debug.WriteLine("After Start Debug");
-        }
-
-        /// <summary> 
-        /// New Start Debug Command Events Before Execution Event Handler. Call the method responsible for building the app. 
-        /// </summary>
-        /// <param name="guid"> Command GUID. </param>
-        /// <param name="id"> Command ID. </param>
-        /// <param name="customIn"> Custom IN Object. </param>
-        /// <param name="customOut"> Custom OUT Object. </param>
-        /// <param name="cancelDefault"> Cancel the default execution of the command. </param>
-        private void StartDebugCommandEvents_BeforeExecute(string guid, int id, object customIn, object customOut, ref bool cancelDefault)
-        {
-            bool bbPlatform = false;
-            if (_dte.Solution.SolutionBuild.ActiveConfiguration != null)
-            {
-                _isDebugConfiguration = CheckDebugConfiguration();
-
-                SolutionContexts scCollection = _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts;
-                foreach (SolutionContext sc in scCollection)
-                {
-                    if (sc.PlatformName == "BlackBerry" || sc.PlatformName == "BlackBerrySimulator")
-                    {
-                        bbPlatform = true;
-                        _isSimulator = sc.PlatformName == "BlackBerrySimulator";
-                    }
-                }
-            }
-
-            Debug.WriteLine("Before Start Debug");
-
-            if (ControlDebugEngine.isDebugEngineRunning || !bbPlatform)
-            {
-                // Disable the override of F5 (this allows the debugged process to continue execution)
-                cancelDefault = false;
-            }
-            else
-            {
-                try
-                {
-                    Solution2 solution = (Solution2)_dte.Solution;
-                    _buildThese = new List<String>();
-                    _targetDir = new List<string[]>();
-
-                    foreach (String startupProject in (Array)solution.SolutionBuild.StartupProjects)
-                    {
-                        foreach (Project p1 in solution.Projects)
-                        {
-                            if (p1.UniqueName == startupProject)
-                            {
-                                _buildThese.Add(p1.FullName);
-                                _processName = p1.Name;
-
-                                ConfigurationManager config = p1.ConfigurationManager;
-                                Configuration active = config.ActiveConfiguration;
-
-                                foreach (Property prop in active.Properties)
-                                {
-                                    try
-                                    {
-                                        if (prop.Name == "OutputPath")
-                                        {
-                                            string[] path = new string[2];
-                                            path[0] = p1.Name;
-                                            path[1] = prop.Value.ToString();
-                                            _targetDir.Add(path);
-                                            break;
-                                        }
-                                    }
-                                    catch
-                                    {
-                                    }
-                                }
-
-                                break;
-                            }
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex.Message);
-                }
-
-                
-                // Create a reference to the Output window.
-                // Create a tool window reference for the Output window
-                // and window pane.
-                OutputWindow ow = _dte.ToolWindows.OutputWindow;
-
-                // Select the Build pane in the Output window.
-                _owP = ow.OutputWindowPanes.Item("Build");
-                _owP.Activate();
-
-                if (_isDebugConfiguration)
-                {
-                    /*
-                     PH: FIXME: update API Level vs current project verification...
-                    UpdateManagerData upData;
-                    if (_targetDir.Count > 0)
-                        upData = new UpdateManagerData(_targetDir[0][1]);
-                    else
-                        upData = new UpdateManagerData();
-
-                    if (!upData.validateDeviceVersion(_isSimulator))
-                    {
-                        cancelDefault = true;
-                    }
-                    else
-                    {
-                        BuildBar();
-                        cancelDefault = true;
-                    }
-                     */
-                }
-                else
-                {
-                    BuildBar();
-                    cancelDefault = true;
-                }
-            }
-        }
-
-
-        /// <summary> 
-        /// This event is fired only when the build/rebuild/clean process ends. 
-        /// </summary>
-        /// <param name="scope"> Represents the scope of the build. </param>
-        /// <param name="action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
-        private void OnBuildDone(vsBuildScope scope, vsBuildAction action)
-        {
-            if (action == vsBuildAction.vsBuildActionBuild)
-            {
-                _amountOfProjects -= 1;
-                if (_amountOfProjects == 0)
-                {
-                    _buildEvents.OnBuildDone -= OnBuildDone;
-                    Built();
-                }
-            }
-            else if (action == vsBuildAction.vsBuildActionDeploy)
-            {
-                _buildEvents.OnBuildDone -= OnBuildDone;
-                _isDeploying = false;
-                Deployed();
-            }
-        }
-
-        /// <summary> 
-        /// This event is fired only when user wants to build, rebuild or clean the project. 
-        /// </summary>
-        /// <param name="Scope"> Represents the scope of the build. </param>
-        /// <param name="Action"> Represents the type of build action that is occurring, such as a build or a deploy action. </param>
-        private void OnBuildBegin(vsBuildScope scope, vsBuildAction action)
-        {
-            if (!HasActiveNDK)
-            {
-                var form = new MissingNdkInstalledForm();
-                form.ShowDialog();
-                return;
-            }
-
-            if (action == vsBuildAction.vsBuildActionBuild || action == vsBuildAction.vsBuildActionRebuildAll)
-            {
-                if (!_hitPlay && !_isDeploying)
-                {
-                    // means that the "play" building and deploying process was cancelled before, so we have to disable the 
-                    // OnBuildDone event to avoid deploying in case user only wants to build.
-                    _buildEvents.OnBuildDone -= OnBuildDone;
-                }
-                _hitPlay = false;
-            }
-        }
-
-        private void MenuItemCallback(object sender, EventArgs e)
-        {
-            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
-            dlg.DefaultExt = ".cproject"; // Default file extension
-            dlg.Filter = "Native Core Application Project Files (*.cproject, *.project)|*.cproject;*.project;";
-            dlg.Title = "Open BlackBerry Core Native Application Project Files";
-            dlg.Multiselect = false;
-            dlg.InitialDirectory = Environment.SpecialFolder.MyComputer.ToString();
-            dlg.CheckFileExists = true;
-
-            bool? result = dlg.ShowDialog();
-            if (result == true)
-            {
-                string filename = dlg.FileName;
-                FileInfo fi = new FileInfo(filename);
-                string folderName = fi.DirectoryName;
-
-                Array projects = (Array)_dte.ActiveSolutionProjects;
-                Project project = (Project)projects.GetValue(0);
-                string name = project.FullName;
-
-                // Create the dialog instance without Help support.
-                var importSummary = new Import.Import(project, folderName, name);
-                importSummary.ShowModel2();
-            }
-        }
-        
         #endregion
     }
 }

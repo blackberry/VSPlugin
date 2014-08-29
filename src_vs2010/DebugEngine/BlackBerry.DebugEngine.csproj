@@ -22,7 +22,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -31,7 +31,7 @@
     <DefineConstants>TRACE;PLATFORM_VS2010</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EnvDTE, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -68,8 +68,8 @@
     <Reference Include="Microsoft.VisualStudio.Shell, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
-      <Link>ConfigDefaults.cs</Link>
+    <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
+      <Link>NativeMethods.cs</Link>
     </Compile>
     <Compile Include="AD7.Definitions\AD7Enums.cs" />
     <Compile Include="AD7.Definitions\AD7Guids.cs" />
@@ -94,20 +94,21 @@
     <Compile Include="AD7.Impl\AD7Property.cs" />
     <Compile Include="AD7.Impl\AD7StackFrame.cs" />
     <Compile Include="AD7.Impl\AD7Thread.cs" />
+    <Compile Include="DebugEngineStatus.cs" />
     <Compile Include="Engine.Impl\BreakpointManager.cs" />
     <Compile Include="Engine.Impl\EngineCallback.cs" />
     <Compile Include="Engine.Impl\EngineUtils.cs" />
     <Compile Include="Engine.Impl\EventDispatcher.cs" />
+    <Compile Include="Engine.Impl\HandleBreakpoints.cs" />
+    <Compile Include="Engine.Impl\HandleOutputs.cs" />
+    <Compile Include="Engine.Impl\HandleProcessExecution.cs" />
+    <Compile Include="Engine.Impl\VariableInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GDBParser\GDBParser.vcxproj">
-      <Project>{CC7B28E0-CB31-44F7-A380-E7072F670F38}</Project>
-      <Name>GDBParser</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
-      <Project>{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}</Project>
-      <Name>BlackBerry.Package</Name>
+    <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
+      <Project>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</Project>
+      <Name>BlackBerry.NativeCore</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

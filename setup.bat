@@ -12,12 +12,14 @@ if "%~1" == "" (
   set ActionVS2013=1
   set ActionUninstall=0
   set ActionSkipTools=0
+  set ActionMSBuildOnly=0
 ) else (
   set ActionVS2010=0
   set ActionVS2012=0
   set ActionVS2013=0
   set ActionUninstall=0
   set ActionSkipTools=0
+  set ActionMSBuildOnly=0
   for %%a in (%*) do (
     if /i "%%a" == "/all"          set ActionVS2010=1 && set ActionVS2012=1 && set ActionVS2013=1
     if /i "%%a" == "/uninstall"    set ActionUninstall=1
@@ -27,6 +29,11 @@ if "%~1" == "" (
     if /i "%%a" == "/skip-tools"   set ActionSkipTools=1
     if /i "%%a" == "/no-tools"     set ActionSkipTools=1
     if /i "%%a" == "/notools"      set ActionSkipTools=1
+    if /i "%%a" == "/msbuild"      set ActionMSBuildOnly=1
+    if /i "%%a" == "/msbuild-only" set ActionMSBuildOnly=1
+    if /i "%%a" == "/msbuildonly"  set ActionMSBuildOnly=1
+    if /i "%%a" == "/only-msbuild" set ActionMSBuildOnly=1
+    if /i "%%a" == "/onlymsbuild"  set ActionMSBuildOnly=1
     if /i "%%a" == "vs2010"        set ActionVS2010=1
     if /i "%%a" == "vs2012"        set ActionVS2012=1
     if /i "%%a" == "vs2013"        set ActionVS2013=1
@@ -112,27 +119,94 @@ set VSWizardsPath=%ProgFilesRoot%\Microsoft Visual Studio %VSVersion%\VC\VCWizar
 set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms
 if not "%VSSelector%" == "" set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\%VSSelector%\Platforms
 
+set /a actionNo += 1
+
+REM Skip tools&plugin, if only upgrading MSBuild (in case of debugger development)
+if %ActionMSBuildOnly% neq 0 goto msbuild_only
+
 REM Skip installation of custom tools (in case upgrading only plugin during development)
 if %ActionSkipTools% neq 0 goto skip_tools
 call :processTools "%thisDir%" "%PluginRoot%" "%SystemDrive%"
 set /a actionNo += 1
 :skip_tools
 
-call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%" "%MSBuildTargetPath%" "%VSWizardsPath%"
+call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%"
+set /a actionNo += 1
+:msbuild_only
+
+call :processMSBuild "%BuildPath%" "%MSBuildTargetPath%"
 set /a actionNo += 1
 
-if %ActionUninstall% neq 0 (goto uninstall_reg)
-
-REM Registering debug-ending and other support classes
-echo %actionNo%: Registering debug-engine [%BuildResults%\setup_VS%VSYear%_install_%SystemArch%.reg]
-REGEDIT.EXE /S "%BuildResults%\setup_VS%VSYear%_install_%SystemArch%.reg"
-goto processSetup_End
-
-:uninstall_reg
-echo %actionNo%: Unregistering debug-engine [%BuildResults%\setup_VS%VSYear%_uninstall.reg]
-REGEDIT.EXE /S "%BuildResults%\setup_VS%VSYear%_uninstall.reg"
+call :processTemplates "%BuildPath%" "%VSWizardsPath%"
+set /a actionNo += 1
 
 :processSetup_End
+endlocal
+exit /b
+
+REM ********************************************************************************************
+REM Templates
+REM ********************************************************************************************
+REM $1 - from
+REM $2 - Wizards path
+:processTemplates
+setlocal
+
+set InputPath=%~1
+set OutputWizardsPath=%~2
+
+if %ActionUninstall% neq 0 (goto uninstall_Templates)
+
+REM Templates
+echo %actionNo%: Installing BlackBerry Wizards
+xcopy "%InputPath%\Templates\VCWizards" "%OutputWizardsPath%" /e /i /y
+
+goto processTemplates_End
+
+:uninstall_Templates
+
+REM Remove Templates
+echo %actionNo%: Removing BlackBerry Wizards
+rd "%OutputWizardsPath%\BlackBerry" /s /q 
+
+:processTemplates_End
+endlocal
+exit /b
+
+REM ********************************************************************************************
+REM MSBuild system upgrade
+REM ********************************************************************************************
+REM $1 - from
+REM $2 - MSBuild Targets path
+:processMSBuild
+setlocal
+
+set InputPath=%~1
+set OutputMsBuildTargetsPath=%~2
+
+if %ActionUninstall% neq 0 (goto uninstall_MSBuild)
+
+REM MSBuild Files
+echo %actionNo%: Installing build targets
+echo Copy BlackBerry MSBuild directory [%OutputMsBuildTargetsPath%]
+xcopy "%InputPath%\BlackBerry" "%OutputMsBuildTargetsPath%\BlackBerry" /e /i /y
+copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerry\BlackBerry.BuildTasks.dll"
+echo Copy BlackBerrySimulator MSBuild directory [%OutputMsBuildTargetsPath%]
+xcopy "%InputPath%\BlackBerrySimulator" "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /e /i /y
+copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerrySimulator\BlackBerry.BuildTasks.dll"
+
+goto processMSBuild_End
+
+:uninstall_MSBuild
+
+REM Remove MSBuild Files
+echo %actionNo%: Removing build targets
+echo Delete BlackBerry MSBuild directory
+rd "%OutputMsBuildTargetsPath%\BlackBerry" /s /q
+echo Delete BlackBerrySimulator MSBuild directory
+rd "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /s /q
+
+:processMSBuild_End
 endlocal
 exit /b
 
@@ -142,16 +216,12 @@ REM ****************************************************************************
 REM $1 - from
 REM $2 - to (plugin path)
 REM $3 - to (Visual Studio path)
-REM $4 - MSBuild Targets path
-REM $5 - Wizards path
 :processPlugin
 setlocal EnableDelayedExpansion
 
 set InputPath=%~1
 set OutputPluginPath=%~2
 set OutputVsPath=%~3
-set OutputMsBuildTargetsPath=%~4
-set OutputWizardsPath=%~5
 
 if %ActionUninstall% neq 0 (goto uninstall_Plugin)
 
@@ -162,79 +232,46 @@ md "%OutputPluginPath%"
 echo Make Directory "%OutputVsPath%"
 md "%OutputVsPath%"
 
-REM Install
-echo Copy "%InputPath%\GDBParser.dll" to "%OutputVsPath%\GDBParser.dll"
-copy "%InputPath%\GDBParser.dll" "%OutputVsPath%\GDBParser.dll" 
-echo Copy "%InputPath%\GDBWrapper.exe" to "%OutputPluginPath%\GDBWrapper.exe"
-copy "%InputPath%\GDBWrapper.exe" "%OutputPluginPath%\GDBWrapper.exe" 
-echo Copy "%InputPath%\Instructions.txt" to "%OutputPluginPath%\Instructions.txt"
-copy "%InputPath%\Instructions.txt" "%OutputPluginPath%\Instructions.txt" 
-echo Copy "%InputPath%\BlackBerry.DebugEngine.dll" to "%OutputPluginPath%\BlackBerry.DebugEngine.dll"
-copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputPluginPath%\BlackBerry.DebugEngine.dll" 
-
 REM Install Package Files
 echo "%InputPath%\extension.vsixmanifest" to "%OutputVsPath%\extension.vsixmanifest"
-copy "%InputPath%\extension.vsixmanifest" "%OutputVsPath%\extension.vsixmanifest" 
+copy "%InputPath%\extension.vsixmanifest" "%OutputVsPath%\extension.vsixmanifest"
+echo "%InputPath%\BlackBerry.GDBHost.exe" to "%OutputVsPath%\BlackBerry.GDBHost.exe"
+copy "%InputPath%\BlackBerry.GDBHost.exe" "%OutputVsPath%\BlackBerry.GDBHost.exe"
 echo "%InputPath%\BlackBerry.NativeCore.dll" to "%OutputVsPath%\BlackBerry.NativeCore.dll"
 copy "%InputPath%\BlackBerry.NativeCore.dll" "%OutputVsPath%\BlackBerry.NativeCore.dll"
 echo "%InputPath%\BlackBerry.Package.dll" to "%OutputVsPath%\BlackBerry.Package.dll"
 copy "%InputPath%\BlackBerry.Package.dll" "%OutputVsPath%\BlackBerry.Package.dll"
 echo "%InputPath%\BlackBerry.Package.pkgdef" to "%OutputVsPath%\BlackBerry.Package.pkgdef"
-copy "%InputPath%\BlackBerry.Package.pkgdef" "%OutputVsPath%\BlackBerry.Package.pkgdef" 
-
-REM MSBuild Files
-echo Copy BlackBerry MSBuild directory [%OutputMsBuildTargetsPath%]
-xcopy "%InputPath%\BlackBerry" "%OutputMsBuildTargetsPath%\BlackBerry" /e /i /y
-copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerry\BlackBerry.BuildTasks.dll"
-echo Copy BlackBerrySimulator MSBuild directory [%OutputMsBuildTargetsPath%]
-xcopy "%InputPath%\BlackBerrySimulator" "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /e /i /y
-copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerrySimulator\BlackBerry.BuildTasks.dll"
-
-REM Templates
-echo Copy BlackBerry VCWizards directory
-xcopy "%InputPath%\Templates\VCWizards" "%OutputWizardsPath%" /e /i /y
-
+copy "%InputPath%\BlackBerry.Package.pkgdef" "%OutputVsPath%\BlackBerry.Package.pkgdef"
+echo "%InputPath%\BlackBerry.DebugEngine.dll" to "%OutputVsPath%\BlackBerry.DebugEngine.dll"
+copy "%InputPath%\BlackBerry.DebugEngine.dll" "%OutputVsPath%\BlackBerry.DebugEngine.dll"
 
 goto processPlugin_End
 
 :uninstall_Plugin
 
-REM Uninstall
 echo %actionNo%: Removing plugin binaries
-echo Deleting "%OutputVsPath%\GDBParser.dll"
-del "%OutputVsPath%\GDBParser.dll" 
-echo Deleting "%OutputPluginPath%\GDBWrapper.exe"
-del  "%OutputPluginPath%\GDBWrapper.exe" 
-echo Deleting "%OutputPluginPath%\Instructions.txt"
-del "%OutputPluginPath%\Instructions.txt" 
-echo Deleting "%OutputPluginPath%\BlackBerry.DebugEngine.dll"
-del "%OutputPluginPath%\BlackBerry.DebugEngine.dll" 
 
 REM Uninstall Package Files
+
 echo Deleting "%OutputVsPath%\extension.vsixmanifest"
-del "%OutputVsPath%\extension.vsixmanifest" 
+del "%OutputVsPath%\extension.vsixmanifest"
+echo Deleting "%OutputVsPath%\BlackBerry.GDBHost.exe"
+del  "%OutputVsPath%\BlackBerry.GDBHost.exe"
 echo Deleting  "%OutputVsPath%\BlackBerry.NativeCore.dll"
 del "%OutputVsPath%\BlackBerry.NativeCore.dll"
 echo Deleting  "%OutputVsPath%\BlackBerry.Package.dll"
 del "%OutputVsPath%\BlackBerry.Package.dll"
 echo Deleting  "%OutputVsPath%\BlackBerry.Package.pkgdef"
-del "%OutputVsPath%\BlackBerry.Package.pkgdef" 
+del "%OutputVsPath%\BlackBerry.Package.pkgdef"
+echo Deleting "%OutputVsPath%\BlackBerry.DebugEngine.dll"
+del "%OutputVsPath%\BlackBerry.DebugEngine.dll"
 
 REM Remove folders
 echo Remove Directory "%OutputPluginPath%"
 rd "%OutputPluginPath%"
 echo Remove Directory "%OutputVsPath%"
 rd "%OutputVsPath%"
-
-REM Remove MSBuild Files
-echo Delete BlackBerry MSBuild directory
-rd "%OutputMsBuildTargetsPath%\BlackBerry" /s /q
-echo Delete BlackBerrySimulator MSBuild directory
-rd "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /s /q
-
-REM Remove Templates
-echo Delete BlackBerry VCWizards directory
-rd "%OutputWizardsPath%\BlackBerry" /s /q 
 
 :processPlugin_End
 endlocal
