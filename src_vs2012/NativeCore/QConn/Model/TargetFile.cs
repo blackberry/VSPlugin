@@ -3,6 +3,9 @@ using System.Text;
 
 namespace BlackBerry.NativeCore.QConn.Model
 {
+    /// <summary>
+    /// Class providing information about a target path.
+    /// </summary>
     public class TargetFile
     {
         internal const uint TypeMask = 0xFFFF0FFF;
@@ -14,6 +17,9 @@ namespace BlackBerry.NativeCore.QConn.Model
         private const uint TypeSymlink = 0xA000;
         private const uint TypeSocket = 0xC000;
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public TargetFile(uint mode, ulong size, uint flags, string path, string originalPath)
         {
             if (string.IsNullOrEmpty(path))
@@ -36,7 +42,7 @@ namespace BlackBerry.NativeCore.QConn.Model
                 throw new ArgumentNullException("path");
 
             CreationTime = DateTime.MinValue;
-            IsStub = true;
+            NoAccess = true;
             Path = path;
             OriginalPath = path;
             UpdateFormatting();
@@ -61,6 +67,12 @@ namespace BlackBerry.NativeCore.QConn.Model
         }
 
         public string FormattedPermissions
+        {
+            get;
+            private set;
+        }
+
+        public char FormattedType
         {
             get;
             private set;
@@ -123,7 +135,11 @@ namespace BlackBerry.NativeCore.QConn.Model
             get { return Type == TypeSymlink; }
         }
 
-        public bool IsStub
+        /// <summary>
+        /// Gets an indication, if specified object describes 'something', we had no access to.
+        /// That's why it was impossible to load info and all properties are invalid.
+        /// </summary>
+        public bool NoAccess
         {
             get;
             private set;
@@ -148,16 +164,19 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         private void UpdateFormatting()
         {
-            if (IsStub)
+            if (NoAccess)
             {
                 FormattedPermissions = "N/A";
+                FormattedType = '-';
             }
             else
             {
+                FormattedType = GetTypeLetter(Type);
+
                 StringBuilder result = new StringBuilder();
 
                 // append type:
-                result.Append(GetTypeLetter(Type));
+                result.Append(FormattedType);
 
                 // append permissions (user/group/all):
                 const string AllPermissions = "xwr";

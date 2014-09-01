@@ -10,12 +10,15 @@ namespace BlackBerry.NativeCore.QConn
     /// </summary>
     public sealed class QConnConnection : IDisposable
     {
-        private string _host;
-        private int _port;
+        private readonly string _host;
+        private readonly int _port;
         private QDataSource _source;
         private readonly Endianess _endian;
         private readonly string _serviceName;
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public QConnConnection(string host, int port)
         {
             if (string.IsNullOrEmpty(host))

@@ -75,7 +75,7 @@ namespace BlackBerry.NativeCore.QConn
                     _socket.SendTimeout = Timeout;
                     _socket.ReceiveTimeout = Timeout;
                     _socket.DontFragment = true;
-                    _socket.NoDelay = true; // don't combine small TCP packets into one
+                    _socket.NoDelay = true; // don't combine small TCP packets into one, just send them immediately as data to transmit was given
                     _socket.Connect(host, port);
 
                     // make sure, the object is listed on the finalizers thread,
@@ -117,7 +117,17 @@ namespace BlackBerry.NativeCore.QConn
 
             try
             {
-                _socket.Send(data);
+                int sent = _socket.Send(data);
+                if (sent < 0)
+                {
+                    QTraceLog.WriteLine("Unable to send data");
+                    return HResult.Fail;
+                }
+                if (sent != data.Length)
+                {
+                    QTraceLog.WriteLine("Invalid number of bytes send ({0} instead of {1})", sent, data.Length);
+                    return HResult.Fail;
+                }
             }
             catch (Exception ex)
             {
@@ -130,7 +140,13 @@ namespace BlackBerry.NativeCore.QConn
         }
 
         /// <summary>
-        /// Reads specified amount of data from target.
+        /// Reads specified amount of available data from target.
+        /// MaxLength parameter serves only as a suggestion here. It might happen,
+        /// that result will be smaller than maxLength, but for sure, it won't return a bigger buffer.
+        /// 
+        /// That's why there are two possible usages:
+        ///  - to call this method with int.MaxValue to just read *all* available data
+        ///  - or with small value, to only get, what is currently needed for processing and leave the rest for next Receive() request.
         /// </summary>
         public HResult Receive(int maxLength, out byte[] result)
         {
@@ -147,6 +163,13 @@ namespace BlackBerry.NativeCore.QConn
                 _buffer = new byte[_chunkSize];
             }
 
+            // PH: hint:
+            // The idea of following code is to try at least once to perform a read of the data from the socket.
+            // Then it will loop and simply stop, when there is nothing more available.
+            //
+            // There are few optimizations implemented. Reading is done in chunks. If somehow the expected maxLength
+            // equals the chunk size, the local array will be returned (to avoid copying) and forget.
+            // In any other case, the result data is a new array filled with data copied from buffer and previously read chunks.
             try
             {
                 int totalLength = 0;
@@ -218,6 +241,10 @@ namespace BlackBerry.NativeCore.QConn
             return HResult.OK;
         }
 
+        /// <summary>
+        /// Allocates new array and copies there data from specified collection of chunks.
+        /// The last one (lastChunk) doesn't need to be fully filled.
+        /// </summary>
         private static byte[] Combine(List<byte[]> buffers, byte[] lastChunk, int lastChunkLength)
         {
             // calculate result length:

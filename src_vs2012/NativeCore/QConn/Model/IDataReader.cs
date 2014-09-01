@@ -11,6 +11,6 @@
         byte[] ReadBytes(int length);
 
         void Skip(int bytes);
-        string ReadString(char terminatorChar);
+        string ReadString(uint maxLength, char terminatorChar);
     }
 }

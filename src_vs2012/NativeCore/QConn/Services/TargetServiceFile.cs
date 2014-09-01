@@ -6,6 +6,10 @@ using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Services
 {
+    /// <summary>
+    /// Class to communicate with a File-System Service on target.
+    /// It allows any file and directory manipulations.
+    /// </summary>
     public sealed class TargetServiceFile : TargetService
     {
         public const int ModeOpenNone = 0;
@@ -13,6 +17,9 @@ namespace BlackBerry.NativeCore.QConn.Services
         public const int ModeOpenWriteOnly = 2;
         public const int ModeOpenReadWrite = 3;
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public TargetServiceFile(Version version, QConnConnection connection)
             : base(version, connection)
         {
@@ -128,7 +135,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             var reader = Connection.Request(string.Concat("r:", descriptor.Handle, ":", offset.ToString("X"), ":", length.ToString("X")));
 
             // read and parse the header part:
-            var responseHeader = reader.ReadString('\n');
+            var responseHeader = reader.ReadString(uint.MaxValue, '\n');
             if (string.IsNullOrEmpty(responseHeader))
                 throw new QConnException("Unable to retrieve response header");
             var response = Token.Parse(responseHeader);

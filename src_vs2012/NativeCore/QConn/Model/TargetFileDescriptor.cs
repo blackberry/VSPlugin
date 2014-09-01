@@ -3,10 +3,16 @@ using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.QConn.Model
 {
+    /// <summary>
+    /// Internal class wrapping the management of the handle used by target's File-System Service.
+    /// </summary>
     sealed class TargetFileDescriptor : TargetFile, IDisposable
     {
         private TargetServiceFile _service;
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public TargetFileDescriptor(TargetServiceFile service, string handle, uint mode, ulong size, uint flags, string path, string originalPath)
             : base(mode, size, flags, path, originalPath)
         {
@@ -61,6 +67,9 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         #endregion
 
+        /// <summary>
+        /// Notifies this instance, that the handle was released and is no more valid.
+        /// </summary>
         internal void Closed()
         {
             _service = null;

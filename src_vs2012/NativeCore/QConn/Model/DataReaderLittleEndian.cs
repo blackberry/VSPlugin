@@ -118,21 +118,22 @@ namespace BlackBerry.NativeCore.QConn.Model
             _at += bytes;
         }
 
-        public string ReadString(char terminatorChar)
+        public string ReadString(uint maxLength, char terminatorChar)
         {
             VerifyData();
 
             var at = _at;
-            for (int i = _at; i < _data.Length; i++)
+            int i = _at;
+            for (; i < _data.Length && maxLength > 0; i++, maxLength--)
             {
                 if (_data[i] == terminatorChar)
                 {
-                    _at = i + 1;
+                    _at = i + 1; // also skip the terminator
                     return Encoding.UTF8.GetString(_data, at, i - at);
                 }
             }
 
-            _at = _data.Length;
+            _at = i;
             return Encoding.UTF8.GetString(_data, at, _data.Length - at);
         }
     }

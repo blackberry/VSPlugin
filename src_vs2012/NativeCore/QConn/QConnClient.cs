@@ -99,7 +99,7 @@ namespace BlackBerry.NativeCore.QConn
         }
 
         /// <summary>
-        /// Loads info about the target.
+        /// Loads info about the target and initializes properties.
         /// </summary>
         public void Load(string host, int port)
         {

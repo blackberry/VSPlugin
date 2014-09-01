@@ -4,6 +4,10 @@ using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Services
 {
+    /// <summary>
+    /// Class to communicate with a Control Service running on target.
+    /// It is supposed to manage running processes.
+    /// </summary>
     public sealed class TargetServiceControl : TargetService
     {
         private const int SIGKILL = 9;
@@ -18,12 +22,18 @@ namespace BlackBerry.NativeCore.QConn.Services
             return "ControlService";
         }
 
-        public void Kill(uint pid)
+        /// <summary>
+        /// Terminates a process with specified PID.
+        /// </summary>
+        public void Terminate(uint pid)
         {
             Kill(pid, SIGKILL);
         }
 
-        public void Kill(SystemInfoProcess process)
+        /// <summary>
+        /// Terminates specified process.
+        /// </summary>
+        public void Terminate(SystemInfoProcess process)
         {
             if (process == null)
                 throw new ArgumentNullException("process");
@@ -31,6 +41,9 @@ namespace BlackBerry.NativeCore.QConn.Services
             Kill(process.ID, SIGKILL);
         }
 
+        /// <summary>
+        /// Sends a kill signal to a process with specified PID.
+        /// </summary>
         public void Kill(uint pid, uint signal)
         {
             var response = Connection.Send(string.Concat("kill ", pid, " ", signal));

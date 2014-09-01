@@ -8,20 +8,27 @@ namespace BlackBerry.NativeCore.QConn.Model
     public sealed class SystemInfoProcess
     {
         /// <summary>
-        /// Init constuctor.
+        /// Init constructor.
         /// </summary>
-        public SystemInfoProcess(uint id, string name)
+        public SystemInfoProcess(uint id, uint parentID, string name)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
 
             ID = id;
+            ParentID = parentID;
             Name = name;
         }
 
         #region Properties
 
         public uint ID
+        {
+            get;
+            private set;
+        }
+
+        public uint ParentID
         {
             get;
             private set;

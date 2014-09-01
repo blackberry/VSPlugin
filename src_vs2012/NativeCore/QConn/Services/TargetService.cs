@@ -48,7 +48,10 @@ namespace BlackBerry.NativeCore.QConn.Services
 
         #endregion
 
-        public void Activate()
+        /// <summary>
+        /// Initializes a connection to a service.
+        /// </summary>
+        public void Open()
         {
             if (_connection == null)
                 throw new ObjectDisposedException("TargetService");
@@ -56,12 +59,18 @@ namespace BlackBerry.NativeCore.QConn.Services
             _connection.Open();
         }
 
+        /// <summary>
+        /// Closes the connection to a service and releases all resources.
+        /// </summary>
         public void Close()
         {
             if (_connection == null)
                 throw new ObjectDisposedException("TargetService");
 
-            _connection.Close();
+            if (_connection.IsConnected)
+            {
+                _connection.Close();
+            }
         }
 
         #region IDisposable Implementation

@@ -5,7 +5,8 @@ using BlackBerry.NativeCore.QConn.Model;
 namespace BlackBerry.NativeCore.QConn.Services
 {
     /// <summary>
-    /// Service providing access to system information about the target.
+    /// Class to communicate with a System-Info Service on target.
+    /// It specifies information about the host.
     /// </summary>
     public sealed class TargetServiceSysInfo : TargetService
     {
@@ -106,8 +107,11 @@ namespace BlackBerry.NativeCore.QConn.Services
             for (int i = 0; i < header.nelems; i++)
             {
                 uint id = reader.ReadUInt32();
-                reader.Skip(41 * 4); // some other non-interesting fields
-                string name = reader.ReadString('\0');
+                uint parentID = reader.ReadUInt32();
+                reader.Skip(40 * 4); // some other non-interesting fields
+
+                // read the process name, which is a NUL-terminated string with max 128 chars
+                string name = reader.ReadString(128u, '\0');
 
                 // skip remaining name buffer:
                 if (name.Length + 1 < 128)
@@ -115,7 +119,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                     reader.Skip(127 - name.Length);
                 }
 
-                result.Add(new SystemInfoProcess(id, name));
+                result.Add(new SystemInfoProcess(id, parentID, name));
             }
 
             return result.ToArray();

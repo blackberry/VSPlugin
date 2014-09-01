@@ -42,7 +42,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             throw new NotImplementedException();
         }
 
-        public string ReadString(char terminatorChar)
+        public string ReadString(uint maxLength, char terminatorChar)
         {
             throw new NotImplementedException();
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn;
 using BlackBerry.NativeCore.QConn.Model;
 using NUnit.Framework;
@@ -91,6 +92,11 @@ namespace UnitTests
             Assert.IsNotNull(processes);
             Assert.IsTrue(processes.Length > 0, "Invalid processes list, QConn should be at least running");
 
+            foreach (var p in processes)
+            {
+                QTraceLog.WriteLine("Process found: 0x{0:X8} (parent: 0x{1:X8}) - {2}", p.ID, p.ParentID, p.Name);
+            }
+
             // and close
             qdoor.Close();
         }
@@ -127,7 +133,7 @@ namespace UnitTests
             // kill the process:
             Assert.IsNotNull(qclient.ControlService);
             Assert.IsNotNull(toKill, "No application to terminate specified, please run anything on the device first");
-            qclient.ControlService.Kill(toKill);
+            qclient.ControlService.Terminate(toKill);
 
             // reload info:
             processes = qclient.SysInfoService.LoadProcesses();
@@ -204,7 +210,16 @@ namespace UnitTests
             //var files = qclient.FileService.List("/tmp/slogger2/"); // place where all apps are installed
 
             Assert.IsNotNull(files);
-            Assert.IsTrue(files.Length > 2, "Invalid number of items loaded");
+            //Assert.IsTrue(files.Length > 2, "Invalid number of items loaded");
+
+            // print all files:
+            QTraceLog.WriteLine("--------------------------------------------------------");
+            QTraceLog.WriteLine("Items: {0}", files.Length);
+
+            foreach (var f in files)
+            {
+                QTraceLog.WriteLine("Item: {0}: {1} - {2}", f.FormattedType, f.FormattedPermissions, f.Path);
+            }
 
             // and close
             qdoor.Close();
