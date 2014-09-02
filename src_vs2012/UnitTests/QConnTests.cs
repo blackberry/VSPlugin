@@ -304,5 +304,34 @@ namespace UnitTests
             // and close
             qdoor.Close();
         }
+
+        [Test]
+        public void ZipSampleFolderAndListFilesInParallel()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.FileService);
+
+            // download all files from the folder:
+            var visitor = new PackagingFileServiceVisitor(Path.Combine(Defaults.NdkDirectory, "test-parallel.zip"));
+            qclient.FileService.DownloadAsync("/tmp", visitor);
+
+            // this should be executed in parallel to the download:
+            var listing = qclient.FileService.List("/accounts/1000/appdata");
+
+            Assert.IsNotNull(visitor);
+            Assert.IsNotNull(listing);
+            Assert.IsTrue(listing.Length > 0, "No installed application found, what is not true");
+
+            visitor.Wait();
+
+            // and close
+            qdoor.Close();
+        }
     }
 }
