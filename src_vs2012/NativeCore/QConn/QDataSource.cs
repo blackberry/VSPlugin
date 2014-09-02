@@ -33,7 +33,7 @@ namespace BlackBerry.NativeCore.QConn
         {
             if (chunkSize < 0)
                 throw new ArgumentOutOfRangeException("chunkSize");
-            _chunkSize = chunkSize;
+            _chunkSize = chunkSize == 0 ? DefaultChunkSize : chunkSize;
         }
 
         ~QDataSource()

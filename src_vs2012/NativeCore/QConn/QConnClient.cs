@@ -163,14 +163,16 @@ namespace BlackBerry.NativeCore.QConn
             if (string.IsNullOrEmpty(version))
                 throw new QConnException("Unable to load version of \"" + name + "\" service");
 
-            QTraceLog.WriteLine("Loaded '{0}' version: {1}", name, version);
-
             uint numberVersion;
             if (uint.TryParse(version, out numberVersion))
             {
-                return new Version((int)((numberVersion & 0xFF00) >> 8), (int)(numberVersion & 0xFF));
+                var result = new Version((int)((numberVersion & 0xFF00) >> 8), (int)(numberVersion & 0xFF));
+                QTraceLog.WriteLine("Loaded '{0}' version: {1} ({2})", name, result, version);
+
+                return result;
             }
 
+            QTraceLog.WriteLine("Loaded '{0}' version: {1}", name, version);
             throw new QConnException("Unable to parse version of \"" + name + "\" service");
         }
 

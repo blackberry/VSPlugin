@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.QConn.Visitors;
 
 namespace BlackBerry.NativeCore.QConn.Services
 {
@@ -12,10 +13,17 @@ namespace BlackBerry.NativeCore.QConn.Services
     /// </summary>
     public sealed class TargetServiceFile : TargetService
     {
-        public const int ModeOpenNone = 0;
-        public const int ModeOpenReadOnly= 1;
-        public const int ModeOpenWriteOnly = 2;
-        public const int ModeOpenReadWrite = 3;
+        private const int ModeOpenNone = 0;
+        private const int ModeOpenReadOnly = 1;
+        private const int ModeOpenWriteOnly = 2;
+        private const int ModeOpenReadWrite = ModeOpenReadOnly | ModeOpenWriteOnly;
+
+        private const int ModeOpenAppend = 8;
+        private const int ModeOpenCreate = 0x100;
+        private const int ModeOpenTruncate = 0x200;
+        private const int ModeOpenExclude = 0x400;
+
+        private const int DownloadUploadChunkSize = 8192;
 
         /// <summary>
         /// Init constructor.
@@ -100,9 +108,9 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             // creating folder, returns some dummy data...
             if (string.Compare(handle, "-1", StringComparison.Ordinal) == 0)
-                return new TargetFileDescriptor(this, null, permissions, 4096, 0, path, path);
+                return new TargetFileDescriptor(this, null, permissions, 4096, path);
 
-            return new TargetFileDescriptor(this, handle, response[2].UInt32Value, response[3].UInt64Value, 0, response[4].StringValue, path);
+            return new TargetFileDescriptor(this, handle, response[2].UInt32Value, response[3].UInt64Value, response[4].StringValue);
         }
 
         internal void Close(TargetFileDescriptor descriptor)
@@ -132,10 +140,12 @@ namespace BlackBerry.NativeCore.QConn.Services
                 throw new ArgumentOutOfRangeException("length", "Unable to load so much data at once");
 
             // ask for the raw data:
-            var reader = Connection.Request(string.Concat("r:", descriptor.Handle, ":", offset.ToString("X"), ":", length.ToString("X")));
+            var command = string.Concat("r:", descriptor.Handle, ":", offset.ToString("X"), ":", length.ToString("X"));
+            var reader = Connection.Request(command);
 
             // read and parse the header part:
-            var responseHeader = reader.ReadString(uint.MaxValue, '\n');
+            var responseHeader = reader.ReadString(uint.MaxValue, '\r');
+            reader.Skip(1); // skip '\n'
             if (string.IsNullOrEmpty(responseHeader))
                 throw new QConnException("Unable to retrieve response header");
             var response = Token.Parse(responseHeader);
@@ -144,18 +154,23 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             ulong contentLength = response[1].UInt64Value;
             // ulong contentOffset = response[2].UInt64Value;
-            var buffer = reader.ReadBytes((int)contentLength);
-            if (buffer == null || buffer.Length != (int)contentLength)
-                throw new QConnException("Invalid number of content bytes read");
 
-            return buffer;
+            if (contentLength > 0)
+            {
+                var buffer = reader.ReadBytes((int) contentLength);
+                if (buffer == null || buffer.Length != (int) contentLength)
+                    throw new QConnException("Invalid number of content bytes read");
+                return buffer;
+            }
+
+            return new byte[0];
         }
 
         /// <summary>
         /// Gets the info about specified path.
         /// If specified, it throws exceptions in case of any errors or permission denies.
         /// </summary>
-        private TargetFileDescriptor Stat(string path, bool throwOnFailure)
+        private TargetFile Stat(string path, bool throwOnFailure)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -199,7 +214,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Lists files and folders at specified location.
         /// </summary>
-        public TargetFile[] List(string path)
+        public TargetFile[] List(string path, bool sort)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -207,13 +222,13 @@ namespace BlackBerry.NativeCore.QConn.Services
             var descriptor = Stat(path, true);
             if (descriptor == null)
                 throw new QConnException("Unable to determine path properties");
-            return List(descriptor);
+            return List(descriptor, sort);
         }
 
         /// <summary>
         /// Lists files and folders at specified location.
         /// </summary>
-        public TargetFile[] List(TargetFile location)
+        public TargetFile[] List(TargetFile location, bool sort)
         {
             if (location == null)
                 throw new ArgumentNullException("location");
@@ -223,9 +238,9 @@ namespace BlackBerry.NativeCore.QConn.Services
                 using (var directory = Open(location.Path, ModeOpenReadOnly, TargetFile.TypeDirectory, true))
                 {
                     // PH: HINT:
-                    // if folder reports no size (like /tmp/slogger2), try to read as much as possible...
+                    // since some folders reports no size (like /tmp/slogger2) or too small size (like /pps/system only 8 bytes), try to read as much as possible...
                     // just fingers crossed, it won't really try to allocated 2GB of memory...
-                    var data = Read(directory, 0, directory.Size > 0 ? directory.Size : int.MaxValue);
+                    var data = Read(directory, 0, int.MaxValue);
                     if (data == null)
                         throw new QConnException("Invalid directory listing read");
                     string listing = Encoding.UTF8.GetString(data);
@@ -243,6 +258,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                             var statInfo = Stat(itemPath, false);
                             if (statInfo != null)
                             {
+                                statInfo.Update(item);
                                 result.Add(statInfo);
                             }
                             else
@@ -250,11 +266,15 @@ namespace BlackBerry.NativeCore.QConn.Services
                                 QTraceLog.WriteLine("Unable to load info about path: \"" + itemPath + "\"");
 
                                 // add a stub, just to keep the path only (as might have lack permissions to read info):
-                                result.Add(new TargetFile(itemPath));
+                                result.Add(new TargetFile(itemPath, item));
                             }
                         }
                     }
 
+                    if (sort)
+                    {
+                        result.Sort();
+                    }
                     return result.ToArray();
                 }
             }
@@ -270,10 +290,43 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
-            using (var descriptor = Open(path, 0x100, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, true))
+            using (var descriptor = Open(path, ModeOpenCreate, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, true))
             {
                 return descriptor;
             }
+        }
+
+        /// <summary>
+        /// Creates a folder at specified location.
+        /// </summary>
+        public TargetFile CreateFolder(string path)
+        {
+            return CreateFolder(path, 0xFFF);
+        }
+
+        /// <summary>
+        /// Creates an empty file on target.
+        /// </summary>
+        public TargetFile CreateFile(string path, uint permissions)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+
+            using (var descriptor = CreateNewFile(path, permissions))
+            {
+                return descriptor;
+            }
+        }
+
+        /// <summary>
+        /// Opens a file for reading or writing on target.
+        /// </summary>
+        internal TargetFileDescriptor CreateNewFile(string path, uint permissions)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+
+            return Open(path, ModeOpenCreate | ModeOpenTruncate | ModeOpenReadWrite, permissions & TargetFile.TypeMask, true);
         }
 
         /// <summary>
@@ -315,6 +368,176 @@ namespace BlackBerry.NativeCore.QConn.Services
             var response = Send("m:\"" + sourcePath + "\":\"" + destinationPath + "\"");
             if (response[0].StringValue == "e")
                 throw new QConnException("Move failed: " + response[1].StringValue);
+        }
+
+        public IFileServiceVisitor DownloadAsync(string path, IFileServiceVisitor visitor)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+            if (visitor == null)
+                throw new ArgumentNullException("visitor");
+
+            // clone current QConn-connection with a bigger buffer, to faster load data:
+            var connection = (QConnConnection) Connection.Clone(DownloadUploadChunkSize);
+            if (connection == null)
+                throw new QConnException("Unable to establish asynchronous connection");
+
+            // connect:
+            connection.Open();
+
+            // load info about the file to download:
+            var service = new TargetServiceFile(Version, connection);
+            var descriptor = service.Stat(path, false);
+            if (descriptor == null)
+            {
+                descriptor = new TargetFile(path, null);
+            }
+
+            // HINT: service will be automatically disposed in completion callback:
+            var asyncHandler = new Action<TargetServiceFile, TargetFile, IFileServiceVisitor>(DownloadAsyncWorker);
+            asyncHandler.BeginInvoke(service, descriptor, visitor, DownloadAsyncCompleted, new KeyValuePair<TargetServiceFile, object>(service, asyncHandler));
+
+            return visitor;
+        }
+
+        private void DownloadAsyncCompleted(IAsyncResult ar)
+        {
+            var data = (KeyValuePair<TargetServiceFile, object>) ar.AsyncState;
+            var service = data.Key;
+            var action = (Action<TargetServiceFile, TargetFile, IFileServiceVisitor>)data.Value;
+
+            try
+            {
+                action.EndInvoke(ar);
+            }
+            catch (Exception ex)
+            {
+                QTraceLog.WriteException(ex, "Asynchronous download failed");
+            }
+
+            service.Dispose();
+        }
+
+        /// <summary>
+        /// Method to visit the whole file system deep-down, starting at given point and read all info around including file contents.
+        /// Then it's the visitors responsibility to use received data and save it anyhow (keep in memory, store to local file system or ZIP).
+        /// </summary>
+        private static void DownloadAsyncWorker(TargetServiceFile service, TargetFile descriptor, IFileServiceVisitor visitor)
+        {
+            try
+            {
+                visitor.Begin(descriptor);
+            }
+            catch (Exception ex)
+            {
+                QTraceLog.WriteException(ex, "Failed to initialize monitor");
+            }
+
+            Stack<TargetFile> items = new Stack<TargetFile>();
+            items.Push(descriptor);
+
+            while (items.Count > 0 && !visitor.IsCancelled)
+            {
+                try
+                {
+                    var item = items.Pop();
+
+                    // do we have an access to open that item?
+                    if (item.NoAccess)
+                    {
+                        visitor.EnteringOther(item);
+                        continue;
+                    }
+
+                    if (item.IsFile)
+                    {
+                        // download a file:
+                        DownloadAsyncReadFile(service, visitor, item);
+                    }
+                    else
+                    {
+                        if (item.IsDirectory)
+                        {
+                            // list items inside the directory and add to queue to visit them:
+                            visitor.EnteringDirectory(item);
+                            var childItems = service.List(item, true);
+
+                            // add non-files, to visit them last:
+                            foreach (var child in childItems)
+                            {
+                                if (!child.IsFile)
+                                    items.Push(child);
+                            }
+
+                            // then add files to visit them immediately:
+                            foreach (var child in childItems)
+                            {
+                                if (child.IsFile)
+                                    items.Push(child);
+                            }
+                        }
+                        else
+                        {
+                            // PH: TODO: here it could be improved and the same info read as for files... but do we need it really?
+                            // who cares about some pipes or sockets; most of them can be found at /tmp on the device
+
+                            //visitor.EnteringOther(item);
+                            DownloadAsyncReadFile(service, visitor, item);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    QTraceLog.WriteException(ex, "Failure during download");
+                }
+            }
+
+            visitor.End();
+        }
+
+        private static void DownloadAsyncReadFile(TargetServiceFile service, IFileServiceVisitor visitor, TargetFile descriptor)
+        {
+            visitor.BeginFile(descriptor);
+            try
+            {
+                using (var file = service.Open(descriptor.Path, ModeOpenReadOnly, 0, false))
+                {
+                    if (file != null)
+                    {
+                        ulong totalRead = 0ul;
+
+                        while (!visitor.IsCancelled)
+                        {
+                            // read following chunks of the file
+                            // (it's crucial that we use the same chunk size as during service cloning, so it will minimize the number of buffer allocations)
+                            var data = service.Read(file, totalRead, DownloadUploadChunkSize);
+                            if (data != null && data.Length > 0)
+                            {
+                                totalRead += (ulong) data.Length;
+                                visitor.ProgressFile(descriptor, data, totalRead);
+
+                                // is last chunk?
+                                if (data.Length != DownloadUploadChunkSize)
+                                {
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                QTraceLog.WriteException(ex, "Failure during download of: \"{0}\"", descriptor.Path);
+            }
+            finally
+            {
+                visitor.EndFile(descriptor);
+            }
         }
     }
 }

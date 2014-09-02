@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.Debugger.Model
 {
@@ -16,39 +17,12 @@ namespace BlackBerry.NativeCore.Debugger.Model
                 throw new ArgumentNullException("executablePath");
 
             ID = id;
-            Name = ExtractName(executablePath);
+
+            // get the name of the process, based on the full executable name, simply - just grabs the last item of the path:
+            Name = PathHelper.ExtractName(executablePath);
+            Directory = PathHelper.ExtractDirectory(executablePath);
             ExecutablePath = executablePath;
             ShortExecutablePath = ExtractShortPath(executablePath);
-        }
-
-        /// <summary>
-        /// Gets the name of the process, based on the executable path.
-        /// Simply - just grabs the last item of the path.
-        /// </summary>
-        private static string ExtractName(string executablePath)
-        {
-            bool skipLastChar = false;
-
-            for (int i = executablePath.Length - 1; i >= 0; i--)
-            {
-                if (executablePath[i] == '/' || executablePath[i] == '\\')
-                {
-                    if (i == executablePath.Length - 1)
-                    {
-                        skipLastChar = true;
-                    }
-                    else
-                    {
-                        if (skipLastChar)
-                            return executablePath.Substring(i + 1, executablePath.Length - i - 2);
-                        return executablePath.Substring(i + 1);
-                    }
-                }
-            }
-
-            if (skipLastChar)
-                return executablePath.Substring(0, executablePath.Length - 1);
-            return executablePath;
         }
 
         /// <summary>
@@ -73,6 +47,12 @@ namespace BlackBerry.NativeCore.Debugger.Model
         }
 
         public string Name
+        {
+            get;
+            private set;
+        }
+
+        public string Directory
         {
             get;
             private set;

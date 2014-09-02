@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Text;
+using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.QConn.Model
 {
     /// <summary>
     /// Class providing information about a target path.
     /// </summary>
-    public class TargetFile
+    public class TargetFile : IComparable<TargetFile>
     {
         internal const uint TypeMask = 0xFFFF0FFF;
         private const uint TypeCharacterDevice = 0x2000;
@@ -20,23 +21,24 @@ namespace BlackBerry.NativeCore.QConn.Model
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public TargetFile(uint mode, ulong size, uint flags, string path, string originalPath)
+        public TargetFile(uint mode, ulong size, uint flags, string path)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
-            if (string.IsNullOrEmpty(originalPath))
-                throw new ArgumentNullException("originalPath");
 
             Mode = mode;
             Size = size;
             Flags = flags;
             CreationTime = DateTime.MinValue;
             Path = path;
-            OriginalPath = originalPath;
+            Name = PathHelper.ExtractName(path);
             UpdateFormatting();
         }
 
-        public TargetFile(string path)
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public TargetFile(string path, string name)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -44,7 +46,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             CreationTime = DateTime.MinValue;
             NoAccess = true;
             Path = path;
-            OriginalPath = path;
+            Name = string.IsNullOrEmpty(name) ? path : name;
             UpdateFormatting();
         }
 
@@ -114,7 +116,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             private set;
         }
 
-        public string OriginalPath
+        public string Name
         {
             get;
             private set;
@@ -147,6 +149,28 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         #endregion
 
+        #region IComparable Implementation
+
+        public int CompareTo(TargetFile other)
+        {
+            if (other == null)
+                return 1;
+
+            if (IsFile)
+            {
+                if (other.IsFile)
+                    return string.Compare(other.Name, Name, StringComparison.CurrentCulture);
+                return -1;
+            }
+
+            if (IsDirectory && other.IsFile)
+                return 1;
+
+            return string.Compare(other.Name, Name, StringComparison.CurrentCulture);
+        }
+
+        #endregion
+
         public override string ToString()
         {
             return string.Concat(Path, " (", FormattedPermissions, ")");
@@ -160,6 +184,14 @@ namespace BlackBerry.NativeCore.QConn.Model
             Mode = mode;
             Size = size;
             UpdateFormatting();
+        }
+
+        internal void Update(string name)
+        {
+            if (!string.IsNullOrEmpty(name))
+            {
+                Name = name;
+            }
         }
 
         private void UpdateFormatting()

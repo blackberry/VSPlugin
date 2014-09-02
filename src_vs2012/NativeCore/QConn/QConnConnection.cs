@@ -8,7 +8,7 @@ namespace BlackBerry.NativeCore.QConn
     /// <summary>
     /// Class responsible for keeping the connection and sending/receiving messages to/from QConn service running on target.
     /// </summary>
-    public sealed class QConnConnection : IDisposable
+    public sealed class QConnConnection : IDisposable, ICloneable
     {
         private readonly string _host;
         private readonly int _port;
@@ -36,13 +36,21 @@ namespace BlackBerry.NativeCore.QConn
         /// Init constructor.
         /// </summary>
         public QConnConnection(string host, int port, string serviceName, Endianess endian)
+            : this(host, port, 0, serviceName, endian)
+        {
+        }
+
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public QConnConnection(string host, int port, int chunkSize, string serviceName, Endianess endian)
         {
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
 
             _host = host;
             _port = port;
-            _source = new QDataSource();
+            _source = new QDataSource(chunkSize); // chunkSize == 0 will fallback to default
             _endian = endian;
             _serviceName = serviceName;
         }
@@ -50,6 +58,28 @@ namespace BlackBerry.NativeCore.QConn
         ~QConnConnection()
         {
             Dispose(false);
+        }
+
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        public object Clone()
+        {
+            if (_source == null)
+                throw new ObjectDisposedException("QConnConnection");
+
+            return Clone(_source.ChunkSize);
+        }
+
+        /// <summary>
+        /// Creates a new object that is a copy of the current instance.
+        /// </summary>
+        public object Clone(int chunkSize)
+        {
+            if (_source == null)
+                throw new ObjectDisposedException("QConnConnection");
+
+            return new QConnConnection(_host, _port, chunkSize, _serviceName, _endian);
         }
 
         #region Properties
@@ -188,7 +218,7 @@ namespace BlackBerry.NativeCore.QConn
                 var status = _source.Receive(int.MaxValue, out data);
                 length = data.Length;
 
-                QTraceLog.WriteLine("Received response: {0} ({1})", data.Length, status);
+                //QTraceLog.WriteLine("Received response: {0} ({1})", data.Length, status);
 
                 if (status != HResult.OK)
                     return null;

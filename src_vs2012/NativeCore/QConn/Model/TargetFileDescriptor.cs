@@ -13,8 +13,8 @@ namespace BlackBerry.NativeCore.QConn.Model
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public TargetFileDescriptor(TargetServiceFile service, string handle, uint mode, ulong size, uint flags, string path, string originalPath)
-            : base(mode, size, flags, path, originalPath)
+        public TargetFileDescriptor(TargetServiceFile service, string handle, uint mode, ulong size, string path)
+            : base(mode, size, mode, path)
         {
             if (service == null)
                 throw new ArgumentNullException("service");

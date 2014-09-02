@@ -1,8 +1,10 @@
 ﻿using System;
+using System.IO;
 using System.Threading;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.QConn.Visitors;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -205,9 +207,10 @@ namespace UnitTests
 
             // list files within the folder:
             Assert.IsNotNull(qclient.FileService);
-            //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs");
-            var files = qclient.FileService.List("/accounts/1000/appdata/"); // place where all apps are installed
-            //var files = qclient.FileService.List("/tmp/slogger2/"); // place where all apps are installed
+            //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs", true);
+            var files = qclient.FileService.List("/accounts/1000/appdata/", true); // place where all apps are installed
+            //var files = qclient.FileService.List("/tmp/slogger2/", true); // place where all apps are installed
+            //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/native/", true);
 
             Assert.IsNotNull(files);
             //Assert.IsTrue(files.Length > 2, "Invalid number of items loaded");
@@ -218,7 +221,7 @@ namespace UnitTests
 
             foreach (var f in files)
             {
-                QTraceLog.WriteLine("Item: {0}: {1} - {2}", f.FormattedType, f.FormattedPermissions, f.Path);
+                QTraceLog.WriteLine("Item: {0}: {1} - {2} ({3})", f.FormattedType, f.FormattedPermissions, f.Path, f.Name);
             }
 
             // and close
@@ -243,6 +246,59 @@ namespace UnitTests
             Assert.IsNotNull(info);
 
             qclient.FileService.Remove(info.Path);
+
+            // and close
+            qdoor.Close();
+        }
+
+        [Test]
+        public void DownloadSampleFolderStats()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.FileService);
+
+            // calculate stats about all files from the folder:
+            var visitor = new LoggingFileServiceVisitor();
+            //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
+            qclient.FileService.DownloadAsync("/tmp", visitor);
+
+            Assert.IsNotNull(visitor);
+            visitor.Wait();
+
+            Assert.IsTrue(visitor.FilesCount > 0, "No files found in the folder");
+            Assert.IsTrue(visitor.TotalSize > 0, "No data to download");
+
+            // and close
+            qdoor.Close();
+        }
+
+        [Test]
+        public void ZipSampleFolder()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.FileService);
+
+            // download all files from the folder:
+            var visitor = new PackagingFileServiceVisitor(Path.Combine(Defaults.NdkDirectory, "test.zip"));
+            //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
+            //qclient.FileService.DownloadAsync("/pps", visitor); // can take some time ~25sec
+            //qclient.FileService.DownloadAsync("/pps/accounts", visitor);
+            qclient.FileService.DownloadAsync("/tmp", visitor);
+
+            Assert.IsNotNull(visitor);
+            visitor.Wait();
 
             // and close
             qdoor.Close();
