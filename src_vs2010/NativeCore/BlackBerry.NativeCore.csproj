@@ -356,17 +356,26 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceSysInfo.cs">
       <Link>QConn\Services\TargetServiceSysInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\BaseVisitorMonitor.cs">
+      <Link>QConn\Visitors\BaseVisitorMonitor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\IFileServiceEnumerator.cs">
+      <Link>QConn\Visitors\IFileServiceEnumerator.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\IFileServiceVisitor.cs">
       <Link>QConn\Visitors\IFileServiceVisitor.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\IFileServiceVisitorMonitor.cs">
       <Link>QConn\Visitors\IFileServiceVisitorMonitor.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\LoggingFileServiceVisitor.cs">
-      <Link>QConn\Visitors\LoggingFileServiceVisitor.cs</Link>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\LoggingVisitor.cs">
+      <Link>QConn\Visitors\LoggingVisitor.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\PackagingFileServiceVisitor.cs">
-      <Link>QConn\Visitors\PackagingFileServiceVisitor.cs</Link>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\TargetEnumerator.cs">
+      <Link>QConn\Visitors\TargetEnumerator.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\ZipPackageVisitor.cs">
+      <Link>QConn\Visitors\ZipPackageVisitor.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\ApiLevelListLoadRunner.cs">
       <Link>Tools\ApiLevelListLoadRunner.cs</Link>

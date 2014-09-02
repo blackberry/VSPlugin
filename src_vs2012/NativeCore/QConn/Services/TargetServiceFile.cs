@@ -13,12 +13,10 @@ namespace BlackBerry.NativeCore.QConn.Services
     /// </summary>
     public sealed class TargetServiceFile : TargetService
     {
-        private const int ModeOpenAppend = 8;
         private const int ModeOpenCreate = 0x100;
         private const int ModeOpenTruncate = 0x200;
-        private const int ModeOpenExclude = 0x400;
 
-        private const int DownloadUploadChunkSize = 8192;
+        internal const int DownloadUploadChunkSize = 8192;
 
         /// <summary>
         /// Init constructor.
@@ -57,7 +55,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Opens specified path with specified mode.
         /// </summary>
-        private TargetFileDescriptor Open(string path, uint mode, uint permissions, bool throwOnFailure)
+        internal TargetFileDescriptor Open(string path, uint mode, uint permissions, bool throwOnFailure)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -165,7 +163,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// Gets the info about specified path.
         /// If specified, it throws exceptions in case of any errors or permission denies.
         /// </summary>
-        private TargetFile Stat(string path, bool throwOnFailure)
+        internal TargetFile Stat(string path, bool throwOnFailure)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -366,16 +364,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         }
 
         /// <summary>
-        /// Downloads the content of the file or folder (including whole subtree) and passes them to specified visitor.
-        /// It allows then more advanced processing like:
-        ///  * loading files into memory
-        ///  * storing them in local file-system
-        ///  * zipping them and storing locally
-        /// and also:
-        ///  * waiting for completion
-        ///  * progress monitoring
-        ///
-        /// Check the implemented visitors for more details.
+        /// Downloads files and folders (including whole subtree) from specified location on target and passes them to visitor for further processing.
         /// </summary>
         public IFileServiceVisitor DownloadAsync(string path, IFileServiceVisitor visitor)
         {
@@ -384,7 +373,30 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (visitor == null)
                 throw new ArgumentNullException("visitor");
 
-            // clone current QConn-connection with a bigger buffer, to faster load data:
+            return EnumerateAsync(new TargetEnumerator(path), visitor);
+        }
+
+        /// <summary>
+        /// Enumerates asynchronously the content of the file or folder (including whole subtree) and passes them to specified visitor.
+        /// It allows then more advanced processing like:
+        ///  * loading specified files into memory
+        ///  * storing them in local file-system
+        ///  * zipping them and storing locally
+        /// and also:
+        ///  * waiting for completion
+        ///  * progress monitoring
+        ///
+        /// Check the implemented visitors for more details.
+        /// </summary>
+        public IFileServiceVisitor EnumerateAsync(IFileServiceEnumerator enumerator, IFileServiceVisitor visitor)
+        {
+            if (enumerator == null)
+                throw new ArgumentNullException("enumerator");
+            if (visitor == null)
+                throw new ArgumentNullException("visitor");
+
+            // clone current QConn-connection to allow asynchronous processing (otherwise it could interfere with other sync commands)
+            // and arm clone with a bigger buffer, to faster load data:
             var connection = (QConnConnection) Connection.Clone(DownloadUploadChunkSize);
             if (connection == null)
                 throw new QConnException("Unable to establish asynchronous connection");
@@ -394,157 +406,32 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             // load info about the file to download:
             var service = new TargetServiceFile(Version, connection);
-            var descriptor = service.Stat(path, false);
-            if (descriptor == null)
-            {
-                descriptor = new TargetFile(path, null);
-            }
+            enumerator.Begin(service);
 
-            // HINT: service will be automatically disposed in completion callback:
-            var asyncHandler = new Action<TargetServiceFile, TargetFile, IFileServiceVisitor>(DownloadAsyncWorker);
-            asyncHandler.BeginInvoke(service, descriptor, visitor, DownloadAsyncCompleted, new KeyValuePair<TargetServiceFile, object>(service, asyncHandler));
+            // HINT: service will be automatically disposed in completion callback below:
+            var asyncHandler = new Action<IFileServiceVisitor>(enumerator.Enumerate);
+            asyncHandler.BeginInvoke(visitor, DownloadAsyncCompleted, new Tuple<IFileServiceEnumerator, TargetServiceFile, object>(enumerator, service, asyncHandler));
 
             return visitor;
         }
 
         private void DownloadAsyncCompleted(IAsyncResult ar)
         {
-            var data = (KeyValuePair<TargetServiceFile, object>) ar.AsyncState;
-            var service = data.Key;
-            var action = (Action<TargetServiceFile, TargetFile, IFileServiceVisitor>)data.Value;
+            var data = (Tuple<IFileServiceEnumerator, TargetServiceFile, object>)ar.AsyncState;
+            var enumerator = data.Item1;
+            var service = data.Item2;
+            var action = (Action<IFileServiceVisitor>)data.Item3;
 
             try
             {
                 action.EndInvoke(ar);
+
+                enumerator.End();
+                service.Dispose();
             }
             catch (Exception ex)
             {
                 QTraceLog.WriteException(ex, "Asynchronous download failed");
-            }
-
-            service.Dispose();
-        }
-
-        /// <summary>
-        /// Method to visit the whole file system deep-down, starting at given point and read all info around including file contents.
-        /// Then it's the visitors responsibility to use received data and save it anyhow (keep in memory, store to local file system or ZIP).
-        /// </summary>
-        private static void DownloadAsyncWorker(TargetServiceFile service, TargetFile descriptor, IFileServiceVisitor visitor)
-        {
-            try
-            {
-                visitor.Begin(descriptor);
-            }
-            catch (Exception ex)
-            {
-                QTraceLog.WriteException(ex, "Failed to initialize monitor");
-            }
-
-            Stack<TargetFile> items = new Stack<TargetFile>();
-            items.Push(descriptor);
-
-            while (items.Count > 0 && !visitor.IsCancelled)
-            {
-                try
-                {
-                    var item = items.Pop();
-
-                    // do we have an access to open that item?
-                    if (item.NoAccess)
-                    {
-                        visitor.UnknownEntering(item);
-                        continue;
-                    }
-
-                    if (item.IsFile)
-                    {
-                        // download a file:
-                        DownloadAsyncReadFile(service, visitor, item);
-                    }
-                    else
-                    {
-                        if (item.IsDirectory)
-                        {
-                            // list items inside the directory and add to queue to visit them:
-                            visitor.DirectoryEntering(item);
-                            var childItems = service.List(item);
-
-                            // add non-files, to visit them last:
-                            foreach (var child in childItems)
-                            {
-                                if (!child.IsFile)
-                                    items.Push(child);
-                            }
-
-                            // then add files to visit them immediately:
-                            foreach (var child in childItems)
-                            {
-                                if (child.IsFile)
-                                    items.Push(child);
-                            }
-                        }
-                        else
-                        {
-                            // treat all named-pipes, sockets etc as file and download any content if possible...
-                            DownloadAsyncReadFile(service, visitor, item);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    QTraceLog.WriteException(ex, "Failure during download");
-                }
-            }
-
-            visitor.End();
-        }
-
-        private static void DownloadAsyncReadFile(TargetServiceFile service, IFileServiceVisitor visitor, TargetFile descriptor)
-        {
-            try
-            {
-                using (var file = service.Open(descriptor.Path, TargetFile.ModeOpenReadOnly, 0, false))
-                {
-                    if (file != null)
-                    {
-                        try
-                        {
-                            visitor.FileOpening(file);
-
-                            ulong totalRead = 0ul;
-
-                            while (!visitor.IsCancelled)
-                            {
-                                // read following chunks of the file
-                                // (it's crucial that we use the same chunk size as during service cloning, so it will minimize the number of buffer allocations)
-                                var data = service.Read(file, totalRead, DownloadUploadChunkSize);
-                                if (data != null && data.Length > 0)
-                                {
-                                    totalRead += (ulong) data.Length;
-                                    visitor.FileContent(descriptor, data, totalRead);
-
-                                    // is last chunk?
-                                    if (data.Length != DownloadUploadChunkSize)
-                                    {
-                                        break;
-                                    }
-                                }
-                                else
-                                {
-                                    break;
-                                }
-                            }
-                        }
-                        finally
-                        {
-                            visitor.FileClosing(file);
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                QTraceLog.WriteException(ex, "Failure during download of: \"{0}\"", descriptor.Path);
             }
         }
     }

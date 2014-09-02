@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading;
-using BlackBerry.NativeCore.Diagnostics;
+﻿using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
@@ -9,18 +7,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
     /// Support class to log statistics about files and folders to download.
     /// Mostly for testing scenarios.
     /// </summary>
-    public sealed class LoggingFileServiceVisitor : IFileServiceVisitor, IFileServiceVisitorMonitor
+    public sealed class LoggingVisitor : BaseVisitorMonitor, IFileServiceVisitor
     {
-        private readonly AutoResetEvent _event;
-
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public LoggingFileServiceVisitor()
-        {
-            _event = new AutoResetEvent(false);
-        }
-
         #region Properties
 
         public bool IsCancelled
@@ -45,10 +33,11 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         public void Begin(TargetFile descriptor)
         {
+            ResetWait();
+
             QTraceLog.WriteLine("Initializing download for: {0}", descriptor.Path);
             FilesCount = 0;
             TotalSize = 0;
-            _event.Reset();
         }
 
         public void End()
@@ -56,11 +45,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             QTraceLog.WriteLine("- DONE -");
 
             // notify about completion:
-            var handler = Completed;
-            if (handler != null)
-                handler(this, EventArgs.Empty);
-
-            _event.Set();
+            NotifyCompleted();
         }
 
         public void FileOpening(TargetFile file)
@@ -89,16 +74,5 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         {
             // no idea, if this is a directory or file or named-pipe or socket... we simply don't have rights to visit it... so ignore in statistics
         }
-
-        #region IFileServiceVisitorMonitor Implemenation
-
-        public event EventHandler Completed;
-
-        public bool Wait()
-        {
-            return _event.WaitOne();
-        }
-
-        #endregion
     }
 }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Packaging;
-using System.Threading;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Model;
 
@@ -10,10 +9,10 @@ namespace BlackBerry.NativeCore.QConn.Visitors
     /// <summary>
     /// Class packaging the files received from target into a dedicated ZIP file.
     /// </summary>
-    public sealed class PackagingFileServiceVisitor : IFileServiceVisitor, IFileServiceVisitorMonitor, IDisposable
+    public sealed class ZipPackageVisitor : BaseVisitorMonitor, IFileServiceVisitor
     {
-        private AutoResetEvent _event;
         private readonly string _fileName;
+        private readonly CompressionOption _compression;
         private string _basePath;
         private Package _package;
         private PackagePart _currentPart;
@@ -22,18 +21,13 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public PackagingFileServiceVisitor(string fileName)
+        public ZipPackageVisitor(string fileName, CompressionOption compression)
         {
             if (string.IsNullOrEmpty(fileName))
                 throw new ArgumentNullException("fileName");
 
-            _event = new AutoResetEvent(false);
             _fileName = fileName;
-        }
-
-        ~PackagingFileServiceVisitor()
-        {
-            Dispose(false);
+            _compression = compression;
         }
 
         #region IFileServiceVisitor Implementation
@@ -46,6 +40,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         public void Begin(TargetFile descriptor)
         {
+            ResetWait();
             _package = Package.Open(_fileName, FileMode.Create);
 
             if (!descriptor.IsDirectory)
@@ -63,13 +58,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         public void End()
         {
             Close();
-
-            // notify about completion:
-            var handler = Completed;
-            if (handler != null)
-                handler(this, EventArgs.Empty);
-
-            _event.Set();
+            NotifyCompleted();
         }
 
         public void FileOpening(TargetFile file)
@@ -122,7 +111,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 _package.DeletePart(uri);
             }
 
-            return _package.CreatePart(uri, string.Empty, CompressionOption.Maximum);
+            return _package.CreatePart(uri, string.Empty, _compression);
         }
 
         private Uri GetRelativeUri(string fullName)
@@ -137,32 +126,6 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         }
 
         #endregion
-
-        #region IFileServiceVisitorMonitor Implementation
-
-        public event EventHandler Completed;
-
-        public bool Wait()
-        {
-            if (_event == null)
-                throw new ObjectDisposedException("PackagingFileSystemVisitor");
-
-            return _event.WaitOne();
-        }
-
-        #endregion
-
-        #region IDisposable Implementation
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        /// <filterpriority>2</filterpriority>
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
 
         private void Close()
         {
@@ -179,20 +142,14 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             }
         }
 
-        private void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
                 Close();
-
-                if (_event != null)
-                {
-                    _event.Dispose();
-                    _event = null;
-                }
             }
-        }
 
-        #endregion
+            base.Dispose(disposing);
+        }
     }
 }

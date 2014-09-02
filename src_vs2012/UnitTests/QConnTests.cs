@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Packaging;
 using System.Threading;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn;
@@ -265,7 +266,7 @@ namespace UnitTests
             Assert.IsNotNull(qclient.FileService);
 
             // calculate stats about all files from the folder:
-            var visitor = new LoggingFileServiceVisitor();
+            var visitor = new LoggingVisitor();
             //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
             qclient.FileService.DownloadAsync("/tmp", visitor);
 
@@ -292,7 +293,7 @@ namespace UnitTests
             Assert.IsNotNull(qclient.FileService);
 
             // download all files from the folder:
-            var visitor = new PackagingFileServiceVisitor(Path.Combine(Defaults.NdkDirectory, "test.zip"));
+            var visitor = new ZipPackageVisitor(Path.Combine(Defaults.NdkDirectory, "test.zip"), CompressionOption.Maximum);
             //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
             //qclient.FileService.DownloadAsync("/pps", visitor); // can take some time ~25sec
             //qclient.FileService.DownloadAsync("/pps/accounts", visitor);
@@ -318,7 +319,7 @@ namespace UnitTests
             Assert.IsNotNull(qclient.FileService);
 
             // download all files from the folder:
-            var visitor = new PackagingFileServiceVisitor(Path.Combine(Defaults.NdkDirectory, "test-parallel.zip"));
+            var visitor = new ZipPackageVisitor(Path.Combine(Defaults.NdkDirectory, "test-parallel.zip"), CompressionOption.NotCompressed);
             qclient.FileService.DownloadAsync("/tmp", visitor);
 
             // this should be executed in parallel to the download:
