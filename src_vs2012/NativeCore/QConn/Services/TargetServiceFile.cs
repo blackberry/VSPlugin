@@ -214,7 +214,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Lists files and folders at specified location.
         /// </summary>
-        public TargetFile[] List(string path, bool sort)
+        public TargetFile[] List(string path)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -222,13 +222,13 @@ namespace BlackBerry.NativeCore.QConn.Services
             var descriptor = Stat(path, true);
             if (descriptor == null)
                 throw new QConnException("Unable to determine path properties");
-            return List(descriptor, sort);
+            return List(descriptor);
         }
 
         /// <summary>
         /// Lists files and folders at specified location.
         /// </summary>
-        public TargetFile[] List(TargetFile location, bool sort)
+        public TargetFile[] List(TargetFile location)
         {
             if (location == null)
                 throw new ArgumentNullException("location");
@@ -246,7 +246,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                     string listing = Encoding.UTF8.GetString(data);
 
                     // parse names, as each is in separate line:
-                    var result = new List<TargetFile>();
+                    var result = new SortedList<TargetFile, TargetFile>();
                     var foundItems = listing.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
                     foreach (var item in foundItems)
                     {
@@ -259,23 +259,23 @@ namespace BlackBerry.NativeCore.QConn.Services
                             if (statInfo != null)
                             {
                                 statInfo.Update(item);
-                                result.Add(statInfo);
                             }
                             else
                             {
                                 QTraceLog.WriteLine("Unable to load info about path: \"" + itemPath + "\"");
 
                                 // add a stub, just to keep the path only (as might have lack permissions to read info):
-                                result.Add(new TargetFile(itemPath, item));
+                                statInfo = new TargetFile(itemPath, item);
                             }
+
+                            result.Add(statInfo, statInfo);
                         }
                     }
 
-                    if (sort)
-                    {
-                        result.Sort();
-                    }
-                    return result.ToArray();
+                    // and return an non-mutable array:
+                    var array = new TargetFile[result.Count];
+                    result.Values.CopyTo(array, 0);
+                    return array;
                 }
             }
 
@@ -370,6 +370,18 @@ namespace BlackBerry.NativeCore.QConn.Services
                 throw new QConnException("Move failed: " + response[1].StringValue);
         }
 
+        /// <summary>
+        /// Downloads the content of the file or folder (including whole subtree) and passes them to specified visitor.
+        /// It allows then more advanced processing like:
+        ///  * loading files into memory
+        ///  * storing them in local file-system
+        ///  * zipping them and storing locally
+        /// and also:
+        ///  * waiting for completion
+        ///  * progress monitoring
+        ///
+        /// Check the implemented visitors for more details.
+        /// </summary>
         public IFileServiceVisitor DownloadAsync(string path, IFileServiceVisitor visitor)
         {
             if (string.IsNullOrEmpty(path))
@@ -460,7 +472,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                         {
                             // list items inside the directory and add to queue to visit them:
                             visitor.EnteringDirectory(item);
-                            var childItems = service.List(item, true);
+                            var childItems = service.List(item);
 
                             // add non-files, to visit them last:
                             foreach (var child in childItems)

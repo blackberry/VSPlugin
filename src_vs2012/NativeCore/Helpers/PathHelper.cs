@@ -62,5 +62,27 @@ namespace BlackBerry.NativeCore.Helpers
 
             return path.Substring(0, start);
         }
+
+        /// <summary>
+        /// Concatenates two path segments.
+        /// </summary>
+        public static string MakePath(string path, string name)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            if (path[path.Length - 1] == '/')
+            {
+                if (name[0] == '/')
+                    return path + name.Substring(1);
+                return path + name;
+            }
+
+            if (name[0] == '/')
+                return path + name;
+            return string.Concat(path, "/", name);
+        }
     }
 }

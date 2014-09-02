@@ -207,10 +207,11 @@ namespace UnitTests
 
             // list files within the folder:
             Assert.IsNotNull(qclient.FileService);
-            //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs", true);
-            var files = qclient.FileService.List("/accounts/1000/appdata/", true); // place where all apps are installed
-            //var files = qclient.FileService.List("/tmp/slogger2/", true); // place where all apps are installed
-            //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/native/", true);
+            //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/logs");
+            var files = qclient.FileService.List("/accounts/1000/appdata/"); // place where all apps are installed
+            //var files = qclient.FileService.List("/tmp/");
+            //var files = qclient.FileService.List("/tmp/slogger2/"); // place where all apps are installed
+            //var files = qclient.FileService.List("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/native/");
 
             Assert.IsNotNull(files);
             //Assert.IsTrue(files.Length > 2, "Invalid number of items loaded");
@@ -221,7 +222,7 @@ namespace UnitTests
 
             foreach (var f in files)
             {
-                QTraceLog.WriteLine("Item: {0}: {1} - {2} ({3})", f.FormattedType, f.FormattedPermissions, f.Path, f.Name);
+                QTraceLog.WriteLine("Item: {0}: {1,-10} - {2} ({3})", f.FormattedType, f.FormattedPermissions, f.Path, f.Name);
             }
 
             // and close

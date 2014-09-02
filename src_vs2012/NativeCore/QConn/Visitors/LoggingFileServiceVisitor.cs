@@ -6,7 +6,8 @@ using BlackBerry.NativeCore.QConn.Model;
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
     /// <summary>
-    /// Supportive class to log statistics about files and folders to download.
+    /// Support class to log statistics about files and folders to download.
+    /// Mostly for testing scenarios.
     /// </summary>
     public sealed class LoggingFileServiceVisitor : IFileServiceVisitor, IFileServiceVisitorMonitor
     {
