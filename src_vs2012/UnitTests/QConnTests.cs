@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Packaging;
+using System.Text;
 using System.Threading;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn;
@@ -330,6 +331,63 @@ namespace UnitTests
             Assert.IsTrue(listing.Length > 0, "No installed application found, what is not true");
 
             visitor.Wait();
+
+            // and close
+            qdoor.Close();
+        }
+
+        [Test]
+        public void DownloadSampleFolderToLocalFileSystem()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.FileService);
+
+            // calculate stats about all files from the folder:
+            var visitor = new LocalCopyVisitor(Path.Combine(Defaults.NdkDirectory, "tmp_copy.xxx"));
+            //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
+            qclient.FileService.DownloadAsync("/tmp", visitor);
+
+            Assert.IsNotNull(visitor);
+            visitor.Wait();
+
+            // and close
+            qdoor.Close();
+        }
+
+        [Test]
+        public void LoadSampleFilePreview()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.FileService);
+
+            // calculate stats about all files from the folder:
+            var visitor = new BufferVisitor();
+            qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/native/", visitor);
+            //qclient.FileService.DownloadAsync("/tmp", visitor);
+
+            Assert.IsNotNull(visitor);
+            visitor.Wait();
+
+            var data = visitor.Find("bar-descriptor.xml");
+            Assert.IsNotNull(visitor.Data, "There should be any file loaded");
+            Assert.IsNotNull(data, "Missing data for bar-descriptor.xml");
+
+            var descriptorContent = Encoding.UTF8.GetString(data);
+            Assert.IsFalse(string.IsNullOrEmpty(descriptorContent));
+
+            QTraceLog.WriteLine("bar-descriptor.xml:\r\n\r\n{0}", descriptorContent);
 
             // and close
             qdoor.Close();

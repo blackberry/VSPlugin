@@ -359,6 +359,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\BaseVisitorMonitor.cs">
       <Link>QConn\Visitors\BaseVisitorMonitor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\BufferVisitor.cs">
+      <Link>QConn\Visitors\BufferVisitor.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\IFileServiceEnumerator.cs">
       <Link>QConn\Visitors\IFileServiceEnumerator.cs</Link>
     </Compile>
@@ -367,6 +370,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\IFileServiceVisitorMonitor.cs">
       <Link>QConn\Visitors\IFileServiceVisitorMonitor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\LocalCopyVisitor.cs">
+      <Link>QConn\Visitors\LocalCopyVisitor.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\LoggingVisitor.cs">
       <Link>QConn\Visitors\LoggingVisitor.cs</Link>

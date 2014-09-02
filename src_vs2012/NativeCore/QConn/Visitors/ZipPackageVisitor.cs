@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.Packaging;
-using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
@@ -42,17 +41,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         {
             ResetWait();
             _package = Package.Open(_fileName, FileMode.Create);
-
-            if (!descriptor.IsDirectory)
-            {
-                // setup the base path to the home folder of the single file added to the package:
-                _basePath = PathHelper.ExtractDirectory(descriptor.Path);
-            }
-            else
-            {
-                // zipping whole folder, so remember where is the root, to make paths of package-items inside shorter
-                _basePath = descriptor.Path;
-            }
+            _basePath = GetInitialBasePath(descriptor, false);
         }
 
         public void End()
@@ -74,7 +63,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         public void FileContent(TargetFile file, byte[] data, ulong totalRead)
         {
             if (_currentPart == null)
-                throw new ObjectDisposedException("PackagingFileServiceVisitor");
+                throw new ObjectDisposedException("ZipPackageVisitor");
 
             _currentStream.Write(data, 0, data.Length);
         }
@@ -91,6 +80,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         public void DirectoryEntering(TargetFile folder)
         {
+            // don't care, do nothing
         }
 
         public void UnknownEntering(TargetFile other)

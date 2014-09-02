@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Sockets;
 using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.QConn
 {
@@ -214,7 +215,7 @@ namespace BlackBerry.NativeCore.QConn
                     }
 
                     // last buffer reading failed, then combine all other extra bytes:
-                    result = Combine(extraBytes, null, 0);
+                    result = BitHelper.Combine(extraBytes, null, 0);
                 }
                 else
                 {
@@ -227,7 +228,7 @@ namespace BlackBerry.NativeCore.QConn
                     else
                     {
                         // or just combine all results:
-                        result = Combine(extraBytes, _buffer, length);
+                        result = BitHelper.Combine(extraBytes, _buffer, length);
                     }
                 }
             }
@@ -239,45 +240,6 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             return HResult.OK;
-        }
-
-        /// <summary>
-        /// Allocates new array and copies there data from specified collection of chunks.
-        /// The last one (lastChunk) doesn't need to be fully filled.
-        /// </summary>
-        private static byte[] Combine(List<byte[]> buffers, byte[] lastChunk, int lastChunkLength)
-        {
-            // calculate result length:
-            int resultLength = lastChunkLength;
-            if (buffers != null)
-            {
-                for (int i = 0; i < buffers.Count; i++)
-                {
-                    resultLength += buffers[i].Length;
-                }
-            }
-
-            // copy data:
-            var result = new byte[resultLength];
-            int index = 0;
-
-            if (buffers != null)
-            {
-                for (int i = 0; i < buffers.Count; i++)
-                {
-                    byte[] src = buffers[i];
-                    Array.Copy(src, 0, result, index, src.Length);
-                    index += src.Length;
-                }
-            }
-
-            if (lastChunk != null)
-            {
-                // and copy the last chunk:
-                Array.Copy(lastChunk, 0, result, index, lastChunkLength);
-            }
-
-            return result;
         }
 
         #region IDisposable Implementation

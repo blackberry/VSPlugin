@@ -170,5 +170,43 @@ namespace BlackBerry.NativeCore.Helpers
             return result.ToString();
         }
 
+        /// <summary>
+        /// Allocates new array and copies there data from specified collection of chunks.
+        /// The last one (lastChunk) doesn't need to be fully filled.
+        /// </summary>
+        public static byte[] Combine(List<byte[]> buffers, byte[] lastChunk, int lastChunkLength)
+        {
+            // calculate result length:
+            int resultLength = lastChunkLength;
+            if (buffers != null)
+            {
+                for (int i = 0; i < buffers.Count; i++)
+                {
+                    resultLength += buffers[i].Length;
+                }
+            }
+
+            // copy data:
+            var result = new byte[resultLength];
+            int index = 0;
+
+            if (buffers != null)
+            {
+                for (int i = 0; i < buffers.Count; i++)
+                {
+                    byte[] src = buffers[i];
+                    Array.Copy(src, 0, result, index, src.Length);
+                    index += src.Length;
+                }
+            }
+
+            if (lastChunk != null)
+            {
+                // and copy the last chunk:
+                Array.Copy(lastChunk, 0, result, index, lastChunkLength);
+            }
+
+            return result;
+        }
     }
 }
