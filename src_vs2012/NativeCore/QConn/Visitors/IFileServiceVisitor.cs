@@ -26,27 +26,27 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         void End();
 
         /// <summary>
-        /// Called each time, when new file is supposed to be downloaded.
+        /// Called once for each new file, which is supposed to be downloaded.
         /// </summary>
-        void BeginFile(TargetFile file);
+        void FileOpening(TargetFile file);
         /// <summary>
         /// Called each time part of the file is being downloaded.
         /// </summary>
-        void ProgressFile(TargetFile file, byte[] data, ulong totalRead);
+        void FileContent(TargetFile file, byte[] data, ulong totalRead);
         /// <summary>
-        /// Called each time, when file download has been completed or cancelled.
+        /// Called once for each file, when download has been completed or cancelled.
         /// </summary>
-        void EndFile(TargetFile file);
+        void FileClosing(TargetFile file);
 
         /// <summary>
         /// Called each time, when entering new folder.
-        /// It will be followed by number of called of file downloads.
+        /// It will be followed by number of calls to file downloads.
         /// </summary>
-        void EnteringDirectory(TargetFile folder);
+        void DirectoryEntering(TargetFile folder);
 
         /// <summary>
-        /// Called each time unexpected item was visited (socket, named-pipe or item without access rights).
+        /// Called each time unexpected item was visited (for example, when no rights to enter or read).
         /// </summary>
-        void EnteringOther(TargetFile other);
+        void UnknownEntering(TargetFile descriptor);
     }
 }

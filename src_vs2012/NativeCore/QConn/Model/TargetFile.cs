@@ -9,6 +9,11 @@ namespace BlackBerry.NativeCore.QConn.Model
     /// </summary>
     public class TargetFile : IComparable<TargetFile>
     {
+        internal const int ModeOpenNone = 0;
+        internal const int ModeOpenReadOnly = 1;
+        private const int ModeOpenWriteOnly = 2;
+        internal const int ModeOpenReadWrite = ModeOpenReadOnly | ModeOpenWriteOnly;
+
         internal const uint TypeMask = 0xFFFF0FFF;
         private const uint TypeCharacterDevice = 0x2000;
         internal const uint TypeDirectory = 0x4000;
@@ -33,6 +38,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             Path = path;
             Name = PathHelper.ExtractName(path);
             UpdateFormatting();
+            UpdateAccess();
         }
 
         /// <summary>
@@ -147,6 +153,16 @@ namespace BlackBerry.NativeCore.QConn.Model
             private set;
         }
 
+        public bool CanRead
+        {
+            get { return (Flags & ModeOpenReadOnly) == ModeOpenReadOnly; }
+        }
+
+        public bool CanWrite
+        {
+            get { return (Flags & ModeOpenWriteOnly) == ModeOpenWriteOnly; }
+        }
+
         #endregion
 
         #region IComparable Implementation
@@ -185,6 +201,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             Mode = mode;
             Size = size;
             UpdateFormatting();
+            UpdateAccess();
         }
 
         internal void Update(string name)
@@ -249,6 +266,11 @@ namespace BlackBerry.NativeCore.QConn.Model
                 default:
                     throw new ArgumentOutOfRangeException("type", "Unrecognized file type");
             }
+        }
+
+        private void UpdateAccess()
+        {
+            NoAccess = NoAccess || (Type == TypeCharacterDevice);
         }
 
         #region Path Management

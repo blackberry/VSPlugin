@@ -63,29 +63,29 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _event.Set();
         }
 
-        public void BeginFile(TargetFile file)
+        public void FileOpening(TargetFile file)
         {
             QTraceLog.WriteLine("Started downloading: {0}", file.Name);
             FilesCount = FilesCount + 1;
         }
 
-        public void EndFile(TargetFile file)
+        public void FileClosing(TargetFile file)
         {
             QTraceLog.WriteLine("Completed downloading: {0}", file.Name);
         }
 
-        public void ProgressFile(TargetFile file, byte[] data, ulong totalRead)
+        public void FileContent(TargetFile file, byte[] data, ulong totalRead)
         {
             QTraceLog.WriteLine("Downloaded: {0}", data.Length);
             TotalSize = TotalSize + (uint) data.Length;
         }
 
-        public void EnteringDirectory(TargetFile folder)
+        public void DirectoryEntering(TargetFile folder)
         {
             QTraceLog.WriteLine("Entering directory: {0}", folder.Name);
         }
 
-        public void EnteringOther(TargetFile other)
+        public void UnknownEntering(TargetFile other)
         {
             // no idea, if this is a directory or file or named-pipe or socket... we simply don't have rights to visit it... so ignore in statistics
         }

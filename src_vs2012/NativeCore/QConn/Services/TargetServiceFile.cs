@@ -13,11 +13,6 @@ namespace BlackBerry.NativeCore.QConn.Services
     /// </summary>
     public sealed class TargetServiceFile : TargetService
     {
-        private const int ModeOpenNone = 0;
-        private const int ModeOpenReadOnly = 1;
-        private const int ModeOpenWriteOnly = 2;
-        private const int ModeOpenReadWrite = ModeOpenReadOnly | ModeOpenWriteOnly;
-
         private const int ModeOpenAppend = 8;
         private const int ModeOpenCreate = 0x100;
         private const int ModeOpenTruncate = 0x200;
@@ -69,7 +64,7 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             Token[] response;
 
-            if (mode == ModeOpenNone)
+            if (mode == TargetFile.ModeOpenNone)
             {
                 response = Send(string.Concat("oc:\"", path, "\":0"));
             }
@@ -108,9 +103,9 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             // creating folder, returns some dummy data...
             if (string.Compare(handle, "-1", StringComparison.Ordinal) == 0)
-                return new TargetFileDescriptor(this, null, permissions, 4096, path);
+                return new TargetFileDescriptor(this, null, permissions, 4096, mode, path);
 
-            return new TargetFileDescriptor(this, handle, response[2].UInt32Value, response[3].UInt64Value, response[4].StringValue);
+            return new TargetFileDescriptor(this, handle, response[2].UInt32Value, response[3].UInt64Value, mode, response[4].StringValue);
         }
 
         internal void Close(TargetFileDescriptor descriptor)
@@ -175,7 +170,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
-            using (var descriptor = Open(path, ModeOpenNone, uint.MaxValue, throwOnFailure))
+            using (var descriptor = Open(path, TargetFile.ModeOpenNone, uint.MaxValue, throwOnFailure))
             {
                 // when opening successful:
                 if (descriptor != null)
@@ -235,7 +230,7 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             if (location.IsDirectory)
             {
-                using (var directory = Open(location.Path, ModeOpenReadOnly, TargetFile.TypeDirectory, true))
+                using (var directory = Open(location.Path, TargetFile.ModeOpenReadOnly, TargetFile.TypeDirectory, true))
                 {
                     // PH: HINT:
                     // since some folders reports no size (like /tmp/slogger2) or too small size (like /pps/system only 8 bytes), try to read as much as possible...
@@ -326,7 +321,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
-            return Open(path, ModeOpenCreate | ModeOpenTruncate | ModeOpenReadWrite, permissions & TargetFile.TypeMask, true);
+            return Open(path, ModeOpenCreate | ModeOpenTruncate | TargetFile.ModeOpenReadWrite, permissions & TargetFile.TypeMask, true);
         }
 
         /// <summary>
@@ -457,7 +452,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                     // do we have an access to open that item?
                     if (item.NoAccess)
                     {
-                        visitor.EnteringOther(item);
+                        visitor.UnknownEntering(item);
                         continue;
                     }
 
@@ -471,7 +466,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                         if (item.IsDirectory)
                         {
                             // list items inside the directory and add to queue to visit them:
-                            visitor.EnteringDirectory(item);
+                            visitor.DirectoryEntering(item);
                             var childItems = service.List(item);
 
                             // add non-files, to visit them last:
@@ -490,10 +485,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                         }
                         else
                         {
-                            // PH: TODO: here it could be improved and the same info read as for files... but do we need it really?
-                            // who cares about some pipes or sockets; most of them can be found at /tmp on the device
-
-                            //visitor.EnteringOther(item);
+                            // treat all named-pipes, sockets etc as file and download any content if possible...
                             DownloadAsyncReadFile(service, visitor, item);
                         }
                     }
@@ -509,35 +501,43 @@ namespace BlackBerry.NativeCore.QConn.Services
 
         private static void DownloadAsyncReadFile(TargetServiceFile service, IFileServiceVisitor visitor, TargetFile descriptor)
         {
-            visitor.BeginFile(descriptor);
             try
             {
-                using (var file = service.Open(descriptor.Path, ModeOpenReadOnly, 0, false))
+                using (var file = service.Open(descriptor.Path, TargetFile.ModeOpenReadOnly, 0, false))
                 {
                     if (file != null)
                     {
-                        ulong totalRead = 0ul;
-
-                        while (!visitor.IsCancelled)
+                        try
                         {
-                            // read following chunks of the file
-                            // (it's crucial that we use the same chunk size as during service cloning, so it will minimize the number of buffer allocations)
-                            var data = service.Read(file, totalRead, DownloadUploadChunkSize);
-                            if (data != null && data.Length > 0)
-                            {
-                                totalRead += (ulong) data.Length;
-                                visitor.ProgressFile(descriptor, data, totalRead);
+                            visitor.FileOpening(file);
 
-                                // is last chunk?
-                                if (data.Length != DownloadUploadChunkSize)
+                            ulong totalRead = 0ul;
+
+                            while (!visitor.IsCancelled)
+                            {
+                                // read following chunks of the file
+                                // (it's crucial that we use the same chunk size as during service cloning, so it will minimize the number of buffer allocations)
+                                var data = service.Read(file, totalRead, DownloadUploadChunkSize);
+                                if (data != null && data.Length > 0)
+                                {
+                                    totalRead += (ulong) data.Length;
+                                    visitor.FileContent(descriptor, data, totalRead);
+
+                                    // is last chunk?
+                                    if (data.Length != DownloadUploadChunkSize)
+                                    {
+                                        break;
+                                    }
+                                }
+                                else
                                 {
                                     break;
                                 }
                             }
-                            else
-                            {
-                                break;
-                            }
+                        }
+                        finally
+                        {
+                            visitor.FileClosing(file);
                         }
                     }
                 }
@@ -545,10 +545,6 @@ namespace BlackBerry.NativeCore.QConn.Services
             catch (Exception ex)
             {
                 QTraceLog.WriteException(ex, "Failure during download of: \"{0}\"", descriptor.Path);
-            }
-            finally
-            {
-                visitor.EndFile(descriptor);
             }
         }
     }

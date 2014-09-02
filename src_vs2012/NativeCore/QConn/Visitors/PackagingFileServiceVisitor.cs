@@ -50,10 +50,12 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
             if (!descriptor.IsDirectory)
             {
+                // setup the base path to the home folder of the single file added to the package:
                 _basePath = PathHelper.ExtractDirectory(descriptor.Path);
             }
             else
             {
+                // zipping whole folder, so remember where is the root, to make paths of package-items inside shorter
                 _basePath = descriptor.Path;
             }
         }
@@ -70,7 +72,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _event.Set();
         }
 
-        public void BeginFile(TargetFile file)
+        public void FileOpening(TargetFile file)
         {
             _currentPart = CreatePart(file.Path);
 
@@ -80,7 +82,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _currentStream = _currentPart.GetStream();
         }
 
-        public void ProgressFile(TargetFile file, byte[] data, ulong totalRead)
+        public void FileContent(TargetFile file, byte[] data, ulong totalRead)
         {
             if (_currentPart == null)
                 throw new ObjectDisposedException("PackagingFileServiceVisitor");
@@ -88,7 +90,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _currentStream.Write(data, 0, data.Length);
         }
 
-        public void EndFile(TargetFile file)
+        public void FileClosing(TargetFile file)
         {
             if (_currentStream != null)
             {
@@ -98,11 +100,11 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _currentPart = null;
         }
 
-        public void EnteringDirectory(TargetFile folder)
+        public void DirectoryEntering(TargetFile folder)
         {
         }
 
-        public void EnteringOther(TargetFile other)
+        public void UnknownEntering(TargetFile other)
         {
             // create 0-length entry:
             CreatePart(other.Path);
