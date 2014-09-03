@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Text;
-using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn
 {
     /// <summary>
     /// Class responsible for keeping the connection and sending/receiving messages to/from QConn service running on target.
+    /// This service seeems to be just TELNET.
     /// </summary>
     public sealed class QConnConnection : IDisposable, ICloneable
     {
