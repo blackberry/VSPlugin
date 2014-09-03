@@ -352,6 +352,7 @@ namespace UnitTests
             var visitor = new LocalCopyVisitor(Path.Combine(Defaults.NdkDirectory, "tmp_copy.xxx"));
             //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
             qclient.FileService.DownloadAsync("/tmp", visitor);
+            //qclient.FileService.DownloadAsync("/tmp/pim.services.pimmain.pid", visitor);
 
             Assert.IsNotNull(visitor);
             visitor.Wait();

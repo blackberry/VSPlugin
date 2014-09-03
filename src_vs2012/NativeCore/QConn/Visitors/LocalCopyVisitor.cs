@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
@@ -14,6 +15,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         private readonly string _outputPath;
         private string _basePath;
         private Stream _stream;
+        private bool _singleFileDownload;
 
         /// <summary>
         /// Init constructor.
@@ -37,8 +39,26 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         public void Begin(TargetFile descriptor)
         {
             ResetWait();
-            _basePath = GetInitialBasePath(descriptor, true);
             _stream = null;
+
+            if (!descriptor.IsDirectory)
+            {
+                // only downloading a single file:
+                _singleFileDownload = true;
+                _basePath = null;
+            }
+            else
+            {
+                // copying folder, so get parent folder, to remember where is the root, to make processed paths of each received file or folder shorter
+                _singleFileDownload = false;
+                _basePath = PathHelper.ExtractDirectory(descriptor.Path);
+
+                // make sure path ends with '\\':
+                if (!string.IsNullOrEmpty(_basePath) && _basePath[_basePath.Length - 1] != Path.DirectorySeparatorChar && _basePath[_basePath.Length - 1] != Path.AltDirectorySeparatorChar)
+                {
+                    _basePath += Path.DirectorySeparatorChar;
+                }
+            }
         }
 
         public void End()
@@ -55,7 +75,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             // assumption is that directory entering, supposed to create whole directory structure,
             // was already called before on that visitor:
 
-            var name = GetLocalPath(file);
+            var name = _singleFileDownload ? _outputPath : GetLocalPath(file);
             _stream = File.Create(name, TargetServiceFile.DownloadUploadChunkSize, FileOptions.SequentialScan);
         }
 
@@ -104,9 +124,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new ArgumentNullException("descriptor");
 
             var name = descriptor.Path.StartsWith(_basePath) ? descriptor.Path.Substring(_basePath.Length) : descriptor.Path;
-            name = name.Replace('/', Path.DirectorySeparatorChar);
-            if (!string.IsNullOrEmpty(name) && name[0] == Path.DirectorySeparatorChar)
-                name = name.Substring(1);
+            name = name.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
             return Path.Combine(_outputPath, name);
         }

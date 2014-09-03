@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Packaging;
+using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
@@ -41,7 +42,19 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         {
             ResetWait();
             _package = Package.Open(_fileName, FileMode.Create);
-            _basePath = GetInitialBasePath(descriptor, false);
+            _basePath = GetInitialBasePath(descriptor);
+        }
+
+        private static string GetInitialBasePath(TargetFile descriptor)
+        {
+            if (!descriptor.IsDirectory)
+            {
+                // get the base path to the home folder of the single file processed:
+                return PathHelper.ExtractDirectory(descriptor.Path);
+            }
+
+            // get whole folder, to remember where is the root, to make processed paths of each received file or folder shorter
+            return descriptor.Path;
         }
 
         public void End()

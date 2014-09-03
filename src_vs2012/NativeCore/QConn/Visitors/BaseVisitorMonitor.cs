@@ -26,24 +26,6 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         }
 
         /// <summary>
-        /// Calculates, what is the base folder for future received content to make all the paths shorter.
-        /// </summary>
-        protected static string GetInitialBasePath(TargetFile descriptor, bool parentOfDirectory)
-        {
-            if (descriptor == null)
-                throw new ArgumentNullException("descriptor");
-
-            if (!descriptor.IsDirectory)
-            {
-                // get the base path to the home folder of the single file processed:
-                return PathHelper.ExtractDirectory(descriptor.Path);
-            }
-
-            // get whole folder, to remember where is the root, to make processed paths of each received file or folder shorter
-            return parentOfDirectory ? PathHelper.ExtractDirectory(descriptor.Path) : descriptor.Path;
-        }
-
-        /// <summary>
         /// Resets the state of wait-event fired, when visitor completes its task.
         /// </summary>
         protected void ResetWait()
