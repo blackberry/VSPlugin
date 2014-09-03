@@ -356,6 +356,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceSysInfo.cs">
       <Link>QConn\Services\TargetServiceSysInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\BaseFileServiceEnumerator.cs">
+      <Link>QConn\Visitors\BaseFileServiceEnumerator.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\BaseVisitorMonitor.cs">
       <Link>QConn\Visitors\BaseVisitorMonitor.cs</Link>
     </Compile>
@@ -374,8 +377,14 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\LocalCopyVisitor.cs">
       <Link>QConn\Visitors\LocalCopyVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\LocalEnumerator.cs">
+      <Link>QConn\Visitors\LocalEnumerator.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\LoggingVisitor.cs">
       <Link>QConn\Visitors\LoggingVisitor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\TargetCopyVisitor.cs">
+      <Link>QConn\Visitors\TargetCopyVisitor.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\TargetEnumerator.cs">
       <Link>QConn\Visitors\TargetEnumerator.cs</Link>

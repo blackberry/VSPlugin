@@ -3,11 +3,12 @@ using System.IO;
 using System.IO.Packaging;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
     /// <summary>
-    /// Class packaging the files received from target into a dedicated ZIP file.
+    /// Class packaging the received files into a dedicated ZIP file.
     /// </summary>
     public sealed class ZipPackageVisitor : BaseVisitorMonitor, IFileServiceVisitor
     {
@@ -38,7 +39,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             set;
         }
 
-        public void Begin(TargetFile descriptor)
+        public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
             ResetWait();
             _package = Package.Open(_fileName, FileMode.Create);
@@ -47,6 +48,9 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         private static string GetInitialBasePath(TargetFile descriptor)
         {
+            if (descriptor == null)
+                return null;
+
             if (!descriptor.IsDirectory)
             {
                 // get the base path to the home folder of the single file processed:

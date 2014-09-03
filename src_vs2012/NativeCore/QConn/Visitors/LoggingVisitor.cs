@@ -1,10 +1,11 @@
 ﻿using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
     /// <summary>
-    /// Support class to log statistics about files and folders to download.
+    /// Support class to log statistics about visited files and folders.
     /// Mostly for testing scenarios.
     /// </summary>
     public sealed class LoggingVisitor : BaseVisitorMonitor, IFileServiceVisitor
@@ -31,7 +32,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         #endregion
 
-        public void Begin(TargetFile descriptor)
+        public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
             ResetWait();
 

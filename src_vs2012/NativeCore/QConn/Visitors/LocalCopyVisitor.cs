@@ -8,14 +8,14 @@ using BlackBerry.NativeCore.QConn.Services;
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
     /// <summary>
-    /// Class saving the files received from target into local file system.
+    /// Class saving the received files into local file system.
     /// </summary>
     public class LocalCopyVisitor : BaseVisitorMonitor, IFileServiceVisitor
     {
         private readonly string _outputPath;
         private string _basePath;
-        private Stream _stream;
         private bool _singleFileDownload;
+        private Stream _stream;
 
         /// <summary>
         /// Init constructor.
@@ -36,10 +36,13 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             set;
         }
 
-        public void Begin(TargetFile descriptor)
+        public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
             ResetWait();
             _stream = null;
+
+            if (descriptor == null)
+                return;
 
             if (!descriptor.IsDirectory)
             {

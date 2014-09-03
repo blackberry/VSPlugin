@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Text;
 using BlackBerry.NativeCore.Helpers;
 
@@ -9,10 +10,10 @@ namespace BlackBerry.NativeCore.QConn.Model
     /// </summary>
     public class TargetFile : IComparable<TargetFile>
     {
-        internal const int ModeOpenNone = 0;
-        internal const int ModeOpenReadOnly = 1;
-        private const int ModeOpenWriteOnly = 2;
-        internal const int ModeOpenReadWrite = ModeOpenReadOnly | ModeOpenWriteOnly;
+        internal const uint ModeOpenNone = 0;
+        internal const uint ModeOpenReadOnly = 1;
+        private const uint ModeOpenWriteOnly = 2;
+        internal const uint ModeOpenReadWrite = ModeOpenReadOnly | ModeOpenWriteOnly;
 
         internal const uint TypeMask = 0xFFFF0FFF;
         private const uint TypeCharacterDevice = 0x2000;
@@ -22,6 +23,8 @@ namespace BlackBerry.NativeCore.QConn.Model
         private const uint TypeRegularFile = 0x8000;
         private const uint TypeSymlink = 0xA000;
         private const uint TypeSocket = 0xC000;
+
+        internal const uint ModePermissionsAll = 0xFFF;
 
         /// <summary>
         /// Init constructor.
@@ -43,6 +46,7 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         /// <summary>
         /// Init constructor.
+        /// It will create a 'stub' for files/folders we don't have access on the device.
         /// </summary>
         public TargetFile(string path, string name)
         {
@@ -52,8 +56,39 @@ namespace BlackBerry.NativeCore.QConn.Model
             CreationTime = DateTime.MinValue;
             NoAccess = true;
             Path = path;
-            Name = string.IsNullOrEmpty(name) ? path : name;
+            Name = string.IsNullOrEmpty(name) ? PathHelper.ExtractName(path) : name;
             UpdateFormatting();
+        }
+
+        /// <summary>
+        /// Init constructor.
+        /// Creates proper info about local file.
+        /// </summary>
+        public TargetFile(FileSystemInfo info)
+        {
+            if (info == null)
+                throw new ArgumentNullException("info");
+
+            Path = info.FullName;
+            Name = info.Name;
+
+            if (info.Exists)
+            {
+                bool isDirectory = (info.Attributes & FileAttributes.Directory) == FileAttributes.Directory;
+
+                CreationTime = info.CreationTime;
+                Size = isDirectory ? 0 : (ulong) ((FileInfo) info).Length;
+                Mode = (isDirectory ? TypeDirectory : TypeRegularFile) | ModePermissionsAll;
+                Flags = (info.Attributes & FileAttributes.ReadOnly) == FileAttributes.ReadOnly ? ModeOpenReadOnly : ModeOpenReadWrite;
+            }
+            else
+            {
+                CreationTime = DateTime.MinValue;
+                NoAccess = true;
+            }
+
+            UpdateFormatting();
+            UpdateAccess();
         }
 
         #region Properties
@@ -66,7 +101,7 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         public uint Permissions
         {
-            get { return Mode & 0xFFF; }
+            get { return Mode & ModePermissionsAll; }
         }
 
         public uint Type

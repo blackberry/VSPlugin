@@ -13,8 +13,8 @@ namespace BlackBerry.NativeCore.QConn.Services
     /// </summary>
     public sealed class TargetServiceFile : TargetService
     {
-        private const int ModeOpenCreate = 0x100;
-        private const int ModeOpenTruncate = 0x200;
+        private const uint ModeOpenCreate = 0x100;
+        private const uint ModeOpenTruncate = 0x200;
 
         internal const int DownloadUploadChunkSize = 8192;
 
@@ -294,7 +294,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// </summary>
         public TargetFile CreateFolder(string path)
         {
-            return CreateFolder(path, 0xFFF);
+            return CreateFolder(path, TargetFile.ModePermissionsAll);
         }
 
         /// <summary>
@@ -366,14 +366,64 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Downloads files and folders (including whole subtree) from specified location on target and passes them to visitor for further processing.
         /// </summary>
-        public IFileServiceVisitor DownloadAsync(string path, IFileServiceVisitor visitor)
+        public IFileServiceVisitor DownloadAsync(string targetPath, IFileServiceVisitor visitor)
         {
-            if (string.IsNullOrEmpty(path))
-                throw new ArgumentNullException("path");
+            if (string.IsNullOrEmpty(targetPath))
+                throw new ArgumentNullException("targetPath");
             if (visitor == null)
                 throw new ArgumentNullException("visitor");
 
-            return EnumerateAsync(new TargetEnumerator(path), visitor);
+            return EnumerateAsync(new TargetEnumerator(targetPath), visitor);
+        }
+
+        /// <summary>
+        /// Downloads files and folders (including whole subtree) from specified location on target and saves them locally.
+        /// </summary>
+        public IFileServiceVisitor DownloadAsync(string targetPath, string localPath)
+        {
+            if (string.IsNullOrEmpty(targetPath))
+                throw new ArgumentNullException("targetPath");
+            if (string.IsNullOrEmpty(localPath))
+                throw new ArgumentNullException("localPath");
+
+            return EnumerateAsync(new TargetEnumerator(targetPath), new LocalCopyVisitor(localPath));
+        }
+
+        /// <summary>
+        /// Gets a specified collection of files and folders and uploads them to target at specified location.
+        /// </summary>
+        public TargetCopyVisitor UploadAsync(IFileServiceEnumerator enumerator, string targetPath)
+        {
+            if (enumerator == null)
+                throw new ArgumentNullException("enumerator");
+            if (string.IsNullOrEmpty(targetPath))
+                throw new ArgumentNullException("targetPath");
+
+            return (TargetCopyVisitor) EnumerateAsync(enumerator, new TargetCopyVisitor(targetPath));
+        }
+
+        /// <summary>
+        /// Gets collection of files and folders (including whole subtree) from specified location on current desktop machine and uploads them to target at specified location.
+        /// </summary>
+        public TargetCopyVisitor UploadAsync(string localPath, string targetPath)
+        {
+            if (string.IsNullOrEmpty(localPath))
+                throw new ArgumentNullException("localPath");
+            if (string.IsNullOrEmpty(targetPath))
+                throw new ArgumentNullException("targetPath");
+
+            return (TargetCopyVisitor) EnumerateAsync(new LocalEnumerator(localPath), new TargetCopyVisitor(targetPath));
+        }
+
+        /// <summary>
+        /// Loads specified file or folders (including whole subtree) into memory.
+        /// </summary>
+        public BufferVisitor PreviewAsync(string targetPath)
+        {
+            if (string.IsNullOrEmpty(targetPath))
+                throw new ArgumentNullException("targetPath");
+
+            return (BufferVisitor) EnumerateAsync(new TargetEnumerator(targetPath), new BufferVisitor());
         }
 
         /// <summary>

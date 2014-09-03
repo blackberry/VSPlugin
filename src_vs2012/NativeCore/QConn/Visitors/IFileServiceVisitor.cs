@@ -1,4 +1,5 @@
 ﻿using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
@@ -18,7 +19,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         /// <summary>
         /// Called once, when visiting has started.
         /// </summary>
-        void Begin(TargetFile descriptor);
+        void Begin(TargetServiceFile service, TargetFile descriptor);
 
         /// <summary>
         /// Called once, when visiting has finished.

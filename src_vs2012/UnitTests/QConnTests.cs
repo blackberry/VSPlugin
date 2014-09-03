@@ -393,5 +393,56 @@ namespace UnitTests
             // and close
             qdoor.Close();
         }
+
+        [Test]
+        [Ignore]
+        public void ZipLocalFolder()
+        {
+            // this is purely for development purposes, let's just try to zip local folder to see all is working fine
+            // normally it makes NO SENSE to have the connection to the target opened
+
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.FileService);
+
+            // package local folder:
+            var visitor = new ZipPackageVisitor(Path.Combine(Defaults.NdkDirectory, "tmp_tools.zip"), CompressionOption.Maximum);
+            var enumerator = new LocalEnumerator(@"C:\Tools");
+            qclient.FileService.EnumerateAsync(enumerator, visitor);
+
+            Assert.IsNotNull(visitor);
+            visitor.Wait();
+
+            // and close
+            qdoor.Close();
+        }
+
+        [Test]
+        [Ignore]
+        public void CopySampleFolderToTargetFileSystem()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.FileService);
+
+            // upload local folder:
+            var visitor = qclient.FileService.UploadAsync(@"C:\Tools\Putty", "/accounts/1000/shared/misc/titans/123");
+
+            Assert.IsNotNull(visitor);
+            visitor.Wait();
+
+            // and close
+            qdoor.Close();
+        }
     }
 }

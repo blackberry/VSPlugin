@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
     /// <summary>
-    /// Class saving the files received from target only inside.
+    /// Class saving the received files only inside memory buffers.
     /// </summary>
     public sealed class BufferVisitor : BaseVisitorMonitor, IFileServiceVisitor
     {
@@ -61,7 +62,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             set;
         }
 
-        public void Begin(TargetFile descriptor)
+        public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
             ResetWait();
             _processedBuffers = new List<Tuple<TargetFile, byte[]>>();
