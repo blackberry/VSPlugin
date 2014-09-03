@@ -121,7 +121,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             }
             catch (Exception ex)
             {
-                QTraceLog.WriteException(ex, "Failure during download of: \"{0}\"", descriptor.Path);
+                QTraceLog.WriteException(ex, "Failure during reading: \"{0}\"", descriptor.Path);
             }
         }
     }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Visitors;
 
@@ -84,8 +85,8 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (response[0].StringValue == "e")
             {
                 if (throwOnFailure)
-                    throw new QConnException("Opening-handle failed: " + response[1].StringValue);
-                QTraceLog.WriteLine("Opening-handle failed: " + response[1].StringValue);
+                    throw new QConnException(string.Concat("Opening-handle failed: ", response[1].StringValue, " (", path, ")"));
+                QTraceLog.WriteLine(string.Concat("Opening-handle failed: ", response[1].StringValue, " (", path, ")"));
                 return null;
             }
             if (response.Length < 5)
@@ -121,12 +122,17 @@ namespace BlackBerry.NativeCore.QConn.Services
             }
         }
 
+        /// <summary>
+        /// Reads binary data directly from a file or folder of the target at specified offset.
+        /// </summary>
         internal byte[] Read(TargetFileDescriptor descriptor, ulong offset, ulong length)
         {
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
             if (descriptor.IsClosed)
                 throw new ArgumentOutOfRangeException("descriptor");
+            if (!descriptor.CanRead)
+                throw new QConnException("File is not opened for read");
             if (length == 0)
                 throw new ArgumentOutOfRangeException("length", "Too few data to read requested");
             if (length > int.MaxValue)
@@ -135,6 +141,8 @@ namespace BlackBerry.NativeCore.QConn.Services
             // ask for the raw data:
             var command = string.Concat("r:", descriptor.Handle, ":", offset.ToString("X"), ":", length.ToString("X"));
             var reader = Connection.Request(command);
+            if (reader == null)
+                throw new QConnException("Invalid response to read request received");
 
             // read and parse the header part:
             var responseHeader = reader.ReadString(uint.MaxValue, '\r');
@@ -157,6 +165,51 @@ namespace BlackBerry.NativeCore.QConn.Services
             }
 
             return new byte[0];
+        }
+
+        /// <summary>
+        /// Writes specified amount of data into an open file.
+        /// </summary>
+        internal uint Write(TargetFileDescriptor descriptor, byte[] data)
+        {
+            if (descriptor == null)
+                throw new ArgumentNullException("descriptor");
+            if (data == null)
+                throw new ArgumentNullException("data");
+
+            return Write(descriptor, data, 0, data.Length);
+        }
+
+        /// <summary>
+        /// Writes specified amount of data into an open file.
+        /// </summary>
+        internal uint Write(TargetFileDescriptor descriptor, byte[] data, int offset, int length)
+        {
+            if (descriptor == null)
+                throw new ArgumentNullException("descriptor");
+            if (descriptor.IsClosed)
+                throw new ArgumentOutOfRangeException("descriptor");
+            if (!descriptor.CanWrite)
+                throw new QConnException("File is not opened for write");
+            if (data == null)
+                throw new ArgumentNullException("data");
+            if (offset > data.Length)
+                throw new ArgumentOutOfRangeException("offset");
+            if (data.Length < offset + length)
+                throw new ArgumentOutOfRangeException("length", "Specified data buffer is too short");
+
+            // send file content:
+            var command = string.Concat("w:", descriptor.Handle, ":0:", length.ToString("X"), ":1"); // last 1 means appending
+            var responseContent = Connection.Send(command, data, offset, length);
+
+            var response = Token.Parse(responseContent);
+            if (response[0].StringValue != "o")
+                throw new QConnException("Reading failed: " + response[1].StringValue);
+
+            uint writeLength = response[1].UInt32Value;
+            // uint contentOffset = response[2].UInt64Value;
+
+            return writeLength;
         }
 
         /// <summary>
@@ -283,6 +336,26 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
+            // does it exist?
+            using (var descriptor = Open(path, TargetFile.ModeOpenNone, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, false))
+            {
+                if (descriptor != null)
+                    return descriptor;
+            }
+
+            // try to create directory:
+            using (var descriptor = Open(path, ModeOpenCreate, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, false))
+            {
+                if (descriptor != null)
+                    return descriptor;
+            }
+
+            // if creation failed, maybe some parent folders on the path are missing, try to create them:
+            var parent = CreateFolder(PathHelper.ExtractDirectory(path), permissions);
+            if (parent == null)
+                throw new QConnException("Failed to create folder");
+
+            // try to create directory again throwing exception if failed:
             using (var descriptor = Open(path, ModeOpenCreate, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, true))
             {
                 return descriptor;

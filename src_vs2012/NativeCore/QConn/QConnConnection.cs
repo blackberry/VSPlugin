@@ -151,23 +151,39 @@ namespace BlackBerry.NativeCore.QConn
         /// </summary>
         public string Send(string command)
         {
+            return Send(command, null, 0, 0);
+        }
+
+        /// <summary>
+        /// Sends a command with data attached that expects a string response.
+        /// It also does some response validation.
+        /// </summary>
+        public string Send(string command, byte[] data, int offset, int length)
+        {
             if (_source == null)
                 throw new ObjectDisposedException("QConnConnection");
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
+            if (data != null && offset >= data.Length)
+                throw new ArgumentOutOfRangeException("offset");
+            if (data != null && length + offset > data.Length)
+                throw new ArgumentOutOfRangeException("length");
+            if (data == null && length != 0)
+                throw new ArgumentOutOfRangeException("length");
 
             Open();
 
             // send request:
-            var status = _source.Send(Encoding.UTF8.GetBytes(command + "\r\n"));
+            var serializedCommand = SerializeCommand(command, data, offset, length);
+            var status = _source.Send(serializedCommand);
             if (status != HResult.OK)
             {
                 throw new QConnException("Unable to send command \"" + command + "\"");
             }
 
             // receive response:
-            int length;
-            var response = Receive(out length);
+            int responseLength;
+            var response = Receive(out responseLength);
 
             // verify response:
             if (string.IsNullOrEmpty(response))
@@ -181,6 +197,27 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             return response;
+        }
+
+        private static byte[] SerializeCommand(string command, byte[] data, int offset, int length)
+        {
+            var totalSize = Encoding.UTF8.GetByteCount(command) + 2 + length;
+            var result = new byte[totalSize];
+
+            // serialize command:
+            int resultOffset = Encoding.UTF8.GetBytes(command, 0, command.Length, result, 0);
+
+            // serialize end of header:
+            result[resultOffset++] = 13; // \r
+            result[resultOffset++] = 10; // \n
+
+            // serialize additional data:
+            if (data != null)
+            {
+                Array.Copy(data, offset, result, resultOffset, length);
+            }
+
+            return result;
         }
 
         /// <summary>

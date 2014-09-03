@@ -25,6 +25,7 @@ namespace BlackBerry.NativeCore.QConn.Model
         private const uint TypeSocket = 0xC000;
 
         internal const uint ModePermissionsAll = 0xFFF;
+        internal const uint ModePermissionDefault = 0x1FF;
 
         /// <summary>
         /// Init constructor.
