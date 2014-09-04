@@ -19,7 +19,7 @@ namespace BlackBerry.NativeCore.QConn
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public QConnConnection(string host, int port)
+        public QConnConnection(string host, int port, int timeout)
         {
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
@@ -29,7 +29,7 @@ namespace BlackBerry.NativeCore.QConn
             _source = new QDataSource();
             _endian = Endianess.Unknown;
 
-            Open();
+            Open(timeout);
         }
 
         /// <summary>
@@ -120,6 +120,14 @@ namespace BlackBerry.NativeCore.QConn
         /// </summary>
         public void Open()
         {
+            Open(0);
+        }
+
+        /// <summary>
+        /// Opens the connection to target.
+        /// </summary>
+        public void Open(int timeout)
+        {
             if (_source == null)
                 throw new ObjectDisposedException("QConnConnection");
 
@@ -129,7 +137,7 @@ namespace BlackBerry.NativeCore.QConn
                 return;
             }
 
-            var status = _source.Connect(_host, _port);
+            var status = _source.Connect(_host, _port, timeout);
             if (status != HResult.OK)
                 throw new QConnException("Unable to connect to QConn service (" + status + ")");
 

@@ -92,7 +92,7 @@ namespace BlackBerry.NativeCore.QConn
         /// <summary>
         /// Establish data connection with a target.
         /// </summary>
-        public HResult Connect(string host, int port)
+        public HResult Connect(string host, int port, int timeout)
         {
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
@@ -107,7 +107,24 @@ namespace BlackBerry.NativeCore.QConn
                     _socket.ReceiveTimeout = Timeout;
                     _socket.DontFragment = true;
                     _socket.NoDelay = true; // don't combine small TCP packets into one, just send them immediately as data to transmit was given
-                    _socket.Connect(host, port);
+
+                    // don't want to use synchronous version of _socket.Connect(host, port) as this will block for undefined amount of seconds
+                    //_socket.Connect(host, port);
+
+                    if (timeout <= 0)
+                    {
+                        timeout = Timeout;
+                    }
+
+                    var asyncResult = _socket.BeginConnect(host, port, null, null);
+                    var success = asyncResult.AsyncWaitHandle.WaitOne(timeout, true);
+
+                    if (!success)
+                    {
+                        _socket.Dispose();
+                        QTraceLog.WriteLine("Unable to establish connection to: {0}:{1} with timeout {2} ms", host, port, timeout);
+                        return HResult.Fail;
+                    }
 
                     // make sure, the object is listed on the finalizers thread,
                     // in case multiple times connection was opened and closed...

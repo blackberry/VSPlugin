@@ -20,6 +20,10 @@ namespace BlackBerry.NativeCore.QConn
         /// Default port the service is operating on the device.
         /// </summary>
         public const int DefaultPort = 4455;
+        /// <summary>
+        /// Default interval for sending keep-alive command.
+        /// </summary>
+        public const int DefaultKeepAliveInterval = 5000;
         private const int DefaultResponseSize = 255;
 
         private QDataSource _source;
@@ -152,9 +156,11 @@ namespace BlackBerry.NativeCore.QConn
             if (IsAuthenticated)
                 return;
 
-            var result = _source.Connect(host, port);
+            var result = _source.Connect(host, port, 0);
             if (result != HResult.OK)
             {
+                NotifyAuthenticationChanged(false);
+
                 QTraceLog.WriteLine("Failed to connect to target");
                 throw new SecureTargetConnectionException(result, string.Concat("Unable to connect to target ", host, ":", port));
             }
@@ -291,9 +297,10 @@ namespace BlackBerry.NativeCore.QConn
         }
 
         /// <summary>
-        /// Sends a keep-alive request to the target.
+        /// Sends single keep-alive request to the target.
         /// Without it the secured and unsecured connections will be automatically closed by the target.
-        /// Suggestion is to transmit it each 5sec.
+        /// Suggestion is to transmit this request each 5sec.
+        /// See overloaded method, where you can specify the interval to have it sent automatically.
         /// </summary>
         public void KeepAlive()
         {

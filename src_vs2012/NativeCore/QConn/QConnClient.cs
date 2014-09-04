@@ -111,13 +111,8 @@ namespace BlackBerry.NativeCore.QConn
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
 
-            using (var connection = new QConnConnection(host, port))
+            using (var connection = new QConnConnection(host, port, timeout))
             {
-                if (timeout > 0)
-                {
-                    connection.SendTimeout = timeout;
-                }
-
                 // get info about the target:
                 var response = connection.Send("info");
                 if (string.IsNullOrEmpty(response))
