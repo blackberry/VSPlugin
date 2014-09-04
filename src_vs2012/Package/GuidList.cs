@@ -32,7 +32,11 @@ namespace BlackBerry.Package
         public static readonly Guid guidVSNDK_PackageEditorFactory = new Guid(guidVsTemplateDesignerEditorFactoryString);
 
         // Guid of the new pane with output messages
-        public const string guidTraceOutputWindowPaneString = "09963e4f-18ea-40e5-ba9e-1bc375ad68d1";
-        public static readonly Guid GUID_TraceOutputWindowPane = new Guid(guidTraceOutputWindowPaneString);
+        public const string guidTraceMainOutputWindowPaneString = "09963E4F-18EA-40E5-BA9E-1BC375AD68D1";
+        public static readonly Guid GUID_TraceMainOutputWindowPane = new Guid(guidTraceMainOutputWindowPaneString);
+        public const string guidTraceGdbOutputWindowPaneString = "796156CD-B6AD-4574-9418-936BC258D38C";
+        public static readonly Guid GUID_TraceGdbOutputWindowPane = new Guid(guidTraceGdbOutputWindowPaneString);
+        public const string guidTraceQConnOutputWindowPaneString = "56D1A17F-2632-49A5-B678-A18B306C07AA";
+        public static readonly Guid GUID_TraceQConnOutputWindowPane = new Guid(guidTraceQConnOutputWindowPaneString);
     };
 }

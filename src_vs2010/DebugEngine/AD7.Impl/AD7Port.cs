@@ -14,8 +14,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Debugger.Model;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.QConn;
+using BlackBerry.NativeCore.QConn.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
 using System.Windows.Forms;
@@ -126,14 +133,33 @@ namespace BlackBerry.DebugEngine
         /// <returns> Returns the list of processes running on this port. </returns>
         private AD7Process[] GetProcesses()
         {
-            var processesRequest = GdbWrapper.ListProcesses(NDK, Device);
+            ////////////////////////////////////////////////////////
+            // "the old way", which seemed not to work on PlayBook
+            //var processesRequest = GdbWrapper.ListProcesses(NDK, Device);
+            //processesRequest.Processes... 
+
+            // get QConnClient and connect to the device, if not yet connected:
+            SystemInfoProcess[] processes = null;
+
+            try
+            {
+                var qClient = Targets.Get(Device, ConfigDefaults.SshPublicKeyPath);
+                if (qClient != null)
+                {
+                    processes = qClient.SysInfoService.LoadProcesses();
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to load list of processes");
+
+                // try to disconnect, so retry will have a clean-state:
+                Targets.Disconnect(Device);
+            }
 
             // timeout or other problem?
-            if (processesRequest == null || processesRequest.Response == null || processesRequest.Response.Name == "error")
+            if (processes == null)
             {
-                // when error: 1^error,msg="169.254.0.3:8000: The requested address is not valid in its context."
-                // the msg part is stored as Content property then
-
                 string deviceType = Device.Type == DeviceDefinitionType.Device ? "device" : "simulator";
                 MessageBox.Show(string.Concat("Please, verify if the ", deviceType, " (", Device.IP, ") is defined correctly. It can be modified at \"BlackBerry -> Settings\" menu."),
                     "Connection failure or timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -142,18 +168,13 @@ namespace BlackBerry.DebugEngine
             }
 
             // ok, got the valid response
-            if (processesRequest.Response.Name == "done")
+            var result = new List<AD7Process>();
+            foreach (var p in processes)
             {
-                var result = new List<AD7Process>();
-                foreach (var p in processesRequest.Processes)
-                {
-                    result.Add(new AD7Process(this, p));
-                }
-
-                return result.ToArray();
+                result.Add(new AD7Process(this, p));
             }
 
-            return new AD7Process[0];
+            return result.ToArray();
         }
 
         #region Implementation of IDebugPort2

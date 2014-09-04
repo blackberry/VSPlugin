@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using BlackBerry.NativeCore.Debugger.Model;
+using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.Debugger.Requests
 {
@@ -85,35 +86,15 @@ namespace BlackBerry.NativeCore.Debugger.Requests
         }
 
         /// <summary>
-        /// Searches for a process with specified executable (full name or partial)
+        /// Searches for a process with specified executable (full name or partial).
+        /// It will return null, if not found.
         /// </summary>
         public ProcessInfo Find(string executable)
         {
             if (string.IsNullOrEmpty(executable))
                 throw new ArgumentNullException("executable");
 
-            // first try to find identical executable:
-            foreach (var process in Processes)
-            {
-                if (string.CompareOrdinal(process.ExecutablePath, executable) == 0)
-                    return process;
-            }
-
-            // is the name matching:
-            foreach (var process in Processes)
-            {
-                if (string.CompareOrdinal(process.Name, executable) == 0)
-                    return process;
-            }
-
-            // or maybe only ends with it?
-            foreach (var process in Processes)
-            {
-                if (process.ExecutablePath != null && process.ExecutablePath.EndsWith(executable, StringComparison.Ordinal))
-                    return process;
-            }
-
-            return null;
+            return ProcessInfo.Find(Processes, executable);
         }
     }
 }

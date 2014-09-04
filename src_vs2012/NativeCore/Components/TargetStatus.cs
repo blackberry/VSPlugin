@@ -2,6 +2,7 @@
 {
     public enum TargetStatus
     {
+        Initialized,
         Connecting,
         Connected,
         Disconnected,

@@ -16,16 +16,20 @@ namespace BlackBerry.Package.Diagnostics
 
         private readonly IVsOutputWindowPane _outputPane;
         private readonly TimeTracker _time;
+        private readonly string _category;
 
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public BlackBerryPaneTraceListener(string title, bool printTime, IVsOutputWindow outputWindow, Guid paneGuid)
+        public BlackBerryPaneTraceListener(string title, string category, bool printTime, IVsOutputWindow outputWindow, Guid paneGuid)
             : base(SName)
         {
+            if (string.IsNullOrEmpty(category))
+                throw new ArgumentNullException("category");
             if (outputWindow == null)
                 throw new ArgumentNullException("outputWindow");
 
+            _category = category;
             _outputPane = FindOrCreatePane(title, outputWindow, paneGuid);
             if (printTime)
                 _time = new TimeTracker();
@@ -68,8 +72,8 @@ namespace BlackBerry.Package.Diagnostics
 
         public override void Write(string message, string category)
         {
-            // print only messages of 'BlackBerry' category:
-            if (string.CompareOrdinal(category, TraceLog.Category) != 0)
+            // print only messages of designated category:
+            if (string.CompareOrdinal(category, _category) != 0)
                 return;
 
             var timeString = _time != null ? _time.GetCurrent() : null;
@@ -81,8 +85,8 @@ namespace BlackBerry.Package.Diagnostics
 
         public override void WriteLine(string message, string category)
         {
-            // print only messages of 'BlackBerry' category:
-            if (string.CompareOrdinal(category, TraceLog.Category) != 0)
+            // print only messages of designated category:
+            if (string.CompareOrdinal(category, _category) != 0)
                 return;
 
             try

@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.Debugger.Model
 {
     /// <summary>
     /// Description of the process received from the device.
     /// </summary>
-    public sealed class ProcessInfo
+    public class ProcessInfo
     {
         /// <summary>
         /// Init constructor, designated for GDB response.
@@ -16,39 +18,12 @@ namespace BlackBerry.NativeCore.Debugger.Model
                 throw new ArgumentNullException("executablePath");
 
             ID = id;
-            Name = ExtractName(executablePath);
+
+            // get the name of the process, based on the full executable name, simply - just grabs the last item of the path:
+            Name = PathHelper.ExtractName(executablePath);
+            Directory = PathHelper.ExtractDirectory(executablePath);
             ExecutablePath = executablePath;
             ShortExecutablePath = ExtractShortPath(executablePath);
-        }
-
-        /// <summary>
-        /// Gets the name of the process, based on the executable path.
-        /// Simply - just grabs the last item of the path.
-        /// </summary>
-        private static string ExtractName(string executablePath)
-        {
-            bool skipLastChar = false;
-
-            for (int i = executablePath.Length - 1; i >= 0; i--)
-            {
-                if (executablePath[i] == '/' || executablePath[i] == '\\')
-                {
-                    if (i == executablePath.Length - 1)
-                    {
-                        skipLastChar = true;
-                    }
-                    else
-                    {
-                        if (skipLastChar)
-                            return executablePath.Substring(i + 1, executablePath.Length - i - 2);
-                        return executablePath.Substring(i + 1);
-                    }
-                }
-            }
-
-            if (skipLastChar)
-                return executablePath.Substring(0, executablePath.Length - 1);
-            return executablePath;
         }
 
         /// <summary>
@@ -78,6 +53,12 @@ namespace BlackBerry.NativeCore.Debugger.Model
             private set;
         }
 
+        public string Directory
+        {
+            get;
+            private set;
+        }
+
         public string ExecutablePath
         {
             get;
@@ -95,6 +76,41 @@ namespace BlackBerry.NativeCore.Debugger.Model
         public override string ToString()
         {
             return string.Concat("0x", ID.ToString("X8"), " ", Name, " (", ExecutablePath, ")");
+        }
+
+        /// <summary>
+        /// Searches for a process with specified executable (full name or partial).
+        /// It will return null, if not found.
+        /// </summary>
+        public static ProcessInfo Find(IEnumerable<ProcessInfo> processes, string executable)
+        {
+            if (processes == null)
+                throw new ArgumentNullException("processes");
+            if (string.IsNullOrEmpty(executable))
+                throw new ArgumentNullException("executable");
+
+            // first try to find identical executable:
+            foreach (var process in processes)
+            {
+                if (string.CompareOrdinal(process.ExecutablePath, executable) == 0)
+                    return process;
+            }
+
+            // is the name matching:
+            foreach (var process in processes)
+            {
+                if (string.CompareOrdinal(process.Name, executable) == 0)
+                    return process;
+            }
+
+            // or maybe only ends with it?
+            foreach (var process in processes)
+            {
+                if (process.ExecutablePath != null && process.ExecutablePath.EndsWith(executable, StringComparison.Ordinal))
+                    return process;
+            }
+
+            return null;
         }
     }
 }

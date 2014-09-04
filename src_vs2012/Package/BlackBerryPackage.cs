@@ -100,7 +100,9 @@ namespace BlackBerry.Package
         public const string VersionString = "2.1.2014.711";
         public const string OptionsCategoryName = "BlackBerry";
 
-        private BlackBerryPaneTraceListener _traceWindow;
+        private BlackBerryPaneTraceListener _mainTraceWindow;
+        private BlackBerryPaneTraceListener _gdbTraceWindow;
+        private BlackBerryPaneTraceListener _qconnTraceWindow;
         private DTE2 _dte;
         private BuildPlatformsManager _buildPlatformsManager;
 
@@ -136,11 +138,17 @@ namespace BlackBerry.Package
             _dte = (DTE2)GetService(typeof(SDTE));
 
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
-            _traceWindow = new BlackBerryPaneTraceListener("BlackBerry", true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceOutputWindowPane);
-            _traceWindow.Activate();
+            _mainTraceWindow = new BlackBerryPaneTraceListener("BlackBerry", TraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceMainOutputWindowPane);
+#if DEBUG
+            _gdbTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - GDB", TraceLog.CategoryGDB, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceGdbOutputWindowPane);
+#endif
+            _qconnTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - QConn", QTraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceQConnOutputWindowPane);
+            _mainTraceWindow.Activate();
 
             // and set it to monitor all logs (they have to be marked with 'BlackBerry' category! aka TraceLog.Category):
-            TraceLog.Add(_traceWindow);
+            TraceLog.Add(_mainTraceWindow);
+            TraceLog.Add(_gdbTraceWindow);
+            TraceLog.Add(_qconnTraceWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
 
             TraceLog.WriteLine(" * loaded NDK descriptions");
@@ -282,10 +290,20 @@ namespace BlackBerry.Package
         {
             if (disposing)
             {
-                if (_traceWindow != null)
+                if (_mainTraceWindow != null)
                 {
-                    _traceWindow.Dispose();
-                    _traceWindow = null;
+                    _mainTraceWindow.Dispose();
+                    _mainTraceWindow = null;
+                }
+                if (_gdbTraceWindow != null)
+                {
+                    _gdbTraceWindow.Dispose();
+                    _gdbTraceWindow = null;
+                }
+                if (_qconnTraceWindow != null)
+                {
+                    _qconnTraceWindow.Dispose();
+                    _qconnTraceWindow = null;
                 }
 
                 if (_buildPlatformsManager != null)

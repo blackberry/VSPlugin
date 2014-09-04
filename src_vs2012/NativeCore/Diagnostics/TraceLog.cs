@@ -10,6 +10,7 @@ namespace BlackBerry.NativeCore.Diagnostics
     public static class TraceLog
     {
         public const string Category = "BlackBerry";
+        public const string CategoryGDB = "GDB";
 
         /// <summary>
         /// Add new trace-log message listener.
@@ -127,7 +128,7 @@ namespace BlackBerry.NativeCore.Diagnostics
         /// Converts exception data into a single string.
         /// </summary>
         [DebuggerStepThrough]
-        private static string FlatException(Exception ex, string message)
+        internal static string FlatException(Exception ex, string message)
         {
             var result = new StringBuilder();
 

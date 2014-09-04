@@ -1,5 +1,6 @@
 ﻿using System;
 using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 
 namespace BlackBerry.NativeCore.Tools
@@ -93,7 +94,7 @@ namespace BlackBerry.NativeCore.Tools
         bool IGdbSender.Send(string command)
         {
 #if DEBUG
-            System.Diagnostics.Debug.WriteLine(string.Format("GDB-INPUT : {0}", command));
+            System.Diagnostics.Trace.WriteLine("INPUT : " + command, TraceLog.CategoryGDB);
 #endif
 
             return SendInput(command);
@@ -127,7 +128,7 @@ namespace BlackBerry.NativeCore.Tools
         protected override void ProcessOutputLine(string text)
         {
 #if DEBUG
-            System.Diagnostics.Debug.WriteLine(string.Format("GDB-OUTPUT: {0}", text));
+            System.Diagnostics.Trace.WriteLine("OUTPUT: " + text, TraceLog.CategoryGDB);
 #endif
 
             if (_processor != null)
