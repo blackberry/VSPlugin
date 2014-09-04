@@ -60,6 +60,39 @@ namespace BlackBerry.NativeCore.QConn
             Dispose(false);
         }
 
+        #region Properties
+
+        public bool IsConnected
+        {
+            get { return _source != null && _source.IsConnected; }
+        }
+
+        public int SendTimeout
+        {
+            get { return _source != null ? _source.SendTimeout : 0; }
+            set
+            {
+                if (_source != null)
+                {
+                    _source.SendTimeout = value;
+                }
+            }
+        }
+
+        public int ReceiveTimeout
+        {
+            get { return _source != null ? _source.ReceiveTimeout : 0; }
+            set
+            {
+                if (_source != null)
+                {
+                    _source.ReceiveTimeout = value;
+                }
+            }
+        }
+
+        #endregion
+
         /// <summary>
         /// Creates a new object that is a copy of the current instance.
         /// </summary>
@@ -81,15 +114,6 @@ namespace BlackBerry.NativeCore.QConn
 
             return new QConnConnection(_host, _port, chunkSize, _serviceName, _endian);
         }
-
-        #region Properties
-
-        public bool IsConnected
-        {
-            get { return _source != null && _source.IsConnected; }
-        }
-
-        #endregion
 
         /// <summary>
         /// Opens the connection to target.

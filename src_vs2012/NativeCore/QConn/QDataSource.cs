@@ -57,6 +57,36 @@ namespace BlackBerry.NativeCore.QConn
             get { return _chunkSize; }
         }
 
+        /// <summary>
+        /// Gets or sets the sending data timeout.
+        /// </summary>
+        public int SendTimeout
+        {
+            get { return _socket != null ? _socket.SendTimeout : 0; }
+            set
+            {
+                if (_socket != null)
+                {
+                    _socket.SendTimeout = value <= 0 ? Timeout : value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the receiving data timeout.
+        /// </summary>
+        public int ReceiveTimeout 
+        {
+            get { return _socket != null ? _socket.ReceiveTimeout : 0; }
+            set
+            {
+                if (_socket != null)
+                {
+                    _socket.ReceiveTimeout = value <= 0 ? Timeout : value;
+                }
+            }
+        }
+
         #endregion
 
         /// <summary>

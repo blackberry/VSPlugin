@@ -548,13 +548,28 @@ namespace BlackBerry.NativeCore.QConn.Services
             try
             {
                 action.EndInvoke(ar);
-
-                enumerator.End();
-                service.Dispose();
             }
             catch (Exception ex)
             {
                 QTraceLog.WriteException(ex, "Asynchronous download failed");
+            }
+
+            try
+            {
+                enumerator.End();
+            }
+            catch (Exception ex)
+            {
+                QTraceLog.WriteException(ex, "Enumerator cleaning-up failed");
+            }
+
+            try
+            {
+                service.Dispose();
+            }
+            catch (Exception ex)
+            {
+                QTraceLog.WriteException(ex, "Service cleaning-up failed");
             }
         }
     }

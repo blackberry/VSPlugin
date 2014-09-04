@@ -14,12 +14,12 @@ namespace BlackBerry.NativeCore.QConn
     ///   * list/start/kill processes
     ///   * transfer files.
     /// </summary>
-    public sealed class QConnClient
+    public sealed class QConnClient : IDisposable
     {
         /// <summary>
         /// Default port the QConn service is running on the target.
         /// </summary>
-        public int DefaultPort = 8000;
+        public const int DefaultPort = 8000;
 
         /// <summary>
         /// Default constructor.
@@ -27,6 +27,11 @@ namespace BlackBerry.NativeCore.QConn
         public QConnClient()
         {
             Services = new TargetService[0];
+        }
+
+        ~QConnClient()
+        {
+            Dispose(false);
         }
 
         #region Properties
@@ -95,19 +100,24 @@ namespace BlackBerry.NativeCore.QConn
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
 
-            Load(host, DefaultPort);
+            Load(host, DefaultPort, 0);
         }
 
         /// <summary>
         /// Loads info about the target and initializes properties.
         /// </summary>
-        public void Load(string host, int port)
+        public void Load(string host, int port, int timeout)
         {
             if (string.IsNullOrEmpty(host))
                 throw new ArgumentNullException("host");
 
             using (var connection = new QConnConnection(host, port))
             {
+                if (timeout > 0)
+                {
+                    connection.SendTimeout = timeout;
+                }
+
                 // get info about the target:
                 var response = connection.Send("info");
                 if (string.IsNullOrEmpty(response))
@@ -295,5 +305,40 @@ namespace BlackBerry.NativeCore.QConn
 
             return result;
         }
+
+        #region IDisposable Implementation
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        /// <filterpriority>2</filterpriority>
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (Services.Length > 0)
+                {
+                    var servicesCopy = Services;
+                    Services = new TargetService[0];
+
+                    foreach (var s in servicesCopy)
+                    {
+                        s.Dispose();
+                    }
+
+                    SysInfoService = null;
+                    ControlService = null;
+                    FileService = null;
+                }
+            }
+        }
+
+        #endregion
     }
 }
