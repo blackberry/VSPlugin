@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.Debugger.Model
@@ -6,7 +7,7 @@ namespace BlackBerry.NativeCore.Debugger.Model
     /// <summary>
     /// Description of the process received from the device.
     /// </summary>
-    public sealed class ProcessInfo
+    public class ProcessInfo
     {
         /// <summary>
         /// Init constructor, designated for GDB response.
@@ -75,6 +76,41 @@ namespace BlackBerry.NativeCore.Debugger.Model
         public override string ToString()
         {
             return string.Concat("0x", ID.ToString("X8"), " ", Name, " (", ExecutablePath, ")");
+        }
+
+        /// <summary>
+        /// Searches for a process with specified executable (full name or partial).
+        /// It will return null, if not found.
+        /// </summary>
+        public static ProcessInfo Find(IEnumerable<ProcessInfo> processes, string executable)
+        {
+            if (processes == null)
+                throw new ArgumentNullException("processes");
+            if (string.IsNullOrEmpty(executable))
+                throw new ArgumentNullException("executable");
+
+            // first try to find identical executable:
+            foreach (var process in processes)
+            {
+                if (string.CompareOrdinal(process.ExecutablePath, executable) == 0)
+                    return process;
+            }
+
+            // is the name matching:
+            foreach (var process in processes)
+            {
+                if (string.CompareOrdinal(process.Name, executable) == 0)
+                    return process;
+            }
+
+            // or maybe only ends with it?
+            foreach (var process in processes)
+            {
+                if (process.ExecutablePath != null && process.ExecutablePath.EndsWith(executable, StringComparison.Ordinal))
+                    return process;
+            }
+
+            return null;
         }
     }
 }

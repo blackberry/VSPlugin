@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Services
@@ -123,6 +124,18 @@ namespace BlackBerry.NativeCore.QConn.Services
             }
 
             return result.ToArray();
+        }
+
+        /// <summary>
+        /// Searches for a running process with specified executable (full name or partial).
+        /// It will return null, if not found.
+        /// </summary>
+        public SystemInfoProcess FindProcess(string executable)
+        {
+            if (string.IsNullOrEmpty(executable))
+                throw new ArgumentNullException("executable");
+
+            return (SystemInfoProcess) ProcessInfo.Find(LoadProcesses(), executable);
         }
     }
 }

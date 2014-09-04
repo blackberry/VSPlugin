@@ -1,32 +1,22 @@
-﻿using System;
+﻿using BlackBerry.NativeCore.Debugger.Model;
 
 namespace BlackBerry.NativeCore.QConn.Model
 {
     /// <summary>
     /// Info about process running on the device.
     /// </summary>
-    public sealed class SystemInfoProcess
+    public sealed class SystemInfoProcess : ProcessInfo
     {
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public SystemInfoProcess(uint id, uint parentID, string name)
+        public SystemInfoProcess(uint id, uint parentID, string executablePath)
+            : base(id, executablePath)
         {
-            if (string.IsNullOrEmpty(name))
-                throw new ArgumentNullException("name");
-
-            ID = id;
             ParentID = parentID;
-            Name = name;
         }
 
         #region Properties
-
-        public uint ID
-        {
-            get;
-            private set;
-        }
 
         public uint ParentID
         {
@@ -34,17 +24,6 @@ namespace BlackBerry.NativeCore.QConn.Model
             private set;
         }
 
-        public string Name
-        {
-            get;
-            private set;
-        }
-
         #endregion
-
-        public override string ToString()
-        {
-            return Name;
-        }
     }
 }

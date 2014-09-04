@@ -110,7 +110,7 @@ namespace UnitTests
 
             foreach (var p in processes)
             {
-                QTraceLog.WriteLine("Process found: 0x{0:X8} (parent: 0x{1:X8}) - {2}", p.ID, p.ParentID, p.Name);
+                QTraceLog.WriteLine("Process found: 0x{0:X8} (parent: 0x{1:X8}) - {2}", p.ID, p.ParentID, p.ExecutablePath);
             }
 
             // and close
@@ -139,7 +139,7 @@ namespace UnitTests
             SystemInfoProcess toKill = null;
             foreach (var p in processes)
             {
-                if (!p.Name.EndsWith("qconn"))
+                if (p.Name != "qconn")
                 {
                     toKill = p;
                     break;
