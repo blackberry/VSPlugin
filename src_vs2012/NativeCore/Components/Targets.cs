@@ -319,10 +319,11 @@ namespace BlackBerry.NativeCore.Components
             {
                 Connect(device, sshPublicKeyPath, null);
 
-                // wait until established or error:
-                Wait(device.IP);
-
-                qClient = Get(device.IP);
+                // wait until link established or error:
+                if (Wait(device.IP))
+                {
+                    qClient = Get(device.IP);
+                }
             }
 
             return qClient;
@@ -538,20 +539,6 @@ namespace BlackBerry.NativeCore.Components
         {
             if (string.IsNullOrEmpty(ip))
                 throw new ArgumentNullException("ip");
-
-            /*
-            DateTime timesUp = millisecondsTimeout < 0 ? DateTime.MaxValue : DateTime.Now.AddMilliseconds(millisecondsTimeout);
-            while (DateTime.Now < timesUp)
-            {
-                var existingTarget = Find(ip);
-                if (existingTarget == null || existingTarget.Status != TargetStatus.Connecting)
-                    break;
-
-                Thread.Sleep(100);
-            }
-
-            return true;
-            */
 
             var existingTarget = Find(ip);
             if (existingTarget != null)

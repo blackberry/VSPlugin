@@ -30,6 +30,7 @@ namespace BlackBerry.NativeCore.QConn
         private readonly object _lock;
         private Timer _keepAliveTimer;
         private bool _isAuthenticated;
+        private bool _didNotified;
 
         /// <summary>
         /// Event raised each time status of an encrypted-channel to target is changed.
@@ -105,6 +106,8 @@ namespace BlackBerry.NativeCore.QConn
             NotifyAuthenticationChanged(false);
             if (result != HResult.OK)
                 throw new SecureTargetConnectionException(HResult.Fail, "Unable to close connection with target");
+
+            _didNotified = false;
         }
 
         /// <summary>
@@ -159,8 +162,6 @@ namespace BlackBerry.NativeCore.QConn
             var result = _source.Connect(host, port, 0);
             if (result != HResult.OK)
             {
-                NotifyAuthenticationChanged(false);
-
                 QTraceLog.WriteLine("Failed to connect to target");
                 throw new SecureTargetConnectionException(result, string.Concat("Unable to connect to target ", host, ":", port));
             }
@@ -493,8 +494,9 @@ namespace BlackBerry.NativeCore.QConn
 
         private void NotifyAuthenticationChanged(bool isAuthenticated)
         {
-            if (isAuthenticated != _isAuthenticated)
+            if (isAuthenticated != _isAuthenticated || !_didNotified)
             {
+                _didNotified = true;
                 _isAuthenticated = isAuthenticated;
 
                 // notify using dispatcher or just by calling handlers from the same thread:
