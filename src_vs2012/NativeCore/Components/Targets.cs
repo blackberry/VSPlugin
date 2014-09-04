@@ -4,7 +4,7 @@ using System.Threading;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
-using BlackBerry.NativeCore.Tools;
+using BlackBerry.NativeCore.QConn;
 
 namespace BlackBerry.NativeCore.Components
 {
@@ -20,6 +20,9 @@ namespace BlackBerry.NativeCore.Components
         /// </summary>
         sealed class TargetInfo : IDisposable
         {
+            private AutoResetEvent _hasStatusEvent;
+            private readonly string _sshPublicKeyPath;
+
             public event EventHandler<TargetConnectionEventArgs> StatusChanged;
 
             public TargetInfo(DeviceDefinition device, string sshPublicKeyPath)
@@ -29,26 +32,14 @@ namespace BlackBerry.NativeCore.Components
                 if (string.IsNullOrEmpty(sshPublicKeyPath))
                     throw new ArgumentNullException("sshPublicKeyPath");
 
+                Status = TargetStatus.Initialized;
                 Device = device;
-                Runner = new DeviceConnectRunner(ConfigDefaults.ToolsDirectory, Device.IP, Device.Password, sshPublicKeyPath);
-                Runner.StatusChanged += OnConnectionStatusChanged;
-            }
+                _hasStatusEvent = new AutoResetEvent(false);
+                _sshPublicKeyPath = sshPublicKeyPath;
 
-            private void OnConnectionStatusChanged(object sender, EventArgs e)
-            {
-                // notify external handler:
-                var statusHandler = StatusChanged;
-                var args = ToEventArgs();
-
-                TraceLog.WriteLine("Target status changed to {0} (message: \"{1}\") for device {2}", args.Status, args.Message ?? "-", Device);
-
-                if (statusHandler != null)
-                {
-                    statusHandler(null, args);
-                }
-
-                // then notify Targets class, so it updates the internal state:
-                OnChildConnectionStatusChanged(this, args);
+                Client = new QConnClient();
+                Door = new QConnDoor();
+                Door.Authenticated += QConnDoorAuthenticationChanged;
             }
 
             ~TargetInfo()
@@ -64,7 +55,19 @@ namespace BlackBerry.NativeCore.Components
                 private set;
             }
 
-            public DeviceConnectRunner Runner
+            public QConnDoor Door
+            {
+                get;
+                private set;
+            }
+
+            public QConnClient Client
+            {
+                get;
+                private set;
+            }
+
+            public TargetStatus Status
             {
                 get;
                 private set;
@@ -84,10 +87,22 @@ namespace BlackBerry.NativeCore.Components
             {
                 if (disposing)
                 {
-                    if (Runner != null)
+                    if (_hasStatusEvent != null)
                     {
-                        Runner.Dispose();
-                        Runner = null;
+                        _hasStatusEvent.Dispose();
+                        _hasStatusEvent = null;
+                    }
+
+                    if (Client != null)
+                    {
+                        Client.Dispose();
+                        Client = null;
+                    }
+
+                    if (Door != null)
+                    {
+                        Door.Dispose();
+                        Door = null;
                     }
 
                     StatusChanged = null;
@@ -104,32 +119,109 @@ namespace BlackBerry.NativeCore.Components
                 return string.CompareOrdinal(Device.IP, ip) == 0;
             }
 
+            public bool Wait(int millisecondsTimeout)
+            {
+                if (_hasStatusEvent == null)
+                    throw new ObjectDisposedException("TargetInfo");
+
+                return _hasStatusEvent.WaitOne(millisecondsTimeout);
+            }
+
             public void Start()
             {
-                if (Runner == null)
-                    throw new ObjectDisposedException("ConnectionInfo");
-                Runner.ExecuteAsync();
+                NotifyStatusChange(TargetStatus.Connecting, null);
+
+                /////////////////////////////////////
+                // Trick of the day: there can be only one QConnDoor connection setup to the device
+                // so it might happen, we already opened one in Visual Studio, Momentics or on
+                // another machine; so let's try, if it's possible to communicate with device services.
+                try
+                {
+                    Client.Load(Device.IP, QConnClient.DefaultPort, 1000);
+
+                    // all is fine, connection established, no need to have own QConnDoor
+                    NotifyStatusChange(TargetStatus.Connected, null);
+                    return;
+                }
+                catch
+                {
+                    // invalid device or QConnDoor not opened by others...
+                }
+
+                Door.OpenAsync(Device.IP, Device.Password, _sshPublicKeyPath);
+            }
+
+            private void QConnDoorAuthenticationChanged(object sender, QConnAuthenticationEventArgs e)
+            {
+                TraceLog.WriteLine("Target status changed to: {0} for: {1}", e.IsAuthenticated ? "authenticated" : "disconnected", Device);
+
+                if (e.IsAuthenticated)
+                {
+                    // load info about services:
+                    try
+                    {
+                        Client.Load(Device.IP);
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteException(ex, "Failed to load info about target's services");
+                        NotifyStatusChange(TargetStatus.Failed, "Failed to load info about services on target");
+                    }
+
+                    // start keeping-alive the connection:
+                    try
+                    {
+                        Door.KeepAlive(QConnDoor.DefaultKeepAliveInterval); // this will continuously asynchronously send the keep-alive request
+                        NotifyStatusChange(TargetStatus.Connected, null);
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteException(ex, "Failed to start keeping the connection alive");
+                        NotifyStatusChange(TargetStatus.Failed, "Lost connection to the device");
+                    }
+                }
+                else
+                {
+                    if (Status == TargetStatus.Connected)
+                    {
+                        NotifyStatusChange(TargetStatus.Failed, "Lost connection to the device");
+                    }
+                    else
+                    {
+                        NotifyStatusChange(TargetStatus.Failed, "Failed to connect to the device");
+                    }
+                }
+
+                // then notify Targets class, so it updates the internal state:
+                OnChildConnectionStatusChanged(this, Status);
+            }
+
+            private void NotifyStatusChange(TargetStatus status, string message)
+            {
+                if (status != Status)
+                {
+                    Status = status;
+
+                    var handler = StatusChanged;
+                    if (handler != null)
+                    {
+                        handler(this, new TargetConnectionEventArgs(Device, status, message));
+                    }
+                }
+
+                // and wake up waiters, if needed...
+                if (status != TargetStatus.Connecting)
+                {
+                    if (_hasStatusEvent != null)
+                    {
+                        _hasStatusEvent.Set();
+                    }
+                }
             }
 
             public TargetConnectionEventArgs ToEventArgs()
             {
-                if (Runner == null)
-                    return new TargetConnectionEventArgs(Device, TargetStatus.Failed, "Unable to start the connection");
-
-                // is the process still running?
-                if (!Runner.IsProcessing)
-                    return new TargetConnectionEventArgs(Device, TargetStatus.Disconnected, "Disconnected");
-
-                if (Runner.IsConnectionFailed)
-                    return new TargetConnectionEventArgs(Device, TargetStatus.Failed, Runner.LastError);
-
-                if (Runner.IsConnected)
-                    return new TargetConnectionEventArgs(Device, TargetStatus.Connected, "Connected");
-
-                if (Runner.IsProcessing)
-                    return new TargetConnectionEventArgs(Device, TargetStatus.Connecting, "Connecting...");
-
-                throw new InvalidOperationException("Impossible to determine status of the target device");
+                return new TargetConnectionEventArgs(Device, Status, null);
             }
         }
 
@@ -170,7 +262,7 @@ namespace BlackBerry.NativeCore.Components
         public static bool IsConnected(string ip)
         {
             var connection = Find(ip);
-            return connection != null && connection.Runner.IsConnected;
+            return connection != null && connection.Status == TargetStatus.Connected;
         }
 
         /// <summary>
@@ -182,20 +274,58 @@ namespace BlackBerry.NativeCore.Components
         }
 
         /// <summary>
-        /// Gets an indication, if there is already a valid or broken connection to the device with given IP.
+        /// Gets the manager of the device for advanced services.
         /// </summary>
-        public static bool IsConnectedOrFailed(string ip)
+        public static QConnClient Get(DeviceDefinition device)
         {
-            var connection = Find(ip);
-            return connection == null || connection.Runner.IsConnected || connection.Runner.IsConnectionFailed;
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            return Get(device.IP);
         }
 
         /// <summary>
-        /// Gets an indication, if there is already a valid or broken connection to the device with given IP.
+        /// Gets the manager of the device for advanced services.
         /// </summary>
-        public static bool IsConnectedOrFailed(DeviceDefinition device)
+        public static QConnClient Get(string ip)
         {
-            return device != null && IsConnectedOrFailed(device.IP);
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+
+            var existingTarget = Find(ip);
+            if (existingTarget != null && existingTarget.Status == TargetStatus.Connected)
+            {
+                return existingTarget.Client;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets the manager of the device for advanced services.
+        /// It will try to automatically connect to the device, if needed and might block current thread for that time.
+        /// </summary>
+        public static QConnClient Get(DeviceDefinition device, string sshPublicKeyPath)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (string.IsNullOrEmpty(sshPublicKeyPath))
+                throw new ArgumentNullException(sshPublicKeyPath);
+
+            var qClient = Get(device.IP);
+
+            // need to connect first:
+            if (qClient == null)
+            {
+                Connect(device, sshPublicKeyPath, null);
+
+                // wait until established or error:
+                Wait(device.IP);
+
+                qClient = Get(device.IP);
+            }
+
+            return qClient;
         }
 
         /// <summary>
@@ -231,7 +361,7 @@ namespace BlackBerry.NativeCore.Components
                     }
                     _activeTargets.Add(newTarget);
 
-                    // until we start the tool, it might report 'disconnected' state, that's why it's inside lock
+                    // until we open the QConnDoor, it might report 'disconnected' state, that's why it's inside lock
                     newTarget.Start();
                 }
                 else
@@ -249,35 +379,48 @@ namespace BlackBerry.NativeCore.Components
                 // and notify the caller:
                 if (resultHandler != null)
                 {
-                    resultHandler.BeginInvoke(null, existingTarget.ToEventArgs(), null, null);
+                    resultHandler.BeginInvoke(null, existingTarget.ToEventArgs(), StatusHandlerAsyncCleanup, resultHandler);
                 }
             }
         }
 
-        private static void OnChildConnectionStatusChanged(object sender, TargetConnectionEventArgs e)
+        private static void StatusHandlerAsyncCleanup(IAsyncResult ar)
         {
-            bool removed = false;
-            var target = sender as TargetInfo;
+            var resultHandler = (EventHandler<TargetConnectionEventArgs>) ar.AsyncState;
+
+            try
+            {
+                resultHandler.EndInvoke(ar);
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Targets status-change notification failed");
+            }
+        }
+
+        private static void OnChildConnectionStatusChanged(TargetInfo target, TargetStatus status)
+        {
             if (target == null)
                 throw new ArgumentNullException("sender");
 
-            if (e.Status == TargetStatus.Disconnected)
+            bool dispose = false;
+
+            if (status == TargetStatus.Disconnected || status == TargetStatus.Failed)
             {
                 lock (_sync)
                 {
-                    removed = _activeTargets.Remove(target);
+                    dispose = _activeTargets.Remove(target);
                 }
             }
 
             // only release the object, when it belong to the list
             // (to avoid double-releases, in case external handlers manipulated the list):
-            if (removed)
+            if (dispose)
             {
                 // and release resources:
                 target.Dispose();
             }
         }
-
 
         /// <summary>
         /// Stops receiving more events related to the connection state to the target device.
@@ -369,37 +512,54 @@ namespace BlackBerry.NativeCore.Components
         /// <summary>
         /// Waits until connection status changes to connected or failed for a given device.
         /// </summary>
-        public static void Wait(string ip)
+        public static bool Wait(string ip)
         {
             if (string.IsNullOrEmpty(ip))
                 throw new ArgumentNullException("ip");
 
-            Wait(GdbProcessor.ShortInfinite, ip);
+            return Wait(GdbProcessor.ShortInfinite, ip);
         }
 
         /// <summary>
         /// Waits until connection status changes to connected or failed for a given device.
         /// </summary>
-        public static void Wait(int millisecondsTimeout, DeviceDefinition device)
+        public static bool Wait(int millisecondsTimeout, DeviceDefinition device)
         {
             if (device == null)
                 throw new ArgumentNullException("device");
 
-            Wait(millisecondsTimeout, device.IP);
+            return Wait(millisecondsTimeout, device.IP);
         }
 
         /// <summary>
         /// Waits until connection status changes to connected or failed for a given device.
         /// </summary>
-        public static void Wait(int millisecondsTimeout, string ip)
+        public static bool Wait(int millisecondsTimeout, string ip)
         {
             if (string.IsNullOrEmpty(ip))
                 throw new ArgumentNullException("ip");
 
+            /*
             DateTime timesUp = millisecondsTimeout < 0 ? DateTime.MaxValue : DateTime.Now.AddMilliseconds(millisecondsTimeout);
+            while (DateTime.Now < timesUp)
+            {
+                var existingTarget = Find(ip);
+                if (existingTarget == null || existingTarget.Status != TargetStatus.Connecting)
+                    break;
 
-            while (DateTime.Now < timesUp && !IsConnectedOrFailed(ip))
-                Thread.Sleep(10);
+                Thread.Sleep(100);
+            }
+
+            return true;
+            */
+
+            var existingTarget = Find(ip);
+            if (existingTarget != null)
+            {
+                return existingTarget.Wait(millisecondsTimeout);
+            }
+
+            return false;
         }
     }
 }

@@ -65,9 +65,10 @@ namespace BlackBerry.DebugEngine
 
             if (devices != null)
             {
+                // creating list in reversed order, as then it displays correctly inside Visual Studio:
                 foreach (var device in devices)
                 {
-                    result.Add(CreatePort(this, new AD7PortRequest(GetPortRequestName(device), device), _ndk));
+                    result.Insert(0, CreatePort(this, new AD7PortRequest(GetPortRequestName(device), device), _ndk));
                 }
             }
 
