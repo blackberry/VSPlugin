@@ -14,6 +14,18 @@ namespace UnitTests
     [TestFixture]
     public sealed class QConnTests
     {
+        private static void SetupProgressMonitor(object source)
+        {
+            var monitor = source as IFileServiceVisitorMonitor;
+            if (monitor != null)
+            {
+                monitor.Started += (sender, e) => QTraceLog.WriteLine("!!! Transfer started");
+                monitor.Completed += (sender, e) => QTraceLog.WriteLine("!!! Transfer completed");
+                monitor.Failed += (sender, e) => QTraceLog.WriteLine("!!! Failure: {0}", e.UltimateMassage);
+                monitor.ProgressChanged += (sender, e) => QTraceLog.WriteLine("!!! {0} / {1} / {2}%", e.Name, e.Operation, e.Progress);
+            }
+        }
+
         [Test]
         public void Connect()
         {
@@ -268,6 +280,8 @@ namespace UnitTests
 
             // calculate stats about all files from the folder:
             var visitor = new LoggingVisitor();
+
+            SetupProgressMonitor(visitor);
             //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
             qclient.FileService.DownloadAsync("/tmp", visitor);
 
@@ -295,6 +309,8 @@ namespace UnitTests
 
             // download all files from the folder:
             var visitor = new ZipPackageVisitor(Path.Combine(Defaults.NdkDirectory, "test.zip"), CompressionOption.Maximum);
+
+            SetupProgressMonitor(visitor);
             //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
             //qclient.FileService.DownloadAsync("/pps", visitor); // can take some time ~25sec
             //qclient.FileService.DownloadAsync("/pps/accounts", visitor);
@@ -321,6 +337,8 @@ namespace UnitTests
 
             // download all files from the folder:
             var visitor = new ZipPackageVisitor(Path.Combine(Defaults.NdkDirectory, "test-parallel.zip"), CompressionOption.NotCompressed);
+
+            SetupProgressMonitor(visitor);
             qclient.FileService.DownloadAsync("/tmp", visitor);
 
             // this should be executed in parallel to the download:
@@ -350,6 +368,8 @@ namespace UnitTests
 
             // calculate stats about all files from the folder:
             var visitor = new LocalCopyVisitor(Path.Combine(Defaults.NdkDirectory, "tmp_copy.xxx"));
+
+            SetupProgressMonitor(visitor);
             //qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/", visitor);
             qclient.FileService.DownloadAsync("/tmp", visitor);
             //qclient.FileService.DownloadAsync("/tmp/pim.services.pimmain.pid", visitor);
@@ -375,6 +395,8 @@ namespace UnitTests
 
             // calculate stats about all files from the folder:
             var visitor = new BufferVisitor();
+
+            SetupProgressMonitor(visitor);
             qclient.FileService.DownloadAsync("/accounts/1000/appdata/com.example.FallingBlocks.testDev_llingBlocks37d009c_/app/native/", visitor);
             //qclient.FileService.DownloadAsync("/tmp", visitor);
 
@@ -413,6 +435,8 @@ namespace UnitTests
             // package local folder:
             var visitor = new ZipPackageVisitor(Path.Combine(Defaults.NdkDirectory, "tmp_tools.zip"), CompressionOption.Maximum);
             var enumerator = new LocalEnumerator(@"C:\Tools");
+
+            SetupProgressMonitor(visitor);
             qclient.FileService.EnumerateAsync(enumerator, visitor);
 
             Assert.IsNotNull(visitor);
@@ -437,6 +461,7 @@ namespace UnitTests
 
             // upload local folder:
             var visitor = qclient.FileService.UploadAsync(@"C:\Tools\Putty", "/accounts/1000/shared/misc/titans/123");
+            SetupProgressMonitor(visitor);
 
             Assert.IsNotNull(visitor);
             visitor.Wait();

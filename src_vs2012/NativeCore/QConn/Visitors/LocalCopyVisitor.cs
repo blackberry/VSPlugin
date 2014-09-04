@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
@@ -38,7 +37,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
-            ResetWait();
+            Reset();
             _stream = null;
 
             if (descriptor == null)
@@ -78,8 +77,21 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             // assumption is that directory entering, supposed to create whole directory structure,
             // was already called before on that visitor:
 
-            var name = _singleFileDownload ? _outputPath : GetLocalPath(file);
+            string relativeName;
+            string name;
+
+            if (_singleFileDownload)
+            {
+                name = _outputPath;
+                relativeName = PathHelper.ExtractName(_outputPath);
+            }
+            else
+            {
+                name = GetLocalPath(file, out relativeName);
+            }
+
             _stream = File.Create(name, TargetServiceFile.DownloadUploadChunkSize, FileOptions.SequentialScan);
+            NotifyProgressNew(file, name, relativeName, TransferOperation.Downloading);
         }
 
         public void FileContent(TargetFile file, byte[] data, ulong totalRead)
@@ -88,45 +100,51 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new ObjectDisposedException("LocalCopyVisitor");
 
             _stream.Write(data, 0, data.Length);
+            NotifyProgressChanged(file, totalRead);
         }
 
-        public void FileClosing(TargetFile file)
+        public void FileClosing(TargetFile file, ulong totalRead)
         {
             if (_stream == null)
                 throw new ObjectDisposedException("LocalCopyVisitor");
 
             _stream.Close();
             _stream = null;
+
+            NotifyProgressDone(file, totalRead);
         }
 
         public void DirectoryEntering(TargetFile folder)
         {
-            var name = GetLocalPath(folder);
-
-            try
-            {
-                Directory.CreateDirectory(name);
-            }
-            catch (Exception ex)
-            {
-                QTraceLog.WriteException(ex, "Unable to create folder: \"{0}\"", name);
-            }
+            string ignored;
+            var name = GetLocalPath(folder, out ignored);
+            Directory.CreateDirectory(name);
         }
 
         public void UnknownEntering(TargetFile descriptor)
         {
             // just create simple empty file:
-            var name = GetLocalPath(descriptor);
+            string relativeName;
+            var name = GetLocalPath(descriptor, out relativeName);
+
             var stream = File.Create(name);
             stream.Close();
+
+            NotifyProgressNew(descriptor, name, relativeName, TransferOperation.Downloading);
+            NotifyProgressDone(descriptor, 0);
         }
 
-        private string GetLocalPath(TargetFile descriptor)
+        public void Failure(TargetFile descriptor, Exception ex, string message)
+        {
+            NotifyFailed(descriptor, ex, message);
+        }
+
+        private string GetLocalPath(TargetFile descriptor, out string name)
         {
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
 
-            var name = descriptor.Path.StartsWith(_basePath) ? descriptor.Path.Substring(_basePath.Length) : descriptor.Path;
+            name = descriptor.Path.StartsWith(_basePath) ? descriptor.Path.Substring(_basePath.Length) : descriptor.Path;
             name = name.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
             return Path.Combine(_outputPath, name);

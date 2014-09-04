@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
@@ -8,9 +9,24 @@ namespace BlackBerry.NativeCore.QConn.Visitors
     public interface IFileServiceVisitorMonitor
     {
         /// <summary>
+        /// Event triggered, when visiting has started.
+        /// </summary>
+        event EventHandler<VisitorEventArgs> Started;
+
+        /// <summary>
+        /// Event fired any time data transfer progress has changed.
+        /// </summary>
+        event EventHandler<VisitorProgressChangedEventArgs> ProgressChanged;
+
+        /// <summary>
+        /// Event fired each time transfer has failed.
+        /// </summary>
+        event EventHandler<VisitorFailureEventArgs> Failed;
+
+        /// <summary>
         /// Event triggered, when visiting finished.
         /// </summary>
-        event EventHandler Completed;
+        event EventHandler<VisitorEventArgs> Completed;
 
         /// <summary>
         /// Waits until visiting is not fully completed.

@@ -1,4 +1,5 @@
-﻿using BlackBerry.NativeCore.QConn.Model;
+﻿using System;
+using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
@@ -14,6 +15,15 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         bool IsCancelled
         {
             get;
+        }
+
+        /// <summary>
+        /// Any object associated with this visitor.
+        /// </summary>
+        object Tag
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -37,7 +47,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         /// <summary>
         /// Called once for each file, when download has been completed or cancelled.
         /// </summary>
-        void FileClosing(TargetFile file);
+        void FileClosing(TargetFile file, ulong totalRead);
 
         /// <summary>
         /// Called each time, when entering new folder.
@@ -49,5 +59,10 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         /// Called each time unexpected item was visited (for example, when no rights to enter or read).
         /// </summary>
         void UnknownEntering(TargetFile descriptor);
+
+        /// <summary>
+        /// Called each time a failure happened.
+        /// </summary>
+        void Failure(TargetFile descriptor, Exception ex, string message);
     }
 }

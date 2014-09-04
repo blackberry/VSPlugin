@@ -263,6 +263,18 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\Token.cs">
       <Link>QConn\Model\Token.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TransferOperation.cs">
+      <Link>QConn\Model\TransferOperation.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\VisitorEventArgs.cs">
+      <Link>QConn\Model\VisitorEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\VisitorFailureEventArgs.cs">
+      <Link>QConn\Model\VisitorFailureEventArgs.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\VisitorProgressChangedEventArgs.cs">
+      <Link>QConn\Model\VisitorProgressChangedEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\QConnAuthenticationEventArgs.cs">
       <Link>QConn\QConnAuthenticationEventArgs.cs</Link>
     </Compile>

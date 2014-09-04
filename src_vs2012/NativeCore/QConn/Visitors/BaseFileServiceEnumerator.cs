@@ -65,7 +65,18 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new ArgumentNullException("visitor");
 
             // gets initial info about path we are about to enumerate:
-            var descriptor = LoadInitialInfo(_path);
+            TargetFile descriptor;
+
+            try
+            {
+                descriptor = LoadInitialInfo(_path);
+            }
+            catch (Exception ex)
+            {
+                descriptor = null;
+                QTraceLog.WriteException(ex, "Failed to initialize startup description");
+                visitor.Failure(null, ex, "Failed to initialize startup description");
+            }
 
             try
             {
@@ -74,6 +85,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             catch (Exception ex)
             {
                 QTraceLog.WriteException(ex, "Failed to initialize visitor");
+                visitor.Failure(descriptor, ex, "Failed to initialize visitor");
             }
 
             try
@@ -86,6 +98,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             catch (Exception ex)
             {
                 QTraceLog.WriteException(ex, "Failed enumeration over \"{0}\"", descriptor != null ? descriptor.Path : "- unknown path -");
+                visitor.Failure(descriptor, ex, "Failed to enumerate");
             }
 
             try
@@ -95,6 +108,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             catch (Exception ex)
             {
                 QTraceLog.WriteException(ex, "Failed to clean-up visitor");
+                visitor.Failure(descriptor, ex, "Failed to clean-up visitor");
             }
         }
 
@@ -109,10 +123,10 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
             while (items.Count > 0 && !visitor.IsCancelled)
             {
+                var item = items.Pop();
+
                 try
                 {
-                    var item = items.Pop();
-
                     // do we have an access to open that item?
                     if (item.NoAccess)
                     {
@@ -151,7 +165,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 }
                 catch (Exception ex)
                 {
-                    QTraceLog.WriteException(ex, "Failure during download");
+                    QTraceLog.WriteException(ex, "Failure during data transfer");
+                    visitor.Failure(item, ex, "Failure during data transfer");
                 }
             }
         }

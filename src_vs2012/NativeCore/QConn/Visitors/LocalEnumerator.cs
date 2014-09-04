@@ -55,7 +55,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         protected override TargetFile[] PerformDirectoryListing(TargetFile descriptor)
         {
             // is it really an existing folder?
-            if (!Directory.Exists(descriptor.Path))
+            if (descriptor == null || !Directory.Exists(descriptor.Path))
                 return null;
 
             // if so, then read all file and folder names:
@@ -77,51 +77,47 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         protected override void PerformFileRead(IFileServiceVisitor visitor, TargetFile descriptor)
         {
-            try
+            if (descriptor == null || !File.Exists(descriptor.Path))
+                return;
+
+            ulong totalRead = 0ul;
+            using (var file = new FileStream(descriptor.Path, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
-                using (var file = new FileStream(descriptor.Path, FileMode.Open, FileAccess.Read, FileShare.Read))
+                try
                 {
-                    try
+                    visitor.FileOpening(descriptor);
+
+                    var data = new byte[TargetServiceFile.DownloadUploadChunkSize];
+
+                    while (!visitor.IsCancelled)
                     {
-                        visitor.FileOpening(descriptor);
-
-                        ulong totalRead = 0ul;
-                        var data = new byte[TargetServiceFile.DownloadUploadChunkSize];
-
-                        while (!visitor.IsCancelled)
+                        var length = file.Read(data, 0, data.Length);
+                        if (length > 0)
                         {
-                            var length = file.Read(data, 0, data.Length);
-                            if (length > 0)
-                            {
-                                totalRead += (ulong) length;
+                            totalRead += (ulong) length;
 
-                                // is last chunk?
-                                if (length != TargetServiceFile.DownloadUploadChunkSize)
-                                {
-                                    // because, if it is, we need to allocate smaller array matching the size
-                                    var lastData = new byte[length];
-                                    Array.Copy(data, 0, lastData, 0, length);
-                                    visitor.FileContent(descriptor, lastData, totalRead);
-                                    break;
-                                }
-                                
-                                visitor.FileContent(descriptor, data, totalRead);
-                            }
-                            else
+                            // is last chunk?
+                            if (length != TargetServiceFile.DownloadUploadChunkSize)
                             {
+                                // because, if it is, we need to allocate smaller array matching the size
+                                var lastData = new byte[length];
+                                Array.Copy(data, 0, lastData, 0, length);
+                                visitor.FileContent(descriptor, lastData, totalRead);
                                 break;
                             }
+
+                            visitor.FileContent(descriptor, data, totalRead);
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
-                    finally
-                    {
-                        visitor.FileClosing(descriptor);
-                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                QTraceLog.WriteException(ex, "Failure during reading: \"{0}\"", descriptor.Path);
+                finally
+                {
+                    visitor.FileClosing(descriptor, totalRead);
+                }
             }
         }
     }

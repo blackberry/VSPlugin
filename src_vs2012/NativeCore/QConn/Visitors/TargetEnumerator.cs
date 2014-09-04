@@ -34,50 +34,43 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         protected override void PerformFileRead(IFileServiceVisitor visitor, TargetFile descriptor)
         {
-            try
+            ulong totalRead = 0ul;
+
+            using (var file = Service.Open(descriptor.Path, TargetFile.ModeOpenReadOnly, 0, false))
             {
-                using (var file = Service.Open(descriptor.Path, TargetFile.ModeOpenReadOnly, 0, false))
+                if (file != null)
                 {
-                    if (file != null)
+                    try
                     {
-                        try
+                        visitor.FileOpening(file);
+
+                        while (!visitor.IsCancelled)
                         {
-                            visitor.FileOpening(file);
-
-                            ulong totalRead = 0ul;
-
-                            while (!visitor.IsCancelled)
+                            // read following chunks of the file
+                            // (it's crucial that we use the same chunk size as during service cloning, so it will minimize the number of buffer allocations)
+                            var data = Service.Read(file, totalRead, TargetServiceFile.DownloadUploadChunkSize);
+                            if (data != null && data.Length > 0)
                             {
-                                // read following chunks of the file
-                                // (it's crucial that we use the same chunk size as during service cloning, so it will minimize the number of buffer allocations)
-                                var data = Service.Read(file, totalRead, TargetServiceFile.DownloadUploadChunkSize);
-                                if (data != null && data.Length > 0)
-                                {
-                                    totalRead += (ulong) data.Length;
-                                    visitor.FileContent(descriptor, data, totalRead);
+                                totalRead += (ulong) data.Length;
+                                visitor.FileContent(descriptor, data, totalRead);
 
-                                    // is last chunk?
-                                    if (data.Length != TargetServiceFile.DownloadUploadChunkSize)
-                                    {
-                                        break;
-                                    }
-                                }
-                                else
+                                // is last chunk?
+                                if (data.Length != TargetServiceFile.DownloadUploadChunkSize)
                                 {
                                     break;
                                 }
                             }
-                        }
-                        finally
-                        {
-                            visitor.FileClosing(file);
+                            else
+                            {
+                                break;
+                            }
                         }
                     }
+                    finally
+                    {
+                        visitor.FileClosing(file, totalRead);
+                    }
                 }
-            }
-            catch (Exception ex)
-            {
-                QTraceLog.WriteException(ex, "Failure during download of: \"{0}\"", descriptor.Path);
             }
         }
 

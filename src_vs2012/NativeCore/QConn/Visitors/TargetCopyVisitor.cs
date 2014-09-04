@@ -43,7 +43,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new ArgumentNullException("service");
             _service = service;
 
-            ResetWait();
+            Reset();
 
             if (descriptor == null)
                 return;
@@ -79,8 +79,21 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             if (_service == null)
                 throw new ObjectDisposedException("TargetCopyVisitor");
 
-            var name = _singleFileDownload ? _outputPath : GetTargetPath(file);
+            string name;
+            string relativeName;
+
+            if (_singleFileDownload)
+            {
+                name = _outputPath;
+                relativeName = PathHelper.ExtractName(_outputPath);
+            }
+            else
+            {
+                name = GetTargetPath(file, out relativeName);
+            }
+
             _currentFile = _service.CreateNewFile(name, TargetFile.ModePermissionDefault);
+            NotifyProgressNew(file, name, relativeName, TransferOperation.Uploading);
         }
 
         public void FileContent(TargetFile file, byte[] data, ulong totalRead)
@@ -93,9 +106,11 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             uint length = _service.Write(_currentFile, data);
             if (length != data.Length)
                 throw new QConnException("Unable to write data to \"" + _currentFile.Path + "\"");
+
+            NotifyProgressChanged(file, totalRead);
         }
 
-        public void FileClosing(TargetFile file)
+        public void FileClosing(TargetFile file, ulong totalRead)
         {
             if (_service == null)
                 throw new ObjectDisposedException("TargetCopyVisitor");
@@ -104,6 +119,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
             _currentFile.Close();
             _currentFile = null;
+
+            NotifyProgressDone(file, totalRead);
         }
 
         public void DirectoryEntering(TargetFile folder)
@@ -111,7 +128,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             if (_service == null)
                 throw new ObjectDisposedException("TargetCopyVisitor");
 
-            var name = GetTargetPath(folder);
+            string ignored;
+            var name = GetTargetPath(folder, out ignored);
 
             try
             {
@@ -128,12 +146,17 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             // do nothing - ignore them - as expected are files and folders from known source!
         }
 
-        private string GetTargetPath(TargetFile descriptor)
+        public void Failure(TargetFile descriptor, Exception ex, string message)
+        {
+            NotifyFailed(descriptor, ex, message);
+        }
+
+        private string GetTargetPath(TargetFile descriptor, out string name)
         {
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
 
-            var name = descriptor.Path.StartsWith(_basePath) ? descriptor.Path.Substring(_basePath.Length) : descriptor.Path;
+            name = descriptor.Path.StartsWith(_basePath) ? descriptor.Path.Substring(_basePath.Length) : descriptor.Path;
             name = name.Replace(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
 
             return PathHelper.MakePath(_outputPath, name);

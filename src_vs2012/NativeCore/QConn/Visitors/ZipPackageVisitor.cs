@@ -41,7 +41,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
-            ResetWait();
+            Reset();
             _package = Package.Open(_fileName, FileMode.Create);
             _basePath = GetInitialBasePath(descriptor);
         }
@@ -75,6 +75,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new InvalidOperationException("Unable to create package part to store file content");
 
             _currentStream = _currentPart.GetStream();
+            NotifyProgressNew(file, _currentPart.Uri.OriginalString, null, TransferOperation.Zipping);
         }
 
         public void FileContent(TargetFile file, byte[] data, ulong totalRead)
@@ -83,9 +84,10 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new ObjectDisposedException("ZipPackageVisitor");
 
             _currentStream.Write(data, 0, data.Length);
+            NotifyProgressChanged(file, totalRead);
         }
 
-        public void FileClosing(TargetFile file)
+        public void FileClosing(TargetFile file, ulong totalRead)
         {
             if (_currentStream != null)
             {
@@ -93,6 +95,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 _currentStream = null;
             }
             _currentPart = null;
+            NotifyProgressDone(file, totalRead);
         }
 
         public void DirectoryEntering(TargetFile folder)
@@ -104,6 +107,11 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         {
             // create 0-length entry:
             CreatePart(other.Path);
+        }
+
+        public void Failure(TargetFile descriptor, Exception ex, string message)
+        {
+            NotifyFailed(descriptor, ex, message);
         }
 
         private PackagePart CreatePart(string fullName)

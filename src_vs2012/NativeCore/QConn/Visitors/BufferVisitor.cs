@@ -64,7 +64,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
-            ResetWait();
+            Reset();
             _processedBuffers = new List<Tuple<TargetFile, byte[]>>();
             _chunks = new List<byte[]>();
             _currentFile = null;
@@ -86,6 +86,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new InvalidOperationException("Previous file was not correctly closed");
             _currentFile = file;
             _chunks.Clear();
+
+            NotifyProgressNew(file, file.Name, null, TransferOperation.Buffering);
         }
 
         public void FileContent(TargetFile file, byte[] data, ulong totalRead)
@@ -94,9 +96,10 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new ObjectDisposedException("BufferVisitor");
 
             _chunks.Add(data);
+            NotifyProgressChanged(file, totalRead);
         }
 
-        public void FileClosing(TargetFile file)
+        public void FileClosing(TargetFile file, ulong totalRead)
         {
             if (_currentFile == null)
                 throw new ObjectDisposedException("BufferVisitor");
@@ -114,6 +117,11 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         public void UnknownEntering(TargetFile descriptor)
         {
             // don't care, do nothing
+        }
+
+        public void Failure(TargetFile descriptor, Exception ex, string message)
+        {
+            NotifyFailed(descriptor, ex, message);
         }
 
         #endregion

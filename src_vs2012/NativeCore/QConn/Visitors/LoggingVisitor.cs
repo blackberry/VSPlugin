@@ -1,4 +1,5 @@
-﻿using BlackBerry.NativeCore.Diagnostics;
+﻿using System;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
@@ -34,7 +35,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
-            ResetWait();
+            Reset();
 
             QTraceLog.WriteLine("Initializing download for: {0}", descriptor.Path);
             FilesCount = 0;
@@ -53,17 +54,22 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         {
             QTraceLog.WriteLine("Started downloading: {0}", file.Name);
             FilesCount = FilesCount + 1;
-        }
 
-        public void FileClosing(TargetFile file)
-        {
-            QTraceLog.WriteLine("Completed downloading: {0}", file.Name);
+            NotifyProgressNew(file, file.Name, null, TransferOperation.Buffering);
         }
 
         public void FileContent(TargetFile file, byte[] data, ulong totalRead)
         {
             QTraceLog.WriteLine("Downloaded: {0}", data.Length);
-            TotalSize = TotalSize + (uint) data.Length;
+            NotifyProgressChanged(file, totalRead);
+        }
+
+        public void FileClosing(TargetFile file, ulong totalRead)
+        {
+            QTraceLog.WriteLine("Completed downloading: {0}", file.Name);
+            TotalSize = TotalSize + totalRead;
+
+            NotifyProgressDone(file, totalRead);
         }
 
         public void DirectoryEntering(TargetFile folder)
@@ -74,6 +80,11 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         public void UnknownEntering(TargetFile other)
         {
             // no idea, if this is a directory or file or named-pipe or socket... we simply don't have rights to visit it... so ignore in statistics
+        }
+
+        public void Failure(TargetFile descriptor, Exception ex, string message)
+        {
+            NotifyFailed(descriptor, ex, message);
         }
     }
 }

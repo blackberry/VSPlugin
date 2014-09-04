@@ -104,6 +104,9 @@
     <Compile Include="Model\Size.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QConn\Model\TransferOperation.cs" />
+    <Compile Include="QConn\Model\VisitorEventArgs.cs" />
+    <Compile Include="QConn\Model\VisitorFailureEventArgs.cs" />
     <Compile Include="QConn\Visitors\BaseFileServiceEnumerator.cs" />
     <Compile Include="QConn\Visitors\BaseVisitorMonitor.cs" />
     <Compile Include="QConn\Visitors\BufferVisitor.cs" />
@@ -160,6 +163,7 @@
     <Compile Include="QConn\Visitors\LoggingVisitor.cs" />
     <Compile Include="QConn\Visitors\TargetCopyVisitor.cs" />
     <Compile Include="QConn\Visitors\TargetEnumerator.cs" />
+    <Compile Include="QConn\Model\VisitorProgressChangedEventArgs.cs" />
     <Compile Include="QConn\Visitors\ZipPackageVisitor.cs" />
     <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
     <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
