@@ -367,7 +367,7 @@ namespace BlackBerry.NativeCore.Model
             {
                 var device = new DeviceDefinition(string.IsNullOrEmpty(values[i]) ? null : values[i],
                                                   values[i + 2], GlobalHelper.Decrypt(values[i + 3]),
-                                                  DeviceHelper.GetTypeFromString(values[i + 1]));
+                                                  DeviceHelper.GetTypeFromString(values[i + 1], false));
                 result.Add(device);
             }
 
