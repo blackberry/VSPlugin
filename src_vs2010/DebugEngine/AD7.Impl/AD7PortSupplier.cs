@@ -12,13 +12,16 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Services;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using Microsoft.VisualStudio.Shell;
 using IServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
 
 namespace BlackBerry.DebugEngine
@@ -46,6 +49,7 @@ namespace BlackBerry.DebugEngine
         /// The NDK reference.
         /// </summary>
         private NdkDefinition _ndk;
+        private ServiceProvider _serviceProvider;
 
         /// <summary>
         /// List of ports for this port supplier.
@@ -80,10 +84,20 @@ namespace BlackBerry.DebugEngine
             if (device == null)
                 throw new ArgumentNullException("device");
 
-            string prefix = device.Type == DeviceDefinitionType.Device ? "Device: " : "Simulator: ";
-            string name = string.IsNullOrEmpty(device.Name) ? device.IP : string.Concat(device.Name, " (", device.IP, ")");
+            if (string.IsNullOrEmpty(device.Name))
+                return string.Concat(DeviceHelper.GetTypeToString(device.Type), ": ", device.IP);
 
-            return prefix + name;
+            return string.Concat(DeviceHelper.GetTypeToString(device.Type), ": ", device.Name, " (", device.IP, ")");
+        }
+
+        private static string GetAdHocPortRequestName(DeviceDefinition device)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            if (string.IsNullOrEmpty(device.Name))
+                return string.Concat(DeviceHelper.GetTypeToString(device.Type), " ", device.IP, " ", device.Password);
+            return string.Concat(DeviceHelper.GetTypeToString(device.Type), " ", device.Name.Replace(' ', '_'), " ", device.IP, " ", device.Password);
         }
 
         /// <summary>
@@ -179,24 +193,33 @@ namespace BlackBerry.DebugEngine
 
             int i = 0;
             var type = DeviceDefinitionType.Device;
+            string name = "Ad-hoc Connection";
             string ip = null;
             string password = null;
 
-            if (string.Compare("simulator", items[i], StringComparison.OrdinalIgnoreCase) == 0
-                || string.Compare("sim", items[i], StringComparison.OrdinalIgnoreCase) == 0)
+            try
             {
-                type = DeviceDefinitionType.Simulator;
-                i++;
+                type = DeviceHelper.GetTypeFromString(items[i++], true);
             }
-            if (string.Compare("device", items[i], StringComparison.OrdinalIgnoreCase) == 0)
+            catch
             {
-                type = DeviceDefinitionType.Device;
-                i++;
+                // unable to decipher type: device/simulator...
+                return null;
             }
+
+            // name:
+            if (items.Length > i && items[i].IndexOf('.') < 0)
+            {
+                name = items[i++];
+            }
+
+            // ip:
             if (items.Length > i && items[i].IndexOf('.') > 0)
             {
                 ip = items[i++];
             }
+
+            // password:
             if (items.Length > i)
             {
                 password = items[i];
@@ -206,7 +229,7 @@ namespace BlackBerry.DebugEngine
             if (string.IsNullOrEmpty(ip) || string.IsNullOrEmpty(password))
                 return null;
 
-            return new DeviceDefinition("Ad-hoc Connection", ip, password, type);
+            return new DeviceDefinition(name, ip, password, type);
         }
 
         /// <summary>
@@ -329,6 +352,7 @@ namespace BlackBerry.DebugEngine
         /// <param name="serviceProvider">Reference to the interface of the service provider.</param>
         int IDebugPortPicker.SetSite(IServiceProvider serviceProvider)
         {
+            _serviceProvider = new ServiceProvider(serviceProvider);
             return VSConstants.S_OK;
         }
 
@@ -340,9 +364,27 @@ namespace BlackBerry.DebugEngine
         /// <returns>If successful, returns S_OK; otherwise, returns an error code. A return value of S_FALSE (or a return value of S_OK with the BSTR set to NULL) indicates that the user clicked Cancel.</returns>
         int IDebugPortPicker.DisplayPortPicker(IntPtr hwndParentDialog, out string pbstrPortId)
         {
-            MessageBox.Show(
-                "Searching is not supported.\r\nPlease add more devices at \"BlackBerry -> Options -> Targets\", if you want to quickly switch between them. They will automatically appear, when \"Qualifier\" list is expanded.",
-                "Microsoft Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var service = _serviceProvider != null ? _serviceProvider.GetService(typeof(IDeviceDiscoveryService)) as IDeviceDiscoveryService : null;
+
+            if (service == null)
+            {
+                MessageBox.Show(
+                    "Searching is not supported.\r\nPlease add more devices at \"BlackBerry -> Options -> Targets\", if you want to quickly switch between them. They will automatically appear, when \"Qualifier\" list is expanded.",
+                    "Microsoft Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                pbstrPortId = null;
+                return VSConstants.S_FALSE;
+            }
+
+            var device = service.FindDevice();
+
+            // did we found the device?
+            if (device != null)
+            {
+                pbstrPortId = GetAdHocPortRequestName(device);
+                return VSConstants.S_OK;
+            }
+
+            // or cancelled:
             pbstrPortId = null;
             return VSConstants.S_FALSE;
         }

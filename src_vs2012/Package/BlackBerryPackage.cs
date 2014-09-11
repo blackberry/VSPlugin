@@ -21,6 +21,7 @@ using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Services;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Components;
 using BlackBerry.Package.Diagnostics;
@@ -80,11 +81,7 @@ namespace BlackBerry.Package
     [InstalledProductRegistration("#110", "#112", VersionString, IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    // This attribute registers a tool window exposed by this package.
-#if !PLATFORM_VS2010
-    // PH: HINT: somehow, when in VS2010, the plugin might be loaded too early and it fails on access to some UI services (like OutputWindow).
-    [ProvideAutoLoad(UIContextGuids80.NoSolution)]
-#endif
+
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackageString)]
 
@@ -95,7 +92,11 @@ namespace BlackBerry.Package
     [ProvideOptionPage(typeof(ApiLevelOptionPage), OptionsCategoryName, "API Levels", 1001, 1004, true)]
     [ProvideOptionPage(typeof(TargetsOptionPage), OptionsCategoryName, "Targets", 1001, 1005, true)]
     [ProvideOptionPage(typeof(SigningOptionPage), OptionsCategoryName, "Signing", 1001, 1006, true)]
-    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable
+
+    // This attribute registers public services exposed by this package.
+    // The package itself will be automatically loaded if needed.
+    [ProvideService(typeof(IDeviceDiscoveryService), ServiceName = "BlackBerry Device Discovery")]
+    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService
     {
         public const string VersionString = "2.1.2014.711";
         public const string OptionsCategoryName = "BlackBerry";
@@ -150,6 +151,12 @@ namespace BlackBerry.Package
             TraceLog.Add(_gdbTraceWindow);
             TraceLog.Add(_qconnTraceWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
+
+            TraceLog.WriteLine(" * registering services");
+
+            // add this package to the globally-proffed services:
+            IServiceContainer serviceContainer = this;
+            serviceContainer.AddService(typeof(IDeviceDiscoveryService), this, true);
 
             TraceLog.WriteLine(" * loaded NDK descriptions");
 
@@ -475,6 +482,21 @@ namespace BlackBerry.Package
         {
             GC.SuppressFinalize(this);
             Dispose(true);
+        }
+
+        #endregion
+
+        #region IDeviceDiscoveryService
+
+        DeviceDefinition IDeviceDiscoveryService.FindDevice()
+        {
+            var dialog = new DeviceForm("Searching for BlackBerry device");
+            if (dialog.ShowDialog() == DialogResult.OK)
+            {
+                return dialog.ToDevice();
+            }
+
+            return null;
         }
 
         #endregion

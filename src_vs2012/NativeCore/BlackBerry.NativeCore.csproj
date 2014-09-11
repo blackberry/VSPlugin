@@ -165,6 +165,7 @@
     <Compile Include="QConn\Visitors\TargetEnumerator.cs" />
     <Compile Include="QConn\Model\VisitorProgressChangedEventArgs.cs" />
     <Compile Include="QConn\Visitors\ZipPackageVisitor.cs" />
+    <Compile Include="Services\IDeviceDiscoveryService.cs" />
     <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
     <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
     <Compile Include="Tools\ApiLevelUpdateRunner.cs" />
