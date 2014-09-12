@@ -37,7 +37,10 @@
             <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" priority="0x0200">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" />
             </Group>
-            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" priority="0x0300">
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_ToolWindows" priority="0x0300">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" />
+            </Group>
+            <Group guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" priority="0x0400">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" />
             </Group>
 
@@ -73,22 +76,30 @@
 
         <Buttons>
 
-          <!-- Common Action Buttons -->
-          <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonAddPlatformTargets" priority="0x0100" type="Button">
-            <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
-            <Strings>
-              <ButtonText>Add BlackBerry Pla&amp;tforms...</ButtonText>
-            </Strings>
-          </Button>
+            <!-- Common Action Buttons -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonAddPlatformTargets" priority="0x0100" type="Button">
+              <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
+              <Strings>
+                <ButtonText>Add BlackBerry Pla&amp;tforms...</ButtonText>
+              </Strings>
+            </Button>
 
-          <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonProjectImport" priority="0x0100" type="Button">
-            <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
-            <Strings>
-              <ButtonText>Import &amp;Core Native Project...</ButtonText>
-            </Strings>
-          </Button>
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonProjectImport" priority="0x0100" type="Button">
+              <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
+              <Strings>
+                <ButtonText>Import &amp;Core Native Project...</ButtonText>
+              </Strings>
+            </Button>
 
-          <!-- Settings Action Buttons -->
+            <!-- ToolWindows Action Buttons -->
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryToolWindowsTargetNavigator" priority="0x0100" type="Button">
+              <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_ToolWindows" />
+              <Strings>
+                <ButtonText>Target &amp;Navigator</ButtonText>
+              </Strings>
+            </Button>
+
+            <!-- Settings Action Buttons -->
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryOptions" priority="0x0100" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" />
                 <Strings>
@@ -263,6 +274,7 @@
             <IDSymbol name="BlackBerryTopMenu" value="0x10" />
             <IDSymbol name="cmdidBlackBerryTopMenuGroup_Targets" value="0x100" />
             <IDSymbol name="cmdidBlackBerryTopMenuGroup_Common" value="0x200" />
+            <IDSymbol name="cmdidBlackBerryTopMenuGroup_ToolWindows" value="0x250" />
             <IDSymbol name="cmdidBlackBerryTopMenuGroup_Options" value="0x300" />
 
             <IDSymbol name="BlackBerrySubMenu_Targets" value="0x400" />
@@ -285,6 +297,7 @@
 
             <IDSymbol name="cmdidBlackBerryCommonAddPlatformTargets" value="0x201" />
             <IDSymbol name="cmdidBlackBerryCommonProjectImport" value="0x202" />
+            <IDSymbol name="cmdidBlackBerryToolWindowsTargetNavigator" value="0x251"/>
             <IDSymbol name="cmdidBlackBerryHelpWelcomePage" value="0x1001" />
             <IDSymbol name="cmdidBlackBerryHelpSupportForum" value="0x1002" />
             <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x1101" />

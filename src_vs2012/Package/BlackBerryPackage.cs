@@ -31,6 +31,7 @@ using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
 using BlackBerry.Package.Options;
 using BlackBerry.Package.Registration;
+using BlackBerry.Package.ToolWindows;
 using BlackBerry.Package.ViewModels;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
@@ -96,6 +97,9 @@ namespace BlackBerry.Package
     // This attribute registers public services exposed by this package.
     // The package itself will be automatically loaded if needed.
     [ProvideService(typeof(IDeviceDiscoveryService), ServiceName = "BlackBerry Device Discovery")]
+
+    // This attribute registers a tool window exposed by this package.
+    [ProvideToolWindow(typeof(TargetNavigatorPane), Style = VsDockStyle.Tabbed, MultiInstances = false)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService
     {
         public const string VersionString = "2.1.2014.711";
@@ -152,11 +156,11 @@ namespace BlackBerry.Package
             TraceLog.Add(_qconnTraceWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
 
-            TraceLog.WriteLine(" * registering services");
-
             // add this package to the globally-proffed services:
             IServiceContainer serviceContainer = this;
             serviceContainer.AddService(typeof(IDeviceDiscoveryService), this, true);
+
+            TraceLog.WriteLine(" * registered services");
 
             TraceLog.WriteLine(" * loaded NDK descriptions");
 
@@ -277,6 +281,11 @@ namespace BlackBerry.Package
                 CommandID projectCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryCommonProjectImport);
                 OleMenuCommand projectItem = new OleMenuCommand(ImportBlackBerryProject, projectCommandID);
                 mcs.AddCommand(projectItem);
+
+                // Create the command for 'Target Navigator' menu item
+                CommandID targetNavigatorCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryToolWindowsTargetNavigator);
+                OleMenuCommand targetNavigatorMenu = new OleMenuCommand(ShowTargetNavigator, targetNavigatorCommandID);
+                mcs.AddCommand(targetNavigatorMenu);
 
                 TraceLog.WriteLine(" * initialized menus");
             }
@@ -470,6 +479,29 @@ namespace BlackBerry.Package
                 var importSummary = new Import.Import(project, folderName, name);
                 importSummary.ShowModel2();
             }
+        }
+
+        private void ShowTargetNavigator(object sender, EventArgs e)
+        {
+            ShowToolWindow<TargetNavigatorPane>();
+        }
+
+        /// <summary>
+        /// Shows the singleton tool window or creates new one.
+        /// </summary>
+        private T ShowToolWindow<T>() where T : ToolWindowPane
+        {
+            var toolWindow = (T) FindToolWindow(typeof(T), 0, true);
+
+            if (toolWindow == null || toolWindow.Frame == null)
+                throw new InvalidOperationException("Unable to create tool window of specified type");
+
+            // force the frame to be shown as MDI content window:
+            var frame = (IVsWindowFrame) toolWindow.Frame;
+            frame.SetProperty((int) __VSFPROPID.VSFPROPID_FrameMode, VSFRAMEMODE.VSFM_MdiChild);
+            ErrorHandler.ThrowOnFailure(frame.Show());
+
+            return toolWindow;
         }
 
         #region IDisposable Implementation

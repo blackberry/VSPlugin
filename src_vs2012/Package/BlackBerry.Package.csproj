@@ -326,6 +326,19 @@
     <Compile Include="Registration\DebugEngineRegistrationAttribute.cs" />
     <Compile Include="Registration\XmlEditorDesignerViewRegistrationAttribute.cs" />
     <Compile Include="StandardCommands.cs" />
+    <Compile Include="ToolWindows\ViewModel\BaseViewItem.cs" />
+    <Compile Include="ToolWindows\ViewModel\FileViewItem.cs" />
+    <Compile Include="ToolWindows\ViewModel\MessageViewItem.cs" />
+    <Compile Include="ToolWindows\ViewModel\ProcessListViewItem.cs" />
+    <Compile Include="ToolWindows\ViewModel\ProcessViewItem.cs" />
+    <Compile Include="ToolWindows\ViewModel\ProgressViewItem.cs" />
+    <Compile Include="ToolWindows\TargetNavigatorControl.xaml.cs">
+      <DependentUpon>TargetNavigatorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ToolWindows\TargetNavigatorPane.cs" />
+    <Compile Include="ToolWindows\ViewModel\FileSystemViewItem.cs" />
+    <Compile Include="ToolWindows\ViewModel\TargetNavigatorViewModel.cs" />
+    <Compile Include="ToolWindows\ViewModel\TargetViewItem.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\BarEditorViewModel.cs" />
     <Compile Include="ViewModels\PackageViewModel.cs" />
@@ -517,6 +530,10 @@
     <Page Include="Editors\BarDescriptorEditorControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="ToolWindows\TargetNavigatorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
