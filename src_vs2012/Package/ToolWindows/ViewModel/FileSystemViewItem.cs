@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Windows.Media;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
@@ -12,7 +11,8 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         private readonly TargetServiceFile _service;
         private readonly Predicate<TargetFile> _filter;
 
-        public FileSystemViewItem(string name, TargetServiceFile service, string path, Predicate<TargetFile> filter)
+        public FileSystemViewItem(TargetNavigatorViewModel viewModel, string name, TargetServiceFile service, string path, Predicate<TargetFile> filter)
+            : base(viewModel)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");
@@ -24,6 +24,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             Path = string.IsNullOrEmpty(path) ? "/" : path;
             _filter = filter;
 
+            ImageSource = ViewModel.GetIconForFolder(false);
             AddExpandablePlaceholder();
         }
 
@@ -32,11 +33,6 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         public override string Name
         {
             get { return _name; }
-        }
-
-        public override ImageSource ImageSource
-        {
-            get { return null; }
         }
 
         public string Path
@@ -56,23 +52,33 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 var path = _service.Stat(Path);
                 if (path == null)
                 {
-                    items = new BaseViewItem[] { new MessageViewItem("Invalid path, reload the parent folder to check if not deleted") };
+                    items = new BaseViewItem[] { new MessageViewItem(ViewModel, "Invalid path, reload the parent folder to check if not deleted") };
                 }
                 else
                 {
-                    items = ListItems(_service, path, _filter);
+                    items = ListItems(ViewModel, _service, path, _filter);
                 }
             }
             catch (Exception ex)
             {
-                items = new BaseViewItem[] { new MessageViewItem(ex) };
+                items = new BaseViewItem[] { new MessageViewItem(ViewModel, ex) };
             }
 
             OnItemsLoaded(items);
         }
 
-        internal static BaseViewItem[] ListItems(TargetServiceFile service, TargetFile path, Predicate<TargetFile> filter)
+        /// <summary>
+        /// Method to list synchronously content of the folder.
+        /// </summary>
+        internal static BaseViewItem[] ListItems(TargetNavigatorViewModel viewModel, TargetServiceFile service, TargetFile path, Predicate<TargetFile> filter)
         {
+            if (viewModel == null)
+                throw new ArgumentNullException("viewModel");
+            if (service == null)
+                throw new ArgumentNullException("service");
+            if (path == null)
+                throw new ArgumentNullException("path");
+
             BaseViewItem[] items;
 
             // we need to lock on that service here, not to allow the user to expand two nodes at the same time
@@ -89,7 +95,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                         items = new BaseViewItem[files.Length];
                         for (int i = 0; i < files.Length; i++)
                         {
-                            items[i] = new FileViewItem(service, files[i], filter);
+                            items[i] = new FileViewItem(viewModel, service, files[i], filter);
                         }
                     }
                     else
@@ -100,7 +106,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                         {
                             if (filter(file))
                             {
-                                filtered.Add(new FileViewItem(service, file, filter));
+                                filtered.Add(new FileViewItem(viewModel, service, file, filter));
                             }
                         }
                         items = filtered.ToArray();
@@ -108,7 +114,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    items = new BaseViewItem[] { new MessageViewItem(ex) };
+                    items = new BaseViewItem[] { new MessageViewItem(viewModel, ex) };
                 }
             }
 

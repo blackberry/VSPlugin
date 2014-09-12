@@ -185,6 +185,7 @@
     <Compile Include="Helpers\CommandHelper.cs" />
     <Compile Include="Helpers\DialogHelper.cs" />
     <Compile Include="Helpers\DteHelper.cs" />
+    <Compile Include="Helpers\IconHelper.cs" />
     <Compile Include="Helpers\MessageBoxHelper.cs" />
     <Compile Include="Helpers\ProjectHelper.cs" />
     <Compile Include="Model\bar-descriptor.cs" />
@@ -329,6 +330,7 @@
     <Compile Include="ToolWindows\ViewModel\BaseViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\FileViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\MessageViewItem.cs" />
+    <Compile Include="ToolWindows\ViewModel\NullToVisibilityIndicator.cs" />
     <Compile Include="ToolWindows\ViewModel\ProcessListViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\ProcessViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\ProgressViewItem.cs" />
@@ -349,6 +351,12 @@
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="Resources\Navigator\target_disconnected.png" />
+    <Resource Include="Resources\Navigator\folder_closed.png" />
+    <Resource Include="Resources\Navigator\folder_opened.png" />
+    <Resource Include="Resources\Navigator\process.png" />
+    <Resource Include="Resources\Navigator\target.png" />
+    <Resource Include="Resources\Navigator\thread.png" />
     <None Include="Resources\Package.Menu.vsct" />
     <EmbeddedResource Include="Dialogs\CertificateDetailsForm.resx">
       <DependentUpon>CertificateDetailsForm.cs</DependentUpon>

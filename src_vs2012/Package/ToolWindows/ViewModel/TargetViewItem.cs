@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Media;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Model;
 
@@ -7,12 +6,14 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 {
     public sealed class TargetViewItem : BaseViewItem
     {
-        public TargetViewItem(DeviceDefinition device)
+        public TargetViewItem(TargetNavigatorViewModel viewModel, DeviceDefinition device)
+            : base(viewModel)
         {
             if (device == null)
                 throw new ArgumentNullException("device");
 
             Device = device;
+            ImageSource = ViewModel.GetIconForTarget(false);
             AddExpandablePlaceholder();
         }
 
@@ -29,18 +30,13 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             get { return Device.ShortName; }
         }
 
-        public override ImageSource ImageSource
-        {
-            get { return null; }
-        }
-
         #endregion
 
         #region Overrides
 
         protected override BaseViewItem CreateProgressPlaceholder()
         {
-            return new ProgressViewItem("Connecting...");
+            return new ProgressViewItem(ViewModel, "Connecting...");
         }
 
         protected override void LoadItems()
@@ -64,11 +60,11 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 case TargetStatus.Connected:
                     items = new BaseViewItem[]
                         {
-                            new ProcessListViewItem(e.Client.SysInfoService),
-                            new FileSystemViewItem("Sandboxes", e.Client.FileService, "/accounts/1000/appdata", file => !file.NoAccess),
-                            new FileSystemViewItem("Shared", e.Client.FileService, "/accounts/1000/shared", null),
-                            new FileSystemViewItem("Developer", e.Client.FileService, "/accounts/devuser", null), 
-                            new FileSystemViewItem("System", e.Client.FileService, null, null)
+                            new ProcessListViewItem(ViewModel, e.Client.SysInfoService),
+                            new FileSystemViewItem(ViewModel, "Sandboxes", e.Client.FileService, "/accounts/1000/appdata", file => !file.NoAccess),
+                            new FileSystemViewItem(ViewModel, "Shared", e.Client.FileService, "/accounts/1000/shared", null),
+                            new FileSystemViewItem(ViewModel, "Developer", e.Client.FileService, "/accounts/devuser", null), 
+                            new FileSystemViewItem(ViewModel, "System", e.Client.FileService, null, null)
                         };
                     break;
                 case TargetStatus.Disconnected:
@@ -78,18 +74,28 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 case TargetStatus.Failed:
                     items = new BaseViewItem[]
                         {
-                            new MessageViewItem(e.Message)
+                            new MessageViewItem(ViewModel, e.Message)
                         };
                     break;
                 default:
                     items = new BaseViewItem[]
                         {
-                            new MessageViewItem(string.Concat("Unsupported device state (", e.Status, ")"))
+                            new MessageViewItem(ViewModel, string.Concat("Unsupported device state (", e.Status, ")"))
                         };
                     break;
             }
 
-            OnItemsLoaded(items);
+            OnItemsLoaded(items, e);
+        }
+
+        protected override void ItemsCompleted(object state)
+        {
+            var e = state as TargetConnectionEventArgs;
+
+            if (e != null)
+            {
+                ImageSource = ViewModel.GetIconForTarget(e.Status == TargetStatus.Connected);
+            }
         }
 
         #endregion

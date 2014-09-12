@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Media;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
@@ -7,7 +6,8 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
     {
         private readonly string _message;
 
-        public MessageViewItem(string message)
+        public MessageViewItem(TargetNavigatorViewModel viewModel, string message)
+            : base(viewModel)
         {
             if (string.IsNullOrEmpty(message))
                 throw new ArgumentNullException("message");
@@ -15,7 +15,8 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             _message = message;
         }
 
-        public MessageViewItem(Exception ex)
+        public MessageViewItem(TargetNavigatorViewModel viewModel, Exception ex)
+            : base(viewModel)
         {
             if (ex == null)
                 throw new ArgumentNullException("ex");
@@ -28,11 +29,6 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         public override string Name
         {
             get { return _message; }
-        }
-
-        public override ImageSource ImageSource
-        {
-            get { return null; }
         }
 
         #endregion

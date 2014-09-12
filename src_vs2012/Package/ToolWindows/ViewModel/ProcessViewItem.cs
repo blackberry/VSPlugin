@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Media;
 using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
@@ -11,12 +10,14 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public ProcessViewItem(SystemInfoProcess process)
+        public ProcessViewItem(TargetNavigatorViewModel viewModel, SystemInfoProcess process)
+            : base(viewModel)
         {
             if (process == null)
                 throw new ArgumentNullException("process");
 
             _process = process;
+            ImageSource = ViewModel.GetIconForProcess();
         }
 
         #region Properties
@@ -24,11 +25,6 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         public override string Name
         {
             get { return _process.ExecutablePath; }
-        }
-
-        public override ImageSource ImageSource
-        {
-            get { return null; }
         }
 
         #endregion

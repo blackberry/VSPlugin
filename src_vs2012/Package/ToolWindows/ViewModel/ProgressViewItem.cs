@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Windows.Media;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
@@ -7,7 +6,8 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
     {
         private readonly string _title;
 
-        public ProgressViewItem(string title)
+        public ProgressViewItem(TargetNavigatorViewModel viewModel, string title)
+            : base(viewModel)
         {
             if (string.IsNullOrEmpty(title))
                 throw new ArgumentNullException("title");
@@ -20,11 +20,6 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         public override string Name
         {
             get { return _title; }
-        }
-
-        public override ImageSource ImageSource
-        {
-            get { return null; }
         }
 
         #endregion
