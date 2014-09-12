@@ -205,7 +205,7 @@ namespace BlackBerry.NativeCore.Components
                     var handler = StatusChanged;
                     if (handler != null)
                     {
-                        handler(this, new TargetConnectionEventArgs(Device, status, message));
+                        handler(this, new TargetConnectionEventArgs(Device, Client, status, message));
                     }
                 }
 
@@ -221,7 +221,7 @@ namespace BlackBerry.NativeCore.Components
 
             public TargetConnectionEventArgs ToEventArgs()
             {
-                return new TargetConnectionEventArgs(Device, Status, null);
+                return new TargetConnectionEventArgs(Device, Client, Status, null);
             }
         }
 
@@ -335,6 +335,17 @@ namespace BlackBerry.NativeCore.Components
         public static void Connect(string ip, string password, DeviceDefinitionType type, string sshPublicKeyPath, EventHandler<TargetConnectionEventArgs> resultHandler)
         {
             Connect(new DeviceDefinition("Ad-hoc device", ip, password, type), sshPublicKeyPath, resultHandler);
+        }
+
+        /// <summary>
+        /// Requests secure connection setup to given device.
+        /// </summary>
+        public static void Connect(DeviceDefinition device, EventHandler<TargetConnectionEventArgs> resultHandler)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            Connect(device, ConfigDefaults.SshPublicKeyPath, resultHandler);
         }
 
         /// <summary>
