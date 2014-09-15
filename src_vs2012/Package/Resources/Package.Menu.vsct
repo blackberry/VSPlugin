@@ -20,8 +20,8 @@
             </Menu>
 
             <!-- Help Submenu -->
-            <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" priority="0x0900" type="Menu">
-                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
+            <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerrySubMenu_Help" priority="0x0100" type="Menu">
+                <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" />
                 <Strings>
                     <ButtonText>&amp;Help</ButtonText>
                 </Strings>
@@ -100,7 +100,7 @@
             </Button>
 
             <!-- Settings Action Buttons -->
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryOptions" priority="0x0100" type="Button">
+            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryOptions" priority="0x0200" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Options" />
                 <Strings>
                     <ButtonText>&amp;Options...</ButtonText>
