@@ -37,6 +37,22 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         }
 
         /// <summary>
+        /// Gets the source file name of the first item.
+        /// </summary>
+        public TargetFile Source
+        {
+            get
+            {
+                if (Buffers.Length > 0)
+                {
+                    return Buffers[0].Item1;
+                }
+
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Gets the buffer value of the first item.
         /// </summary>
         public byte[] Data
