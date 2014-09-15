@@ -16,6 +16,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         private bool _isSelected;
         private bool _isExpanded;
         private bool _isLoading;
+        private bool _loadedItemsAlready;
         private ImageSource _imageSource;
         private object _content;
 
@@ -98,9 +99,15 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                     {
                         ViewModel.SelectedItem = this;
                         Selected();
+                        AutoExpand();
                     }
                 }
             }
+        }
+
+        protected virtual bool CanAutoExpand
+        {
+            get { return true; }
         }
 
         public object Content
@@ -121,6 +128,14 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         protected void AddExpandablePlaceholder()
         {
             Children.Add(ExpandPlaceholder);
+        }
+
+        private void AutoExpand()
+        {
+            if (!_loadedItemsAlready && !IsExpanded && Children.Count > 0 && CanAutoExpand)
+            {
+                IsExpanded = true;
+            }
         }
 
         public void Refresh()
@@ -188,6 +203,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         /// </summary>
         private void InternalRefreshItemsLoaded(BaseViewItem[] items, object content, object state)
         {
+            _loadedItemsAlready = true;
             Children.Clear();
 
             // did we loaded items correctly?

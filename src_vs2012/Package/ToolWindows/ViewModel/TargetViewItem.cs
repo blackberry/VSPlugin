@@ -30,6 +30,11 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             get { return Device.ShortName; }
         }
 
+        protected override bool CanAutoExpand
+        {
+            get { return false; }
+        }
+
         #endregion
 
         #region Overrides
