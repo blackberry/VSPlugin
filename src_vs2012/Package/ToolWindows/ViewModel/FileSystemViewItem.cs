@@ -81,7 +81,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 throw new ArgumentNullException("path");
 
             BaseViewItem[] items;
-            var goUp = canGoUp ? new FileViewItem(viewModel, service, new TargetFile("..", "..", true), null) : null;
+            var goUp = canGoUp ? new FileToParentViewItem(viewModel, service) : null;
 
             // we need to lock on that service here, not to allow the user to expand two nodes at the same time
             // as it might affect sync call to the service itself;

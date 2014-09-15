@@ -73,21 +73,21 @@ namespace BlackBerry.Package.ViewModels.Common
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (item is Image || item is ImageSource)
-                return ImageTemplate;
+                return ImageTemplate ?? DefaultTemplate;
             if (item is string)
-                return StringTemplate;
+                return StringTemplate ?? DefaultTemplate;
             if (item is int)
-                return Int32Template;
+                return Int32Template ?? DefaultTemplate;
             if (item is IEnumerable<int>)
-                return Int32ArrayTemplate;
+                return Int32ArrayTemplate ?? DefaultTemplate;
             if (item is IEnumerable<byte>)
-                return BinaryTemplate;
+                return BinaryTemplate ?? DefaultTemplate;
             if (item is IEnumerable<FileViewItem>)
-                return FileArrayTemplate;
+                return FileArrayTemplate ?? DefaultTemplate;
             if (item is SystemInfoProcess)
-                return ProcessViewTemplate;
+                return ProcessViewTemplate ?? DefaultTemplate;
             if (item is IEnumerable<BaseViewItem>)
-                return ViewItemArrayTemplate;
+                return ViewItemArrayTemplate ?? DefaultTemplate;
 
             return DefaultTemplate;
         }

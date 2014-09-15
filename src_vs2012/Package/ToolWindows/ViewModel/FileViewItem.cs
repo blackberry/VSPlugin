@@ -45,27 +45,27 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             get { return _path == null ? NoAccess : _path.Name; }
         }
 
-        public string CreationTime
+        public virtual string CreationTime
         {
             get { return _path == null || _path.NoAccess ? NoAccess : _path.CreationTime.ToString(); }
         }
 
-        public string Size
+        public virtual string Size
         {
             get { return _path == null || _path.NoAccess ? NoAccess : _path.Size.ToString(); }
         }
 
-        public string Owner
+        public virtual string Owner
         {
             get { return _path == null || _path.NoAccess ? NoAccess : _path.UserID.ToString(); }
         }
 
-        public string Group
+        public virtual string Group
         {
             get { return _path == null || _path.NoAccess ? NoAccess : _path.GroupID.ToString(); }
         }
 
-        public string Permissions
+        public virtual string Permissions
         {
             get { return _path == null || _path.NoAccess ? NoAccess : _path.FormattedPermissions; }
         }
@@ -79,6 +79,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 FileViewItem[] content;
                 BaseViewItem[] items = FileSystemViewItem.ListItems(ViewModel, _service, _path, _filter, true, out content);
 
+                AdoptItems(content);
                 OnItemsLoaded(items, content, null);
             }
             else

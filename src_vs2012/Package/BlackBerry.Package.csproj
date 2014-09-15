@@ -328,6 +328,7 @@
     <Compile Include="Registration\XmlEditorDesignerViewRegistrationAttribute.cs" />
     <Compile Include="StandardCommands.cs" />
     <Compile Include="ToolWindows\ViewModel\BaseViewItem.cs" />
+    <Compile Include="ToolWindows\ViewModel\FileToParentViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\FileViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\MessageViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\ProcessListViewItem.cs" />

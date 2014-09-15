@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Threading;
@@ -37,6 +38,12 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         {
             get;
             private set;
+        }
+
+        public BaseViewItem Parent
+        {
+            get;
+            set;
         }
 
         public abstract string Name
@@ -212,6 +219,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 var error = CreateErrorPlaceholder();
                 if (error != null)
                 {
+                    error.Parent = this;
                     Children.Add(error);
                 }
             }
@@ -219,6 +227,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             {
                 foreach (var item in items)
                 {
+                    item.Parent = this;
                     Children.Add(item);
                 }
             }
@@ -288,6 +297,17 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         public virtual void ExecuteDefaultAction()
         {
             IsSelected = true;
+        }
+
+        protected void AdoptItems(IEnumerable<BaseViewItem> items)
+        {
+            if (items != null)
+            {
+                foreach (var item in items)
+                {
+                    item.Parent = this;
+                }
+            }
         }
 
         #region INotifyPropertyChanged Implementation
