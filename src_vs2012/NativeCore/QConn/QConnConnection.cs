@@ -265,7 +265,7 @@ namespace BlackBerry.NativeCore.QConn
             Open();
 
             // send request:
-            var status = _source.Send(Encoding.UTF8.GetBytes(command + "\r\n"));
+            var status = _source.Send(SerializeCommand(command, null, 0, 0));
             if (status != HResult.OK)
             {
                 throw new QConnException("Unable to send command \"" + command + "\"");
@@ -297,7 +297,7 @@ namespace BlackBerry.NativeCore.QConn
         }
 
         /// <summary>
-        /// Converts raw response to string object, removing all controls chars.
+        /// Converts raw response to string object, removing all controls chars and any types of TELNET negotiations.
         /// </summary>
         private static string ResponseToString(byte[] data)
         {
@@ -309,10 +309,10 @@ namespace BlackBerry.NativeCore.QConn
             const byte SB = 250;
             const byte SE = 240;
 
-            var buff = new StringBuilder();
+            int length = 0;
 
             int state = 0;
-            for (int i = 0; i < data.Length && (state != 0 || data[i] != 10); i++)
+            for (int i = 0; i < data.Length && (state != 0 || i == 0 || data[i - 1] != 10); i++)
             {
                 byte c = data[i];
 
@@ -323,16 +323,16 @@ namespace BlackBerry.NativeCore.QConn
                         {
                             state = 1;
                         }
-                        else if (!char.IsControl((char)c))
+                        else
                         {
-                            buff.Append((char)c);
+                            data[length++] = data[i];
                         }
                         break;
                     case 1:
                         switch (c)
                         {
                             case IAC:
-                                buff.Append((char)c);
+                                data[length++] = data[i];
                                 state = 0;
                                 break;
                             case WILL:
@@ -371,7 +371,11 @@ namespace BlackBerry.NativeCore.QConn
                 }
             }
 
-            return buff.ToString();
+            // remove the "\r\n" from the end of the text:
+            if (length >= 2 && data[length - 2] == 13 && data[length - 1] == 10)
+                length -= 2;
+
+            return length > 0 ? Encoding.UTF8.GetString(data, 0, length) : string.Empty;
         }
 
         #endregion

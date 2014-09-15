@@ -163,8 +163,21 @@ namespace BlackBerry.NativeCore.QConn
                 return HResult.Fail;
             }
 
+            // allocate new temp buffer for data:
+            if (_buffer == null)
+            {
+                _buffer = new byte[_chunkSize];
+            }
+
             try
             {
+                // remove any available data from 'previous' requests:
+                while (_socket.Available > 0)
+                {
+                    _socket.Receive(_buffer);
+                }
+
+                // issue new request:
                 int sent = _socket.Send(data);
                 if (sent < 0)
                 {
