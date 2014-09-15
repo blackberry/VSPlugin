@@ -41,6 +41,8 @@ namespace BlackBerry.NativeCore.QConn.Model
             CreationTime = DateTime.MinValue;
             Path = path;
             Name = PathHelper.ExtractName(path);
+            Extension = System.IO.Path.GetExtension(Name);
+
             UpdateFormatting();
             UpdateAccess();
         }
@@ -58,6 +60,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             NoAccess = true;
             Path = path;
             Name = string.IsNullOrEmpty(name) ? PathHelper.ExtractName(path) : name;
+            Extension = System.IO.Path.GetExtension(Name);
             UpdateFormatting();
         }
 
@@ -72,6 +75,7 @@ namespace BlackBerry.NativeCore.QConn.Model
 
             Path = info.FullName;
             Name = info.Name;
+            Extension = info.Extension;
 
             if (info.Exists)
             {
@@ -159,6 +163,12 @@ namespace BlackBerry.NativeCore.QConn.Model
         }
 
         public string Name
+        {
+            get;
+            private set;
+        }
+
+        public string Extension
         {
             get;
             private set;
