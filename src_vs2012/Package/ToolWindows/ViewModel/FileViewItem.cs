@@ -92,7 +92,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         protected override void Selected()
         {
             // if it's not so big file and we have access to open it:
-            if (_path.IsFile && !_path.NoAccess && _path.Size < 2 * 1024 * 1024)
+            if (_path.IsFile && !_path.NoAccess && _path.Size < 4 * 1024 * 1024)
             {
                 var monitor = _service.PreviewAsync(_path.Path);
                 monitor.Completed += MonitorOnCompleted;
