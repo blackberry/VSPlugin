@@ -48,7 +48,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 QTraceLog.WriteException(ex, "Unable to access: \"{0}\"", path);
 
                 // or a stub, in case directory doesn't exist nor we have rights to open it:
-                return new TargetFile(path, System.IO.Path.GetFileName(path));
+                return new TargetFile(path, System.IO.Path.GetFileName(path), false);
             }
         }
 

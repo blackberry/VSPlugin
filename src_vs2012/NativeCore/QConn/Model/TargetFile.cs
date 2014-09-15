@@ -51,11 +51,12 @@ namespace BlackBerry.NativeCore.QConn.Model
         /// Init constructor.
         /// It will create a 'stub' for files/folders we don't have access on the device.
         /// </summary>
-        public TargetFile(string path, string name)
+        public TargetFile(string path, string name, bool isDirectory)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
+            Mode = isDirectory ? TypeDirectory : 0;
             CreationTime = DateTime.MinValue;
             NoAccess = true;
             Path = path;

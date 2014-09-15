@@ -57,7 +57,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 }
                 else
                 {
-                    items = ListItems(ViewModel, _service, path, _filter, out content);
+                    items = ListItems(ViewModel, _service, path, _filter, false, out content);
                 }
             }
             catch (Exception ex)
@@ -71,7 +71,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         /// <summary>
         /// Method to list synchronously content of the folder.
         /// </summary>
-        internal static BaseViewItem[] ListItems(TargetNavigatorViewModel viewModel, TargetServiceFile service, TargetFile path, Predicate<TargetFile> filter, out FileViewItem[] contentFilesAndFolders)
+        internal static BaseViewItem[] ListItems(TargetNavigatorViewModel viewModel, TargetServiceFile service, TargetFile path, Predicate<TargetFile> filter, bool canGoUp, out FileViewItem[] contentFilesAndFolders)
         {
             if (viewModel == null)
                 throw new ArgumentNullException("viewModel");
@@ -81,6 +81,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 throw new ArgumentNullException("path");
 
             BaseViewItem[] items;
+            var goUp = canGoUp ? new FileViewItem(viewModel, service, new TargetFile("..", "..", true), null) : null;
 
             // we need to lock on that service here, not to allow the user to expand two nodes at the same time
             // as it might affect sync call to the service itself;
@@ -94,11 +95,28 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                     if (filter == null)
                     {
                         items = new BaseViewItem[files.Length];
-                        contentFilesAndFolders = new FileViewItem[items.Length];
 
-                        for (int i = 0; i < files.Length; i++)
+                        if (canGoUp)
                         {
-                            items[i] = contentFilesAndFolders[i] = new FileViewItem(viewModel, service, files[i], null);
+                            // add '..':
+                            contentFilesAndFolders = new FileViewItem[items.Length + 1];
+                            contentFilesAndFolders[0] = goUp;
+
+                            // and all other files/folders:
+                            for (int i = 0; i < files.Length; i++)
+                            {
+                                items[i] = contentFilesAndFolders[i + 1] = new FileViewItem(viewModel, service, files[i], null);
+                            }
+                        }
+                        else
+                        {
+                            contentFilesAndFolders = new FileViewItem[items.Length];
+
+                            // only all other files/folders:
+                            for (int i = 0; i < files.Length; i++)
+                            {
+                                items[i] = contentFilesAndFolders[i] = new FileViewItem(viewModel, service, files[i], null);
+                            }
                         }
                     }
                     else
@@ -106,6 +124,13 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                         var filtered = new List<BaseViewItem>();
                         var filteredFiles = new List<FileViewItem>();
 
+                        // add '..' if allowed:
+                        if (canGoUp)
+                        {
+                            filteredFiles.Add(goUp);
+                        }
+
+                        // enumerate all files/folders and return all matching the filter:
                         foreach (var file in files)
                         {
                             if (filter(file))
@@ -116,6 +141,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                             }
                         }
 
+                        // prepare results:
                         items = filtered.ToArray();
                         contentFilesAndFolders = filteredFiles.ToArray();
                     }
@@ -124,7 +150,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 catch (Exception ex)
                 {
                     items = new BaseViewItem[] { new MessageViewItem(viewModel, ex) };
-                    contentFilesAndFolders = new FileViewItem[0]; // nothing inside...
+                    contentFilesAndFolders = canGoUp ? new FileViewItem[] { goUp } : new FileViewItem[0]; // '..' to go up or nothing inside...
                 }
             }
 

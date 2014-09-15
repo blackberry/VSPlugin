@@ -77,7 +77,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             if (_path.IsDirectory)
             {
                 FileViewItem[] content;
-                BaseViewItem[] items = FileSystemViewItem.ListItems(ViewModel, _service, _path, _filter, out content);
+                BaseViewItem[] items = FileSystemViewItem.ListItems(ViewModel, _service, _path, _filter, true, out content);
 
                 OnItemsLoaded(items, content, null);
             }

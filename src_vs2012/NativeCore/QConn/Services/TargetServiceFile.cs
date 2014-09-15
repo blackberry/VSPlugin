@@ -311,7 +311,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                                 QTraceLog.WriteLine("Unable to load info about path: \"" + itemPath + "\"");
 
                                 // add a stub, just to keep the path only (as might have lack permissions to read info):
-                                statInfo = new TargetFile(itemPath, item);
+                                statInfo = new TargetFile(itemPath, item, false);
                             }
 
                             result.Add(statInfo, statInfo);

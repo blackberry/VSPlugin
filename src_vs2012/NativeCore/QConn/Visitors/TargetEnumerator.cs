@@ -24,7 +24,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             var descriptor = Service.Stat(path, false);
             if (descriptor == null)
             {
-                descriptor = new TargetFile(path, null);
+                descriptor = new TargetFile(path, null, false);
             }
 
             return descriptor;
