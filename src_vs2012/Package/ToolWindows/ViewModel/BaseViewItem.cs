@@ -164,29 +164,29 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         /// </summary>
         protected void OnItemsLoaded(BaseViewItem[] items)
         {
-            OnItemsLoaded(items, null);
+            OnItemsLoaded(items, null, null);
         }
 
         /// <summary>
         /// Method called after asynchronous items were loaded to populate them to the UI.
         /// </summary>
-        protected void OnItemsLoaded(BaseViewItem[] items, object state)
+        protected void OnItemsLoaded(BaseViewItem[] items, object content, object state)
         {
             var dispatcher = Application.Current.Dispatcher;
             if (dispatcher == null || dispatcher.CheckAccess())
             {
-                InternalRefreshItemsLoaded(items, state);
+                InternalRefreshItemsLoaded(items, content, state);
             }
             else
             {
-                dispatcher.BeginInvoke(DispatcherPriority.Background, new Action<BaseViewItem[], object>(InternalRefreshItemsLoaded), items, state);
+                dispatcher.BeginInvoke(DispatcherPriority.Background, new Action<BaseViewItem[], object, object>(InternalRefreshItemsLoaded), items, content, state);
             }
         }
 
         /// <summary>
         /// Refreshes the collection of child-items. Since it automatically fires the collection-changed events, it should be only called from the UI thread.
         /// </summary>
-        private void InternalRefreshItemsLoaded(BaseViewItem[] items, object state)
+        private void InternalRefreshItemsLoaded(BaseViewItem[] items, object content, object state)
         {
             Children.Clear();
 
@@ -207,6 +207,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 }
             }
 
+            InternalUpdateContent(content);
             ItemsCompleted(state);
             _isLoading = false;
         }

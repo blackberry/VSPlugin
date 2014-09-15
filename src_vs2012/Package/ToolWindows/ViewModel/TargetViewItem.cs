@@ -85,7 +85,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                     break;
             }
 
-            OnItemsLoaded(items, e);
+            OnItemsLoaded(items, null, e);
         }
 
         protected override void ItemsCompleted(object state)

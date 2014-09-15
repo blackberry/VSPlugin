@@ -342,6 +342,12 @@
     <Compile Include="ToolWindows\ViewModel\TargetViewItem.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\BarEditorViewModel.cs" />
+    <Compile Include="ViewModels\Common\BinaryToStringConverter.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="ViewModels\Common\ContentTemplateSelector.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ViewModels\Common\NullToVisibilityConverter.cs" />
     <Compile Include="ViewModels\PackageViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />

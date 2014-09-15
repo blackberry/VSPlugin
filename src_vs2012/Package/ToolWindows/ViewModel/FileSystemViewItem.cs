@@ -46,6 +46,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         protected override void LoadItems()
         {
             BaseViewItem[] items;
+            FileViewItem[] content = null;
 
             try
             {
@@ -56,7 +57,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 }
                 else
                 {
-                    items = ListItems(ViewModel, _service, path, _filter);
+                    items = ListItems(ViewModel, _service, path, _filter, out content);
                 }
             }
             catch (Exception ex)
@@ -64,13 +65,13 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 items = new BaseViewItem[] { new MessageViewItem(ViewModel, ex) };
             }
 
-            OnItemsLoaded(items);
+            OnItemsLoaded(items, content, null);
         }
 
         /// <summary>
         /// Method to list synchronously content of the folder.
         /// </summary>
-        internal static BaseViewItem[] ListItems(TargetNavigatorViewModel viewModel, TargetServiceFile service, TargetFile path, Predicate<TargetFile> filter)
+        internal static BaseViewItem[] ListItems(TargetNavigatorViewModel viewModel, TargetServiceFile service, TargetFile path, Predicate<TargetFile> filter, out FileViewItem[] contentFilesAndFolders)
         {
             if (viewModel == null)
                 throw new ArgumentNullException("viewModel");
@@ -93,28 +94,37 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                     if (filter == null)
                     {
                         items = new BaseViewItem[files.Length];
+                        contentFilesAndFolders = new FileViewItem[items.Length];
+
                         for (int i = 0; i < files.Length; i++)
                         {
-                            items[i] = new FileViewItem(viewModel, service, files[i], filter);
+                            items[i] = contentFilesAndFolders[i] = new FileViewItem(viewModel, service, files[i], null);
                         }
                     }
                     else
                     {
                         var filtered = new List<BaseViewItem>();
+                        var filteredFiles = new List<FileViewItem>();
 
                         foreach (var file in files)
                         {
                             if (filter(file))
                             {
-                                filtered.Add(new FileViewItem(viewModel, service, file, filter));
+                                var newItem = new FileViewItem(viewModel, service, file, filter);
+                                filtered.Add(newItem);
+                                filteredFiles.Add(newItem);
                             }
                         }
+
                         items = filtered.ToArray();
+                        contentFilesAndFolders = filteredFiles.ToArray();
                     }
+
                 }
                 catch (Exception ex)
                 {
                     items = new BaseViewItem[] { new MessageViewItem(viewModel, ex) };
+                    contentFilesAndFolders = new FileViewItem[0]; // nothing inside...
                 }
             }
 
