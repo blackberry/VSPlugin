@@ -330,7 +330,6 @@
     <Compile Include="ToolWindows\ViewModel\BaseViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\FileViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\MessageViewItem.cs" />
-    <Compile Include="ToolWindows\ViewModel\NullToVisibilityIndicator.cs" />
     <Compile Include="ToolWindows\ViewModel\ProcessListViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\ProcessViewItem.cs" />
     <Compile Include="ToolWindows\ViewModel\ProgressViewItem.cs" />
@@ -343,6 +342,7 @@
     <Compile Include="ToolWindows\ViewModel\TargetViewItem.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\BarEditorViewModel.cs" />
+    <Compile Include="ViewModels\Common\NullToVisibilityConverter.cs" />
     <Compile Include="ViewModels\PackageViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
