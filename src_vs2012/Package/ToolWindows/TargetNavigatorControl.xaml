@@ -33,7 +33,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsFileList">
-                <ListView ItemsSource="{Binding}">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick">
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Name" Width="450">
@@ -90,6 +90,7 @@
                                             ImageTemplate="{StaticResource PreviewAsImage}"
                                             FileArrayTemplate="{StaticResource PreviewAsFileList}"
                                             ProcessViewTemplate="{StaticResource PreviewAsProcess}"
+                                            DefaultTemplate="{StaticResource PreviewAsFileList}"
                                             />
         </ResourceDictionary>
     </UserControl.Resources>

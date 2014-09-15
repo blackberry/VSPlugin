@@ -1,4 +1,6 @@
 ﻿using System.Windows.Controls;
+using System.Windows.Input;
+using BlackBerry.Package.ToolWindows.ViewModel;
 
 namespace BlackBerry.Package.ToolWindows
 {
@@ -10,6 +12,17 @@ namespace BlackBerry.Package.ToolWindows
         public TargetFileSystemNavigatorControl()
         {
             InitializeComponent();
+        }
+
+        private void ListPreview_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var listView = sender as ListView;
+            var item = listView != null ? listView.SelectedItem as BaseViewItem : null;
+
+            if (item != null)
+            {
+                item.ExecuteDefaultAction();
+            }
         }
     }
 }

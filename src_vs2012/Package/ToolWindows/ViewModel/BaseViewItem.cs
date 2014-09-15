@@ -282,6 +282,14 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             Content = content;
         }
 
+        /// <summary>
+        /// Executes default behavior, when user double-clicked this item on the UI.
+        /// </summary>
+        public virtual void ExecuteDefaultAction()
+        {
+            IsSelected = true;
+        }
+
         #region INotifyPropertyChanged Implementation
 
         public event PropertyChangedEventHandler PropertyChanged;
