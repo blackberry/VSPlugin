@@ -218,15 +218,15 @@ namespace BlackBerry.NativeCore.QConn.Model
             if (other == null)
                 return 1;
 
-            // non-folders should be first on the list:
-            if (!IsDirectory)
+            // folders should be first on the list:
+            if (IsDirectory)
             {
-                if (!other.IsDirectory)
+                if (other.IsDirectory)
                     return string.Compare(Name, other.Name, StringComparison.CurrentCulture);
                 return -1;
             }
 
-            if (IsDirectory && !other.IsDirectory)
+            if (!IsDirectory && other.IsDirectory)
                 return 1;
 
             return string.Compare(Name, other.Name, StringComparison.CurrentCulture);

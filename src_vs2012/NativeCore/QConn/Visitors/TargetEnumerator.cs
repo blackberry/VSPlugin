@@ -1,6 +1,4 @@
-﻿using System;
-using BlackBerry.NativeCore.Diagnostics;
-using BlackBerry.NativeCore.QConn.Model;
+﻿using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
