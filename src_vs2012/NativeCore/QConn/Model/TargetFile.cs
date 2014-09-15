@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using BlackBerry.NativeCore.Helpers;
@@ -62,6 +63,7 @@ namespace BlackBerry.NativeCore.QConn.Model
             Path = path;
             Name = string.IsNullOrEmpty(name) ? PathHelper.ExtractName(path) : name;
             Extension = System.IO.Path.GetExtension(Name);
+
             UpdateFormatting();
         }
 
@@ -261,6 +263,9 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         private void UpdateFormatting()
         {
+            if (Extension != null)
+                Extension = Extension.ToLower(CultureInfo.CurrentCulture);
+
             if (NoAccess)
             {
                 FormattedPermissions = "N/A";
