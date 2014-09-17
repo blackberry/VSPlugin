@@ -102,16 +102,16 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Name:" />
+                    <TextBlock Text="Name:" Margin="0,0,10,0" VerticalAlignment="Center" />
                     <TextBox Text="{Binding Name, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="0" Grid.Column="1" Width="Auto" />
 
-                    <TextBlock Text="ID:" Grid.Row="1" Grid.Column="0" />
+                    <TextBlock Text="ID:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
                     <TextBox Text="{Binding ID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="1" Grid.Column="1" />
 
-                    <TextBlock Text="Parent ID:" Grid.Row="2" Grid.Column="0" />
+                    <TextBlock Text="Parent ID:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
                     <TextBox Text="{Binding ParentID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="2" Grid.Column="1" />
 
-                    <TextBlock Text="Executable:" Grid.Row="3" Grid.Column="0" />
+                    <TextBlock Text="Executable:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
                     <TextBox Text="{Binding ExecutablePath, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="3" Grid.Column="1" />
                 </Grid>
             </DataTemplate>

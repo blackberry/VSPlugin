@@ -18,7 +18,6 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
             _process = process;
             ImageSource = ViewModel.GetIconForProcess();
-            Content = this;
         }
 
         #region Properties
@@ -49,5 +48,10 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         }
 
         #endregion
+
+        protected override void ItemsCompleted(object state)
+        {
+            UpdateContent(this);
+        }
     }
 }

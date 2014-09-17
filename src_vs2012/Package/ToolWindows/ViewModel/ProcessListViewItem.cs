@@ -50,6 +50,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 items = new BaseViewItem[] { new MessageViewItem(ViewModel, ex) };
             }
 
+            AdoptItems(items);
             OnItemsLoaded(items, items, null);
         }
     }
