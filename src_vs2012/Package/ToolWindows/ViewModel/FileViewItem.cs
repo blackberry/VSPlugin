@@ -94,8 +94,8 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             }
             else
             {
-                _path = _service.Stat(_path.Path);
-                OnItemsLoaded(new BaseViewItem[0], this, null);
+                //_path = _service.Stat(_path.Path);
+                OnItemsLoaded(new BaseViewItem[0], null, null);
             }
         }
 

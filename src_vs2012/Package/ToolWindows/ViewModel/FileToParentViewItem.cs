@@ -42,11 +42,6 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             get { return false; }
         }
 
-        protected override bool CanAutoExpand
-        {
-            get { return false; }
-        }
-
         #endregion
 
         public override void ExecuteDefaultAction()

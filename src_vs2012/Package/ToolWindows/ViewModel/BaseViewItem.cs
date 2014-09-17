@@ -111,6 +111,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                     {
                         ViewModel.SelectedItem = this;
                         Selected();
+                        Refresh();
                         //AutoExpand();
                     }
 
@@ -149,7 +150,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         protected virtual bool CanAutoExpand
         {
-            get { return true; }
+            get { return false; }
         }
 
         public object Content
@@ -182,7 +183,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         public void Refresh()
         {
-            if (!_isLoading)
+            if (!_isLoading && !_loadedItemsAlready)
             {
                 _isLoading = true;
 
@@ -203,6 +204,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         public void Collapse()
         {
+            InvalidateItems();
             IsExpanded = false;
         }
 
@@ -300,6 +302,11 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         /// </summary>
         protected virtual void ItemsCompleted(object state)
         {
+        }
+
+        protected virtual void InvalidateItems()
+        {
+            _loadedItemsAlready = false;
         }
 
         /// <summary>

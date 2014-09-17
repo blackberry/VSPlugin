@@ -32,7 +32,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         protected override bool CanAutoExpand
         {
-            get { return false; }
+            get { return true; }
         }
 
         #endregion
