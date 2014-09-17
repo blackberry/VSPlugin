@@ -15,6 +15,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
     public abstract class BaseViewItem : INotifyPropertyChanged
     {
         private bool _isSelected;
+        private bool _isActivated;
         private bool _isExpanded;
         private bool _isLoading;
         private bool _loadedItemsAlready;
@@ -93,6 +94,9 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             }
         }
 
+        /// <summary>
+        /// Property indicating, if item is selected on the tree-view on the left-side.
+        /// </summary>
         public bool IsSelected
         {
             get { return _isSelected; }
@@ -101,15 +105,46 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 if (_isSelected != value)
                 {
                     _isSelected = value;
-                    NotifyPropertyChanged("IsSelected");
+                    _isActivated = value;
+
                     if (value)
                     {
                         ViewModel.SelectedItem = this;
                         Selected();
                         AutoExpand();
                     }
+
+                    NotifyPropertyChanged("IsSelected");
+                    NotifyPropertyChanged("IsActivated");
                 }
             }
+        }
+
+        /// <summary>
+        /// Property indicating, if item is selected on the list-view on the right-side.
+        /// </summary>
+        public bool IsActivated
+        {
+            get { return _isActivated; }
+            set
+            {
+                if (_isActivated != value)
+                {
+                    _isActivated = value;
+
+                    if (value)
+                    {
+                        ViewModel.SelectedItemListSource = this; // try to evaluate
+                        Selected();
+                    }
+                    NotifyPropertyChanged("IsActivated");
+                }
+            }
+        }
+
+        public virtual bool IsEnumerable
+        {
+            get { return true; }
         }
 
         protected virtual bool CanAutoExpand
@@ -156,6 +191,9 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 if (progressItem != null)
                 {
                     Children.Add(progressItem);
+
+                    progressItem.Parent = this;
+                    UpdateContent(new BaseViewItem[] { progressItem });
                 }
 
                 // retrieve items to fill-in the list asynchronously:

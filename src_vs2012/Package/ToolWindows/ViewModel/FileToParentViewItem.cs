@@ -37,6 +37,11 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             get { return string.Empty; }
         }
 
+        public override bool IsEnumerable
+        {
+            get { return false; }
+        }
+
         protected override bool CanAutoExpand
         {
             get { return false; }

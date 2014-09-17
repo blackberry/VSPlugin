@@ -13,6 +13,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 throw new ArgumentNullException("message");
 
             _message = message;
+            UpdateContent(_message);
         }
 
         public MessageViewItem(TargetNavigatorViewModel viewModel, Exception ex)
@@ -22,6 +23,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 throw new ArgumentNullException("ex");
 
             _message = ex.Message;
+            UpdateContent(_message);
         }
 
         #region Properties
@@ -29,6 +31,11 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         public override string Name
         {
             get { return _message; }
+        }
+
+        public override bool IsEnumerable
+        {
+            get { return false; }
         }
 
         #endregion

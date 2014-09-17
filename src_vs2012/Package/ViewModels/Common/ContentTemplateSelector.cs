@@ -50,13 +50,25 @@ namespace BlackBerry.Package.ViewModels.Common
             set;
         }
 
-        public DataTemplate FileArrayTemplate
+        public DataTemplate FileViewTemplate
+        {
+            get;
+            set;
+        }
+
+        public DataTemplate FileViewArrayTemplate
         {
             get;
             set;
         }
 
         public DataTemplate ProcessViewTemplate
+        {
+            get;
+            set;
+        }
+
+        public DataTemplate ProcessViewArrayTemplate
         {
             get;
             set;
@@ -74,7 +86,7 @@ namespace BlackBerry.Package.ViewModels.Common
         {
             if (item is Image || item is ImageSource)
                 return ImageTemplate ?? DefaultTemplate;
-            if (item is string)
+            if (item is string || item is MessageViewItem)
                 return StringTemplate ?? DefaultTemplate;
             if (item is int)
                 return Int32Template ?? DefaultTemplate;
@@ -83,9 +95,13 @@ namespace BlackBerry.Package.ViewModels.Common
             if (item is IEnumerable<byte>)
                 return BinaryTemplate ?? DefaultTemplate;
             if (item is IEnumerable<FileViewItem>)
-                return FileArrayTemplate ?? DefaultTemplate;
-            if (item is SystemInfoProcess)
+                return FileViewArrayTemplate ?? DefaultTemplate;
+            if (item is FileViewItem)
+                return FileViewTemplate;
+            if (item is ProcessViewItem)
                 return ProcessViewTemplate ?? DefaultTemplate;
+            if (item is IEnumerable<ProcessViewItem>)
+                return ProcessViewArrayTemplate ?? DefaultTemplate;
             if (item is IEnumerable<BaseViewItem>)
                 return ViewItemArrayTemplate ?? DefaultTemplate;
 

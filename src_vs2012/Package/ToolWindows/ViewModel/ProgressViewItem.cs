@@ -22,6 +22,11 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             get { return _title; }
         }
 
+        public override bool IsEnumerable
+        {
+            get { return false; }
+        }
+
         #endregion
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -12,9 +13,11 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
     /// <summary>
     /// View model class for navigating over file system of the target.
     /// </summary>
-    public sealed class TargetNavigatorViewModel
+    public sealed class TargetNavigatorViewModel : INotifyPropertyChanged
     {
         private readonly Dictionary<string, ImageSource> _iconCache;
+        private BaseViewItem _selectedItem;
+        private BaseViewItem _selectedItemListSource;
 
         public TargetNavigatorViewModel()
         {
@@ -38,8 +41,50 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         public BaseViewItem SelectedItem
         {
-            get;
-            set;
+            get { return _selectedItem; }
+            set
+            {
+                if (_selectedItem != value)
+                {
+                    _selectedItem = value;
+                    NotifyPropertyChanged("SelectedItem");
+
+                    var newSelectedItemSource = value != null ? (value.IsEnumerable ? value : value.Parent) : null;
+                    if (newSelectedItemSource != _selectedItemListSource)
+                    {
+                        _selectedItemListSource = newSelectedItemSource;
+                        NotifyPropertyChanged("SelectedItemListSource");
+                    }
+                }
+            }
+        }
+
+        public BaseViewItem SelectedItemListSource
+        {
+            get { return _selectedItemListSource; }
+            set
+            {
+                if (value != null && !value.IsEnumerable)
+                {
+                    if (_selectedItem != value)
+                    {
+                        value.IsSelected = true;
+                    }
+                }
+
+                // since the 'value' comes from the list-view (items listing panel on the right)
+                // as a source to that panel we need still to serve it's parent:
+                if (value != null)
+                {
+                    value = value.Parent;
+                }
+
+                if (_selectedItemListSource != value)
+                {
+                    _selectedItemListSource = value;
+                    NotifyPropertyChanged("SelectedItemListSource");
+                }
+            }
         }
 
         #endregion
@@ -104,5 +149,18 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             _iconCache[name] = result;
             return result;
         }
+
+        #region INotifyPropertyChanged Implementation
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string propertyName)
+        {
+            PropertyChangedEventHandler handler = PropertyChanged;
+            if (handler != null)
+                handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
     }
 }

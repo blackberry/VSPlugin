@@ -12,6 +12,9 @@
             <common:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
             <common:BinaryToStringConverter x:Key="BinaryToStringConverter" />
 
+            <DataTemplate x:Key="PreviewImpossible">
+                <TextBlock Text="Preview is unavailable. Maybe the file is too big or has unsupported extension." HorizontalAlignment="Stretch" />
+            </DataTemplate>
             <DataTemplate x:Key="PreviewAsString">
                 <TextBox Text="{Binding Mode=OneWay}" IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
                          HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
@@ -33,7 +36,12 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsFileList">
-                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" SelectionMode="Single">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="IsSelected" Value="{Binding IsActivated, Mode=TwoWay}" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
                     <ListView.View>
                         <GridView>
                             <GridViewColumn Header="Name" Width="450">
@@ -56,6 +64,30 @@
                     </ListView.View>
                 </ListView>
             </DataTemplate>
+            <DataTemplate x:Key="PreviewAsItemList">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" SelectionMode="Single">
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="IsSelected" Value="{Binding IsActivated, Mode=TwoWay}" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Name" Width="900"> <!-- matches PreviewAsFileList's columns sum width -->
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{Binding ImageSource, Mode=OneWay}" Margin="2" Width="16" Height="16" Stretch="None" VerticalAlignment="Center"
+                                                    Visibility="{Binding ImageSource, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                            <TextBlock Text="{Binding Name, Mode=OneWay}" Margin="4,2,2,2" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DataTemplate>
             <DataTemplate x:Key="PreviewAsProcess">
                 <Grid>
                     <Grid.RowDefinitions>
@@ -70,27 +102,32 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Name:" Margin="5,5,5,0" />
-                    <TextBox Text="{Binding Name, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="5,0,5,0" Grid.Row="0" Grid.Column="1" Width="Auto" />
+                    <TextBlock Text="Name:" />
+                    <TextBox Text="{Binding Name, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="0" Grid.Column="1" Width="Auto" />
 
-                    <TextBlock Text="ID:" Margin="5,5,5,0" Grid.Row="1" Grid.Column="0" />
-                    <TextBox Text="{Binding ID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="5,0,5,0" Grid.Row="1" Grid.Column="1" />
+                    <TextBlock Text="ID:" Grid.Row="1" Grid.Column="0" />
+                    <TextBox Text="{Binding ID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="1" Grid.Column="1" />
 
-                    <TextBlock Text="Parent ID:" Margin="5,5,5,0" Grid.Row="2" Grid.Column="0" />
-                    <TextBox Text="{Binding ParentID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="5,0,5,0" Grid.Row="2" Grid.Column="1" />
+                    <TextBlock Text="Parent ID:" Grid.Row="2" Grid.Column="0" />
+                    <TextBox Text="{Binding ParentID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="2" Grid.Column="1" />
 
-                    <TextBlock Text="Executable:" Margin="5,5,5,0" Grid.Row="3" Grid.Column="0" />
-                    <TextBox Text="{Binding ExecutablePath, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="5,0,5,0" Grid.Row="3" Grid.Column="1" />
+                    <TextBlock Text="Executable:" Grid.Row="3" Grid.Column="0" />
+                    <TextBox Text="{Binding ExecutablePath, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="3" Grid.Column="1" />
                 </Grid>
             </DataTemplate>
+
+            <common:ContentTemplateSelector x:Key="ListingTemplateSelector"
+                                            FileViewArrayTemplate="{StaticResource PreviewAsFileList}"
+                                            ViewItemArrayTemplate="{StaticResource PreviewAsItemList}"
+                                            DefaultTemplate="{StaticResource PreviewAsItemList}"
+                                            />
 
             <common:ContentTemplateSelector x:Key="ContentTemplateSelector"
                                             StringTemplate="{StaticResource PreviewAsString}"
                                             BinaryTemplate="{StaticResource PreviewAsBinary}"
                                             ImageTemplate="{StaticResource PreviewAsImage}"
-                                            FileArrayTemplate="{StaticResource PreviewAsFileList}"
                                             ProcessViewTemplate="{StaticResource PreviewAsProcess}"
-                                            DefaultTemplate="{StaticResource PreviewAsFileList}"
+                                            DefaultTemplate="{StaticResource PreviewImpossible}"
                                             />
         </ResourceDictionary>
     </UserControl.Resources>
@@ -98,20 +135,26 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" MinHeight="100" />
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="70*" />
+            <RowDefinition Height="30*" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="40*" />
+            <ColumnDefinition Width="60*" />
         </Grid.ColumnDefinitions>
 
-        <TextBlock Text="Path:" Margin="4" VerticalAlignment="Center" />
-        <TextBox Text="" Margin="4" Padding="2" Grid.Row="0" Grid.Column="1" />
-        <Button Margin="4" Padding="8,2,8,2" Grid.Row="0" Grid.Column="2" Content="Go"/>
+        <Grid Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Path:" Margin="4" VerticalAlignment="Center" />
+            <TextBox Text="" Margin="4" Padding="2" Grid.Column="1" />
+            <Button Margin="4" Padding="8,2,8,2" Content="Go" Grid.Column="2" />
+        </Grid>
 
-        <TreeView x:Name="treeNavigator" ItemsSource="{Binding Targets}" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3" Margin="0,0,0,12">
+        <TreeView x:Name="treeNavigator" ItemsSource="{Binding Targets}" Grid.Row="1" Grid.Column="0" Margin="0,0,10,10">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
@@ -129,13 +172,21 @@
             </TreeView.Resources>
         </TreeView>
 
-        <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-                      Visibility="{Binding Visibility, ElementName=previewControl, Mode=OneWay}"
+        <!-- folders/processes listing right panel -->
+        <GridSplitter Grid.Row="1" Grid.Column="0"
+                      HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="10" />
+        <ContentControl Content="{Binding SelectedItemListSource.Content, Mode=OneWay}"
+                        Margin="0,0,0,10"
+                        ContentTemplateSelector="{StaticResource ListingTemplateSelector}"
+                        Grid.Row="1" Grid.Column="1" />
+
+        <!-- content preview bottom panel -->
+        <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
                       HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="10" />
-        <ContentControl x:Name="previewControl" Content="{Binding SelectedItem.Content, ElementName=treeNavigator, Mode=OneWay}"
+        <ContentControl Content="{Binding SelectedItem.Content, Mode=OneWay}"
                         Visibility="{Binding SelectedItem.Content, Converter={StaticResource NullToVisibilityConverter}}"
                         Margin="0,6,0,0"
                         ContentTemplateSelector="{StaticResource ContentTemplateSelector}"
-                        Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" />
+                        Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" />
     </Grid>
 </UserControl>

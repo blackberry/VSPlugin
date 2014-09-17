@@ -18,7 +18,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
             _process = process;
             ImageSource = ViewModel.GetIconForProcess();
-            Content = process;
+            Content = this;
         }
 
         #region Properties
@@ -30,17 +30,22 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         public string ID
         {
-            get { return "0x" + _process.ID.ToString("X4"); }
+            get { return "0x" + _process.ID.ToString("X8"); }
         }
 
         public string ParentID
         {
-            get { return "0x" + _process.ParentID.ToString("X4"); }
+            get { return "0x" + _process.ParentID.ToString("X8"); }
         }
 
         public string ExecutablePath
         {
             get { return _process.ExecutablePath; }
+        }
+
+        public override bool IsEnumerable
+        {
+            get { return false; }
         }
 
         #endregion

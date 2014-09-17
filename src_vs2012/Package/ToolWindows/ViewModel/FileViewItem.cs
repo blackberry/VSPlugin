@@ -70,6 +70,16 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             get { return _path == null || _path.NoAccess ? NoAccess : _path.FormattedPermissions; }
         }
 
+        public override bool IsEnumerable
+        {
+            get { return IsDirectory; }
+        }
+
+        public bool IsDirectory
+        {
+            get { return _path != null && _path.IsDirectory; }
+        }
+
         #endregion
 
         protected override void LoadItems()
@@ -85,7 +95,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             else
             {
                 _path = _service.Stat(_path.Path);
-                OnItemsLoaded(new BaseViewItem[0]);
+                OnItemsLoaded(new BaseViewItem[0], this, null);
             }
         }
 
