@@ -111,7 +111,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                     {
                         ViewModel.SelectedItem = this;
                         Selected();
-                        AutoExpand();
+                        //AutoExpand();
                     }
 
                     NotifyPropertyChanged("IsSelected");
@@ -335,6 +335,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         public virtual void ExecuteDefaultAction()
         {
             IsSelected = true;
+            IsExpanded = true;
         }
 
         protected void AdoptItems(IEnumerable<BaseViewItem> items)
