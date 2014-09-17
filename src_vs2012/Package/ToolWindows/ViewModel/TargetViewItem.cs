@@ -90,6 +90,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                     break;
             }
 
+            AdoptItems(items);
             OnItemsLoaded(items, items, e);
         }
 

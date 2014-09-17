@@ -64,11 +64,15 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             get { return _selectedItemListSource; }
             set
             {
-                if (value != null && !value.IsEnumerable)
+                if (value != null)
                 {
-                    if (_selectedItem != value)
+                    if (!value.IsEnumerable)
                     {
-                        value.IsSelected = true;
+                        var newSelected = value is FileToParentViewItem ? value.Parent : value;
+                        if (_selectedItem != newSelected && newSelected != null)
+                        {
+                            newSelected.IsSelected = true;
+                        }
                     }
                 }
 

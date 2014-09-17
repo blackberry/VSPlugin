@@ -57,7 +57,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 }
                 else
                 {
-                    items = ListItems(ViewModel, _service, path, _filter, false, out content);
+                    items = ListItems(ViewModel, _service, path, _filter, true, out content);
                 }
             }
             catch (Exception ex)
@@ -65,6 +65,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 items = new BaseViewItem[] { new MessageViewItem(ViewModel, ex) };
             }
 
+            AdoptItems(content);
             OnItemsLoaded(items, content, null);
         }
 
