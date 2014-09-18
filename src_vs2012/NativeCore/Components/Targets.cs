@@ -184,7 +184,7 @@ namespace BlackBerry.NativeCore.Components
                 {
                     if (Status == TargetStatus.Connected)
                     {
-                        NotifyStatusChange(TargetStatus.Failed, "Lost connection to the device");
+                        NotifyStatusChange(TargetStatus.Disconnected, "Device has been disconnected");
                     }
                     else
                     {
