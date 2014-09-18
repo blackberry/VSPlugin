@@ -11,8 +11,10 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
     public class FileViewItem : BaseViewItem
     {
         private const string NoAccess = "N/A";
+        public const ulong MaxFileSize = 4 * 1024 * 1024;
+
         private readonly TargetServiceFile _service;
-        private TargetFile _path;
+        private readonly TargetFile _path;
         private readonly Predicate<TargetFile> _filter;
 
         public FileViewItem(TargetNavigatorViewModel viewModel, TargetServiceFile service, TargetFile path, Predicate<TargetFile> filter)
@@ -102,7 +104,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         protected override void Selected()
         {
             // if it's not so big file and we have access to open it:
-            if (_path.IsFile && !_path.NoAccess && _path.Size < 4 * 1024 * 1024)
+            if (_path.IsFile && !_path.NoAccess && _path.Size < MaxFileSize)
             {
                 var monitor = _service.PreviewAsync(_path.Path);
                 monitor.Completed += MonitorOnCompleted;
@@ -204,5 +206,11 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         }
 
         #endregion
+
+        protected override string PresentNavigationPath()
+        {
+            var root = GetRoot();
+            return root != null ? root + _path.Path : _path.Path;
+        }
     }
 }

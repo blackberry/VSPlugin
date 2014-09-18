@@ -166,5 +166,16 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         }
 
         #endregion
+
+        /// <summary>
+        /// Navigates over the whole tree of items and selects the one specified.
+        /// </summary>
+        public void NavigateTo(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return;
+
+
+        }
     }
 }

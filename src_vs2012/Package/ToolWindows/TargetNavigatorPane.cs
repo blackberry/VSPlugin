@@ -12,7 +12,7 @@ namespace BlackBerry.Package.ToolWindows
             Caption = "Target Navigator";
 
             var control = new TargetFileSystemNavigatorControl();
-            control.DataContext = new TargetNavigatorViewModel();
+            control.ViewModel = new TargetNavigatorViewModel();
             Content = control;
         }
     }

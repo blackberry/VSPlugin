@@ -150,11 +150,11 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Text="Path:" Margin="4" VerticalAlignment="Center" />
-            <TextBox Text="" Margin="4" Padding="2" Grid.Column="1" />
-            <Button Margin="4" Padding="8,2,8,2" Content="Go" Grid.Column="2" />
+            <TextBox x:Name="NavigationPath" Text="{Binding SelectedItem.NavigationPath, Mode=OneWay}" Margin="4" Padding="2" Grid.Column="1" />
+            <Button Margin="4" Padding="8,2,8,2" Content="Go" Grid.Column="2" Click="NavigateToItem_OnClick" />
         </Grid>
 
-        <TreeView x:Name="treeNavigator" ItemsSource="{Binding Targets}" Grid.Row="1" Grid.Column="0" Margin="0,0,10,10">
+        <TreeView ItemsSource="{Binding Targets}" Grid.Row="1" Grid.Column="0" Margin="0,0,10,10">
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Model;
 
@@ -102,6 +103,19 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             {
                 ImageSource = ViewModel.GetIconForTarget(e.Status == TargetStatus.Connected);
             }
+        }
+
+        protected override string PresentNavigationPath()
+        {
+            return Name + ':';
+        }
+
+        protected override void PresentName(StringBuilder buffer)
+        {
+            if (buffer == null)
+                throw new ArgumentNullException("buffer");
+
+            buffer.Append(Name).Append(':');
         }
 
         #endregion

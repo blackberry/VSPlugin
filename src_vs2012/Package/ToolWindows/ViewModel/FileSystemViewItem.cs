@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
@@ -62,6 +63,8 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             }
             catch (Exception ex)
             {
+                QTraceLog.WriteException(ex);
+
                 items = new BaseViewItem[] { new MessageViewItem(ViewModel, ex) };
             }
 
@@ -156,6 +159,12 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             }
 
             return items;
+        }
+
+        protected override string PresentNavigationPath()
+        {
+            var root = GetRoot();
+            return root != null ? root + Path : Path;
         }
     }
 }

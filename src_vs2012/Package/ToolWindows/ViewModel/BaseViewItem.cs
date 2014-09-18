@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Text;
 using System.Threading;
 using System.Windows;
 using System.Windows.Media;
@@ -21,6 +22,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         private bool _loadedItemsAlready;
         private ImageSource _imageSource;
         private object _content;
+        private string _navigationPath;
 
         protected static readonly BaseViewItem ExpandPlaceholder = new ProgressViewItem(null, "X-X-X");
 
@@ -50,6 +52,17 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         public abstract string Name
         {
             get;
+        }
+
+        public string NavigationPath
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_navigationPath))
+                    _navigationPath = PresentNavigationPath();
+
+                return _navigationPath;
+            }
         }
 
         public ImageSource ImageSource
@@ -132,13 +145,13 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 if (_isActivated != value)
                 {
                     _isActivated = value;
+                    NotifyPropertyChanged("IsActivated");
 
                     if (value)
                     {
                         ViewModel.SelectedItemListSource = this; // try to evaluate
                         Selected();
                     }
-                    NotifyPropertyChanged("IsActivated");
                 }
             }
         }
@@ -368,6 +381,51 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             PropertyChangedEventHandler handler = PropertyChanged;
             if (handler != null)
                 handler(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #endregion
+
+        #region Name Presentation
+
+        /// <summary>
+        /// Gets the top parent of this item.
+        /// It will return null, if current object has no parent.
+        /// </summary>
+        protected BaseViewItem GetRoot()
+        {
+            var root = Parent;
+
+            while (root.Parent != null)
+            {
+                root = root.Parent;
+            }
+
+            return root;
+        }
+
+        protected virtual string PresentNavigationPath()
+        {
+            return null;
+        }
+
+        protected virtual void PresentName(StringBuilder buffer)
+        {
+            if (buffer == null)
+                throw new ArgumentNullException("buffer");
+
+            if (Parent != null)
+            {
+                Parent.PresentName(buffer);
+            }
+
+            buffer.Append('/').Append(Name);
+        }
+
+        public override string ToString()
+        {
+            var buffer = new StringBuilder();
+            PresentName(buffer);
+            return buffer.ToString();
         }
 
         #endregion

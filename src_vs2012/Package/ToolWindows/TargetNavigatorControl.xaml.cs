@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using BlackBerry.Package.ToolWindows.ViewModel;
 
@@ -14,6 +15,16 @@ namespace BlackBerry.Package.ToolWindows
             InitializeComponent();
         }
 
+        #region Properties
+
+        public TargetNavigatorViewModel ViewModel
+        {
+            get { return (TargetNavigatorViewModel) DataContext; }
+            set { DataContext = value; }
+        }
+
+        #endregion
+
         private void ListPreview_OnMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var listView = sender as ListView;
@@ -23,6 +34,11 @@ namespace BlackBerry.Package.ToolWindows
             {
                 item.ExecuteDefaultAction();
             }
+        }
+
+        private void NavigateToItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            ViewModel.NavigateTo(NavigationPath.Text);
         }
     }
 }

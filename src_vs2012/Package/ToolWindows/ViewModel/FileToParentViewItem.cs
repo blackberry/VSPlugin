@@ -55,5 +55,10 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 }
             }
         }
+
+        protected override string PresentNavigationPath()
+        {
+            return Parent != null ? Parent.NavigationPath : string.Empty;
+        }
     }
 }
