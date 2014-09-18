@@ -173,7 +173,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         {
             if (!string.IsNullOrEmpty(path) && path.StartsWith(Path, StringComparison.CurrentCulture))
             {
-                matchingSegments = Count(Path, '/') + (Path[0] == '/' ? 0 : 1);
+                matchingSegments = Path == "/" ? 0 : Count(Path, '/') + (Path[0] == '/' ? 0 : 1);
                 return true;
             }
 
