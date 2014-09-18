@@ -316,7 +316,7 @@ namespace BlackBerry.NativeCore.QConn.Model
                 case TypeSocket:
                     return 's';
                 default:
-                    throw new ArgumentOutOfRangeException("type", "Unrecognized file type");
+                    throw new ArgumentOutOfRangeException("type", "Unrecognized file type (not a file, link nor folder)");
             }
         }
 
