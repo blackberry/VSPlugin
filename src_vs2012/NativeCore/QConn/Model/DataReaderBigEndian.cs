@@ -2,7 +2,12 @@
 
 namespace BlackBerry.NativeCore.QConn.Model
 {
-    public sealed class DataReaderBigEndian : IDataReader
+    /// <summary>
+    /// Class providing reading functionality of strings and numbers extracted from row byte stream of QDataSource.
+    /// It uses little-endian arithmetic. But looks like there is no device nor simulator using it yet.
+    /// PH: TODO: Left stubs for future implementation.
+    /// </summary>
+    sealed class DataReaderBigEndian : IDataReader
     {
         private readonly QDataSource _source;
 

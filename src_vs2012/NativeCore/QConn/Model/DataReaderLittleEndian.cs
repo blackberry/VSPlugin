@@ -5,7 +5,11 @@ using BlackBerry.NativeCore.Helpers;
 
 namespace BlackBerry.NativeCore.QConn.Model
 {
-    public sealed class DataReaderLittleEndian : IDataReader
+    /// <summary>
+    /// Class providing reading functionality of strings and numbers extracted from row byte stream of QDataSource.
+    /// It uses little-endian arithmetic. Both the device and simulator are using this convention.
+    /// </summary>
+    sealed class DataReaderLittleEndian : IDataReader
     {
         private readonly QDataSource _source;
         private byte[] _data;
