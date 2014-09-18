@@ -46,6 +46,11 @@ namespace BlackBerry.NativeCore.QConn.Services
             }
         }
 
+        protected bool IsDisposed
+        {
+            get { return _connection == null; }
+        }
+
         #endregion
 
         /// <summary>

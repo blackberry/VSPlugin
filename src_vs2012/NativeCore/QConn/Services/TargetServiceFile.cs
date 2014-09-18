@@ -112,7 +112,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
 
-            if (!descriptor.IsClosed)
+            if (!descriptor.IsClosed && !IsDisposed)
             {
                 var response = Send("c:" + descriptor.Handle);
                 descriptor.Closed();
