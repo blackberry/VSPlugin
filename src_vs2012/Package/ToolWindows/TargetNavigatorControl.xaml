@@ -36,7 +36,11 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsFileList">
-                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" SelectionMode="Single">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" ContextMenuOpening="OnContextMenuOpening" SelectionMode="Single">
+                    <ListView.ContextMenu>
+                        <!-- This is just a stub, without it, it would be required to right-click twice to show the dynamic context-menu -->
+                        <ContextMenu />
+                    </ListView.ContextMenu>
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">
                             <Setter Property="IsSelected" Value="{Binding IsActivated, Mode=TwoWay}" />
@@ -65,7 +69,11 @@
                 </ListView>
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsItemList">
-                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" SelectionMode="Single">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" ContextMenuOpening="OnContextMenuOpening" SelectionMode="Single">
+                    <ListView.ContextMenu>
+                        <!-- This is just a stub, without it, it would be required to right-click twice to show the dynamic context-menu -->
+                        <ContextMenu />
+                    </ListView.ContextMenu>
                     <ListView.ItemContainerStyle>
                         <Style TargetType="{x:Type ListViewItem}">
                             <Setter Property="IsSelected" Value="{Binding IsActivated, Mode=TwoWay}" />
@@ -132,6 +140,43 @@
                                             ProcessViewTemplate="{StaticResource PreviewAsProcess}"
                                             DefaultTemplate="{StaticResource PreviewImpossible}"
                                             />
+
+            <ContextMenu x:Key="ContextForTarget">
+                <MenuItem Header="Edit..." />
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+                <Separator />
+                <MenuItem Header="Disconnect" Click="DisconnectTarget_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextForProcess">
+                <MenuItem Header="Terminate" IsEnabled="{Binding CanTerminate}" Click="TerminateProcess_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextForFile">
+                <MenuItem Header="Download..." />
+                <MenuItem Header="Download as ZIP..." />
+                <Separator />
+                <MenuItem Header="Delete" />
+                <MenuItem Header="Rename" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextForFolder">
+                <MenuItem Header="Download..." />
+                <MenuItem Header="Download as ZIP..." />
+                <Separator />
+                <MenuItem Header="New folder" />
+                <MenuItem Header="Delete" />
+                <MenuItem Header="Rename" />
+                <Separator />
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextForFileSystem">
+                <MenuItem Header="New folder" />
+                <Separator />
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextRefresh">
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextDefault" />
+
         </ResourceDictionary>
     </UserControl.Resources>
 
@@ -157,7 +202,11 @@
             <Button Margin="4" Padding="8,2,8,2" Content="Go" Grid.Column="2" Click="NavigateToItem_OnClick" />
         </Grid>
 
-        <TreeView ItemsSource="{Binding Targets}" Grid.Row="1" Grid.Column="0" Margin="0,0,10,10">
+        <TreeView ItemsSource="{Binding Targets}" Grid.Row="1" Grid.Column="0" Margin="0,0,10,10" MouseRightButtonUp="TreeView_OnMouseRightButtonUp" ContextMenuOpening="OnContextMenuOpening">
+            <TreeView.ContextMenu>
+                <!-- This is just a stub, without it, it would be required to right-click twice to show the dynamic context-menu -->
+                <ContextMenu />
+            </TreeView.ContextMenu>
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />

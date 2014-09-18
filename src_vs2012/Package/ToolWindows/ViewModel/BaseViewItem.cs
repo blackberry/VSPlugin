@@ -33,6 +33,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         /// </summary>
         public BaseViewItem(TargetNavigatorViewModel viewModel)
         {
+            ContextMenuName = "ContextDefault";
             ViewModel = viewModel;
             Children = new ObservableCollection<BaseViewItem>();
         }
@@ -71,6 +72,15 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
                 return _navigationPath;
             }
+        }
+
+        /// <summary>
+        /// Gets the name of the context-menu that is supposed to be displayed over this item.
+        /// </summary>
+        public string ContextMenuName
+        {
+            get;
+            protected set;
         }
 
         public ImageSource ImageSource

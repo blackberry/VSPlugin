@@ -1,11 +1,9 @@
 ﻿using System.Windows;
-using System.Windows.Forms;
+using System.Windows.Controls;
 using System.Windows.Input;
-using BlackBerry.Package.Helpers;
+using System.Windows.Media;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.Package.ToolWindows.ViewModel;
-using Button = System.Windows.Controls.Button;
-using ListView = System.Windows.Controls.ListView;
-using UserControl = System.Windows.Controls.UserControl;
 
 namespace BlackBerry.Package.ToolWindows
 {
@@ -47,21 +45,91 @@ namespace BlackBerry.Package.ToolWindows
 
         private void TerminateProcess_OnClick(object sender, RoutedEventArgs e)
         {
-            var button = sender as Button;
-            var process = button != null ? button.DataContext as ProcessViewItem : null;
+            var process = GetViewItem(sender) as ProcessViewItem;
 
-            if (process != null && process.CanTerminate)
+            if (process != null)
             {
-                if (MessageBoxHelper.Show(process.Name, "Do you really want to terminate this process?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                process.Terminate();
+            }
+        }
+
+        private void TreeView_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            var item = FindVisualUpward(e.OriginalSource as DependencyObject);
+
+            // select item beneath the mouse, to show respective ContextMenu
+            // (also that's why event is not handled here!)
+            if (item != null)
+            {
+                item.IsSelected = true;
+            }
+        }
+
+        private void OnContextMenuOpening(object sender, ContextMenuEventArgs e)
+        {
+            var treeView = sender as TreeView;
+            var listView = sender as ListView;
+
+            if (treeView != null)
+            {
+                treeView.ContextMenu = GetContextMenu(ViewModel.SelectedItem);
+            }
+
+            if (listView != null)
+            {
+                var item = listView.SelectedItem as BaseViewItem;
+                listView.ContextMenu = GetContextMenu(item ?? ViewModel.SelectedItem);
+            }
+        }
+
+        private static TreeViewItem FindVisualUpward(DependencyObject source)
+        {
+            while (source != null && !(source is TreeViewItem))
+                source = VisualTreeHelper.GetParent(source);
+
+            return source as TreeViewItem;
+        }
+
+        private ContextMenu GetContextMenu(BaseViewItem viewItem)
+        {
+            if (viewItem != null && !string.IsNullOrEmpty(viewItem.ContextMenuName) && Resources.Contains(viewItem.ContextMenuName))
+            {
+                var contextMenu = Resources[viewItem.ContextMenuName] as ContextMenu;
+                if (contextMenu != null)
                 {
-                    if (process.Terminate())
-                    {
-                        if (process.Parent != null)
-                        {
-                            process.Parent.ForceReload();
-                        }
-                    }
+                    contextMenu.DataContext = viewItem;
                 }
+                return contextMenu;
+            }
+
+            return null;
+        }
+
+        private BaseViewItem GetViewItem(object sender)
+        {
+            var element = (sender as FrameworkElement);
+            return element != null ? element.DataContext as BaseViewItem : null;
+            //return ViewModel.SelectedItem;
+        }
+
+        private void DisconnectTarget_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedTarget = GetViewItem(sender) as TargetViewItem;
+
+            if (selectedTarget != null)
+            {
+                // force the specified device to disconnect:
+                Targets.Disconnect(selectedTarget.Device);
+            }
+        }
+
+        private void RefreshItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var item = GetViewItem(sender);
+
+            if (item != null)
+            {
+                item.ForceReload();
             }
         }
     }

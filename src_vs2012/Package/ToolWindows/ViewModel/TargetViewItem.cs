@@ -13,6 +13,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             if (device == null)
                 throw new ArgumentNullException("device");
 
+            ContextMenuName = "ContextForTarget";
             Device = device;
             ImageSource = ViewModel.GetIconForTarget(false);
             AddExpandablePlaceholder();
@@ -74,7 +75,10 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                         };
                     break;
                 case TargetStatus.Disconnected:
-                    items = new BaseViewItem[0];
+                    items = new BaseViewItem[]
+                        {
+                            new MessageViewItem(ViewModel, e.Message)
+                        };
                     Collapse();
                     break;
                 case TargetStatus.Failed:
@@ -102,6 +106,12 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             if (e != null)
             {
                 ImageSource = ViewModel.GetIconForTarget(e.Status == TargetStatus.Connected);
+
+                // force the child-items to be reloaded on next refresh:
+                if (e.Status == TargetStatus.Disconnected)
+                {
+                    InvalidateItems();
+                }
             }
         }
 

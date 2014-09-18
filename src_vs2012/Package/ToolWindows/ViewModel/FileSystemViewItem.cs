@@ -21,6 +21,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             if (service == null)
                 throw new ArgumentNullException("service");
 
+            ContextMenuName = "ContextForFileSystem";
             _name = name;
             _service = service;
             Path = string.IsNullOrEmpty(path) ? "/" : path;

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Windows.Forms;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
+using BlackBerry.Package.Helpers;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
@@ -20,6 +22,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             if (process == null)
                 throw new ArgumentNullException("process");
 
+            ContextMenuName = "ContextForProcess";
             _service = service;
             _process = process;
             ImageSource = ViewModel.GetIconForProcess();
@@ -54,7 +57,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         public bool CanTerminate
         {
-            get { return _process.ExecutablePath != "usr/bin/qconn"; }
+            get { return _process.ExecutablePath != "usr/sbin/qconn"; }
         }
 
         #endregion
@@ -68,7 +71,17 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         {
             if (CanTerminate)
             {
-                _service.Terminate(_process);
+                if (MessageBoxHelper.Show(Name, "Do you really want to terminate this process?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+                {
+                    _service.Terminate(_process);
+
+                    // and force the parent node to reload the items, to make the currently executed one to disappear:
+                    if (Parent != null)
+                    {
+                        Parent.ForceReload();
+                    }
+                }
+
                 return true;
             }
 

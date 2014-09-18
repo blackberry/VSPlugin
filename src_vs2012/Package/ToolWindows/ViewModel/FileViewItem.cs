@@ -31,11 +31,13 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
             if (path.IsDirectory)
             {
+                ContextMenuName = "ContextForFolder";
                 ImageSource = ViewModel.GetIconForFolder(false);
                 AddExpandablePlaceholder();
             }
             else
             {
+                ContextMenuName = "ContextForFile";
                 ImageSource = ViewModel.GetIconForFile(path.Name);
             }
         }

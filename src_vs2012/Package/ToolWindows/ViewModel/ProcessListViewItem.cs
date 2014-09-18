@@ -13,6 +13,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             if (control == null)
                 throw new ArgumentNullException("control");
 
+            ContextMenuName = "ContextRefresh";
             Service = service;
             Control = control;
             ImageSource = ViewModel.GetIconForFolder(false);
