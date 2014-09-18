@@ -33,13 +33,13 @@ namespace BlackBerry.NativeCore.QConn.Model
         private void VerifyData()
         {
             if (_finished)
-                throw new EndOfStreamException("Read all available data");
+                throw new EndOfStreamException("Failed to read all available data");
 
             if (_at >= _data.Length)
             {
                 LoadNextDataBuffer();
                 if (_finished)
-                    throw new EndOfStreamException("Read all available data");
+                    throw new EndOfStreamException("Failed to read all available data");
             }
         }
 
