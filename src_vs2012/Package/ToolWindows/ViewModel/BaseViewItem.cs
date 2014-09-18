@@ -24,6 +24,8 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         private object _content;
         private string _navigationPath;
 
+        public event EventHandler ItemsAvailable;
+
         protected static readonly BaseViewItem ExpandPlaceholder = new ProgressViewItem(null, "X-X-X");
 
         /// <summary>
@@ -44,6 +46,12 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         }
 
         public BaseViewItem Parent
+        {
+            get;
+            set;
+        }
+
+        public object Tag
         {
             get;
             set;
@@ -213,6 +221,12 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 // retrieve items to fill-in the list asynchronously:
                 ThreadPool.QueueUserWorkItem(InternalLoadItems);
             }
+
+            // notify, that items are already in place:
+            if (_loadedItemsAlready)
+            {
+                NotifyItemsAvailable();
+            }
         }
 
         public void Collapse()
@@ -288,6 +302,9 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             InternalUpdateContent(content);
             ItemsCompleted(state);
             _isLoading = false;
+
+            // notify, that new items just appeared:
+            NotifyItemsAvailable();
         }
 
         protected virtual BaseViewItem CreateProgressPlaceholder()
@@ -385,7 +402,14 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         #endregion
 
-        #region Name Presentation
+        protected void NotifyItemsAvailable()
+        {
+            var handler = ItemsAvailable;
+            if (handler != null)
+                handler(this, EventArgs.Empty);
+        }
+
+        #region Navigation
 
         /// <summary>
         /// Gets the top parent of this item.
@@ -407,6 +431,32 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         {
             return null;
         }
+
+        public virtual bool MatchesNavigationSegment(string path, string segment, out int matchingSegments)
+        {
+            matchingSegments = 0;
+            return false;
+        }
+
+        /// <summary>
+        /// Finds matching child item using full path or currently active segment.
+        /// Specified segment is part of the navigation path returned.
+        /// </summary>
+        public BaseViewItem FindByNavigation(string path, string segment, out int matchingSegments)
+        {
+            foreach (var item in Children)
+            {
+                if (item.MatchesNavigationSegment(path, segment, out matchingSegments))
+                    return item;
+            }
+
+            matchingSegments = 0;
+            return null;
+        }
+
+        #endregion
+
+        #region Name Presentation
 
         protected virtual void PresentName(StringBuilder buffer)
         {

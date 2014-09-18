@@ -15,6 +15,85 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
     /// </summary>
     public sealed class TargetNavigatorViewModel : INotifyPropertyChanged
     {
+        #region Internal Classes
+
+        sealed class NavigationArgs
+        {
+            private int _level;
+
+            public NavigationArgs(string path)
+            {
+                if (string.IsNullOrEmpty(path))
+                    throw new ArgumentNullException("path");
+
+                OriginalPath = path;
+                Segments = path.Split('/');
+
+                // move to next segment:
+                Path = path;
+                _level = 0;
+            }
+
+            #region Properties
+
+            public TargetViewItem Target
+            {
+                get;
+                set;
+            }
+
+            public string Path
+            {
+                get;
+                private set;
+            }
+
+            public string OriginalPath
+            {
+                get;
+                private set;
+            }
+
+            public string[] Segments
+            {
+                get;
+                private set;
+            }
+
+            public string Name
+            {
+                get { return _level >= Segments.Length ? null : Segments[_level]; }
+            }
+
+            #endregion
+
+            public bool GoDownThePath()
+            {
+                return GoDownThePath(1);
+            }
+
+            public bool GoDownThePath(int segments)
+            {
+                _level += segments;
+
+                // remove specified number of segments from Path's beginning:
+                if (!string.IsNullOrEmpty(Path) && segments > 0)
+                {
+                    int at = 0;
+                    for (int i = 0; i < segments && at >= 0; i++)
+                    {
+                        at = Path.IndexOf('/', at + 1);
+                    }
+
+                    Path = at > 0 ? Path.Substring(at) : string.Empty;
+                }
+
+                return _level < Segments.Length;
+            }
+        }
+
+        #endregion
+
         private readonly Dictionary<string, ImageSource> _iconCache;
         private BaseViewItem _selectedItem;
         private BaseViewItem _selectedItemListSource;
@@ -170,12 +249,120 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         /// <summary>
         /// Navigates over the whole tree of items and selects the one specified.
         /// </summary>
-        public void NavigateTo(string path)
+        public bool NavigateTo(string path)
         {
             if (string.IsNullOrEmpty(path))
+                return false;
+
+            path = path.Trim();
+            if (SelectedItem != null)
+            {
+                if (string.Compare(path, SelectedItem.NavigationPath, StringComparison.CurrentCulture) == 0)
+                    return false;
+            }
+
+            var navArgs = new NavigationArgs(path);
+            TargetViewItem target = Targets.Count > 0 ? Targets[0] : null;
+
+            // does the path points to the specified target?
+            if (navArgs.Name.EndsWith(":"))
+            {
+                target = FindTarget(navArgs.Name);
+            }
+
+            if (target == null)
+            {
+                // no way to find anything if no targets defined or non-matching name...
+                return false;
+            }
+
+            if (navArgs.GoDownThePath())
+            {
+                navArgs.Target = target;
+                InternalStartNavigateTo(navArgs);
+                return true;
+            }
+
+            // there was only target specified in the path:
+            target.IsSelected = true;
+            target.IsExpanded = true;
+            return true;
+        }
+
+        /// <summary>
+        /// Find target with maching navigation name (the one used in construction of NavigationPath for each child item).
+        /// </summary>
+        private TargetViewItem FindTarget(string navigationName)
+        {
+            foreach (var target in Targets)
+            {
+                if (string.Compare(target.NavigationPath, navigationName, StringComparison.CurrentCultureIgnoreCase) == 0)
+                    return target;
+            }
+
+            return null;
+        }
+
+        private void InternalStartNavigateTo(NavigationArgs e)
+        {
+            if (e == null)
+                throw new ArgumentNullException("e");
+            if (e.Target == null)
+                throw new ArgumentOutOfRangeException("e");
+
+            NavigateTo(e.Target, e);
+        }
+
+        private void NavigateTo(BaseViewItem item, NavigationArgs e)
+        {
+            if (item == null)
+                throw new ArgumentNullException("item");
+
+            item.ItemsAvailable += ViewItemsAvailable;
+            item.Tag = e;
+            item.IsSelected = true;
+            item.IsExpanded = true;
+            item.Refresh(); // continue looking down...
+        }
+
+        private void ViewItemsAvailable(object sender, EventArgs e)
+        {
+            var item = (BaseViewItem) sender;
+            var navArgs = (NavigationArgs) item.Tag;
+
+            // ignore loading progress notifications...
+            if (item.Children.Count == 1 && item.Children[0] is ProgressViewItem)
                 return;
 
+            item.ItemsAvailable -= ViewItemsAvailable;
+            item.Tag = null;
+            if (navArgs == null)
+            {
+                return;
+            }
 
+            // find navigation sub-item:
+            int matchingSegments;
+            var nav = item.FindByNavigation(navArgs.Path, navArgs.Name, out matchingSegments);
+
+            // if we should go down further:
+            if (nav != null)
+            {
+                if (navArgs.GoDownThePath(matchingSegments))
+                {
+                    NavigateTo(nav, navArgs);
+                }
+                else
+                {
+                    nav.IsSelected = true;
+                    nav.IsActivated = true;
+                }
+            }
+            else
+            {
+                item.IsSelected = true;
+                item.IsActivated = true;
+            }
         }
     }
 }

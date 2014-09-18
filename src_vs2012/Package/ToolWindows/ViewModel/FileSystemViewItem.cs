@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
@@ -165,6 +166,36 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         {
             var root = GetRoot();
             return root != null ? root + Path : Path;
+        }
+
+        public override bool MatchesNavigationSegment(string path, string segment, out int matchingSegments)
+        {
+            if (!string.IsNullOrEmpty(path) && path.StartsWith(Path, StringComparison.CurrentCulture))
+            {
+                matchingSegments = Count(Path, '/') + (Path[0] == '/' ? 0 : 1);
+                return true;
+            }
+
+            matchingSegments = 0;
+            return false;
+        }
+
+        /// <summary>
+        /// Counts the occurrences of specified char.
+        /// </summary>
+        private static int Count(string text, char c)
+        {
+            if (string.IsNullOrEmpty(text))
+                return 0;
+
+            int result = 0;
+            for (int i = 0; i < text.Length; i++)
+            {
+                if (text[i] == c)
+                    result++;
+            }
+
+            return result;
         }
     }
 }

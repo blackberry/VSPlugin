@@ -212,5 +212,17 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             var root = GetRoot();
             return root != null ? root + _path.Path : _path.Path;
         }
+
+        public override bool MatchesNavigationSegment(string path, string segment, out int matchingSegments)
+        {
+            if (_path != null && string.Compare(segment, _path.Name, StringComparison.CurrentCulture) == 0)
+            {
+                matchingSegments = 1;
+                return true;
+            }
+
+            matchingSegments = 0;
+            return false;
+        }
     }
 }
