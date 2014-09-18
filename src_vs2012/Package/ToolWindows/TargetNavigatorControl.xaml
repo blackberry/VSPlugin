@@ -95,6 +95,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
@@ -103,16 +104,18 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Text="Name:" Margin="0,0,10,0" VerticalAlignment="Center" />
-                    <TextBox Text="{Binding Name, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="0" Grid.Column="1" Width="Auto" />
+                    <TextBox Text="{Binding Name, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="0" Grid.Column="1" Width="500" HorizontalAlignment="Left" />
 
                     <TextBlock Text="ID:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
-                    <TextBox Text="{Binding ID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="1" Grid.Column="1" />
+                    <TextBox Text="{Binding ID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="1" Grid.Column="1" Width="100" HorizontalAlignment="Left" />
 
                     <TextBlock Text="Parent ID:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
-                    <TextBox Text="{Binding ParentID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="2" Grid.Column="1" />
+                    <TextBox Text="{Binding ParentID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="2" Grid.Column="1" Width="100" HorizontalAlignment="Left" />
 
                     <TextBlock Text="Executable:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
-                    <TextBox Text="{Binding ExecutablePath, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="3" Grid.Column="1" />
+                    <TextBox Text="{Binding ExecutablePath, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="3" Grid.Column="1" Width="700" HorizontalAlignment="Left" />
+
+                    <Button Content="Terminate" IsEnabled="{Binding CanTerminate}" Margin="2" Padding="5" Click="TerminateProcess_OnClick" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" />
                 </Grid>
             </DataTemplate>
 

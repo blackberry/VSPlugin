@@ -235,6 +235,12 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
             IsExpanded = false;
         }
 
+        public void ForceReload()
+        {
+            InvalidateItems();
+            Refresh();
+        }
+
         private void InternalLoadItems(object state)
         {
             try

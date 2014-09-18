@@ -5,13 +5,16 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 {
     public sealed class ProcessListViewItem : BaseViewItem
     {
-        public ProcessListViewItem(TargetNavigatorViewModel viewModel, TargetServiceSysInfo service)
+        public ProcessListViewItem(TargetNavigatorViewModel viewModel, TargetServiceSysInfo service, TargetServiceControl control)
             : base(viewModel)
         {
             if (service == null)
                 throw new ArgumentNullException("service");
+            if (control == null)
+                throw new ArgumentNullException("control");
 
             Service = service;
+            Control = control;
             ImageSource = ViewModel.GetIconForFolder(false);
             AddExpandablePlaceholder();
         }
@@ -24,6 +27,12 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         }
 
         public TargetServiceSysInfo Service
+        {
+            get;
+            private set;
+        }
+
+        public TargetServiceControl Control
         {
             get;
             private set;
@@ -42,7 +51,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
                 items = new BaseViewItem[processes.Length];
                 for (int i = 0; i < processes.Length; i++)
                 {
-                    items[i] = new ProcessViewItem(ViewModel, processes[i]);
+                    items[i] = new ProcessViewItem(ViewModel, Control, processes[i]);
                 }
             }
             catch (Exception ex)
