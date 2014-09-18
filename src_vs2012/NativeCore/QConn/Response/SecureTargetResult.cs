@@ -79,7 +79,7 @@ namespace BlackBerry.NativeCore.QConn.Response
                             case 10:
                                 var message = GetString(result, 10, feedbackLength);
                                 return new SecureTargetFeedbackMismatchedVersion(result, version, code, feedbackCode, message);
-                            case 21:
+                            case 17:
                                 return new SecureTargetFeedbackNoPasswordRequired(result, version, code, feedbackCode);
                             default:
                                 var reason = GetString(result, 10, feedbackLength);

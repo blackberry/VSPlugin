@@ -219,20 +219,24 @@ namespace BlackBerry.NativeCore.QConn
             }
 
             // confirm encrypted channel:
-            Execute(new SecureTargetDecryptedChallengeRequest(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
+            response = Execute(new SecureTargetDecryptedChallengeRequest(decryptedChallenge.DecryptedBlob, decryptedChallenge.Signature, decryptedChallenge.SessionKey));
 
-            // prepare for sending password and ssh-public-key:
-            response = Execute(new SecureTargetAuthenticateChallengeRequest());
-
-            var authenticateResponse = response as SecureTargetAuthenticateChallengeResponse;
-            if (authenticateResponse == null)
+            if (!(response is SecureTargetFeedbackNoPasswordRequired))
             {
-                throw new SecureTargetConnectionException(HResult.InvalidFrameCode, "Authentication negotiation failed");
-            }
+                // prepare for sending password and ssh-public-key:
+                response = Execute(new SecureTargetAuthenticateChallengeRequest());
 
-            // send password-hash:
-            Execute(new SecureTargetAuthenticateRequest(password, authenticateResponse.Algorithm, authenticateResponse.Iterations, authenticateResponse.Salt, authenticateResponse.Challenge, decryptedChallenge.SessionKey));
-            QTraceLog.WriteLine("Successfully authenticated with target credentials.");
+                var authenticateResponse = response as SecureTargetAuthenticateChallengeResponse;
+                if (authenticateResponse == null)
+                {
+                    throw new SecureTargetConnectionException(HResult.InvalidFrameCode, "Authentication negotiation failed");
+                }
+
+                // send password-hash:
+                Execute(new SecureTargetAuthenticateRequest(password, authenticateResponse.Algorithm, authenticateResponse.Iterations, authenticateResponse.Salt, authenticateResponse.Challenge,
+                    decryptedChallenge.SessionKey));
+                QTraceLog.WriteLine("Successfully authenticated with target credentials.");
+            }
 
             // send ssh-key:
             QTraceLog.WriteLine("Sending ssh key to target");
