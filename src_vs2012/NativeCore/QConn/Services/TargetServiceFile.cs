@@ -308,7 +308,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                             }
                             else
                             {
-                                QTraceLog.WriteLine("Unable to load info about path: \"" + itemPath + "\"");
+                                //QTraceLog.WriteLine("Unable to load info about path: \"" + itemPath + "\"");           // PH: for debugging only; this log only duplicates error printouts from Stat() call
 
                                 // add a stub, just to keep the path only (as might have lack permissions to read info):
                                 statInfo = new TargetFile(itemPath, item, false);
