@@ -17,7 +17,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         private const uint ModeOpenCreate = 0x100;
         private const uint ModeOpenTruncate = 0x200;
 
-        internal const int DownloadUploadChunkSize = 8192;
+        internal const int DownloadUploadChunkSize = 48 * 1024;
 
         /// <summary>
         /// Init constructor.
@@ -173,7 +173,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (string.IsNullOrEmpty(responseHeader))
                 throw new QConnException("Unable to retrieve response header");
             var response = Token.Parse(responseHeader);
-            if (response[0].StringValue != "o")
+            if (response[0].StringValue != "o" && response[0].StringValue != "o+")
                 throw new QConnException("Reading failed: " + response[1].StringValue);
 
             ulong contentLength = response[1].UInt64Value;
