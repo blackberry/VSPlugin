@@ -173,5 +173,45 @@ namespace BlackBerry.Package.ToolWindows
                 item.Rename();
             }
         }
+
+        private void DownloadItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var item = GetViewItem(sender) as FileViewItem;
+
+            if (item != null)
+            {
+                item.Download(false);
+            }
+        }
+
+        private void DownloadZipItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var item = GetViewItem(sender) as FileViewItem;
+
+            if (item != null)
+            {
+                item.Download(true);
+            }
+        }
+
+        private void UploadItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var item = GetViewItem(sender) as FileViewItem;
+
+            if (item != null)
+            {
+                item.Upload(false);
+            }
+        }
+
+        private void UploadZipItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var item = GetViewItem(sender) as FileViewItem;
+
+            if (item != null)
+            {
+                item.Upload(true);
+            }
+        }
     }
 }

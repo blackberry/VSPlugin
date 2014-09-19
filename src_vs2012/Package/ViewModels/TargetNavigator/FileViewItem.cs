@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.IO.Packaging;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
@@ -7,6 +8,7 @@ using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 using BlackBerry.NativeCore.QConn.Visitors;
+using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Dialogs;
 using BlackBerry.Package.Helpers;
 
@@ -358,6 +360,70 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             }
 
             return false;
+        }
+
+        public bool Download(bool shouldCompress)
+        {
+            string destinationPath;
+
+            if (_path.IsDirectory && !shouldCompress)
+            {
+                destinationPath = DialogHelper.BrowseForFolder(null, "Location for folder from taget device");
+                if (string.IsNullOrEmpty(destinationPath))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                var form = DialogHelper.SaveZipFile("Downloading from target", _path.Name);
+                form.FilterIndex = shouldCompress ? 0 : 1;
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    destinationPath = form.FileName;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            // initialize download and store monitor for progress reference:
+            try
+            {
+                var monitor = shouldCompress
+                    ? _service.DownloadAsync(_path.Path, new ZipPackageVisitor(destinationPath, CompressionOption.Maximum, destinationPath))
+                    : _service.DownloadAsync(_path.Path, destinationPath, destinationPath);
+
+                monitor.Dispatcher = EventDispatcher.NewForWPF();
+                monitor.Failed += OnDownloadFailed;
+                monitor.Completed += OnDownloadCompleted;
+
+                ViewModel.DownloadStarted(monitor);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Failed to initialize download from: \"{0}\" to \"{1}\"", _path.Path, destinationPath);
+
+                MessageBoxHelper.Show(ex.Message, "Unable to initialize download operation", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        private void OnDownloadCompleted(object sender, VisitorEventArgs e)
+        {
+            MessageBoxHelper.Show("from: " + _path.Path + "\r\n\r\nto: " + e.Tag, "Download has been completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void OnDownloadFailed(object sender, VisitorFailureEventArgs e)
+        {
+            MessageBoxHelper.Show(e.Descriptor.Path, e.UltimateMassage, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        public void Upload(bool extract)
+        {
+            
         }
     }
 }

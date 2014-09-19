@@ -494,27 +494,27 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Downloads files and folders (including whole subtree) from specified location on target and passes them to visitor for further processing.
         /// </summary>
-        public IFileServiceVisitor DownloadAsync(string targetPath, IFileServiceVisitor visitor)
+        public IFileServiceVisitorMonitor DownloadAsync(string targetPath, IFileServiceVisitor visitor)
         {
             if (string.IsNullOrEmpty(targetPath))
                 throw new ArgumentNullException("targetPath");
             if (visitor == null)
                 throw new ArgumentNullException("visitor");
 
-            return EnumerateAsync(new TargetEnumerator(targetPath), visitor);
+            return EnumerateAsync(new TargetEnumerator(targetPath), visitor) as IFileServiceVisitorMonitor;
         }
 
         /// <summary>
         /// Downloads files and folders (including whole subtree) from specified location on target and saves them locally.
         /// </summary>
-        public IFileServiceVisitor DownloadAsync(string targetPath, string localPath)
+        public IFileServiceVisitorMonitor DownloadAsync(string targetPath, string localPath, object tag)
         {
             if (string.IsNullOrEmpty(targetPath))
                 throw new ArgumentNullException("targetPath");
             if (string.IsNullOrEmpty(localPath))
                 throw new ArgumentNullException("localPath");
 
-            return EnumerateAsync(new TargetEnumerator(targetPath), new LocalCopyVisitor(localPath));
+            return EnumerateAsync(new TargetEnumerator(targetPath), new LocalCopyVisitor(localPath, tag)) as IFileServiceVisitorMonitor;
         }
 
         /// <summary>

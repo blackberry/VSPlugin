@@ -6,6 +6,7 @@ using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.QConn.Visitors;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.ViewModels.TargetNavigator;
 
@@ -390,6 +391,11 @@ namespace BlackBerry.Package.ViewModels
                 item.IsSelected = true;
                 item.IsActivated = true;
             }
+        }
+
+        public void DownloadStarted(IFileServiceVisitorMonitor monitor)
+        {
+            
         }
     }
 }

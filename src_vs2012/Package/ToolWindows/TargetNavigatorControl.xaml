@@ -151,15 +151,18 @@
                 <MenuItem Header="Terminate" IsEnabled="{Binding CanTerminate}" Click="TerminateProcess_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForFile">
-                <MenuItem Header="Download..." />
-                <MenuItem Header="Download as ZIP..." />
+                <MenuItem Header="Download..." Click="DownloadItem_OnClick" />
+                <MenuItem Header="Download as ZIP..." Click="DownloadZipItem_OnClick" />
                 <Separator />
                 <MenuItem Header="Delete" Click="DeleteItem_OnClick" />
                 <MenuItem Header="Rename..." Click="RenameItem_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForFolder">
-                <MenuItem Header="Download..." />
-                <MenuItem Header="Download as ZIP..." />
+                <MenuItem Header="Download..." Click="DownloadItem_OnClick" />
+                <MenuItem Header="Download as ZIP..." Click="DownloadZipItem_OnClick" />
+                <Separator />
+                <MenuItem Header="Upload..." Click="UploadItem_OnClick"/>
+                <MenuItem Header="Upload and extract ZIP..." Click="UploadZipItem_OnClick" />
                 <Separator />
                 <MenuItem Header="New folder..." Click="NewFolder_OnClick" />
                 <MenuItem Header="Delete" Click="DeleteItem_OnClick" />

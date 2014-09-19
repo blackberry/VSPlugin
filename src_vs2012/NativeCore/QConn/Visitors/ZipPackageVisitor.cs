@@ -31,6 +31,15 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _compression = compression;
         }
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public ZipPackageVisitor(string fileName, CompressionOption compression, object tag)
+            : this(fileName, compression)
+        {
+            Tag = tag;
+        }
+
         #region IFileServiceVisitor Implementation
 
         public bool IsCancelled
