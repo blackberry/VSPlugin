@@ -3,7 +3,7 @@ using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
-    public sealed class FileToParentViewItem : FileViewItem
+    internal sealed class FileToParentViewItem : FileViewItem
     {
         public FileToParentViewItem(TargetNavigatorViewModel viewModel, TargetServiceFile service)
             : base(viewModel, service, new TargetFile("..", "..", true), null)

@@ -8,7 +8,7 @@ using BlackBerry.NativeCore.QConn.Visitors;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
-    public class FileViewItem : BaseViewItem
+    internal class FileViewItem : BaseViewItem
     {
         private const string NoAccess = "N/A";
         public const ulong MaxFileSize = 4 * 1024 * 1024;

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Text;
+using System.Windows.Forms;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.Package.Dialogs;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
-    public sealed class TargetViewItem : BaseViewItem
+    internal sealed class TargetViewItem : BaseViewItem
     {
         public TargetViewItem(TargetNavigatorViewModel viewModel, DeviceDefinition device)
             : base(viewModel)
@@ -129,5 +131,17 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         }
 
         #endregion
+
+        public void EditProperties()
+        {
+            // show form initialized with current device's data:
+            var form = new DeviceForm("Edit Target Device");
+            form.FromDevice(Device);
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                ViewModel.Update(Device, form.ToDevice());
+            }
+        }
     }
 }

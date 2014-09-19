@@ -596,5 +596,10 @@ namespace BlackBerry.Package.ViewModels
 
             return null;
         }
+
+        public void Update(DeviceDefinition oldDevice, DeviceDefinition newDevice)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

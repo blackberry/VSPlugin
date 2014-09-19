@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.ViewModels;
 
@@ -13,7 +14,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
     /// <summary>
     /// View model class for navigating over file system of the target.
     /// </summary>
-    public sealed class TargetNavigatorViewModel : INotifyPropertyChanged
+    internal sealed class TargetNavigatorViewModel : INotifyPropertyChanged
     {
         #region Internal Classes
 
@@ -94,17 +95,22 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
 
         #endregion
 
+        private readonly PackageViewModel _packageViewModel;
         private readonly Dictionary<string, ImageSource> _iconCache;
         private BaseViewItem _selectedItem;
         private BaseViewItem _selectedItemListSource;
 
-        public TargetNavigatorViewModel()
+        public TargetNavigatorViewModel(PackageViewModel packageViewModel)
         {
+            if (packageViewModel == null)
+                throw new ArgumentNullException("packageViewModel");
+
+            _packageViewModel = packageViewModel;
             _iconCache = new Dictionary<string, ImageSource>();
 
             // initialize target devices:
             Targets = new ObservableCollection<TargetViewItem>();
-            foreach (var target in PackageViewModel.Instance.TargetDevices)
+            foreach (var target in _packageViewModel.TargetDevices)
             {
                 Targets.Add(new TargetViewItem(this, target));
             }
@@ -245,6 +251,19 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
         }
 
         #endregion
+
+        /// <summary>
+        /// Updates info about specified device.
+        /// </summary>
+        public void Update(DeviceDefinition oldDevice, DeviceDefinition newDevice)
+        {
+            if (oldDevice == null)
+                throw new ArgumentNullException("oldDevice");
+            if (newDevice == null)
+                throw new ArgumentNullException("newDevice");
+
+            _packageViewModel.Update(oldDevice, newDevice);
+        }
 
         /// <summary>
         /// Navigates over the whole tree of items and selects the one specified.

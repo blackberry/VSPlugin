@@ -3,7 +3,7 @@ using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
-    public sealed class ProcessListViewItem : BaseViewItem
+    internal sealed class ProcessListViewItem : BaseViewItem
     {
         public ProcessListViewItem(TargetNavigatorViewModel viewModel, TargetServiceSysInfo service, TargetServiceControl control)
             : base(viewModel)

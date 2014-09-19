@@ -13,7 +13,7 @@ namespace BlackBerry.Package.ToolWindows.ViewModel
     /// <summary>
     /// Base class for all view model items.
     /// </summary>
-    public abstract class BaseViewItem : INotifyPropertyChanged
+    internal abstract class BaseViewItem : INotifyPropertyChanged
     {
         private bool _isSelected;
         private bool _isActivated;

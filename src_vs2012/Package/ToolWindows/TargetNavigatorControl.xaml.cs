@@ -19,7 +19,7 @@ namespace BlackBerry.Package.ToolWindows
 
         #region Properties
 
-        public TargetNavigatorViewModel ViewModel
+        internal TargetNavigatorViewModel ViewModel
         {
             get { return (TargetNavigatorViewModel) DataContext; }
             set { DataContext = value; }
@@ -110,6 +110,16 @@ namespace BlackBerry.Package.ToolWindows
             var element = (sender as FrameworkElement);
             return element != null ? element.DataContext as BaseViewItem : null;
             //return ViewModel.SelectedItem;
+        }
+
+        private void EditTarget_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedTarget = GetViewItem(sender) as TargetViewItem;
+
+            if (selectedTarget != null)
+            {
+                selectedTarget.EditProperties();
+            }
         }
 
         private void DisconnectTarget_OnClick(object sender, RoutedEventArgs e)

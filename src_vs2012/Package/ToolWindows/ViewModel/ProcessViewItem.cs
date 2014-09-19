@@ -6,7 +6,7 @@ using BlackBerry.Package.Helpers;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
-    public sealed class ProcessViewItem : BaseViewItem
+    internal sealed class ProcessViewItem : BaseViewItem
     {
         private readonly SystemInfoProcess _process;
         private readonly TargetServiceControl _service;

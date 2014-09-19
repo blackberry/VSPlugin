@@ -1,5 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using BlackBerry.Package.ToolWindows.ViewModel;
+using BlackBerry.Package.ViewModels;
 using Microsoft.VisualStudio.Shell;
 
 namespace BlackBerry.Package.ToolWindows
@@ -12,7 +13,7 @@ namespace BlackBerry.Package.ToolWindows
             Caption = "Target Navigator";
 
             var control = new TargetFileSystemNavigatorControl();
-            control.ViewModel = new TargetNavigatorViewModel();
+            control.ViewModel = new TargetNavigatorViewModel(PackageViewModel.Instance);
             Content = control;
         }
     }

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
-    public sealed class FileSystemViewItem : BaseViewItem
+    internal sealed class FileSystemViewItem : BaseViewItem
     {
         private readonly string _name;
         private readonly TargetServiceFile _service;

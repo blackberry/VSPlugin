@@ -2,7 +2,7 @@
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
-    public sealed class ProgressViewItem : BaseViewItem
+    internal sealed class ProgressViewItem : BaseViewItem
     {
         private readonly string _title;
 

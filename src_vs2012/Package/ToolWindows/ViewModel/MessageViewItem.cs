@@ -2,7 +2,7 @@
 
 namespace BlackBerry.Package.ToolWindows.ViewModel
 {
-    public sealed class MessageViewItem : BaseViewItem
+    internal sealed class MessageViewItem : BaseViewItem
     {
         private readonly string _message;
 
