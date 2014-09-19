@@ -36,6 +36,16 @@ namespace BlackBerry.NativeCore.QConn.Model
             private set;
         }
 
+        public bool CanRead
+        {
+            get { return (Flags & ModeOpenReadOnly) == ModeOpenReadOnly; }
+        }
+
+        public bool CanWrite
+        {
+            get { return (Flags & ModeOpenWriteOnly) == ModeOpenWriteOnly; }
+        }
+
         public bool IsClosed
         {
             get { return _service == null || string.IsNullOrEmpty(Handle); }

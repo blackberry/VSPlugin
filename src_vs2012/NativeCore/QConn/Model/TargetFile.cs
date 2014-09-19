@@ -13,7 +13,7 @@ namespace BlackBerry.NativeCore.QConn.Model
     {
         internal const uint ModeOpenNone = 0;
         internal const uint ModeOpenReadOnly = 1;
-        private const uint ModeOpenWriteOnly = 2;
+        internal const uint ModeOpenWriteOnly = 2;
         internal const uint ModeOpenReadWrite = ModeOpenReadOnly | ModeOpenWriteOnly;
 
         internal const uint TypeMask = 0xFFFF0FFF;
@@ -200,16 +200,6 @@ namespace BlackBerry.NativeCore.QConn.Model
         {
             get;
             private set;
-        }
-
-        public bool CanRead
-        {
-            get { return (Flags & ModeOpenReadOnly) == ModeOpenReadOnly; }
-        }
-
-        public bool CanWrite
-        {
-            get { return (Flags & ModeOpenWriteOnly) == ModeOpenWriteOnly; }
         }
 
         #endregion
