@@ -4,7 +4,7 @@ using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 using BlackBerry.Package.Helpers;
 
-namespace BlackBerry.Package.ToolWindows.ViewModel
+namespace BlackBerry.Package.ViewModels.TargetNavigator
 {
     internal sealed class ProcessViewItem : BaseViewItem
     {

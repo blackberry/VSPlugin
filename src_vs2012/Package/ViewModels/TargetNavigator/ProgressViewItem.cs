@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BlackBerry.Package.ToolWindows.ViewModel
+namespace BlackBerry.Package.ViewModels.TargetNavigator
 {
     internal sealed class ProgressViewItem : BaseViewItem
     {

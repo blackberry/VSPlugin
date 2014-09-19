@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 
-namespace BlackBerry.Package.ToolWindows.ViewModel
+namespace BlackBerry.Package.ViewModels.TargetNavigator
 {
     /// <summary>
     /// Base class for all view model items.

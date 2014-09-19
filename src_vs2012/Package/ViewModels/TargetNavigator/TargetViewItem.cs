@@ -5,7 +5,7 @@ using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Dialogs;
 
-namespace BlackBerry.Package.ToolWindows.ViewModel
+namespace BlackBerry.Package.ViewModels.TargetNavigator
 {
     internal sealed class TargetViewItem : BaseViewItem
     {

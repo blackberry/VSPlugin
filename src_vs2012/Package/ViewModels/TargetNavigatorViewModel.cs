@@ -7,9 +7,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Helpers;
-using BlackBerry.Package.ViewModels;
+using BlackBerry.Package.ViewModels.TargetNavigator;
 
-namespace BlackBerry.Package.ToolWindows.ViewModel
+namespace BlackBerry.Package.ViewModels
 {
     /// <summary>
     /// View model class for navigating over file system of the target.

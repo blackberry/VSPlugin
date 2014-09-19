@@ -3,7 +3,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using BlackBerry.NativeCore.Components;
-using BlackBerry.Package.ToolWindows.ViewModel;
+using BlackBerry.Package.ViewModels;
+using BlackBerry.Package.ViewModels.TargetNavigator;
 
 namespace BlackBerry.Package.ToolWindows
 {

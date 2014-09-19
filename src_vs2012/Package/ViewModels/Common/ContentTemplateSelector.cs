@@ -2,8 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using BlackBerry.NativeCore.QConn.Model;
-using BlackBerry.Package.ToolWindows.ViewModel;
+using BlackBerry.Package.ViewModels.TargetNavigator;
 
 namespace BlackBerry.Package.ViewModels.Common
 {

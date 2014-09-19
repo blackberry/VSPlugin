@@ -6,7 +6,7 @@ using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 using BlackBerry.NativeCore.QConn.Visitors;
 
-namespace BlackBerry.Package.ToolWindows.ViewModel
+namespace BlackBerry.Package.ViewModels.TargetNavigator
 {
     internal class FileViewItem : BaseViewItem
     {

@@ -1,5 +1,4 @@
 ﻿using System.Runtime.InteropServices;
-using BlackBerry.Package.ToolWindows.ViewModel;
 using BlackBerry.Package.ViewModels;
 using Microsoft.VisualStudio.Shell;
 

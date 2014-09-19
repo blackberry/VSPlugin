@@ -4,7 +4,7 @@ using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
-namespace BlackBerry.Package.ToolWindows.ViewModel
+namespace BlackBerry.Package.ViewModels.TargetNavigator
 {
     internal sealed class FileSystemViewItem : BaseViewItem
     {
