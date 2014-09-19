@@ -520,27 +520,27 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Gets a specified collection of files and folders and uploads them to target at specified location.
         /// </summary>
-        public TargetCopyVisitor UploadAsync(IFileServiceEnumerator enumerator, string targetPath)
+        public TargetCopyVisitor UploadAsync(IFileServiceEnumerator enumerator, string targetPath, object tag)
         {
             if (enumerator == null)
                 throw new ArgumentNullException("enumerator");
             if (string.IsNullOrEmpty(targetPath))
                 throw new ArgumentNullException("targetPath");
 
-            return (TargetCopyVisitor) EnumerateAsync(enumerator, new TargetCopyVisitor(targetPath));
+            return (TargetCopyVisitor) EnumerateAsync(enumerator, new TargetCopyVisitor(targetPath, tag));
         }
 
         /// <summary>
         /// Gets collection of files and folders (including whole subtree) from specified location on current desktop machine and uploads them to target at specified location.
         /// </summary>
-        public TargetCopyVisitor UploadAsync(string localPath, string targetPath)
+        public TargetCopyVisitor UploadAsync(string localPath, string targetPath, object tag)
         {
             if (string.IsNullOrEmpty(localPath))
                 throw new ArgumentNullException("localPath");
             if (string.IsNullOrEmpty(targetPath))
                 throw new ArgumentNullException("targetPath");
 
-            return (TargetCopyVisitor) EnumerateAsync(new LocalEnumerator(localPath), new TargetCopyVisitor(targetPath));
+            return (TargetCopyVisitor) EnumerateAsync(new LocalEnumerator(localPath), new TargetCopyVisitor(targetPath, tag));
         }
 
         /// <summary>

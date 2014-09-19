@@ -460,7 +460,7 @@ namespace UnitTests
             Assert.IsNotNull(qclient.FileService);
 
             // upload local folder:
-            var visitor = qclient.FileService.UploadAsync(@"C:\Tools\Putty", "/accounts/1000/shared/misc/titans/123");
+            var visitor = qclient.FileService.UploadAsync(@"C:\Tools\Putty", "/accounts/1000/shared/misc/titans/123", null);
             SetupProgressMonitor(visitor);
 
             Assert.IsNotNull(visitor);

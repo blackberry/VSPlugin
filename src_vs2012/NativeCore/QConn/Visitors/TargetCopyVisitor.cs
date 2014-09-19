@@ -29,6 +29,15 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _outputPath = outputPath;
         }
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public TargetCopyVisitor(string outputPath, object tag)
+            : this(outputPath)
+        {
+            Tag = tag;
+        }
+
         #region IFileServiceVisitor Implementation
 
         public bool IsCancelled
@@ -84,8 +93,16 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
             if (_singleFileDownload)
             {
-                name = _outputPath;
-                relativeName = PathHelper.ExtractName(_outputPath);
+                if (IsPathSeparator(_outputPath, _outputPath.Length - 1))
+                {
+                    name = PathHelper.MakePath(_outputPath, PathHelper.ExtractName(file.Path));
+                    relativeName = _outputPath;
+                }
+                else
+                {
+                    name = _outputPath;
+                    relativeName = PathHelper.ExtractName(_outputPath);
+                }
             }
             else
             {
@@ -149,6 +166,16 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         public void Failure(TargetFile descriptor, Exception ex, string message)
         {
             NotifyFailed(descriptor, ex, message);
+        }
+
+        private static bool IsPathSeparator(string path, int index)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+            if (index < 0 || index > path.Length)
+                return false;
+
+            return path[index] == Path.DirectorySeparatorChar || path[index] == Path.AltDirectorySeparatorChar;
         }
 
         private string GetTargetPath(TargetFile descriptor, out string name)
