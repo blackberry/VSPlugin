@@ -331,32 +331,32 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Create a folder at specified location.
         /// </summary>
-        public TargetFile CreateFolder(string path, uint permissions)
+        public TargetFile CreateFolder(string fullPath, uint permissions)
         {
-            if (string.IsNullOrEmpty(path))
-                throw new ArgumentNullException("path");
+            if (string.IsNullOrEmpty(fullPath))
+                throw new ArgumentNullException("fullPath");
 
             // does it exist?
-            using (var descriptor = Open(path, TargetFile.ModeOpenNone, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, false))
+            using (var descriptor = Open(fullPath, TargetFile.ModeOpenNone, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, false))
             {
                 if (descriptor != null)
                     return descriptor;
             }
 
             // try to create directory:
-            using (var descriptor = Open(path, ModeOpenCreate, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, false))
+            using (var descriptor = Open(fullPath, ModeOpenCreate, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, false))
             {
                 if (descriptor != null)
                     return descriptor;
             }
 
             // if creation failed, maybe some parent folders on the path are missing, try to create them:
-            var parent = CreateFolder(PathHelper.ExtractDirectory(path), permissions);
+            var parent = CreateFolder(PathHelper.ExtractDirectory(fullPath), permissions);
             if (parent == null)
                 throw new QConnException("Failed to create folder");
 
             // try to create directory again throwing exception if failed:
-            using (var descriptor = Open(path, ModeOpenCreate, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, true))
+            using (var descriptor = Open(fullPath, ModeOpenCreate, (permissions & TargetFile.TypeMask) | TargetFile.TypeDirectory, true))
             {
                 return descriptor;
             }
@@ -365,9 +365,27 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Creates a folder at specified location.
         /// </summary>
-        public TargetFile CreateFolder(string path)
+        public TargetFile CreateFolder(string fullPath)
         {
-            return CreateFolder(path, TargetFile.ModePermissionsAll);
+            if (string.IsNullOrEmpty(fullPath))
+                throw new ArgumentNullException("fullPath");
+
+            return CreateFolder(fullPath, TargetFile.ModePermissionsAll);
+        }
+
+        /// <summary>
+        /// Creates new sub-folder at specified location.
+        /// </summary>
+        public TargetFile CreateFolder(TargetFile location, string name)
+        {
+            if (location == null)
+                throw new ArgumentNullException("location");
+            if (location.NoAccess)
+                throw new ArgumentOutOfRangeException("location");
+            if (string.IsNullOrEmpty(name))
+                throw new ArgumentNullException("name");
+
+            return CreateFolder(PathHelper.MakePath(location.Path, name), TargetFile.ModePermissionsAll);
         }
 
         /// <summary>
