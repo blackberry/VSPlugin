@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.Tools;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
@@ -31,6 +32,12 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         #region Properties
 
+        public IEventDispatcher Dispatcher
+        {
+            get;
+            set;
+        }
+
         public object Tag
         {
             get;
@@ -54,10 +61,17 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _lastOperation = TransferOperation.Unknown;
 
             // notify that visiting started:
-            var handler = Started;
-            if (handler != null)
+            if (Dispatcher != null)
             {
-                handler(this, new VisitorEventArgs(Tag));
+                Dispatcher.Invoke(Started, this, new VisitorEventArgs(Tag));
+            }
+            else
+            {
+                var handler = Started;
+                if (handler != null)
+                {
+                    handler(this, new VisitorEventArgs(Tag));
+                }
             }
         }
 
@@ -76,9 +90,16 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             if (_event == null)
                 throw new ObjectDisposedException("BaseVisitorMonitor");
 
-            var handler = Completed;
-            if (handler != null)
-                handler(this, new VisitorEventArgs(Tag));
+            if (Dispatcher != null)
+            {
+                Dispatcher.Invoke(Completed, this, new VisitorEventArgs(Tag));
+            }
+            else
+            {
+                var handler = Completed;
+                if (handler != null)
+                    handler(this, new VisitorEventArgs(Tag));
+            }
 
             _event.Set();
         }
@@ -95,7 +116,16 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 _lastDestination = destination;
                 _lastRelativeName = relativeName;
                 _lastOperation = operation;
-                handler(this, new VisitorProgressChangedEventArgs(source, destination, relativeName, 0, 0, operation, Tag));
+
+                var e = new VisitorProgressChangedEventArgs(source, destination, relativeName, 0, 0, operation, Tag);
+                if (Dispatcher != null)
+                {
+                    Dispatcher.Invoke(ProgressChanged, this, e);
+                }
+                else
+                {
+                    handler(this, e);
+                }
             }
         }
 
@@ -114,7 +144,16 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 if (progress != _lastProgress)
                 {
                     _lastProgress = progress;
-                    handler(this, new VisitorProgressChangedEventArgs(source, _lastDestination, _lastRelativeName, transferred, progress, _lastOperation, Tag));
+
+                    var e = new VisitorProgressChangedEventArgs(source, _lastDestination, _lastRelativeName, transferred, progress, _lastOperation, Tag);
+                    if (Dispatcher != null)
+                    {
+                        Dispatcher.Invoke(ProgressChanged, this, e);
+                    }
+                    else
+                    {
+                        handler(this, e);
+                    }
                 }
             }
         }
@@ -136,7 +175,15 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 _lastRelativeName = null;
                 _lastOperation = TransferOperation.Unknown;
 
-                handler(this, new VisitorProgressChangedEventArgs(source, destination, relativeName, transferred, 100, operation, Tag));
+                var e = new VisitorProgressChangedEventArgs(source, destination, relativeName, transferred, 100, operation, Tag);
+                if (Dispatcher != null)
+                {
+                    Dispatcher.Invoke(ProgressChanged, this, e);
+                }
+                else
+                {
+                    handler(this, e);
+                }
             }
         }
 
@@ -145,10 +192,17 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         /// </summary>
         protected void NotifyFailed(TargetFile descriptor, Exception ex, string message)
         {
-            var handler = Failed;
-            if (handler != null)
+            if (Dispatcher != null)
             {
-                handler(this, new VisitorFailureEventArgs(descriptor, ex, message, Tag));
+                Dispatcher.Invoke(Failed, this, new VisitorFailureEventArgs(descriptor, ex, message, Tag));
+            }
+            else
+            {
+                var handler = Failed;
+                if (handler != null)
+                {
+                    handler(this, new VisitorFailureEventArgs(descriptor, ex, message, Tag));
+                }
             }
         }
 
@@ -179,6 +233,11 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         protected virtual void Dispose(bool disposing)
         {
+            Started = null;
+            ProgressChanged = null;
+            Completed = null;
+            Failed = null;
+
             if (disposing)
             {
                 if (_event != null)

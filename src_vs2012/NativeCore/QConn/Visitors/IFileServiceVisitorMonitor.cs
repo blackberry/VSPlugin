@@ -1,5 +1,6 @@
 ﻿using System;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.Tools;
 
 namespace BlackBerry.NativeCore.QConn.Visitors
 {
@@ -8,6 +9,15 @@ namespace BlackBerry.NativeCore.QConn.Visitors
     /// </summary>
     public interface IFileServiceVisitorMonitor
     {
+        /// <summary>
+        /// Gets or sets the dispatcher object to handle callbacks invocations.
+        /// </summary>
+        IEventDispatcher Dispatcher
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Event triggered, when visiting has started.
         /// </summary>
