@@ -11,12 +11,14 @@ namespace BlackBerry.NativeCore.QConn
     /// </summary>
     public sealed class QDataSource : IDisposable
     {
+        private const string DefaultDescription = "Disconnected";
         private const int Timeout = 10000;
         private const int DefaultChunkSize = 512;
 
         private Socket _socket;
         private byte[] _buffer;
         private readonly int _chunkSize;
+        private string _description;
 
         /// <summary>
         /// Default constructor.
@@ -24,6 +26,7 @@ namespace BlackBerry.NativeCore.QConn
         public QDataSource()
         {
             _chunkSize = DefaultChunkSize;
+            _description = DefaultDescription;
         }
 
         /// <summary>
@@ -35,6 +38,7 @@ namespace BlackBerry.NativeCore.QConn
             if (chunkSize < 0)
                 throw new ArgumentOutOfRangeException("chunkSize");
             _chunkSize = chunkSize == 0 ? DefaultChunkSize : chunkSize;
+            _description = DefaultDescription;
         }
 
         ~QDataSource()
@@ -102,6 +106,7 @@ namespace BlackBerry.NativeCore.QConn
             {
                 try
                 {
+                    _description = DefaultDescription;
                     _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
                     _socket.SendTimeout = Timeout;
                     _socket.ReceiveTimeout = Timeout;
@@ -122,6 +127,7 @@ namespace BlackBerry.NativeCore.QConn
                     if (!success)
                     {
                         _socket.Dispose();
+                        _description = DefaultDescription;
                         QTraceLog.WriteLine("Unable to establish connection to: {0}:{1} with timeout {2} ms", host, port, timeout);
                         return HResult.Fail;
                     }
@@ -129,6 +135,7 @@ namespace BlackBerry.NativeCore.QConn
                     // make sure, the object is listed on the finalizers thread,
                     // in case multiple times connection was opened and closed...
                     GC.ReRegisterForFinalize(this);
+                    _description = host;
                 }
                 catch (Exception ex)
                 {
@@ -327,6 +334,7 @@ namespace BlackBerry.NativeCore.QConn
                     {
                         QTraceLog.WriteException(ex, "Unable to close connection");
                     }
+
                     _socket = null;
                 }
                 _buffer = null;
@@ -334,5 +342,10 @@ namespace BlackBerry.NativeCore.QConn
         }
 
         #endregion
+
+        public override string ToString()
+        {
+            return _description;
+        }
     }
 }

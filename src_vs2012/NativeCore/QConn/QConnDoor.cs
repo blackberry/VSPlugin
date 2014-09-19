@@ -102,6 +102,7 @@ namespace BlackBerry.NativeCore.QConn
 
             // close connection:
             var result = _source.Close();
+            QTraceLog.WriteLine("Disconnected from target {0}", _source);
 
             NotifyAuthenticationChanged(false);
             if (result != HResult.OK)
@@ -317,7 +318,7 @@ namespace BlackBerry.NativeCore.QConn
             var response = InternalSendKeepAlive();
             VerifyResponse(response);
 
-            QTraceLog.WriteLine("Keep-alive confirmed [OK]");
+            QTraceLog.WriteLine("Keep-alive confirmed from {0} - [OK]", _source);
         }
 
         /// <summary>
@@ -376,12 +377,12 @@ namespace BlackBerry.NativeCore.QConn
                 }
 
                 // and notify about failure:
-                QTraceLog.WriteLine("Failed to deliver keep-alive request ({0})", response != null ? response.ToString() : "Connection already closed");
+                QTraceLog.WriteLine("Failed to deliver keep-alive request to target {0} ({1})", _source, response != null ? response.ToString() : "Connection already closed");
                 NotifyAuthenticationChanged(false);
             }
             else
             {
-                QTraceLog.WriteLine("Keep-alive confirmed [OK]");
+                QTraceLog.WriteLine("Keep-alive confirmed from {0} - [OK]", _source);
             }
         }
 
@@ -554,6 +555,7 @@ namespace BlackBerry.NativeCore.QConn
                 Authenticated = null;
             }
         }
+
         #endregion
     }
 }
