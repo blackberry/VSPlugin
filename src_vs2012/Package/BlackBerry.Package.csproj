@@ -352,6 +352,7 @@
     <Compile Include="ViewModels\TargetNavigator\ProcessViewItem.cs" />
     <Compile Include="ViewModels\TargetNavigator\ProgressViewItem.cs" />
     <Compile Include="ViewModels\TargetNavigator\TargetViewItem.cs" />
+    <Compile Include="ViewModels\TargetsChangedEventArgs.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>

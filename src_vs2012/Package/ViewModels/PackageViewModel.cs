@@ -44,6 +44,11 @@ namespace BlackBerry.Package.ViewModels
         private DeviceDefinition _activeSimulator;
         private RuntimeInfo _activeRuntime;
 
+        /// <summary>
+        /// Event fired each time targets collection has been changed.
+        /// </summary>
+        public event EventHandler<TargetsChangedEventArgs> TargetsChanged;
+
         public PackageViewModel()
         {
             _remoteNDKs = new ApiInfoArray[0];
@@ -241,11 +246,25 @@ namespace BlackBerry.Package.ViewModels
             }
             set
             {
-                _targetDevices = value ?? new DeviceDefinition[0];
-                DeviceDefinition.SaveAll(_targetDevices);
+                // ignore constant null assignment:
+                if (value == null && _targetDevices.Length == 0)
+                    return;
 
-                ActiveDevice = DeviceDefinition.Find(_targetDevices, _activeDevice);
-                ActiveSimulator = DeviceDefinition.Find(_targetDevices, _activeSimulator);
+                if (value != _targetDevices)
+                {
+                    _targetDevices = value ?? new DeviceDefinition[0];
+                    DeviceDefinition.SaveAll(_targetDevices);
+
+                    ActiveDevice = DeviceDefinition.Find(_targetDevices, _activeDevice);
+                    ActiveSimulator = DeviceDefinition.Find(_targetDevices, _activeSimulator);
+
+                    // and notify about the change:
+                    var handler = TargetsChanged;
+                    if (handler != null)
+                    {
+                        handler(this, new TargetsChangedEventArgs(_targetDevices));
+                    }
+                }
             }
         }
 
@@ -597,9 +616,31 @@ namespace BlackBerry.Package.ViewModels
             return null;
         }
 
+        /// <summary>
+        /// Updates a single target device inside the collection.
+        /// </summary>
         public void Update(DeviceDefinition oldDevice, DeviceDefinition newDevice)
         {
-            throw new NotImplementedException();
+            var currentDevices = TargetDevices;
+            int replaceAt = DeviceDefinition.IndexOf(currentDevices, oldDevice);
+            DeviceDefinition[] result;
+
+            // add or replace?
+            if (replaceAt < 0)
+            {
+                result = new DeviceDefinition[currentDevices.Length + 1];
+                Array.Copy(currentDevices, 0, result, 0, currentDevices.Length);
+                result[currentDevices.Length] = newDevice;
+            }
+            else
+            {
+                result = new DeviceDefinition[currentDevices.Length];
+                Array.Copy(currentDevices, 0, result, 0, currentDevices.Length);
+                result[replaceAt] = newDevice;
+            }
+
+            // and replace the old list with new one:
+            TargetDevices = result;
         }
     }
 }

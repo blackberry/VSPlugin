@@ -159,6 +159,23 @@ namespace BlackBerry.NativeCore.Model
         }
 
         /// <summary>
+        /// Finds the index of the device, by comparing the object references.
+        /// </summary>
+        public static int IndexOf(DeviceDefinition[] targetDevices, DeviceDefinition device)
+        {
+            if (device == null || targetDevices == null)
+                return -1;
+
+            for (int i = 0; i < targetDevices.Length; i++)
+            {
+                if (ReferenceEquals(targetDevices[i], device))
+                    return i;
+            }
+
+            return -1;
+        }
+
+        /// <summary>
         /// Retrieves device definition from the registry.
         /// </summary>
         public static DeviceDefinition LoadDevice()
