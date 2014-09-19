@@ -90,7 +90,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (_connection != null)
             {

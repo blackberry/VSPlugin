@@ -27,6 +27,17 @@ namespace BlackBerry.NativeCore.QConn.Services
         {
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            if (!IsDisposed)
+            {
+                // disconnect with target service:
+                Post("q");
+            }
+
+            base.Dispose(disposing);
+        }
+
         public override string ToString()
         {
             return "FileService";
@@ -51,6 +62,18 @@ namespace BlackBerry.NativeCore.QConn.Services
                 throw new QConnException("Unable to parse response: \"" + rawResponse + "\" for command: \"" + command + "\"");
 
             return response;
+        }
+
+        /// <summary>
+        /// Sends a command to the target and ignores the response.
+        /// </summary>
+        private void Post(string command)
+        {
+            if (string.IsNullOrEmpty(command))
+                throw new ArgumentNullException("command");
+
+            // send:
+            var rawResponse = Connection.Post(command);
         }
 
         /// <summary>
@@ -200,7 +223,7 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             // send file content:
             var command = string.Concat("w:", descriptor.Handle, ":0:", length.ToString("X"), ":1"); // last 1 means appending
-            var responseContent = Connection.Send(command, data, offset, length);
+            var responseContent = Connection.Send(command, data, offset, length, true);
 
             var response = Token.Parse(responseContent);
             if (response[0].StringValue != "o")
@@ -238,8 +261,11 @@ namespace BlackBerry.NativeCore.QConn.Services
                     }
 
                     // update creation-date, type and size:
-                    var creationTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(response[9].UInt64Value).ToLocalTime();
-                    descriptor.Update(response[5].UInt32Value, response[6].UInt32Value, creationTime, response[10].UInt32Value, response[2].UInt64Value);
+                    if (response.Length > 5)
+                    {
+                        var creationTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(response[9].UInt64Value).ToLocalTime();
+                        descriptor.Update(response[5].UInt32Value, response[6].UInt32Value, creationTime, response[10].UInt32Value, response[2].UInt64Value);
+                    }
                 }
                 return descriptor;
             }
@@ -436,6 +462,17 @@ namespace BlackBerry.NativeCore.QConn.Services
             var response = Send("d:\"" + path + "\":" + flags.ToString("X"));
             if (response[0].StringValue == "e")
                 throw new QConnException("Remove failed: " + response[1].StringValue);
+        }
+
+        /// <summary>
+        /// Removes the whole directory tree.
+        /// </summary>
+        public void RemoveTree(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                throw new ArgumentNullException("path");
+
+            Remove(path, 1u);
         }
 
         /// <summary>

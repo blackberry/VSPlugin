@@ -183,14 +183,23 @@ namespace BlackBerry.NativeCore.QConn
         /// </summary>
         public string Send(string command)
         {
-            return Send(command, null, 0, 0);
+            return Send(command, null, 0, 0, true);
+        }
+
+        /// <summary>
+        /// Sends a command that expects a string response.
+        /// It also does some response validation.
+        /// </summary>
+        public string Post(string command)
+        {
+            return Send(command, null, 0, 0, false);
         }
 
         /// <summary>
         /// Sends a command with data attached that expects a string response.
         /// It also does some response validation.
         /// </summary>
-        public string Send(string command, byte[] data, int offset, int length)
+        public string Send(string command, byte[] data, int offset, int length, bool validateResponse)
         {
             if (_source == null)
                 throw new ObjectDisposedException("QConnConnection");
@@ -220,7 +229,9 @@ namespace BlackBerry.NativeCore.QConn
             // verify response:
             if (string.IsNullOrEmpty(response))
             {
-                throw new QConnException("Unknown response for command \"" + command + "\"");
+                if (validateResponse)
+                    throw new QConnException("Unknown response for command \"" + command + "\"");
+                return response;
             }
 
             if (response.StartsWith("error ", StringComparison.OrdinalIgnoreCase))
