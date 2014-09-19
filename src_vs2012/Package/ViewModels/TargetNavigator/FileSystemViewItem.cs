@@ -95,6 +95,8 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             {
                 try
                 {
+                    TraceLog.WriteLine("Listing folder: {0}", path.Path);
+
                     var files = service.List(path);
 
                     if (filter == null)
@@ -159,6 +161,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
                 }
             }
 
+            // TraceLog.WriteLine("Completed listing folder: {0}", path.Path);
             return items;
         }
 
