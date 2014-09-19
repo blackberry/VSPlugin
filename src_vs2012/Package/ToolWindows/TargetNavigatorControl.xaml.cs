@@ -153,5 +153,25 @@ namespace BlackBerry.Package.ToolWindows
                 item.CreateFolder();
             }
         }
+
+        private void DeleteItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var item = GetViewItem(sender) as FileViewItem;
+
+            if (item != null)
+            {
+                item.Delete();
+            }
+        }
+
+        private void RenameItem_OnClick(object sender, RoutedEventArgs e)
+        {
+            var item = GetViewItem(sender) as FileViewItem;
+
+            if (item != null)
+            {
+                item.Rename();
+            }
+        }
     }
 }

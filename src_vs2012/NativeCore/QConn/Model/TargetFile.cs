@@ -328,6 +328,21 @@ namespace BlackBerry.NativeCore.QConn.Model
             return PathHelper.MakePath(Path, name);
         }
 
+        /// <summary>
+        /// Creates new path assuming that current item should change its name.
+        /// </summary>
+        public string CreateRenamedPath(string newName)
+        {
+            if (string.IsNullOrEmpty(newName))
+                throw new ArgumentNullException("newName");
+
+            if (newName[0] == '/' || newName[0] == '\\')
+            {
+                return newName;
+            }
+            return PathHelper.MakePath(PathHelper.ExtractDirectory(Path), newName);
+        }
+
         #endregion
     }
 }

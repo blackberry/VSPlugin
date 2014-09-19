@@ -3,6 +3,7 @@ using System.IO;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Media.Imaging;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 using BlackBerry.NativeCore.QConn.Visitors;
@@ -280,6 +281,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
                     }
                     catch (Exception ex)
                     {
+                        TraceLog.WriteException(ex, "Unable to create folder \"{0}\" at: \"{1}\"", form.FolderName, location);
                         message = ex.Message;
                     }
 
@@ -290,6 +292,71 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             }
 
             MessageBoxHelper.Show(null, "Missing write permissions at: " + location.Path, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+
+        public bool Delete()
+        {
+            if (_path.NoAccess)
+            {
+                MessageBoxHelper.Show(null, "Missing permissions to delete item at: " + _path.Path, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            if (MessageBoxHelper.Show(_path.Path, "Do you really want to delete this " + (_path.IsDirectory ? "folder" : "file") + "?",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try
+                {
+                    _service.RemoveTree(_path.Path);
+
+                    if (Parent != null)
+                    {
+                        Parent.ForceReload();
+                    }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBoxHelper.Show(ex.Message, null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
+            return false;
+        }
+
+        public bool Rename()
+        {
+            if (_path.NoAccess)
+            {
+                MessageBoxHelper.Show(null, "Missing permissions to rename item at: " + _path.Path, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return false;
+            }
+
+            var form = new FolderForm("Rename " + (_path.IsDirectory ? "Folder" : "File"));
+            form.FolderLocation = _path.Path;
+            form.FolderName = _path.Name;
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    // now, try to predict, what the developer is expecting (only rename or move it via absolute path):
+                    string destinationPath = _path.CreateRenamedPath(form.FolderName);
+                    _service.Move(_path.Path, destinationPath);
+
+                    if (Parent != null)
+                    {
+                        Parent.ForceReload();
+                    }
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    MessageBoxHelper.Show(ex.Message, null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+            }
+
             return false;
         }
     }
