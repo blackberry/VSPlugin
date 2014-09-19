@@ -17,7 +17,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
 
             ContextMenuName = "ContextForTarget";
             Device = device;
-            ImageSource = ViewModel.GetIconForTarget(false);
+            ImageSource = ViewModel.GetIconForTarget(Targets.IsConnected(device));
             AddExpandablePlaceholder();
         }
 

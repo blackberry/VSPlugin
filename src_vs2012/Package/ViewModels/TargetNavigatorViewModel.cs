@@ -105,15 +105,14 @@ namespace BlackBerry.Package.ViewModels
             if (packageViewModel == null)
                 throw new ArgumentNullException("packageViewModel");
 
-            _packageViewModel = packageViewModel;
+            Targets = new ObservableCollection<TargetViewItem>();
             _iconCache = new Dictionary<string, ImageSource>();
 
+            _packageViewModel = packageViewModel;
+            _packageViewModel.TargetsChanged += OnTargetsChanged;
+
             // initialize target devices:
-            Targets = new ObservableCollection<TargetViewItem>();
-            foreach (var target in _packageViewModel.TargetDevices)
-            {
-                Targets.Add(new TargetViewItem(this, target));
-            }
+            OnTargetsChanged(null, new TargetsChangedEventArgs(_packageViewModel.TargetDevices));
         }
 
         #region Properties
@@ -177,6 +176,15 @@ namespace BlackBerry.Package.ViewModels
         }
 
         #endregion
+
+        private void OnTargetsChanged(object sender, TargetsChangedEventArgs e)
+        {
+            Targets.Clear();
+            foreach (var target in e.TargetDevices)
+            {
+                Targets.Add(new TargetViewItem(this, target));
+            }
+        }
 
         public ImageSource GetIconForTarget(bool connected)
         {
