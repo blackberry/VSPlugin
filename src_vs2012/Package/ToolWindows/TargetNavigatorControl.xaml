@@ -10,6 +10,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <common:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <common:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
             <common:BinaryToStringConverter x:Key="BinaryToStringConverter" />
 
             <DataTemplate x:Key="PreviewImpossible">
@@ -161,8 +162,8 @@
                 <MenuItem Header="Download..." Click="DownloadItem_OnClick" />
                 <MenuItem Header="Download as ZIP..." Click="DownloadZipItem_OnClick" />
                 <Separator />
-                <MenuItem Header="Upload..." Click="UploadItem_OnClick"/>
-                <MenuItem Header="Upload and extract ZIP..." Click="UploadZipItem_OnClick" />
+                <MenuItem Header="Upload file..." Click="UploadFile_OnClick" />
+                <MenuItem Header="Upload folder..." Click="UploadFolder_OnClick"/>
                 <Separator />
                 <MenuItem Header="New folder..." Click="NewFolder_OnClick" />
                 <MenuItem Header="Delete" Click="DeleteItem_OnClick" />
@@ -221,7 +222,7 @@
                     <StackPanel Orientation="Horizontal">
                         <Image Source="{Binding ImageSource, Mode=OneWay}" Margin="2" Width="16" Height="16" Stretch="None" VerticalAlignment="Center"
                                Visibility="{Binding ImageSource, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}"/>
-                        <TextBlock Text="{Binding Name, Mode=OneWay}" Margin="4,2,2,2" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding Name, Mode=OneWay}" Margin="2,2,4,2" VerticalAlignment="Center" />
                     </StackPanel>
                 </HierarchicalDataTemplate>
             </TreeView.Resources>
@@ -243,5 +244,29 @@
                         Margin="0,6,0,0"
                         ContentTemplateSelector="{StaticResource ContentTemplateSelector}"
                         Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" />
+        
+        <!-- download progress - overlapping the content preview -->
+        <ItemsControl ItemsSource="{Binding DownloadUpload, Mode=OneWay}" Visibility="{Binding DownloadUpload.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}"
+                      Background="#FFFFE1" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Top" Width="Auto"
+                      Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Padding="5">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" Width="300" />
+                        <TextBlock Text="{Binding Text, Mode=OneWay}" HorizontalAlignment="Center" />
+                        <Button Content="Cancel" Margin="5,0,0,0" Grid.Column="1" Click="CancelDownloadUpload" />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
     </Grid>
 </UserControl>

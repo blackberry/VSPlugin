@@ -10,11 +10,12 @@ namespace BlackBerry.NativeCore.QConn.Visitors
     public interface IFileServiceVisitor
     {
         /// <summary>
-        /// Gets the indication, if visitor wants to stop further processing.
+        /// Gets or sets the indication, if visitor wants to stop further processing.
         /// </summary>
         bool IsCancelled
         {
             get;
+            set;
         }
 
         /// <summary>

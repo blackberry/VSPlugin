@@ -107,6 +107,7 @@ namespace BlackBerry.Package.ViewModels
                 throw new ArgumentNullException("packageViewModel");
 
             Targets = new ObservableCollection<TargetViewItem>();
+            DownloadUpload = new ObservableCollection<DownloadUploadProgress>();
             _iconCache = new Dictionary<string, ImageSource>();
 
             _packageViewModel = packageViewModel;
@@ -119,6 +120,12 @@ namespace BlackBerry.Package.ViewModels
         #region Properties
 
         public ObservableCollection<TargetViewItem> Targets
+        {
+            get;
+            private set;
+        }
+
+        public ObservableCollection<DownloadUploadProgress> DownloadUpload
         {
             get;
             private set;
@@ -393,9 +400,32 @@ namespace BlackBerry.Package.ViewModels
             }
         }
 
-        public void DownloadStarted(IFileServiceVisitorMonitor monitor)
+        public void DownloadStarted(IFileServiceVisitorMonitor monitor, IFileServiceVisitor visitor)
         {
-            
+            if (monitor == null)
+                throw new ArgumentNullException("monitor");
+            if (visitor == null)
+                throw new ArgumentNullException("visitor");
+
+            DownloadUpload.Add(new DownloadUploadProgress(this, monitor, visitor));
+        }
+
+        public void UploadStarted(TargetCopyVisitor monitor, IFileServiceVisitor visitor)
+        {
+            if (monitor == null)
+                throw new ArgumentNullException("monitor");
+            if (visitor == null)
+                throw new ArgumentNullException("visitor");
+
+            DownloadUpload.Add(new DownloadUploadProgress(this, monitor, visitor));
+        }
+
+        public void DownloadUploadFinished(DownloadUploadProgress progress)
+        {
+            if (progress == null)
+                throw new ArgumentNullException("progress");
+
+            DownloadUpload.Remove(progress);
         }
     }
 }

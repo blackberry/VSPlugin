@@ -194,7 +194,7 @@ namespace BlackBerry.Package.ToolWindows
             }
         }
 
-        private void UploadItem_OnClick(object sender, RoutedEventArgs e)
+        private void UploadFolder_OnClick(object sender, RoutedEventArgs e)
         {
             var item = GetViewItem(sender) as FileViewItem;
 
@@ -204,13 +204,24 @@ namespace BlackBerry.Package.ToolWindows
             }
         }
 
-        private void UploadZipItem_OnClick(object sender, RoutedEventArgs e)
+        private void UploadFile_OnClick(object sender, RoutedEventArgs e)
         {
             var item = GetViewItem(sender) as FileViewItem;
 
             if (item != null)
             {
                 item.Upload(true);
+            }
+        }
+
+        private void CancelDownloadUpload(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            var context = button != null ? button.DataContext as DownloadUploadProgress : null;
+
+            if (context != null)
+            {
+                context.Cancel();
             }
         }
     }

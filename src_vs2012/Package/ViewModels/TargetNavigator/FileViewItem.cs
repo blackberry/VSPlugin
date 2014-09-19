@@ -394,12 +394,12 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
                 var monitor = shouldCompress
                     ? _service.DownloadAsync(_path.Path, new ZipPackageVisitor(destinationPath, CompressionOption.Maximum, destinationPath))
                     : _service.DownloadAsync(_path.Path, destinationPath, destinationPath);
+                ViewModel.DownloadStarted(monitor, monitor as IFileServiceVisitor);
 
                 monitor.Dispatcher = EventDispatcher.NewForWPF();
                 monitor.Failed += OnDownloadFailed;
                 monitor.Completed += OnDownloadCompleted;
 
-                ViewModel.DownloadStarted(monitor);
                 return true;
             }
             catch (Exception ex)
@@ -413,7 +413,8 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
 
         private void OnDownloadCompleted(object sender, VisitorEventArgs e)
         {
-            MessageBoxHelper.Show("from: " + _path.Path + "\r\n\r\nto: " + e.Tag, "Download has been completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var destinationPath = e.Tag.ToString();
+            MessageBoxHelper.Show("from: " + _path.Path + "\r\n\r\nto: " + destinationPath, "Download has been completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void OnDownloadFailed(object sender, VisitorFailureEventArgs e)
@@ -421,9 +422,67 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             MessageBoxHelper.Show(e.Descriptor.Path, e.UltimateMassage, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        public void Upload(bool extract)
+        public bool Upload(bool asFile)
         {
-            
+            string sourcePath;
+
+            if (_path.IsDirectory && !asFile)
+            {
+                sourcePath = DialogHelper.BrowseForFolder(null, "Folder to upload to taget device");
+                if (string.IsNullOrEmpty(sourcePath))
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                var form = DialogHelper.OpenZipFile("Uploading to target");
+                form.FilterIndex = 1;
+
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    sourcePath = form.FileName;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            // initialize uploading and store monitor for progress reference:
+            try
+            {
+                var monitor = _service.UploadAsync(sourcePath, _path.Path + '/', sourcePath);
+                ViewModel.UploadStarted(monitor, monitor as IFileServiceVisitor);
+
+                monitor.Dispatcher = EventDispatcher.NewForWPF();
+                monitor.Failed += OnUploadFailed;
+                monitor.Completed += OnUploadCompleted;
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Failed to initialize upload from: \"{0}\" to \"{1}\"", sourcePath, _path.Path);
+
+                MessageBoxHelper.Show(ex.Message, "Unable to initialize upload operation", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return false;
+            }
+        }
+
+        private void OnUploadCompleted(object sender, VisitorEventArgs e)
+        {
+            ForceReload();
+
+            var sourcePath = e.Tag.ToString();
+            MessageBoxHelper.Show("from: " + sourcePath + "\r\n\r\nto: " + _path.Path, "Upload has been completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void OnUploadFailed(object sender, VisitorFailureEventArgs e)
+        {
+            ForceReload();
+
+            MessageBoxHelper.Show(e.Descriptor.Path, e.UltimateMassage, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }

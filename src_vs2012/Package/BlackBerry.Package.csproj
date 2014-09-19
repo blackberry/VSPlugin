@@ -342,6 +342,7 @@
     <Compile Include="ViewModels\Common\BinaryToStringConverter.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ViewModels\Common\CountToVisibilityConverter.cs" />
     <Compile Include="ViewModels\Common\ContentTemplateSelector.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -350,6 +351,7 @@
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetNavigatorViewModel.cs" />
     <Compile Include="ViewModels\TargetNavigator\BaseViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\DownloadUploadProgress.cs" />
     <Compile Include="ViewModels\TargetNavigator\FileSystemViewItem.cs" />
     <Compile Include="ViewModels\TargetNavigator\FileToParentViewItem.cs" />
     <Compile Include="ViewModels\TargetNavigator\FileViewItem.cs" />
