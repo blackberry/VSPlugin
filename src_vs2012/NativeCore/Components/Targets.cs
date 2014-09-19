@@ -559,5 +559,32 @@ namespace BlackBerry.NativeCore.Components
 
             return false;
         }
+
+        /// <summary>
+        /// Forces disconnection for all kwnon devices that are *outside* of this list.
+        /// </summary>
+        public static void DisconnectIfOutside(DeviceDefinition[] devices)
+        {
+            if (devices != null)
+            {
+                var toDisconnect = new List<TargetInfo>();
+                lock (_sync)
+                {
+                    foreach (var target in _activeTargets)
+                    {
+                        if (!DeviceDefinition.ContainsWithIP(devices, target.Device.IP))
+                        {
+                            toDisconnect.Add(target);
+                        }
+                    }
+                }
+
+                // and now... disconnect them:
+                foreach (var target in toDisconnect)
+                {
+                    Disconnect(target.Device);
+                }
+            }
+        }
     }
 }

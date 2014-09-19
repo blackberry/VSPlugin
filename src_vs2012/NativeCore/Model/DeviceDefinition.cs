@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Helpers;
 using Microsoft.Win32;
 
@@ -156,6 +157,25 @@ namespace BlackBerry.NativeCore.Model
                     return d;
 
             return null;
+        }
+
+        /// <summary>
+        /// Checks, if specified collection contains device with known IP.
+        /// </summary>
+        public static bool ContainsWithIP(DeviceDefinition[] devices, string ip)
+        {
+            if (string.IsNullOrEmpty(ip))
+                return false;
+            if (devices == null)
+                return false;
+
+            foreach (var device in devices)
+            {
+                if (device.HasIdenticalIP(ip))
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>

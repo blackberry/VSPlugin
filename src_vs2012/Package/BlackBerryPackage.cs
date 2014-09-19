@@ -19,6 +19,7 @@ using System.Runtime.InteropServices;
 using System.ComponentModel.Design;
 using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
@@ -182,6 +183,9 @@ namespace BlackBerry.Package
                     }
                 };
 
+            // inform Targets, that list of target-devices has been changed and maybe it should force some disconnections:
+            PackageViewModel.Instance.TargetsChanged += (s, e) => Targets.DisconnectIfOutside(e.TargetDevices);
+
             // Create Editor Factory. Note that the base Package class will call Dispose on it.
             RegisterEditorFactory(new BarDescriptorEditorFactory());
             TraceLog.WriteLine(" * registered editors");
@@ -192,7 +196,7 @@ namespace BlackBerry.Package
 
             // Add our command handlers for menu (commands must exist in the .vsct file)
             OleMenuCommandService mcs = GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if ( null != mcs )
+            if (mcs != null)
             {
                 // Create command for the 'Options...' menu
                 CommandID optionsCommandID = new CommandID(GuidList.guidVSNDK_PackageCmdSet, PackageCommands.cmdidBlackBerryOptions);
