@@ -14,7 +14,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
         public const ulong MaxFileSize = 4 * 1024 * 1024;
 
         private readonly TargetServiceFile _service;
-        private readonly TargetFile _path;
+        private TargetFile _path;
         private readonly Predicate<TargetFile> _filter;
 
         public FileViewItem(TargetNavigatorViewModel viewModel, TargetServiceFile service, TargetFile path, Predicate<TargetFile> filter)
@@ -98,9 +98,19 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             }
             else
             {
-                //_path = _service.Stat(_path.Path);
+                _path = _service.Stat(_path.Path);
                 OnItemsLoaded(new BaseViewItem[0], null, null);
             }
+        }
+
+        protected override void ItemsCompleted(object state)
+        {
+            // since we might did reloaded the file/folder info:
+            NotifyPropertyChanged("CreationTime");
+            NotifyPropertyChanged("Size");
+            NotifyPropertyChanged("Owner");
+            NotifyPropertyChanged("Group");
+            NotifyPropertyChanged("Permissions");
         }
 
         protected override void Selected()
