@@ -327,20 +327,10 @@
     <Compile Include="Registration\DebugEngineRegistrationAttribute.cs" />
     <Compile Include="Registration\XmlEditorDesignerViewRegistrationAttribute.cs" />
     <Compile Include="StandardCommands.cs" />
-    <Compile Include="ToolWindows\ViewModel\BaseViewItem.cs" />
-    <Compile Include="ToolWindows\ViewModel\FileToParentViewItem.cs" />
-    <Compile Include="ToolWindows\ViewModel\FileViewItem.cs" />
-    <Compile Include="ToolWindows\ViewModel\MessageViewItem.cs" />
-    <Compile Include="ToolWindows\ViewModel\ProcessListViewItem.cs" />
-    <Compile Include="ToolWindows\ViewModel\ProcessViewItem.cs" />
-    <Compile Include="ToolWindows\ViewModel\ProgressViewItem.cs" />
     <Compile Include="ToolWindows\TargetNavigatorControl.xaml.cs">
       <DependentUpon>TargetNavigatorControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="ToolWindows\TargetNavigatorPane.cs" />
-    <Compile Include="ToolWindows\ViewModel\FileSystemViewItem.cs" />
-    <Compile Include="ToolWindows\ViewModel\TargetNavigatorViewModel.cs" />
-    <Compile Include="ToolWindows\ViewModel\TargetViewItem.cs" />
     <Compile Include="ViewModels\ApiLevelOptionViewModel.cs" />
     <Compile Include="ViewModels\BarEditorViewModel.cs" />
     <Compile Include="ViewModels\Common\BinaryToStringConverter.cs">
@@ -352,6 +342,16 @@
     <Compile Include="ViewModels\Common\NullToVisibilityConverter.cs" />
     <Compile Include="ViewModels\PackageViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
+    <Compile Include="ViewModels\TargetNavigatorViewModel.cs" />
+    <Compile Include="ViewModels\TargetNavigator\BaseViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\FileSystemViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\FileToParentViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\FileViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\MessageViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\ProcessListViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\ProcessViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\ProgressViewItem.cs" />
+    <Compile Include="ViewModels\TargetNavigator\TargetViewItem.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
