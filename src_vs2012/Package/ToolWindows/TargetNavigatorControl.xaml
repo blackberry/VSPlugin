@@ -161,21 +161,21 @@
                 <MenuItem Header="Download..." />
                 <MenuItem Header="Download as ZIP..." />
                 <Separator />
-                <MenuItem Header="New folder" />
+                <MenuItem Header="New folder" Click="NewFolder_OnClick" />
                 <MenuItem Header="Delete" />
                 <MenuItem Header="Rename" />
                 <Separator />
                 <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForFileSystem">
-                <MenuItem Header="New folder" />
-                <Separator />
                 <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextRefresh">
                 <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
             </ContextMenu>
-            <ContextMenu x:Key="ContextDefault" />
+            <ContextMenu x:Key="ContextDefault">
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+            </ContextMenu>
 
         </ResourceDictionary>
     </UserControl.Resources>

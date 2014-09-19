@@ -1,10 +1,13 @@
 ﻿using System;
 using System.IO;
 using System.Text;
+using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 using BlackBerry.NativeCore.QConn.Visitors;
+using BlackBerry.Package.Dialogs;
+using BlackBerry.Package.Helpers;
 
 namespace BlackBerry.Package.ViewModels.TargetNavigator
 {
@@ -234,6 +237,59 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             }
 
             matchingSegments = 0;
+            return false;
+        }
+
+        public void CreateFolder()
+        {
+            if (CreateNewFolder(_service, _path))
+            {
+                ForceReload();
+            }
+        }
+
+        /// <summary>
+        /// Creates new folder at specified location. It will ask via UI about the name etc.
+        /// </summary>
+        public static bool CreateNewFolder(TargetServiceFile service, TargetFile location)
+        {
+            if (service == null)
+                throw new ArgumentNullException("service");
+            if (location == null)
+                throw new ArgumentNullException("location");
+
+            // do we have access to this folder?
+            if (!location.NoAccess && location.IsDirectory)
+            {
+                var form = new FolderForm("New Folder");
+                form.FolderLocation = location.Path;
+
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    string message = null;
+
+                    try
+                    {
+                        var folder = service.CreateFolder(location, form.FolderName);
+
+                        if (folder != null)
+                        {
+                            // ok, did it!
+                            return true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        message = ex.Message;
+                    }
+
+                    MessageBoxHelper.Show(message, "Unable to create folder \"" + form.FolderName + "\" at specified location.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+
+                return false;
+            }
+
+            MessageBoxHelper.Show(null, "Missing write permissions at: " + location.Path, MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return false;
         }
     }
