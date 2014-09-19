@@ -27,6 +27,15 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _outputPath = outputPath;
         }
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public LocalCopyVisitor(string outputPath, object tag)
+            : this(outputPath)
+        {
+            Tag = tag;
+        }
+
         #region IFileServiceVisitor Implementation
 
         public bool IsCancelled
@@ -54,12 +63,6 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 // copying folder, so get parent folder, to remember where is the root, to make processed paths of each received file or folder shorter
                 _singleFileDownload = false;
                 _basePath = PathHelper.ExtractDirectory(descriptor.Path);
-
-                // make sure path ends with '\\':
-                if (!string.IsNullOrEmpty(_basePath) && _basePath[_basePath.Length - 1] != Path.DirectorySeparatorChar && _basePath[_basePath.Length - 1] != Path.AltDirectorySeparatorChar)
-                {
-                    _basePath += Path.DirectorySeparatorChar;
-                }
             }
         }
 
@@ -144,10 +147,20 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
 
-            name = descriptor.Path.StartsWith(_basePath) ? descriptor.Path.Substring(_basePath.Length) : descriptor.Path;
+            name = descriptor.Path.StartsWith(_basePath) ? descriptor.Path.Substring(_basePath.Length + (IsPathSeparator(descriptor.Path, _basePath.Length) ? 1 : 0)) : descriptor.Path;
             name = name.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar);
 
             return Path.Combine(_outputPath, name);
+        }
+
+        private bool IsPathSeparator(string path, int index)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+            if (index < 0 || index >= path.Length)
+                return false;
+
+            return path[index] == Path.DirectorySeparatorChar || path[index] == Path.AltDirectorySeparatorChar;
         }
 
         #endregion
