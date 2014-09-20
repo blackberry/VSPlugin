@@ -258,11 +258,11 @@
                 <DataTemplate>
                     <Grid Margin="5">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="300" MaxWidth="300" MinWidth="300" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" Width="300" />
-                        <TextBlock Text="{Binding Text, Mode=OneWay}" HorizontalAlignment="Center" />
+                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" ToolTip="{Binding Percent, Mode=OneWay}" Width="300" />
+                        <TextBlock Text="{Binding Text, Mode=OneWay}" HorizontalAlignment="Center" ToolTip="{Binding Percent, Mode=OneWay}" />
                         <Button Content="Cancel" Margin="5,0,0,0" Grid.Column="1" Click="CancelDownloadUpload" />
                     </Grid>
                 </DataTemplate>
