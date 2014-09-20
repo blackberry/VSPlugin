@@ -404,6 +404,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\ZipPackageVisitor.cs">
       <Link>QConn\Visitors\ZipPackageVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Services\IDeviceDiscoveryService.cs">
+      <Link>Services\IDeviceDiscoveryService.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\ApiLevelListLoadRunner.cs">
       <Link>Tools\ApiLevelListLoadRunner.cs</Link>
     </Compile>
