@@ -376,8 +376,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             }
             else
             {
-                var form = DialogHelper.SaveZipFile("Downloading from target", _path.Name);
-                form.FilterIndex = shouldCompress ? 0 : 1;
+                var form = shouldCompress ? DialogHelper.SaveZipFile("Downloading from target", _path.Name) : DialogHelper.SaveAnyFile("Downloading from target", _path.Name);
                 if (form.ShowDialog() == DialogResult.OK)
                 {
                     destinationPath = form.FileName;
@@ -436,8 +435,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             }
             else
             {
-                var form = DialogHelper.OpenZipFile("Uploading to target");
-                form.FilterIndex = 1;
+                var form = DialogHelper.OpenAnyFile("Uploading to target");
 
                 if (form.ShowDialog() == DialogResult.OK)
                 {

@@ -132,7 +132,7 @@ namespace BlackBerry.Package.Helpers
         {
             var saveFile = new SaveFileDialog();
             saveFile.Title = title;
-            saveFile.FileName = fileName;
+            saveFile.FileName = string.IsNullOrEmpty(fileName) ? string.Empty : Path.ChangeExtension(fileName, ".zip");
             saveFile.DefaultExt = ".zip";
             saveFile.Filter = "Zip files|*.zip|All files|*.*";
             saveFile.FilterIndex = 0;
@@ -142,6 +142,38 @@ namespace BlackBerry.Package.Helpers
             return saveFile;
         }
 
+        /// <summary>
+        /// Returns preconfigured window for opening ANY files.
+        /// </summary>
+        public static OpenFileDialog OpenAnyFile(string title)
+        {
+            var openFile = new OpenFileDialog();
+            openFile.Title = title;
+            openFile.DefaultExt = ".bar";
+            openFile.Filter = "All files|*.*";
+            openFile.FilterIndex = 1;
+            openFile.CheckFileExists = true;
+            openFile.CheckPathExists = true;
+
+            return openFile;
+        }
+
+        /// <summary>
+        /// Returns preconfigured window for saving ANY file.
+        /// </summary>
+        public static SaveFileDialog SaveAnyFile(string title, string fileName)
+        {
+            var saveFile = new SaveFileDialog();
+            saveFile.Title = title;
+            saveFile.FileName = fileName;
+            saveFile.DefaultExt = string.Empty;
+            saveFile.Filter = "All files|*.*";
+            saveFile.FilterIndex = 1;
+            saveFile.CreatePrompt = false;
+            saveFile.OverwritePrompt = true;
+
+            return saveFile;
+        }
 
         /// <summary>
         /// Opens Windows Explorer window with specified path.
