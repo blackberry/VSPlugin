@@ -40,12 +40,6 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         #region IFileServiceVisitor Implementation
 
-        public bool IsCancelled
-        {
-            get;
-            set;
-        }
-
         public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
             if (service == null)
@@ -95,8 +89,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             {
                 if (IsPathSeparator(_outputPath, _outputPath.Length - 1))
                 {
-                    name = PathHelper.MakePath(_outputPath, PathHelper.ExtractName(file.Path));
-                    relativeName = _outputPath;
+                    relativeName = PathHelper.ExtractName(file.Path);
+                    name = PathHelper.MakePath(_outputPath, relativeName);
                 }
                 else
                 {

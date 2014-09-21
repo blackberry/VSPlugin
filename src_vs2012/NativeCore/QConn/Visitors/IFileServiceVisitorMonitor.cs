@@ -10,6 +10,15 @@ namespace BlackBerry.NativeCore.QConn.Visitors
     public interface IFileServiceVisitorMonitor
     {
         /// <summary>
+        /// Gets or sets the indication, if visitor wants to stop further processing.
+        /// </summary>
+        bool IsCancelled
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Gets or sets the dispatcher object to handle callbacks invocations.
         /// </summary>
         IEventDispatcher Dispatcher

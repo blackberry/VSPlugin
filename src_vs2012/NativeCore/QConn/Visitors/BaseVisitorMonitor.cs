@@ -32,6 +32,15 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         #region Properties
 
+        /// <summary>
+        /// Gets or sets the indication, if visitor wants to stop further processing.
+        /// </summary>
+        public bool IsCancelled
+        {
+            get;
+            set;
+        }
+
         public IEventDispatcher Dispatcher
         {
             get;

@@ -400,24 +400,20 @@ namespace BlackBerry.Package.ViewModels
             }
         }
 
-        public void DownloadStarted(IFileServiceVisitorMonitor monitor, IFileServiceVisitor visitor)
+        public void DownloadStarted(IFileServiceVisitorMonitor monitor)
         {
             if (monitor == null)
                 throw new ArgumentNullException("monitor");
-            if (visitor == null)
-                throw new ArgumentNullException("visitor");
 
-            DownloadUpload.Add(new DownloadUploadProgress(this, monitor, visitor));
+            DownloadUpload.Add(new DownloadUploadProgress(this, monitor));
         }
 
-        public void UploadStarted(TargetCopyVisitor monitor, IFileServiceVisitor visitor)
+        public void UploadStarted(TargetCopyVisitor monitor)
         {
             if (monitor == null)
                 throw new ArgumentNullException("monitor");
-            if (visitor == null)
-                throw new ArgumentNullException("visitor");
 
-            DownloadUpload.Add(new DownloadUploadProgress(this, monitor, visitor));
+            DownloadUpload.Add(new DownloadUploadProgress(this, monitor));
         }
 
         public void DownloadUploadFinished(DownloadUploadProgress progress)

@@ -393,7 +393,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
                 var monitor = shouldCompress
                     ? _service.DownloadAsync(_path.Path, new ZipPackageVisitor(destinationPath, CompressionOption.Maximum, destinationPath))
                     : _service.DownloadAsync(_path.Path, destinationPath, destinationPath);
-                ViewModel.DownloadStarted(monitor, monitor as IFileServiceVisitor);
+                ViewModel.DownloadStarted(monitor);
 
                 monitor.Dispatcher = EventDispatcher.NewForWPF();
                 monitor.Failed += OnDownloadFailed;
@@ -451,7 +451,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             try
             {
                 var monitor = _service.UploadAsync(sourcePath, _path.Path + '/', sourcePath);
-                ViewModel.UploadStarted(monitor, monitor as IFileServiceVisitor);
+                ViewModel.UploadStarted(monitor);
 
                 monitor.Dispatcher = EventDispatcher.NewForWPF();
                 monitor.Failed += OnUploadFailed;

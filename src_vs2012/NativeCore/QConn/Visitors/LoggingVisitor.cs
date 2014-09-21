@@ -13,12 +13,6 @@ namespace BlackBerry.NativeCore.QConn.Visitors
     {
         #region Properties
 
-        public bool IsCancelled
-        {
-            get;
-            set;
-        }
-
         public uint FilesCount
         {
             get;

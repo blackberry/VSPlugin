@@ -13,23 +13,19 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
     {
         private readonly TargetNavigatorViewModel _viewModel;
         private readonly IFileServiceVisitorMonitor _monitor;
-        private readonly IFileServiceVisitor _visitor;
 
         private string _text;
         private int _percent;
 
-        internal DownloadUploadProgress(TargetNavigatorViewModel viewModel, IFileServiceVisitorMonitor monitor, IFileServiceVisitor visitor)
+        internal DownloadUploadProgress(TargetNavigatorViewModel viewModel, IFileServiceVisitorMonitor monitor)
         {
             if (viewModel == null)
                 throw new ArgumentNullException("viewModel");
             if (monitor == null)
                 throw new ArgumentNullException("monitor");
-            if (visitor == null)
-                throw new ArgumentNullException("visitor");
 
             _viewModel = viewModel;
             _monitor = monitor;
-            _visitor = visitor;
 
             _monitor.Started += OnStarted;
             _monitor.Completed += OnCompleted;
@@ -108,7 +104,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
 
         public void Cancel()
         {
-            _visitor.IsCancelled = true;
+            _monitor.IsCancelled = true;
         }
     }
 }

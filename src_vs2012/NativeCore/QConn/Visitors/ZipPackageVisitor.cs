@@ -43,12 +43,6 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
         #region IFileServiceVisitor Implementation
 
-        public bool IsCancelled
-        {
-            get;
-            set;
-        }
-
         public void Begin(TargetServiceFile service, TargetFile descriptor)
         {
             Reset();
