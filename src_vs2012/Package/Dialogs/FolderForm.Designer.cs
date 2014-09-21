@@ -105,7 +105,6 @@
             // bttOK
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.bttOK.Location = new System.Drawing.Point(426, 124);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
