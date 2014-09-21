@@ -266,6 +266,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TransferOperation.cs">
       <Link>QConn\Model\TransferOperation.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\VisitorCompletionEventArgs.cs">
+      <Link>QConn\Model\VisitorCompletionEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\VisitorEventArgs.cs">
       <Link>QConn\Model\VisitorEventArgs.cs</Link>
     </Compile>

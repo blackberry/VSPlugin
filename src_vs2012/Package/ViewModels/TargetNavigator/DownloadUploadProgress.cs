@@ -1,8 +1,10 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Visitors;
+using BlackBerry.Package.Helpers;
 
 namespace BlackBerry.Package.ViewModels.TargetNavigator
 {
@@ -104,7 +106,10 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
 
         public void Cancel()
         {
-            _monitor.IsCancelled = true;
+            if (MessageBoxHelper.Show("Do you want to cancel this transfer operation?", null, MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                _monitor.IsCancelled = true;
+            }
         }
     }
 }

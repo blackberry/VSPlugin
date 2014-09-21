@@ -8,8 +8,6 @@
         Unknown,
         Buffering,
         Downloading,
-        Uploading,
-        Zipping,
-        Unzipping
+        Uploading
     }
 }

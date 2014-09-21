@@ -16,6 +16,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         private string _lastDestination;
         private string _lastRelativeName;
         private TransferOperation _lastOperation;
+        private TransferOperation _firstOperation;
+        private int _filesTransferred;
 
         /// <summary>
         /// Default constructor.
@@ -68,6 +70,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
             _lastDestination = null;
             _lastRelativeName = null;
             _lastOperation = TransferOperation.Unknown;
+            _firstOperation = TransferOperation.Unknown;
+            _filesTransferred = 0;
 
             // notify that visiting started:
             if (Dispatcher != null)
@@ -89,7 +93,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         public event EventHandler<VisitorEventArgs> Started;
         public event EventHandler<VisitorProgressChangedEventArgs> ProgressChanged;
         public event EventHandler<VisitorFailureEventArgs> Failed;
-        public event EventHandler<VisitorEventArgs> Completed;
+        public event EventHandler<VisitorCompletionEventArgs> Completed;
 
         /// <summary>
         /// Notifies subscribed listeners, that visitor finished its task and arms the wait-event.
@@ -101,13 +105,13 @@ namespace BlackBerry.NativeCore.QConn.Visitors
 
             if (Dispatcher != null)
             {
-                Dispatcher.Invoke(Completed, this, new VisitorEventArgs(Tag));
+                Dispatcher.Invoke(Completed, this, new VisitorCompletionEventArgs(Tag, _firstOperation, IsCancelled, _filesTransferred));
             }
             else
             {
                 var handler = Completed;
                 if (handler != null)
-                    handler(this, new VisitorEventArgs(Tag));
+                    handler(this, new VisitorCompletionEventArgs(Tag, _firstOperation, IsCancelled, _filesTransferred));
             }
 
             _event.Set();
@@ -118,6 +122,11 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         /// </summary>
         protected void NotifyProgressNew(TargetFile source, string destination, string relativeName, TransferOperation operation)
         {
+            if (_firstOperation == TransferOperation.Unknown)
+            {
+                _firstOperation = operation;
+            }
+
             var handler = ProgressChanged;
             if (handler != null)
             {
@@ -172,6 +181,8 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         /// </summary>
         protected void NotifyProgressDone(TargetFile source, ulong transferred)
         {
+            _filesTransferred++;
+
             var handler = ProgressChanged;
             if (handler != null && _lastProgress != 100)
             {

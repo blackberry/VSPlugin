@@ -410,15 +410,37 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             }
         }
 
-        private void OnDownloadCompleted(object sender, VisitorEventArgs e)
+        private void OnDownloadCompleted(object sender, VisitorCompletionEventArgs e)
         {
-            var destinationPath = e.Tag.ToString();
-            MessageBoxHelper.Show("from: " + _path.Path + "\r\n\r\nto: " + destinationPath, "Download has been completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            var monitor = (IFileServiceVisitorMonitor) sender;
+            monitor.Failed -= OnDownloadFailed;
+            monitor.Completed -= OnDownloadCompleted;
+
+            ShowCompletionDialog(e);
         }
 
         private void OnDownloadFailed(object sender, VisitorFailureEventArgs e)
         {
             MessageBoxHelper.Show(e.Descriptor.Path, e.UltimateMassage, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void ShowCompletionDialog(VisitorCompletionEventArgs e)
+        {
+            var localPath = e.Tag.ToString();
+            string countMessage = e.FileCount > 1 ? "\r\n\r\nTransferred " + e.FileCount + " files." : string.Empty;
+
+            if (e.Operation == TransferOperation.Downloading)
+            {
+                MessageBoxHelper.Show(string.Concat("from: ", _path.Path, "\r\n\r\nto: ", localPath, countMessage),
+                    string.Concat("Download has been ", e.WasCancelled ? "cancelled" : "completed"),
+                    MessageBoxButtons.OK, e.WasCancelled ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+            }
+            else
+            {
+                MessageBoxHelper.Show(string.Concat("from: ", localPath, "\r\n\r\nto: ", _path.Path, countMessage),
+                    string.Concat("Upload has been ", e.WasCancelled ? "cancelled" : "completed"),
+                    MessageBoxButtons.OK, e.WasCancelled ? MessageBoxIcon.Warning : MessageBoxIcon.Information);
+            }
         }
 
         public bool Upload(bool asFile)
@@ -468,12 +490,14 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             }
         }
 
-        private void OnUploadCompleted(object sender, VisitorEventArgs e)
+        private void OnUploadCompleted(object sender, VisitorCompletionEventArgs e)
         {
-            ForceReload();
+            var monitor = (IFileServiceVisitorMonitor) sender;
+            monitor.Failed -= OnUploadFailed;
+            monitor.Completed -= OnUploadCompleted;
 
-            var sourcePath = e.Tag.ToString();
-            MessageBoxHelper.Show("from: " + sourcePath + "\r\n\r\nto: " + _path.Path, "Upload has been completed", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ForceReload();
+            ShowCompletionDialog(e);
         }
 
         private void OnUploadFailed(object sender, VisitorFailureEventArgs e)

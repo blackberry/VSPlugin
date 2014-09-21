@@ -80,7 +80,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
                 throw new InvalidOperationException("Unable to create package part to store file content");
 
             _currentStream = _currentPart.GetStream();
-            NotifyProgressNew(file, DecodeNameForProgress(shortName), null, TransferOperation.Zipping);
+            NotifyProgressNew(file, DecodeNameForProgress(shortName), null, TransferOperation.Downloading);
         }
 
         private static string DecodeNameForProgress(string path)

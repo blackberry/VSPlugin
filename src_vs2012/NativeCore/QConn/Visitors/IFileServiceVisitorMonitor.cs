@@ -45,7 +45,7 @@ namespace BlackBerry.NativeCore.QConn.Visitors
         /// <summary>
         /// Event triggered, when visiting finished.
         /// </summary>
-        event EventHandler<VisitorEventArgs> Completed;
+        event EventHandler<VisitorCompletionEventArgs> Completed;
 
         /// <summary>
         /// Waits until visiting is not fully completed.
