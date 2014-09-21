@@ -490,6 +490,69 @@
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\BlackBerryMessager.bmp">
+      <Link>Resources\Permissions\BlackBerryMessager.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Calendar.bmp">
+      <Link>Resources\Permissions\Calendar.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Camera.bmp">
+      <Link>Resources\Permissions\Camera.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\CaptureScreen.bmp">
+      <Link>Resources\Permissions\CaptureScreen.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Contacts.bmp">
+      <Link>Resources\Permissions\Contacts.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\DeviceIdentifyingInfo.bmp">
+      <Link>Resources\Permissions\DeviceIdentifyingInfo.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\EmailPINMessages.bmp">
+      <Link>Resources\Permissions\EmailPINMessages.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Gamepad.bmp">
+      <Link>Resources\Permissions\Gamepad.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\GPSLocation.bmp">
+      <Link>Resources\Permissions\GPSLocation.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Internet.bmp">
+      <Link>Resources\Permissions\Internet.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Location.bmp">
+      <Link>Resources\Permissions\Location.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Mircrophone.bmp">
+      <Link>Resources\Permissions\Mircrophone.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\MyContactInfo.bmp">
+      <Link>Resources\Permissions\MyContactInfo.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Notebooks.bmp">
+      <Link>Resources\Permissions\Notebooks.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Phone.bmp">
+      <Link>Resources\Permissions\Phone.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\PhoneControl.bmp">
+      <Link>Resources\Permissions\PhoneControl.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\PostNotifications.bmp">
+      <Link>Resources\Permissions\PostNotifications.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Push.bmp">
+      <Link>Resources\Permissions\Push.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\RunBackgrounded.bmp">
+      <Link>Resources\Permissions\RunBackgrounded.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\SharedFiles.bmp">
+      <Link>Resources\Permissions\SharedFiles.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\TextMessages.bmp">
+      <Link>Resources\Permissions\TextMessages.bmp</Link>
+    </Resource>
     <Resource Include="..\..\src_vs2012\Package\Resources\Navigator\folder_closed.png">
       <Link>Resources\Navigator\folder_closed.png</Link>
     </Resource>
@@ -603,36 +666,9 @@
     <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xss">
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
     </None>
-    <Resource Include="..\..\src_vs2010\Package\Resources\BlackBerryMessager.bmp">
-      <Link>Resources\BlackBerryMessager.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Calendar.bmp">
-      <Link>Resources\Calendar.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Camera.bmp">
-      <Link>Resources\Camera.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\CaptureScreen.bmp">
-      <Link>Resources\CaptureScreen.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Contacts.bmp">
-      <Link>Resources\Contacts.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\DeviceIdentifyingInfo.bmp">
-      <Link>Resources\DeviceIdentifyingInfo.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\EmailPINMessages.bmp">
-      <Link>Resources\EmailPINMessages.bmp</Link>
-    </Resource>
     <Content Include="..\..\src_vs2010\Package\Resources\File.ico">
       <Link>Resources\File.ico</Link>
     </Content>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Gamepad.bmp">
-      <Link>Resources\Gamepad.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\GPSLocation.bmp">
-      <Link>Resources\GPSLocation.bmp</Link>
-    </Resource>
     <Resource Include="..\..\src_vs2010\Package\Resources\Images_24bit.bmp">
       <Link>Resources\Images_24bit.bmp</Link>
     </Resource>
@@ -645,45 +681,9 @@
     <Resource Include="..\..\src_vs2010\Package\Resources\info.png">
       <Link>Resources\info.png</Link>
     </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Internet.bmp">
-      <Link>Resources\Internet.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Location.bmp">
-      <Link>Resources\Location.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Mircrophone.bmp">
-      <Link>Resources\Mircrophone.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\MyContactInfo.bmp">
-      <Link>Resources\MyContactInfo.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Notebooks.bmp">
-      <Link>Resources\Notebooks.bmp</Link>
-    </Resource>
     <Content Include="..\..\src_vs2010\Package\Resources\Package.ico">
       <Link>Resources\Package.ico</Link>
     </Content>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Phone.bmp">
-      <Link>Resources\Phone.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\PhoneControl.bmp">
-      <Link>Resources\PhoneControl.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\PostNotifications.bmp">
-      <Link>Resources\PostNotifications.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Push.bmp">
-      <Link>Resources\Push.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\RunBackgrounded.bmp">
-      <Link>Resources\RunBackgrounded.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\SharedFiles.bmp">
-      <Link>Resources\SharedFiles.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\TextMessages.bmp">
-      <Link>Resources\TextMessages.bmp</Link>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Strings.resx">

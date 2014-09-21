@@ -419,76 +419,75 @@ namespace BlackBerry.Package.ViewModels
         /// <summary>
         /// Given the permission ID return the appropriate Icon
         /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
         internal static string GetPermissionIcon(string id)
         {
             string retVal = "";
+            string prefix = "/BlackBerry.Package;component/Resources/Permissions/";
 
             switch (id)
             {
                 case "bbm_connect":
-                    retVal = "/BlackBerry.Package;component/Resources/BlackBerryMessager.bmp";
+                    retVal = prefix + "BlackBerryMessager.bmp";
                     break;
                 case "access_pimdomain_calendars":
-                    retVal = "/BlackBerry.Package;component/Resources/Calendar.bmp";
+                    retVal = prefix + "Calendar.bmp";
                     break;
                 case "use_camera":
-                    retVal = "/BlackBerry.Package;component/Resources/Camera.bmp";
+                    retVal = prefix + "Camera.bmp";
                     break;
                 case "access_pimdomain_contacts":
-                    retVal = "/BlackBerry.Package;component/Resources/Contacts.bmp";
+                    retVal = prefix + "Contacts.bmp";
                     break;
                 case "read_device_identifying_information":
-                    retVal = "/BlackBerry.Package;component/Resources/DeviceIdentifyingInfo.bmp";
+                    retVal = prefix + "DeviceIdentifyingInfo.bmp";
                     break;
                 case "access_pimdomain_messages":
-                    retVal = "/BlackBerry.Package;component/Resources/EmailPINMessages.bmp";
+                    retVal = prefix + "EmailPINMessages.bmp";
                     break;
                 case "access_internet":
-                    retVal = "/BlackBerry.Package;component/Resources/Internet.bmp";
+                    retVal = prefix + "Internet.bmp";
                     break;
                 case "read_geolocation":
-                    retVal = "/BlackBerry.Package;component/Resources/GPSLocation.bmp";
+                    retVal = prefix + "GPSLocation.bmp";
                     break;
                 case "access_location_services":
-                    retVal = "/BlackBerry.Package;component/Resources/Location.bmp";
+                    retVal = prefix + "Location.bmp";
                     break;
                 case "record_audio":
-                    retVal = "/BlackBerry.Package;component/Resources/Mircrophone.bmp";
+                    retVal = prefix + "Mircrophone.bmp";
                     break;
                 case "access_pimdomain_notebooks":
-                    retVal = "/BlackBerry.Package;component/Resources/Notebooks.bmp";
+                    retVal = prefix + "Notebooks.bmp";
                     break;
                 case "post_notification":
-                    retVal = "/BlackBerry.Package;component/Resources/PostNotifications.bmp";
+                    retVal = prefix + "PostNotifications.bmp";
                     break;
                 case "run_when_backgrounded":
-                    retVal = "/BlackBerry.Package;component/Resources/RunBackgrounded.bmp";
+                    retVal = prefix + "RunBackgrounded.bmp";
                     break;
                 case "access_shared":
-                    retVal = "/BlackBerry.Package;component/Resources/SharedFiles.bmp";
+                    retVal = prefix + "SharedFiles.bmp";
                     break;
                 case "access_sms_mms":
-                    retVal = "/BlackBerry.Package;component/Resources/TextMessages.bmp";
+                    retVal = prefix + "TextMessages.bmp";
                     break;
                 case "read_personally_identifiable_information":
-                    retVal = "/BlackBerry.Package;component/Resources/MyContactInfo.bmp";
+                    retVal = prefix + "MyContactInfo.bmp";
                     break;
                 case "access_phone":
-                    retVal = "/BlackBerry.Package;component/Resources/Phone.bmp";
+                    retVal = prefix + "Phone.bmp";
                     break;
                 case "control_phone":
-                    retVal = "/BlackBerry.Package;component/Resources/PhoneControl.bmp";
+                    retVal = prefix + "PhoneControl.bmp";
                     break;
                 case "_sys_use_consumer_push":
-                    retVal = "/BlackBerry.Package;component/Resources/Push.bmp";
+                    retVal = prefix + "Push.bmp";
                     break;
                 case "use_camera_desktop":
-                    retVal = "/BlackBerry.Package;component/Resources/CaptureScreen.bmp";
+                    retVal = prefix + "CaptureScreen.bmp";
                     break;
                 case "use_gamepad":
-                    retVal = "/BlackBerry.Package;component/Resources/Gamepad.bmp";
+                    retVal = prefix + "Gamepad.bmp";
                     break;
             }
 
