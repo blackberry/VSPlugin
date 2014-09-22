@@ -103,7 +103,7 @@ namespace BlackBerry.Package
     [ProvideToolWindow(typeof(TargetNavigatorPane), Style = VsDockStyle.Tabbed, MultiInstances = false)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService
     {
-        public const string VersionString = "2.1.2014.711";
+        public const string VersionString = "2.1.2014.922";
         public const string OptionsCategoryName = "BlackBerry";
 
         private BlackBerryPaneTraceListener _mainTraceWindow;
