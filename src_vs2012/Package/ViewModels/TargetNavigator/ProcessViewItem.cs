@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows.Forms;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
 using BlackBerry.Package.Helpers;
@@ -73,7 +74,15 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             {
                 if (MessageBoxHelper.Show(Name, "Do you really want to terminate this process?", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
                 {
-                    _service.Terminate(_process);
+                    try
+                    {
+                        _service.Terminate(_process);
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteException(ex, "Failure, trying to terminate: {0} (0x{1:X8}", _process.Name, _process.ID);
+                        MessageBoxHelper.Show(Name, "Unable to terminate the process.\r\n" + ex.Message, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
 
                     // and force the parent node to reload the items, to make the currently executed one to disappear:
                     if (Parent != null)

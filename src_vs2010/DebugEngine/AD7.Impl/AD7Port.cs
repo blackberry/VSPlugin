@@ -138,6 +138,10 @@ namespace BlackBerry.DebugEngine
             //var processesRequest = GdbWrapper.ListProcesses(NDK, Device);
             //processesRequest.Processes... 
 
+            ////////////////////////////////////////////////////////
+            // "the new way" is using a dedicated separate connection to the device,
+            // that servers extra data for IDEs:
+
             // get QConnClient and connect to the device, if not yet connected:
             SystemInfoProcess[] processes = null;
 
