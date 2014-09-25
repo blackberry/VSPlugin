@@ -548,6 +548,11 @@
       <Project>{59a7b188-e307-4495-a3af-4ed76b086a87}</Project>
       <Name>BlackBerry.DebugEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GDBHost\BlackBerry.GDBHost.vcxproj">
+      <Project>{9A560339-44DB-413F-868C-403962C2CF01}</Project>
+      <Name>BlackBerry.GDBHost</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{faddd789-6cb5-4f9d-8481-1c0c72e5f19f}</Project>
       <Name>BlackBerry.NativeCore</Name>
