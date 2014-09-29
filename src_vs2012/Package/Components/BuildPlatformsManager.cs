@@ -710,12 +710,23 @@ namespace BlackBerry.Package.Components
                 {
                     foreach (Project project in projects)
                     {
-                        var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
-                        if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
+                        if (IsBlackBerryProject(project))
                             return true;
                     }
                 }
             }
+
+            return false;
+        }
+
+        public bool IsBlackBerryProject(Project project)
+        {
+            if (project == null)
+                return false;
+
+            var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
+            if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
+                return true;
 
             return false;
         }

@@ -544,8 +544,24 @@ namespace BlackBerry.Package
 
         string IAttachDiscoveryService.FindExecutable(ProcessInfo process)
         {
-            // PH: TODO: add iteration through all BB projects to find the one matching running process on target
-            //           or just ask developer via any UI to point to that executable (binary)
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                {
+                    var outputPath = ProjectHelper.GetTargetFullName(project);
+                    if (!string.IsNullOrEmpty(outputPath))
+                    {
+                        var name = Path.GetFileName(outputPath);
+                        if (string.Compare(name, process.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            TraceLog.WarnLine("Suggesting executable path: \"{0}\"", outputPath);
+                            return outputPath;
+                        }
+                    }
+                }
+            }
+
+            // PH: TODO: ask developer via any UI to point to the executable (binary)
             return null;
         }
 

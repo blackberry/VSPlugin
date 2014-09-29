@@ -133,8 +133,8 @@ namespace BlackBerry.Package.Helpers
             // 4) "folder"
             var folder = Path.GetDirectoryName(project.FullName);
             if (string.IsNullOrEmpty(folder))
-                return targetName;
-            return Path.Combine(folder, targetName);
+                return Path.Combine(outputPath, targetName);
+            return Path.Combine(folder, outputPath, targetName);
         }
     }
 }
