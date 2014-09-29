@@ -407,6 +407,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\ZipPackageVisitor.cs">
       <Link>QConn\Visitors\ZipPackageVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Services\IAttachDiscoveryService.cs">
+      <Link>Services\IAttachDiscoveryService.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Services\IDeviceDiscoveryService.cs">
       <Link>Services\IDeviceDiscoveryService.cs</Link>
     </Compile>

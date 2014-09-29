@@ -20,6 +20,7 @@ using System.ComponentModel.Design;
 using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
@@ -98,10 +99,11 @@ namespace BlackBerry.Package
     // This attribute registers public services exposed by this package.
     // The package itself will be automatically loaded if needed.
     [ProvideService(typeof(IDeviceDiscoveryService), ServiceName = "BlackBerry Device Discovery")]
+    [ProvideService(typeof(IAttachDiscoveryService), ServiceName = "BlackBerry Process-Attach Executable Discovery")]
 
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(TargetNavigatorPane), Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService
+    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService, IAttachDiscoveryService
     {
         public const string VersionString = "2.1.2014.922";
         public const string OptionsCategoryName = "BlackBerry";
@@ -160,6 +162,7 @@ namespace BlackBerry.Package
             // add this package to the globally-proffed services:
             IServiceContainer serviceContainer = this;
             serviceContainer.AddService(typeof(IDeviceDiscoveryService), this, true);
+            serviceContainer.AddService(typeof(IAttachDiscoveryService), this, true);
 
             TraceLog.WriteLine(" * registered services");
 
@@ -522,7 +525,7 @@ namespace BlackBerry.Package
 
         #endregion
 
-        #region IDeviceDiscoveryService
+        #region IDeviceDiscoveryService Implementation
 
         DeviceDefinition IDeviceDiscoveryService.FindDevice()
         {
@@ -532,6 +535,17 @@ namespace BlackBerry.Package
                 return dialog.ToDevice();
             }
 
+            return null;
+        }
+
+        #endregion
+
+        #region IAttachDiscoveryService Implementation
+
+        string IAttachDiscoveryService.FindExecutable(ProcessInfo process)
+        {
+            // PH: TODO: add iteration through all BB projects to find the one matching running process on target
+            //           or just ask developer via any UI to point to that executable (binary)
             return null;
         }
 
