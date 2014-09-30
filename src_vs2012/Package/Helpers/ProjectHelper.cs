@@ -51,7 +51,7 @@ namespace BlackBerry.Package.Helpers
                 {
                     if (string.Compare(configuration.ConfigurationName, currentConfigurationName, StringComparison.InvariantCulture) == 0)
                     {
-                        var platformName = configuration.GetEvaluatedPropertyValue("PlatformName");
+                        var platformName = ((VCPlatform) configuration.Platform).Name;
                         if (string.Compare(platformName, currentPlatformName, StringComparison.InvariantCulture) == 0)
                         {
                             var rulePropertyStorage = configuration.Rules.Item(rule) as IVCRulePropertyStorage;

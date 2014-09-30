@@ -191,6 +191,9 @@
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\ProjectHelper.cs">
+      <Link>Helpers\ProjectHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
       <Link>Model\bar-descriptor.cs</Link>
     </Compile>
