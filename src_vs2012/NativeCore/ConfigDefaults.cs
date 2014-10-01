@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Microsoft.Win32;
 
 namespace BlackBerry.NativeCore
 {
@@ -20,6 +21,9 @@ namespace BlackBerry.NativeCore
         public static readonly string BuildDebugNativePath;
         public static readonly string GdbHostPath;
 
+        private const string FieldQnxToolsPath = "QNXToolsPath";
+        private const string FieldVsNdkPath = "VSNDKPath";
+        private const string FieldJavaHomePath = "JavaHomePath";
 
         /// <summary>
         /// Plugin-owned installation cache config directory.
@@ -46,14 +50,43 @@ namespace BlackBerry.NativeCore
 
         static ConfigDefaults()
         {
+            RegistryPath = @"Software\BlackBerry\VSPlugin";
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // read master values from registry:
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            string defaultToolsDirectory = null;
+            string defaultNdkDirectory = null;
+            string defaultJavaHomeDirectory = null;
+
+            try
+            {
+                settings = registry.OpenSubKey(RegistryPath);
+                if (settings != null)
+                {
+                    defaultToolsDirectory = (string) settings.GetValue(FieldQnxToolsPath);
+                    defaultNdkDirectory = (string) settings.GetValue(FieldVsNdkPath);
+                    defaultJavaHomeDirectory = (string) settings.GetValue(FieldJavaHomePath);
+                }
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
             var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
             if (string.IsNullOrEmpty(programFilesX86))
                 programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 
-            ToolsDirectory = Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
-            NdkDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
-            // PH: TODO: this would probably be much safer, when enumerating all folders and finding one with 'java.exe' or 'jre' in the name
-            JavaHome = Path.Combine(NdkDirectory, "features", "com.qnx.tools.jre.win32_1.6.0.43", "jre");
+            ToolsDirectory = !string.IsNullOrEmpty(defaultToolsDirectory) ? defaultToolsDirectory : Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
+            NdkDirectory = !string.IsNullOrEmpty(defaultNdkDirectory) ? defaultNdkDirectory : Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
+            JavaHome = FindJavaHomePath(defaultJavaHomeDirectory, NdkDirectory);
 
             // the base data folder is different for each platform...
             if (IsWindowsXP)
@@ -68,15 +101,128 @@ namespace BlackBerry.NativeCore
             }
 
             InstallationConfigDirectory = Path.Combine(DataDirectory, "BlackBerry Native SDK", "qconfig");
-            SupplementaryInstallationConfigDirectory = Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs", "..", "qconfig");
+            SupplementaryInstallationConfigDirectory = Path.Combine(NdkDirectory, "..", "qconfig");
             SupplementaryPlayBookInstallationConfigDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "QNX Software Systems", "qconfig");
             PluginInstallationConfigDirectory = Path.Combine(DataDirectory, "VSPlugin", "qconfig");
 
             SshPublicKeyPath = Path.Combine(DataDirectory, "bbt_id_rsa.pub");
             BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
-            RegistryPath = @"Software\BlackBerry\VSPlugin";
 
             GdbHostPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "BlackBerry.GDBHost.exe");
+        }
+
+        #region Java Localization
+
+        private static string FindJavaHomePath(string expectedJavaHomeDirectory, string vsndkDirectory)
+        {
+            // first check, if specified expected path is really a home of Java:
+            if (!string.IsNullOrEmpty(expectedJavaHomeDirectory))
+            {
+                if (IsValidJavaHomePath(expectedJavaHomeDirectory))
+                {
+                    return expectedJavaHomeDirectory;
+                }
+
+                // nope, so maybe the parent directory has info about Java?
+                var parentOfExpected = Path.GetDirectoryName(expectedJavaHomeDirectory);
+                if (IsValidJavaHomePath(parentOfExpected))
+                {
+                    SetJavaHome(parentOfExpected);
+                    return parentOfExpected;
+                }
+            }
+
+            // is Java in any location of the BB-NDK for Visual Studio?
+            if (!string.IsNullOrEmpty(vsndkDirectory))
+            {
+                // predefined one:
+                var predefinedPath = Path.Combine(vsndkDirectory, "features", "com.qnx.tools.jre.win32_1.6.0.43", "jre");
+                if (IsValidJavaHomePath(predefinedPath))
+                {
+                    SetJavaHome(null); // delete the value from registry, as we use the default one
+                    return predefinedPath;
+                }
+
+                // or anywhere:
+                var newPath = GetJavaHomeFromNdk(vsndkDirectory);
+                if (!string.IsNullOrEmpty(newPath))
+                {
+                    SetJavaHome(newPath);
+                    return newPath;
+                }
+            }
+
+            // no way to find, where the Java is:
+            return null;
+        }
+
+        private static bool IsValidJavaHomePath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+
+            return File.Exists(Path.Combine(path, "bin", "java.exe"));
+        }
+
+        /// <summary>
+        /// Enumerates all folders from specified one looking for Java binaries.
+        /// </summary>
+        private static string GetJavaHomeFromNdk(string vsndkDirectory)
+        {
+            if (string.IsNullOrEmpty(vsndkDirectory))
+                return null;
+
+            // or if not, enumerate all folders (2-levels only) and finding one with 'java.exe' inside:
+            try
+            {
+                foreach (var directory in Directory.EnumerateDirectories(vsndkDirectory))
+                {
+                    foreach (var feature in Directory.EnumerateDirectories(directory))
+                    {
+                        var expectedPath = Path.Combine(feature, "jre");
+                        if (File.Exists(Path.Combine(expectedPath, "bin", "java.exe")))
+                        {
+                            return expectedPath;
+                        }
+                    }
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        #endregion
+
+        public static void SetJavaHome(string path)
+        {
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            try
+            {
+                settings = registry.CreateSubKey(RegistryPath);
+                if (settings != null)
+                {
+                    if (!IsValidJavaHomePath(path))
+                    {
+                        settings.DeleteValue(FieldJavaHomePath, false);
+                    }
+                    else
+                    {
+                        settings.SetValue(FieldJavaHomePath, path, RegistryValueKind.String);
+                    }
+                }
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
         }
 
         /// <summary>
