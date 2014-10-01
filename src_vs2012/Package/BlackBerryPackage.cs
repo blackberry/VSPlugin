@@ -170,6 +170,7 @@ namespace BlackBerry.Package
             // setup called before running any 'tool':
             ToolRunner.Startup += (s, e) =>
                 {
+                    /*
                     var ndk = PackageViewModel.Instance.ActiveNDK;
 
                     if (ndk != null)
@@ -180,6 +181,7 @@ namespace BlackBerry.Package
                                                   Path.Combine(ndk.HostPath, "usr", "bin"), ";");
                     }
                     else
+                     */
                     {
                         e["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", e["PATH"]);
                     }

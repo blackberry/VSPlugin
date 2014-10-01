@@ -102,9 +102,9 @@ namespace BlackBerry.BuildTasks
 
                 pCommand = "cmd";
                 if (mprocess)
-                    pArgs = "/c " + ToolsPath + @"\make -j" + numProcessors + " all";
+                    pArgs = "/c \"" + ToolsPath + @"\make"" -j" + numProcessors + " all";
                 else
-                    pArgs = "/c " + ToolsPath + @"\make all";
+                    pArgs = "/c \"" + ToolsPath + @"\make"" all";
 
                 ProcessStartInfo startInfo = new ProcessStartInfo(pCommand, pArgs);
 

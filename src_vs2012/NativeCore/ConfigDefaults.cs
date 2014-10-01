@@ -76,11 +76,7 @@ namespace BlackBerry.NativeCore
             BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
             RegistryPath = @"Software\BlackBerry\VSPlugin";
 
-#if DEBUG
-            GdbHostPath = @"T:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
-#else
             GdbHostPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "BlackBerry.GDBHost.exe");
-#endif
         }
 
         /// <summary>

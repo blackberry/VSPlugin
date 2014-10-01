@@ -134,11 +134,10 @@ namespace BlackBerry.BuildTasks
         }
 
         /// <summary>
-        /// Return the assets from the bardescriptor.xml
+        /// Return the assets from the bar-descriptor.xml
         /// </summary>
         private ITaskItem[] GetAssetsFile()
         {
-
             //make sure the _descriptor is loaded
             if (_descriptor == null)
             {

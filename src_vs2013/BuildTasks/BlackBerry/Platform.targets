@@ -78,31 +78,29 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <PropertyGroup>
       <LibToolArchitecture Condition="'$(LibToolArchitecture)' == ''">$(DefaultToolArchitecture)</LibToolArchitecture>
     </PropertyGroup>
-    
+
     <GenerateMakefile
       TargetName      ="$(TargetName)"
       TargetExtension ="$(TargetExt)"
       CompileItems    ="@(ClCompile)"
-      LinkItems		  ="@(Lib)"
+      LinkItems       ="@(Lib)"
       ProjectDir      ="$(ProjectDir)"
-      IntDir		  ="$(IntDir)"
-      OutDir		  ="$(OutDir)"
+      IntDir          ="$(IntDir)"
+      OutDir          ="$(OutDir)"
       CompilerVersion ="$(CompilerVersion)"
       Platform        ="$(Platform)"
-      AdditionalIncludeDirectories ="$(IncludePath)"
-      AdditionalLibraryDirectories ="$(LibraryPath)"
-      ExcludeDirectories ="$(ExcludePath)"
-      ConfigurationType ="$(ConfigurationType)"
+      AdditionalIncludeDirectories  ="$(IncludePath)"
+      AdditionalLibraryDirectories  ="$(LibraryPath)"
+      ExcludeDirectories            ="$(ExcludePath)"
+      ConfigurationType             ="$(ConfigurationType)"
       />
-    
+
     <MakeAllAndFormatOutputMessages
         ProjectDir      ="$(ProjectDir)"
-        OutDir		  ="$(IntDir)"      
-        ToolsPath ="$(BuildBarToolPath)"
-        CompileItems    ="@(ClCompile)"
-      >
-    </MakeAllAndFormatOutputMessages >
-    
+        OutDir          ="$(IntDir)"
+        ToolsPath       ="$(QccToolsPath)"
+        CompileItems    ="@(ClCompile)" />
+
   </Target>
 
   <!-- *******************************************************************************************
@@ -133,24 +131,23 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       TargetName      ="$(TargetName)"
       TargetExtension ="$(TargetExt)"
       CompileItems    ="@(ClCompile)"
-      LinkItems		  ="@(Link)"
+      LinkItems       ="@(Link)"
       ProjectDir      ="$(ProjectDir)"
-      IntDir		  ="$(IntDir)"
-      OutDir		  ="$(OutDir)"
+      IntDir          ="$(IntDir)"
+      OutDir          ="$(OutDir)"
       CompilerVersion ="$(CompilerVersion)"
       Platform        ="$(Platform)"
-      AdditionalIncludeDirectories ="$(IncludePath)"
-      AdditionalLibraryDirectories ="$(LibraryPath)"
-      ExcludeDirectories ="$(ExcludePath)"
-      ConfigurationType ="$(ConfigurationType)"
+      AdditionalIncludeDirectories  ="$(IncludePath)"
+      AdditionalLibraryDirectories  ="$(LibraryPath)"
+      ExcludeDirectories            ="$(ExcludePath)"
+      ConfigurationType             ="$(ConfigurationType)"
       />
 
     <MakeAllAndFormatOutputMessages
         ProjectDir      ="$(ProjectDir)"
-        OutDir		  ="$(IntDir)"      
-        ToolsPath ="$(BuildBarToolPath)"
-        CompileItems    ="@(ClCompile)">
-    </MakeAllAndFormatOutputMessages >
+        OutDir          ="$(IntDir)"
+        ToolsPath       ="$(QccToolsPath)"
+        CompileItems    ="@(ClCompile)" />
   
 </Target>
 
