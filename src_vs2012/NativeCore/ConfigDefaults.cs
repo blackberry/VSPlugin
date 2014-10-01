@@ -9,14 +9,33 @@ namespace BlackBerry.NativeCore
 #endif
     static class ConfigDefaults
     {
-        public static readonly string ToolsDirectory;
-        public static readonly string NdkDirectory;
+        public static string ToolsDirectory
+        {
+            get;
+            private set;
+        }
+
+        public static string NdkDirectory
+        {
+            get;
+            private set;
+        }
+
+        public static string JavaHome
+        {
+            get;
+            private set;
+        }
+
+        public static string SupplementaryInstallationConfigDirectory
+        {
+            get;
+            private set;
+        }
+
         public static readonly string DataDirectory;
         public static readonly string InstallationConfigDirectory;
-        public static readonly string SupplementaryInstallationConfigDirectory;
         public static readonly string SupplementaryPlayBookInstallationConfigDirectory;
-
-        public static readonly string JavaHome;
         public static readonly string SshPublicKeyPath;
         public static readonly string BuildDebugNativePath;
         public static readonly string GdbHostPath;
@@ -52,41 +71,7 @@ namespace BlackBerry.NativeCore
         {
             RegistryPath = @"Software\BlackBerry\VSPlugin";
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // read master values from registry:
-            RegistryKey registry = Registry.CurrentUser;
-            RegistryKey settings = null;
-
-            string defaultToolsDirectory = null;
-            string defaultNdkDirectory = null;
-            string defaultJavaHomeDirectory = null;
-
-            try
-            {
-                settings = registry.OpenSubKey(RegistryPath);
-                if (settings != null)
-                {
-                    defaultToolsDirectory = (string) settings.GetValue(FieldQnxToolsPath);
-                    defaultNdkDirectory = (string) settings.GetValue(FieldVsNdkPath);
-                    defaultJavaHomeDirectory = (string) settings.GetValue(FieldJavaHomePath);
-                }
-            }
-            finally
-            {
-                if (settings != null)
-                    settings.Close();
-                registry.Close();
-            }
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
-            if (string.IsNullOrEmpty(programFilesX86))
-                programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-
-            ToolsDirectory = !string.IsNullOrEmpty(defaultToolsDirectory) ? defaultToolsDirectory : Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
-            NdkDirectory = !string.IsNullOrEmpty(defaultNdkDirectory) ? defaultNdkDirectory : Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
-            JavaHome = FindJavaHomePath(defaultJavaHomeDirectory, NdkDirectory);
+            LoadDynamicSettings();
 
             // the base data folder is different for each platform...
             if (IsWindowsXP)
@@ -101,7 +86,6 @@ namespace BlackBerry.NativeCore
             }
 
             InstallationConfigDirectory = Path.Combine(DataDirectory, "BlackBerry Native SDK", "qconfig");
-            SupplementaryInstallationConfigDirectory = Path.Combine(NdkDirectory, "..", "qconfig");
             SupplementaryPlayBookInstallationConfigDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "QNX Software Systems", "qconfig");
             PluginInstallationConfigDirectory = Path.Combine(DataDirectory, "VSPlugin", "qconfig");
 
@@ -119,11 +103,72 @@ namespace BlackBerry.NativeCore
                 GdbHostPath = @"T:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
 #           elif PLATFORM_VS2013
                 GdbHostPath = @"T:\vs-plugin\src_vs2013\Debug\BlackBerry.GDBHost.exe";
+#           else
+#               error Define path to debug version of the GDBHost.dll to make the debugging working.
 #           endif
 #else
             GdbHostPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "BlackBerry.GDBHost.exe");
 #endif
         }
+
+        private static void LoadDynamicSettings()
+        {
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // read master values from registry:
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            string defaultToolsDirectory = null;
+            string defaultNdkDirectory = null;
+            string defaultJavaHomeDirectory = null;
+
+            try
+            {
+                settings = registry.OpenSubKey(RegistryPath);
+                if (settings != null)
+                {
+                    defaultToolsDirectory = (string)settings.GetValue(FieldQnxToolsPath);
+                    defaultNdkDirectory = (string)settings.GetValue(FieldVsNdkPath);
+                    defaultJavaHomeDirectory = (string)settings.GetValue(FieldJavaHomePath);
+                }
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            ToolsDirectory = !string.IsNullOrEmpty(defaultToolsDirectory) ? defaultToolsDirectory : GetToolsDefaultLocation();
+            NdkDirectory = !string.IsNullOrEmpty(defaultNdkDirectory) ? defaultNdkDirectory : GetNdkDefaultLocation();
+            JavaHome = FindJavaHomePath(defaultJavaHomeDirectory, NdkDirectory);
+            SupplementaryInstallationConfigDirectory = Path.Combine(NdkDirectory, "..", "qconfig");
+        }
+
+        #region Default Locations
+
+        private static string GetToolsDefaultLocation()
+        {
+            var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+            if (string.IsNullOrEmpty(programFilesX86))
+                programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+
+            return Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
+        }
+
+        private static string GetNdkDefaultLocation()
+        {
+            return Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
+        }
+
+        private static string GetJavaHomeDefaultLocation(string vsndkDirectory)
+        {
+            return Path.Combine(vsndkDirectory, "features", "com.qnx.tools.jre.win32_1.6.0.43", "jre");
+        }
+
+        #endregion
 
         #region Java Localization
 
@@ -150,7 +195,7 @@ namespace BlackBerry.NativeCore
             if (!string.IsNullOrEmpty(vsndkDirectory))
             {
                 // predefined one:
-                var predefinedPath = Path.Combine(vsndkDirectory, "features", "com.qnx.tools.jre.win32_1.6.0.43", "jre");
+                var predefinedPath = GetJavaHomeDefaultLocation(vsndkDirectory);
                 if (IsValidJavaHomePath(predefinedPath))
                 {
                     SetJavaHome(null); // delete the value from registry, as we use the default one
@@ -209,9 +254,7 @@ namespace BlackBerry.NativeCore
             }
         }
 
-        #endregion
-
-        public static void SetJavaHome(string path)
+        private static void SetJavaHome(string path)
         {
             RegistryKey registry = Registry.CurrentUser;
             RegistryKey settings = null;
@@ -219,23 +262,55 @@ namespace BlackBerry.NativeCore
             try
             {
                 settings = registry.CreateSubKey(RegistryPath);
-                if (settings != null)
-                {
-                    if (!IsValidJavaHomePath(path))
-                    {
-                        settings.DeleteValue(FieldJavaHomePath, false);
-                    }
-                    else
-                    {
-                        settings.SetValue(FieldJavaHomePath, path, RegistryValueKind.String);
-                    }
-                }
+                SetOrDelete(settings, FieldJavaHomePath, IsValidJavaHomePath(path) ? path : null, GetJavaHomeDefaultLocation(NdkDirectory));
             }
             finally
             {
                 if (settings != null)
                     settings.Close();
                 registry.Close();
+            }
+        }
+
+        #endregion
+
+        public static void Apply(string vsndkDirectory, string toolsDirectory, string javaHomeDirectory)
+        {
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            try
+            {
+                settings = registry.CreateSubKey(RegistryPath);
+                SetOrDelete(settings, FieldVsNdkPath, vsndkDirectory, GetNdkDefaultLocation());
+                SetOrDelete(settings, FieldQnxToolsPath, toolsDirectory, GetToolsDefaultLocation());
+                SetOrDelete(settings, FieldJavaHomePath, javaHomeDirectory, GetJavaHomeDefaultLocation(vsndkDirectory));
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
+
+            LoadDynamicSettings();
+        }
+
+        private static void SetOrDelete(RegistryKey context, string fieldName, string value, string defaultValue)
+        {
+            if (string.IsNullOrEmpty(fieldName))
+                throw new ArgumentNullException("fieldName");
+
+            if (context != null)
+            {
+                if (string.IsNullOrEmpty(value) || string.Compare(value, defaultValue, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    context.DeleteValue(fieldName, false);
+                }
+                else
+                {
+                    context.SetValue(fieldName, value, RegistryValueKind.String);
+                }
             }
         }
 

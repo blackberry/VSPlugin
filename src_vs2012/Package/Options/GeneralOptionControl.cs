@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
 using System.Windows.Forms;
 using BlackBerry.NativeCore;
-using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
 
 namespace BlackBerry.Package.Options
@@ -16,21 +15,24 @@ namespace BlackBerry.Package.Options
 
         #region Properties
 
-        [Browsable(false)]
         public string NdkPath
         {
             get { return txtNdkPath.Text; }
             set { txtNdkPath.Text = value; }
         }
 
-        [Browsable(false)]
+        public string JavaHomePath
+        {
+            get { return txtJavaPath.Text; }
+            set { txtJavaPath.Text = value; }
+        }
+
         public string ToolsPath
         {
             get { return txtToolsPath.Text; }
             set { txtToolsPath.Text = value; }
         }
 
-        [Browsable(false)]
         public string ProfilePath
         {
             get { return txtProfilePath.Text; }
@@ -56,6 +58,11 @@ namespace BlackBerry.Package.Options
         private void bttToolsBrowse_Click(object sender, System.EventArgs e)
         {
             txtToolsPath.Text = DialogHelper.BrowseForFolder(txtToolsPath.Text, "Browse for Tools folder");
+        }
+
+        private void bttJavaBrowse_Click(object sender, System.EventArgs e)
+        {
+            txtJavaPath.Text = DialogHelper.BrowseForFolder(txtJavaPath.Text, "Browse for Java Home folder");
         }
 
         private void bttOpenProfile_Click(object sender, System.EventArgs e)
