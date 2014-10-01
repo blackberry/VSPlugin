@@ -20,12 +20,12 @@ using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
+using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
 using System.Threading;
 using System.Windows.Forms;
-using Microsoft.VisualStudio.Shell;
 
 namespace BlackBerry.DebugEngine
 {
@@ -237,7 +237,7 @@ namespace BlackBerry.DebugEngine
                     _process = programNode.Process;
                     var port = (AD7Port)programNode.Process.Port;
 
-                    var attachDiscoveryService = (IAttachDiscoveryService) Package.GetGlobalService(typeof(IAttachDiscoveryService));
+                    var attachDiscoveryService = (IAttachDiscoveryService) Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IAttachDiscoveryService));
                     Debug.Assert(attachDiscoveryService != null, "Invalid project references (make sure VisualStudio.Shell.dll is not references, as it duplicates the Package definition from VisualStudio.Shell.<version>.dll)");
 
                     // ask the package about opened BlackBerry projects and find matching one:
@@ -251,7 +251,7 @@ namespace BlackBerry.DebugEngine
                     {
                         if (exePath == "CannotAttachToRunningProcess")
                         {
-                            MessageBox.Show(_process.Details.Name + " is attached to the debugger. However, to be able to debug your application, you must build and deploy it from this computer first.", "No executable file with symbols found.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBoxHelper.Show(_process.Details.Name + " is attached to the debugger. However, to be able to debug your application, you must build and deploy it from this computer first.", "No executable file with symbols found.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
                         EventDispatcher = new EventDispatcher(this);
                         _module = new AD7Module();

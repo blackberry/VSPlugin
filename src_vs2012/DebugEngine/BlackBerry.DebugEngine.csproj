@@ -180,6 +180,9 @@
     <Compile Include="..\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
+    <Compile Include="..\Package\Helpers\MessageBoxHelper.cs">
+      <Link>Helpers\MessageBoxHelper.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

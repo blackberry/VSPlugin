@@ -171,6 +171,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
+      <Link>Helpers\MessageBoxHelper.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">

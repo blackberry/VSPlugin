@@ -63,7 +63,7 @@ namespace BlackBerry.Package
     [ProvideEditorExtension(typeof(BarDescriptorEditorFactory), BarDescriptorEditorFactory.DefaultExtension, 0x40, NameResourceID = 106)]
     // We register that our editor supports LOGVIEWID_Designer logical view
     [ProvideEditorLogicalView(typeof(BarDescriptorEditorFactory), LogicalViewID.Designer)]
-    // Microsoft Visual C# Project
+    // Microsoft Visual C++ Project
     [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", BarDescriptorEditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
     // Registration of custom debugger
@@ -142,8 +142,7 @@ namespace BlackBerry.Package
             Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
             base.Initialize();
 
-            MessageBoxHelper.Initialise(this);
-            _dte = (DTE2)GetService(typeof(SDTE));
+            _dte = (DTE2) GetService(typeof(SDTE));
 
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
             _mainTraceWindow = new BlackBerryPaneTraceListener("BlackBerry", TraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceMainOutputWindowPane);
