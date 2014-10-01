@@ -543,17 +543,16 @@ namespace BlackBerry.Package
 
         #region IAttachDiscoveryService Implementation
 
-        string IAttachDiscoveryService.FindExecutable(ProcessInfo process)
+        private string FindMatchingProject(ProcessInfo process)
         {
-            foreach (Project project in _dte.Solution.Projects)
+            if (process != null)
             {
-                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                foreach (Project project in _dte.Solution.Projects)
                 {
-                    var outputPath = ProjectHelper.GetTargetFullName(project);
-                    if (!string.IsNullOrEmpty(outputPath))
+                    if (_buildPlatformsManager.IsBlackBerryProject(project))
                     {
-                        var name = Path.GetFileName(outputPath);
-                        if (string.Compare(name, process.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                        string outputPath;
+                        if (IsMatchingProject(project, process, out outputPath))
                         {
                             TraceLog.WarnLine("Suggesting executable path: \"{0}\"", outputPath);
                             return outputPath;
@@ -562,7 +561,68 @@ namespace BlackBerry.Package
                 }
             }
 
-            // PH: TODO: ask developer via any UI to point to the executable (binary)
+            return null;
+        }
+
+        private static bool IsMatchingProject(Project project, ProcessInfo process, out string outputPath)
+        {
+            outputPath = ProjectHelper.GetTargetFullName(project);
+            if (!string.IsNullOrEmpty(outputPath))
+            {
+                var name = Path.GetFileName(outputPath);
+                if (process != null && string.Compare(name, process.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        string IAttachDiscoveryService.FindExecutable(ProcessInfo process)
+        {
+            // try to automatically select the project:
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                {
+                    string outputPath;
+                    if (IsMatchingProject(project, process, out outputPath))
+                    {
+                        TraceLog.WarnLine("Suggesting executable path: \"{0}\"", outputPath);
+                        return outputPath;
+                    }
+                }
+            }
+
+            // PH: HINT: this code will be for sure executed, when attaching to a process without any solution opened:
+
+            // ask developer via any UI to point the executable (binary):
+            var form = new BinaryDiscoveryForm("Select Matching Target Process Binary");
+
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                {
+                    string outputPath;
+                    if (IsMatchingProject(project, process, out outputPath))
+                    {
+                        form.AddTarget(project, outputPath, true);
+                    }
+                    else
+                    {
+                        form.AddTarget(project, outputPath, false);
+                    }
+                }
+            }
+
+            form.AddCustomTarget("Custom executable");
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                return form.SelectedPath;
+            }
+
             return null;
         }
 

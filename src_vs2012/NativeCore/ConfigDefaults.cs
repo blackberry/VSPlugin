@@ -108,7 +108,21 @@ namespace BlackBerry.NativeCore
             SshPublicKeyPath = Path.Combine(DataDirectory, "bbt_id_rsa.pub");
             BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
 
+#if DEBUG
+            // PH: INFO: here is a small trick - since we develop this plugin in 'debug build', we also overwrite in that build
+            //           the place, where the debug-engine is stored (check package attributes), to have it also debuggable; that's why
+            //           the package and DE are not in the same folder and even GDBHost is not inside any of them
+            //           so let it be hardcoded for that moment to have a fluent GDB attaching...
+#           if PLATFORM_VS2010
+                GdbHostPath = @"T:\vs-plugin\src_vs2010\Debug\BlackBerry.GDBHost.exe";
+#           elif PLATFORM_VS2012
+                GdbHostPath = @"T:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
+#           elif PLATFORM_VS2013
+                GdbHostPath = @"T:\vs-plugin\src_vs2013\Debug\BlackBerry.GDBHost.exe";
+#           endif
+#else
             GdbHostPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "BlackBerry.GDBHost.exe");
+#endif
         }
 
         #region Java Localization

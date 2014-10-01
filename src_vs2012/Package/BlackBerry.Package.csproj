@@ -173,6 +173,12 @@
     <Compile Include="BlackBerryPackage.cs" />
     <Compile Include="Components\BuildPlatformsManager.cs" />
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
+    <Compile Include="Dialogs\BinaryDiscoveryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\BinaryDiscoveryForm.Designer.cs">
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\FolderForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -401,6 +407,9 @@
     <Resource Include="Resources\Navigator\target.png" />
     <Resource Include="Resources\Navigator\thread.png" />
     <None Include="Resources\Package.Menu.vsct" />
+    <EmbeddedResource Include="Dialogs\BinaryDiscoveryForm.resx">
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\CertificateDetailsForm.resx">
       <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
     </EmbeddedResource>

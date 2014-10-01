@@ -156,6 +156,14 @@
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.cs">
+      <Link>Dialogs\BinaryDiscoveryForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.designer.cs">
+      <Link>Dialogs\BinaryDiscoveryForm.designer.cs</Link>
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Dialogs\FolderForm.cs">
       <Link>Dialogs\FolderForm.cs</Link>
       <SubType>Form</SubType>
@@ -580,6 +588,10 @@
     <None Include="..\..\src_vs2012\Package\Resources\Package.Bitmaps.vsct">
       <Link>Resources\Package.Bitmaps.vsct</Link>
     </None>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.resx">
+      <Link>Dialogs\BinaryDiscoveryForm.resx</Link>
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\FolderForm.resx">
       <Link>Dialogs\FolderForm.resx</Link>
       <DependentUpon>FolderForm.cs</DependentUpon>
