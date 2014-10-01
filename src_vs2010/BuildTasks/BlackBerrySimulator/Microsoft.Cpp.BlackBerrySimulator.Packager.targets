@@ -115,8 +115,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         AppName                        ="$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
-        Device                         ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password                       ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device                         ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)"
+        Password                       ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)"
         BarDeploy                      ="%(BuildBar.BarDeploy)"
         DevMode                        ="%(BuildBar.DevMode)"
         PackageManifestOnly            ="$(BuildBar_OptimizedDeploy)"
@@ -148,7 +148,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       Sources                        ="@(BuildBar)"
       Register                       ="%(BuildBar.Register)"
       CSJFiles                       ="%(BuildBar.SigningCSJFilePath);%(BuildBar.DebugTokenCSJPath)"
-      KeyStorePassword               ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@CSKPass)"
+      KeyStorePassword               ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@CSKPass)"
       CSJPin                         ="%(BuildBar.CSJPin)"
       OutputFile                     ="%(BuildBar.OutputFile)"
       ToolExe                        ="$(SignerBarToolExe)"
@@ -166,7 +166,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <BuildBar Include="@(None)" />
     </ItemGroup>
 
-    <Error Condition="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP) == ''" Text=" Target simulator ip is not set. See menu BlackBerry -> Settings" />
+    <Error Condition="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP) == ''" Text=" Target simulator ip is not set. See menu BlackBerry -> Settings" />
 
     <!-- Get app's ID from bar descriptor. -->
     <GetAppInfo
@@ -183,8 +183,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Condition="%(BuildBar.DevMode) == 'true'"
         ToolExe           ="$(DeployToolExe)"
         ToolPath          ="$(BuildBarToolPath)"
-        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)"
+        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)"
         ListInstalledApps ="true"
       />
 
@@ -223,8 +223,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <BBDeploy
         ToolExe           ="$(DeployToolExe)"
         ToolPath          ="$(BuildBarToolPath)"
-        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)"
+        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)"
         Package           ="$(ProjectDir)%(BuildBar.OutputFile)"
         InstallApp        ="true"
         LaunchApp         ="true"
@@ -247,8 +247,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         AppName                        ="$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
-        Device                         ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password                       ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device                         ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)"
+        Password                       ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)"
         BarDeploy                      ="%(BuildBar.BarDeploy)"
         DevMode                        ="%(BuildBar.DevMode)"
         DebugToken                     ="%(BuildBar.DebugToken)"
@@ -276,8 +276,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <BBDeploy
         ToolExe           ="$(DeployToolExe)"
         ToolPath          ="$(BuildBarToolPath)"
-        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)"
+        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)"
         LocalManifestFile ="localManifest.mf"
         GetFile           ="META-INF/MANIFEST.MF"
         GetFileSaveAs     ="targetManifest.mf"
@@ -311,8 +311,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         LocalManifestFile ="localManifest.mf"
         PutFile           ="%(ModifiedFiles.SourcePath)"
         PutFileSaveAs     ="%(ModifiedFiles.Identity)"
-        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)"
+        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)"
       />
 
     <!-- Delete files over SSH. -->
@@ -321,7 +321,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         ToolPath        ="$(SSHToolPath)"
         PackageId       ="$(PackageId)"
         PackageName     ="$(PackageName)"
-        Device          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
+        Device          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)"
         PrivateKeyPath  ="$(SSHPrivateKeyPath)"
         DeleteFiles     ="@(DeletedFiles)"
       />
@@ -332,8 +332,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         ToolPath          ="$(BuildBarToolPath)"
         PackageId         ="$(PackageId)"
         PackageName       ="$(PackageName)"
-        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_IP)"
-        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\BlackBerryVSPlugin@simulator_password)"
+        Device            ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)"
+        Password          ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)"
         LaunchApp         ="true"
         FlagFile          ="$(AppDataPath)\Research In Motion\vsndk-debugNative.txt"
         DebugNative       ="false"
