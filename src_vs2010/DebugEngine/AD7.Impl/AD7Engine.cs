@@ -101,7 +101,7 @@ namespace BlackBerry.DebugEngine
         /// A module loaded in the debuggee process to the debugger. It is always null because the AD7Module class is 
         /// not implemented yet.
         /// </summary>
-        internal AD7Module _module;
+        private AD7Module _module;
 
         /// <summary>
         /// A process running on a port. A process "Is a container for a set of programs".
@@ -116,7 +116,7 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// A program that is running in a process.
         /// </summary>
-        internal IDebugProgram2 _program;
+        private IDebugProgram2 _program;
 
         /// <summary>
         /// TRUE whenever a thread is created/ended, so the debug engine can update the m_threads data structure.
@@ -170,6 +170,16 @@ namespace BlackBerry.DebugEngine
         {
             get;
             set;
+        }
+
+        public AD7Module Module
+        {
+            get { return _module; }
+        }
+
+        public IDebugProgram2 Program
+        {
+            get { return _program; }
         }
 
         /// <summary>
@@ -571,11 +581,9 @@ namespace BlackBerry.DebugEngine
 
                     return VSConstants.S_OK;
                 }
-                else
-                {
-                    DebugEngineStatus.IsRunning = false;
-                    return VSConstants.E_FAIL;
-                }
+
+                DebugEngineStatus.IsRunning = false;
+                return VSConstants.E_FAIL;
             }
             catch (Exception e)
             {

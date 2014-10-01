@@ -21,7 +21,7 @@ using Microsoft.VisualStudio.Debugger.Interop;
 using System.Threading;
 
 namespace BlackBerry.DebugEngine
-{    
+{
     /// <summary>
     /// This class manages debug events for the debug engine.
     /// 

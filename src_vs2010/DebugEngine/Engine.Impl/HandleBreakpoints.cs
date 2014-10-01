@@ -12,10 +12,12 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         private int _number = -1;
 
+        /*
         /// <summary>
         /// Boolean variable that indicates if this breakpoint is enable (true) or disable (false).
         /// </summary>
         private bool _enabled;
+         */
 
         /// <summary>
         /// Breakpoint address.
@@ -120,10 +122,12 @@ namespace BlackBerry.DebugEngine
                     end = ev.IndexOf(';', 3);
                     _number = Convert.ToInt32(ev.Substring(ini, (end - ini)));
 
+                    /*
                     if (ev[end + 1] == 'y')
                         _enabled = true;
                     else
                         _enabled = false;
+                     */
 
                     ini = end + 3;
                     end = ev.IndexOf(';', ini);
@@ -161,10 +165,12 @@ namespace BlackBerry.DebugEngine
                     end = ev.IndexOf(';', 3);
                     _number = Convert.ToInt32(ev.Substring(ini, (end - ini))); ;
 
+                    /*
                     if (ev[end + 1] == 'y')
                         _enabled = true;
                     else
                         _enabled = false;
+                     */
 
                     ini = end + 3;
                     end = ev.IndexOf(';', ini);

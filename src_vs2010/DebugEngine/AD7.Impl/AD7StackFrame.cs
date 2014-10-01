@@ -397,7 +397,7 @@ namespace BlackBerry.DebugEngine
             // The debugger would like a pointer to the IDebugModule2 that contains this stack frame.
             if ((flags & enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP) != 0)
             {
-                frameInfo.m_pModule = _engine._module;
+                frameInfo.m_pModule = _engine.Module;
                 frameInfo.m_dwValidFields |= enum_FRAMEINFO_FLAGS.FIF_DEBUG_MODULEP;
             }
 
