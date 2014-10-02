@@ -144,6 +144,10 @@ namespace BlackBerry.Package
 
             _dte = (DTE2) GetService(typeof(SDTE));
 
+            // create dedicated persistent logs
+            var logOptions = (LogsOptionPage)GetDialogPage(typeof(LogsOptionPage));
+            LogManager.Initialize(logOptions.Path, logOptions.LimitLogs ? logOptions.LimitCount : -1, TraceLog.Category, TraceLog.CategoryGDB);
+
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
             _mainTraceWindow = new BlackBerryPaneTraceListener("BlackBerry", TraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceMainOutputWindowPane);
 #if DEBUG

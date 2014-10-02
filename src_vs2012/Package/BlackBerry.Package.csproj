@@ -172,7 +172,9 @@
     </Compile>
     <Compile Include="BlackBerryPackage.cs" />
     <Compile Include="Components\BuildPlatformsManager.cs" />
+    <Compile Include="Components\LogManager.cs" />
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
+    <Compile Include="Diagnostics\PersistentTraceListener.cs" />
     <Compile Include="Dialogs\BinaryDiscoveryForm.cs">
       <SubType>Form</SubType>
     </Compile>

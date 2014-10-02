@@ -143,8 +143,14 @@
     <Compile Include="..\..\src_vs2012\Package\Components\BuildPlatformsManager.cs">
       <Link>Components\BuildPlatformsManager.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\LogManager.cs">
+      <Link>Components\LogManager.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Diagnostics\PersistentTraceListener.cs">
+      <Link>Diagnostics\PersistentTraceListener.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.cs">
       <Link>Dialogs\BinaryDiscoveryForm.cs</Link>
