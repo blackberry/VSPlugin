@@ -106,128 +106,68 @@
     <None Include="BarDescriptor\Schema\bar-descriptor.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets">
+    <Content Include="BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
+    </Content>
+    <Content Include="BlackBerry\Microsoft.Cpp.BlackBerry.default.props">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Microsoft.Cpp.BlackBerry.default.props">
+    </Content>
+    <Content Include="BlackBerry\Microsoft.Cpp.BlackBerry.props">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Microsoft.Cpp.BlackBerry.props">
+    </Content>
+    <Content Include="BlackBerry\Microsoft.Cpp.BlackBerry.targets">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Microsoft.Cpp.BlackBerry.targets">
+    </Content>
+    <Content Include="BlackBerry\Microsoft.CppBuild.BlackBerry.targets">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Microsoft.CppBuild.BlackBerry.targets">
+    </Content>
+    <Content Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props">
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.targets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.targets">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.default.props">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.props">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.targets">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerrySimulator.qcc.props">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="BlackBerrySimulator\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerrySimulator.qcc.targets">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+    </Content>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\cl.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\cl.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\debugger_general.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\debugger_general.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\directories.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\directories.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\general.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\general.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\lib.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\lib.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\link.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\link.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\packager.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\packager.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="BarDescriptor\Schema\bar-descriptor.xml">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\debugger_ndk.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerry\Rules\debugger_ndk.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerry\Rules\ndk_general_ps.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="BlackBerry\Rules\ndk_directories.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="BlackBerry\Rules\ndk_general.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerry\Rules\ndkProjectItemsSchema.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerry\Rules\qcc_cl.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerry\Rules\qcc_lib.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerry\Rules\qcc_link.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerry\Rules\packager.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\ndk_directories.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\ndk_general.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\ndk_general_ps.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\packager.xml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\qcc_cl.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\qcc_lib.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BlackBerrySimulator\Rules\qcc_link.xml">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

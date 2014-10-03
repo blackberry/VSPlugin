@@ -29,10 +29,36 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <TrackFileAccess Condition="'$(TrackFileAccess)' == ''">true</TrackFileAccess>
   </PropertyGroup>
 
+  <!-- This target is called as the first one to prepare the environment, expected variables must be set by the PlatformToolset -->
+  <Target Name="SetQnxBuildVariables">
+    <Message Text="Updating environment variables for QNX:
+  QNX_HOST          = $(QNX_HOST)
+  QNX_TARGET        = $(QNX_TARGET)
+  QNX_FAMILY        = $(QNX_FAMILY)
+  Architecture      = $(TargetArch)
+  Platform          = $(Platform)
+  Makefile Platform = $(CompilerMakefilePlatform)
+  Deploy Target     = IP: $(TargetDeviceIP)
+    
+    " Importance="High" />
+
+    <Error Condition="$(QNX_HOST) == ''" Text="The NDK is missing, please make sure NDK is downloaded and selected." />
+    
+    <SetEnv Name="QNX_HOST" Value="$(QNX_HOST)" Prefix="false">
+      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_HOST"/>
+    </SetEnv>
+    <SetEnv Name="QNX_TARGET" Value="$(QNX_TARGET)" Prefix="false">
+      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_TARGET"/>
+    </SetEnv>
+    <SetEnv Name ="QCC_CONF_PATH" Value="$(QCC_CONF_PATH)" Prefix ="false">
+      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QCC_CONF_PATH"/>
+    </SetEnv>
+  </Target>
+
   <!-- *******************************************************************************************
         CLCompile
        ******************************************************************************************* -->
-  <Target Name="ClCompile" Condition="'@(ClCompile)' != ''" DependsOnTargets="SelectClCompile">
+  <Target Name="ClCompile" Condition="'@(ClCompile)' != ''" DependsOnTargets="SetQnxBuildVariables;SelectClCompile">
     <ItemGroup>
       <ClCompile>
         <CompileAs                    Condition="'%(ClCompile.CompileAs)' == 'Default' and '%(ClCompile.Extension)' == '.c'">CompileAsC</CompileAs>
@@ -46,29 +72,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <PropertyGroup>
       <CLToolArchitecture Condition="'$(CLToolArchitecture)' == ''">$(DefaultToolArchitecture)</CLToolArchitecture>
     </PropertyGroup>
-
-    <SetEnv Name   ="QNX_HOST"
-            Value  ="$(QNX_HOST)"
-            Prefix ="false">
-      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_HOST"/>
-    </SetEnv>
-    <SetEnv Name   ="QNX_TARGET"
-            Value  ="$(QNX_TARGET)"
-            Prefix ="false">
-      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_TARGET"/>
-    </SetEnv>
-    <SetEnv Name   ="QCC_CONF_PATH"
-            Value  ="$(QCC_CONF_PATH)"
-            Prefix ="false">
-      <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QCC_CONF_PATH"/>
-    </SetEnv>
   </Target>
 
   <!-- *******************************************************************************************
         Lib
        ******************************************************************************************* -->
-  <Target Name="Lib"
-          Condition="'@(Lib)' != ''">
+  <Target Name="Lib" Condition="'@(Lib)' != ''">
     <ItemGroup>
       <Lib>
         <MinimalRebuildFromTracking Condition="'$(BuildType)' != 'Build' or '$(ForceRebuild)' == 'true'">false</MinimalRebuildFromTracking>
@@ -88,21 +97,19 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       IntDir          ="$(IntDir)"
       OutDir          ="$(OutDir)"
       CompilerVersion ="$(CompilerVersion)"
-      Platform        ="$(Platform)"
+      Platform        ="$(CompilerMakefilePlatform)"
       AdditionalIncludeDirectories ="$(IncludePath)"
       AdditionalLibraryDirectories ="$(LibraryPath)"
       ExcludeDirectories ="$(ExcludePath)"
       ConfigurationType  ="$(ConfigurationType)"
-      />
+    />
     
     <MakeAllAndFormatOutputMessages
         ProjectDir      ="$(ProjectDir)"
         OutDir          ="$(IntDir)"
         ToolsPath       ="$(QccToolsPath)"
         CompileItems    ="@(ClCompile)"
-      >
-    </MakeAllAndFormatOutputMessages>
-    
+    />
   </Target>
 
   <!-- *******************************************************************************************
@@ -138,21 +145,20 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       IntDir          ="$(IntDir)"
       OutDir          ="$(OutDir)"
       CompilerVersion ="$(CompilerVersion)"
-      Platform        ="$(Platform)"
+      Platform        ="$(CompilerMakefilePlatform)"
       AdditionalIncludeDirectories ="$(IncludePath)"
       AdditionalLibraryDirectories ="$(LibraryPath)"
       ExcludeDirectories ="$(ExcludePath)"
       ConfigurationType  ="$(ConfigurationType)"
-      />
+    />
 
     <MakeAllAndFormatOutputMessages
         ProjectDir      ="$(ProjectDir)"
         OutDir          ="$(IntDir)"
         ToolsPath       ="$(QccToolsPath)"
-        CompileItems    ="@(ClCompile)">
-    </MakeAllAndFormatOutputMessages>
-
-</Target>
+        CompileItems    ="@(ClCompile)"
+    />
+  </Target>
 
   <PropertyGroup>
     <CleanDependsOn>
@@ -162,7 +168,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </PropertyGroup>
   
   <Target Name="MakeClean">
-    <Error Condition="$(QNX_HOST) == ''" Text="The NDK is not selected properly, unable to build as toolset is missing, QNX_HOST and QNX_TARGET are undefined." />
     <Exec Command="$(QccToolsPath)\make clean" WorkingDirectory="$(IntDir)" Condition="Exists('$(IntDir)makefile')" />
     <Message Text="Nothing to clean. $(IntDir)makefile does not exist." Condition="!Exists('$(IntDir)makefile')" />
   </Target>
