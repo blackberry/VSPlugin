@@ -602,7 +602,7 @@ namespace BlackBerry.Package.Components
             }
 
             var targetName = _startProject.Name;  // name of the binary... should be better way to detect it... although whole deploying fails, if binary-name != project-name
-            var executablePath = Path.Combine(DteHelper.GetOutputPath(_startProject), targetName);
+            var executablePath = ProjectHelper.GetTargetFullName(_startProject);
             var ndk = ActiveNDK;
             var device = ActiveTarget;
             var runtime = ActiveRuntime;

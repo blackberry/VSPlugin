@@ -593,8 +593,11 @@ namespace BlackBerry.Package
                     string outputPath;
                     if (IsMatchingProject(project, process, out outputPath))
                     {
-                        TraceLog.WarnLine("Suggesting executable path: \"{0}\"", outputPath);
-                        return outputPath;
+                        if (File.Exists(outputPath))
+                        {
+                            TraceLog.WarnLine("Suggesting executable path: \"{0}\"", outputPath);
+                            return outputPath;
+                        }
                     }
                 }
             }
