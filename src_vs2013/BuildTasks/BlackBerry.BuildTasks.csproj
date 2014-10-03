@@ -153,66 +153,66 @@
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Common.props</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.default.props">
-      <Link>BlackBerry\Microsoft.Cpp.BlackBerry.default.props</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\cl.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\cl.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\debugger_general.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\debugger_general.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\directories.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\directories.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\general.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\general.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\lib.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\lib.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\link.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\link.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\packager.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\packager.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.default.props">
+      <Link>BlackBerry\Platform.default.props</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.props">
-      <Link>BlackBerry\Microsoft.Cpp.BlackBerry.props</Link>
+      <Link>BlackBerry\Platform.props</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.targets">
-      <Link>BlackBerry\Microsoft.Cpp.BlackBerry.targets</Link>
+      <Link>BlackBerry\Platform.targets</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props">
-      <Link>BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props</Link>
+      <Link>BlackBerry\PlatformToolsets\qcc\Toolset.props</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.targets">
-      <Link>BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.targets</Link>
+      <Link>BlackBerry\PlatformToolsets\qcc\Toolset.targets</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xml">
       <Link>BarDescriptor\Schema\bar-descriptor.xml</Link>
-    </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\cl.xml">
-      <Link>BlackBerry\PlatformToolsets\1033\cl.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\debugger_general.xml">
-      <Link>BlackBerry\PlatformToolsets\1033\debugger_general.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\directories.xml">
-      <Link>BlackBerry\PlatformToolsets\1033\directories.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\general.xml">
-      <Link>BlackBerry\PlatformToolsets\1033\general.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\lib.xml">
-      <Link>BlackBerry\PlatformToolsets\1033\lib.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\link.xml">
-      <Link>BlackBerry\PlatformToolsets\1033\link.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\packager.xml">
-      <Link>BlackBerry\PlatformToolsets\1033\packager.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml">
-      <Link>BlackBerry\PlatformToolsets\1033\ProjectItemsSchema.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
