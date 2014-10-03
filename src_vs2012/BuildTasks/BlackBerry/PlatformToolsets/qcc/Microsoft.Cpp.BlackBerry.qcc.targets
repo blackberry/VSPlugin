@@ -28,7 +28,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </ItemGroup>
 
   <ItemGroup Condition="('$(ConfigurationType)' == 'Application')">
-    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\Rules\packager.xml" />
+    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\packager.xml" />
     <ProjectTools Include="BuildBar"/>
     <ProjectTools Include="OptimizedDeploy" />
   </ItemGroup>
