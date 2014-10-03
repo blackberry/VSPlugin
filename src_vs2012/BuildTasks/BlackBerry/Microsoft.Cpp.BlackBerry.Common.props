@@ -15,8 +15,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
           Condition="Exists('$(VCTargetsPath)Platforms\BlackBerry\ImportBefore')" />
 
   <!-- Default preprocessor defines -->
-  <PropertyGroup>
-    <QccDefines>QCC;__QCC__;__QNX__</QccDefines>
+  <PropertyGroup Condition="'$(CPUVARDIR)' == 'armle-v7'">
+    <QccDefines>QCC;__QCC__;__QNX__;QNX_DEVICE=1;QNX_FAMILY=device</QccDefines>
+    <QccDefines Condition="'$(QNX_FAMILY)' == 'tablet'">QCC;__QCC__;__QNX__;QNX_DEVICE=2;QNX_TABLET=1;QNX_FAMILY=tablet</QccDefines>
+    <LinkSharedLib>false</LinkSharedLib>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(CPUVARDIR)' == 'x86'">
+    <QccDefines>QCC;__QCC__;__QNX__;QNX_SIMULATOR=1;QNX_FAMILY=device-simulator</QccDefines>
+    <QccDefines Condition="'$(QNX_FAMILY)' == 'tablet'">QCC;__QCC__;__QNX__;QNX_SIMULATOR=2;QNX_TABLET=1;QNX_FAMILY=tablet-simulator</QccDefines>
     <LinkSharedLib>false</LinkSharedLib>
   </PropertyGroup>
 

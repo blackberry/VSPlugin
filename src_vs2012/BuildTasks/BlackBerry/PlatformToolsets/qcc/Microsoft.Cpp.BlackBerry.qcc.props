@@ -28,9 +28,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <FullDeploy>true</FullDeploy>
   </PropertyGroup>
 
-  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Common.props" />
-  <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\Microsoft.Cpp.BlackBerry.Common.props" />
-  
   <PropertyGroup>
     <QNX_TARGET>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@NDKTargetPath)</QNX_TARGET>
     <QNX_HOST>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@NDKHostPath)</QNX_HOST>
@@ -48,6 +45,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <SSHPublicKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa.pub</SSHPublicKeyPath>
     <SSHPrivateKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa</SSHPrivateKeyPath>
   </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Common.props" />
+  <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\Microsoft.Cpp.BlackBerry.Common.props" />
   
   <PropertyGroup>
     <PlatformToolsetVersion>qcc2.0</PlatformToolsetVersion>
@@ -69,31 +69,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </PropertyGroup>
 
   <PropertyGroup>
-    <VCInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
-    <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
-    <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\10.0\Setup\VC@ProductDir)</VCInstallDir>
-    <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VCExpress\10.0\Setup\VC@ProductDir)</VCInstallDir>
-
-    <VSInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\11.0\Setup\VS@ProductDir)</VSInstallDir>
-    <VSInstallDir Condition="'$(VSInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\11.0\Setup\VS@ProductDir)</VSInstallDir>
-    <VSInstallDir Condition="'$(VSInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\11.0\Setup\VS@ProductDir)</VSInstallDir>
-    <VSInstallDir Condition="'$(VSInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VCExpress\11.0\Setup\VS@ProductDir)</VSInstallDir>
-
-    <WindowsSdkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A@InstallationFolder)</WindowsSdkDir>
-    <WindowsSdkDir Condition="'$(WindowsSdkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v7.0A@InstallationFolder)</WindowsSdkDir>
-
-    <WindowsSdkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v8.0A@InstallationFolder)</WindowsSdkDir>
-    <WindowsSdkDir Condition="'$(WindowsSdkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v8.0A@InstallationFolder)</WindowsSdkDir>
-
-    <FrameworkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework@InstallRoot)</FrameworkDir>
-    <FrameworkDir Condition="'$(FrameworkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\.NETFramework@InstallRoot)</FrameworkDir>
-
-    <FrameworkSdkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v7.0A@InstallationFolder)</FrameworkSdkDir>
-    <FrameworkSdkDir Condition="'$(FrameworkSdkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v7.0A@InstallationFolder)</FrameworkSdkDir>
-
-    <FrameworkSdkDir Condition="'$(UseEnv)' != 'true'">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Microsoft SDKs\Windows\v8.0A@InstallationFolder)</FrameworkSdkDir>
-    <FrameworkSdkDir Condition="'$(FrameworkSdkDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Microsoft SDKs\Windows\v8.0A@InstallationFolder)</FrameworkSdkDir>
-
     <ExecutablePath Condition="'$(ExecutablePath)' == ''">$(QNX_HOST)\usr\bin;$(PATH);</ExecutablePath>
     <IncludePath Condition="'$(IncludePath)' == ''">$(QNX_TARGET)\usr\include;$(QNX_TARGET)\usr\include\freetype2;$(QNX_TARGET)\..\target-override\usr\include;$(QNX_TARGET)\usr\include\cpp;$(QNX_TARGET)\usr\include\cpp\c</IncludePath>
     <LibraryPath Condition="'$(LibraryPath)' == ''">$(QccLibPath);$(QNX_TARGET)\..\target-override\$(CPUVARDIR)\lib;$(QNX_TARGET)\..\target-override\$(CPUVARDIR)\usr\lib;</LibraryPath>

@@ -35,6 +35,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Message Text="Updating environment variables for QNX:
   QNX_HOST          = $(QNX_HOST)
   QNX_TARGET        = $(QNX_TARGET)
+  QNX_FAMILY        = $(QNX_FAMILY)
   CPUVARDIR         = $(CPUVARDIR)
   Platform          = $(Platform)
   Makefile Platform = $(CompilerMakefilePlatorm)
