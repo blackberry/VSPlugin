@@ -43,6 +43,7 @@ src_vs2012/Package/BlackBerry.Package.csproj.user
 src_vs2012/Tasks/BlackBerry.Tasks.csproj.user
 src_vs2012/UnitTests/UnitTests.csproj.user
 
+src_vs2013/BuildTasks/BlackBerry.BuildTasks.csproj.user
 src_vs2013/BlackBerry.NativePlugin.sdf
 src_vs2013/BlackBerry.NativePlugin.opensdf
 src_vs2013/BlackBerry.NativePlugin.sln.DotSettings
