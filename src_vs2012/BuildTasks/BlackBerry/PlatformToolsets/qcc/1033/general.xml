@@ -97,7 +97,7 @@
     <EnumValue Name="Unicode" DisplayName="Use Unicode Character Set" Description="Use Unicode Character Set" />
     <EnumValue Name="MultiByte" DisplayName="Use Multi-Byte Character Set" Description="Use Multi-Byte Character Set" />
   </EnumProperty>
-  <EnumProperty Name="CPUVARDIR" DisplayName="Target CPU"
+  <EnumProperty Name="TargetArch" DisplayName="Target CPU"
                 Description="Specifies that the compiler target is simulator or device."
                 Category="ProjectDefaults" Visible="true">
     <EnumValue Name="x86" DisplayName="Simulator" Description="Build for simulator" />

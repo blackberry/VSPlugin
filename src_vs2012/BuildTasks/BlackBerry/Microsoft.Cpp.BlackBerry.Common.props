@@ -14,13 +14,19 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <Import Project="$(VCTargetsPath)Platforms\BlackBerry\ImportBefore\*.props" 
           Condition="Exists('$(VCTargetsPath)Platforms\BlackBerry\ImportBefore')" />
 
+  <PropertyGroup>
+    <TargetArch Condition="'$(TargetArch)' == ''">armle-v7</TargetArch>
+    <ConfigurationAppType Condition="'$(ConfigurationAppType)' == ''">Regular</ConfigurationAppType>
+    <CharacterSet Condition="'$(CharacterSet)' == ''">Unicode</CharacterSet>
+  </PropertyGroup>
+  
   <!-- Default preprocessor defines -->
-  <PropertyGroup Condition="'$(CPUVARDIR)' == 'armle-v7'">
+  <PropertyGroup Condition="'$(TargetArch)' == 'armle-v7'">
     <QccDefines>QCC;__QCC__;__QNX__;QNX_DEVICE=1;QNX_FAMILY=device</QccDefines>
     <QccDefines Condition="'$(QNX_FAMILY)' == 'tablet'">QCC;__QCC__;__QNX__;QNX_DEVICE=2;QNX_TABLET=1;QNX_FAMILY=tablet</QccDefines>
     <LinkSharedLib>false</LinkSharedLib>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(CPUVARDIR)' == 'x86'">
+  <PropertyGroup Condition="'$(TargetArch)' == 'x86'">
     <QccDefines>QCC;__QCC__;__QNX__;QNX_SIMULATOR=1;QNX_FAMILY=device-simulator</QccDefines>
     <QccDefines Condition="'$(QNX_FAMILY)' == 'tablet'">QCC;__QCC__;__QNX__;QNX_SIMULATOR=2;QNX_TABLET=1;QNX_FAMILY=tablet-simulator</QccDefines>
     <LinkSharedLib>false</LinkSharedLib>
@@ -30,9 +36,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <PropertyGroup>
     <IgnoreImportLibrary>true</IgnoreImportLibrary>
     <GenerateManifest>false</GenerateManifest>
-    <CPUVARDIR Condition="'$(CPUVARDIR)' == ''">armle-v7</CPUVARDIR>
-    <ConfigurationAppType Condition="'$(ConfigurationAppType)' == ''">Regular</ConfigurationAppType>
-    <CharacterSet Condition="'$(CharacterSet)' == ''">Unicode</CharacterSet>
   </PropertyGroup>
 
   <!-- Settings specific to each build type -->
@@ -55,7 +58,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <LibPrefix>lib</LibPrefix>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(CPUVARDIR)' == 'armle-v7'">
+  <PropertyGroup Condition="'$(TargetArch)' == 'armle-v7'">
     <IntDir Condition="'$(IntDir)'=='' AND '$(IntermediateOutputPath)'!=''">$(IntermediateOutputPath)</IntDir>
     <IntDir Condition="'$(IntDir)'=='' AND '$(IntermediateOutputPath)'==''">Device-$(Configuration)\</IntDir>
     <OutDir Condition="'$(OutDir)'=='' AND '$(SolutionDir)' != ''">Device-$(Configuration)\</OutDir>
@@ -63,11 +66,13 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     
     <CompilerTarget>gcc_ntoarmv7le</CompilerTarget>
     <CompilerMakefilePlatform>BlackBerry</CompilerMakefilePlatform>
+    <TargetCPU>Device</TargetCPU>
     <TargetDeviceIP>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@device_IP)</TargetDeviceIP>
     <TargetDevicePassword>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@device_password)</TargetDevicePassword>
+    <CPUVARDIR>armle-v7</CPUVARDIR>
   </PropertyGroup>
   
-  <PropertyGroup Condition="'$(CPUVARDIR)' == 'x86'">
+  <PropertyGroup Condition="'$(TargetArch)' == 'x86'">
     <IntDir Condition="'$(IntDir)'=='' AND '$(IntermediateOutputPath)'!=''">$(IntermediateOutputPath)</IntDir>
     <IntDir Condition="'$(IntDir)'=='' AND '$(IntermediateOutputPath)'==''">Simulator-$(Configuration)\</IntDir>
     <OutDir Condition="'$(OutDir)'=='' AND '$(SolutionDir)' != ''">Simulator-$(Configuration)\</OutDir>
@@ -75,8 +80,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     
     <CompilerTarget>gcc_ntox86</CompilerTarget>
     <CompilerMakefilePlatform>BlackBerrySimulator</CompilerMakefilePlatform>
+    <TargetCPU>Simulator</TargetCPU>
     <TargetDeviceIP>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)</TargetDeviceIP>
     <TargetDevicePassword>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)</TargetDevicePassword>
+    <CPUVARDIR>x86</CPUVARDIR>
   </PropertyGroup>
 
   <!-- Redefine the Target Macros-->

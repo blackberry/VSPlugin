@@ -36,7 +36,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   QNX_HOST          = $(QNX_HOST)
   QNX_TARGET        = $(QNX_TARGET)
   QNX_FAMILY        = $(QNX_FAMILY)
-  CPUVARDIR         = $(CPUVARDIR)
+  Architecture      = $(TargetArch)
   Platform          = $(Platform)
   Makefile Platform = $(CompilerMakefilePlatform)
   Deploy Target     = IP: $(TargetDeviceIP)
@@ -168,7 +168,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </CleanDependsOn>
   </PropertyGroup>
   
-  <Target Name="MakeClean" DependsOnTargets="SetQnxBuildVariables">
+  <Target Name="MakeClean">
     <Exec Command="$(QccToolsPath)\make clean" WorkingDirectory="$(IntDir)" Condition="Exists('$(IntDir)makefile')" />
     <Message Text="Nothing to clean. $(IntDir)makefile does not exist." Condition="!Exists('$(IntDir)makefile')" />
   </Target>
