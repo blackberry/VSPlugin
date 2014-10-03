@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--original MSBuild\Microsoft.Cpp\v4.0\1033\lib.xml.-->
+<Rule Name="LIB" PageTemplate="tool" DisplayName="Librarian" SwitchPrefix="-" Order="40" 
+      xmlns="http://schemas.microsoft.com/build/2009/properties" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+      xmlns:sys="clr-namespace:System;assembly=mscorlib">
+  <Rule.Categories>
+    <Category Name="General" DisplayName="General" />
+    <Category Name="Debugging" DisplayName="Debugging" />
+    <Category Name="Command Line" DisplayName="Command Line" Subtype="CommandLine" />
+  </Rule.Categories>
+  <Rule.DataSource>
+    <DataSource Persistence="ProjectFile" ItemType="Lib" Label="" HasConfigurationCondition="true" />
+  </Rule.DataSource>
+  <StringProperty Subtype="file" Name="OutputFile" DisplayName="Output File" 
+                  Description="The -A option overrides the default name and location of the program that the lib creates." 
+                  Category="General" Switch="A" Separator=":" F1Keyword="VC.Project.VCLibrarianTool.OutputFile">
+  </StringProperty>
+  <StringListProperty Subtype="file" Name="AdditionalDependencies" DisplayName="Additional Dependencies" 
+                      Description="Specifies additional items to add to the link command line [i.e. sound] " 
+                      Category="General" F1Keyword="VC.Project.VCLibrarianTool.AdditionalDependencies">
+  </StringListProperty>
+  <StringListProperty Subtype="folder" Name="AdditionalLibraryDirectories" DisplayName="Additional Library Directories" 
+                      Description="Allows the user to override the environmental library path" Category="General" Switch="L" 
+                      F1Keyword="VC.Project.VCLibrarianTool.AdditionalLibraryDirectories">
+  </StringListProperty>
+  <BoolProperty Name="LinkStatic" DisplayName="Link lib static" Description="Link lib static" Category="General" Switch="static" F1Keyword="VC.Project.VCLibrarianTool.Verbose" />
+  <BoolProperty Name="TreatLibWarningAsErrors" DisplayName="Treat Lib Warning As Errors" Description="Causes no output file to be generated if lib generates a warning." 
+                Category="General" Switch="Werror" F1Keyword="VC.Project.VCLibrarianTool.TreatLibWarningsAsErrors">
+  </BoolProperty>
+
+  <StringProperty Name="InternalName" DisplayName="Internal Name"
+                  Description="This option sets the internal name of the shared object to the name given instead of to the object's pathname, so you'd use name to access the object when dynamically linking. You might find this useful when doing cross-development (e.g. from a Windows system to a QNX Neutrino target). "
+                  Category="General" Switch="Wl,-hname" >
+  </StringProperty>
+  <BoolProperty Name="Verbose" DisplayName="Verbose" Description="Verbose" Category="General" Switch="VERBOSE" F1Keyword="VC.Project.VCLibrarianTool.Verbose">
+  </BoolProperty>
+
+  <!-- Debugging -->
+  <BoolProperty Name="GenerateDebugInformation" DisplayName="Generate Debug Info"
+       Description="The -g option creates debugging information for the .exe file or DLL."
+       Category="Debugging" Switch="g" F1Keyword="VC.Project.VCLinkerTool.GenerateDebugInformation">
+  </BoolProperty>
+  <BoolProperty Name="EnhancedSecurity" DisplayName="Enhanced Security" Category="Debugging" Switch="Wl,-z,relro -Wl,-z,now" />
+  <StringProperty Subtype="folder" Name="TrackerLogDirectory" DisplayName="Tracker Log Directory" Description="Tracker log directory."
+                  Category="General" IncludeInCommandLine="false" Visible="false">
+  </StringProperty>
+  <StringProperty Name="AdditionalOptions" DisplayName="Additional Options" Description="Additional Options"
+                  Category="Command Line" F1Keyword="vc.project.AdditionalOptionsPage">
+  </StringProperty>
+</Rule>

@@ -14,6 +14,26 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 -->
 
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  <!-- Tools that show up in the IDE property pages for exe and dll projects -->
+  <ItemGroup Condition="('$(ConfigurationType)' == 'Application' or '$(ConfigurationType)' == 'DynamicLibrary')">
+    <ProjectTools Include="Link"/>
+    <ProjectTools Include="CustomBuildStep"/>
+  </ItemGroup>
+
+  <!-- Tools that show up in the IDE property pages for lib project-->
+  <ItemGroup Condition="'$(ConfigurationType)' == 'StaticLibrary'">
+    <ProjectTools Include="Lib"/>
+    <ProjectTools Include="CustomBuildStep"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="('$(ConfigurationType)' == 'Application')">
+    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\Rules\packager.xml" />
+    <ProjectTools Include="BuildBar"/>
+    <ProjectTools Include="OptimizedDeploy" />
+  </ItemGroup>
+  
   <Import Project="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\ImportBefore\*.targets" Condition="Exists('$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\ImportBefore')" />
+  <Import Project="$(VCTargetsPath)\Microsoft.CppCommon.targets" />
   <Import Project="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\ImportAfter\*.targets" Condition="Exists('$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\ImportAfter')" />
 </Project>

@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--Based on script: MSBuild\Microsoft.Cpp\v4.0\1033\cl.xml-->
+<Rule Name="CL" PageTemplate="tool" DisplayName="C/C++" SwitchPrefix="-" Order="10" 
+      xmlns="http://schemas.microsoft.com/build/2009/properties" 
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:sys="clr-namespace:System;assembly=mscorlib">
+  <Rule.Categories>
+    <Category Name="General" DisplayName="General" />
+    <Category Name="Optimization" DisplayName="Optimization" />
+    <Category Name="Preprocessor" DisplayName="Preprocessor" />
+    <Category Name="Code Generation" DisplayName="Code Generation" />
+    <Category Name="Language" DisplayName="Language" />
+    <Category Name="Output Files" DisplayName="Output Files" />
+    <Category Name="Advanced" DisplayName="Advanced" />
+    <Category Name="Command Line" DisplayName="Command Line" Subtype="CommandLine" />
+  </Rule.Categories>
+  <Rule.DataSource>
+    <DataSource Persistence="ProjectFile" ItemType="ClCompile" Label="" HasConfigurationCondition="true" />
+  </Rule.DataSource>
+
+  <!-- General -->
+  <StringListProperty Subtype="folder" Name="AdditionalIncludeDirectories" DisplayName="Additional Include Directories"
+                      Description="Specifies one or more directories to add to the include path; separate with semi-colons if more than one (-I[path])."
+                      Category="General" Switch="I" F1Keyword="VC.Project.VCCLCompilerTool.AdditionalIncludeDirectories" />
+  <BoolProperty Name="MultiProcess" DisplayName="Multi-Processor Compilation"
+              Description="Use the maximum number of processors during compilation."
+              Category="General" Switch="j" />
+  <BoolProperty Name="Ansi" DisplayName="Compile strict ANSI code" 
+                Description="When you use the -ansi option, qcc compiles strict ANSI code. Use this option when you're creating an application that must conform to the ANSI standard."
+                Category="General" Switch="ansi" />
+  <BoolProperty Name="GenerateDebugInformation" DisplayName="Generate Debug Info" Category="General" Switch="g" />
+  <EnumProperty Name="WarningLevel" DisplayName="Warning Level"
+     Description="Select how strict you want the compiler to be about code errors (-w, -w9)."
+     Category="General" F1Keyword="VC.Project.VCCLCompilerTool.WarningLevel">
+    <EnumValue Name="TurnOffAllWarnings" Switch="w" DisplayName="Turn Off All Warnings" Description="Level 0 disables all warnings." />
+    <EnumValue Name="Level1" Switch="w1" DisplayName="Level1" Description="Level 1 displays severe warnings. Level 1 is the default warning level at the command line." />
+    <EnumValue Name="Level2" Switch="w2" DisplayName="Level2" Description="Level 2 displays all level 1 warnings and warnings less severe than level 1." />
+    <EnumValue Name="Level3" Switch="w3" DisplayName="Level3" Description="Level 3 displays all level 2 warnings and all other warnings recommended for production purposes." />
+    <EnumValue Name="Level4" Switch="w4" DisplayName="Level4" Description="Level 4 displays all level 3 warnings plus informational warnings, which in most cases can be safely ignored." />
+    <EnumValue Name="Level5" Switch="w5" DisplayName="Level5" Description="Level 5 warnings." />
+    <EnumValue Name="Level6" Switch="w6" DisplayName="Level6" Description="Level 6 warnings." />
+    <EnumValue Name="Level7" Switch="w7" DisplayName="Level7" Description="Level 7 warnings." />
+    <EnumValue Name="Level8" Switch="w8" DisplayName="Level8" Description="Level 8 warnings." />
+    <EnumValue Name="Level9" Switch="w9" DisplayName="Level9" Description="Level 9 warnings." />
+    <EnumValue Name="AllWarnings" DisplayName="Enable All Warnings" Switch="Wall" />
+  </EnumProperty>
+  <BoolProperty Name="TreatWarningAsError" DisplayName="Treat Warnings as Errors" Category="General" Switch="Werror" />
+  <StringProperty Subtype="folder" Name="TrackerLogDirectory" DisplayName="Tracker Log Directory" Description="Tracker Log Directory." Category="General"
+                  IncludeInCommandLine="false" Visible="false" />
+
+  <!-- Optimization -->
+  <EnumProperty Name="Optimization" DisplayName="Optimization"
+                Description="Select option for code optimization; choose Custom to use specific optimization options (-O0, -O1, -O2, -O3)."
+                Category="Optimization" F1Keyword="VC.Project.VCCLCompilerTool.Optimization">
+    <EnumValue Name="Disabled" Switch="O0" DisplayName="None" Description="Disable optimization." />
+    <EnumValue Name="MinSpace" Switch="O1" DisplayName="Minimize Size" Description="" />
+    <EnumValue Name="MaxSpeed" Switch="O2" DisplayName="Maximize Speed" Description="" />
+    <EnumValue Name="Full" Switch="O3" DisplayName="Full Optimization" Description="" />
+  </EnumProperty>
+
+  <!-- Preprocessor -->
+  <StringListProperty Name="PreprocessorDefinitions" DisplayName="Preprocessor Definitions"
+                      Description="Defines a preprocessing symbols for your source file."
+                      Category="Preprocessor" Switch="D " F1Keyword="VC.Project.VCCLCompilerTool.PreprocessorDefinitions">
+  </StringListProperty>
+  <StringListProperty Name="UndefinePreprocessorDefinitions" DisplayName="Undefine Preprocessor Definitions"
+                      Description="Specifies one or more preprocessor undefines (-U[macro])."
+                      Category="Preprocessor" Switch="U" F1Keyword="VC.Project.VCCLCompilerTool.UndefinePreprocessorDefinitions">
+  </StringListProperty>
+  <BoolProperty Name="PreprocessToFile" DisplayName="Preprocess to a File"
+                Description="Preprocesses to file.i (C) or file.ii (C++)."
+                Category="Preprocessor" Switch="P" F1Keyword="VC.Project.VCCLCompilerTool.GeneratePreprocessedFile">
+  </BoolProperty>
+  <BoolProperty Name="PreprocessToStdout" DisplayName="Preprocess Output to stdout"
+                  Description="" Category="Preprocessor" Switch="E" >
+  </BoolProperty>
+  <BoolProperty Name="PreprocessKeepComments" DisplayName="Keep Comments"
+                Description="Suppresses comment strip from source code; requires that one of the 'Preprocessing' options be set (-C)."
+                Category="Preprocessor" Switch="C" F1Keyword="VC.Project.VCCLCompilerTool.KeepComments">
+  </BoolProperty>
+
+  <!-- Code generation -->
+  <BoolProperty Name="GccExceptionHandling" DisplayName="Enable C++ Exceptions" Category="Code Generation"
+          Switch="fexceptions" ReverseSwitch="fno-exceptions" />
+  <BoolProperty Name="EnhancedSecurity" DisplayName="Enhanced Security" Category="Code Generation" Switch="fstack-protector-all" />
+  <BoolProperty Name="PIE" DisplayName="Position Independent Executable" Category="Code Generation" Switch="fPIE" />
+  <BoolProperty Name="ProfilingCall" DisplayName="Build for Profiling (Call Count)" Category="Code Generation" Switch="p" />
+  <BoolProperty Name="ProfilingFunc" DisplayName="Build for Profiling (Function Instrumentation)" Category="Code Generation" Switch="finstrument-functions" />
+  <BoolProperty Name="CodeCoverage" DisplayName="Build for Code Coverage" Category="Code Generation" Switch="Wc,-ftext-coverage -Wc,-fprofile-arcs" />
+  <BoolProperty Name="Mudflap" DisplayName="Build for Mudflap" Category="Code Generation" Switch="fmudflapth" />
+
+  <!-- Language -->
+  <BoolProperty Name="RuntimeTypeInfo" DisplayName="Enable Run-Time Type Information" Category="Language"  Switch="frtti" ReverseSwitch="fno-rtti" />
+  <BoolProperty Name="ShortEnums" DisplayName="Short Enums" Category="Language" Switch="fshort-enums" ReverseSwitch="fno-short-enums" />
+
+  <!-- Output Files -->
+  <StringProperty Subtype="file" Name="ObjectFileName" DisplayName="Object File Name"
+                  Description="Specifies a name to override the default object file name; can be file or directory name (-o[name])."
+                  Category="Output Files" Switch="o" F1Keyword="VC.Project.VCCLCompilerTool.ObjectFile">
+  </StringProperty>
+  
+  <!-- Advanced -->
+  <EnumProperty Name="CompileAs" DisplayName="Compile As"
+                Description="Select compile language option for .c and .cpp files (-lang-c, -lang-c++)."
+                Category="Advanced" F1Keyword="VC.Project.VCCLCompilerTool.CompileAs">
+    <EnumValue Name="CompileAsC" Switch="lang-c" DisplayName="Compile as C Code" Description="Compile as C Code" />
+    <EnumValue Name="CompileAsCpp" Switch="lang-c++" DisplayName="Compile as C++ Code" Description="Compile as C++ Code" />
+  </EnumProperty>
+
+  <!-- Command Line -->
+  <StringProperty Name="AdditionalOptions" DisplayName="Additional Options" Description="Additional Options" Category="Command Line" F1Keyword="vc.project.AdditionalOptionsPage" />
+  <BoolProperty Name="BuildingInIDE" Visible="false" />
+</Rule>

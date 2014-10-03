@@ -191,9 +191,6 @@ echo %actionNo%: Installing build targets
 echo Copy BlackBerry MSBuild directory [%OutputMsBuildTargetsPath%]
 xcopy "%InputPath%\BlackBerry" "%OutputMsBuildTargetsPath%\BlackBerry" /e /i /y
 copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerry\BlackBerry.BuildTasks.dll"
-echo Copy BlackBerrySimulator MSBuild directory [%OutputMsBuildTargetsPath%]
-xcopy "%InputPath%\BlackBerrySimulator" "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /e /i /y
-copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerrySimulator\BlackBerry.BuildTasks.dll"
 
 goto processMSBuild_End
 
@@ -203,8 +200,6 @@ REM Remove MSBuild Files
 echo %actionNo%: Removing build targets
 echo Delete BlackBerry MSBuild directory
 rd "%OutputMsBuildTargetsPath%\BlackBerry" /s /q
-echo Delete BlackBerrySimulator MSBuild directory
-rd "%OutputMsBuildTargetsPath%\BlackBerrySimulator" /s /q
 
 :processMSBuild_End
 endlocal

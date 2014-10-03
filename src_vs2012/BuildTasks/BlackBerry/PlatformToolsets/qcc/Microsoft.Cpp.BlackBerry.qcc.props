@@ -14,15 +14,30 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <Import Project="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\ImportBefore\*.props" 
           Condition="Exists('$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\ImportBefore')" />
 
+  <!-- Override all the default Microsoft cpp property pages and project tools -->
+  <PropertyGroup>
+    <!-- Limit some Microsoft Win32 settings -->
+    <!-- Don't use the shared WINAPI_FAMILY_APP setting -->
+    <_NoWinAPIFamilyApp Condition="'$(_NoWinAPIFamilyApp)' == ''">true</_NoWinAPIFamilyApp>
+    <MinimalCoreWin Condition="'$(MinimalCoreWin)' == ''">true</MinimalCoreWin>
+    <NonCoreWin>true</NonCoreWin>
+    <SupportsNativeResources>false</SupportsNativeResources>
+    <SupportsCrossRuntimeReferences>false</SupportsCrossRuntimeReferences>
+
+    <UseDefaultProjectTools>false</UseDefaultProjectTools>
+    <FullDeploy>true</FullDeploy>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Common.props" />
+  <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\Microsoft.Cpp.BlackBerry.Common.props" />
+  
   <PropertyGroup>
     <QNX_TARGET>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@NDKTargetPath)</QNX_TARGET>
     <QNX_HOST>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@NDKHostPath)</QNX_HOST>
     <QNX_FAMILY>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@NDKFamilyType)</QNX_FAMILY>
     <from_file Condition="'$(QNX_HOST)' != ''">$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
     <QCC_CONF_PATH Condition="'$(QCC_CONF_PATH)' == ''">$(QNX_HOST)\etc\qcc\gcc</QCC_CONF_PATH>
-    <CPUVARDIR>armle-v7</CPUVARDIR>
     <CompilerVersion>$(from_file)</CompilerVersion>
-    <CompilerTarget>gcc_ntoarmv7le</CompilerTarget>
     <QccLibPath>$(QNX_TARGET)\$(CPUVARDIR)\lib</QccLibPath>
     <AppDataPath>$(AppData)</AppDataPath>
 
@@ -32,10 +47,6 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <SSHPublicKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa.pub</SSHPublicKeyPath>
     <SSHPrivateKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa</SSHPrivateKeyPath>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Platform)'=='BlackBerry'">
-    <DebuggerFlavor>BlackBerryDebugEngine</DebuggerFlavor>
   </PropertyGroup>
   
   <PropertyGroup>
@@ -55,7 +66,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <SSHToolExe>ssh.exe</SSHToolExe>
     <SSHToolPath>$(QccToolsPath)</SSHToolPath>
     <SSHKeygenToolExe>$(QccToolsPath)\ssh-keygen.exe</SSHKeygenToolExe>
+  </PropertyGroup>
 
+  <PropertyGroup>
     <VCInstallDir>$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
     <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\VisualStudio\10.0\Setup\VC@ProductDir)</VCInstallDir>
     <VCInstallDir Condition="'$(VCInstallDir)' == ''">$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\VCExpress\10.0\Setup\VC@ProductDir)</VCInstallDir>
