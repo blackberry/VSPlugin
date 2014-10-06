@@ -34,7 +34,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <QNX_FAMILY>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@NDKFamilyType)</QNX_FAMILY>
     <from_file Condition="'$(QNX_HOST)' != ''">$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
     <QCC_CONF_PATH Condition="'$(QCC_CONF_PATH)' == ''">$(QNX_HOST)\etc\qcc\gcc</QCC_CONF_PATH>
-    <CompilerVersion>$(from_file)</CompilerVersion>
+    <TargetCompilerVersion>$(from_file)</TargetCompilerVersion>
     <AppDataPath>$(AppData)</AppDataPath>
 
     <!-- for Windows XP the AppDataPath is different! -->

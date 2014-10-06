@@ -14,6 +14,7 @@
 
 using System.Collections.Generic;
 using System.IO;
+using BlackBerry.BuildTasks.Templates;
 using BlackBerry.NativeCore;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -179,6 +180,12 @@ namespace BlackBerry.BuildTasks
             get;
         }
 
+        public string SolutionName
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Getter/Setter for ConfigurationType property
         /// </summary>
@@ -188,10 +195,28 @@ namespace BlackBerry.BuildTasks
             get;
         }
 
+        public string ConfigurationAppType
+        {
+            get;
+            set;
+        }
+
+        public string TargetCompiler
+        {
+            get;
+            set;
+        }
+
+        public string TargetArch
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Getter/Setter for CompilerVersion property
         /// </summary>
-        public string CompilerVersion
+        public string TargetCompilerVersion
         {
             set;
             get;
@@ -214,13 +239,21 @@ namespace BlackBerry.BuildTasks
         /// <returns></returns>
         public override bool Execute()
         {
+            using (StreamWriter outFile = new StreamWriter(IntDir + "makefile.shadow"))
+            {
+                var template = new MakefileTemplate();
+                template.SolutionName = SolutionName;
+
+                outFile.Write(template.TransformText());
+            }
+
             string targetString = TargetName + TargetExtension;
             targetString = targetString.Replace(".exe", "");
-            string compilerFlag = "-V\"" + CompilerVersion;
+            string compilerFlag = "-V\"" + TargetCompilerVersion;
 
-            if (Platform == "BlackBerry")
+            if (Platform == "Device")
                 compilerFlag += ",gcc_ntoarmv7le\"";
-            else if (Platform == "BlackBerrySimulator")
+            else if (Platform == "Simulator")
                 compilerFlag += ",gcc_ntox86\"";
 
             using (StreamWriter outFile = new StreamWriter(IntDir + "makefile"))

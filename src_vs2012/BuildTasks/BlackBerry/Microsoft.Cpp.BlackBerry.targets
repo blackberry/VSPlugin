@@ -21,7 +21,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <UsingTask TaskName="QccCompiler" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="QccLink" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="QccLib" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
-  <UsingTask TaskName="GenerateMakeFile" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="GenerateMakefile" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="MakeAllAndFormatOutputMessages" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="VCMessage" AssemblyName="Microsoft.Build.CppTasks.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
 
@@ -33,18 +33,18 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <!-- This target is called as the first one to prepare the environment, expected variables must be set by the PlatformToolset -->
   <Target Name="SetQnxBuildVariables">
     <Message Text="Updating environment variables for QNX:
-  QNX_HOST          = $(QNX_HOST)
-  QNX_TARGET        = $(QNX_TARGET)
-  QNX_FAMILY        = $(QNX_FAMILY)
-  Architecture      = $(TargetArch)
-  Platform          = $(Platform)
-  Makefile Platform = $(CompilerMakefilePlatform)
-  Deploy Target     = IP: $(TargetDeviceIP)
+  QNX_HOST      = $(QNX_HOST)
+  QNX_TARGET    = $(QNX_TARGET)
+  QNX_FAMILY    = $(QNX_FAMILY)
+  Architecture  = $(TargetArch)
+  Platform      = $(Platform)
+  Target CPU    = $(TargetCPU)
+  Deploy Target = IP: $(TargetDeviceIP)
     
     " Importance="High" />
 
     <Error Condition="$(QNX_HOST) == ''" Text="The NDK is missing, please make sure NDK is downloaded and selected." />
-    
+
     <SetEnv Name="QNX_HOST" Value="$(QNX_HOST)" Prefix="false">
       <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_HOST"/>
     </SetEnv>
@@ -69,7 +69,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </ItemGroup>
 
     <WriteLinesToFile File="CompileRan" Lines="true" Overwrite="true" />
-    
+
     <PropertyGroup>
       <CLToolArchitecture Condition="'$(CLToolArchitecture)' == ''">$(DefaultToolArchitecture)</CLToolArchitecture>
     </PropertyGroup>
@@ -88,23 +88,27 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <PropertyGroup>
       <LibToolArchitecture Condition="'$(LibToolArchitecture)' == ''">$(DefaultToolArchitecture)</LibToolArchitecture>
     </PropertyGroup>
-    
+
     <GenerateMakefile
       TargetName      ="$(TargetName)"
       TargetExtension ="$(TargetExt)"
+      TargetArch      ="$(TargetArch)"
+      SolutionName    ="$(SolutionName)"
       CompileItems    ="@(ClCompile)"
       LinkItems       ="@(Lib)"
       ProjectDir      ="$(ProjectDir)"
       IntDir          ="$(IntDir)"
       OutDir          ="$(OutDir)"
-      CompilerVersion ="$(CompilerVersion)"
-      Platform        ="$(CompilerMakefilePlatform)"
+      Platform        ="$(TargetCPU)"
+      TargetCompiler        ="$(TargetCompiler)"
+      TargetCompilerVersion ="$(TargetCompilerVersion)"
       AdditionalIncludeDirectories ="$(IncludePath)"
       AdditionalLibraryDirectories ="$(LibraryPath)"
-      ExcludeDirectories ="$(ExcludePath)"
-      ConfigurationType  ="$(ConfigurationType)"
+      ExcludeDirectories    ="$(ExcludePath)"
+      ConfigurationType     ="$(ConfigurationType)"
+      ConfigurationAppType  ="$(ConfigurationAppType)"
     />
-    
+
     <MakeAllAndFormatOutputMessages
       ProjectDir      ="$(ProjectDir)"
       OutDir          ="$(IntDir)"
@@ -140,17 +144,21 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <GenerateMakefile
       TargetName      ="$(TargetName)"
       TargetExtension ="$(TargetExt)"
+      TargetArch      ="$(TargetArch)"
+      SolutionName    ="$(SolutionName)"
       CompileItems    ="@(ClCompile)"
       LinkItems       ="@(Link)"
       ProjectDir      ="$(ProjectDir)"
       IntDir          ="$(IntDir)"
       OutDir          ="$(OutDir)"
-      CompilerVersion ="$(CompilerVersion)"
-      Platform        ="$(CompilerMakefilePlatform)"
+      Platform        ="$(TargetCPU)"
+      TargetCompiler        ="$(TargetCompiler)"
+      TargetCompilerVersion ="$(TargetCompilerVersion)"
       AdditionalIncludeDirectories ="$(IncludePath)"
       AdditionalLibraryDirectories ="$(LibraryPath)"
-      ExcludeDirectories ="$(ExcludePath)"
-      ConfigurationType  ="$(ConfigurationType)"
+      ExcludeDirectories    ="$(ExcludePath)"
+      ConfigurationType     ="$(ConfigurationType)"
+      ConfigurationAppType  ="$(ConfigurationAppType)"
     />
 
     <MakeAllAndFormatOutputMessages

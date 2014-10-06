@@ -83,11 +83,12 @@
     <EnumValue Name="DynamicLibrary" DisplayName="Dynamic Library (.so)" Description="Dynamic Library (.so)" />
     <EnumValue Name="StaticLibrary" DisplayName="Static library (.a)" Description="Static Library (.a)" />
   </EnumProperty>
-  <EnumProperty Name="ConfigurationAppType" DisplayName="Application Type" Visible="false"
+  <EnumProperty Name="ConfigurationAppType" DisplayName="Application Type" Visible="True"
                 Description="Specifies the type of the application this configuration generates."
                 Category="ProjectDefaults">
     <EnumValue Name="Regular" DisplayName="Regular Application" Description="Application" />
     <EnumValue Name="Cascades" DisplayName="Cascades Application" Description="Cascades Application" />
+    <EnumValue Name="Custom" DisplayName="Custom Makefile" Description="Use project supplied makefile. It is expected that the makefile is placed next to the project file. Nothing will be generated in that case by the IDE." />
   </EnumProperty>
   <EnumProperty Name="CharacterSet" DisplayName="Character Set"
                 Description="Tells the compiler to use the specified character set; aids in localization issues."
