@@ -86,7 +86,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <Output TaskParameter="Lines" PropertyName="CompileRan" />
     </ReadLinesFromFile>
     <Delete Files="CompileRan" />    
-    
+
     <!-- Check if the app is installed on the device or not. -->
     <CheckIfInstalled
         Condition="%(BuildBar.DevMode) == 'true'"
@@ -110,7 +110,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <BBNativePackager  Condition="'$(RunBuildBar)' == 'true' and ('$(CompileRan)' == 'true' or '$(IsAppInstalled)' == 'true')"
         Sources                        ="@(BuildBar)"
-        Platform                       ="$(CompilerMakefilePlatform)"
+        Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        ="$(ProjectName)"
@@ -202,7 +202,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       >
       <Output TaskParameter="IsAppInstalled" PropertyName="IsAppInstalled" />
     </CheckIfInstalled>
-    
+
     <!-- Check that the required SSH keys exist, and generate them if not. -->
     <Exec Condition="!Exists('$(SSHPrivateKeyPath)') or !Exists('$(SSHPublicKeyPath)')"
           Command ="$(SSHKeygenToolExe) -t rsa -b 4096 -f %22$(SSHPrivateKeyPath)%22 -N ''" />
@@ -239,7 +239,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         DebugNative       ="false"
       />
   </Target>
-  
+
   <Target Name="OptimizedDeploy">
     <ItemGroup>
       <BuildBar Include="@(None)" />
@@ -248,7 +248,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <!-- Get the target file map. -->
     <BBNativePackager
         Sources                        ="@(BuildBar)"
-        Platform                       ="$(CompilerMakefilePlatform)"
+        Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        = "$(ProjectName)"
@@ -363,17 +363,17 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         FlagFile          ="$(AppDataPath)\Research In Motion\vsndk-debugNative.txt"
         DebugNative       ="false"
       />
-    
+
     <!-- Delete temporary files used by the optimized build process. -->
     <Delete Files="localManifest.mf;targetManifest.mf;targetFileMap.txt;installedApps.txt" />
 
     <!-- App Descriptor changed, so re-package and perform full deploy. -->  
     <BBNativePackager  Condition="$(AppDescriptorChanged)"
         Sources                        ="@(BuildBar)"
-        Platform                       ="$(CompilerMakefilePlatform)"
+        Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
-        AppName                        = "$(ProjectName)"
+        AppName                        ="$(ProjectName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device                         ="$(TargetDeviceIP)"

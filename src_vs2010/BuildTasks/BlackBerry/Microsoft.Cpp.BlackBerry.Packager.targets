@@ -107,11 +107,11 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </PropertyGroup>
 
     <Message Text="Optimized deploy is disabled, performing full deployment" Condition="$(BuildBar_OptimizedDeploy) == 'false'" Importance="high" />
-    <Message Text="Preparing BAR for $(CompilerMakefilePlatform)" Importance="high" />
+    <Message Text="Preparing BAR for $(TargetCPU)" Importance="high" />
 
     <BBNativePackager  Condition="'$(RunBuildBar)' == 'true' and ('$(CompileRan)' == 'true' or '$(IsAppInstalled)' == 'true')"
         Sources                        ="@(BuildBar)"
-        Platform                       ="$(CompilerMakefilePlatform)"
+        Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        ="$(ProjectName)"
@@ -249,7 +249,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <!-- Get the target file map. -->
     <BBNativePackager
         Sources                        ="@(BuildBar)"
-        Platform                       ="$(CompilerMakefilePlatform)"
+        Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        = "$(ProjectName)"
@@ -371,7 +371,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <!-- App Descriptor changed, so re-package and perform full deploy. -->  
     <BBNativePackager  Condition="$(AppDescriptorChanged)"
         Sources                        ="@(BuildBar)"
-        Platform                       ="$(CompilerMakefilePlatform)"
+        Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        = "$(ProjectName)"

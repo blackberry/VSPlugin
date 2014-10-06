@@ -153,42 +153,42 @@ namespace BlackBerry.BuildTasks
             BarDescriptor.qnxConfiguration[] configs = _descriptor.configurations;
             foreach (var config in configs)
             {
-                if (Configuration == "Debug" && Platform == "BlackBerry" && config.name == "Device-Debug")
+                if (Configuration == "Debug" && Platform == "Device" && config.name == "Device-Debug")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Release" && Platform == "BlackBerry" && config.name == "Device-Release")
+                if (Configuration == "Release" && Platform == "Device" && config.name == "Device-Release")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Profile" && Platform == "BlackBerry" && config.name == "Device-Profile")
+                if (Configuration == "Profile" && Platform == "Device" && config.name == "Device-Profile")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Coverage" && Platform == "BlackBerry" && config.name == "Device-Coverage")
+                if (Configuration == "Coverage" && Platform == "Device" && config.name == "Device-Coverage")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Debug" && Platform == "BlackBerrySimulator" && (config.name == "Simulator" || config.name == "Simulator-Debug"))
+                if (Configuration == "Debug" && Platform == "Simulator" && (config.name == "Simulator" || config.name == "Simulator-Debug"))
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Profile" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Profile")
+                if (Configuration == "Profile" && Platform == "Simulator" && config.name == "Simulator-Profile")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Coverage" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Coverage")
+                if (Configuration == "Coverage" && Platform == "Simulator" && config.name == "Simulator-Coverage")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Release" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Release")
+                if (Configuration == "Release" && Platform == "Simulator" && config.name == "Simulator-Release")
                 {
                     configAssets = config.asset;
                     break;
