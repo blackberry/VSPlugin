@@ -134,6 +134,15 @@
     <Compile Include="..\..\src_vs2010\BuildTasks\SSHDelete.cs">
       <Link>SSHDelete.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.cs">
+      <Link>Templates\MakefileTemplate.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MakefileTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.Properties.cs">
+      <Link>Templates\MakefileTemplate.Properties.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
       <Link>ConfigDefaults.cs</Link>
     </Compile>
@@ -209,6 +218,11 @@
       <Link>BlackBerry\PlatformToolsets\qcc\Toolset.targets</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <None Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt">
+      <Link>Templates\MakefileTemplate.tt</Link>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>MakefileTemplate.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xml">
@@ -237,7 +251,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\src_vs2010\BuildTasks\Properties\Resources.resx">
       <Link>Properties\Resources.resx</Link>

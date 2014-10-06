@@ -1,0 +1,38 @@
+﻿<#@ template language="C#" visibility="internal" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+#
+# Makefile for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual studio (v<#= Version #>).
+# Any manual changes made by user will be overwritten! Use the project settings instead.
+#
+
+#############################################
+# Initials
+RM := rm -rf
+
+# Empty variable definitions.
+O_SRCS :=
+CPP_SRCS :=
+C_UPPER_SRCS :=
+C_SRCS :=
+S_UPPER_SRCS :=
+OBJ_SRCS :=
+II_SRCS :=
+ASM_SRCS :=
+CXX_SRCS :=
+I_SRCS :=
+CC_SRCS :=
+OBJS :=
+C_DEPS :=
+CC_DEPS :=
+ARCHIVES :=
+CPP_DEPS :=
+I_DEPS :=
+CXX_DEPS :=
+C_UPPER_DEPS :=
+II_DEPS :=
+
+USER_OBJS :=
+LIBS :=
+
+

@@ -141,6 +141,12 @@
     <Compile Include="..\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
+    <Compile Include="Templates\MakefileTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MakefileTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\MakefileTemplate.Properties.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xsd">
@@ -164,10 +170,16 @@
     </Content>
     <Content Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.targets">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <SubType>Designer</SubType>
     </Content>
+    <None Include="Templates\MakefileTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>MakefileTemplate.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xml">
@@ -226,6 +238,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <!--  <ItemGroup>
     <WCFMetadata Include="Service References\" />
