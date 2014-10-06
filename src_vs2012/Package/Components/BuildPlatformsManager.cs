@@ -59,7 +59,6 @@ namespace BlackBerry.Package.Components
         private CommandEvents _eventsDebugContext;
 
         private const string ConfigNameBlackBerry = "BlackBerry";
-        private const string ConfigNameBlackBerrySimulator = "BlackBerrySimulator";
         private const string ToolbarNameStandard = "Standard";
         private const string SolutionConfigurationsName = "Solution Configurations";
         private const string SolutionPlatformsName = "Solution Platforms";
@@ -140,10 +139,16 @@ namespace BlackBerry.Package.Components
         {
             get
             {
-                bool isSimulator = _startProject != null && _startProject.ConfigurationManager != null
-                                        && _startProject.ConfigurationManager.ActiveConfiguration != null
-                                        && _startProject.ConfigurationManager.ActiveConfiguration.PlatformName == ConfigNameBlackBerrySimulator;
-                return isSimulator ? ActiveSimulator : ActiveDevice;
+                if (_startProject != null && IsBlackBerryProject(_startProject))
+                {
+                    var projectArch = ProjectHelper.GetTargetArchitecture(_startProject);
+                    var simulatorArch = DeviceDefinition.GetArchitecture(DeviceDefinitionType.Simulator);
+                    if (string.Compare(projectArch, simulatorArch, StringComparison.OrdinalIgnoreCase) == 0)
+                        return ActiveSimulator;
+                }
+
+                // by default, try to run on a device:
+                return ActiveDevice;
             }
         }
 
@@ -224,7 +229,6 @@ namespace BlackBerry.Package.Components
             {
                 AddBarDescriptorToProject(project);
                 project.ConfigurationManager.AddPlatform(ConfigNameBlackBerry, ConfigNameBlackBerry, true);
-                project.ConfigurationManager.AddPlatform(ConfigNameBlackBerrySimulator, ConfigNameBlackBerrySimulator, true);
                 EnableDeploymentForSolutionPlatforms();
 
                 project.ConfigurationManager.DeletePlatform("Win32");
@@ -252,7 +256,7 @@ namespace BlackBerry.Package.Components
             {
                 foreach (SolutionContext context in configuration.SolutionContexts)
                 {
-                    if (context.PlatformName == ConfigNameBlackBerry || context.PlatformName == ConfigNameBlackBerrySimulator)
+                    if (context.PlatformName == ConfigNameBlackBerry)
                     {
                         context.ShouldDeploy = true;
                     }
@@ -725,7 +729,7 @@ namespace BlackBerry.Package.Components
                 return false;
 
             var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
-            if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
+            if (platformName == ConfigNameBlackBerry)
                 return true;
 
             return false;
@@ -738,7 +742,7 @@ namespace BlackBerry.Package.Components
                 foreach (SolutionContext context in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
                 {
                     string platformName = context.PlatformName;
-                    if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
+                    if (platformName == ConfigNameBlackBerry)
                         return true;
                 }
             }

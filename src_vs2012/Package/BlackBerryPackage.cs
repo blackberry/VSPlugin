@@ -471,7 +471,7 @@ namespace BlackBerry.Package
                 _buildPlatformsManager.AddPlatforms(project);
             }
 
-            MessageBoxHelper.Show("You might now:\r\n * restart Visual Studio, as it has the 'deploy' option disabled\r\n * update the Author Information within the bar-descriptor.xml", "BlackBerry and BlackBerrySimulator targets have been added to solution configurations.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxHelper.Show("You might now:\r\n * restart Visual Studio, as it has the 'deploy' option disabled\r\n * update the Author Information within the bar-descriptor.xml", "BlackBerry target have been added to solution configurations.", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void ImportBlackBerryProject(object sender, EventArgs e)

@@ -136,5 +136,16 @@ namespace BlackBerry.Package.Helpers
                 return Path.Combine(outputPath, targetName);
             return Path.Combine(folder, outputPath, targetName);
         }
+
+        /// <summary>
+        /// Gets the project's target architecture (x86 for simulator and armle-v7 for device).
+        /// </summary>
+        public static string GetTargetArchitecture(Project project)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            return GetValue(project, "ConfigurationGeneral", "TargetArch");
+        }
     }
 }
