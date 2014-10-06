@@ -42,6 +42,7 @@ namespace BlackBerry.NativeCore
 
         private const string FieldQnxToolsPath = "QNXToolsPath";
         private const string FieldVsNdkPath = "VSNDKPath";
+        private const string FieldVsNdkConfigPath = "VSNDKConfigPath";
         private const string FieldJavaHomePath = "JavaHomePath";
 
         /// <summary>
@@ -120,6 +121,7 @@ namespace BlackBerry.NativeCore
 
             string defaultToolsDirectory = null;
             string defaultNdkDirectory = null;
+            string defaultNdkConfigDirectory = null;
             string defaultJavaHomeDirectory = null;
 
             try
@@ -127,9 +129,10 @@ namespace BlackBerry.NativeCore
                 settings = registry.OpenSubKey(RegistryPath);
                 if (settings != null)
                 {
-                    defaultToolsDirectory = (string)settings.GetValue(FieldQnxToolsPath);
-                    defaultNdkDirectory = (string)settings.GetValue(FieldVsNdkPath);
-                    defaultJavaHomeDirectory = (string)settings.GetValue(FieldJavaHomePath);
+                    defaultToolsDirectory = (string) settings.GetValue(FieldQnxToolsPath);
+                    defaultNdkDirectory = (string) settings.GetValue(FieldVsNdkPath);
+                    defaultNdkConfigDirectory = (string) settings.GetValue(FieldVsNdkConfigPath);
+                    defaultJavaHomeDirectory = (string) settings.GetValue(FieldJavaHomePath);
                 }
             }
             finally
@@ -144,7 +147,7 @@ namespace BlackBerry.NativeCore
             ToolsDirectory = !string.IsNullOrEmpty(defaultToolsDirectory) ? defaultToolsDirectory : GetToolsDefaultLocation();
             NdkDirectory = !string.IsNullOrEmpty(defaultNdkDirectory) ? defaultNdkDirectory : GetNdkDefaultLocation();
             JavaHome = FindJavaHomePath(defaultJavaHomeDirectory, NdkDirectory);
-            SupplementaryInstallationConfigDirectory = Path.Combine(NdkDirectory, "..", "qconfig");
+            SupplementaryInstallationConfigDirectory = !string.IsNullOrEmpty(defaultNdkConfigDirectory) ? defaultNdkConfigDirectory : Path.Combine(NdkDirectory, "..", "qconfig");
         }
 
         #region Default Locations
