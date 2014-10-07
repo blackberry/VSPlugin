@@ -13,6 +13,7 @@ if "%~1" == "" (
   set ActionUninstall=0
   set ActionSkipTools=0
   set ActionMSBuildOnly=0
+  set ActionWizardsOnly=0
 ) else (
   set ActionVS2010=0
   set ActionVS2012=0
@@ -20,6 +21,7 @@ if "%~1" == "" (
   set ActionUninstall=0
   set ActionSkipTools=0
   set ActionMSBuildOnly=0
+  set ActionWizardsOnly=0
   for %%a in (%*) do (
     if /i "%%a" == "/all"          set ActionVS2010=1 && set ActionVS2012=1 && set ActionVS2013=1
     if /i "%%a" == "/uninstall"    set ActionUninstall=1
@@ -34,6 +36,11 @@ if "%~1" == "" (
     if /i "%%a" == "/msbuildonly"  set ActionMSBuildOnly=1
     if /i "%%a" == "/only-msbuild" set ActionMSBuildOnly=1
     if /i "%%a" == "/onlymsbuild"  set ActionMSBuildOnly=1
+    if /i "%%a" == "/wizards"      set ActionWizardsOnly=1
+    if /i "%%a" == "/wizards-only" set ActionWizardsOnly=1
+    if /i "%%a" == "/wizardsonly"  set ActionWizardsOnly=1
+    if /i "%%a" == "/only-wizards" set ActionWizardsOnly=1
+    if /i "%%a" == "/onlywizards"  set ActionWizardsOnly=1
     if /i "%%a" == "vs2010"        set ActionVS2010=1
     if /i "%%a" == "vs2012"        set ActionVS2012=1
     if /i "%%a" == "vs2013"        set ActionVS2013=1
@@ -123,6 +130,7 @@ set /a actionNo += 1
 
 REM Skip tools&plugin, if only upgrading MSBuild (in case of debugger development)
 if %ActionMSBuildOnly% neq 0 goto msbuild_only
+if %ActionWizardsOnly% neq 0 goto wizards_only
 
 REM Skip installation of custom tools (in case upgrading only plugin during development)
 if %ActionSkipTools% neq 0 goto skip_tools
@@ -132,11 +140,14 @@ set /a actionNo += 1
 
 call :processPlugin "%BuildPath%" "%PluginRoot%" "%VSPluginPath%"
 set /a actionNo += 1
-:msbuild_only
 
+:msbuild_only
 call :processMSBuild "%BuildPath%" "%MSBuildTargetPath%"
 set /a actionNo += 1
+if %ActionWizardsOnly% neq 0 goto wizards_only
+if %ActionMSBuildOnly% neq 0 goto processSetup_End
 
+:wizards_only
 call :processTemplates "%BuildPath%" "%VSWizardsPath%"
 set /a actionNo += 1
 
@@ -167,7 +178,7 @@ goto processTemplates_End
 
 REM Remove Templates
 echo %actionNo%: Removing BlackBerry Wizards
-rd "%OutputWizardsPath%\BlackBerry" /s /q 
+rd "%OutputWizardsPath%\BlackBerry" /s /q
 
 :processTemplates_End
 endlocal
@@ -189,6 +200,7 @@ if %ActionUninstall% neq 0 (goto uninstall_MSBuild)
 REM MSBuild Files
 echo %actionNo%: Installing build targets
 echo Copy BlackBerry MSBuild directory [%OutputMsBuildTargetsPath%]
+if exist "%OutputMsBuildTargetsPath%\BlackBerry" ( rd "%OutputMsBuildTargetsPath%\BlackBerry" /s /q )
 xcopy "%InputPath%\BlackBerry" "%OutputMsBuildTargetsPath%\BlackBerry" /e /i /y
 copy "%InputPath%\BlackBerry.BuildTasks.dll" "%OutputMsBuildTargetsPath%\BlackBerry\BlackBerry.BuildTasks.dll"
 
