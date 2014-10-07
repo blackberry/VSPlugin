@@ -156,13 +156,8 @@ namespace BlackBerry.BuildTasks.Templates
             {
                 int lastIndex = items.Length - 1;
 
-                // print first item without prefix:
-                Write(GetFullPath8dot3(items[0]));
-                Write(suffix);
-                WriteLine(" \\");
-
                 // print middle items:
-                for (int i = 1; i < lastIndex; i++)
+                for (int i = 0; i < lastIndex; i++)
                 {
                     Write(prefix);
                     Write(GetFullPath8dot3(items[i]));
@@ -183,13 +178,8 @@ namespace BlackBerry.BuildTasks.Templates
             {
                 int lastIndex = items.Length - 1;
 
-                // print first item without prefix:
-                Write(items[0].GetMetadata("Filename"));
-                Write(suffix);
-                WriteLine(" \\");
-
-                // print middle items:
-                for (int i = 1; i < lastIndex; i++)
+                // print items:
+                for (int i = 0; i < lastIndex; i++)
                 {
                     Write(prefix);
                     Write(items[i].GetMetadata("Filename"));
