@@ -109,10 +109,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     />
 
     <MakeAllAndFormatOutputMessages
-        ProjectDir      ="$(ProjectDir)"
-        OutDir          ="$(IntDir)"
-        ToolsPath       ="$(QccToolsPath)"
-        CompileItems    ="@(ClCompile)"
+      ProjectDir      ="$(ProjectDir)"
+      OutDir          ="$(IntDir)"
+      ToolsPath       ="$(QccToolsPath)"
+      CompileItems    ="@(ClCompile)"
+      ConfigurationType     ="$(ConfigurationType)"
+      ConfigurationAppType  ="$(ConfigurationAppType)"
     />
   </Target>
 
@@ -161,10 +163,12 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     />
 
     <MakeAllAndFormatOutputMessages
-        ProjectDir      ="$(ProjectDir)"
-        OutDir          ="$(IntDir)"
-        ToolsPath       ="$(QccToolsPath)"
-        CompileItems    ="@(ClCompile)"
+      ProjectDir      ="$(ProjectDir)"
+      OutDir          ="$(IntDir)"
+      ToolsPath       ="$(QccToolsPath)"
+      CompileItems    ="@(ClCompile)"
+      ConfigurationType     ="$(ConfigurationType)"
+      ConfigurationAppType  ="$(ConfigurationAppType)"
     />
   </Target>
 

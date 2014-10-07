@@ -141,6 +141,7 @@
     <Compile Include="..\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
+    <Compile Include="Helpers\ProcessSetupHelper.cs" />
     <Compile Include="Templates\MakefileTemplate.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

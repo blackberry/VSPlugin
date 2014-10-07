@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using BlackBerry.BuildTasks.Templates;
 using Microsoft.Build.Framework;
@@ -184,6 +185,13 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public override bool Execute()
         {
+            // are we asked not to generate makefile as developer supplied custom one:
+            if (ConfigurationAppType == "Custom")
+            {
+                NotifyMessage(new BuildMessageEventArgs("Skipped makefile creation", null, "GenerateMakefile", MessageImportance.High));
+                return true;
+            }
+
             // normalize excluded list:
             if (ExcludeDirectories != null)
             {
@@ -227,7 +235,7 @@ namespace BlackBerry.BuildTasks
                 }
             }
 
-            using (StreamWriter outFile = new StreamWriter(IntDir + "makefile"))
+            using (var outputFile = new StreamWriter(IntDir + "makefile"))
             {
                 var template = new MakefileTemplate();
                 template.ConfigurationType = ConfigurationType;
@@ -248,7 +256,7 @@ namespace BlackBerry.BuildTasks
                 template.AdditionalIncludeDirectories = MakefileTemplate.GetRootedDirs(ProjectDir, AdditionalIncludeDirectories);
                 template.AdditionalLibraryDirectories = MakefileTemplate.GetRootedDirs(ProjectDir, AdditionalLibraryDirectories);
 
-                outFile.Write(template.TransformText());
+                outputFile.Write(template.TransformText());
             }
 
             return true;
@@ -285,6 +293,24 @@ namespace BlackBerry.BuildTasks
                 }
             }
             return false;
+        }
+
+        private void NotifyMessage(BuildMessageEventArgs e)
+        {
+            if (e != null)
+            {
+                try
+                {
+                    if (BuildEngine != null)
+                    {
+                        BuildEngine.LogMessageEvent(e);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Trace.WriteLine(ex.Message, "BlackBerry.Build.Log");
+                }
+            }
         }
     }
 }
