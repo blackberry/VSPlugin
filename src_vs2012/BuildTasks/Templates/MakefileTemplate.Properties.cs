@@ -156,7 +156,7 @@ namespace BlackBerry.BuildTasks.Templates
             {
                 int lastIndex = items.Length - 1;
 
-                // print middle items:
+                // print items:
                 for (int i = 0; i < lastIndex; i++)
                 {
                     Write(prefix);

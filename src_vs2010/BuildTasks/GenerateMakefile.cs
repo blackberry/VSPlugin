@@ -38,12 +38,18 @@ namespace BlackBerry.BuildTasks
         #region Properties
 
         /// <summary>
-        /// Getter/Setter for CompileItems property
+        /// Gets or sets items supposed to compile.
         /// </summary>
         public ITaskItem[] CompileItems
         {
             set;
             get;
+        }
+
+        public ITaskItem[] IncludeItems
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -192,6 +198,51 @@ namespace BlackBerry.BuildTasks
                 return true;
             }
 
+            if (ConfigurationAppType == "Regular")
+            {
+                GenerateRegularMakefile();
+                return true;
+            }
+
+            if (ConfigurationAppType == "Cascades")
+            {
+                GenerateConfigPri();
+                return true;
+            }
+
+            return false;
+        }
+
+        private void GenerateConfigPri()
+        {
+            // generate list of items to compile:
+            ITaskItem[] toCompile;
+            ITaskItem[] toCompileAsC;
+            ITaskItem[] toCompileAsCpp;
+
+            SplitCompileItems(out toCompile, out toCompileAsC, out toCompileAsCpp);
+
+            using (var outputFile = new StreamWriter(ProjectDir + "config.pri"))
+            {
+                ITaskItem excludedHeader;
+                ITaskItem excludedItem;
+
+                var template = new ConfigPriTemplate();
+                template.SolutionName = SolutionName;
+                template.CompileItems = toCompile;
+                template.CompileDirs = ExtractDirectories(template.CompileItems);
+                template.IncludeItems = FilterByExtension(IncludeItems, new[] { ".h", ".hpp", ".hxx", ".h++", ".hh" }, new[] { "precompiled.h", "precompiled.hpp", "stdafx.h" }, out excludedHeader);
+                template.IncludeDirs = ExtractDirectories(template.IncludeItems);
+                template.PrecompiledHeaderName = excludedHeader != null ? excludedHeader.ItemSpec : null;
+                template.QmlItems = FilterByExtension(IncludeItems, new[] {".qml", ".js", ".qs"}, null, out excludedItem);
+                template.QmlDirs = ExtractDirectories(template.QmlItems);
+
+                outputFile.Write(template.TransformText());
+            }
+        }
+
+        private void GenerateRegularMakefile()
+        {
             // normalize excluded list:
             if (ExcludeDirectories != null)
             {
@@ -214,26 +265,10 @@ namespace BlackBerry.BuildTasks
             }
 
             // generate list of items to compile:
-            var toCompile = new List<ITaskItem>();
-            var toCompileAsC = new List<ITaskItem>();
-            var toCompileAsCpp = new List<ITaskItem>();
-
-            foreach (var item in CompileItems)
-            {
-                var fullPath = GetFullPath(item);
-
-                // skip the ones, that are explicitly excluded:
-                if (!IsExcludedPath(fullPath))
-                {
-                    toCompile.Add(item);
-
-                    // and devide into C vs C++ sets:
-                    if (IsCompileAsC(item))
-                        toCompileAsC.Add(item);
-                    else
-                        toCompileAsCpp.Add(item);
-                }
-            }
+            ITaskItem[] toCompile;
+            ITaskItem[] toCompileAsC;
+            ITaskItem[] toCompileAsCpp;
+            SplitCompileItems(out toCompile, out toCompileAsC, out toCompileAsCpp);
 
             using (var outputFile = new StreamWriter(IntDir + "makefile"))
             {
@@ -249,17 +284,43 @@ namespace BlackBerry.BuildTasks
                 template.CompilerFlags = string.Concat("-V\"", TargetCompilerVersion,
                                                        string.IsNullOrEmpty(TargetCompilerVersion) || string.IsNullOrEmpty(TargetCompiler) ? string.Empty : ",",
                                                        TargetCompiler, "\"");
-                template.CompileItems = toCompile.ToArray();
-                template.CompileItemsAsC = toCompileAsC.ToArray();
-                template.CompileItemsAsCpp = toCompileAsCpp.ToArray();
+                template.CompileItems = toCompile;
+                template.CompileItemsAsC = toCompileAsC;
+                template.CompileItemsAsCpp = toCompileAsCpp;
                 template.LinkItem = LinkItems != null && LinkItems.Length > 0 ? LinkItems[0] : null;
                 template.AdditionalIncludeDirectories = MakefileTemplate.GetRootedDirs(ProjectDir, AdditionalIncludeDirectories);
                 template.AdditionalLibraryDirectories = MakefileTemplate.GetRootedDirs(ProjectDir, AdditionalLibraryDirectories);
 
                 outputFile.Write(template.TransformText());
             }
+        }
 
-            return true;
+        private void SplitCompileItems(out ITaskItem[] toCompile, out ITaskItem[] toCompileAsC, out ITaskItem[] toCompileAsCpp)
+        {
+            var listCompile = new List<ITaskItem>();
+            var listCompileAsC = new List<ITaskItem>();
+            var listCompileAsCpp = new List<ITaskItem>();
+
+            foreach (var item in CompileItems)
+            {
+                var fullPath = GetFullPath(item);
+
+                // skip the ones, that are explicitly excluded:
+                if (!IsExcludedPath(fullPath))
+                {
+                    listCompile.Add(item);
+
+                    // and devide into C vs C++ sets:
+                    if (IsCompileAsC(item))
+                        listCompileAsC.Add(item);
+                    else
+                        listCompileAsCpp.Add(item);
+                }
+            }
+
+            toCompile = listCompile.ToArray();
+            toCompileAsC = listCompileAsC.ToArray();
+            toCompileAsCpp = listCompileAsCpp.ToArray();
         }
 
         private static bool IsCompileAsC(ITaskItem item)
@@ -270,6 +331,88 @@ namespace BlackBerry.BuildTasks
         private static string GetFullPath(ITaskItem item)
         {
             return item.GetMetadata("FullPath").Replace('\\', '/');
+        }
+
+        private static ITaskItem[] FilterByExtension(IEnumerable<ITaskItem> items, string[] extensions, string[] excludedItemSpecs, out ITaskItem excludedItem)
+        {
+            var result = new List<ITaskItem>();
+
+            excludedItem = null;
+            if (items != null)
+            {
+                if (extensions != null && extensions.Length > 0)
+                {
+                    foreach (var item in items)
+                    {
+                        var itemExtension = item.GetMetadata("Extension");
+                        for (int i = 0; i < extensions.Length; i++)
+                        {
+                            // is the extension matching?
+                            if (string.Compare(itemExtension, extensions[i], StringComparison.OrdinalIgnoreCase) == 0)
+                            {
+                                // is the file excluded?
+                                var index = IndexOf(excludedItemSpecs, item);
+                                if (index >= 0)
+                                {
+                                    if (excludedItem == null)
+                                    {
+                                        excludedItem = item;
+                                    }
+                                }
+                                else
+                                {
+                                    result.Add(item);
+                                }
+                                break;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    result.AddRange(items);
+                }
+            }
+
+            return result.ToArray();
+        }
+
+        /// <summary>
+        /// Finds index of the matching by ItemSpec item.
+        /// </summary>
+        private static int IndexOf(string[] itemSpecs, ITaskItem item)
+        {
+            if (item == null || itemSpecs == null || itemSpecs.Length == 0)
+                return -1;
+
+            for(int i = 0; i < itemSpecs.Length; i++)
+            {
+                if (string.Compare(itemSpecs[i], item.ItemSpec, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        private static string[] ExtractDirectories(IEnumerable<ITaskItem> items)
+        {
+            var result = new List<string>();
+
+            if (items != null)
+            {
+                foreach (var item in items)
+                {
+                    var path = Path.GetDirectoryName(item.ItemSpec);
+                    if (!result.Contains(path))
+                    {
+                        result.Add(path);
+                    }
+                }
+            }
+
+            return result.ToArray();
         }
 
         /// <summary>

@@ -146,6 +146,12 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Helpers\ProcessSetupHelper.cs" />
+    <Compile Include="Templates\ConfigPriTemplate.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConfigPriTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Templates\ConfigPriTemplate.Properties.cs" />
     <Compile Include="Templates\MakefileTemplate.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -181,6 +187,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Templates\ConfigPriTemplate.tt">
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ConfigPriTemplate.cs</LastGenOutput>
+    </None>
     <None Include="Templates\MakefileTemplate.tt">
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>MakefileTemplate.cs</LastGenOutput>

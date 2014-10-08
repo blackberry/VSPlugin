@@ -1,0 +1,43 @@
+﻿<#@ template language="C#" visibility="internal" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+#
+# Cascades Application config file for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual studio (v<#= Version #>).
+# Any manual changes made by user will be overwritten! Use the project settings instead.
+#
+
+BASEDIR = $$quote($$_PRO_FILE_PWD_)
+
+<# if (!string.IsNullOrEmpty(PrecompiledHeaderName)) { #>
+#############################################
+# Precompiled header
+CONFIG += precompile_header
+PRECOMPILED_HEADER = $$quote($$BASEDIR/<#= PrecompiledHeaderName #>)
+
+<# } #>
+#############################################
+# Source files, headers and QMLs
+SOURCES += <# WriteRelativePaths(CompileItems, "    $$quote($$BASEDIR/", ")"); #>
+
+HEADERS += <# WriteRelativePaths(IncludeItems, "    $$quote($$BASEDIR/", ")"); #>
+
+INCLUDEPATH += <# WriteRelativePaths(IncludeDirs, "    $$quote($$BASEDIR/", ")"); #>
+
+OTHER_FILES += <# WriteRelativePaths(QmlItems, "    $$quote($$BASEDIR/", ")"); #>
+
+#############################################
+# Translations
+TRANSLATIONS = $$quote($${TARGET}.ts)
+
+lupdate_inclusion {
+
+    SOURCES += <# WriteRelativePathsTuple(CompileDirs, new[] { "*.c", "*.c++", "*.cc", "*.cpp", "*.cxx" }, "        $$quote($$BASEDIR/../", ")"); #>
+
+    SOURCES += <# WriteRelativePathsTuple(QmlDirs, new[] { "*.qml", "*.js", "*.qs" }, "        $$quote($$BASEDIR/../", ")"); #>
+
+    HEADERS += <# WriteRelativePathsTuple(IncludeDirs, new[] { "*.h", "*.h++", "*.hh", "*.hpp", "*.hxx" }, "        $$quote($$BASEDIR/../", ")"); #>
+
+}
+
+
+

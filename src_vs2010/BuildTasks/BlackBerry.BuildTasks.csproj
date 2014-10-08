@@ -69,6 +69,15 @@
     <Compile Include="..\..\src_vs2012\BuildTasks\QccExec.cs">
       <Link>QccExec.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.cs">
+      <Link>Templates\ConfigPriTemplate.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConfigPriTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.Properties.cs">
+      <Link>Templates\ConfigPriTemplate.Properties.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.cs">
       <Link>Templates\MakefileTemplate.cs</Link>
       <AutoGen>True</AutoGen>
@@ -119,6 +128,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt">
+      <Link>Templates\ConfigPriTemplate.tt</Link>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ConfigPriTemplate.cs</LastGenOutput>
+    </None>
     <None Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt">
       <Link>Templates\MakefileTemplate.tt</Link>
       <Generator>TextTemplatingFilePreprocessor</Generator>
