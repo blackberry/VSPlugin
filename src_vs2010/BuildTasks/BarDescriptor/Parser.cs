@@ -20,7 +20,7 @@ using System.Xml.Serialization;
 
 namespace BlackBerry.BuildTasks.BarDescriptor
 {
-    public class Parser
+    static class Parser
     {
         /// <summary>
         /// Helper function to to deserialize the bar-descriptor.xml file for read.
@@ -43,6 +43,7 @@ namespace BlackBerry.BuildTasks.BarDescriptor
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
+                    throw;
                 }
             }
             return null;

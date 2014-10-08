@@ -29,7 +29,7 @@ namespace BlackBerry.BuildTasks
         #region Member Variable and Constant Declarations
 
         private readonly ArrayList _switchOrderList;
-        private static BarDescriptor.qnx _descriptor;
+        private qnx _descriptor;
         private string _projectDirectory;
         private string _appName;
         private string _barDescriptorPath = "";
@@ -143,16 +143,16 @@ namespace BlackBerry.BuildTasks
             //make sure the _descriptor is loaded
             if (_descriptor == null)
             {
-                _descriptor = BarDescriptor.Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
+                _descriptor = Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
             }
-            BarDescriptor.asset[] globalAssets = _descriptor.assets;
-            BarDescriptor.asset[] configAssets = null;
+            asset[] globalAssets = _descriptor.assets;
+            asset[] configAssets = null;
 
             // You can call a configuration whatever you like, but these are the ones Momentics uses for its various
             // platform + configuration combinations.  Usually this is the same as the output directory, but asset paths
             // don't have anything to do with the configuration name.  I've based the config names on the platform
             // + configuration combination, not the output directory.
-            BarDescriptor.qnxConfiguration[] configs = _descriptor.configurations;
+            qnxConfiguration[] configs = _descriptor.configurations;
             foreach (var config in configs)
             {
                 if (Configuration == "Debug" && Platform == "Device" && config.name == "Device-Debug")
