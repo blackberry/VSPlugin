@@ -14,7 +14,9 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using BlackBerry.BuildTasks.BarDescriptor;
 using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
 using Microsoft.Build.Framework;
@@ -195,35 +197,39 @@ namespace BlackBerry.BuildTasks
                 }
             }
 
-            int clen = configAssets == null ? 0 : configAssets.Length;
-            int glen = globalAssets == null ? 0 : globalAssets.Length;
-            var items = new ITaskItem[glen + clen];
+            var items = new List<ITaskItem>();
 
-            if (globalAssets != null)
+            AppendAssets(items, globalAssets);
+            AppendAssets(items, configAssets);
+
+            return items.ToArray();
+        }
+
+        private void AppendAssets(List<ITaskItem> result, IEnumerable<asset> assets)
+        {
+            if (result == null)
+                throw new ArgumentNullException("result");
+
+            if (assets != null)
             {
-                for (int i = 0; i < glen; i++)
+                foreach (var asset in assets)
                 {
-                    string path = globalAssets[i].path;
-                    path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
-                    string target = globalAssets[i].Value;
-                    items[i] = new TaskItem(path);
-                    items[i].SetMetadata("target", target);
+                    string path = asset.path;
+                    path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, ProjectDir);
+                    string target = asset.Value;
+
+                    if (!string.IsNullOrEmpty(target))
+                    {
+                        var item = new TaskItem(path);
+                        item.SetMetadata("target", target);
+                        result.Add(item);
+                    }
+                    else
+                    {
+                        Log.LogWarning("Asset \"{0}\" has no value set. Ignoring.", path);
+                    }
                 }
             }
-
-            if (configAssets != null)
-            {
-                for (int i = 0; i < configAssets.Length; i++)
-                {
-                    string path = configAssets[i].path;
-                    path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
-                    string target = configAssets[i].Value;
-                    items[i + glen] = new TaskItem(path);
-                    items[i + glen].SetMetadata("target", target);
-                }
-            }
-
-            return items;
         }
 
         /// <summary>
@@ -349,7 +355,7 @@ namespace BlackBerry.BuildTasks
             set
             {
                 _projectDirectory = value;
-                _descriptor = BarDescriptor.Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
+                _descriptor = Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
             }
         }
 
