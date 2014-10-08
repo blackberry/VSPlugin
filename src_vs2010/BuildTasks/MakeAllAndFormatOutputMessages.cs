@@ -95,6 +95,12 @@ namespace BlackBerry.BuildTasks
             set;
         }
 
+        public string MakefileTargetName
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Getter/Setter for the number of processors property.
         /// </summary>
@@ -127,7 +133,9 @@ namespace BlackBerry.BuildTasks
                     multiProcess = (compileItem.GetMetadata("MultiProcess") == "true");
                 }
 
-                string args = string.Concat("/c \"", ToolsPath, "\\make\"", multiProcess ? " -j" + ProcessorCount : string.Empty);
+                string args = string.Concat("/c \"", ToolsPath, "\\make\"", multiProcess ? " -j" + ProcessorCount : string.Empty,
+                    !string.IsNullOrEmpty(MakefileTargetName) ? " " : string.Empty, MakefileTargetName);
+
                 ProcessStartInfo startInfo = new ProcessStartInfo("cmd.exe", args);
 
                 // set some BlackBerry default environment variables:

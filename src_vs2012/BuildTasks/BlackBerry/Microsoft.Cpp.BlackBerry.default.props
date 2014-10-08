@@ -16,6 +16,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <PlatformToolset Condition="'$(PlatformToolset)' == ''">qcc</PlatformToolset>
     <DefaultPlatformToolset Condition="'$(DefaultPlatformToolset)' == ''">qcc</DefaultPlatformToolset>
     <ConfigurationAppType Condition="'$(ConfigurationAppType)' == ''">Regular</ConfigurationAppType>
+    <MakefileTargetName Condition="'$(MakefileTargetName)' == ''">all</MakefileTargetName>
 
     <!-- Short name for platform toolset (appended to project name in Solution Explorer) -->
     <_PlatformToolsetShortNameFor_qcc Condition="'$(_PlatformToolsetShortNameFor_qcc)' == ''">BlackBerry</_PlatformToolsetShortNameFor_qcc>

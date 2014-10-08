@@ -116,6 +116,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       CompileItems    ="@(ClCompile)"
       ConfigurationType     ="$(ConfigurationType)"
       ConfigurationAppType  ="$(ConfigurationAppType)"
+      MakefileTargetName    ="$(MakefileTargetName)"
     />
   </Target>
 
@@ -170,6 +171,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       CompileItems    ="@(ClCompile)"
       ConfigurationType     ="$(ConfigurationType)"
       ConfigurationAppType  ="$(ConfigurationAppType)"
+      MakefileTargetName    ="$(MakefileTargetName)"
     />
   </Target>
 

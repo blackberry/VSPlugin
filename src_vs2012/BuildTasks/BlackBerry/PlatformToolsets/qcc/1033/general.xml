@@ -84,11 +84,23 @@
     <EnumValue Name="StaticLibrary" DisplayName="Static library (.a)" Description="Static Library (.a)" />
   </EnumProperty>
   <EnumProperty Name="ConfigurationAppType" DisplayName="Application Type" Visible="True"
-                Description="Specifies the type of the application this configuration generates."
+                Description="Specifies the type of the application this configuration handles."
                 Category="ProjectDefaults">
     <EnumValue Name="Regular" DisplayName="Regular Application" Description="Application" />
     <EnumValue Name="Cascades" DisplayName="Cascades Application" Description="Cascades Application" />
     <EnumValue Name="Custom" DisplayName="Custom Makefile" Description="Use project supplied makefile. It is expected that the makefile is placed next to the project file. Nothing will be generated in that case by the IDE." />
+  </EnumProperty>
+  <EnumProperty Name="MakefileTargetName" DisplayName="Makefile active target" Visible="True"
+                Description="Specifies the name of a makefile's target to be called to correctly build current application configuration."
+                Category="ProjectDefaults">
+    <EnumValue Name="" DisplayName="Empty (default)" Description="Default target" />
+    <EnumValue Name="all" DisplayName="all" Description="Application" />
+    <EnumValue Name="app" DisplayName="app" Description="Application" />
+    <EnumValue Name="Device-Debug" DisplayName="Device-Debug" Description="Device-Debug target for the Cascades Application" />
+    <EnumValue Name="Device-Profile" DisplayName="Device-Profile" Description="Device-Profile target for the Cascades Application" />
+    <EnumValue Name="Device-Release" DisplayName="Device-Release" Description="Device-Release target for the Cascades Application" />
+    <EnumValue Name="Simulator-Debug" DisplayName="Simulator-Debug" Description="Simulator-Debug target for the Cascades Application" />
+    <EnumValue Name="Simulator-Release" DisplayName="Simulator-Release" Description="Simulator-Release target for the Cascades Application" />
   </EnumProperty>
   <EnumProperty Name="CharacterSet" DisplayName="Character Set"
                 Description="Tells the compiler to use the specified character set; aids in localization issues."
