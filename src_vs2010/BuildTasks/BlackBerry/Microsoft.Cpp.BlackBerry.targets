@@ -20,6 +20,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <UsingTask TaskName="QccCompiler" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="QccLink" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="QccLib" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
+  <UsingTask TaskName="QccExec" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="GenerateMakefile" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="MakeAllAndFormatOutputMessages" AssemblyFile="$(VCTargetsPath)Platforms\BlackBerry\BlackBerry.BuildTasks.dll" />
   <UsingTask TaskName="VCMessage" AssemblyName="Microsoft.Build.CppTasks.Common, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
@@ -180,8 +181,19 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </PropertyGroup>
   
   <Target Name="MakeClean">
-    <Exec Command="$(QccToolsPath)\make clean" WorkingDirectory="$(IntDir)" Condition="Exists('$(IntDir)makefile')" />
-    <Message Text="Nothing to clean. $(IntDir)makefile does not exist." Condition="!Exists('$(IntDir)makefile')" />
+    <QccExec Command="$(QccToolsPath)\make clean"
+             WorkingDirectory="$(ProjectDir)"
+             QnxHost="$(QNX_HOST)"
+             QnxTarget="$(QNX_TARGET)"
+             Condition="Exists('$(ProjectDir)makefile') AND !Exists('$(IntDir)makefile')"
+             />
+    <QccExec Command="$(QccToolsPath)\make clean"
+             WorkingDirectory="$(IntDir)"
+             QnxHost="$(QNX_HOST)"
+             QnxTarget="$(QNX_TARGET)"
+             Condition="Exists('$(IntDir)makefile')"
+             />
+    <Message Text="Nothing to clean. $(IntDir)makefile does not exist." Condition="!Exists('$(IntDir)makefile') AND !Exists('$(ProjectDir)')" />
   </Target>
 
   <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets"

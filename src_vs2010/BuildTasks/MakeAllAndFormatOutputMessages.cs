@@ -132,7 +132,7 @@ namespace BlackBerry.BuildTasks
 
                 // set some BlackBerry default environment variables:
                 // (taken from any bbndk-env_xxx.bat script)
-                ProcessSetupHelper.UpdateEnvironmentVariables(startInfo, QnxHost, QnxTarget);
+                ProcessSetupHelper.Update(startInfo.EnvironmentVariables, QnxHost, QnxTarget);
 
                 // Set UseShellExecute to false for redirection.
                 startInfo.UseShellExecute = false;

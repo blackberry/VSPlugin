@@ -66,6 +66,9 @@
     <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\ProcessSetupHelper.cs">
       <Link>Helpers\ProcessSetupHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccExec.cs">
+      <Link>QccExec.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.cs">
       <Link>Templates\MakefileTemplate.cs</Link>
       <AutoGen>True</AutoGen>

@@ -142,6 +142,9 @@
     <Compile Include="..\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
+    <Compile Include="QccExec.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Helpers\ProcessSetupHelper.cs" />
     <Compile Include="Templates\MakefileTemplate.cs">
       <AutoGen>True</AutoGen>
