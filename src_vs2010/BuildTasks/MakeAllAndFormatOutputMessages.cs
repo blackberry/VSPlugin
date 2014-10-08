@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using BlackBerry.BuildTasks.Helpers;
 using BlackBerry.NativeCore;
 using Microsoft.Build.Framework;
@@ -175,11 +176,13 @@ namespace BlackBerry.BuildTasks
 
                 do
                 {
+                    Application.DoEvents();
+
                     // Wait until finished
                     // This code is correct, don't remove it. WaitForExit freezes the IDE while waiting for the end of the build process.
                     // With this loop and the time out, the IDE won't be frozen enabling the build process to be cancelled.
                 }
-                while (!_process.WaitForExit(1000));
+                while (!_process.WaitForExit(100));
 
             }
             catch (Exception e)
