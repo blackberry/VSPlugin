@@ -749,6 +749,13 @@
       <Project>{59A7B188-E307-4495-A3AF-4ED76B086A87}</Project>
       <Name>BlackBerry.DebugEngine</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GDBHost\BlackBerry.GDBHost.vcxproj">
+      <Project>{9A560339-44DB-413F-868C-403962C2CF01}</Project>
+      <Name>BlackBerry.GDBHost</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+    </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</Project>
       <Name>BlackBerry.NativeCore</Name>

@@ -562,6 +562,8 @@
     <ProjectReference Include="..\GDBHost\BlackBerry.GDBHost.vcxproj">
       <Project>{9A560339-44DB-413F-868C-403962C2CF01}</Project>
       <Name>BlackBerry.GDBHost</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
