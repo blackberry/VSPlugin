@@ -92,21 +92,21 @@ namespace BlackBerry.NativeCore.Debugger.Model
             // first try to find identical executable:
             foreach (var process in processes)
             {
-                if (string.CompareOrdinal(process.ExecutablePath, executable) == 0)
+                if (string.Compare(process.ExecutablePath, executable, StringComparison.OrdinalIgnoreCase) == 0)
                     return process;
             }
 
             // is the name matching:
             foreach (var process in processes)
             {
-                if (string.CompareOrdinal(process.Name, executable) == 0)
+                if (string.Compare(process.Name, executable, StringComparison.OrdinalIgnoreCase) == 0)
                     return process;
             }
 
             // or maybe only ends with it?
             foreach (var process in processes)
             {
-                if (process.ExecutablePath != null && process.ExecutablePath.EndsWith(executable, StringComparison.Ordinal))
+                if (process.ExecutablePath != null && process.ExecutablePath.EndsWith(executable, StringComparison.OrdinalIgnoreCase))
                     return process;
             }
 

@@ -27,8 +27,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <ItemGroup>
     <!-- Property pages that always apply -->
     <PropertyPageSchema Include="
-        $(VCTargetsPath)Platforms\BlackBerry\Rules\ndkProjectItemsSchema.xml;
-        $(VCTargetsPath)Platforms\BlackBerry\Rules\debugger_*.xml;
+        $(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\ProjectItemsSchema.xml;
+        $(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\debugger_*.xml;
         $(VCTargetsPath)$(LangID)\debugger_*.xml;
         $(VCTargetsPath)$(LangID)\midl.xml;
         $(VCTargetsPath)$(LangID)\build_events.xml;
@@ -52,24 +52,24 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </PropertyPageSchema>
 
     <!-- Switch view between project property based directories and environment variables -->
-    <PropertyPageSchema Include="$(VCTargetsPath)\Platforms\BlackBerry\Rules\ndk_directories.xml" />
+    <PropertyPageSchema Include="$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\directories.xml" />
 
     <!-- Non-Utility project property pages -->
     <PropertyPageSchema Condition="'$(ConfigurationType)' != 'Utility'" Include="
-        $(VCTargetsPath)Platforms\BlackBerry\Rules\qcc_cl.xml;
+        $(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\cl.xml;
         $(VCTargetsPath)$(LangID)\custom_build_step.xml;
     "/>
-    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\Rules\qcc_link.xml" Condition="'$(ConfigurationType)' == 'Application' or '$(ConfigurationType)' == 'DynamicLibrary'" />
-    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\Rules\qcc_lib.xml" Condition="'$(ConfigurationType)' == 'StaticLibrary'" />
-    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\Rules\packager.xml" Condition="'$(ConfigurationType)' == 'Application'" />
+    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\link.xml" Condition="'$(ConfigurationType)' == 'Application' or '$(ConfigurationType)' == 'DynamicLibrary'" />
+    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\lib.xml" Condition="'$(ConfigurationType)' == 'StaticLibrary'" />
+    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\packager.xml" Condition="'$(ConfigurationType)' == 'Application'" />
 
   </ItemGroup>
 
   <ItemGroup>
-    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\Rules\ndk_general.xml">
+    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\general.xml">
       <Context>Project</Context>
     </PropertyPageSchema>
-    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\Rules\ndk_general_ps.xml">
+    <PropertyPageSchema Include="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\qcc\$(LangID)\general_ps.xml">
       <Context>PropertySheet</Context>
     </PropertyPageSchema>
   </ItemGroup>

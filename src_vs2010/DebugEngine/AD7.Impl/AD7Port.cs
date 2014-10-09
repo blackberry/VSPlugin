@@ -23,6 +23,7 @@ using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.QConn;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio.Debugger.Interop;
 using Microsoft.VisualStudio;
 using System.Windows.Forms;
@@ -165,7 +166,7 @@ namespace BlackBerry.DebugEngine
             if (processes == null)
             {
                 string deviceType = Device.Type == DeviceDefinitionType.Device ? "device" : "simulator";
-                MessageBox.Show(string.Concat("Please, verify if the ", deviceType, " (", Device.IP, ") is defined correctly. It can be modified at \"BlackBerry -> Settings\" menu."),
+                MessageBoxHelper.Show(string.Concat("Please, verify if the ", deviceType, " (", Device.IP, ") is defined correctly. It can be modified at \"BlackBerry -> Settings\" menu."),
                     "Connection failure or timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 return new AD7Process[0];

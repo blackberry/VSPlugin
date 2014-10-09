@@ -11,7 +11,7 @@ namespace BlackBerry.Package.ToolWindows
     /// <summary>
     /// Interaction logic for TargetFileSystemNavigatorControl.xaml
     /// </summary>
-    public partial class TargetFileSystemNavigatorControl : UserControl
+    public partial class TargetFileSystemNavigatorControl
     {
         public TargetFileSystemNavigatorControl()
         {
@@ -222,6 +222,39 @@ namespace BlackBerry.Package.ToolWindows
             if (context != null)
             {
                 context.Cancel();
+            }
+        }
+
+        private void NavigationPath_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                e.Handled = true;
+                NavigateToItem_OnClick(null, null);
+            }
+        }
+
+        private void ListPreview_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Return)
+            {
+                e.Handled = true;
+                ListPreview_OnMouseDoubleClick(sender, null);
+                return;
+            }
+
+            if (e.Key == Key.Back)
+            {
+                e.Handled = true;
+
+                // open the parent view (i.e. go one folder up):
+                var listView = sender as ListView;
+                var item = listView != null && listView.Items.Count > 0 ? listView.Items[0] as FileToParentViewItem : null;
+
+                if (item != null)
+                {
+                    item.ExecuteDefaultAction();
+                }
             }
         }
     }

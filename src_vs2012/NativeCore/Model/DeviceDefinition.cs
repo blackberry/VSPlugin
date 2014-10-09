@@ -76,18 +76,7 @@ namespace BlackBerry.NativeCore.Model
         /// </summary>
         public string Architecture
         {
-            get
-            {
-                switch (Type)
-                {
-                    case DeviceDefinitionType.Device:
-                        return "ARMv7";
-                    case DeviceDefinitionType.Simulator:
-                        return "x86";
-                    default:
-                        throw new InvalidEnumArgumentException("Unsupported enum value (" + Type + ")");
-                }
-            }
+            get { return GetArchitectureFriendlyName(Type); }
         }
 
         #endregion
@@ -131,6 +120,38 @@ namespace BlackBerry.NativeCore.Model
             }
 
             return string.Concat(Name, " (", IP, ", ", DeviceHelper.GetTypeToString(Type), ")");
+        }
+
+        /// <summary>
+        /// Gets the target architecture's friendly name assigned to particular device type.
+        /// </summary>
+        public static string GetArchitectureFriendlyName(DeviceDefinitionType type)
+        {
+            switch (type)
+            {
+                case DeviceDefinitionType.Device:
+                    return "ARMv7";
+                case DeviceDefinitionType.Simulator:
+                    return "x86";
+                default:
+                    throw new InvalidEnumArgumentException("Unsupported enum value (" + type + ")");
+            }
+        }
+
+        /// <summary>
+        /// Gets the target processor architecture assigned to particular device type.
+        /// </summary>
+        public static string GetArchitecture(DeviceDefinitionType type)
+        {
+            switch (type)
+            {
+                case DeviceDefinitionType.Device:
+                    return "armle-v7";
+                case DeviceDefinitionType.Simulator:
+                    return "x86";
+                default:
+                    throw new InvalidEnumArgumentException("Unsupported enum value (" + type + ")");
+            }
         }
 
         /// <summary>

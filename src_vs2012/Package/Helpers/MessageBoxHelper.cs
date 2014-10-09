@@ -5,7 +5,10 @@ using Microsoft.VisualStudio.Shell.Interop;
 
 namespace BlackBerry.Package.Helpers
 {
-    public static class MessageBoxHelper
+    /// <summary>
+    /// Helper class for displaying native dialog boxes.
+    /// </summary>
+    static class MessageBoxHelper
     {
         private const int IDABORT = 3;
         private const int IDCANCEL = 2;
@@ -15,20 +18,20 @@ namespace BlackBerry.Package.Helpers
         private const int IDRETRY = 4;
         private const int IDYES = 6;
 
-
-        private static IVsUIShell _uiShell;
+        private static readonly IVsUIShell _uiShell;
 
         /// <summary>
         /// Initialize internal structures.
         /// </summary>
-        public static void Initialise(IServiceProvider serviceProvider)
+        static MessageBoxHelper()
         {
-            if (serviceProvider == null)
-                throw new ArgumentNullException("serviceProvider");
-
-            _uiShell = serviceProvider.GetService(typeof(IVsUIShell)) as IVsUIShell;
+            // do we need to initialize it again?
             if (_uiShell == null)
-                throw new InvalidOperationException("Unable to initialize UiShell");
+            {
+                _uiShell = Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(SVsUIShell)) as IVsUIShell;
+                if (_uiShell == null)
+                    throw new InvalidOperationException("Unable to initialize UiShell");
+            }
         }
 
         /// <summary>
@@ -37,10 +40,6 @@ namespace BlackBerry.Package.Helpers
         public static DialogResult Show(string text, string title, MessageBoxButtons buttons, MessageBoxIcon icon,
                             MessageBoxDefaultButton defaultButton)
         {
-            // check the state:
-            if (_uiShell == null)
-                throw new InvalidOperationException("MessageBox ecosystem has not been initialized properly yet");
-
             var guid = Guid.Empty;
             int result;
             var xButton = OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL;

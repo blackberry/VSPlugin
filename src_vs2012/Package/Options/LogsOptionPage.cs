@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using BlackBerry.Package.Components;
 using Microsoft.VisualStudio.Shell;
 
 namespace BlackBerry.Package.Options
@@ -68,5 +69,15 @@ namespace BlackBerry.Package.Options
         }
 
         #endregion
+
+        protected override void OnApply(PageApplyEventArgs e)
+        {
+            base.OnApply(e);
+
+            if (e.ApplyBehavior == ApplyKind.Apply)
+            {
+                LogManager.Update(Path, LimitLogs ? LimitCount : -1);
+            }
+        }
     }
 }

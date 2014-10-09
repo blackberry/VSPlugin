@@ -22,6 +22,8 @@ namespace BlackBerry.Package.Dialogs
             Simulator
         }
 
+        private const string DefaultPasswordForSimulator = "not-required"; // anything non-empty string, as simulator doesn't require any password
+
         private DeviceInfoRunner _runner;
         private ulong _pin;
         private string _loadedDeviceName;
@@ -33,6 +35,7 @@ namespace BlackBerry.Package.Dialogs
             Text = title;
             cmbType.SelectedIndex = 0;
             IsConnected = false;
+            GoToIPControl();
         }
 
         #region Properties
@@ -145,7 +148,16 @@ namespace BlackBerry.Package.Dialogs
             DeviceClass = GetDeviceClass(device.Type, device.IP);
             DeviceName = device.Name;
             DeviceIP = device.IP;
-            DevicePassword = device.Password;
+            DevicePassword = DeviceClass == DialogDeviceClass.Simulator ? DefaultPasswordForSimulator : device.Password;
+
+            GoToIPControl();
+        }
+
+        private void GoToIPControl()
+        {
+            ActiveControl = txtIP;
+            txtIP.SelectionLength = 0;
+            txtIP.SelectionStart = txtIP.Text.Length;
         }
 
         /// <summary>
@@ -272,7 +284,15 @@ namespace BlackBerry.Package.Dialogs
 
         private void cmbType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            txtIP.ReadOnly = DeviceClass == DialogDeviceClass.UsbDevice;
+            txtPassword.ReadOnly = DeviceClass == DialogDeviceClass.Simulator;
+
+            if (DeviceClass == DialogDeviceClass.Simulator)
+            {
+                if (string.IsNullOrEmpty(DeviceName))
+                    DeviceName = "simulator";
+                DeviceIP = "192.168.32.1";
+                DevicePassword = DefaultPasswordForSimulator;
+            }
 
             if (DeviceClass == DialogDeviceClass.UsbDevice)
             {
@@ -284,7 +304,11 @@ namespace BlackBerry.Package.Dialogs
                 ActiveControl = txtPassword;
                 txtPassword.SelectionLength = 0;
                 txtPassword.SelectionStart = txtPassword.Text.Length;
+                return;
             }
+
+            // and to IP control:
+            GoToIPControl();
         }
 
         private void bttOK_Click(object sender, EventArgs e)

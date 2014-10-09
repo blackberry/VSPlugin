@@ -14,12 +14,45 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <Import Project="$(VCTargetsPath)Platforms\BlackBerry\ImportBefore\*.props" 
           Condition="Exists('$(VCTargetsPath)Platforms\BlackBerry\ImportBefore')" />
 
+  <PropertyGroup Condition="'$(TargetArch)' == 'armle-v7'">
+    <IntDir Condition="'$(IntDir)'=='' AND '$(IntermediateOutputPath)'!=''">$(IntermediateOutputPath)</IntDir>
+    <IntDir Condition="'$(IntDir)'=='' AND '$(IntermediateOutputPath)'==''">Device-$(Configuration)\</IntDir>
+    <OutDir Condition="'$(OutDir)'=='' AND '$(SolutionDir)' != ''">Device-$(Configuration)\</OutDir>
+    <OutDir Condition="'$(OutDir)'=='' AND '$(SolutionDir)' == ''">$(IntDir)</OutDir>
+
+    <TargetCompiler>gcc_ntoarmv7le</TargetCompiler>
+    <TargetCPU>Device</TargetCPU>
+    <TargetDeviceIP>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@device_IP)</TargetDeviceIP>
+    <TargetDevicePassword>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@device_password)</TargetDevicePassword>
+    <CPUVARDIR>armle-v7</CPUVARDIR>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(TargetArch)' == 'x86'">
+    <IntDir Condition="'$(IntDir)'=='' AND '$(IntermediateOutputPath)'!=''">$(IntermediateOutputPath)</IntDir>
+    <IntDir Condition="'$(IntDir)'=='' AND '$(IntermediateOutputPath)'==''">Simulator-$(Configuration)\</IntDir>
+    <OutDir Condition="'$(OutDir)'=='' AND '$(SolutionDir)' != ''">Simulator-$(Configuration)\</OutDir>
+    <OutDir Condition="'$(OutDir)'=='' AND '$(SolutionDir)' == ''">$(IntDir)</OutDir>
+
+    <TargetCompiler>gcc_ntox86</TargetCompiler>
+    <TargetCPU>Simulator</TargetCPU>
+    <TargetDeviceIP>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)</TargetDeviceIP>
+    <TargetDevicePassword>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)</TargetDevicePassword>
+    <CPUVARDIR>x86</CPUVARDIR>
+  </PropertyGroup>
+
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Common.props" Condition="Exists('$(VCTargetsPath)\Microsoft.Cpp.Common.props')" />
   <Import Project="$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).props"
-          Condition="(exists('$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).props'))" />
+          Condition="Exists('$(VCTargetsPath)Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).props')" />
 
   <!-- Default preprocessor defines -->
-  <PropertyGroup>
-    <QccDefines>QCC;__QCC__;__QNX__</QccDefines>
+  <PropertyGroup Condition="'$(TargetArch)' == 'armle-v7'">
+    <QccDefines>QCC;__QCC__;__QNX__;QNX_DEVICE=1;QNX_FAMILY=device</QccDefines>
+    <QccDefines Condition="'$(QNX_FAMILY)' == 'tablet'">QCC;__QCC__;__QNX__;QNX_DEVICE=2;QNX_TABLET=1;QNX_FAMILY=tablet</QccDefines>
+    <LinkSharedLib>false</LinkSharedLib>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetArch)' == 'x86'">
+    <QccDefines>QCC;__QCC__;__QNX__;QNX_SIMULATOR=1;QNX_FAMILY=device-simulator</QccDefines>
+    <QccDefines Condition="'$(QNX_FAMILY)' == 'tablet'">QCC;__QCC__;__QNX__;QNX_SIMULATOR=2;QNX_TABLET=1;QNX_FAMILY=tablet-simulator</QccDefines>
     <LinkSharedLib>false</LinkSharedLib>
   </PropertyGroup>
 
@@ -134,14 +167,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <Deployment Condition="'%(BuildBar.Deployment)' == ''">Install</Deployment>
       <Register Condition="'%(BuildBar.Register)' == ''">false</Register>
       <BuildID Condition="'%(BuildBar.BuildID)' == ''">1</BuildID>
+      <ApplicationDescriptorXml>bar-descriptor.xml</ApplicationDescriptorXml>
     </BuildBar>
   </ItemDefinitionGroup>
-
-  <PropertyGroup>
-    <Device Condition="'$(Device)' == ''">169.254.0.1</Device>
-    <DevicePassword Condition="'$(DevicePassword)' == ''"></DevicePassword>
-    <ApplicationDescriptorXml Condition="'$(ApplicationDescriptorXml)' == ''">bar-descriptor.xml</ApplicationDescriptorXml>
-  </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter\*.props" Condition="Exists('$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter')" />
 </Project>

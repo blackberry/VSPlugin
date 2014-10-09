@@ -343,7 +343,7 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugThread2.GetProgram(out IDebugProgram2 ppProgram)
         {
-            ppProgram = _engine._program;
+            ppProgram = _engine.Program;
             return VSConstants.S_OK;
         }
 

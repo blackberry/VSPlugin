@@ -178,6 +178,8 @@ namespace BlackBerry.NativeCore.Debugger
             if (!string.IsNullOrEmpty(localBinaryPath) && File.Exists(localBinaryPath))
             {
                 parsed = _gdbRunner.Send(RequestsFactory.SetExecutable(localBinaryPath, true), Instructions[8]);
+
+                // PH: TODO: HINT: potentially we could ignore the error here
                 if (parsed == string.Empty || parsed[0] == '!')
                 {
                     _gdbRunner.Send(RequestsFactory.Exit());

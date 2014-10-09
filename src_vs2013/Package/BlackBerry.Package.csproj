@@ -153,8 +153,22 @@
     <Compile Include="..\..\src_vs2012\Package\Components\BuildPlatformsManager.cs">
       <Link>Components\BuildPlatformsManager.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\LogManager.cs">
+      <Link>Components\LogManager.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Diagnostics\PersistentTraceListener.cs">
+      <Link>Diagnostics\PersistentTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.cs">
+      <Link>Dialogs\BinaryDiscoveryForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.designer.cs">
+      <Link>Dialogs\BinaryDiscoveryForm.designer.cs</Link>
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Dialogs\FolderForm.cs">
       <Link>Dialogs\FolderForm.cs</Link>
@@ -200,6 +214,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\ProjectHelper.cs">
+      <Link>Helpers\ProjectHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
       <Link>Model\bar-descriptor.cs</Link>
@@ -577,6 +594,10 @@
     <None Include="..\..\src_vs2012\Package\Resources\Package.Bitmaps.vsct">
       <Link>Resources\Package.Bitmaps.vsct</Link>
     </None>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.resx">
+      <Link>Dialogs\BinaryDiscoveryForm.resx</Link>
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\FolderForm.resx">
       <Link>Dialogs\FolderForm.resx</Link>
       <DependentUpon>FolderForm.cs</DependentUpon>

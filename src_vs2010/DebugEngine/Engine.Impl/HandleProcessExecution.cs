@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
+using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio.Debugger.Interop;
 
 namespace BlackBerry.DebugEngine
@@ -384,7 +385,7 @@ namespace BlackBerry.DebugEngine
                             if (_eventDispatcher.countSIGINT > 5)
                             {
                                 _eventDispatcher.EndDebugSession(0);
-                                MessageBox.Show("Lost communication with GDB. Please refer to documentation for more details.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBoxHelper.Show("Lost communication with GDB. Please refer to documentation for more details.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             }
                             break;
                         case '1':  
@@ -398,12 +399,12 @@ namespace BlackBerry.DebugEngine
                         case '2':
                             // GDB Bugs, like "... 2374: internal-error: frame_cleanup_after_sniffer ...". Example: 52
                             _eventDispatcher.EndDebugSession(0);
-                            MessageBox.Show("This is a known issue that can happen when interrupting GDB's execution by hitting the \"break all\" or toggling a breakpoint in run mode. \n\n GDB CRASHED. Details: \"../../gdb/frame.c:2374: internal-error: frame_cleanup_after_sniffer: Assertion `frame->prologue_cache == NULL' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBoxHelper.Show("This is a known issue that can happen when interrupting GDB's execution by hitting the \"break all\" or toggling a breakpoint in run mode. \n\n GDB CRASHED. Details: \"../../gdb/frame.c:2374: internal-error: frame_cleanup_after_sniffer: Assertion `frame->prologue_cache == NULL' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             break;
                         case '3':  
                             // Lost communication with device/simulator: ^error,msg="Remote communication error: No error."
-                            MessageBox.Show("Lost communication with the device/simulator.", "Communication lost", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBoxHelper.Show("Lost communication with the device/simulator.", "Communication lost", MessageBoxButtons.OK, MessageBoxIcon.Error);
                             _eventDispatcher.EndDebugSession(0);
 
                             break;
@@ -462,7 +463,7 @@ namespace BlackBerry.DebugEngine
                                     break;
                             }
 
-                            MessageBox.Show("Segmentation Fault: If you continue debugging could take the environment to an unstable state.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBoxHelper.Show("Segmentation Fault: If you continue debugging could take the environment to an unstable state.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                             _eventDispatcher.Engine.CleanEvaluatedThreads();
 
@@ -502,13 +503,13 @@ namespace BlackBerry.DebugEngine
 
                             if (_signalMeaning == "Segmentation fault")
                             {
-                                MessageBox.Show("Segmentation Fault: Closing debugger.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBoxHelper.Show("Segmentation Fault: Closing debugger.", "Segmentation Fault", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 _eventDispatcher.EndDebugSession(0);
                             }
 
                             if (_signalMeaning == "Aborted")
                             {
-                                MessageBox.Show("Program aborted: Closing debugger.", "Program Aborted", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                MessageBoxHelper.Show("Program aborted: Closing debugger.", "Program Aborted", MessageBoxButtons.OK, MessageBoxIcon.Error);
                                 _eventDispatcher.EndDebugSession(0);
                             }
 
@@ -516,7 +517,7 @@ namespace BlackBerry.DebugEngine
                         case '6':  
                             // GDB Bugs, like "... 3550: internal-error: handle_inferior_event ...". Example: 56
                             _eventDispatcher.EndDebugSession(0);
-                            MessageBox.Show("This is a known issue that can happen while debugging multithreaded programs. \n\n GDB CRASHED. Details: \"../../gdb/infrun.c:3550: internal-error: handle_inferior_event: Assertion ptid_equal (singlestep_ptid, ecs->ptid)' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBoxHelper.Show("This is a known issue that can happen while debugging multithreaded programs. \n\n GDB CRASHED. Details: \"../../gdb/infrun.c:3550: internal-error: handle_inferior_event: Assertion ptid_equal (singlestep_ptid, ecs->ptid)' failed.\nA problem internal to GDB has been detected,\nfurther debugging may prove unreliable.\" \r\n \nPlease close the app in the device/simulator if you want to debug it again.", "GDB failure", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
                             break;
                         case '7':  // Not used
@@ -529,7 +530,6 @@ namespace BlackBerry.DebugEngine
                     break;
             }
         }
-
 
         /// <summary>
         /// Update VS when a step action is completed in GDB.
@@ -548,7 +548,6 @@ namespace BlackBerry.DebugEngine
                 AD7StepCompletedEvent.Send(eventDispatcher.Engine);
             }
         }
-
 
         /// <summary>
         /// Update VS when the debugging process is interrupted in GDB.

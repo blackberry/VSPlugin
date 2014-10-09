@@ -172,7 +172,15 @@
     </Compile>
     <Compile Include="BlackBerryPackage.cs" />
     <Compile Include="Components\BuildPlatformsManager.cs" />
+    <Compile Include="Components\LogManager.cs" />
     <Compile Include="Diagnostics\BlackBerryPaneTraceListener.cs" />
+    <Compile Include="Diagnostics\PersistentTraceListener.cs" />
+    <Compile Include="Dialogs\BinaryDiscoveryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\BinaryDiscoveryForm.Designer.cs">
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Dialogs\FolderForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -401,6 +409,9 @@
     <Resource Include="Resources\Navigator\target.png" />
     <Resource Include="Resources\Navigator\thread.png" />
     <None Include="Resources\Package.Menu.vsct" />
+    <EmbeddedResource Include="Dialogs\BinaryDiscoveryForm.resx">
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Dialogs\CertificateDetailsForm.resx">
       <DependentUpon>CertificateDetailsForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -547,6 +558,11 @@
     <ProjectReference Include="..\DebugEngine\BlackBerry.DebugEngine.csproj">
       <Project>{59a7b188-e307-4495-a3af-4ed76b086a87}</Project>
       <Name>BlackBerry.DebugEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GDBHost\BlackBerry.GDBHost.vcxproj">
+      <Project>{9A560339-44DB-413F-868C-403962C2CF01}</Project>
+      <Name>BlackBerry.GDBHost</Name>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{faddd789-6cb5-4f9d-8481-1c0c72e5f19f}</Project>

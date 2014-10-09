@@ -1,0 +1,219 @@
+﻿<#@ template language="C#" visibility="internal" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+#
+# Makefile for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual studio (v<#= Version #>).
+# Any manual changes made by user will be overwritten! Use the project settings instead.
+#
+
+#############################################
+# Initials
+RM := rm -rf
+
+# Empty variable definitions.
+O_SRCS :=
+CPP_SRCS :=
+C_UPPER_SRCS :=
+C_SRCS :=
+S_UPPER_SRCS :=
+OBJ_SRCS :=
+II_SRCS :=
+ASM_SRCS :=
+CXX_SRCS :=
+I_SRCS :=
+CC_SRCS :=
+OBJS :=
+C_DEPS :=
+CC_DEPS :=
+ARCHIVES :=
+CPP_DEPS :=
+I_DEPS :=
+CXX_DEPS :=
+C_UPPER_DEPS :=
+II_DEPS :=
+
+USER_OBJS :=
+LIBS :=
+
+#############################################
+# Sources
+
+<#  if (CompileItemsAsC.Length > 0)
+    { #>
+C_SRCS += <# Write8dot3Collection(CompileItemsAsC, "    ", ""); #>
+
+C_DEPS += <# WriteNameCollection(CompileItemsAsC, "    ./", ".d"); #>
+<#  } /* CompileItemsAsC.Length > 0 */ #>
+
+<#  if (CompileItemsAsCpp.Length > 0)
+    { #>
+CPP_SRCS += <# Write8dot3Collection(CompileItemsAsCpp, "    ", ""); #>
+
+CPP_DEPS += <# WriteNameCollection(CompileItemsAsCpp, "    ./", ".d"); #>
+<#  } /* CompileItemsAsCpp.Length > 0 */ #>
+
+OBJS += <# WriteNameCollection(CompileItems, "    ./", ".o"); #>
+
+#############################################
+# Targets
+
+all: "<#= TargetFile #>"
+
+"<#= TargetFile #>": $(OBJS) $(USER_OBJS) $(LIB_DEPS)
+	<# switch (ConfigurationType)
+    {
+        case "Application":
+            {
+                // Invoke linker
+                #>qcc -o "<#= OutDir #><#= TargetFile #>" $(OBJS) $(USER_OBJS) $(LIBS) <#= CompilerFlags #> <#
+
+                if (LinkItem.GetMetadata("CompileAs") == "CompileAsC") { #>-lang-c <# } else { #>-lang-c++ <# }
+                if (LinkItem.GetMetadata("GenerateDebugInformation") == "true") { #>-g <# }
+
+                // For added security, remap some sections of ELF as read-only.
+                #>-Wl,-z,relro,-z,now <#
+
+                // Visual Studio doesn't have separate lists for static vs. dynamic dependencies.
+                // To differentiate between the two, include the extension in the list - `.a for static, `.so for dynamic.
+                // If no extension is included in the name it will be treated as the same type
+                // as the last declared type, and the default type is static. This is the way qcc would work
+                // if you were using it from the command line with the "-Bstatic" and "-Bdynamic" flags.
+
+                var libs = LinkItem.GetMetadata("AdditionalDependencies").Split(';');
+                for (int i = 0; i < libs.Length; i++)
+                {
+                    if (libs[i].EndsWith(".so"))
+                    {
+                        #>-Bdynamic -l<#= libs[i].Substring(0, libs[i].Length - 3) #> <#
+                    }
+                    else if (libs[i].EndsWith(".a"))
+                    {
+                        #>-Bstatic -l<#= libs[i].Substring(0, libs[i].Length - 2) #> <#
+                    }
+                    else
+                    {
+                        #>-l<#= libs[i] #> <#
+                    }
+                }
+
+                WriteCollection(GetRootedDirs(ProjectDir, LinkItem.GetMetadata("AdditionalLibraryDirectories").Split(';')), "-L");
+                WriteCollection(AdditionalLibraryDirectories, "-L");
+            }
+            break;
+        case "StaticLibrary":
+            {
+                #>qcc -A "<#= OutDir #><#= TargetFile #> $(OBJS) $(USER_OBJS) $(LIBS) <#= CompilerFlags #> -w1<#
+            }
+            break;
+        case "DynamicLibrary":
+            {
+                // In case of reverse dependencies, may need to add "-Wl,-export-dynamic"
+                // Also note that the soname is currently the same as the target name, and no version information is added.
+                #>qcc -shared -Wl,-soname,"<#= TargetFile #>" -o "<#= OutDir #><#= TargetFile #>" $(OBJS) $(USER_OBJS) $(LIBS) <#= CompilerFlags #><#
+            }
+            break;
+        default:
+            #>!! Error - unsupported configuration type !!<#
+            break;
+    }
+#>
+
+
+clean:
+	-$(RM) $(OBJS)$(C_DEPS)$(CC_DEPS)$(COM_QNX_QCC_OUTPUTTYPE_LINKER_OUTPUTS)$(CPP_DEPS)$(I_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS)$(II_DEPS) "<#= OutDir #><#= TargetFile #>"<#
+    if (ConfigurationType == "Application")
+    {
+#> "<#= OutDir #><#= TargetBarFile #>"
+<#  } #>
+
+.PHONY: all clean dependents
+
+<#
+
+    var warningMap = new Dictionary<string,string>();
+    warningMap.Add("TurnOffAllWarnings", "-w0 ");
+    warningMap.Add("Level1", "-w1 ");
+    warningMap.Add("Level2", "-w2 ");
+    warningMap.Add("Level3", "-w3 ");
+    warningMap.Add("Level4", "-w4 ");
+    warningMap.Add("Level5", "-w5 ");
+    warningMap.Add("Level6", "-w6 ");
+    warningMap.Add("Level7", "-w7 ");
+    warningMap.Add("Level8", "-w8 ");
+    warningMap.Add("Level9", "-w9 ");
+    warningMap.Add("EnableAllWarnings", "-Wall ");
+
+    foreach(var compileItem in CompileItems)
+    {
+        var filename = compileItem.GetMetadata("Filename");
+        var shortPath = GetFullPath8dot3(compileItem);
+        var additionalIncludeDirs = GetRootedDirs(ProjectDir, compileItem.GetMetadata("AdditionalIncludeDirectories").Split(';'));
+
+        // Now add a compile rule for this item.
+        #><#= filename #>.o: <#= shortPath #>
+	qcc -o $@ <#= GetFullPath8dot3(compileItem) #> <#= CompilerFlags #> -c -Wp,-MMD,$(basename $@).d -Wp,-MT,$@ <#
+
+        if (compileItem.GetMetadata("CompileAs") == "CompileAsC")
+        {
+             #>-lang-c <#
+        }
+        else
+        {
+            #>-lang-c++ <#
+            if (compileItem.GetMetadata("RuntimeTypeInfo") == "false") { #>-fno-rtti <# }
+        }
+
+        string warningLevel;
+        if (warningMap.TryGetValue(compileItem.GetMetadata("WarningLevel"), out warningLevel))
+        {
+            Write(warningLevel);
+        }
+
+        if (compileItem.GetMetadata("GenerateDebugInformation") == "true") { #>-g <# }
+        if (compileItem.GetMetadata("GccExceptionHandling") == "true") { #>-fexceptions <# } else { #>-fno-exceptions <# }
+        if (compileItem.GetMetadata("EnhancedSecurity") == "true") { #>-fstack-protector-all <# }
+
+        // Note: Consider letting user decide between "-fpic" and "-fPIC"
+        // For now we use the safe, cross-platform "-fPIC"
+        if (ConfigurationType == "DynamicLibrary") { #>-fPIC <# }
+
+        WriteCollection(AdditionalIncludeDirectories, "-I");
+        WriteCollection(GetRootedDirs(ProjectDir, compileItem.GetMetadata("AdditionalIncludeDirectories").Replace('\\', '/').Split(';')), "-I");
+        WriteCollection(compileItem.GetMetadata("UndefinePreprocessorDefinitions").Split(';'), "-U");
+        WriteCollection(compileItem.GetMetadata("PreprocessorDefinitions").Split(';'), "-D");
+        Write(compileItem.GetMetadata("AdditionalOptions"));
+        #>
+
+
+<#
+    }
+#>
+#############################################
+# Include all dependency files
+
+ifneq ($(MAKECMDGOALS),clean)
+ ifneq ($(strip $(C_DEPS)),)
+  -include $(C_DEPS)
+ endif
+ ifneq ($(strip $(CC_DEPS)),)
+  -include $(CC_DEPS)
+ endif
+ ifneq ($(strip $(CPP_DEPS)),)
+  -include $(CPP_DEPS)
+ endif
+ ifneq ($(strip $(I_DEPS)),)
+  -include $(I_DEPS)
+ endif
+ ifneq ($(strip $(CXX_DEPS)),)
+  -include $(CXX_DEPS)
+ endif
+ ifneq ($(strip $(C_UPPER_DEPS)),)
+  -include $(C_UPPER_DEPS)
+ endif
+ ifneq ($(strip $(II_DEPS)),)
+  -include $(II_DEPS)
+ endif
+endif
+
+# End
+#############################################

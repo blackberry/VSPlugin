@@ -106,7 +106,7 @@ REM ****************************************************************************
 if %ActionBuildVS2012% equ 0 (goto skip_vs2012)
 
 echo %actionNo%: Building Solution for Visual Studio 2012
-%MsBuildCmd% %SolutionPath2012% /p:OutputPath="%BuildResults%\VS2012" /p:VisualStudioVersion=11.0  > "%BuildResults%\VS2012_buildlog.txt"
+%MsBuildCmd% %SolutionPath2012% /p:OutputPath="%BuildResults%\VS2012" /p:VisualStudioVersion=11.0 > "%BuildResults%\VS2012_buildlog.txt"
 if errorlevel 1 ( exit /b %errorlevel% )
 echo %actionNo%: Build - DONE
 set /a actionNo += 1
@@ -119,7 +119,7 @@ REM ****************************************************************************
 if %ActionBuildVS2013% equ 0 (goto skip_vs2013)
 
 echo %actionNo%: Building Solution for Visual Studio 2013
-%MsBuild2013Cmd% %SolutionPath2013% /p:OutputPath="%BuildResults%\VS2013" /p:VisualStudioVersion=12.0  > "%BuildResults%\VS2013_buildlog.txt"
+%MsBuild2013Cmd% %SolutionPath2013% /p:OutputPath="%BuildResults%\VS2013" /p:VisualStudioVersion=12.0 > "%BuildResults%\VS2013_buildlog.txt"
 if errorlevel 1 ( exit /b %errorlevel% )
 echo %actionNo%: Build - DONE
 set /a actionNo += 1
