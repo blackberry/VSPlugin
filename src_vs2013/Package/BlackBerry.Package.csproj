@@ -156,6 +156,14 @@
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\FolderForm.cs">
+      <Link>Dialogs\FolderForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\FolderForm.designer.cs">
+      <Link>Dialogs\FolderForm.designer.cs</Link>
+      <DependentUpon>FolderForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml.cs">
       <Link>Editors\BarDescriptorEditorControl.xaml.cs</Link>
       <DependentUpon>BarDescriptorEditorControl.xaml</DependentUpon>
@@ -186,6 +194,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\DteHelper.cs">
       <Link>Helpers\DteHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\IconHelper.cs">
+      <Link>Helpers\IconHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
@@ -387,17 +398,72 @@
     <Compile Include="..\..\src_vs2012\Package\StandardCommands.cs">
       <Link>StandardCommands.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ToolWindows\TargetNavigatorControl.xaml.cs">
+      <Link>ToolWindows\TargetNavigatorControl.xaml.cs</Link>
+      <DependentUpon>TargetNavigatorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ToolWindows\TargetNavigatorPane.cs">
+      <Link>ToolWindows\TargetNavigatorPane.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\BarEditorViewModel.cs">
       <Link>ViewModels\BarEditorViewModel.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\Common\BinaryToStringConverter.cs">
+      <Link>ViewModels\Common\BinaryToStringConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\Common\ContentTemplateSelector.cs">
+      <Link>ViewModels\Common\ContentTemplateSelector.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\Common\CountToVisibilityConverter.cs">
+      <Link>ViewModels\Common\CountToVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\Common\NullToVisibilityConverter.cs">
+      <Link>ViewModels\Common\NullToVisibilityConverter.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageViewModel.cs">
       <Link>ViewModels\PackageViewModel.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\SigningOptionViewModel.cs">
       <Link>ViewModels\SigningOptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigatorViewModel.cs">
+      <Link>ViewModels\TargetNavigatorViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\BaseViewItem.cs">
+      <Link>ViewModels\TargetNavigator\BaseViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\DownloadUploadProgress.cs">
+      <Link>ViewModels\TargetNavigator\DownloadUploadProgress.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\FileSystemViewItem.cs">
+      <Link>ViewModels\TargetNavigator\FileSystemViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\FileToParentViewItem.cs">
+      <Link>ViewModels\TargetNavigator\FileToParentViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\FileViewItem.cs">
+      <Link>ViewModels\TargetNavigator\FileViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\MessageViewItem.cs">
+      <Link>ViewModels\TargetNavigator\MessageViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\ProcessListViewItem.cs">
+      <Link>ViewModels\TargetNavigator\ProcessListViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\ProcessViewItem.cs">
+      <Link>ViewModels\TargetNavigator\ProcessViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\ProgressViewItem.cs">
+      <Link>ViewModels\TargetNavigator\ProgressViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetNavigator\TargetViewItem.cs">
+      <Link>ViewModels\TargetNavigator\TargetViewItem.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsChangedEventArgs.cs">
+      <Link>ViewModels\TargetsChangedEventArgs.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
@@ -424,12 +490,97 @@
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\BlackBerryMessager.bmp">
+      <Link>Resources\Permissions\BlackBerryMessager.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Calendar.bmp">
+      <Link>Resources\Permissions\Calendar.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Camera.bmp">
+      <Link>Resources\Permissions\Camera.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\CaptureScreen.bmp">
+      <Link>Resources\Permissions\CaptureScreen.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Contacts.bmp">
+      <Link>Resources\Permissions\Contacts.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\DeviceIdentifyingInfo.bmp">
+      <Link>Resources\Permissions\DeviceIdentifyingInfo.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\EmailPINMessages.bmp">
+      <Link>Resources\Permissions\EmailPINMessages.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Gamepad.bmp">
+      <Link>Resources\Permissions\Gamepad.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\GPSLocation.bmp">
+      <Link>Resources\Permissions\GPSLocation.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Internet.bmp">
+      <Link>Resources\Permissions\Internet.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Location.bmp">
+      <Link>Resources\Permissions\Location.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Mircrophone.bmp">
+      <Link>Resources\Permissions\Mircrophone.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\MyContactInfo.bmp">
+      <Link>Resources\Permissions\MyContactInfo.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Notebooks.bmp">
+      <Link>Resources\Permissions\Notebooks.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Phone.bmp">
+      <Link>Resources\Permissions\Phone.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\PhoneControl.bmp">
+      <Link>Resources\Permissions\PhoneControl.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\PostNotifications.bmp">
+      <Link>Resources\Permissions\PostNotifications.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\Push.bmp">
+      <Link>Resources\Permissions\Push.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\RunBackgrounded.bmp">
+      <Link>Resources\Permissions\RunBackgrounded.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\SharedFiles.bmp">
+      <Link>Resources\Permissions\SharedFiles.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\TextMessages.bmp">
+      <Link>Resources\Permissions\TextMessages.bmp</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Navigator\folder_closed.png">
+      <Link>Resources\Navigator\folder_closed.png</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Navigator\folder_opened.png">
+      <Link>Resources\Navigator\folder_opened.png</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Navigator\process.png">
+      <Link>Resources\Navigator\process.png</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Navigator\target.png">
+      <Link>Resources\Navigator\target.png</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Navigator\target_disconnected.png">
+      <Link>Resources\Navigator\target_disconnected.png</Link>
+    </Resource>
+    <Resource Include="..\..\src_vs2012\Package\Resources\Navigator\thread.png">
+      <Link>Resources\Navigator\thread.png</Link>
+    </Resource>
     <None Include="..\..\src_vs2012\Package\Resources\Package.Menu.vsct">
       <Link>Resources\Package.Menu.vsct</Link>
     </None>
     <None Include="..\..\src_vs2012\Package\Resources\Package.Bitmaps.vsct">
       <Link>Resources\Package.Bitmaps.vsct</Link>
     </None>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\FolderForm.resx">
+      <Link>Dialogs\FolderForm.resx</Link>
+      <DependentUpon>FolderForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.resx">
       <Link>Options\ApiLevelOptionControl.resx</Link>
       <DependentUpon>ApiLevelOptionControl.cs</DependentUpon>
@@ -515,36 +666,9 @@
     <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xss">
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
     </None>
-    <Resource Include="..\..\src_vs2010\Package\Resources\BlackBerryMessager.bmp">
-      <Link>Resources\BlackBerryMessager.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Calendar.bmp">
-      <Link>Resources\Calendar.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Camera.bmp">
-      <Link>Resources\Camera.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\CaptureScreen.bmp">
-      <Link>Resources\CaptureScreen.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Contacts.bmp">
-      <Link>Resources\Contacts.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\DeviceIdentifyingInfo.bmp">
-      <Link>Resources\DeviceIdentifyingInfo.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\EmailPINMessages.bmp">
-      <Link>Resources\EmailPINMessages.bmp</Link>
-    </Resource>
     <Content Include="..\..\src_vs2010\Package\Resources\File.ico">
       <Link>Resources\File.ico</Link>
     </Content>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Gamepad.bmp">
-      <Link>Resources\Gamepad.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\GPSLocation.bmp">
-      <Link>Resources\GPSLocation.bmp</Link>
-    </Resource>
     <Resource Include="..\..\src_vs2010\Package\Resources\Images_24bit.bmp">
       <Link>Resources\Images_24bit.bmp</Link>
     </Resource>
@@ -557,45 +681,9 @@
     <Resource Include="..\..\src_vs2010\Package\Resources\info.png">
       <Link>Resources\info.png</Link>
     </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Internet.bmp">
-      <Link>Resources\Internet.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Location.bmp">
-      <Link>Resources\Location.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Mircrophone.bmp">
-      <Link>Resources\Mircrophone.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\MyContactInfo.bmp">
-      <Link>Resources\MyContactInfo.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Notebooks.bmp">
-      <Link>Resources\Notebooks.bmp</Link>
-    </Resource>
     <Content Include="..\..\src_vs2010\Package\Resources\Package.ico">
       <Link>Resources\Package.ico</Link>
     </Content>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Phone.bmp">
-      <Link>Resources\Phone.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\PhoneControl.bmp">
-      <Link>Resources\PhoneControl.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\PostNotifications.bmp">
-      <Link>Resources\PostNotifications.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\Push.bmp">
-      <Link>Resources\Push.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\RunBackgrounded.bmp">
-      <Link>Resources\RunBackgrounded.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\SharedFiles.bmp">
-      <Link>Resources\SharedFiles.bmp</Link>
-    </Resource>
-    <Resource Include="..\..\src_vs2010\Package\Resources\TextMessages.bmp">
-      <Link>Resources\TextMessages.bmp</Link>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\src_vs2010\Package\Resources\Strings.resx">
@@ -635,6 +723,11 @@
     </Page>
     <Page Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml">
       <Link>Editors\BarDescriptorEditorControl.xaml</Link>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="..\..\src_vs2012\Package\ToolWindows\TargetNavigatorControl.xaml">
+      <Link>ToolWindows\TargetNavigatorControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

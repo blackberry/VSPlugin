@@ -1,5 +1,6 @@
 ﻿using System;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.QConn;
 
 namespace BlackBerry.NativeCore.Components
 {
@@ -11,12 +12,13 @@ namespace BlackBerry.NativeCore.Components
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public TargetConnectionEventArgs(DeviceDefinition device, TargetStatus status, string message)
+        public TargetConnectionEventArgs(DeviceDefinition device, QConnClient client, TargetStatus status, string message)
         {
             if (device == null)
                 throw new ArgumentNullException("device");
 
             Device = device;
+            Client = client;
             Status = status;
             Message = message;
         }
@@ -24,6 +26,12 @@ namespace BlackBerry.NativeCore.Components
         #region Properties
 
         public DeviceDefinition Device
+        {
+            get;
+            private set;
+        }
+
+        public QConnClient Client
         {
             get;
             private set;

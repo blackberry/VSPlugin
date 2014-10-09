@@ -35,11 +35,11 @@ namespace BlackBerry.NativeCore
         /// </summary>
         public const string DebugEngineDebugablePath =
 #               if PLATFORM_VS2010
-                    @"S:\vs-plugin\src_vs2010\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+                    @"T:\vs-plugin\src_vs2010\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
 #               elif PLATFORM_VS2012
-                    @"S:\vs-plugin\src_vs2012\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+                    @"T:\vs-plugin\src_vs2012\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
 #               elif PLATFORM_VS2013
-                    @"S:\vs-plugin\src_vs2013\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
+                    @"T:\vs-plugin\src_vs2013\DebugEngine\bin\Debug\BlackBerry.DebugEngine.dll";
 #               else
 #                   error Define path to debug version of the DebugEngine.dll to make the debugging working.
 #               endif
@@ -78,7 +78,7 @@ namespace BlackBerry.NativeCore
             RegistryPath = @"Software\BlackBerry\BlackBerryVSPlugin";
 
 #if DEBUG
-            GdbHostPath = @"S:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
+            GdbHostPath = @"T:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
 #else
             GdbHostPath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "BlackBerry.GDBHost.exe");
 #endif

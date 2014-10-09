@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Helpers;
 using Microsoft.Win32;
 
@@ -156,6 +157,42 @@ namespace BlackBerry.NativeCore.Model
                     return d;
 
             return null;
+        }
+
+        /// <summary>
+        /// Checks, if specified collection contains device with known IP.
+        /// </summary>
+        public static bool ContainsWithIP(DeviceDefinition[] devices, string ip)
+        {
+            if (string.IsNullOrEmpty(ip))
+                return false;
+            if (devices == null)
+                return false;
+
+            foreach (var device in devices)
+            {
+                if (device.HasIdenticalIP(ip))
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Finds the index of the device, by comparing the object references.
+        /// </summary>
+        public static int IndexOf(DeviceDefinition[] targetDevices, DeviceDefinition device)
+        {
+            if (device == null || targetDevices == null)
+                return -1;
+
+            for (int i = 0; i < targetDevices.Length; i++)
+            {
+                if (ReferenceEquals(targetDevices[i], device))
+                    return i;
+            }
+
+            return -1;
         }
 
         /// <summary>
@@ -367,7 +404,7 @@ namespace BlackBerry.NativeCore.Model
             {
                 var device = new DeviceDefinition(string.IsNullOrEmpty(values[i]) ? null : values[i],
                                                   values[i + 2], GlobalHelper.Decrypt(values[i + 3]),
-                                                  DeviceHelper.GetTypeFromString(values[i + 1]));
+                                                  DeviceHelper.GetTypeFromString(values[i + 1], false));
                 result.Add(device);
             }
 

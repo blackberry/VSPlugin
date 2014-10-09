@@ -27,7 +27,7 @@ namespace BlackBerry.NativeCore.Helpers
         /// <summary>
         /// Gets the DeviceDefinitionType from string.
         /// </summary>
-        public static DeviceDefinitionType GetTypeFromString(string name)
+        public static DeviceDefinitionType GetTypeFromString(string name, bool throwOnFailure)
         {
             if (string.IsNullOrEmpty(name))
                 return DeviceDefinitionType.Device;
@@ -38,6 +38,16 @@ namespace BlackBerry.NativeCore.Helpers
                 return DeviceDefinitionType.Simulator;
             if(name == "S" || name == "s")
                 return DeviceDefinitionType.Simulator;
+
+            if (string.Compare("device", name, StringComparison.OrdinalIgnoreCase) == 0)
+                return DeviceDefinitionType.Device;
+            if (string.Compare("dev", name, StringComparison.OrdinalIgnoreCase) == 0)
+                return DeviceDefinitionType.Device;
+            if (name == "D" || name == "d")
+                return DeviceDefinitionType.Device;
+
+            if (throwOnFailure)
+                throw new ArgumentOutOfRangeException("name", "Invalid device type specified: \"" + name + "\"");
 
             return DeviceDefinitionType.Device;
         }

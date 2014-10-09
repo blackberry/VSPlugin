@@ -103,10 +103,10 @@ namespace BlackBerry.NativeCore.Debugger
             // as communication is done via BlackBerry.GDBHost.exe (not directly as it would be done using GdbRunner).
             // The reason is simple - this is the ONLY way to send BreakRequest (aka Ctrl+C) to the GDB, while
             // it's running program. This allows to pause current binary execution at any time and inject other commands.
-            // Second trick we do here is using a dedicated 'event dispatcher'. This async dispacher simply instantiates
+            // Second trick we do here is using a dedicated 'event dispatcher'. This async dispatcher simply instantiates
             // single background-thread and all event notifications from GDB are sent from that thread with order kept.
             // It is required since the current DE architecture assumes that blocking calls of SendCommand() can be
-            // send immediatelly when processing asynchronous GDB notification. That, without an extra thread,
+            // send immediately when processing asynchronous GDB notification. That, without an extra thread,
             // would lead to a total blockage of whole communication, as we would block in the reading thread
             // and wait for data it was supposed to produce.
             _gdbRunner = new GdbHostRunner(ConfigDefaults.GdbHostPath, gdbInfo);
@@ -135,12 +135,26 @@ namespace BlackBerry.NativeCore.Debugger
             // load PID of the process to attach:
             if (!uint.TryParse(pidOrBinaryName, out pidNumber))
             {
+                ///////////////////////////////////////////////////////
+                // "the old way" - which seems not to work on PlayBook:
+                /*
                 var listRequest = RequestsFactory.ListProcesses();
                 _gdbRunner.Send(listRequest);
 
                 // wait for response:
                 listRequest.Wait();
                 var existingProcess = listRequest.Find(pidOrBinaryName);
+                 */
+                ///////////////////////////////////////////////////////
+
+                // this should succeed as we already used GDB successfully, so secure communication is working...
+                var qClient = Targets.Get(device);
+                if (qClient == null)
+                {
+                    throw new InvalidOperationException("Missing the client connected to target - this should never happen");
+                }
+                var existingProcess = qClient.SysInfoService.FindProcess(pidOrBinaryName);
+
                 if (existingProcess != null)
                 {
                     // doesn't run

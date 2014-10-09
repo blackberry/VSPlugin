@@ -108,6 +108,7 @@ namespace BlackBerry.NativeCore.Tools
 
                 if (_eventTerminate != null)
                 {
+                    Terminate();
                     _eventTerminate.Dispose();
                     _eventTerminate = null;
                 }

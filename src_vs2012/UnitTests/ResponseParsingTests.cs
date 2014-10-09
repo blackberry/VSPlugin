@@ -33,23 +33,45 @@ namespace UnitTests
         [Test]
         public void ParseProcessNames()
         {
-            var process = new ProcessInfo(0, "just name");
+            var process = new ProcessInfo(0, "/");
+            Assert.IsNull(process.Name);
+            Assert.AreEqual("/", process.Directory);
+
+            process = new ProcessInfo(0, "just name");
             Assert.AreEqual("just name", process.Name);
+            Assert.AreEqual("/", process.Directory);
 
             process = new ProcessInfo(0, "just name/");
             Assert.AreEqual("just name", process.Name);
+            Assert.AreEqual("/", process.Directory);
+
+            process = new ProcessInfo(0, "just name/////");
+            Assert.AreEqual("just name", process.Name);
+            Assert.AreEqual("/", process.Directory);
 
             process = new ProcessInfo(0, "just.name.exe");
             Assert.AreEqual("just.name.exe", process.Name);
+            Assert.AreEqual("/", process.Directory);
+
+            process = new ProcessInfo(0, "/executable");
+            Assert.AreEqual("executable", process.Name);
+            Assert.AreEqual("/", process.Directory);
+
+            process = new ProcessInfo(0, "/path/executable");
+            Assert.AreEqual("executable", process.Name);
+            Assert.AreEqual("/path", process.Directory);
 
             process = new ProcessInfo(0, "/path/to/executable");
             Assert.AreEqual("executable", process.Name);
+            Assert.AreEqual("/path/to", process.Directory);
 
             process = new ProcessInfo(0, "/path/to/executable/");
             Assert.AreEqual("executable", process.Name);
+            Assert.AreEqual("/path/to", process.Directory);
 
             process = new ProcessInfo(0, "path\\to\\executable");
             Assert.AreEqual("executable", process.Name);
+            Assert.AreEqual("path\\to", process.Directory);
         }
 
         [Test]

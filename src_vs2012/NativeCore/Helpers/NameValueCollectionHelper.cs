@@ -118,7 +118,7 @@ namespace BlackBerry.NativeCore.Helpers
 
             var name = data.ContainsKey("target.name") ? data["target.name"] : "Ad-hoc device";
 
-            return new DeviceDefinition(name, data["target.IP"], data["target.password"], DeviceHelper.GetTypeFromString(data["target.type"]));
+            return new DeviceDefinition(name, data["target.IP"], data["target.password"], DeviceHelper.GetTypeFromString(data["target.type"], false));
         }
 
         /// <summary>

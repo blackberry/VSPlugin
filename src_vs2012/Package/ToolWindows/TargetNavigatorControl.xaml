@@ -1,0 +1,272 @@
+﻿<UserControl x:Class="BlackBerry.Package.ToolWindows.TargetFileSystemNavigatorControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:BlackBerry.Package.ViewModels.TargetNavigator"
+             xmlns:common="clr-namespace:BlackBerry.Package.ViewModels.Common"
+             mc:Ignorable="d" 
+             d:DesignHeight="300" d:DesignWidth="300">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <common:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+            <common:CountToVisibilityConverter x:Key="CountToVisibilityConverter" />
+            <common:BinaryToStringConverter x:Key="BinaryToStringConverter" />
+
+            <DataTemplate x:Key="PreviewImpossible">
+                <TextBlock Text="Preview is unavailable. Maybe the file is too big or has unsupported extension." HorizontalAlignment="Stretch" />
+            </DataTemplate>
+            <DataTemplate x:Key="PreviewAsString">
+                <TextBox Text="{Binding Mode=OneWay}" IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
+                         HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+            </DataTemplate>
+            <DataTemplate x:Key="PreviewAsBinary">
+                <TextBox Text="{Binding Mode=OneWay, Converter={StaticResource BinaryToStringConverter}}" FontFamily="Consolas"
+                         IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
+                         HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
+            </DataTemplate>
+            <DataTemplate x:Key="PreviewAsImage">
+                <Grid>
+                    <ScrollViewer HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible">
+                        <Image Source="{Binding Mode=OneWay}" Stretch="Uniform" HorizontalAlignment="Center" VerticalAlignment="Stretch" />
+                    </ScrollViewer>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="5,5,30,5">
+                        <TextBlock Text="{Binding PixelWidth, Mode=OneWay, StringFormat=Size: {0}}" />
+                        <TextBlock Text="{Binding PixelHeight, Mode=OneWay, StringFormat=x{0}}" />
+                    </StackPanel>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Key="PreviewAsFileList">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" ContextMenuOpening="OnContextMenuOpening" SelectionMode="Single">
+                    <ListView.ContextMenu>
+                        <!-- This is just a stub, without it, it would be required to right-click twice to show the dynamic context-menu -->
+                        <ContextMenu />
+                    </ListView.ContextMenu>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="IsSelected" Value="{Binding IsActivated, Mode=TwoWay}" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Name" Width="450">
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{Binding ImageSource, Mode=OneWay}" Margin="2" Width="16" Height="16" Stretch="None" VerticalAlignment="Center"
+                                                    Visibility="{Binding ImageSource, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                            <TextBlock Text="{Binding Name, Mode=OneWay}" Margin="4,2,2,2" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                            <GridViewColumn Header="Size" Width="70" DisplayMemberBinding="{Binding Size, Mode=OneWay}" />
+                            <GridViewColumn Header="Date" Width="120" DisplayMemberBinding="{Binding CreationTime, Mode=OneWay}" />
+                            <GridViewColumn Header="Owner" Width="90" DisplayMemberBinding="{Binding Owner, Mode=OneWay}" />
+                            <GridViewColumn Header="Group" Width="90" DisplayMemberBinding="{Binding Group, Mode=OneWay}" />
+                            <GridViewColumn Header="Permissions" Width="80" DisplayMemberBinding="{Binding Permissions, Mode=OneWay}" />
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DataTemplate>
+            <DataTemplate x:Key="PreviewAsItemList">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" ContextMenuOpening="OnContextMenuOpening" SelectionMode="Single">
+                    <ListView.ContextMenu>
+                        <!-- This is just a stub, without it, it would be required to right-click twice to show the dynamic context-menu -->
+                        <ContextMenu />
+                    </ListView.ContextMenu>
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListViewItem}">
+                            <Setter Property="IsSelected" Value="{Binding IsActivated, Mode=TwoWay}" />
+                        </Style>
+                    </ListView.ItemContainerStyle>
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Name" Width="900"> <!-- matches PreviewAsFileList's columns sum width -->
+                                <GridViewColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <Image Source="{Binding ImageSource, Mode=OneWay}" Margin="2" Width="16" Height="16" Stretch="None" VerticalAlignment="Center"
+                                                    Visibility="{Binding ImageSource, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}"/>
+                                            <TextBlock Text="{Binding Name, Mode=OneWay}" Margin="4,2,2,2" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </GridViewColumn.CellTemplate>
+                            </GridViewColumn>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </DataTemplate>
+            <DataTemplate x:Key="PreviewAsProcess">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Text="Name:" Margin="0,0,10,0" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding Name, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="0" Grid.Column="1" Width="500" HorizontalAlignment="Left" />
+
+                    <TextBlock Text="ID:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="1" Grid.Column="0" />
+                    <TextBox Text="{Binding ID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="1" Grid.Column="1" Width="100" HorizontalAlignment="Left" />
+
+                    <TextBlock Text="Parent ID:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="2" Grid.Column="0" />
+                    <TextBox Text="{Binding ParentID, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="2" Grid.Column="1" Width="100" HorizontalAlignment="Left" />
+
+                    <TextBlock Text="Executable:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
+                    <TextBox Text="{Binding ExecutablePath, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="3" Grid.Column="1" Width="700" HorizontalAlignment="Left" />
+
+                    <Button Content="Terminate" IsEnabled="{Binding CanTerminate}" Margin="2" Padding="5" Click="TerminateProcess_OnClick" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" />
+                </Grid>
+            </DataTemplate>
+
+            <common:ContentTemplateSelector x:Key="ListingTemplateSelector"
+                                            FileViewArrayTemplate="{StaticResource PreviewAsFileList}"
+                                            ViewItemArrayTemplate="{StaticResource PreviewAsItemList}"
+                                            DefaultTemplate="{StaticResource PreviewAsItemList}"
+                                            />
+
+            <common:ContentTemplateSelector x:Key="ContentTemplateSelector"
+                                            StringTemplate="{StaticResource PreviewAsString}"
+                                            BinaryTemplate="{StaticResource PreviewAsBinary}"
+                                            ImageTemplate="{StaticResource PreviewAsImage}"
+                                            ProcessViewTemplate="{StaticResource PreviewAsProcess}"
+                                            DefaultTemplate="{StaticResource PreviewImpossible}"
+                                            />
+
+            <ContextMenu x:Key="ContextForTarget">
+                <MenuItem Header="Edit..." Click="EditTarget_OnClick" />
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+                <Separator />
+                <MenuItem Header="Disconnect" Click="DisconnectTarget_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextForProcess">
+                <MenuItem Header="Terminate" IsEnabled="{Binding CanTerminate}" Click="TerminateProcess_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextForFile">
+                <MenuItem Header="Download..." Click="DownloadItem_OnClick" />
+                <MenuItem Header="Download as ZIP..." Click="DownloadZipItem_OnClick" />
+                <Separator />
+                <MenuItem Header="Delete" Click="DeleteItem_OnClick" />
+                <MenuItem Header="Rename..." Click="RenameItem_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextForFolder">
+                <MenuItem Header="Download..." Click="DownloadItem_OnClick" />
+                <MenuItem Header="Download as ZIP..." Click="DownloadZipItem_OnClick" />
+                <Separator />
+                <MenuItem Header="Upload file..." Click="UploadFile_OnClick" />
+                <MenuItem Header="Upload folder..." Click="UploadFolder_OnClick"/>
+                <Separator />
+                <MenuItem Header="New folder..." Click="NewFolder_OnClick" />
+                <MenuItem Header="Delete" Click="DeleteItem_OnClick" />
+                <MenuItem Header="Rename..." Click="RenameItem_OnClick" />
+                <Separator />
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextForFileSystem">
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextRefresh">
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+            </ContextMenu>
+            <ContextMenu x:Key="ContextDefault">
+                <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+            </ContextMenu>
+
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="70*" />
+            <RowDefinition Height="30*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="35*" />
+            <ColumnDefinition Width="65*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Text="Path:" Margin="4" VerticalAlignment="Center" />
+            <TextBox x:Name="NavigationPath" Text="{Binding SelectedItem.NavigationPath, Mode=OneWay}" Margin="4" Padding="2" Grid.Column="1" />
+            <Button Margin="4" Padding="8,2,8,2" Content="Go" Grid.Column="2" Click="NavigateToItem_OnClick" />
+        </Grid>
+
+        <TreeView ItemsSource="{Binding Targets}" Grid.Row="1" Grid.Column="0" Margin="0,0,10,10" MouseRightButtonUp="TreeView_OnMouseRightButtonUp" ContextMenuOpening="OnContextMenuOpening">
+            <TreeView.ContextMenu>
+                <!-- This is just a stub, without it, it would be required to right-click twice to show the dynamic context-menu -->
+                <ContextMenu />
+            </TreeView.ContextMenu>
+            <TreeView.ItemContainerStyle>
+                <Style TargetType="{x:Type TreeViewItem}">
+                    <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+                    <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
+                </Style>
+            </TreeView.ItemContainerStyle>
+            <TreeView.Resources>
+                <HierarchicalDataTemplate DataType="{x:Type local:BaseViewItem}" ItemsSource="{Binding Children, Mode=OneWay}">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="{Binding ImageSource, Mode=OneWay}" Margin="2" Width="16" Height="16" Stretch="None" VerticalAlignment="Center"
+                               Visibility="{Binding ImageSource, Mode=OneWay, Converter={StaticResource NullToVisibilityConverter}}"/>
+                        <TextBlock Text="{Binding Name, Mode=OneWay}" Margin="2,2,4,2" VerticalAlignment="Center" />
+                    </StackPanel>
+                </HierarchicalDataTemplate>
+            </TreeView.Resources>
+        </TreeView>
+
+        <!-- folders/processes listing right panel -->
+        <GridSplitter Grid.Row="1" Grid.Column="0"
+                      HorizontalAlignment="Right" VerticalAlignment="Stretch" Width="10" />
+        <ContentControl Content="{Binding SelectedItemListSource.Content, Mode=OneWay}"
+                        Margin="0,0,0,10"
+                        ContentTemplateSelector="{StaticResource ListingTemplateSelector}"
+                        Grid.Row="1" Grid.Column="1" />
+
+        <!-- content preview bottom panel -->
+        <GridSplitter Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                      HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Height="10" />
+        <ContentControl Content="{Binding SelectedItem.Content, Mode=OneWay}"
+                        Visibility="{Binding SelectedItem.Content, Converter={StaticResource NullToVisibilityConverter}}"
+                        Margin="0,6,0,0"
+                        ContentTemplateSelector="{StaticResource ContentTemplateSelector}"
+                        Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" />
+        
+        <!-- download progress - overlapping the content preview -->
+        <ItemsControl ItemsSource="{Binding DownloadUpload, Mode=OneWay}" Visibility="{Binding DownloadUpload.Count, Mode=OneWay, Converter={StaticResource CountToVisibilityConverter}}"
+                      Background="#FFFFE1" BorderThickness="1" BorderBrush="Black" VerticalAlignment="Top" Width="Auto"
+                      Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Padding="5">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="5">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="300" MaxWidth="300" MinWidth="300" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ProgressBar Minimum="0" Maximum="100" Value="{Binding Percent, Mode=OneWay}" ToolTip="{Binding Percent, Mode=OneWay}" Width="300" />
+                        <TextBlock Text="{Binding Text, Mode=OneWay}" HorizontalAlignment="Center" ToolTip="{Binding Percent, Mode=OneWay}" />
+                        <Button Content="Cancel" Margin="5,0,0,0" Grid.Column="1" Click="CancelDownloadUpload" />
+                    </Grid>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+</UserControl>
