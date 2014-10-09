@@ -29,13 +29,13 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.bttOpen = new System.Windows.Forms.Button();
+            this.txtPath = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.cmbProjects = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
             this.bttOK = new System.Windows.Forms.Button();
             this.bttCancel = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.cmbProjects = new System.Windows.Forms.ComboBox();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtPath = new System.Windows.Forms.TextBox();
-            this.bttOpen = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,36 +56,34 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Available Outputs";
             // 
-            // bttOK
+            // bttOpen
             // 
-            this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.bttOK.Location = new System.Drawing.Point(363, 122);
-            this.bttOK.Name = "bttOK";
-            this.bttOK.Size = new System.Drawing.Size(75, 23);
-            this.bttOK.TabIndex = 1;
-            this.bttOK.Text = "&OK";
-            this.bttOK.UseVisualStyleBackColor = true;
+            this.bttOpen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttOpen.Location = new System.Drawing.Point(450, 58);
+            this.bttOpen.Name = "bttOpen";
+            this.bttOpen.Size = new System.Drawing.Size(40, 23);
+            this.bttOpen.TabIndex = 4;
+            this.bttOpen.Text = "...";
+            this.bttOpen.UseVisualStyleBackColor = true;
+            this.bttOpen.Click += new System.EventHandler(this.bttOpen_Click);
             // 
-            // bttCancel
+            // txtPath
             // 
-            this.bttCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.bttCancel.Location = new System.Drawing.Point(444, 122);
-            this.bttCancel.Name = "bttCancel";
-            this.bttCancel.Size = new System.Drawing.Size(75, 23);
-            this.bttCancel.TabIndex = 2;
-            this.bttCancel.Text = "&Cancel";
-            this.bttCancel.UseVisualStyleBackColor = true;
+            this.txtPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtPath.Location = new System.Drawing.Point(69, 60);
+            this.txtPath.Name = "txtPath";
+            this.txtPath.Size = new System.Drawing.Size(375, 20);
+            this.txtPath.TabIndex = 3;
             // 
-            // label1
+            // label2
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(20, 29);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(43, 13);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "Project:";
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(20, 63);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(32, 13);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "Path:";
             // 
             // cmbProjects
             // 
@@ -99,34 +97,36 @@
             this.cmbProjects.TabIndex = 1;
             this.cmbProjects.SelectionChangeCommitted += new System.EventHandler(this.cmbProjects_SelectionChangeCommitted);
             // 
-            // label2
+            // label1
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(20, 63);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(32, 13);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "Path:";
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(20, 29);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(43, 13);
+            this.label1.TabIndex = 0;
+            this.label1.Text = "Project:";
             // 
-            // txtPath
+            // bttOK
             // 
-            this.txtPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtPath.Location = new System.Drawing.Point(69, 60);
-            this.txtPath.Name = "txtPath";
-            this.txtPath.Size = new System.Drawing.Size(375, 20);
-            this.txtPath.TabIndex = 3;
+            this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttOK.Location = new System.Drawing.Point(363, 122);
+            this.bttOK.Name = "bttOK";
+            this.bttOK.Size = new System.Drawing.Size(75, 23);
+            this.bttOK.TabIndex = 1;
+            this.bttOK.Text = "&OK";
+            this.bttOK.UseVisualStyleBackColor = true;
+            this.bttOK.Click += new System.EventHandler(this.bttOK_Click);
             // 
-            // bttOpen
+            // bttCancel
             // 
-            this.bttOpen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOpen.Location = new System.Drawing.Point(450, 58);
-            this.bttOpen.Name = "bttOpen";
-            this.bttOpen.Size = new System.Drawing.Size(40, 23);
-            this.bttOpen.TabIndex = 4;
-            this.bttOpen.Text = "...";
-            this.bttOpen.UseVisualStyleBackColor = true;
-            this.bttOpen.Click += new System.EventHandler(this.bttOpen_Click);
+            this.bttCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.bttCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.bttCancel.Location = new System.Drawing.Point(444, 122);
+            this.bttCancel.Name = "bttCancel";
+            this.bttCancel.Size = new System.Drawing.Size(75, 23);
+            this.bttCancel.TabIndex = 2;
+            this.bttCancel.Text = "&Cancel";
+            this.bttCancel.UseVisualStyleBackColor = true;
             // 
             // BinaryDiscoveryForm
             // 

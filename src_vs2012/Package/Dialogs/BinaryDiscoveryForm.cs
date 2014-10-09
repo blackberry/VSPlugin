@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Windows.Forms;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
@@ -59,6 +60,7 @@ namespace BlackBerry.Package.Dialogs
             if (cmbProjects.SelectedIndex < 0)
             {
                 cmbProjects.SelectedIndex = index;
+                ActiveControl = txtPath;
                 RefreshUI();
             }
         }
@@ -88,6 +90,30 @@ namespace BlackBerry.Package.Dialogs
                 txtPath.Enabled = item.Tag == null;
                 bttOpen.Enabled = item.Tag == null;
             }
+        }
+
+        private void bttOK_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(SelectedPath))
+            {
+                if (MessageBoxHelper.Show("Specifying an empty path will cause it to be ignored.\r\nYou won't be able to set a breakpoint in your application.\r\n\r\nContinue?", null,
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                {
+                    return;
+                }
+            }
+
+            if (!File.Exists(SelectedPath))
+            {
+                if (MessageBoxHelper.Show("Specified binary doesn't exist. This path will be ignored.\r\nYou won't be able to set a breakpoint in your application.\r\n\r\nContinue?", null,
+                        MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                {
+                    return;
+                }
+            }
+
+            DialogResult = DialogResult.OK;
+            Close();
         }
     }
 }
