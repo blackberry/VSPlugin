@@ -279,21 +279,24 @@ LIBS :=
                     }
                     else
                     {
-                        
+                        if (!string.IsNullOrEmpty(libs[i]))
+                        {
+                            
             
             #line default
             #line hidden
             this.Write("-l");
             
-            #line 95 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 97 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(libs[i]));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 95 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 97 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
+                        }
                     }
                 }
 
@@ -309,27 +312,27 @@ LIBS :=
             #line hidden
             this.Write("qcc -A \"");
             
-            #line 105 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 108 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(OutDir));
             
             #line default
             #line hidden
             
-            #line 105 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 108 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TargetFile));
             
             #line default
             #line hidden
             this.Write(" $(OBJS) $(USER_OBJS) $(LIBS) ");
             
-            #line 105 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 108 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(CompilerFlags));
             
             #line default
             #line hidden
             this.Write(" -w1");
             
-            #line 105 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 108 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
             }
             break;
@@ -343,33 +346,33 @@ LIBS :=
             #line hidden
             this.Write("qcc -shared -Wl,-soname,\"");
             
-            #line 112 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 115 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TargetFile));
             
             #line default
             #line hidden
             this.Write("\" -o \"");
             
-            #line 112 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 115 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(OutDir));
             
             #line default
             #line hidden
             
-            #line 112 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 115 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TargetFile));
             
             #line default
             #line hidden
             this.Write("\" $(OBJS) $(USER_OBJS) $(LIBS) ");
             
-            #line 112 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 115 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(CompilerFlags));
             
             #line default
             #line hidden
             
-            #line 112 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 115 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
             }
             break;
@@ -380,7 +383,7 @@ LIBS :=
             #line hidden
             this.Write("!! Error - unsupported configuration type !!");
             
-            #line 116 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 119 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
             break;
     }
@@ -391,20 +394,20 @@ LIBS :=
             this.Write("\r\n\r\nclean:\r\n\t-$(RM) $(OBJS)$(C_DEPS)$(CC_DEPS)$(COM_QNX_QCC_OUTPUTTYPE_LINKER_OUT" +
                     "PUTS)$(CPP_DEPS)$(I_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS)$(II_DEPS) \"");
             
-            #line 123 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 126 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(OutDir));
             
             #line default
             #line hidden
             
-            #line 123 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 126 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TargetFile));
             
             #line default
             #line hidden
             this.Write("\"");
             
-            #line 123 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 126 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
     if (ConfigurationType == "Application")
     {
@@ -414,27 +417,27 @@ LIBS :=
             #line hidden
             this.Write(" \"");
             
-            #line 126 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 129 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(OutDir));
             
             #line default
             #line hidden
             
-            #line 126 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 129 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(TargetBarFile));
             
             #line default
             #line hidden
             this.Write("\"\r\n");
             
-            #line 127 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 130 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
   } 
             
             #line default
             #line hidden
             this.Write("\r\n.PHONY: all clean dependents\r\n\r\n");
             
-            #line 131 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 134 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
 
     var warningMap = new Dictionary<string,string>();
@@ -462,35 +465,35 @@ LIBS :=
             #line default
             #line hidden
             
-            #line 153 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 156 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(filename));
             
             #line default
             #line hidden
             this.Write(".o: ");
             
-            #line 153 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 156 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(shortPath));
             
             #line default
             #line hidden
             this.Write("\r\n\tqcc -o $@ ");
             
-            #line 154 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 157 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(GetFullPath8dot3(compileItem)));
             
             #line default
             #line hidden
             this.Write(" ");
             
-            #line 154 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 157 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(CompilerFlags));
             
             #line default
             #line hidden
             this.Write(" -c -Wp,-MMD,$(basename $@).d -Wp,-MT,$@ ");
             
-            #line 154 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 157 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
 
         if (compileItem.GetMetadata("CompileAs") == "CompileAsC")
@@ -501,7 +504,7 @@ LIBS :=
             #line hidden
             this.Write("-lang-c ");
             
-            #line 158 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 161 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
         }
         else
@@ -512,7 +515,7 @@ LIBS :=
             #line hidden
             this.Write("-lang-c++ ");
             
-            #line 162 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 165 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
             if (compileItem.GetMetadata("RuntimeTypeInfo") == "false") { 
             
@@ -520,7 +523,7 @@ LIBS :=
             #line hidden
             this.Write("-fno-rtti ");
             
-            #line 163 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 166 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
  }
         }
 
@@ -536,7 +539,7 @@ LIBS :=
             #line hidden
             this.Write("-g ");
             
-            #line 172 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 175 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
  }
         if (compileItem.GetMetadata("GccExceptionHandling") == "true") { 
             
@@ -544,14 +547,14 @@ LIBS :=
             #line hidden
             this.Write("-fexceptions ");
             
-            #line 173 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 176 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
  } else { 
             
             #line default
             #line hidden
             this.Write("-fno-exceptions ");
             
-            #line 173 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 176 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
  }
         if (compileItem.GetMetadata("EnhancedSecurity") == "true") { 
             
@@ -559,7 +562,7 @@ LIBS :=
             #line hidden
             this.Write("-fstack-protector-all ");
             
-            #line 174 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 177 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
  }
 
         // Note: Consider letting user decide between "-fpic" and "-fPIC"
@@ -570,7 +573,7 @@ LIBS :=
             #line hidden
             this.Write("-fPIC ");
             
-            #line 178 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 181 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
  }
 
         WriteCollection(AdditionalIncludeDirectories, "-I");
@@ -584,7 +587,7 @@ LIBS :=
             #line hidden
             this.Write("\r\n\r\n");
             
-            #line 188 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
+            #line 191 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
 
     }
 

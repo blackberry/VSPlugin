@@ -92,7 +92,10 @@ all: "<#= TargetFile #>"
                     }
                     else
                     {
-                        #>-l<#= libs[i] #> <#
+                        if (!string.IsNullOrEmpty(libs[i]))
+                        {
+                            #>-l<#= libs[i] #> <#
+                        }
                     }
                 }
 
