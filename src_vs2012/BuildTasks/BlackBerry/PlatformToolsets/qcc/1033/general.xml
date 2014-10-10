@@ -90,7 +90,7 @@
     <EnumValue Name="Cascades" DisplayName="Cascades Application" Description="Cascades Application" />
     <EnumValue Name="Custom" DisplayName="Custom Makefile" Description="Use project supplied makefile. It is expected that the makefile is placed next to the project file. Nothing will be generated in that case by the IDE." />
   </EnumProperty>
-  <EnumProperty Name="MakefileTargetName" DisplayName="Makefile active target" Visible="True"
+  <EnumProperty Name="MakefileTargetName" DisplayName="Makefile Active Target" Visible="True"
                 Description="Specifies the name of a makefile's target to be called to correctly build current application configuration."
                 Category="ProjectDefaults">
     <EnumValue Name="" DisplayName="Empty (default)" Description="Default target" />
