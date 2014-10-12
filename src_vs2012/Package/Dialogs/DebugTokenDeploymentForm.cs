@@ -190,7 +190,7 @@ namespace BlackBerry.Package.Dialogs
             UpdateTokenStatusUI(false);
 
             // and load token info asynchronously:
-            _tokenInfoRunner = new DebugTokenInfoRunner(ConfigDefaults.ToolsDirectory, fileName);
+            _tokenInfoRunner = new DebugTokenInfoRunner(fileName);
             _tokenInfoRunner.Dispatcher = EventDispatcher.From(this);
             _tokenInfoRunner.Finished += TokenInfoRunnerOnFinished;
             _tokenInfoRunner.ExecuteAsync();
@@ -296,7 +296,7 @@ namespace BlackBerry.Package.Dialogs
                 UpdateDeviceStatusUI(false);
 
                 // load info asynchronously:
-                _deviceInfoRunner = new DeviceInfoRunner(ConfigDefaults.ToolsDirectory, _device.IP, _device.Password);
+                _deviceInfoRunner = new DeviceInfoRunner(_device.IP, _device.Password);
                 _deviceInfoRunner.Dispatcher = EventDispatcher.From(this);
                 _deviceInfoRunner.Finished += DeviceInfoRunnerOnFinished;
                 _deviceInfoRunner.ExecuteAsync();
@@ -387,7 +387,7 @@ namespace BlackBerry.Package.Dialogs
             UpdateDeviceStatusUI(false);
 
             // upload token asynchronously:
-            _tokenUploadRunner = new DebugTokenUploadRunner(ConfigDefaults.ToolsDirectory, fileName, _device.IP, _device.Password);
+            _tokenUploadRunner = new DebugTokenUploadRunner(fileName, _device.IP, _device.Password);
             _tokenUploadRunner.Dispatcher = EventDispatcher.From(this);
             _tokenUploadRunner.Finished += DebugTokenUploadRunnerOnFinished;
             _tokenUploadRunner.ExecuteAsync();
@@ -449,7 +449,7 @@ namespace BlackBerry.Package.Dialogs
             UpdateDeviceStatusUI(false);
 
             // remove token asynchronously:
-            _tokenRemoveRunner = new ApplicationRemoveRunner(ConfigDefaults.ToolsDirectory, _tokenInfo.ID, _device.IP, _device.Password);
+            _tokenRemoveRunner = new ApplicationRemoveRunner(_tokenInfo.ID, _device.IP, _device.Password);
             _tokenRemoveRunner.Dispatcher = EventDispatcher.From(this);
             _tokenRemoveRunner.Finished += DebugTokenRemoveRunnerOnFinished;
             _tokenRemoveRunner.ExecuteAsync();
@@ -500,7 +500,7 @@ namespace BlackBerry.Package.Dialogs
             UpdateTokenStatusUI(false);
 
             // and create token asynchronously:
-            _tokenCreateRunner = new DebugTokenCreateRunner(ConfigDefaults.ToolsDirectory, fileName, _vm.Developer.CskPassword, devicePins, _vm.Developer.CertificateFullPath);
+            _tokenCreateRunner = new DebugTokenCreateRunner(fileName, _vm.Developer.CskPassword, devicePins, _vm.Developer.CertificateFullPath);
             _tokenCreateRunner.Dispatcher = EventDispatcher.From(this);
             _tokenCreateRunner.Finished += TokenCreateRunnerOnFinished;
             _tokenCreateRunner.ExecuteAsync();

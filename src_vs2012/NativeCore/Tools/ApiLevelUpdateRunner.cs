@@ -13,7 +13,7 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to update specified target within the NDK (new API Level, new simulator or runtime).
     /// </summary>
-    public sealed class ApiLevelUpdateRunner : ToolRunner
+    public sealed class ApiLevelUpdateRunner : BBToolRunner
     {
         #region Internal Classes
 
@@ -363,14 +363,17 @@ namespace BlackBerry.NativeCore.Tools
         }
 
         private readonly List<int> _runningInstallers;
-        private LogParser _parser;
+        private readonly LogParser _parser;
 
         private ApiLevelAction _action;
         private ApiLevelTarget _target;
         private Version _version;
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public ApiLevelUpdateRunner(string workingDirectory, ApiLevelAction action, ApiLevelTarget target, Version version)
-            : base("cmd.exe", workingDirectory)
+            : base(workingDirectory)
         {
             if (version == null)
                 throw new ArgumentNullException("version");

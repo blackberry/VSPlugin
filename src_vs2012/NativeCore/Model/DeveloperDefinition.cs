@@ -502,7 +502,7 @@ namespace BlackBerry.NativeCore.Model
                 var issuer = cert.Issuer;
                  */
                 string issuer;
-                using (var runner = new KeyToolInfoRunner(ConfigDefaults.ToolsDirectory, certificateFileName, password))
+                using (var runner = new KeyToolInfoRunner(certificateFileName, password))
                 {
                     // invoke
                     if (!runner.Execute())

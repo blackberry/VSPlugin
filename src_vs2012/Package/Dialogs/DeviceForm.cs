@@ -245,7 +245,7 @@ namespace BlackBerry.Package.Dialogs
             IsConnected = false;
             LoadedDeviceName = null;
             PIN = 0;
-            _runner = new DeviceInfoRunner(ConfigDefaults.ToolsDirectory, DeviceIP, DevicePassword);
+            _runner = new DeviceInfoRunner(DeviceIP, DevicePassword);
             _runner.Dispatcher = EventDispatcher.From(this);
             _runner.Finished += RunnerOnFinished;
 

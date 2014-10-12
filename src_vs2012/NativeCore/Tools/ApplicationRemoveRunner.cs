@@ -5,7 +5,7 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to remove installed application from the device.
     /// </summary>
-    public sealed class ApplicationRemoveRunner : ToolRunner
+    public sealed class ApplicationRemoveRunner : BBToolRunner
     {
         private string _packageID;
         private string _ip;
@@ -14,12 +14,10 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
         /// <param name="packageID">Identifier of the application .bar file</param>
         /// <param name="ip">Device IP</param>
         /// <param name="password">Device password</param>
-        public ApplicationRemoveRunner(string workingDirectory, string packageID, string ip, string password)
-            : base("cmd.exe", workingDirectory)
+        public ApplicationRemoveRunner(string packageID, string ip, string password)
         {
             if (string.IsNullOrEmpty(packageID))
                 throw new ArgumentNullException("packageID");

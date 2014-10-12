@@ -171,26 +171,6 @@ namespace BlackBerry.Package
 
             TraceLog.WriteLine(" * loaded NDK descriptions");
 
-            // setup called before running any 'tool':
-            ToolRunner.Startup += (s, e) =>
-                {
-                    /*
-                    var ndk = PackageViewModel.Instance.ActiveNDK;
-
-                    if (ndk != null)
-                    {
-                        e["QNX_TARGET"] = ndk.TargetPath;
-                        e["QNX_HOST"] = ndk.HostPath;
-                        e["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", e["PATH"],
-                                                  Path.Combine(ndk.HostPath, "usr", "bin"), ";");
-                    }
-                    else
-                     */
-                    {
-                        e["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", e["PATH"]);
-                    }
-                };
-
             // inform Targets, that list of target-devices has been changed and maybe it should force some disconnections:
             PackageViewModel.Instance.TargetsChanged += (s, e) => Targets.DisconnectIfOutside(e.TargetDevices);
 

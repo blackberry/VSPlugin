@@ -6,17 +6,15 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to get debug-token information.
     /// </summary>
-    public sealed class DebugTokenInfoRunner : ToolRunner
+    public sealed class DebugTokenInfoRunner : BBToolRunner
     {
         private string _location;
 
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
         /// <param name="debugTokenLocation">File name and directory of the debug-token bar file</param>
-        public DebugTokenInfoRunner(string workingDirectory, string debugTokenLocation)
-            : base("cmd.exe", workingDirectory)
+        public DebugTokenInfoRunner(string debugTokenLocation)
         {
             if (string.IsNullOrEmpty(debugTokenLocation))
                 throw new ArgumentNullException("debugTokenLocation");

@@ -420,6 +420,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\ApplicationRemoveRunner.cs">
       <Link>Tools\ApplicationRemoveRunner.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\BBToolRunner.cs">
+      <Link>Tools\BBToolRunner.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\DebugTokenCreateRunner.cs">
       <Link>Tools\DebugTokenCreateRunner.cs</Link>
     </Compile>

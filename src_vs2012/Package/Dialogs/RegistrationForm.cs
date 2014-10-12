@@ -282,7 +282,7 @@ namespace BlackBerry.Package.Dialogs
             // create CSK file:
             bool successful;
             string certificateFileName;
-            using (var runner = new KeyToolRegisterRunner(ConfigDefaults.ToolsDirectory, txtCsjPin.Text, txtCskPassword.Text, txtRdkPath.Text, txtPbdtPath.Text))
+            using (var runner = new KeyToolRegisterRunner(txtCsjPin.Text, txtCskPassword.Text, txtRdkPath.Text, txtPbdtPath.Text))
             {
                 successful = runner.Execute();
                 certificateFileName = runner.CertificateFileName;
@@ -354,7 +354,7 @@ namespace BlackBerry.Package.Dialogs
 
             UpdateActionButtons(false);
 
-            using (var runner = new KeyToolGenRunner(ConfigDefaults.ToolsDirectory, AuthorName, Password, null))
+            using (var runner = new KeyToolGenRunner(AuthorName, Password, null))
             {
                 Log("Started certificate generation..." + Environment.NewLine);
                 var success = runner.Execute();

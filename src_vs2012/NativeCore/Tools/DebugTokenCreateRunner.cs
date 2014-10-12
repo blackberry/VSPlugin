@@ -7,7 +7,7 @@ namespace BlackBerry.NativeCore.Tools
     /// Runner, that calls specific tool to create debug-token .bar file on disk.
     /// If a file exists at specified file location, it will be overwritten.
     /// </summary>
-    public sealed class DebugTokenCreateRunner : ToolRunner
+    public sealed class DebugTokenCreateRunner : BBToolRunner
     {
         private string _location;
         private string _password;
@@ -17,13 +17,11 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
         /// <param name="debugTokenLocation">File name and directory of the debug-token bar file</param>
         /// <param name="password">Password to the local certificate, specified when registering with the BlackBerry Signing Authority</param>
         /// <param name="devices">List of device PINs</param>
         /// <param name="storeFileName">Name of the certificate, where to developer data is stored; if null, 'author.p12' is used</param>
-        public DebugTokenCreateRunner(string workingDirectory, string debugTokenLocation, string password, ulong[] devices, string storeFileName)
-            : base("cmd.exe", workingDirectory)
+        public DebugTokenCreateRunner(string debugTokenLocation, string password, ulong[] devices, string storeFileName)
         {
             if (string.IsNullOrEmpty(debugTokenLocation))
                 throw new ArgumentNullException("debugTokenLocation");
