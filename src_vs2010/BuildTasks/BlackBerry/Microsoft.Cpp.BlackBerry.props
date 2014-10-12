@@ -167,7 +167,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <Deployment Condition="'%(BuildBar.Deployment)' == ''">Install</Deployment>
       <Register Condition="'%(BuildBar.Register)' == ''">false</Register>
       <BuildID Condition="'%(BuildBar.BuildID)' == ''">1</BuildID>
-      <ApplicationDescriptorXml>bar-descriptor.xml</ApplicationDescriptorXml>
+      <ApplicationDescriptorXml Condition="'%(BuildBar.ApplicationDescriptorXml)' == ''">bar-descriptor.xml</ApplicationDescriptorXml>
     </BuildBar>
   </ItemDefinitionGroup>
 

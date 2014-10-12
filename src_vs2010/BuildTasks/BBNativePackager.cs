@@ -409,6 +409,7 @@ namespace BlackBerry.BuildTasks
         [Required]
         public string SolutionDir { get; set; }
 
+        [Required]
         public string ApplicationDescriptorXml
         {
             get
@@ -444,7 +445,7 @@ namespace BlackBerry.BuildTasks
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.String)
                 {
                     DisplayName = "Target format",
-                    Description = "Select the build target format( -target bar -target bar-debug)",
+                    Description = "Select the build target format (-target bar -target bar-debug)",
                     ArgumentRelationList = new ArrayList()
                 };
                 string[][] switchMap =
@@ -484,7 +485,7 @@ namespace BlackBerry.BuildTasks
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Integer)
                 {
                     DisplayName = "Build Id",
-                    Description = "set the build id ( the fourth segment of the version ). Must be a number from 0 to 65535"
+                    Description = "Set the build id (the fourth segment of the version). Must be a numbers from 0 to 65535"
                 };
                 switch2.ArgumentRelationList = new ArrayList();
                 switch2.IsValid = ValidateInteger(BUILD_ID, 0, 65535, value);
