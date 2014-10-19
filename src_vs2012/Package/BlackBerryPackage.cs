@@ -24,7 +24,6 @@ using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
-using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Components;
 using BlackBerry.Package.Diagnostics;
 using BlackBerry.Package.Dialogs;
@@ -35,6 +34,7 @@ using BlackBerry.Package.Options;
 using BlackBerry.Package.Registration;
 using BlackBerry.Package.ToolWindows;
 using BlackBerry.Package.ViewModels;
+using BlackBerry.Package.Wizards;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -87,6 +87,16 @@ namespace BlackBerry.Package
 
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackageString)]
+
+    // This attribute adds top level node at [Add Project Item] dialog for Visual C++ projects only and showing
+    // new item wizards from '<Package>/Templates/ProjectItems' folder. This is an easy way to inject new templates
+    // without any need of copying them into Visual Studio folder itself.
+    // No extra permissions for the plugin are required in that case.
+    [ProvideProjectItem("{8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942}", "BlackBerry", @"Templates\ProjectItems\BlackBerry", 10)]
+    [ProvideProjects(GuidList.guidVSNDK_PackageString, "BlackBerry Projects", @"Templates\Projects\BlackBerry", 31)]
+    // This attribute registers a custom wizard engine, that is used to populate new projects and items into a project.
+    // Reference to this engine is made directly from *.vsz file (from locations provided by both attributes above).
+    [ProvideWizardEngine(typeof(PuppetMasterWizardEngine))]
 
     // This attribute defines set of settings pages provided by this package.
     // They are automatically instantiated and displayed inside [Visual Studio -> Tools -> Options...] dialog.

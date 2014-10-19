@@ -339,6 +339,8 @@
     </Compile>
     <Compile Include="PackageCommands.cs" />
     <Compile Include="Registration\DebugEngineRegistrationAttribute.cs" />
+    <Compile Include="Registration\ProvideProjects.cs" />
+    <Compile Include="Registration\ProvideWizardEngineAttribute.cs" />
     <Compile Include="Registration\XmlEditorDesignerViewRegistrationAttribute.cs" />
     <Compile Include="StandardCommands.cs" />
     <Compile Include="ToolWindows\TargetNavigatorControl.xaml.cs">
@@ -370,6 +372,34 @@
     <Compile Include="ViewModels\TargetNavigator\TargetViewItem.cs" />
     <Compile Include="ViewModels\TargetsChangedEventArgs.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
+    <Compile Include="Wizards\PuppetMasterWizardEngine.cs" />
+    <Content Include="Templates\Projects\BlackBerry\OpenGL\items.vsdir">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\Projects\BlackBerry\emptyproj.ico">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\Projects\BlackBerry\emptyproj.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\Projects\BlackBerry.vsdir">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\Projects\BlackBerry\items.vsdir">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ProjectItems\BlackBerry.vsdir">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ProjectItems\BlackBerry\items.vsdir">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ProjectItems\BlackBerry\bar-descriptor.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\opengl-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Resource Include="..\..\src_vs2010\Package\Resources\Images_24bit.bmp">
       <Link>Resources\Images_24bit.bmp</Link>
     </Resource>
