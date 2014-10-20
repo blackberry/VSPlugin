@@ -239,9 +239,9 @@ namespace BlackBerry.NativeCore.Components
         /// <summary>
         /// For all known tokens, replace them with correct values
         /// </summary>
-        /// <param name="source">File of the source file</param>
-        /// <param name="destination">File of the destination file</param>
-        public void UntokenFile(string source, string destination)
+        /// <param name="source">Full path of the source file</param>
+        /// <param name="destination">Full path of the destination file</param>
+        public string UntokenFile(string source, string destination)
         {
             if (string.IsNullOrEmpty(source))
                 throw new ArgumentNullException("source");
@@ -290,6 +290,8 @@ namespace BlackBerry.NativeCore.Components
             }
             else
                 File.Copy(source, destination);
+
+            return destination;
         }
 
         #endregion
