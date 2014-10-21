@@ -208,6 +208,15 @@
     <Compile Include="Model\Integration\WebBrowserTurbo.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="Model\Wizards\ContextParams.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Model\Wizards\NewProjectItemParams.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Model\Wizards\NewProjectParams.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Options\ApiLevelOptionControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -372,6 +381,9 @@
     <Compile Include="ViewModels\TargetNavigator\TargetViewItem.cs" />
     <Compile Include="ViewModels\TargetsChangedEventArgs.cs" />
     <Compile Include="ViewModels\TargetsOptionViewModel.cs" />
+    <Compile Include="Wizards\BaseWizardEngine.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Wizards\PuppetMasterWizardEngine.cs" />
     <EmbeddedResource Include="Resources\Template.Icons.resx">
       <SubType>Designer</SubType>
@@ -611,6 +623,7 @@
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
