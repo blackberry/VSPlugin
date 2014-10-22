@@ -11,10 +11,12 @@ PURPOSE, MERCHANTABILITY, OR NON-INFRINGEMENT.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace BlackBerry.NativeCore.Components
 {
@@ -27,23 +29,41 @@ namespace BlackBerry.NativeCore.Components
 
         private abstract class ActionToken
         {
+            public abstract int ID
+            {
+                get;
+            }
+
             public abstract void UpdateBuffer(StringBuilder buffer);
         }
 
         /// <summary>
         ///  Storage classes for replacement tokens
         /// </summary>
+        [DebuggerDisplay("{ID}: {Token} -> {Replacement}")]
         private class ReplacePairToken : ActionToken
         {
+            private readonly int _id;
+
             /// <summary>
             /// Constructor
             /// </summary>
+            /// <param name="id">Identifier of the action</param>
             /// <param name="token">replaceable token</param>
             /// <param name="replacement">replacement string</param>
-            public ReplacePairToken(string token, string replacement)
+            public ReplacePairToken(int id, string token, string replacement)
             {
+                _id = id;
                 Token = token;
                 Replacement = replacement;
+            }
+
+            /// <summary>
+            /// Identifier of the action.
+            /// </summary>
+            public override int ID
+            {
+                get { return _id; }
             }
 
             /// <summary>
@@ -79,15 +99,28 @@ namespace BlackBerry.NativeCore.Components
         /// <summary>
         /// Storage classes for token to be deleted
         /// </summary>
+        [DebuggerDisplay("{ID}: {StringToDelete} -> \"\"")]
         private class DeleteToken : ActionToken
         {
+            private readonly int _id;
+
             /// <summary>
             /// Constructor
             /// </summary>
+            /// <param name="id">Identifier of the action</param>
             /// <param name="toDelete">Element to delete</param>
-            public DeleteToken(string toDelete)
+            public DeleteToken(int id, string toDelete)
             {
+                _id = id;
                 StringToDelete = toDelete;
+            }
+
+            /// <summary>
+            /// Identifier of the action.
+            /// </summary>
+            public override int ID
+            {
+                get { return _id; }
             }
 
             /// <summary>
@@ -114,21 +147,34 @@ namespace BlackBerry.NativeCore.Components
         /// <summary>
         /// Storage classes for string to be deleted between tokens to be deleted 
         /// </summary>
+        [DebuggerDisplay("{ID}: {TokenStart}...{TokenEnd} -> {TokenReplacement}")]
         private class ReplaceBetweenPairToken : ActionToken
         {
+            private readonly int _id;
+
             /// <summary>
             /// Constructor
             /// </summary>
+            /// <param name="id">Identifier of the action</param>
             /// <param name="tokenIdentifier">Identifier</param>
             /// <param name="blockStart">Start token</param>
             /// <param name="blockEnd">End Token</param>
             /// <param name="replacement">Replacement string.</param>
-            public ReplaceBetweenPairToken(string tokenIdentifier, string blockStart, string blockEnd, string replacement)
+            public ReplaceBetweenPairToken(int id, string tokenIdentifier, string blockStart, string blockEnd, string replacement)
             {
+                _id = id;
                 TokenIdentifier = tokenIdentifier;
                 TokenStart = blockStart;
                 TokenEnd = blockEnd;
                 TokenReplacement = replacement;
+            }
+
+            /// <summary>
+            /// Identifier of the action.
+            /// </summary>
+            public override int ID
+            {
+                get { return _id; }
             }
 
             /// <summary>
@@ -186,6 +232,7 @@ namespace BlackBerry.NativeCore.Components
         #endregion
 
         private readonly List<ActionToken> _tokens;
+        private int _globalID;
 
         /// <summary>
         /// Default constructor.
@@ -193,6 +240,11 @@ namespace BlackBerry.NativeCore.Components
         public TokenProcessor()
         {
             _tokens = new List<ActionToken>();
+        }
+
+        private int GetNextID()
+        {
+            return Interlocked.Increment(ref _globalID);
         }
 
         /// <summary>
@@ -204,13 +256,48 @@ namespace BlackBerry.NativeCore.Components
         }
 
         /// <summary>
+        /// Remove action with specified id.
+        /// </summary>
+        /// <param name="id">Unique identifier of an action to remove</param>
+        public bool Remove(int id)
+        {
+            for(int i = 0; i < _tokens.Count; i++)
+            {
+                if (_tokens[i].ID == id)
+                {
+                    _tokens.RemoveAt(i);
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Remove all actions with specified identifiers.
+        /// </summary>
+        /// <param name="identifiers">Collection of unique identifiers of actions to remove</param>
+        public void Remove(IEnumerable<int> identifiers)
+        {
+            if (identifiers == null)
+                throw new ArgumentNullException("identifiers");
+
+            foreach(var id in identifiers)
+            {
+                Remove(id);
+            }
+        }
+
+        /// <summary>
         /// Add a replacement type entry.
         /// </summary>
         /// <param name="token">Token to replace</param>
         /// <param name="replacement">Replacement string</param>
-        public void AddReplace(string token, string replacement)
+        public int AddReplace(string token, string replacement)
         {
-            _tokens.Add(new ReplacePairToken(token, replacement));
+            var id = GetNextID();
+            _tokens.Add(new ReplacePairToken(id, token, replacement));
+            return id;
         }
 
         /// <summary>
@@ -220,21 +307,38 @@ namespace BlackBerry.NativeCore.Components
         /// <param name="tokenStart">Start token</param>
         /// <param name="tokenEnd">End token</param>
         /// <param name="replacement">Replacement for found entry</param>
-        public void AddReplaceBetween(string tokenIdentifier, string tokenStart, string tokenEnd, string replacement)
+        public int AddReplaceBetween(string tokenIdentifier, string tokenStart, string tokenEnd, string replacement)
         {
-            _tokens.Add(new ReplaceBetweenPairToken(tokenIdentifier, tokenStart, tokenEnd, replacement));
+            var id = GetNextID();
+            _tokens.Add(new ReplaceBetweenPairToken(id, tokenIdentifier, tokenStart, tokenEnd, replacement));
+            return id;
         }
 
         /// <summary>
         /// Add a deletion entry.
         /// </summary>
         /// <param name="tokenToDelete">Token to delete</param>
-        public void AddDelete(string tokenToDelete)
+        public int AddDelete(string tokenToDelete)
         {
-            _tokens.Add(new DeleteToken(tokenToDelete));
+            var id = GetNextID();
+            _tokens.Add(new DeleteToken(id, tokenToDelete));
+            return id;
         }
 
         #region TokenProcessing
+
+        /// <summary>
+        /// For all known tokens, replace them with correct values inside given string.
+        /// </summary>
+        public string Untoken(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return null;
+
+            var buffer = new StringBuilder(text);
+            Untoken(buffer);
+            return buffer.ToString();
+        }
 
         /// <summary>
         /// For all known tokens, replace them with correct values
@@ -281,17 +385,24 @@ namespace BlackBerry.NativeCore.Components
                     encoding = reader.CurrentEncoding;
                 }
 
-                foreach (var token in _tokens)
-                {
-                    token.UpdateBuffer(buffer);
-                }
-
+                Untoken(buffer);
                 File.WriteAllText(destination, buffer.ToString(), encoding);
             }
             else
                 File.Copy(source, destination);
 
             return destination;
+        }
+
+        private void Untoken(StringBuilder buffer)
+        {
+            if (buffer == null)
+                throw new ArgumentNullException("buffer");
+
+            foreach (var token in _tokens)
+            {
+                token.UpdateBuffer(buffer);
+            }
         }
 
         #endregion
