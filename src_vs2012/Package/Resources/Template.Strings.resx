@@ -126,4 +126,22 @@
   <data name="5002" xml:space="preserve">
     <value>OpenGLProject</value>
   </data>
+  <data name="6000" xml:space="preserve">
+    <value>BAR Descriptor</value>
+  </data>
+  <data name="6001" xml:space="preserve">
+    <value>Adds a BAR descriptor file into the project</value>
+  </data>
+  <data name="6002" xml:space="preserve">
+    <value>bar-descriptor.xml</value>
+  </data>
+  <data name="6010" xml:space="preserve">
+    <value>QObject Class</value>
+  </data>
+  <data name="6011" xml:space="preserve">
+    <value>Adds a new class inheriting from QObject</value>
+  </data>
+  <data name="6012" xml:space="preserve">
+    <value>Class.cpp</value>
+  </data>
 </root>

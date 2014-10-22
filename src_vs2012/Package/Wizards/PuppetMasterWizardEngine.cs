@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.Package.Model.Wizards;
 using BlackBerry.Package.ViewModels;
 using EnvDTE;
 using EnvDTE80;
+using Microsoft.VisualStudio.VCProjectEngine;
 
 namespace BlackBerry.Package.Wizards
 {
@@ -45,10 +45,116 @@ namespace BlackBerry.Package.Wizards
         /// </summary>
         internal override wizardResult ExecuteNewProject(DTE2 dte, IntPtr owner, NewProjectParams context, KeyValuePair<string, string>[] customParams)
         {
-            dte.Solution.AddFromFile(Path.Combine(WizardDataFolder, "opengl-default.vcxproj"));
+            foreach (var data in customParams)
+            {
+                if (data.Key != null && 
+                    (string.Compare(data.Key, "project", StringComparison.OrdinalIgnoreCase) == 0 || data.Key.StartsWith("project#", StringComparison.OrdinalIgnoreCase)))
+                {
+                    // add the project itself:
+                    var templatePath = Path.Combine(WizardDataFolder, data.Value);
+                    var projectRoot = context.IsExclusive ? context.LocalDirectory : Path.Combine(context.LocalDirectory, context.ProjectName);
+                    var destinationPath = Path.Combine(projectRoot, context.ProjectName + Path.GetExtension(data.Value));
 
-            MessageBox.Show("I am a custom wizard engine!");
+                    var tokenProcessor = CreateTokenProcessor(context.ProjectName, context.LocalDirectory, destinationPath);
+                    tokenProcessor.UntokenFile(templatePath, destinationPath);
+                    var project = dte.Solution.AddFromFile(destinationPath);
+
+                    // get project identifier, in case the template wants to add more than one:
+                    var projectNumber = GetProjectNumber(data.Key);
+                    string filtersParamName;
+                    string fileParamName;
+
+                    if (string.IsNullOrEmpty(projectNumber))
+                    {
+                        filtersParamName = "filters";
+                        fileParamName = "file";
+                    }
+                    else
+                    {
+                        filtersParamName = "filters#" + projectNumber;
+                        fileParamName = "file#" + projectNumber;
+                    }
+
+                    // add project items:
+                    foreach (var subItem in customParams)
+                    {
+                        // file:
+                        if (string.Compare(subItem.Key, fileParamName, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            var itemName = Path.Combine(projectRoot, Path.GetFileName(GetSourceName(subItem.Value)));
+                            var itemTokenProcessor = CreateTokenProcessor(context.ProjectName, projectRoot, GetDestinationName(itemName, subItem.Value, tokenProcessor));
+                            AddFile(project, itemName, subItem.Value, itemTokenProcessor);
+                        }
+
+                        // filters:
+                        if (string.Compare(subItem.Key, filtersParamName, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            var vcProject = project.Object as VCProject;
+                            if (vcProject != null)
+                            {
+                                CreateFilters(subItem.Value, vcProject);
+                            }
+                        }
+                    }
+
+                    project.Save();
+                }
+            }
+
+            if (context.IsExclusive)
+            {
+                var solutionPath = string.IsNullOrEmpty(context.SolutionName) ? context.LocalDirectory : Path.GetDirectoryName(context.LocalDirectory);
+                dte.Solution.SaveAs(Path.Combine(solutionPath, context.ProjectName));
+            }
             return wizardResult.wizardResultSuccess;
+        }
+
+        private static void CreateFilters(string filtersDefinition, VCProject vcProject)
+        {
+            if (string.IsNullOrEmpty(filtersDefinition))
+                return;
+
+            foreach (var filterName in filtersDefinition.Split(';', ',', ' '))
+            {
+                if (string.Compare(filterName, "sources", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    VCFilter filter = vcProject.AddFilter("Source Files");
+                    filter.Filter = "cpp;c;cc;cxx;def;bat";
+                }
+
+                if (string.Compare(filterName, "headers", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    VCFilter filter = vcProject.AddFilter("Header Files");
+                    filter.Filter = "h;hpp;hxx;hm;inl;inc;xsd";
+                }
+
+                if (string.Compare(filterName, "src", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    VCFilter filter = vcProject.AddFilter("Source Files");
+                    filter.Filter = "cpp;c;cc;cxx;def;bat;h;hpp;hxx;hm;inl;inc;xsd";
+                }
+
+                if (string.Compare(filterName, "assets", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    VCFilter filter = vcProject.AddFilter("Assets");
+                    filter.Filter = "qml;js;jpg;png;gif";
+                }
+
+                if (string.Compare(filterName, "config", StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    VCFilter filter = vcProject.AddFilter("Config Files");
+                    filter.Filter = "pri;pro;xml";
+                }
+            }
+        }
+
+        private string GetProjectNumber(string name)
+        {
+            if (string.IsNullOrEmpty(name))
+                return null;
+
+            var index = name.IndexOf('#');
+            return index < 0 ? null : name.Substring(index + 1).Trim();
         }
 
         /// <summary>
@@ -57,31 +163,48 @@ namespace BlackBerry.Package.Wizards
         internal override wizardResult ExecuteNewProjectItem(DTE2 dte, IntPtr owner, NewProjectItemParams context, KeyValuePair<string, string>[] customParams)
         {
             var project = context.ProjectItems.ContainingProject;
-            var tokenProcessor = CreateTokenProcessor(context, context.ItemName);
+            var tokenProcessor = CreateTokenProcessor(context.ProjectName, context.LocalDirectory, context.ItemName);
 
             foreach (var data in customParams)
             {
                 if (string.Compare(data.Key, "file", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    var templatePath = Path.Combine(WizardDataFolder, GetSourceName(data.Value));
-                    var destinationPath = GetDestinationName(context.ItemName, data.Value);
-
-                    // update tokens withing the file and copy to destination:
-                    tokenProcessor.UntokenFile(templatePath, destinationPath);
-
-                    // then add that file to the project items:
-                    project.ProjectItems.AddFromFile(destinationPath);
-                    TraceLog.WriteLine("Added file: \"{0}\"", destinationPath);
+                    AddFile(project, context.ItemName, data.Value, tokenProcessor);
                 }
             }
 
             return wizardResult.wizardResultSuccess;
         }
 
-        private TokenProcessor CreateTokenProcessor(ContextParams context, string destinationName)
+        /// <summary>
+        /// Processes item and adds it to the project.
+        /// </summary>
+        private void AddFile(Project project, string itemName, string templateDefinition, TokenProcessor tokenProcessor)
         {
-            if (context == null)
-                throw new ArgumentNullException("context");
+            if (project == null)
+                throw new ArgumentNullException("project");
+            if (string.IsNullOrEmpty(itemName))
+                throw new ArgumentNullException("itemName");
+            if (string.IsNullOrEmpty(templateDefinition))
+                throw new ArgumentNullException("templateDefinition");
+
+            var templatePath = Path.Combine(WizardDataFolder, GetSourceName(templateDefinition));
+            var destinationPath = GetDestinationName(itemName, templateDefinition, tokenProcessor);
+
+            // update tokens withing the file and copy to destination:
+            tokenProcessor.UntokenFile(templatePath, destinationPath);
+
+            // then add that file to the project items:
+            project.ProjectItems.AddFromFile(destinationPath);
+            TraceLog.WriteLine("Added file: \"{0}\"", destinationPath);
+        }
+
+        private TokenProcessor CreateTokenProcessor(string projectName, string projectRoot, string destinationName)
+        {
+            if (string.IsNullOrEmpty(projectName))
+                throw new ArgumentNullException("projectName");
+            if (string.IsNullOrEmpty(projectRoot))
+                throw new ArgumentNullException("projectRoot");
             if (string.IsNullOrEmpty(destinationName))
                 throw new ArgumentNullException("destinationName");
 
@@ -89,18 +212,25 @@ namespace BlackBerry.Package.Wizards
             var name = Path.GetFileNameWithoutExtension(destinationName);
             var ext = Path.GetExtension(destinationName);
             var safeName = CreateSafeName(name);
+            var safeNameUpper = safeName.ToUpperInvariant();
 
             var author = PackageViewModel.Instance.Developer.Name ?? "Example Inc.";
             var authorID = "ABCD1234";
             var now = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
-            tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", context.ProjectName);
-            tokenProcessor.AddReplace("$projectname$", context.ProjectName);
-            tokenProcessor.AddReplace("$ProjectName$", context.ProjectName);
+            tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", projectName);
+            tokenProcessor.AddReplace("$projectname$", projectName);
+            tokenProcessor.AddReplace("$ProjectName$", projectName);
+            tokenProcessor.AddReplace("$projectroot$", projectRoot);
+            tokenProcessor.AddReplace("$ProjectRoot$", projectRoot);
             tokenProcessor.AddReplace("$safename$", safeName);
             tokenProcessor.AddReplace("$SafeName$", safeName);
+            tokenProcessor.AddReplace("$safenameupper$", safeNameUpper);
+            tokenProcessor.AddReplace("$SafeNameUpper$", safeNameUpper);
             tokenProcessor.AddReplace("$filename$", name);
             tokenProcessor.AddReplace("$FileName$", name);
+            tokenProcessor.AddReplace("$name$", name);
+            tokenProcessor.AddReplace("$Name$", name);
             tokenProcessor.AddReplace("$ext$", ext);
             tokenProcessor.AddReplace("$Ext$", ext);
             tokenProcessor.AddReplace("$extension$", ext);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.Package.Model.Wizards;
 using EnvDTE;
@@ -121,6 +122,7 @@ namespace BlackBerry.Package.Wizards
         ///  * &lt;source-template&gt;
         ///  * &lt;source-template&gt; -&gt; &lt;new-name&gt;
         ///  * &lt;source-template&gt; #&gt; &lt;new-extension&gt;
+        ///  * &lt;source-template&gt; ~&gt; &lt;new-folder&gt;
         /// </summary>
         protected string GetSourceName(string path)
         {
@@ -128,55 +130,83 @@ namespace BlackBerry.Package.Wizards
                 return null;
 
             var index = path.IndexOf("->", 0, StringComparison.Ordinal);
-            if (index >= 0)
+            if (index < 0)
             {
-                return Unwrap(path.Substring(0, index).Trim());
+                index = path.IndexOf("#>", 0, StringComparison.Ordinal);
+            }
+            if (index < 0)
+            {
+                index = path.IndexOf("~>", 0, StringComparison.Ordinal);
             }
 
-            index = path.IndexOf("#>", 0, StringComparison.Ordinal);
+            return index >= 0 ? Unwrap(path.Substring(0, index).Trim()) : Unwrap(path);
+        }
+
+        private static string GetDestinationNameRequest(string marker, string path, TokenProcessor tokenProcessor)
+        {
+            if (string.IsNullOrEmpty(marker))
+                throw new ArgumentNullException("marker");
+
+            var index = path.IndexOf(marker, 0, StringComparison.Ordinal);
             if (index >= 0)
             {
-                return Unwrap(path.Substring(0, index).Trim());
+                var request = Unwrap(path.Substring(index + marker.Length).Trim());
+
+                if (!string.IsNullOrEmpty(request))
+                {
+                    if (tokenProcessor != null)
+                    {
+                        request = tokenProcessor.Untoken(request);
+                    }
+
+                    return request.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar).Replace("" + Path.DirectorySeparatorChar + Path.DirectorySeparatorChar, "" + Path.DirectorySeparatorChar);
+                }
             }
 
-            return Unwrap(path);
+            return null;
         }
 
         /// <summary>
         /// Gets the 'destination' part of the item specified path and applies the transformation.
         /// </summary>
-        protected string GetDestinationName(string itemName, string path)
+        protected string GetDestinationName(string itemName, string path, TokenProcessor tokenProcessor)
         {
             if (string.IsNullOrEmpty(itemName))
                 throw new ArgumentNullException("itemName");
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
 
-            var index = path.IndexOf("->", 0, StringComparison.Ordinal);
-            if (index >= 0)
+            var destinationRequest = GetDestinationNameRequest("->", path, tokenProcessor);
+            if (!string.IsNullOrEmpty(destinationRequest))
             {
-                var destinationRequest = Unwrap(path.Substring(index + 2).Trim());
-
-                if (!string.IsNullOrEmpty(destinationRequest))
-                {
-                    // replace item's name:
-                    return Path.Combine(Path.GetDirectoryName(itemName), destinationRequest);
-                }
+                // replace item's name:
+                if (IsFullPath(destinationRequest))
+                    return destinationRequest;
+                return Path.Combine(Path.GetDirectoryName(itemName), destinationRequest);
             }
 
-            index = path.IndexOf("#>", 0, StringComparison.Ordinal);
-            if (index >= 0)
+            destinationRequest = GetDestinationNameRequest("#>", path, tokenProcessor);
+            if (!string.IsNullOrEmpty(destinationRequest))
             {
-                var destinationRequest = Unwrap(path.Substring(index + 2).Trim());
+                // change item's extension:
+                return Path.ChangeExtension(itemName, destinationRequest);
+            }
 
-                if (!string.IsNullOrEmpty(destinationRequest))
-                {
-                    // change item's extension:
-                    return Path.ChangeExtension(itemName, destinationRequest);
-                }
+            destinationRequest = GetDestinationNameRequest("~>", path, tokenProcessor);
+            if (!string.IsNullOrEmpty(destinationRequest))
+            {
+                // change item's folder (to full or relative path):
+                if (IsFullPath(destinationRequest))
+                    return Path.Combine(destinationRequest, Path.GetFileName(itemName));
+                return Path.Combine(Path.GetDirectoryName(itemName), destinationRequest, Path.GetFileName(itemName));
             }
 
             return itemName;
+        }
+
+        private static bool IsFullPath(string path)
+        {
+            return !string.IsNullOrEmpty(path) && ((path.Length > 1 && path[1] == ':') || path.StartsWith("\\\\"));
         }
 
         private static string Unwrap(string path)

@@ -2,4 +2,7 @@ VSWIZARD 7.0
 Wizard={0cb934ba-06c8-4919-9498-bc6517940bcd}
 Param="TITLE = BlackBerry Empty OpenGL Project"
 Param="PROJECT = opengl-default.vcxproj"
-Param="WIZARD_ID = 54"
+Param="FILTERS = assets;config;src"
+Param="FILE = BarDescriptor/Templates/1033/bar-descriptor.xml"
+Param="FILE = Shared/empty-main.c -> src/main.c"
+
