@@ -501,6 +501,10 @@
       <DependentUpon>Import.xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Resources\Template.Icons.resx" />
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\empty-main.c">
       <Link>Templates\VCWizards\BlackBerry\Shared\empty-main.c</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -732,17 +736,6 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="Resources\TemplateIcons\EmptyProj.ico" />
-    <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml">
-      <IncludeInVSIX>true</IncludeInVSIX>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Compile Include="Resources\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

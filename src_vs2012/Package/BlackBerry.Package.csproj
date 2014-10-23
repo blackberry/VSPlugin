@@ -385,6 +385,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Wizards\PuppetMasterWizardEngine.cs" />
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\VCWizards\BlackBerry\Shared\empty-main.c">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -435,11 +438,6 @@
     <Resource Include="..\..\src_vs2010\Package\Resources\Images_32bit.bmp">
       <Link>Resources\Images_32bit.bmp</Link>
     </Resource>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Resources\Permissions\BlackBerryMessager.bmp" />
     <Resource Include="Resources\Permissions\Calendar.bmp" />
     <Resource Include="Resources\Permissions\Camera.bmp" />
@@ -560,11 +558,6 @@
     <None Include="..\..\src_vs2010\Package\Key.snk">
       <Link>Key.snk</Link>
     </None>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsd">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsd</Link>
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -629,21 +622,6 @@
       <Project>{faddd789-6cb5-4f9d-8481-1c0c72e5f19f}</Project>
       <Name>BlackBerry.NativeCore</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <IncludeInVSIX>true</IncludeInVSIX>
-    </Content>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup />
   <PropertyGroup>
