@@ -199,7 +199,10 @@ namespace BlackBerry.Package.Wizards
             TraceLog.WriteLine("Added file: \"{0}\"", destinationPath);
         }
 
-        private TokenProcessor CreateTokenProcessor(string projectName, string projectRoot, string destinationName)
+        /// <summary>
+        /// Creates token processor to update dynamically token markers within the template file.
+        /// </summary>
+        public static TokenProcessor CreateTokenProcessor(string projectName, string projectRoot, string destinationName)
         {
             if (string.IsNullOrEmpty(projectName))
                 throw new ArgumentNullException("projectName");
@@ -218,7 +221,6 @@ namespace BlackBerry.Package.Wizards
             var authorID = "ABCD1234";
             var now = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
-            tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", projectName);
             tokenProcessor.AddReplace("$projectname$", projectName);
             tokenProcessor.AddReplace("$ProjectName$", projectName);
             tokenProcessor.AddReplace("$projectroot$", projectRoot);

@@ -29,6 +29,7 @@ using BlackBerry.NativeCore.Services;
 using BlackBerry.Package.Dialogs;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.ViewModels;
+using BlackBerry.Package.Wizards;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
@@ -65,7 +66,7 @@ namespace BlackBerry.Package.Components
         private const string SolutionConfigurationsName = "Solution Configurations";
         private const string SolutionPlatformsName = "Solution Platforms";
         private const string BarDescriptorFileName = "bar-descriptor.xml";
-        private const string BarDescriptorFolder = @"..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033";
+        private const string BarDescriptorTemplate = @"Shared\bar-descriptor.xml";
 
         /// <summary>
         /// Init constructor.
@@ -298,12 +299,10 @@ namespace BlackBerry.Package.Components
                     }
                 }
 
-                string templatePath = Path.Combine(_dte.Solution.ProjectItemsTemplatePath(project.Kind), BarDescriptorFolder, BarDescriptorFileName);
+                string templatePath = Path.Combine(PuppetMasterWizardEngine.WizardDataFolder, BarDescriptorTemplate);
                 string destination = string.IsNullOrEmpty(projectFolder) ? BarDescriptorFileName : Path.Combine(projectFolder, BarDescriptorFileName);
 
-                var tokenProcessor = new TokenProcessor();
-                tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", project.Name);
-
+                var tokenProcessor = PuppetMasterWizardEngine.CreateTokenProcessor(project.Name, projectFolder, destination);
                 tokenProcessor.UntokenFile(templatePath, destination);
                 project.ProjectItems.AddFromFile(destination);
             }

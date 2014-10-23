@@ -8,11 +8,11 @@
 
   <!-- A universally unique application identifier. Must be unique across all BlackBerry applications.
          Using a reverse DNS-style name as the id is recommended. (Eg. com.example.ExampleApplication.) Required. -->
-  <id>com.example.[!output PROJECT_NAME]</id>
+  <id>com.example.$ProjectName$</id>
 
   <!-- The name that is displayed in the BlackBerry application installer. 
          May have multiple values for each language. See samples or xsd schema file. Optional. -->
-  <name>[!output PROJECT_NAME]</name>
+  <name>$ProjectName$</name>
 
   <!-- A string value of the format <0-999>.<0-999>.<0-999> that represents application version which can be used to check for application upgrade. 
          Values can also be 1-part or 2-part. It is not necessary to have a 3-part value.
@@ -28,10 +28,10 @@
   <description>The [!output PROJECT_NAME] application</description>
 
   <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
-  <author>Example Inc.</author>
+  <author>$Author$</author>
 
   <!--  Unique author ID assigned by signing authority. Required if using debug tokens. -->
-  <authorId>ABC1234YjsnUk235h</authorId> 
+  <authorId>$AuthorID$</authorId> 
 
   <initialWindow>
     <systemChrome>none</systemChrome>
@@ -42,19 +42,19 @@
   <category>core.games</category>
   <configuration id="com.qnx.qcc.configuration.exe.debug.536891653" name="Device-Debug">
     <platformArchitecture>armle-v7</platformArchitecture>
-    <asset path="Device-Debug/[!output PROJECT_NAME]" entry="true" type="Qnx/Elf">[!output PROJECT_NAME]</asset>
+    <asset path="Device-Debug/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
   <configuration id="com.qnx.qcc.configuration.exe.release.1323337687" name="Device-Release">
     <platformArchitecture>armle-v7</platformArchitecture>
-    <asset path="Device-Release/[!output PROJECT_NAME]" entry="true" type="Qnx/Elf">[!output PROJECT_NAME]</asset>
+    <asset path="Device-Release/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
   <configuration id="com.qnx.qcc.configuration.exe.debug.1533993701" name="Simulator-Debug">
     <platformArchitecture>x86</platformArchitecture>
-    <asset path="Simulator-Debug/[!output PROJECT_NAME]" entry="true" type="Qnx/Elf">[!output PROJECT_NAME]</asset>
+    <asset path="Simulator-Debug/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
   <configuration id="com.qnx.qcc.configuration.exe.release.1324337687" name="Simulator-Release">
     <platformArchitecture>armle-v7</platformArchitecture>
-    <asset path="Simulator-Release/[!output PROJECT_NAME]" entry="true" type="Qnx/Elf">[!output PROJECT_NAME]</asset>
+    <asset path="Simulator-Release/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
 
   <!--  The icon for the application, which should be 86x86. -->
