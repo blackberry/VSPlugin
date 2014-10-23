@@ -231,6 +231,15 @@
       <Link>Model\Integration\WebBrowserTurbo.cs</Link>
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Wizards\ContextParams.cs">
+      <Link>Model\Wizards\ContextParams.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Wizards\NewProjectItemParams.cs">
+      <Link>Model\Wizards\NewProjectItemParams.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Wizards\NewProjectParams.cs">
+      <Link>Model\Wizards\NewProjectParams.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.cs">
       <Link>Options\ApiLevelOptionControl.cs</Link>
       <SubType>UserControl</SubType>
@@ -409,6 +418,12 @@
     <Compile Include="..\..\src_vs2012\Package\Registration\DebugEngineRegistrationAttribute.cs">
       <Link>Registration\DebugEngineRegistrationAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Registration\ProvideProjects.cs">
+      <Link>Registration\ProvideProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Registration\ProvideWizardEngineAttribute.cs">
+      <Link>Registration\ProvideWizardEngineAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Registration\XmlEditorDesignerViewRegistrationAttribute.cs">
       <Link>Registration\XmlEditorDesignerViewRegistrationAttribute.cs</Link>
     </Compile>
@@ -485,13 +500,15 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Wizards\BaseWizardEngine.cs">
+      <Link>Wizards\BaseWizardEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Wizards\PuppetMasterWizardEngine.cs">
+      <Link>Wizards\PuppetMasterWizardEngine.cs</Link>
+    </Compile>
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
       <DependentUpon>bar-descriptor.xsd</DependentUpon>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\Package\Templates\bar-descriptor.cs">
-      <Link>Templates\bar-descriptor.cs</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
@@ -502,10 +519,69 @@
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
       <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry.vsdir">
+      <Link>Templates\Projects\BlackBerry.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\emptyproj.vsz">
+      <Link>Templates\Projects\BlackBerry\emptyproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\items.vsdir">
+      <Link>Templates\Projects\BlackBerry\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\OpenGL\items.vsdir">
+      <Link>Templates\Projects\BlackBerry\OpenGL\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry.vsdir">
+      <Link>Templates\ProjectItems\BlackBerry.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\bar-descriptor.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\bar-descriptor.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\items.vsdir">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qclass.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qclass.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\items.vsdir">
+      <Link>Templates\ProjectItems\BlackBerry\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="Resources\TemplateIcons\EmptyProj.ico" />
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Template.Strings.resx">
+      <Link>Resources\Template.Strings.resx</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Template.Icons.resx">
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\empty-main.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\empty-main.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qclass.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qclass.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qclass.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qclass.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\opengl-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\BlackBerryMessager.bmp">
       <Link>Resources\Permissions\BlackBerryMessager.bmp</Link>
@@ -681,12 +757,6 @@
     <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Logo.png">
       <Link>Resources\Logo.png</Link>
     </EmbeddedResource>
-    <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsc">
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
-    </None>
-    <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xss">
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
-    </None>
     <Content Include="..\..\src_vs2010\Package\Resources\File.ico">
       <Link>Resources\File.ico</Link>
     </Content>

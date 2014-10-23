@@ -6,7 +6,7 @@ namespace BlackBerry.Package.Model.Wizards
     /// <summary>
     /// Context parameters passed by Visual Studio, when creating new project item.
     /// </summary>
-    internal sealed class NewProjectItemParams : ContextParams
+    sealed class NewProjectItemParams : ContextParams
     {
         internal const string TypeGuid = "{0f90e1d1-4999-11d1-b6d1-00a0c90f2744}";
 

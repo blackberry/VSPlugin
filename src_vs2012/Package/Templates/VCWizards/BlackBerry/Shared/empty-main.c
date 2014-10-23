@@ -1,6 +1,4 @@
 ﻿
-/* $Name$$Ext$ */
-
 /**
  * Application Entry Point.
  */
