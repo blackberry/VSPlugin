@@ -66,6 +66,39 @@ namespace BlackBerry.BuildTasks.Templates
 
         #endregion
 
+        private static bool IsDirSeparator(char c)
+        {
+            return c == '\\' || c == '/';
+        }
+
+        private void WritePath(params string[] segments)
+        {
+            if (segments != null)
+            {
+                bool trailing = false;
+                foreach (var s in segments)
+                {
+                    if (string.IsNullOrEmpty(s))
+                    {
+                        continue;
+                    }
+
+                    if (trailing)
+                    {
+                        if (IsDirSeparator(s[0]))
+                        {
+                            Write(s.Substring(1));
+                            if (s.Length > 1)
+                                trailing = IsDirSeparator(s[s.Length - 1]);
+                            continue;
+                        }
+                    }
+                    Write(s);
+                    trailing = IsDirSeparator(s[s.Length - 1]);
+                }
+            }
+        }
+
         private void WriteRelativePaths(ITaskItem[] items, string prefix, string suffix)
         {
             if (items != null && items.Length > 0)
@@ -75,16 +108,13 @@ namespace BlackBerry.BuildTasks.Templates
                 // print items:
                 for (int i = 0; i < lastIndex; i++)
                 {
-                        Write(prefix);
-                        Write(items[i].ItemSpec.Replace('\\', '/'));
-                        Write(suffix);
-                        WriteLine(" \\");
+                    WritePath(prefix, items[i].ItemSpec.Replace('\\', '/'), suffix);
+                    WriteLine(" \\");
                 }
 
                 // print last item without 'move to next line char':
-                Write(prefix);
-                Write(items[lastIndex].ItemSpec.Replace('\\', '/'));
-                WriteLine(suffix);
+                WritePath(prefix, items[lastIndex].ItemSpec.Replace('\\', '/'), suffix);
+                WriteLine(string.Empty);
             }
         }
 
@@ -97,16 +127,13 @@ namespace BlackBerry.BuildTasks.Templates
                 // print items:
                 for (int i = 0; i < lastIndex; i++)
                 {
-                    Write(prefix);
-                    Write(items[i].Replace('\\', '/'));
-                    Write(suffix);
+                    WritePath(prefix, items[i].Replace('\\', '/'), suffix);
                     WriteLine(" \\");
                 }
 
                 // print last item without 'move to next line char':
-                Write(prefix);
-                Write(items[lastIndex].Replace('\\', '/'));
-                WriteLine(suffix);
+                Write(prefix, items[lastIndex].Replace('\\', '/'), suffix);
+                WriteLine(string.Empty);
             }
         }
 
@@ -128,11 +155,7 @@ namespace BlackBerry.BuildTasks.Templates
                 {
                     for (int j = 0; j <= lastIndex2; j++)
                     {
-                        Write(prefix);
-                        Write(items1[i].Replace('\\', '/'));
-                        Write("/");
-                        Write(items2[j]);
-                        Write(suffix);
+                        WritePath(prefix, items1[i].Replace('\\', '/'), "/", items2[j], suffix);
 
                         if (i != lastIndex1 && j != lastIndex2)
                         {
@@ -140,7 +163,7 @@ namespace BlackBerry.BuildTasks.Templates
                         }
                         else
                         {
-                            WriteLine("");
+                            WriteLine(string.Empty);
                         }
                     }
                 }
