@@ -41,7 +41,7 @@ namespace BlackBerry.BuildTasks.Templates
             
             #line default
             #line hidden
-            this.Write("] by BlackBerry NDK plugin for Visual studio (v");
+            this.Write("] by BlackBerry NDK plugin for Visual Studio (v");
             
             #line 5 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
             this.Write(this.ToStringHelper.ToStringWithCulture(Version));

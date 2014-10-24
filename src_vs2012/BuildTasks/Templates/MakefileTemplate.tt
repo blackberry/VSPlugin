@@ -2,7 +2,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 #
-# Makefile for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual studio (v<#= Version #>).
+# Makefile for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual Studio (v<#= Version #>).
 # Any manual changes made by user will be overwritten! Use the project settings instead.
 #
 
