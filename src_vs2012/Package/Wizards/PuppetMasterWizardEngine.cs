@@ -221,14 +221,11 @@ namespace BlackBerry.Package.Wizards
             var authorID = "ABCD1234";
             var now = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
 
+            // project & file info:
             tokenProcessor.AddReplace("$projectname$", projectName);
             tokenProcessor.AddReplace("$ProjectName$", projectName);
             tokenProcessor.AddReplace("$projectroot$", projectRoot);
             tokenProcessor.AddReplace("$ProjectRoot$", projectRoot);
-            tokenProcessor.AddReplace("$safename$", safeName);
-            tokenProcessor.AddReplace("$SafeName$", safeName);
-            tokenProcessor.AddReplace("$safenameupper$", safeNameUpper);
-            tokenProcessor.AddReplace("$SafeNameUpper$", safeNameUpper);
             tokenProcessor.AddReplace("$filename$", name);
             tokenProcessor.AddReplace("$FileName$", name);
             tokenProcessor.AddReplace("$name$", name);
@@ -237,6 +234,8 @@ namespace BlackBerry.Package.Wizards
             tokenProcessor.AddReplace("$Ext$", ext);
             tokenProcessor.AddReplace("$extension$", ext);
             tokenProcessor.AddReplace("$Extension$", ext);
+
+            // developer info:
             tokenProcessor.AddReplace("$user$", Environment.UserName);
             tokenProcessor.AddReplace("$User$", Environment.UserName);
             tokenProcessor.AddReplace("$author$", author);
@@ -245,6 +244,16 @@ namespace BlackBerry.Package.Wizards
             tokenProcessor.AddReplace("$AuthorID$", authorID);
             tokenProcessor.AddReplace("$now$", now);
             tokenProcessor.AddReplace("$Now$", now);
+
+            // C++ development info:
+            tokenProcessor.AddReplace("$safename$", safeName); // safe name of the file to be used as class or control name...
+            tokenProcessor.AddReplace("$SafeName$", safeName);
+            tokenProcessor.AddReplace("$safenameupper$", safeNameUpper);
+            tokenProcessor.AddReplace("$SafeNameUpper$", safeNameUpper);
+
+            // QML development info:
+            tokenProcessor.AddReplace("$cascadesversion$", "1.2"); // PH: TODO: could be provided dynamically from the current NDK...
+            tokenProcessor.AddReplace("$CascadesVersion$", "1.2");
 
             return tokenProcessor;
         }

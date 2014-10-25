@@ -385,6 +385,24 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Wizards\PuppetMasterWizardEngine.cs" />
+    <None Include="Resources\TemplateIcons\CascadesProj.ico" />
+    <None Include="Resources\TemplateIcons\NewQItem.ico" />
+    <Content Include="Templates\ProjectItems\BlackBerry\Cascades\qcontrol.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ProjectItems\BlackBerry\Cascades\qsheet.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ProjectItems\BlackBerry\Cascades\qdialog.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ProjectItems\BlackBerry\Cascades\qpage.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\ProjectItems\BlackBerry\Cascades\qpane.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="Resources\TemplateIcons\NewItem.ico" />
     <Content Include="Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
@@ -430,6 +448,21 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="Templates\ProjectItems\BlackBerry\Cascades\items.vsdir">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\qcontrol.qml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\qdialog.qml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\qpage.qml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\qpane.qml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\qsheet.qml">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="..\..\src_vs2010\Package\Resources\Images_24bit.bmp">

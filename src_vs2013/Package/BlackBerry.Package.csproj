@@ -542,6 +542,46 @@
       <Link>Templates\ProjectItems\BlackBerry\items.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qcontrol.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qcontrol.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qdialog.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qdialog.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qpage.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qpage.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qpane.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qpane.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qsheet.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qsheet.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qcontrol.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qcontrol.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qdialog.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qdialog.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qpage.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qpage.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qpane.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qpane.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qsheet.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qsheet.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Resources\TemplateIcons\EmptyProj.ico" />
     <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Template.Strings.resx">
       <Link>Resources\Template.Strings.resx</Link>
@@ -565,6 +605,9 @@
       <Link>Templates\VCWizards\BlackBerry\Shared\qclass.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <None Include="Resources\TemplateIcons\CascadesProj.ico" />
+    <None Include="Resources\TemplateIcons\NewItem.ico" />
+    <None Include="Resources\TemplateIcons\NewQItem.ico" />
     <Content Include="Templates\VCWizards\BlackBerry\opengl-default.vcxproj">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

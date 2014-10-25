@@ -18,14 +18,14 @@ namespace BlackBerry.Package.Model.Wizards
         {
             if (contextParams == null)
                 throw new ArgumentNullException("contextParams");
-            if (contextParams.Length < 7)
+            if (contextParams.Length < 6)
                 throw new ArgumentOutOfRangeException("contextParams");
 
             ProjectItems = (ProjectItems) contextParams[2];
             LocalDirectory = contextParams[3] != null ? contextParams[3].ToString() : null;
             ItemName = contextParams[4] != null ? contextParams[4].ToString() : null;
             InstallationDirectory = contextParams[5] != null ? contextParams[5].ToString() : null;
-            Silent = GetBoolValue(contextParams[6]);
+            Silent = contextParams.Length < 7 || GetBoolValue(contextParams[6]); // optional in VS2010, set to 'true' then
         }
 
         #region Properties

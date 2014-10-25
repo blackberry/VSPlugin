@@ -139,9 +139,54 @@
     <value>QObject Class</value>
   </data>
   <data name="6011" xml:space="preserve">
-    <value>Adds a new class inheriting from QObject</value>
+    <value>Adds new class inheriting from QObject</value>
   </data>
   <data name="6012" xml:space="preserve">
     <value>Class.cpp</value>
+  </data>
+  <data name="6020" xml:space="preserve">
+    <value>QML Control</value>
+  </data>
+  <data name="6021" xml:space="preserve">
+    <value>Adds new QML file defining a custom control</value>
+  </data>
+  <data name="6022" xml:space="preserve">
+    <value>Control.qml</value>
+  </data>
+  <data name="6030" xml:space="preserve">
+    <value>QML Dialog</value>
+  </data>
+  <data name="6031" xml:space="preserve">
+    <value>Adds new QML file defining an empty dialog</value>
+  </data>
+  <data name="6032" xml:space="preserve">
+    <value>Dialog.qml</value>
+  </data>
+  <data name="6040" xml:space="preserve">
+    <value>QML Page</value>
+  </data>
+  <data name="6041" xml:space="preserve">
+    <value>Adds new QML file defining an empty page</value>
+  </data>
+  <data name="6042" xml:space="preserve">
+    <value>Page.qml</value>
+  </data>
+  <data name="6050" xml:space="preserve">
+    <value>QML Navigation Pane</value>
+  </data>
+  <data name="6051" xml:space="preserve">
+    <value>Adds new QML file defining a custom navigation pane usage</value>
+  </data>
+  <data name="6052" xml:space="preserve">
+    <value>NavigationPane.qml</value>
+  </data>
+  <data name="6060" xml:space="preserve">
+    <value>QML Sheet</value>
+  </data>
+  <data name="6061" xml:space="preserve">
+    <value>Adds new QML file defining an empty sheet</value>
+  </data>
+  <data name="6062" xml:space="preserve">
+    <value>Sheet.qml</value>
   </data>
 </root>
