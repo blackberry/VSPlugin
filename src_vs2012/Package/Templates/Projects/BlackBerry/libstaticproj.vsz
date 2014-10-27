@@ -1,0 +1,5 @@
+VSWIZARD 7.0
+Wizard={0cb934ba-06c8-4919-9498-bc6517940bcd}
+Param="TITLE = BlackBerry Empty Native Core Static Library"
+Param="PROJECT = native-libstatic-default.vcxproj"
+Param="FILTERS = config;src"

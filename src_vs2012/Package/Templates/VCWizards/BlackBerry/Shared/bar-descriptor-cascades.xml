@@ -42,30 +42,34 @@
   <category>core.games</category>
   <configuration id="com.qnx.qcc.configuration.exe.debug.536891653" name="Device-Debug">
     <platformArchitecture>armle-v7</platformArchitecture>
-    <asset path="Device-Debug/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
+    <asset path="arm/o.le-v7-g/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
   <configuration id="com.qnx.qcc.configuration.exe.release.1323337687" name="Device-Release">
     <platformArchitecture>armle-v7</platformArchitecture>
-    <asset path="Device-Release/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
+    <asset path="arm/o.le-v7/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
   <configuration id="com.qnx.qcc.configuration.exe.debug.1533993701" name="Simulator-Debug">
     <platformArchitecture>x86</platformArchitecture>
-    <asset path="Simulator-Debug/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
+    <asset path="x86/o-g/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
   <configuration id="com.qnx.qcc.configuration.exe.release.1324337687" name="Simulator-Release">
     <platformArchitecture>armle-v7</platformArchitecture>
-    <asset path="Simulator-Release/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
+    <asset path="x86/o/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
 
   <!--  The icon for the application, which should be 86x86. -->
   <icon></icon>
   
+  <!-- Folder with QML files and images -->
+  <asset path="assets">assets</asset>
+  <asset path="translations"></asset>
+
   <!--  The splash screen that will appear when your application is launching. Should be 1024x600. -->
   <splashscreen></splashscreen> 
   <!-- Request permission to execute native code.  Required for native applications. -->
   <permission system="true">run_native</permission>
 
   <!-- Ensure that shared libraries in the package are found at run-time. -->
-  <env var="LD_LIBRARY_PATH" value="app/native/lib"/>
+  <env var="LD_LIBRARY_PATH" value="app/native/lib:/usr/lib/qt4/lib"/>
 
 </qnx>

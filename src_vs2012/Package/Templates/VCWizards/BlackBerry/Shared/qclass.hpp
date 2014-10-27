@@ -1,5 +1,5 @@
-﻿#ifndef __$SafeNameUpper$__
-#define __$SafeNameUpper$__
+#ifndef __$SafeNameUpper$_HPP__
+#define __$SafeNameUpper$_HPP__
 
 #include <QObject>
 
@@ -12,4 +12,4 @@ public:
     virtual ~$SafeName$();
 };
 
-#endif /* __$SafeNameUpper$__ */
+#endif /* __$SafeNameUpper$_HPP__ */

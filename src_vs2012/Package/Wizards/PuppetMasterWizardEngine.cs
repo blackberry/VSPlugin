@@ -61,18 +61,17 @@ namespace BlackBerry.Package.Wizards
 
                     // get project identifier, in case the template wants to add more than one:
                     var projectNumber = GetProjectNumber(data.Key);
-                    string filtersParamName;
-                    string fileParamName;
+                    var filtersParamName = "filters";
+                    var fileParamName = "file";
+                    var dependencyParamName = "dependency";
+                    var defineParamName = "define";
 
-                    if (string.IsNullOrEmpty(projectNumber))
+                    if (!string.IsNullOrEmpty(projectNumber))
                     {
-                        filtersParamName = "filters";
-                        fileParamName = "file";
-                    }
-                    else
-                    {
-                        filtersParamName = "filters#" + projectNumber;
-                        fileParamName = "file#" + projectNumber;
+                        filtersParamName = string.Concat(filtersParamName, "#", projectNumber);
+                        fileParamName = string.Concat(fileParamName, "#", projectNumber);
+                        dependencyParamName = string.Concat(dependencyParamName, "#", projectNumber);
+                        defineParamName = string.Concat(defineParamName, "#", projectNumber);
                     }
 
                     // add project items:
@@ -81,7 +80,8 @@ namespace BlackBerry.Package.Wizards
                         // file:
                         if (string.Compare(subItem.Key, fileParamName, StringComparison.OrdinalIgnoreCase) == 0)
                         {
-                            var itemName = Path.Combine(projectRoot, Path.GetFileName(GetSourceName(subItem.Value)));
+                            bool ignore;
+                            var itemName = Path.Combine(projectRoot, Path.GetFileName(GetSourceName(subItem.Value, out ignore)));
                             var itemTokenProcessor = CreateTokenProcessor(context.ProjectName, projectRoot, GetDestinationName(itemName, subItem.Value, tokenProcessor));
                             AddFile(project, itemName, subItem.Value, itemTokenProcessor);
                         }
@@ -93,6 +93,26 @@ namespace BlackBerry.Package.Wizards
                             if (vcProject != null)
                             {
                                 CreateFilters(subItem.Value, vcProject);
+                            }
+                        }
+
+                        // library references:
+                        if (string.Compare(subItem.Key, dependencyParamName, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            var vcProject = project.Object as VCProject;
+                            if (vcProject != null)
+                            {
+                                UpdateProjectProperty(subItem.Value, null, vcProject, "Link", "AdditionalDependencies", ";");
+                            }
+                        }
+
+                        // defines:
+                        if (string.Compare(subItem.Key, defineParamName, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            var vcProject = project.Object as VCProject;
+                            if (vcProject != null)
+                            {
+                                UpdateProjectProperty(subItem.Value, null, vcProject, "CL", "PreprocessorDefinitions", ";");
                             }
                         }
                     }
@@ -107,6 +127,29 @@ namespace BlackBerry.Package.Wizards
                 dte.Solution.SaveAs(Path.Combine(solutionPath, context.ProjectName));
             }
             return wizardResult.wizardResultSuccess;
+        }
+
+        private void UpdateProjectProperty(string value, string platformName, VCProject vcProject, string ruleName, string propertyName, string valueSeparator)
+        {
+            if (string.IsNullOrEmpty(value))
+                return;
+            if (vcProject == null)
+                return;
+
+            foreach (VCConfiguration configuration in (IVCCollection) vcProject.Configurations)
+            {
+                var rulePropertyStore = configuration.Rules.Item(ruleName) as IVCRulePropertyStorage;
+                if (rulePropertyStore != null)
+                {
+                    var currentPlatformName = ((VCPlatform)configuration.Platform).Name;
+                    if (string.IsNullOrEmpty(platformName) || string.Compare(currentPlatformName, platformName, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        var existingDependencies = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
+                        var dependencies = string.IsNullOrEmpty(existingDependencies) ? value : string.Concat(existingDependencies, valueSeparator, value);
+                        rulePropertyStore.SetPropertyValue(propertyName, dependencies);
+                    }
+                }
+            }
         }
 
         private static void CreateFilters(string filtersDefinition, VCProject vcProject)
@@ -188,15 +231,23 @@ namespace BlackBerry.Package.Wizards
             if (string.IsNullOrEmpty(templateDefinition))
                 throw new ArgumentNullException("templateDefinition");
 
-            var templatePath = Path.Combine(WizardDataFolder, GetSourceName(templateDefinition));
+            bool canAddToProject;
+            var templatePath = Path.Combine(WizardDataFolder, GetSourceName(templateDefinition, out canAddToProject));
             var destinationPath = GetDestinationName(itemName, templateDefinition, tokenProcessor);
 
             // update tokens withing the file and copy to destination:
             tokenProcessor.UntokenFile(templatePath, destinationPath);
 
             // then add that file to the project items:
-            project.ProjectItems.AddFromFile(destinationPath);
-            TraceLog.WriteLine("Added file: \"{0}\"", destinationPath);
+            if (canAddToProject)
+            {
+                project.ProjectItems.AddFromFile(destinationPath);
+                TraceLog.WriteLine("Added file: \"{0}\"", destinationPath);
+            }
+            else
+            {
+                TraceLog.WriteLine("Generated file: \"{0}\", but omitted adding to project", destinationPath);
+            }
         }
 
         /// <summary>
@@ -220,6 +271,7 @@ namespace BlackBerry.Package.Wizards
             var author = PackageViewModel.Instance.Developer.Name ?? "Example Inc.";
             var authorID = "ABCD1234";
             var now = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
+            var authorSafe = CreateSafeName(author).ToLowerInvariant();
 
             // project & file info:
             tokenProcessor.AddReplace("$projectname$", projectName);
@@ -244,6 +296,8 @@ namespace BlackBerry.Package.Wizards
             tokenProcessor.AddReplace("$AuthorID$", authorID);
             tokenProcessor.AddReplace("$now$", now);
             tokenProcessor.AddReplace("$Now$", now);
+            tokenProcessor.AddReplace("$authorsafe$", authorSafe);
+            tokenProcessor.AddReplace("$AuthorSafe$", authorSafe);
 
             // C++ development info:
             tokenProcessor.AddReplace("$safename$", safeName); // safe name of the file to be used as class or control name...

@@ -20,10 +20,12 @@
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|BlackBerry'">
     <PlatformToolset>qcc</PlatformToolset>
     <TargetArch>armle-v7</TargetArch>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|BlackBerry'">
     <PlatformToolset>qcc</PlatformToolset>
     <TargetArch>armle-v7</TargetArch>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />

@@ -124,10 +124,23 @@ namespace BlackBerry.Package.Wizards
         ///  * &lt;source-template&gt; #&gt; &lt;new-extension&gt;
         ///  * &lt;source-template&gt; ~&gt; &lt;new-folder&gt;
         /// </summary>
-        protected string GetSourceName(string path)
+        protected string GetSourceName(string path, out bool canAddToProject)
         {
             if (string.IsNullOrEmpty(path))
+            {
+                canAddToProject = true;
                 return null;
+            }
+
+            if (path[0] == '!')
+            {
+                canAddToProject = false;
+                path = path.Substring(1).TrimStart();
+            }
+            else
+            {
+                canAddToProject = true;
+            } 
 
             var index = path.IndexOf("->", 0, StringComparison.Ordinal);
             if (index < 0)

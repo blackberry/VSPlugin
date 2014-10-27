@@ -118,13 +118,67 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="5000" xml:space="preserve">
-    <value>Empty OpenGL Project</value>
+    <value>Native Core - Empty Project</value>
   </data>
   <data name="5001" xml:space="preserve">
-    <value>Creates new OpenGL project</value>
+    <value>Creates new C/C++ project with a BAR descriptor file only. No source code is provided.</value>
   </data>
   <data name="5002" xml:space="preserve">
-    <value>OpenGLProject</value>
+    <value>NativeApp</value>
+  </data>
+  <data name="5010" xml:space="preserve">
+    <value>Native Core - Screen Application</value>
+  </data>
+  <data name="5011" xml:space="preserve">
+    <value>Creates C/C++ application using the minimum Core Native APIs to display a window on a screen.</value>
+  </data>
+  <data name="5012" xml:space="preserve">
+    <value>ScreenApp</value>
+  </data>
+  <data name="5020" xml:space="preserve">
+    <value>Cascades - Empty Application</value>
+  </data>
+  <data name="5021" xml:space="preserve">
+    <value>Creates a basic 'Hello World' Cascades application that only loads a QML file.</value>
+  </data>
+  <data name="5022" xml:space="preserve">
+    <value>CascadesProject</value>
+  </data>
+  <data name="5030" xml:space="preserve">
+    <value>Native Core - OpenGL v1.1</value>
+  </data>
+  <data name="5031" xml:space="preserve">
+    <value>Creates a C/C++ application using OpenGL ES v1.1 and Core Native APIs. Includes code to add a window to the screen and render a trivial scene.</value>
+  </data>
+  <data name="5032" xml:space="preserve">
+    <value>OpenGL11App</value>
+  </data>
+  <data name="5040" xml:space="preserve">
+    <value>Native Core - OpenGL v2.0</value>
+  </data>
+  <data name="5041" xml:space="preserve">
+    <value>Creates a C/C++ application using OpenGL ES 2.0 and Core Native APIs. Includes code to add a window to the screen and render a trivial scene.</value>
+  </data>
+  <data name="5042" xml:space="preserve">
+    <value>OpenGL2App</value>
+  </data>
+  <data name="5050" xml:space="preserve">
+    <value>Native Core - Static Library</value>
+  </data>
+  <data name="5051" xml:space="preserve">
+    <value>Creates a C/C++ static library</value>
+  </data>
+  <data name="5052" xml:space="preserve">
+    <value>StaticLib</value>
+  </data>
+  <data name="5060" xml:space="preserve">
+    <value>NativeCore - Shared Library</value>
+  </data>
+  <data name="5061" xml:space="preserve">
+    <value>Creates a C/C++ shared library</value>
+  </data>
+  <data name="5062" xml:space="preserve">
+    <value>SharedLib</value>
   </data>
   <data name="6000" xml:space="preserve">
     <value>BAR Descriptor</value>

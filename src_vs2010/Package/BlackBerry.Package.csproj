@@ -501,12 +501,48 @@
       <DependentUpon>Import.xaml</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Resources\Template.Icons.resx" />
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\applicationui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\applicationui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\applicationui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\applicationui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\empty-main.c">
-      <Link>Templates\VCWizards\BlackBerry\Shared\empty-main.c</Link>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-cascades.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-cascades.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-empty.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-empty.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-opengl1.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-opengl1.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-opengl2.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-opengl2.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-screen.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-screen.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\precompiled-cascades.h">
+      <Link>Templates\VCWizards\BlackBerry\Shared\precompiled-cascades.h</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\precompiled-empty.h">
+      <Link>Templates\VCWizards\BlackBerry\Shared\precompiled-empty.h</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qclass.cpp">
@@ -557,10 +593,82 @@
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qsheet.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\items.vsdir">
+      <Link>Templates\Projects\BlackBerry\Cascades\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\cascadesproj.vsz">
+      <Link>Templates\Projects\BlackBerry\cascadesproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\libsharedproj.vsz">
+      <Link>Templates\Projects\BlackBerry\libsharedproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\libstaticproj.vsz">
+      <Link>Templates\Projects\BlackBerry\libstaticproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\openglproj1.vsz">
+      <Link>Templates\Projects\BlackBerry\openglproj1.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\openglproj2.vsz">
+      <Link>Templates\Projects\BlackBerry\openglproj2.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\screenproj.vsz">
+      <Link>Templates\Projects\BlackBerry\screenproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\main-helloworld.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\main-helloworld.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Translations\makefile-cascades">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Translations\makefile-cascades</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Translations\qmake-default.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Translations\qmake-default.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\makefile-cascades">
+      <Link>Templates\VCWizards\BlackBerry\Shared\makefile-cascades</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qmake-config.pri">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qmake-config.pri</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qmake-default.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qmake-default.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Resources\TemplateIcons\NewItem.ico" />
     <None Include="Resources\TemplateIcons\NewQItem.ico" />
     <None Include="Resources\TemplateIcons\CascadesProj.ico" />
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.h">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.h</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\VCWizards\BlackBerry\opengl-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\cascades-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-libshared-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-libstatic-default.vcxproj">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <VSCTCompile Include="Resources\Package.vsct">

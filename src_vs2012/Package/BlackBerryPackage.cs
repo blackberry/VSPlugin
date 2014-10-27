@@ -93,6 +93,11 @@ namespace BlackBerry.Package
     // without any need of copying them into Visual Studio folder itself.
     // No extra permissions for the plugin are required in that case.
     [ProvideProjectItem("{8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942}", "BlackBerry", @"Templates\ProjectItems\BlackBerry", 10)]
+#if PLATFORM_VS2013
+    // PH: somehow for VS2013 it uses a different value for VC++ projects... don't ask, how I discovered it
+    [ProvideProjectItem("{8bc9ceb8-8b4a-11d0-8d11-00a0c91bc943}", "BlackBerry", @"Templates\ProjectItems\BlackBerry", 10)]
+#endif
+    [ProvideProjectItem("{a2fe74e1-b743-11d0-ae1a-00a0c90fffc3}", "BlackBerry", @"Templates\ProjectItems\BlackBerry", 11)]
     [ProvideProjects(GuidList.guidVSNDK_PackageString, "BlackBerry Projects", @"Templates\Projects\BlackBerry", 31)]
     // This attribute registers a custom wizard engine, that is used to populate new projects and items into a project.
     // Reference to this engine is made directly from *.vsz file (from locations provided by both attributes above).

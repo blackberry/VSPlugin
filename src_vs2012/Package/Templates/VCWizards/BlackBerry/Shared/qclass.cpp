@@ -1,4 +1,4 @@
-﻿#include "$Name$.hpp"
+#include "$Name$.hpp"
 
 $SafeName$::$SafeName$(QObject *parentOrNull)
     : QObject(parentOrNull)
