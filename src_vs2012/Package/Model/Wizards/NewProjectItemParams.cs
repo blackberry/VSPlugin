@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using EnvDTE;
 
 namespace BlackBerry.Package.Model.Wizards
@@ -26,6 +27,12 @@ namespace BlackBerry.Package.Model.Wizards
             ItemName = contextParams[4] != null ? contextParams[4].ToString() : null;
             InstallationDirectory = contextParams[5] != null ? contextParams[5].ToString() : null;
             Silent = contextParams.Length < 7 || GetBoolValue(contextParams[6]); // optional in VS2010, set to 'true' then
+
+            // if item is created via 'File->New->File...' it will have no folder at name start, so let's try to add it to keep the convention:
+            if (!string.IsNullOrEmpty(LocalDirectory) && !string.IsNullOrEmpty(ItemName) && !Path.IsPathRooted(ItemName))
+            {
+                ItemName = Path.Combine(LocalDirectory, ItemName);
+            }
         }
 
         #region Properties
