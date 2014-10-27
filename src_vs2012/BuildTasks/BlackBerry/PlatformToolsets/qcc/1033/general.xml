@@ -80,7 +80,7 @@
                 Category="ProjectDefaults"
                 F1Keyword="VC.Project.VCConfiguration.ConfigurationType">
     <EnumValue Name="Application" DisplayName="Application (BAR file)" Description="Application" />
-    <EnumValue Name="DynamicLibrary" DisplayName="Dynamic Library (.so)" Description="Dynamic Library (.so)" />
+    <EnumValue Name="DynamicLibrary" DisplayName="Shared Library (.so)" Description="Shared Library (.so)" />
     <EnumValue Name="StaticLibrary" DisplayName="Static library (.a)" Description="Static Library (.a)" />
   </EnumProperty>
   <EnumProperty Name="ConfigurationAppType" DisplayName="Application Type" Visible="True"
