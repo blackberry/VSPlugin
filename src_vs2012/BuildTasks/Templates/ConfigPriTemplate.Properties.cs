@@ -132,7 +132,7 @@ namespace BlackBerry.BuildTasks.Templates
                 }
 
                 // print last item without 'move to next line char':
-                Write(prefix, items[lastIndex].Replace('\\', '/'), suffix);
+                WritePath(prefix, items[lastIndex].Replace('\\', '/'), suffix);
                 WriteLine(string.Empty);
             }
         }
