@@ -509,6 +509,42 @@
       <Link>Templates\VCWizards\BlackBerry\Shared\applicationui.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -643,6 +679,58 @@
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qmake-default.pro">
       <Link>Templates\VCWizards\BlackBerry\Shared\qmake-default.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_card.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_card.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_listview.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_listview.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_navigationpane.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_navigationpane.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_tabs.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_tabs.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\main-tabs.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\main-tabs.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\card.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\card.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\qmake.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\qmake.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\ItemPage.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\ItemPage.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\qmake.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\qmake.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\DetailsPage.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\DetailsPage.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\main.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="Resources\TemplateIcons\NewItem.ico" />

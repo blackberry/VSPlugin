@@ -180,6 +180,51 @@
   <data name="5062" xml:space="preserve">
     <value>SharedLib</value>
   </data>
+  <data name="5070" xml:space="preserve">
+    <value>Cascades - List View Application</value>
+  </data>
+  <data name="5071" xml:space="preserve">
+    <value>Creates an application that uses a list-view</value>
+  </data>
+  <data name="5072" xml:space="preserve">
+    <value>CascadesListViewApp</value>
+  </data>
+  <data name="5080" xml:space="preserve">
+    <value>Cascades - Tabbed Pane Application</value>
+  </data>
+  <data name="5081" xml:space="preserve">
+    <value>Creates an application that allows users to switch between tabs</value>
+  </data>
+  <data name="5082" xml:space="preserve">
+    <value>CascadesTabsApp</value>
+  </data>
+  <data name="5090" xml:space="preserve">
+    <value>Cascades - Navigation Pane Application</value>
+  </data>
+  <data name="5091" xml:space="preserve">
+    <value>Creates an application that uses a navigation pane to display a details screen</value>
+  </data>
+  <data name="5092" xml:space="preserve">
+    <value>CascadesNavigationApp</value>
+  </data>
+  <data name="5100" xml:space="preserve">
+    <value>Cascades - Headless App</value>
+  </data>
+  <data name="5101" xml:space="preserve">
+    <value>Creates a headless application consisting of a project for the UI component and a project for the background service</value>
+  </data>
+  <data name="5102" xml:space="preserve">
+    <value>CascadesHeadlessApp</value>
+  </data>
+  <data name="5110" xml:space="preserve">
+    <value>Cascades - Card Application</value>
+  </data>
+  <data name="5111" xml:space="preserve">
+    <value>Creates a card application with a user UI component able to send a message to a UI card</value>
+  </data>
+  <data name="5112" xml:space="preserve">
+    <value>CascadesCardApp</value>
+  </data>
   <data name="6000" xml:space="preserve">
     <value>BAR Descriptor</value>
   </data>
