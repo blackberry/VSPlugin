@@ -541,6 +541,30 @@
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main-service.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main-service.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -731,6 +755,22 @@
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\main.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_headless.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_headless.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake-service.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake-service.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="Resources\TemplateIcons\NewItem.ico" />

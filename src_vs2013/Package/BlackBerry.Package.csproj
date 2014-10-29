@@ -582,6 +582,30 @@
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main-service.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main-service.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -762,6 +786,22 @@
       <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_tabs.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_headless.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_headless.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake-service.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake-service.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Resources\TemplateIcons\EmptyProj.ico" />
     <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Template.Strings.resx">
       <Link>Resources\Template.Strings.resx</Link>
@@ -795,10 +835,18 @@
     <Content Include="Templates\VCWizards\BlackBerry\opengl-default.vcxproj">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="Templates\VCWizards\BlackBerry\cascades-default.vcxproj" />
-    <None Include="Templates\VCWizards\BlackBerry\native-default.vcxproj" />
-    <None Include="Templates\VCWizards\BlackBerry\native-libshared-default.vcxproj" />
-    <None Include="Templates\VCWizards\BlackBerry\native-libstatic-default.vcxproj" />
+    <Content Include="Templates\VCWizards\BlackBerry\cascades-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-libshared-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-libstatic-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\BlackBerryMessager.bmp">
       <Link>Resources\Permissions\BlackBerryMessager.bmp</Link>
     </Resource>
