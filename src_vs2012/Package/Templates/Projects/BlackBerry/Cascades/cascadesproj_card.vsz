@@ -17,5 +17,5 @@ Param="FILE = Shared/Assets/Card/applicationuibase.cpp -> src/ApplicationUIBase.
 Param="FILE = Shared/Assets/Card/applicationuibase.hpp -> src/ApplicationUIBase.hpp"
 Param="FILE = Shared/Assets/Card/cardui.cpp -> src/CardUI.cpp"
 Param="FILE = Shared/Assets/Card/cardui.hpp -> src/CardUI.hpp"
-Param="FILE = Shared/Assets/Card/main.qml -> assets/main.qml"
-Param="FILE = Shared/Assets/Card/card.qml -> assets/card.qml"
+Param="FILE = * Shared/Assets/Card/main.qml -> assets/main.qml"
+Param="FILE = * Shared/Assets/Card/card.qml -> assets/card.qml"

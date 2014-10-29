@@ -5,5 +5,5 @@ Param="PROJECT = native-default.vcxproj"
 Param="FILTERS = assets;config;src"
 Param="Dependency = bps;screen;m"
 Param="FILE = Shared/bar-descriptor.xml"
-Param="FILE = Shared/main-screen.c -> src/main.c"
+Param="FILE = * Shared/main-screen.c -> src/main.c"
 

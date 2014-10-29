@@ -11,7 +11,7 @@ Param="FILE#1 = ! Shared/Translations/makefile-cascades -> translations/makefile
 Param="FILE#1 = ! Shared/Translations/qmake-default.pro -> translations/$ProjectName$.pro"
 Param="FILE#1 = Shared/precompiled-cascades.h -> src/precomiled.h"
 Param="FILE#1 = Shared/main-cascades.cpp -> src/main.cpp"
-Param="FILE#1 = Shared/Assets/Headless/applicationui.cpp -> src/ApplicationUI.cpp"
+Param="FILE#1 = * Shared/Assets/Headless/applicationui.cpp -> src/ApplicationUI.cpp"
 Param="FILE#1 = Shared/Assets/Headless/applicationui.hpp -> src/ApplicationUI.hpp"
 Param="FILE#1 = Shared/Assets/Headless/main.qml -> assets/main.qml"
 
@@ -24,5 +24,5 @@ Param="FILE#2 = ! Shared/Translations/makefile-cascades -> translations/makefile
 Param="FILE#2 = ! Shared/Translations/qmake-default.pro -> translations/$ProjectName$.pro"
 Param="FILE#2 = Shared/precompiled-empty.h -> src/precomiled.h"
 Param="FILE#2 = Shared/Assets/Headless/main-service.cpp -> main.cpp"
-Param="FILE#2 = Shared/Assets/Headless/service.cpp -> Service.cpp"
+Param="FILE#2 = * Shared/Assets/Headless/service.cpp -> Service.cpp"
 Param="FILE#2 = Shared/Assets/Headless/service.hpp -> Service.hpp"

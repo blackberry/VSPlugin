@@ -4,5 +4,5 @@ Param="TITLE = BlackBerry Empty Native Core Application"
 Param="PROJECT = native-default.vcxproj"
 Param="FILTERS = assets;config;src"
 Param="FILE = Shared/bar-descriptor.xml"
-Param="FILE = Shared/main-empty.c -> src/main.c"
+Param="FILE = * Shared/main-empty.c -> src/main.c"
 

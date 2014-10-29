@@ -6,7 +6,7 @@ Param="FILTERS = assets;config;src"
 Param="DEPENDENCY = bps;screen;EGL;GLESv2;freetype;png;m"
 Param="DEFINE = USING_GL20"
 Param="FILE = Shared/bar-descriptor.xml"
-Param="FILE = Shared/main-opengl2.c -> src/main.c"
+Param="FILE = * Shared/main-opengl2.c -> src/main.c"
 Param="FILE = Shared/Utils/bbutil.c -> src/bbutil.c"
 Param="FILE = Shared/Utils/bbutil.h -> src/bbutil.h"
 
