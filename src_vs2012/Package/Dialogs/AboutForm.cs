@@ -57,12 +57,19 @@ namespace BlackBerry.Package.Dialogs
 
         private void linkSourceCode_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            DialogHelper.StartURL("https://github.com/blackberry/VSPlugin");
+            //DialogHelper.StartURL("https://github.com/blackberry/VSPlugin");
+            DialogHelper.StartURL("https://github.com/phofman/vs-plugin");
         }
 
         private void linkBugTracker_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            DialogHelper.StartURL("https://github.com/blackberry/VSPlugin/issues");
+            //DialogHelper.StartURL("https://github.com/blackberry/VSPlugin/issues");
+            DialogHelper.StartURL("https://github.com/phofman/vs-plugin/issues");
+        }
+
+        private void linkAuthor_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            DialogHelper.StartURL("https://twitter.com/CodeTitans");
         }
     }
 }
