@@ -288,4 +288,13 @@
   <data name="6062" xml:space="preserve">
     <value>Sheet.qml</value>
   </data>
+  <data name="6070" xml:space="preserve">
+    <value>EGL Utility</value>
+  </data>
+  <data name="6071" xml:space="preserve">
+    <value>Adds a basic code to manage EGL surface - initialize, swap buffers, render text and draw textures</value>
+  </data>
+  <data name="6072" xml:space="preserve">
+    <value>bbutil.c</value>
+  </data>
 </root>

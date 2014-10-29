@@ -23,7 +23,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-#include "bbutil.h"
+#include "$Name$.h"
 
 #ifdef USING_GL11
 #include <GLES/gl.h>
@@ -60,7 +60,8 @@ static GLint textureLoc;
 static GLint colorLoc;
 #endif
 
-struct font_t {
+struct font_t
+{
     unsigned int font_texture;
     float pt;
     float advance[128];
@@ -75,9 +76,8 @@ struct font_t {
     int initialized;
 };
 
-
-static void
-bbutil_egl_perror(const char *msg) {
+static void bbutil_egl_perror(const char *msg)
+{
     static const char *errmsg[] = {
         "function succeeded",
         "EGL is not initialized, or could not be initialized, for the specified display",
@@ -108,8 +108,7 @@ bbutil_egl_perror(const char *msg) {
 /**
  * Use the PID to set the window group id.
  */
-static const char *
-get_window_group_id()
+static const char *get_window_group_id()
 {
     static char s_window_group_id[16] = "";
 
@@ -120,8 +119,8 @@ get_window_group_id()
     return s_window_group_id;
 }
 
-int
-bbutil_init_egl(screen_context_t ctx) {
+int bbutil_init_egl(screen_context_t ctx)
+{
     int usage;
     int format = SCREEN_FORMAT_RGBX8888;
     EGLint interval = 1;
@@ -284,8 +283,8 @@ bbutil_init_egl(screen_context_t ctx) {
     return EXIT_SUCCESS;
 }
 
-void
-bbutil_terminate() {
+void bbutil_terminate()
+{
     //Typical EGL cleanup
     if (egl_disp != EGL_NO_DISPLAY) {
         eglMakeCurrent(egl_disp, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -309,8 +308,8 @@ bbutil_terminate() {
     initialized = 0;
 }
 
-void
-bbutil_swap() {
+void bbutil_swap()
+{
     int rc = eglSwapBuffers(egl_disp, egl_surf);
     if (rc != EGL_TRUE) {
         bbutil_egl_perror("eglSwapBuffers");
@@ -318,15 +317,15 @@ bbutil_swap() {
 }
 
 /* Finds the next power of 2 */
-static inline int
-nextp2(int x)
+static inline int nextp2(int x)
 {
     int val = 1;
     while(val < x) val <<= 1;
     return val;
 }
 
-font_t* bbutil_load_font(const char* path, int point_size, int dpi) {
+font_t* bbutil_load_font(const char* path, int point_size, int dpi)
+{
     FT_Library library;
     FT_Face face;
     int c;
@@ -467,7 +466,8 @@ font_t* bbutil_load_font(const char* path, int point_size, int dpi) {
     return font;
 }
 
-void bbutil_render_text(font_t* font, const char* msg, float x, float y, float r, float g, float b, float a) {
+void bbutil_render_text(font_t* font, const char* msg, float x, float y, float r, float g, float b, float a)
+{
     int i, c;
     GLfloat *vertices;
     GLfloat *texture_coords;
@@ -708,8 +708,10 @@ void bbutil_render_text(font_t* font, const char* msg, float x, float y, float r
     free(indices);
 }
 
-void bbutil_destroy_font(font_t* font) {
-    if (!font) {
+void bbutil_destroy_font(font_t* font)
+{
+    if (!font)
+    {
         return;
     }
 
@@ -718,40 +720,48 @@ void bbutil_destroy_font(font_t* font) {
     free(font);
 }
 
-void bbutil_measure_text(font_t* font, const char* msg, float* width, float* height) {
+void bbutil_measure_text(font_t* font, const char* msg, float* width, float* height)
+{
     int i, c;
 
-    if (!msg) {
+    if (!msg)
+    {
         return;
     }
 
     const int msg_len  =strlen(msg);
 
-    if (width) {
+    if (width)
+    {
         //Width of a text rectangle is a sum advances for every glyph in a string
         *width = 0.0f;
 
-        for(i = 0; i < msg_len; ++i) {
+        for(i = 0; i < msg_len; ++i)
+        {
             c = msg[i];
             *width += font->advance[c];
         }
     }
 
-    if (height) {
+    if (height)
+    {
         //Height of a text rectangle is a high of a tallest glyph in a string
         *height = 0.0f;
 
-        for(i = 0; i < msg_len; ++i) {
+        for(i = 0; i < msg_len; ++i)
+        {
             c = msg[i];
 
-            if (*height < font->height[c]) {
+            if (*height < font->height[c])
+            {
                 *height = font->height[c];
             }
         }
     }
 }
 
-int bbutil_load_texture(const char* filename, int* width, int* height, float* tex_x, float* tex_y, unsigned int *tex) {
+int bbutil_load_texture(const char* filename, int* width, int* height, float* tex_x, float* tex_y, unsigned int *tex)
+{
     int i;
     GLuint format;
     //header for testing if it is a png
@@ -923,7 +933,8 @@ int bbutil_load_texture(const char* filename, int* width, int* height, float* te
     }
 }
 
-int bbutil_calculate_dpi(screen_context_t ctx) {
+int bbutil_calculate_dpi(screen_context_t ctx)
+{
     int rc;
     int screen_phys_size[2];
 
@@ -952,7 +963,8 @@ int bbutil_calculate_dpi(screen_context_t ctx) {
     }
 }
 
-int bbutil_rotate_screen_surface(int angle) {
+int bbutil_rotate_screen_surface(int angle)
+{
     int rc, rotation, skip = 1, temp;;
     EGLint interval = 1;
     int size[2];
@@ -1037,4 +1049,3 @@ int bbutil_rotate_screen_surface(int angle) {
 
     return EXIT_SUCCESS;
 }
-

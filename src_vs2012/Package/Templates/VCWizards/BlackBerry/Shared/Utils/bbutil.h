@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-#ifndef _UTILITY_H_INCLUDED
-#define _UTILITY_H_INCLUDED
+#ifndef __$SafeNameUpper$_H__
+#define __$SafeNameUpper$_H__
 
 #include <EGL/egl.h>
 #include <screen/screen.h>
@@ -30,7 +30,7 @@ typedef struct font_t font_t;
 
 #ifdef __cplusplus
 extern "C" {
-#endif
+#endif /* __cplusplus */
 
 /**
  * Initializes EGL
@@ -127,6 +127,6 @@ int bbutil_rotate_screen_surface(int angle);
 
 #ifdef __cplusplus
 }
-#endif
+#endif /* __cplusplus */
 
-#endif
+#endif /* __$SafeNameUpper$_H__ */

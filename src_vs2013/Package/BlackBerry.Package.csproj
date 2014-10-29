@@ -802,6 +802,10 @@
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\bbutil.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\bbutil.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Resources\TemplateIcons\EmptyProj.ico" />
     <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Template.Strings.resx">
       <Link>Resources\Template.Strings.resx</Link>
