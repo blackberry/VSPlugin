@@ -30,6 +30,32 @@ namespace BlackBerry.Package.Helpers
         }
 
         /// <summary>
+        /// Updates specific project settings. It can be used to setup value only for particular platform (or 'null' to overwrite for all of them).
+        /// </summary>
+        public static void SetValue(VCProject project, string ruleName, string propertyName, string platformName, string value, string valueSeparator)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+            if (string.IsNullOrEmpty(value))
+                return;
+
+            foreach (VCConfiguration configuration in (IVCCollection) project.Configurations)
+            {
+                var rulePropertyStore = configuration.Rules.Item(ruleName) as IVCRulePropertyStorage;
+                if (rulePropertyStore != null)
+                {
+                    var currentPlatformName = ((VCPlatform) configuration.Platform).Name;
+                    if (string.IsNullOrEmpty(platformName) || string.Compare(currentPlatformName, platformName, StringComparison.OrdinalIgnoreCase) == 0)
+                    {
+                        var existingDependencies = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
+                        var dependencies = string.IsNullOrEmpty(existingDependencies) ? value : string.Concat(existingDependencies, valueSeparator, value);
+                        rulePropertyStore.SetPropertyValue(propertyName, dependencies);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Gets the evaluated value of specific Visual C++ project property.
         /// </summary>
         public static string GetValue(Project project, string rule, string propertyName)

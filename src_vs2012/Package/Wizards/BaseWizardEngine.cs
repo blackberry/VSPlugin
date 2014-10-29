@@ -17,6 +17,14 @@ namespace BlackBerry.Package.Wizards
     [ComVisible(true)]
     public abstract class BaseWizardEngine : IDTWizard
     {
+        [Flags]
+        protected enum SourceActions
+        {
+            None,
+            AddToProject,
+            Open
+        }
+
         /// <summary>
         /// Entry point of the wizard engine.
         /// </summary>
@@ -124,24 +132,38 @@ namespace BlackBerry.Package.Wizards
         ///  * &lt;source-template&gt; #&gt; &lt;new-extension&gt;
         ///  * &lt;source-template&gt; ~&gt; &lt;new-folder&gt;
         /// </summary>
-        protected static string GetSourceName(string path, out bool canAddToProject)
+        protected static string GetSourceName(string path, out SourceActions flags)
         {
             if (string.IsNullOrEmpty(path))
             {
-                canAddToProject = true;
+                flags = SourceActions.AddToProject;
                 return null;
             }
 
-            if (path[0] == '!')
+            // decipher flags that are in front of the paths:
+            flags = SourceActions.AddToProject;
+            for (int i = 0; i < path.Length; i++)
             {
-                canAddToProject = false;
-                path = path.Substring(1).TrimStart();
-            }
-            else
-            {
-                canAddToProject = true;
-            } 
+                if (path[i] == '!')
+                {
+                    flags &= ~SourceActions.AddToProject;
+                    continue;
+                }
 
+                if (path[i] == '*')
+                {
+                    flags |= SourceActions.Open;
+                    continue;
+                }
+
+                if (i > 0)
+                {
+                    path = path.Substring(i).TrimStart();
+                }
+                break;
+            }
+
+            // decipher transformation:
             var index = path.IndexOf("->", 0, StringComparison.Ordinal);
             if (index < 0)
             {
@@ -152,6 +174,7 @@ namespace BlackBerry.Package.Wizards
                 index = path.IndexOf("~>", 0, StringComparison.Ordinal);
             }
 
+            // and return the left side of the transformation request:
             return index >= 0 ? Unwrap(path.Substring(0, index).Trim()) : Unwrap(path);
         }
 

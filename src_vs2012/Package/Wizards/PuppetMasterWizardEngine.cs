@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Wizards;
 using BlackBerry.Package.ViewModels;
 using EnvDTE;
@@ -89,10 +90,10 @@ namespace BlackBerry.Package.Wizards
                         // file:
                         if (IsMatchingKey(subItem.Key, fileParamName))
                         {
-                            bool ignore;
-                            var itemName = Path.Combine(projectRoot, Path.GetFileName(GetSourceName(subItem.Value, out ignore)));
+                            SourceActions reserved;
+                            var itemName = Path.Combine(projectRoot, Path.GetFileName(GetSourceName(subItem.Value, out reserved)));
                             var itemTokenProcessor = CreateTokenProcessor(project.Name, projectRoot, GetDestinationName(itemName, subItem.Value, tokenProcessor), masterProjectName);
-                            AddFile(project, itemName, subItem.Value, itemTokenProcessor);
+                            AddFile(dte, project, itemName, subItem.Value, itemTokenProcessor, false);
                         }
 
                         // filters:
@@ -111,7 +112,7 @@ namespace BlackBerry.Package.Wizards
                             var vcProject = project.Object as VCProject;
                             if (vcProject != null)
                             {
-                                UpdateProjectProperty(subItem.Value, GetTag(projectNumber, PlatformSeparator), vcProject, "Link", "AdditionalDependencies", ";");
+                                ProjectHelper.SetValue(vcProject, "Link", "AdditionalDependencies", GetTag(projectNumber, PlatformSeparator), subItem.Value, ";");
                             }
                         }
 
@@ -122,7 +123,7 @@ namespace BlackBerry.Package.Wizards
                             if (vcProject != null)
                             {
                                 // HINT: you can specify per-platform settings using '@':
-                                UpdateProjectProperty(subItem.Value, GetTag(projectNumber, PlatformSeparator), vcProject, "CL", "PreprocessorDefinitions", ";");
+                                ProjectHelper.SetValue(vcProject, "CL", "PreprocessorDefinitions", GetTag(projectNumber, PlatformSeparator), subItem.Value, ";");
                             }
                         }
                     }
@@ -146,7 +147,7 @@ namespace BlackBerry.Package.Wizards
         private static string CreateProject(NewProjectParams context, string projectTemplateName, string masterProjectName, bool singleProject)
         {
             // calculate default location, where the project should be written:
-            bool reserved;
+            SourceActions reserved;
             var templatePath = Path.Combine(WizardDataFolder, GetSourceName(projectTemplateName, out reserved));
             var projectRoot = context.IsExclusive || !singleProject ? context.LocalDirectory : Path.Combine(context.LocalDirectory, context.ProjectName);
             var destinationPath = Path.Combine(projectRoot, context.ProjectName + Path.GetExtension(templatePath));
@@ -160,32 +161,6 @@ namespace BlackBerry.Package.Wizards
             tokenProcessor.UntokenFile(templatePath, destinationPath);
 
             return destinationPath;
-        }
-
-        /// <summary>
-        /// Updates specific project settings. It can be used to setup value only for particular platform (or 'null' to overwrite for all of them).
-        /// </summary>
-        private void UpdateProjectProperty(string value, string platformName, VCProject vcProject, string ruleName, string propertyName, string valueSeparator)
-        {
-            if (string.IsNullOrEmpty(value))
-                return;
-            if (vcProject == null)
-                return;
-
-            foreach (VCConfiguration configuration in (IVCCollection) vcProject.Configurations)
-            {
-                var rulePropertyStore = configuration.Rules.Item(ruleName) as IVCRulePropertyStorage;
-                if (rulePropertyStore != null)
-                {
-                    var currentPlatformName = ((VCPlatform)configuration.Platform).Name;
-                    if (string.IsNullOrEmpty(platformName) || string.Compare(currentPlatformName, platformName, StringComparison.OrdinalIgnoreCase) == 0)
-                    {
-                        var existingDependencies = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
-                        var dependencies = string.IsNullOrEmpty(existingDependencies) ? value : string.Concat(existingDependencies, valueSeparator, value);
-                        rulePropertyStore.SetPropertyValue(propertyName, dependencies);
-                    }
-                }
-            }
         }
 
         private static void CreateFilters(string filtersDefinition, VCProject vcProject)
@@ -284,7 +259,7 @@ namespace BlackBerry.Package.Wizards
             {
                 if (string.Compare(data.Key, "file", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    AddFile(project, context.ItemName, data.Value, tokenProcessor);
+                    AddFile(dte, project, context.ItemName, data.Value, tokenProcessor, true);
                 }
             }
 
@@ -294,8 +269,10 @@ namespace BlackBerry.Package.Wizards
         /// <summary>
         /// Processes item and adds it to the project.
         /// </summary>
-        private void AddFile(Project project, string itemName, string templateDefinition, TokenProcessor tokenProcessor)
+        private void AddFile(DTE2 dte, Project project, string itemName, string templateDefinition, TokenProcessor tokenProcessor, bool forceOpen)
         {
+            if (dte == null)
+                throw new ArgumentNullException("dte");
             if (project == null)
                 throw new ArgumentNullException("project");
             if (string.IsNullOrEmpty(itemName))
@@ -303,15 +280,15 @@ namespace BlackBerry.Package.Wizards
             if (string.IsNullOrEmpty(templateDefinition))
                 throw new ArgumentNullException("templateDefinition");
 
-            bool canAddToProject;
-            var templatePath = Path.Combine(WizardDataFolder, GetSourceName(templateDefinition, out canAddToProject));
+            SourceActions flags;
+            var templatePath = Path.Combine(WizardDataFolder, GetSourceName(templateDefinition, out flags));
             var destinationPath = GetDestinationName(itemName, templateDefinition, tokenProcessor);
 
             // update tokens withing the file and copy to destination:
             tokenProcessor.UntokenFile(templatePath, destinationPath);
 
             // then add that file to the project items:
-            if (canAddToProject)
+            if ((flags & SourceActions.AddToProject) == SourceActions.AddToProject)
             {
                 project.ProjectItems.AddFromFile(destinationPath);
                 TraceLog.WriteLine("Added file: \"{0}\"", destinationPath);
@@ -319,6 +296,12 @@ namespace BlackBerry.Package.Wizards
             else
             {
                 TraceLog.WriteLine("Generated file: \"{0}\", but omitted adding to project", destinationPath);
+            }
+
+            // should it be opened?
+            if ((forceOpen || (flags & SourceActions.Open) == SourceActions.Open) && File.Exists(destinationPath))
+            {
+                dte.ItemOperations.OpenFile(destinationPath, Constants.vsViewKindTextView);
             }
         }
 
