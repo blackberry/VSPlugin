@@ -16,7 +16,7 @@ CardUI::CardUI(bb::system::InvokeManager* invokeManager)
     QmlDocument *qml = QmlDocument::create("asset:///card.qml").parent(this);
 
     // Make C++ UI part available to the qml.
-    qml->setContextProperty("ApplicationUI", this);
+    qml->setContextProperty("card", this);
 
     // Create root object for the UI
     AbstractPane *root = qml->createRootObject<AbstractPane>();

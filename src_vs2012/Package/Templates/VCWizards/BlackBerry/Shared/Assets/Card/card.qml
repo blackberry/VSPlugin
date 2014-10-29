@@ -22,6 +22,6 @@ NavigationPane {
     }
 
     onCreationCompleted: {
-        ApplicationUI.memoChanged.connect(setMemo);
+        card.memoChanged.connect(setMemo);
     }
 }

@@ -14,7 +14,7 @@ Page {
         Button {
             text: "Send & reveal card"
             onClicked: {
-                ApplicationUI.invokeCard(tf.text);
+                app.invokeCard(tf.text);
             }
         }
     }

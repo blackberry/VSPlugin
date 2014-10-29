@@ -23,7 +23,7 @@ ApplicationUI::ApplicationUI(InvokeManager *invokeManager)
     // to ensure the document gets destroyed properly at shut down.
     QmlDocument *qml = QmlDocument::create("asset:///main.qml").parent(this);
     // Make app UI available to the qml.
-    qml->setContextProperty("ApplicationUI", this);
+    qml->setContextProperty("app", this);
 
     // Create root object for the UI
     AbstractPane *root = qml->createRootObject<AbstractPane>();
