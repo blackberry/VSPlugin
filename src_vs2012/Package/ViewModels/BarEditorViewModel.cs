@@ -16,7 +16,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Model;
@@ -864,7 +863,7 @@ namespace BlackBerry.Package.ViewModels
         /// <summary>
         /// Read the author information from the debug token and update the appropriate boxes.
         /// </summary>
-        public void SetAuthorInfoFrom(string debugTokenFileName, IEventDispatcher dispatcher,  EventHandler failHandler)
+        public void SetAuthorInfoFrom(string debugTokenFileName, IEventDispatcher dispatcher, EventHandler failHandler)
         {
             if (string.IsNullOrEmpty(debugTokenFileName))
                 throw new ArgumentNullException("debugTokenFileName");
@@ -894,8 +893,8 @@ namespace BlackBerry.Package.ViewModels
 
             if (e.IsSuccessfull && debugToken != null)
             {
+                Author = debugToken.AuthorName;
                 AuthorID = debugToken.AuthorID;
-                Author = debugToken.Author;
             }
             else
             {

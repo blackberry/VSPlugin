@@ -42,7 +42,7 @@ namespace BlackBerry.NativeCore.Model
             private set;
         }
 
-        public string Author
+        public string AuthorName
         {
             get;
             private set;
@@ -124,7 +124,7 @@ namespace BlackBerry.NativeCore.Model
             if (!mostImportantOnly)
             {
                 result.Append("Name: ").Append(Name).Append(" (").Append(ID).AppendLine(")");
-                result.Append("Author: ").AppendLine(Author);
+                result.Append("Author: ").AppendLine(AuthorName);
             }
 
             // print dates:
@@ -154,7 +154,7 @@ namespace BlackBerry.NativeCore.Model
 
             if (mostImportantOnly)
             {
-                result.Append("Author: ").AppendLine(Author);
+                result.Append("Author: ").AppendLine(AuthorName);
                 result.Append("Author ID: ").AppendLine(AuthorID);
 
                 result.AppendLine();
@@ -187,9 +187,9 @@ namespace BlackBerry.NativeCore.Model
         {
             var result = new StringBuilder();
 
-            if (!string.IsNullOrEmpty(Author))
+            if (!string.IsNullOrEmpty(AuthorName))
             {
-                result.Append(Author);
+                result.Append(AuthorName);
             }
             else
             {
@@ -251,7 +251,7 @@ namespace BlackBerry.NativeCore.Model
                             result.VersionID = value;
                             break;
                         case "package-author":
-                            result.Author = value;
+                            result.AuthorName = value;
                             break;
                         case "package-author-id":
                             result.AuthorID = value;
@@ -275,7 +275,7 @@ namespace BlackBerry.NativeCore.Model
                 }
             }
 
-            return !isDebugToken || string.IsNullOrEmpty(result.ID) || string.IsNullOrEmpty(result.Author) ? null : result;
+            return !isDebugToken || string.IsNullOrEmpty(result.ID) || string.IsNullOrEmpty(result.AuthorName) ? null : result;
         }
 
         private static string[] ParseSystemActions(string text)

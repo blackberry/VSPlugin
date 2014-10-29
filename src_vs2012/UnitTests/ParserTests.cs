@@ -31,7 +31,7 @@ Debug-Token-Device-Id: 1311521222,1311052217,1354621311,128366899
 
             var tokenData = DebugTokenInfo.Parse(text);
             Assert.IsNotNull(tokenData);
-            Assert.AreEqual("XyXyXyXyXy", tokenData.Author);
+            Assert.AreEqual("XyXyXyXyXy", tokenData.AuthorName);
             Assert.AreEqual("123XyXyQwhm4KpkL-Dy2241SOUw", tokenData.ID);
             Assert.AreEqual(new DateTime(2013, 01, 17, 1, 47, 50, DateTimeKind.Utc), tokenData.IssueDate);
             Assert.AreEqual(new DateTime(2013, 02, 16, 1, 47, 50, DateTimeKind.Utc), tokenData.ExpiryDate);
