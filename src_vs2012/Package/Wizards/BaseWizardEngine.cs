@@ -124,7 +124,7 @@ namespace BlackBerry.Package.Wizards
         ///  * &lt;source-template&gt; #&gt; &lt;new-extension&gt;
         ///  * &lt;source-template&gt; ~&gt; &lt;new-folder&gt;
         /// </summary>
-        protected string GetSourceName(string path, out bool canAddToProject)
+        protected static string GetSourceName(string path, out bool canAddToProject)
         {
             if (string.IsNullOrEmpty(path))
             {
@@ -182,7 +182,7 @@ namespace BlackBerry.Package.Wizards
         /// <summary>
         /// Gets the 'destination' part of the item specified path and applies the transformation.
         /// </summary>
-        protected string GetDestinationName(string itemName, string path, TokenProcessor tokenProcessor)
+        protected static string GetDestinationName(string itemName, string path, TokenProcessor tokenProcessor)
         {
             if (string.IsNullOrEmpty(itemName))
                 throw new ArgumentNullException("itemName");

@@ -21,6 +21,9 @@ namespace BlackBerry.Package.Wizards
     [ProgId("BlackBerry.PuppetMasterWizardEngine")]
     public sealed class PuppetMasterWizardEngine : BaseWizardEngine
     {
+        private const char ProjectNumberSeparator = '#';
+        private const char PlatformSeparator = '@';
+
         private static string _wizardDataFolder;
 
         /// <summary>
@@ -45,22 +48,28 @@ namespace BlackBerry.Package.Wizards
         /// </summary>
         internal override wizardResult ExecuteNewProject(DTE2 dte, IntPtr owner, NewProjectParams context, KeyValuePair<string, string>[] customParams)
         {
+            int count = GetProjectsCount(customParams);
+            string masterProjectName = null;
+
             foreach (var data in customParams)
             {
-                if (data.Key != null && 
-                    (string.Compare(data.Key, "project", StringComparison.OrdinalIgnoreCase) == 0 || data.Key.StartsWith("project#", StringComparison.OrdinalIgnoreCase)))
+                if (IsMatchingProjectKey(data.Key))
                 {
                     // add the project itself:
-                    var templatePath = Path.Combine(WizardDataFolder, data.Value);
-                    var projectRoot = context.IsExclusive ? context.LocalDirectory : Path.Combine(context.LocalDirectory, context.ProjectName);
-                    var destinationPath = Path.Combine(projectRoot, context.ProjectName + Path.GetExtension(data.Value));
-
-                    var tokenProcessor = CreateTokenProcessor(context.ProjectName, context.LocalDirectory, destinationPath);
-                    tokenProcessor.UntokenFile(templatePath, destinationPath);
+                    var destinationPath = CreateProject(context, data.Value, masterProjectName ?? context.ProjectName, count == 1);
                     var project = dte.Solution.AddFromFile(destinationPath);
 
+                    // PH: HINT: remember the name of the 'first' project and assume it later, that this is what the developer input in VisualStudio as project name;
+                    // as it could overwrite that value by renaming rules of the template:
+                    if (string.IsNullOrEmpty(masterProjectName))
+                    {
+                        masterProjectName = project.Name;
+                    }
+
                     // get project identifier, in case the template wants to add more than one:
-                    var projectNumber = GetProjectNumber(data.Key);
+                    var projectRoot = Path.GetDirectoryName(project.FullName);
+                    var tokenProcessor = CreateTokenProcessor(project.Name, projectRoot, destinationPath, masterProjectName);
+                    var projectNumber = GetTag(data.Key, ProjectNumberSeparator);
                     var filtersParamName = "filters";
                     var fileParamName = "file";
                     var dependencyParamName = "dependency";
@@ -68,26 +77,26 @@ namespace BlackBerry.Package.Wizards
 
                     if (!string.IsNullOrEmpty(projectNumber))
                     {
-                        filtersParamName = string.Concat(filtersParamName, "#", projectNumber);
-                        fileParamName = string.Concat(fileParamName, "#", projectNumber);
-                        dependencyParamName = string.Concat(dependencyParamName, "#", projectNumber);
-                        defineParamName = string.Concat(defineParamName, "#", projectNumber);
+                        filtersParamName = string.Concat(filtersParamName, ProjectNumberSeparator, projectNumber);
+                        fileParamName = string.Concat(fileParamName, ProjectNumberSeparator, projectNumber);
+                        dependencyParamName = string.Concat(dependencyParamName, ProjectNumberSeparator, projectNumber);
+                        defineParamName = string.Concat(defineParamName, ProjectNumberSeparator, projectNumber);
                     }
 
                     // add project items:
                     foreach (var subItem in customParams)
                     {
                         // file:
-                        if (string.Compare(subItem.Key, fileParamName, StringComparison.OrdinalIgnoreCase) == 0)
+                        if (IsMatchingKey(subItem.Key, fileParamName))
                         {
                             bool ignore;
                             var itemName = Path.Combine(projectRoot, Path.GetFileName(GetSourceName(subItem.Value, out ignore)));
-                            var itemTokenProcessor = CreateTokenProcessor(context.ProjectName, projectRoot, GetDestinationName(itemName, subItem.Value, tokenProcessor));
+                            var itemTokenProcessor = CreateTokenProcessor(project.Name, projectRoot, GetDestinationName(itemName, subItem.Value, tokenProcessor), masterProjectName);
                             AddFile(project, itemName, subItem.Value, itemTokenProcessor);
                         }
 
                         // filters:
-                        if (string.Compare(subItem.Key, filtersParamName, StringComparison.OrdinalIgnoreCase) == 0)
+                        if (IsMatchingKey(subItem.Key, filtersParamName))
                         {
                             var vcProject = project.Object as VCProject;
                             if (vcProject != null)
@@ -97,22 +106,23 @@ namespace BlackBerry.Package.Wizards
                         }
 
                         // library references:
-                        if (string.Compare(subItem.Key, dependencyParamName, StringComparison.OrdinalIgnoreCase) == 0)
+                        if (IsMatchingKey(subItem.Key, dependencyParamName))
                         {
                             var vcProject = project.Object as VCProject;
                             if (vcProject != null)
                             {
-                                UpdateProjectProperty(subItem.Value, null, vcProject, "Link", "AdditionalDependencies", ";");
+                                UpdateProjectProperty(subItem.Value, GetTag(projectNumber, PlatformSeparator), vcProject, "Link", "AdditionalDependencies", ";");
                             }
                         }
 
                         // defines:
-                        if (string.Compare(subItem.Key, defineParamName, StringComparison.OrdinalIgnoreCase) == 0)
+                        if (IsMatchingKey(subItem.Key, defineParamName))
                         {
                             var vcProject = project.Object as VCProject;
                             if (vcProject != null)
                             {
-                                UpdateProjectProperty(subItem.Value, null, vcProject, "CL", "PreprocessorDefinitions", ";");
+                                // HINT: you can specify per-platform settings using '@':
+                                UpdateProjectProperty(subItem.Value, GetTag(projectNumber, PlatformSeparator), vcProject, "CL", "PreprocessorDefinitions", ";");
                             }
                         }
                     }
@@ -129,6 +139,32 @@ namespace BlackBerry.Package.Wizards
             return wizardResult.wizardResultSuccess;
         }
 
+        /// <summary>
+        /// Creates new project based on a given template.
+        /// It also allows changing the project name on the fly using the same rules as for items transformations.
+        /// </summary>
+        private static string CreateProject(NewProjectParams context, string projectTemplateName, string masterProjectName, bool singleProject)
+        {
+            // calculate default location, where the project should be written:
+            bool reserved;
+            var templatePath = Path.Combine(WizardDataFolder, GetSourceName(projectTemplateName, out reserved));
+            var projectRoot = context.IsExclusive || !singleProject ? context.LocalDirectory : Path.Combine(context.LocalDirectory, context.ProjectName);
+            var destinationPath = Path.Combine(projectRoot, context.ProjectName + Path.GetExtension(templatePath));
+
+            // apply the name change transformations as for ordinary files to the project:
+            destinationPath = GetDestinationName(destinationPath, projectTemplateName,
+                CreateTokenProcessor(context.ProjectName, Path.GetDirectoryName(destinationPath), destinationPath, masterProjectName));
+
+            // process the tokens from the template file and generate project file:
+            var tokenProcessor = CreateTokenProcessor(context.ProjectName, context.LocalDirectory, destinationPath, masterProjectName);
+            tokenProcessor.UntokenFile(templatePath, destinationPath);
+
+            return destinationPath;
+        }
+
+        /// <summary>
+        /// Updates specific project settings. It can be used to setup value only for particular platform (or 'null' to overwrite for all of them).
+        /// </summary>
         private void UpdateProjectProperty(string value, string platformName, VCProject vcProject, string ruleName, string propertyName, string valueSeparator)
         {
             if (string.IsNullOrEmpty(value))
@@ -191,13 +227,49 @@ namespace BlackBerry.Package.Wizards
             }
         }
 
-        private string GetProjectNumber(string name)
+        private static string GetTag(string name, char separator)
         {
             if (string.IsNullOrEmpty(name))
                 return null;
 
-            var index = name.IndexOf('#');
+            var index = name.IndexOf(separator);
             return index < 0 ? null : name.Substring(index + 1).Trim();
+        }
+
+        private static int GetProjectsCount(IEnumerable<KeyValuePair<string, string>> customParams)
+        {
+            int count = 0;
+
+            if (customParams != null)
+            {
+                foreach (var item in customParams)
+                {
+                    if (IsMatchingProjectKey(item.Key))
+                    {
+                        count++;
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        private static bool IsMatchingKey(string key, string patternDefinition)
+        {
+            if (string.Compare(key, patternDefinition, StringComparison.OrdinalIgnoreCase) == 0)
+                return true;
+
+            if (key != null && key.StartsWith(patternDefinition, StringComparison.OrdinalIgnoreCase)
+                && key.Length > patternDefinition.Length && key[patternDefinition.Length] == PlatformSeparator)
+                return true;
+
+            return false;
+        }
+
+        private static bool IsMatchingProjectKey(string key)
+        {
+            return key != null &&
+                   (string.Compare(key, "project", StringComparison.OrdinalIgnoreCase) == 0 || (key.StartsWith("project", StringComparison.OrdinalIgnoreCase) && key.Length > 7 && key[7] == ProjectNumberSeparator));
         }
 
         /// <summary>
@@ -206,7 +278,7 @@ namespace BlackBerry.Package.Wizards
         internal override wizardResult ExecuteNewProjectItem(DTE2 dte, IntPtr owner, NewProjectItemParams context, KeyValuePair<string, string>[] customParams)
         {
             var project = context.ProjectItems.ContainingProject;
-            var tokenProcessor = CreateTokenProcessor(context.ProjectName, context.LocalDirectory, context.ItemName);
+            var tokenProcessor = CreateTokenProcessor(context.ProjectName, context.LocalDirectory, context.ItemName, context.ProjectName);
 
             foreach (var data in customParams)
             {
@@ -253,7 +325,7 @@ namespace BlackBerry.Package.Wizards
         /// <summary>
         /// Creates token processor to update dynamically token markers within the template file.
         /// </summary>
-        public static TokenProcessor CreateTokenProcessor(string projectName, string projectRoot, string destinationName)
+        public static TokenProcessor CreateTokenProcessor(string projectName, string projectRoot, string destinationName, string masterProjectName)
         {
             if (string.IsNullOrEmpty(projectName))
                 throw new ArgumentNullException("projectName");
@@ -278,6 +350,11 @@ namespace BlackBerry.Package.Wizards
             tokenProcessor.AddReplace("$ProjectName$", projectName);
             tokenProcessor.AddReplace("$projectroot$", projectRoot);
             tokenProcessor.AddReplace("$ProjectRoot$", projectRoot);
+            if (!string.IsNullOrEmpty(masterProjectName))
+            {
+                tokenProcessor.AddReplace("$masterprojectname$", masterProjectName);
+                tokenProcessor.AddReplace("$MasterProjectName$", masterProjectName);
+            }
             tokenProcessor.AddReplace("$filename$", name);
             tokenProcessor.AddReplace("$FileName$", name);
             tokenProcessor.AddReplace("$name$", name);

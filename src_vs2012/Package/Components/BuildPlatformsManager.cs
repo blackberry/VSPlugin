@@ -302,7 +302,7 @@ namespace BlackBerry.Package.Components
                 string templatePath = Path.Combine(PuppetMasterWizardEngine.WizardDataFolder, BarDescriptorTemplate);
                 string destination = string.IsNullOrEmpty(projectFolder) ? BarDescriptorFileName : Path.Combine(projectFolder, BarDescriptorFileName);
 
-                var tokenProcessor = PuppetMasterWizardEngine.CreateTokenProcessor(project.Name, projectFolder, destination);
+                var tokenProcessor = PuppetMasterWizardEngine.CreateTokenProcessor(project.Name, projectFolder, destination, null);
                 tokenProcessor.UntokenFile(templatePath, destination);
                 project.ProjectItems.AddFromFile(destination);
             }
