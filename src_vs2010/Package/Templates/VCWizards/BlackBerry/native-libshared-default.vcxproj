@@ -34,6 +34,12 @@
   </ImportGroup>
 
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|BlackBerry'">
+    <OutDir>$(TargetCPU)-$(Configuration)\</OutDir>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|BlackBerry'">
+    <OutDir>$(TargetCPU)-$(Configuration)\</OutDir>
+  </PropertyGroup>
   <PropertyGroup />
 
   <ItemDefinitionGroup></ItemDefinitionGroup>
