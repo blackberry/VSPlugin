@@ -108,12 +108,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
 
     <Message Text="Optimized deploy is disabled, performing full deployment" Condition="$(BuildBar_OptimizedDeploy) == 'false'" Importance="high" />
 
-    <BBNativePackager  Condition="'$(RunBuildBar)' == 'true' and ('$(CompileRan)' == 'true' or '$(IsAppInstalled)' == 'true')"
+    <BBNativePackager Condition="'$(RunBuildBar)' == 'true' and ('$(CompileRan)' == 'true' or '$(IsAppInstalled)' == 'true')"
         Sources                        ="@(BuildBar)"
         Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        ="$(ProjectName)"
+        AppType                        ="$(ConfigurationAppType)"
+        MakefileTargetName             ="$(MakefileTargetName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device                         ="$(TargetDeviceIP)"
@@ -251,7 +253,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
-        AppName                        = "$(ProjectName)"
+        AppName                        ="$(ProjectName)"
+        AppType                        ="$(ConfigurationAppType)"
+        MakefileTargetName             ="$(MakefileTargetName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device                         ="$(TargetDeviceIP)"
@@ -368,12 +372,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Delete Files="localManifest.mf;targetManifest.mf;targetFileMap.txt;installedApps.txt" />
 
     <!-- App Descriptor changed, so re-package and perform full deploy. -->  
-    <BBNativePackager  Condition="$(AppDescriptorChanged)"
+    <BBNativePackager Condition="$(AppDescriptorChanged)"
         Sources                        ="@(BuildBar)"
         Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        ="$(ProjectName)"
+        AppType                        ="$(ConfigurationAppType)"
+        MakefileTargetName             ="$(MakefileTargetName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device                         ="$(TargetDeviceIP)"

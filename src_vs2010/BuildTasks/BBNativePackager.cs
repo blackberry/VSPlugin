@@ -40,6 +40,7 @@ namespace BlackBerry.BuildTasks
         private const string BUILD_ID = "BuildId";
         private const string BUILD_ID_FILE = "BuildIdFile";
         private const string DEV_MODE = "DevMode";
+        private const string CONFIGURATION = "Configuration";
         private const string PACKAGE_MANIFEST_ONLY = "PackageManifestOnly";
         private const string DEBUG_TOKEN = "DebugToken";
         private const string SOURCES = "Sources";
@@ -60,6 +61,7 @@ namespace BlackBerry.BuildTasks
             _switchOrderList.Add(BUILD_ID);
             _switchOrderList.Add(BUILD_ID_FILE);
             _switchOrderList.Add(DEV_MODE);
+            _switchOrderList.Add(CONFIGURATION);
             _switchOrderList.Add(GET_TARGET_FILE_MAP);
             _switchOrderList.Add(PACKAGE_MANIFEST_ONLY);
             _switchOrderList.Add(OUTPUT_FILE);
@@ -121,17 +123,42 @@ namespace BlackBerry.BuildTasks
         /// <param name="clb">Command Line Builder object</param>
         private void AppendResources(CommandLineBuilder clb)
         {
-            ITaskItem[] sources = GetAssetsFile();
-            foreach (ITaskItem item in sources)
+            // is it a regular application?
+            if (string.Compare(AppType, "Regular", StringComparison.OrdinalIgnoreCase) == 0 || string.IsNullOrEmpty(MakefileTargetName))
             {
-                string target = item.GetMetadata("target");
-                if (item.ItemSpec == target)
-                    clb.AppendFileNameIfNotNull(item);
-                else
+                ITaskItem[] sources = GetAssetsFile();
+                foreach (ITaskItem item in sources)
                 {
-                    clb.AppendSwitchIfNotNull("-e ", item);
-                    clb.AppendFileNameIfNotNull(target);
+                    string target = item.GetMetadata("target");
+                    if (item.ItemSpec == target)
+                        clb.AppendFileNameIfNotNull(item);
+                    else
+                    {
+                        clb.AppendSwitchIfNotNull("-e ", item);
+                        clb.AppendFileNameIfNotNull(target);
+                    }
                 }
+            }
+            else
+            {
+                // or Cascades application, where we can use directly the configuration with specified name from bar-descriptor file?
+                clb.AppendTextUnquoted("-configuration \"" + MakefileTargetName + "\"");
+
+                /*
+                ActiveToolSwitches.Remove(CONFIGURATION);
+
+                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.String)
+                {
+                    DisplayName = "Configuration Name",
+                    Description = "Name of the configuration from bar-descriptor.xml to use during BAR build",
+                    ArgumentRelationList = new ArrayList(),
+                    SwitchValue = "-configuration ",
+                    Name = CONFIGURATION,
+                    Value = MakefileTargetName
+                };
+                ActiveToolSwitches.Add(CONFIGURATION, switch2);
+                AddActiveSwitchToolValue(switch2);
+                 */
             }
         }
 
@@ -153,44 +180,16 @@ namespace BlackBerry.BuildTasks
             // don't have anything to do with the configuration name.  I've based the config names on the platform
             // + configuration combination, not the output directory.
             qnxConfiguration[] configs = _descriptor.configurations;
+            var expectedConfigName = string.Concat(Platform, "-", Configuration);
+
             foreach (var config in configs)
             {
-                if (Configuration == "Debug" && Platform == "Device" && config.name == "Device-Debug")
+                if (config.name == expectedConfigName)
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Release" && Platform == "Device" && config.name == "Device-Release")
-                {
-                    configAssets = config.asset;
-                    break;
-                }
-                if (Configuration == "Profile" && Platform == "Device" && config.name == "Device-Profile")
-                {
-                    configAssets = config.asset;
-                    break;
-                }
-                if (Configuration == "Coverage" && Platform == "Device" && config.name == "Device-Coverage")
-                {
-                    configAssets = config.asset;
-                    break;
-                }
-                if (Configuration == "Debug" && Platform == "Simulator" && (config.name == "Simulator" || config.name == "Simulator-Debug"))
-                {
-                    configAssets = config.asset;
-                    break;
-                }
-                if (Configuration == "Profile" && Platform == "Simulator" && config.name == "Simulator-Profile")
-                {
-                    configAssets = config.asset;
-                    break;
-                }
-                if (Configuration == "Coverage" && Platform == "Simulator" && config.name == "Simulator-Coverage")
-                {
-                    configAssets = config.asset;
-                    break;
-                }
-                if (Configuration == "Release" && Platform == "Simulator" && config.name == "Simulator-Release")
+                if (expectedConfigName == "Simulator-Debug" && (config.name == "Simulator" || config.name == expectedConfigName))
                 {
                     configAssets = config.asset;
                     break;
@@ -733,6 +732,25 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         [Required]
         public string Platform
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or sets the type of application, which is currently built.
+        /// </summary>
+        [Required]
+        public string AppType
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Gets or set the name of makefile's target issuing the build.
+        /// </summary>
+        public string MakefileTargetName
         {
             get;
             set;

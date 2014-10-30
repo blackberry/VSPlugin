@@ -43,21 +43,18 @@
 
   <!--  The category where the application appears. Either core.games or core.media. -->
   <category>core.games</category>
-  <configuration id="com.qnx.qcc.configuration.exe.debug.536891653" name="Device-Debug">
+  <configuration name="Device-Debug">
     <platformArchitecture>armle-v7</platformArchitecture>
     <asset entryPointId="$ProjectName$" path="arm/o.le-v7-g/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
-  <configuration id="com.qnx.qcc.configuration.exe.release.1323337687" name="Device-Release">
+  <configuration name="Device-Release">
     <platformArchitecture>armle-v7</platformArchitecture>
-    <asset entryPointId="$ProjectName$" path="arm/o.le-v7/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
+    <entryPointType>Qnx/Cascades</entryPointType>
+    <asset entryPointId="$ProjectName$" path="arm/o.le-v7/$ProjectName$.so" entry="true" type="Qnx/Cascades">$ProjectName$.so</asset>
   </configuration>
-  <configuration id="com.qnx.qcc.configuration.exe.debug.1533993701" name="Simulator-Debug">
+  <configuration name="Simulator-Debug">
     <platformArchitecture>x86</platformArchitecture>
     <asset entryPointId="$ProjectName$" path="x86/o-g/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
-  </configuration>
-  <configuration id="com.qnx.qcc.configuration.exe.release.1324337687" name="Simulator-Release">
-    <platformArchitecture>armle-v7</platformArchitecture>
-    <asset entryPointId="$ProjectName$" path="x86/o/$ProjectName$" entry="true" type="Qnx/Elf">$ProjectName$</asset>
   </configuration>
 
   <entryPoint id="$ProjectName$">
