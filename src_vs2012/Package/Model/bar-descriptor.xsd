@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!-- xsd.exe /n:BlackBerry.BarDescriptor.Model /c /edb /language:CS bar-descriptor.xsd -->
+<xs:schema id="BarDescriptor" targetNamespace="http://www.qnx.com/schemas/application/1.0" xmlns:mstns="http://www.qnx.com/schemas/application/1.0"
+           xmlns="http://www.qnx.com/schemas/application/1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" attributeFormDefault="qualified" elementFormDefault="qualified">
+  <xs:complexType name="LocalizedStringType" mixed="true">
+    <xs:sequence>
+      <xs:element name="text" type="xs:string" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="WindowType">
+    <xs:sequence>
+      <xs:element name="aspectRatio" type="xs:string" minOccurs="0" />
+      <xs:element name="autoOrients" type="xs:string" minOccurs="0" />
+      <xs:element name="systemChrome" type="xs:string" minOccurs="0" />
+      <xs:element name="transparent" type="xs:string" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="AssetType" mixed="true">
+    <xs:sequence>
+      <xs:element name="include" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:simpleContent>
+            <xs:extension base="xs:string">
+              <xs:attribute name="name" type="xs:string" />
+            </xs:extension>
+          </xs:simpleContent>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="public" form="unqualified" type="xs:string" use="optional" msdata:ColumnName="publicAsset" />
+    <xs:attribute name="path" form="unqualified" type="xs:string" use="required" />
+    <xs:attribute name="entry" form="unqualified" type="xs:string" use="optional" />
+    <xs:attribute name="type" form="unqualified" type="xs:string" use="optional" />
+    <xs:attribute name="entryPointId" form="unqualified" type="xs:string" use="optional" />
+    <xs:attribute name="dest" form="unqualified" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="ConfigurationType">
+    <xs:sequence minOccurs="1" maxOccurs="unbounded">
+      <xs:element name="platformArchitecture" type="xs:string" minOccurs="0" msdata:Ordinal="0" />
+      <xs:element name="entryPointType" type="xs:string" minOccurs="0" maxOccurs="1" />
+      <xs:element name="asset" type="AssetType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="id" form="unqualified" type="xs:string" use="optional" />
+    <xs:attribute name="name" form="unqualified" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="ImageType">
+    <xs:sequence minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="image" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="PermissionType">
+    <xs:simpleContent>
+      <xs:extension base="xs:string">
+        <xs:attribute name="system" form="unqualified" type="xs:string" use="optional" />
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
+  <xs:complexType name="EnvironmentVarType">
+    <xs:attribute name="var" form="unqualified" type="xs:string" />
+    <xs:attribute name="value" form="unqualified" type="xs:string" />
+  </xs:complexType>
+  <xs:complexType name="EntryPointType">
+    <xs:sequence>
+      <xs:element name="name" type="xs:string" minOccurs="0" />
+      <xs:element name="entryPointType" type="xs:string" minOccurs="0" />
+      <xs:element name="permission" type="PermissionType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="id" form="unqualified" type="xs:string" use="optional" />
+  </xs:complexType>
+  <xs:complexType name="InvokeTargetFilterType">
+    <xs:sequence>
+      <xs:element name="action" type="xs:string" minOccurs="0" />
+      <xs:element name="mime-type" type="xs:string" minOccurs="0" />
+      <xs:element name="property" type="EnvironmentVarType" minOccurs="0" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="InvokeTargetType">
+    <xs:sequence>
+      <xs:element name="invoke-target-type" type="xs:string" minOccurs="1" />
+      <xs:element name="invoke-target-name" type="xs:string" minOccurs="1" />
+      <xs:element name="entry-point-id" type="xs:string" minOccurs="1" />
+      <xs:element name="icon" type="ImageType" minOccurs="0" />
+      <xs:element name="filter" type="InvokeTargetFilterType" minOccurs="0" />
+    </xs:sequence>
+    <xs:attribute name="id" form="unqualified" type="xs:string" use="required" />
+  </xs:complexType>
+  <xs:complexType name="QnxRootType">
+    <xs:sequence>
+      <xs:element name="id" type="xs:string" minOccurs="0" />
+      <xs:element name="name" type="LocalizedStringType" minOccurs="0" />
+      <xs:element name="versionNumber" type="xs:string" minOccurs="0" />
+      <xs:element name="platformVersion" type="xs:string" minOccurs="0" />
+      <xs:element name="buildId" type="xs:string" minOccurs="0" />
+      <xs:element name="description" type="LocalizedStringType" minOccurs="0" />
+      <xs:element name="copyright" type="LocalizedStringType" minOccurs="0" />
+      <xs:element name="author" type="xs:string" minOccurs="0" />
+      <xs:element name="authorId" type="xs:string" minOccurs="0" />
+      <xs:element name="category" type="xs:string" minOccurs="0" />
+      <xs:element name="initialWindow" type="WindowType" minOccurs="0" />
+      <xs:element name="asset" type="AssetType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="configuration" type="ConfigurationType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="icon" type="ImageType" minOccurs="0" />
+      <xs:element name="splashScreens" type="ImageType" minOccurs="0" />
+      <xs:element name="splashscreen" type="xs:string" minOccurs="0" />
+      <xs:element name="action" type="PermissionType" nillable="true" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="permission" type="PermissionType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="env" type="EnvironmentVarType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="invoke-target" type="InvokeTargetType" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="qnx" type="QnxRootType" />
+</xs:schema>
