@@ -212,7 +212,7 @@ namespace BlackBerry.Package.Helpers
                 var path = Path.Combine(projectDir, "arm", "o.le-v7-g", targetName);
                 if (File.Exists(path))
                     return path;
-                return Path.Combine(projectDir, "arm", "o.le-v7", targetName);
+                return Path.Combine(projectDir, "arm", "o.le-v7", targetName + ".so"); // Cascades apps in Device-Release mode are regular shared-object!
             }
 
             if (string.Compare(targetCpu, "x86", StringComparison.OrdinalIgnoreCase) == 0 && !string.IsNullOrEmpty(projectDir))

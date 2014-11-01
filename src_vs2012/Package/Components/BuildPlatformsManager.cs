@@ -766,22 +766,22 @@ namespace BlackBerry.Package.Components
             // if the path to binary is invalid GDB might have problems with loading correct symbols;
             // maybe try to guess better or ask developer, what is wrong, why the project doesn't define it correctly
             // (possible causes: dev is using any kind of makefile and plugin can't detect the outcomes automatically):
-            if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
-            {
-                executablePath = ProjectHelper.GuessTargetFullName(_startProject);
-
-                if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
-                {
-                    var attachDiscoveryService = (IAttachDiscoveryService) Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IAttachDiscoveryService));
-                    Debug.Assert(attachDiscoveryService != null, "Invalid project references (make sure VisualStudio.Shell.dll is not references, as it duplicates the Package definition from VisualStudio.Shell.<version>.dll)");
-
-                    // ask the developer to specify the path:
-                    executablePath = attachDiscoveryService.FindExecutable(null);
-                }
-            }
-
             if (_startDebugger)
             {
+                if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
+                {
+                    executablePath = ProjectHelper.GuessTargetFullName(_startProject);
+
+                    if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
+                    {
+                        var attachDiscoveryService = (IAttachDiscoveryService) Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IAttachDiscoveryService));
+                        Debug.Assert(attachDiscoveryService != null, "Invalid project references (make sure VisualStudio.Shell.dll is not references, as it duplicates the Package definition from VisualStudio.Shell.<version>.dll)");
+
+                        // ask the developer to specify the path:
+                        executablePath = attachDiscoveryService.FindExecutable(null);
+                    }
+                }
+
                 LaunchDebugTarget(_startProject.Name, ndk, device, runtime, null, executablePath);
             }
         }
