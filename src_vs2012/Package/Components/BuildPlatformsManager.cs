@@ -57,10 +57,14 @@ namespace BlackBerry.Package.Components
         private OutputWindowPane _outputWindowPane;
 
         private BuildEvents _buildEvents;
+        private SolutionEvents _solutionEvents;
         private CommandEvents _deploymentEvents;
         private CommandEvents _eventsDebug;
         private CommandEvents _eventsNoDebug;
         private CommandEvents _eventsDebugContext;
+
+        private bool _solutionOpened;
+        private int _openedBlackBerryProjects;
 
         private const string ConfigNameBlackBerry = "BlackBerry";
         private const string ToolbarNameStandard = "Standard";
@@ -90,7 +94,6 @@ namespace BlackBerry.Package.Components
             _deploymentEvents = CommandHelper.Register(_dte, VSConstants.GUID_VSStandardCommandSet97, VSConstants.VSStd2KCmdID.SolutionPlatform, null, OnNewPlatform_AfterExecute);
             //CommandHelper.Register(_dte, GuidList.guidVSDebugGroup, StandardCommands.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_beforeExec, cmdNewFunctionBreakpoint_afterExec);
 
-            //DisableIntelliSenseErrorReport(true);
             ShowSolutionPlatformSelector();
 
             // INFO: the references to returned objects must be stored and live as long, as the handlers are needed,
@@ -102,6 +105,14 @@ namespace BlackBerry.Package.Components
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
             _buildEvents.OnBuildDone += OnWholeBuildDone;
+
+            // to monitor, when to disable IntelliSense errors,
+            // TODO: however there is still one case not covered - when project is added as Win32 and manually platform is added and configuration converted co BlackBerry...
+            _solutionEvents = _dte.Events.SolutionEvents;
+            _solutionEvents.Opened += OnSolutionOpened;
+            _solutionEvents.AfterClosing += OnSolutionClosed;
+            _solutionEvents.ProjectAdded += OnProjectAdded;
+            _solutionEvents.ProjectRemoved += OnProjectRemoved;
         }
 
         #region Properties
@@ -165,26 +176,80 @@ namespace BlackBerry.Package.Components
         /// </summary>
         public void Close()
         {
-            //DisableIntelliSenseErrorReport(false);
         }
 
-        /*
-        /// <summary> 
-        /// Set the DisableErrorReporting property value. 
-        /// </summary>
-        /// <param name="disable"> The property value to set. </param>
-        private void DisableIntelliSenseErrorReport(bool disable)
+        #region Managing IntelliSense Error Reporting
+
+        private void OnProjectRemoved(Project project)
         {
-            DTE dte = _dte as DTE;
-            var txtEdCpp = dte.get_Properties("TextEditor", "C/C++ Specific");
-            if (txtEdCpp != null)
+            if (_solutionOpened)
             {
-                var prop = txtEdCpp.Item("DisableErrorReporting");
-                if (prop != null)
-                    prop.Value = disable;
+                if (IsBlackBerryProject(project))
+                {
+                    _openedBlackBerryProjects--;
+                    UpdateIntelliSenseState();
+                }
             }
         }
-         */
+
+        private void OnProjectAdded(Project project)
+        {
+            if (_solutionOpened)
+            {
+                if (IsBlackBerryProject(project))
+                {
+                    _openedBlackBerryProjects++;
+                    UpdateIntelliSenseState();
+                }
+            }
+        }
+
+        private void OnSolutionClosed()
+        {
+            _solutionOpened = false;
+            _openedBlackBerryProjects = 0;
+            UpdateIntelliSenseState();
+        }
+
+        private void OnSolutionOpened()
+        {
+            _solutionOpened = true;
+            _openedBlackBerryProjects = 0;
+
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                if (IsBlackBerryProject(project))
+                {
+                    _openedBlackBerryProjects++;
+                }
+            }
+
+            UpdateIntelliSenseState();
+        }
+
+        private void UpdateIntelliSenseState()
+        {
+            UpdateIntelliSenseState(_openedBlackBerryProjects != 0);
+        }
+
+        /// <summary>
+        /// Enables or disables error reporting detected by IntelliSense at runtime.
+        /// Unfortunately, no idea for now, how to extend the IntelliSense with extra Qt syntax.
+        /// </summary>
+        private void UpdateIntelliSenseState(bool state)
+        {
+            var intelliPropertyGroup = _dte.Properties["TextEditor", "C/C++ Specific"];
+            if (intelliPropertyGroup != null)
+            {
+                var intelliProperty = intelliPropertyGroup.Item("DisableErrorReporting");
+                if (intelliProperty != null)
+                {
+                    intelliProperty.Value = state;
+                }
+            }
+        }
+
+        #endregion
 
         #region Managing Configurations
 
@@ -627,7 +692,10 @@ namespace BlackBerry.Package.Components
             }
 
             _filesToDelete.Clear();
-            _buildThese.Clear();
+            if (_buildThese != null)
+            {
+                _buildThese.Clear();
+            }
             _startDebugger = false;
             _isDeploying = false;
             _hitPlay = false;
