@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -174,7 +175,15 @@ namespace BlackBerry.DebugEngine
                                 case 3:
                                     // Thread ID
                                     ini = end + 1;
-                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    try
+                                    {
+                                        _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _threadId = -1;
+                                        TraceLog.WriteException(ex, "Unable to parse ThreadID from: \"{0}\"", ev);
+                                    }
                                     EventDispatcher._unknownCode = true;
                                     break;
                                 case 4:
