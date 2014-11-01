@@ -46,7 +46,8 @@ namespace BlackBerry.Package.Components
     {
         private readonly DTE2 _dte;
 
-        private List<String> _buildThese;
+        private List<string> _buildThese;
+        private readonly List<string> _filesToDelete;
         private bool _hitPlay;
         private int _amountOfProjects;
         private bool _isDeploying;
@@ -77,6 +78,7 @@ namespace BlackBerry.Package.Components
                 throw new ArgumentNullException("dte");
 
             _dte = dte;
+            _filesToDelete = new List<string>();
         }
 
         public void Initialize()
@@ -99,6 +101,7 @@ namespace BlackBerry.Package.Components
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
+            _buildEvents.OnBuildDone += OnWholeBuildDone;
         }
 
         #region Properties
@@ -369,6 +372,8 @@ namespace BlackBerry.Package.Components
                 }
                 _hitPlay = false;
             }
+
+            PrepareFlagFilesForDeployment();
         }
 
 
@@ -547,32 +552,52 @@ namespace BlackBerry.Package.Components
             return success;
         }
 
+        private static void DeleteFlagFile(string fileName)
+        {
+            try
+            {
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to delete flag file (\"{0}\")", fileName);
+            }
+        }
+
         /// <summary> 
         /// Verify if the build process was successful. If so, start deploying the app.
         /// </summary>
         private void Built()
         {
             TraceLog.WriteLine("BUILD: Built");
-            
+
             _outputWindowPane.TextDocument.Selection.SelectAll();
             string outputText = _outputWindowPane.TextDocument.Selection.Text;
 
             if (string.IsNullOrEmpty(outputText) || Regex.IsMatch(outputText, ">Build succeeded.\r\n") || !outputText.Contains("): error :"))
             {
-                if (_startDebugger)
-                {
-                    // Write file to flag the deploy task that it should use the -debugNative option
-                    File.WriteAllText(ConfigDefaults.BuildDebugNativePath, "Use -debugNative.\r\n");
-                    _buildEvents.OnBuildDone += OnBuildDone;
-                }
-
-                foreach (string startupProject in (Array)_dte.Solution.SolutionBuild.StartupProjects)
+                foreach (string startupProject in (Array) _dte.Solution.SolutionBuild.StartupProjects)
                 {
                     foreach (SolutionContext sc in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
                     {
+                        var project = _dte.Solution.Item(sc.ProjectName);
+                        var debugNativeFlagFileName = ProjectHelper.GetFlagFileNameForDebugNative(project);
+
+                        DeleteFlagFile(debugNativeFlagFileName);
+
                         if (sc.ProjectName == startupProject)
                         {
                             sc.ShouldDeploy = true;
+
+                            if (_startDebugger)
+                            {
+                                // write file to flag the deploy task that it should use the -debugNative option:
+                                File.WriteAllText(debugNativeFlagFileName, "Use -debugNative.\r\n");
+                                _buildEvents.OnBuildDone += OnBuildDone;
+                            }
                         }
                         else
                         {
@@ -590,6 +615,52 @@ namespace BlackBerry.Package.Components
 
                 _isDeploying = true;
                 _dte.Solution.SolutionBuild.Deploy(true);
+            }
+        }
+
+        private void OnWholeBuildDone(vsBuildScope scope, vsBuildAction action)
+        {
+            // remove all temporary flag files created during build:
+            foreach (var fileName in _filesToDelete)
+            {
+                DeleteFlagFile(fileName);
+            }
+
+            _filesToDelete.Clear();
+            _buildThese.Clear();
+            _startDebugger = false;
+            _isDeploying = false;
+            _hitPlay = false;
+        }
+
+        /// <summary>
+        /// Writes down all flag files used by MSBuild.
+        /// NOTE: somehow passing values via environment variables seems not to work,
+        /// that's why we use local files deleted automatically after the build/deployment is completed.
+        /// </summary>
+        private void PrepareFlagFilesForDeployment()
+        {
+            var developer = PackageViewModel.Instance.Developer;
+            bool shouldSaveLocally = developer != null && !developer.IsPasswordSaved && !string.IsNullOrEmpty(developer.CskPassword);
+
+            // store CSK-password inside a local flag-file, in case dev doesn't want to store it persistently:
+            foreach (string startupProject in (Array) _dte.Solution.SolutionBuild.StartupProjects)
+            {
+                foreach (SolutionContext sc in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
+                {
+                    var project = _dte.Solution.Item(sc.ProjectName);
+                    var cskPasswordFileName = ProjectHelper.GetFlagFileNameForCSKPassword(project);
+
+                    // remove old value:
+                    DeleteFlagFile(cskPasswordFileName);
+
+                    if (sc.ProjectName == startupProject && shouldSaveLocally)
+                    {
+                        // write CSK-password, if not stored persistently inside registry, to let signing process to succeed:
+                        File.WriteAllText(cskPasswordFileName, GlobalHelper.Encrypt(developer.CskPassword));
+                        _filesToDelete.Add(cskPasswordFileName);
+                    }
+                }
             }
         }
 

@@ -226,5 +226,31 @@ namespace BlackBerry.Package.Helpers
             // unsupported architecture:
             return null;
         }
+
+        /// <summary>
+        /// Gets the name of the file for debug-native flag passed to MSBuild.
+        /// </summary>
+        public static string GetFlagFileNameForDebugNative(Project project)
+        {
+            return GetFlagFileName(project, "debug-native");
+        }
+
+        /// <summary>
+        /// Gets the name of the file for CSK-password passed to MSBuild.
+        /// </summary>
+        public static string GetFlagFileNameForCSKPassword(Project project)
+        {
+            return GetFlagFileName(project, "csk-password");
+        }
+
+        private static string GetFlagFileName(Project project, string flagName)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+            if (string.IsNullOrEmpty(flagName))
+                throw new ArgumentNullException("flagName");
+
+            return Path.Combine(Path.GetDirectoryName(project.FullName), string.Concat("vsndk-", flagName, ".flag"));
+        }
     }
 }

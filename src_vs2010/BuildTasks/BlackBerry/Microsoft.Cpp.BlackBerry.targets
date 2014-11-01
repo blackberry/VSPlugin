@@ -68,7 +68,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       </ClCompile>
     </ItemGroup>
 
-    <WriteLinesToFile File="CompileRan" Lines="true" Overwrite="true" />
+    <WriteLinesToFile File="vsndk-compile-ran.flag" Lines="true" Overwrite="true" />
     
     <PropertyGroup>
       <CLToolArchitecture Condition="'$(CLToolArchitecture)' == ''">$(DefaultToolArchitecture)</CLToolArchitecture>
@@ -217,10 +217,10 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   <Target Name="PlatformPrepareForBuild" DependsOnTargets="$(PlatformPrepareForBuildDependsOn)">
     <!-- Error out if the project references a missing platform toolset -->
     <VCMessage Code="MSB8008" Type="Error" Arguments="$(PlatformToolset)"
-          Condition="!(exists('$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).targets'))"/>
+          Condition="!(Exists('$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).targets'))"/>
   </Target>
 
   <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).targets"
-          Condition="(exists('$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).targets'))" />
+          Condition="(Exists('$(VCTargetsPath)\Platforms\BlackBerry\PlatformToolsets\$(PlatformToolset)\Microsoft.Cpp.BlackBerry.$(PlatformToolset).targets'))" />
   <Import Project="$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter\*.targets" Condition="Exists('$(VCTargetsPath)\Platforms\BlackBerry\ImportAfter')" />
 </Project>

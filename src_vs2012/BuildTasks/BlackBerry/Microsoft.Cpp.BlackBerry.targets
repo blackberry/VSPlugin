@@ -69,7 +69,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       </ClCompile>
     </ItemGroup>
 
-    <WriteLinesToFile File="CompileRan" Lines="true" Overwrite="true" />
+    <WriteLinesToFile File="vsndk-compile-ran.flag" Lines="true" Overwrite="true" />
 
     <PropertyGroup>
       <CLToolArchitecture Condition="'$(CLToolArchitecture)' == ''">$(DefaultToolArchitecture)</CLToolArchitecture>
