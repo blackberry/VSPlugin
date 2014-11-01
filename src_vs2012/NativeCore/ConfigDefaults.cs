@@ -99,7 +99,7 @@ namespace BlackBerry.NativeCore
             //           the package and DE are not in the same folder and even GDBHost is not inside any of them
             //           so let it be hardcoded for that moment to have a fluent GDB attaching...
 #           if PLATFORM_VS2010
-                GdbHostPath = @"T:\vs-plugin\src_vs2010\Debug\BlackBerry.GDBHost.exe";
+                GdbHostPath = @"T:\vs-plugin\src_vs2010\GDBHost\Debug\BlackBerry.GDBHost.exe";
 #           elif PLATFORM_VS2012
                 GdbHostPath = @"T:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
 #           elif PLATFORM_VS2013
