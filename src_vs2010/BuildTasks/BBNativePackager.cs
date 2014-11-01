@@ -16,6 +16,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using BlackBerry.BuildTasks.BarDescriptor;
 using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
@@ -28,7 +29,6 @@ namespace BlackBerry.BuildTasks
     {
         #region Member Variable and Constant Declarations
 
-        private readonly ArrayList _switchOrderList;
         private qnx _descriptor;
         private string _projectDirectory;
         private string _appName;
@@ -44,7 +44,6 @@ namespace BlackBerry.BuildTasks
         private const string PACKAGE_MANIFEST_ONLY = "PackageManifestOnly";
         private const string DEBUG_TOKEN = "DebugToken";
         private const string SOURCES = "Sources";
-        private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
         private const string GET_TARGET_FILE_MAP = "GetTargetFileMap";
         private const string WORKSPACE_LOC = "${workspace_loc:/";
 
@@ -56,17 +55,7 @@ namespace BlackBerry.BuildTasks
         public BBNativePackager()
             : base(Resources.ResourceManager)
         {
-            _switchOrderList = new ArrayList();
-            _switchOrderList.Add(TARGET_FORMAT);
-            _switchOrderList.Add(BUILD_ID);
-            _switchOrderList.Add(BUILD_ID_FILE);
-            _switchOrderList.Add(DEV_MODE);
-            _switchOrderList.Add(CONFIGURATION);
-            _switchOrderList.Add(GET_TARGET_FILE_MAP);
-            _switchOrderList.Add(PACKAGE_MANIFEST_ONLY);
-            _switchOrderList.Add(OUTPUT_FILE);
-            _switchOrderList.Add(APP_DESCRIPTOR);
-            _switchOrderList.Add(TRACKER_LOG_DIRECTORY);
+            DefineSwitchOrder(TARGET_FORMAT, BUILD_ID, BUILD_ID_FILE, DEV_MODE, CONFIGURATION, GET_TARGET_FILE_MAP, PACKAGE_MANIFEST_ONLY, OUTPUT_FILE, APP_DESCRIPTOR);
         }
 
         #region Overrides
@@ -95,54 +84,56 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Return the Response File Command String
         /// </summary>
-        /// <returns></returns>
         protected override string GenerateResponseFileCommands()
         {
-            string cmd = base.GenerateResponseFileCommands();
-            PackagerCmdBuilder clb = new PackagerCmdBuilder();
-            AppendResources(clb);
-            cmd += " " + clb;
+            StringBuilder resultCommand = new StringBuilder(base.GenerateResponseFileCommands());
+            PackagerCmdBuilder packagerBuilder = new PackagerCmdBuilder();
+
+            AppendResources(packagerBuilder);
+            resultCommand.Append(' ').Append(packagerBuilder);
 
             // Output the .bar file's manifest to a file so we can parse it.
             if (PackageManifestOnly)
             {
-                cmd += " > localManifest.mf";
+                resultCommand.Append(" > localManifest.mf");
             }
             else if (GetTargetFileMap)
             {
-                cmd += " > targetFileMap.txt";
+                resultCommand.Append(" > targetFileMap.txt");
             }
             
-            return cmd;
+            return resultCommand.ToString();
         }
 
         /// <summary>
         /// Helper function to read the assets from the bar-descriptor.xml file and 
         /// generate the command line listing the resources to be packaged into the bar file.
         /// </summary>
-        /// <param name="clb">Command Line Builder object</param>
-        private void AppendResources(CommandLineBuilder clb)
+        /// <param name="commandBuilder">Command Line Builder object</param>
+        private void AppendResources(CommandLineBuilder commandBuilder)
         {
             // is it a regular application?
             if (string.Compare(AppType, "Regular", StringComparison.OrdinalIgnoreCase) == 0 || string.IsNullOrEmpty(MakefileTargetName))
             {
-                ITaskItem[] sources = GetAssetsFile();
+                IEnumerable<ITaskItem> sources = GetAssetsFile();
                 foreach (ITaskItem item in sources)
                 {
                     string target = item.GetMetadata("target");
                     if (item.ItemSpec == target)
-                        clb.AppendFileNameIfNotNull(item);
+                    {
+                        commandBuilder.AppendFileNameIfNotNull(item);
+                    }
                     else
                     {
-                        clb.AppendSwitchIfNotNull("-e ", item);
-                        clb.AppendFileNameIfNotNull(target);
+                        commandBuilder.AppendSwitchIfNotNull("-e ", item);
+                        commandBuilder.AppendFileNameIfNotNull(target);
                     }
                 }
             }
             else
             {
                 // or Cascades application, where we can use directly the configuration with specified name from bar-descriptor file?
-                clb.AppendTextUnquoted("-configuration \"" + MakefileTargetName + "\"");
+                commandBuilder.AppendTextUnquoted("-configuration \"" + MakefileTargetName + "\"");
 
                 /*
                 ActiveToolSwitches.Remove(CONFIGURATION);
@@ -165,7 +156,7 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Return the assets from the bar-descriptor.xml
         /// </summary>
-        private ITaskItem[] GetAssetsFile()
+        private IEnumerable<ITaskItem> GetAssetsFile()
         {
             //make sure the _descriptor is loaded
             if (_descriptor == null)
@@ -204,7 +195,7 @@ namespace BlackBerry.BuildTasks
             return items.ToArray();
         }
 
-        private void AppendAssets(List<ITaskItem> result, IEnumerable<asset> assets)
+        private void AppendAssets(ICollection<ITaskItem> result, IEnumerable<asset> assets)
         {
             if (result == null)
                 throw new ArgumentNullException("result");
@@ -232,17 +223,6 @@ namespace BlackBerry.BuildTasks
         }
 
         /// <summary>
-        /// Getter for the SwitchOrderList property
-        /// </summary>
-        protected override ArrayList SwitchOrderList
-        {
-            get
-            {
-                return _switchOrderList;
-            }
-        }
-
-        /// <summary>
         /// Getter for the CommandTLogName property
         /// </summary>
         protected override string CommandTLogName
@@ -263,10 +243,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string[] WriteTLogNames
         {
-            get
-            {
-                return new[] { "BBNativePackager.write.1.tlog", "BBNativePackager.*.write.1.tlog" };
-            }
+            get { return new[] { "BBNativePackager.write.1.tlog", "BBNativePackager.*.write.1.tlog" }; }
         }
 
         /// <summary>
@@ -274,10 +251,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string ToolName
         {
-            get
-            {
-                return ToolExe;
-            }
+            get { return ToolExe; }
         }
 
         #endregion
@@ -319,25 +293,22 @@ namespace BlackBerry.BuildTasks
             }
             set
             {
-                ActiveToolSwitches.Remove(OUTPUT_FILE);
-
                 String switchValue = "";
                 if (IsPropertySet(OUTPUT_FILE) && IsExplicitlySetToFalse(PACKAGE_MANIFEST_ONLY))
                 {
                     switchValue = "-package ";
                 }
 
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.File)
                 {
+                    Name = OUTPUT_FILE,
                     DisplayName = "Output bar file name, for example, out.bar",
                     Description = "The -package option specifies the bar file name.",
                     ArgumentRelationList = new ArrayList(),
                     SwitchValue = switchValue,
-                    Name = OUTPUT_FILE,
                     Value = value
                 };
-                ActiveToolSwitches.Add(OUTPUT_FILE, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -346,11 +317,8 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         [Required]
         public string ProjectDir
-        { 
-            get
-            {
-                return _projectDirectory;
-            }
+        {
+            get { return _projectDirectory; }
             set
             {
                 _projectDirectory = value;
@@ -364,20 +332,17 @@ namespace BlackBerry.BuildTasks
         [Required]
         public string AppName
         {
-            get
-            {
-                return _appName;
-            }
+            get { return _appName; }
             set
             {
                 _appName = value;
 
-                if (_barDescriptorPath == "")
-                {   
+                if (string.IsNullOrEmpty(_barDescriptorPath))
+                {
                     // Default location of bar-descriptor file, if not specified in the Properties Configurations.
                     _barDescriptorPath = "BlackBerry-" + _appName + "\\bar-descriptor.xml";
                     if (!File.Exists(_barDescriptorPath))
-                    {   
+                    {
                         // Just to support the default locations of bar-descriptor from previous versions of the plug-in.
                         _barDescriptorPath = _appName + "_barDescriptor\\bar-descriptor.xml";
                         if (!File.Exists(_barDescriptorPath))
@@ -387,18 +352,15 @@ namespace BlackBerry.BuildTasks
                     }
                 }
 
-                ActiveToolSwitches.Remove(APP_DESCRIPTOR);
-
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.File)
                 {
+                    Name = APP_DESCRIPTOR,
                     DisplayName = "Application descriptor file name, for example, bar-descriptor.xml",
                     Description = "Application descriptor file name, for example, bar-descriptor.xml, it must follows the out.bar file",
                     ArgumentRelationList = new ArrayList(),
-                    Name = APP_DESCRIPTOR,
                     Value = _barDescriptorPath
                 };
-                ActiveToolSwitches.Add(APP_DESCRIPTOR, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -411,18 +373,8 @@ namespace BlackBerry.BuildTasks
         [Required]
         public string ApplicationDescriptorXml
         {
-            get
-            {
-                if (IsPropertySet(APP_DESCRIPTOR))
-                {
-                    return ActiveToolSwitches[APP_DESCRIPTOR].Value;
-                }
-                return null;
-            }
-            set
-            {
-                _barDescriptorPath = value;
-            }
+            get { return GetSwitchAsString(APP_DESCRIPTOR); }
+            set { _barDescriptorPath = value; }
         }
 
         /// <summary>
@@ -430,38 +382,30 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string TargetFormat
         {
-            get
-            {
-                if (IsPropertySet(TARGET_FORMAT))
-                {
-                    return ActiveToolSwitches[TARGET_FORMAT].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(TARGET_FORMAT); }
             set
             {
-                ActiveToolSwitches.Remove(TARGET_FORMAT);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.String)
-                {
-                    DisplayName = "Target format",
-                    Description = "Select the build target format (-target bar -target bar-debug)",
-                    ArgumentRelationList = new ArrayList()
-                };
                 string[][] switchMap =
                 {
-                    new[] { "bar", "-target bar" }, 
-                    new[] { "bar-debug", "-target bar-debug" } 
+                    new[] { "bar", "-target bar" },
+                    new[] { "bar-debug", "-target bar-debug" }
                 };
-                switch2.SwitchValue = ReadSwitchMap(TARGET_FORMAT, switchMap, value);
-                switch2.Name = TARGET_FORMAT;
-                switch2.Value = value;
+
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
+                {
+                    Name = TARGET_FORMAT,
+                    DisplayName = "Target format",
+                    Description = "Select the build target format (-target bar -target bar-debug)",
+                    ArgumentRelationList = new ArrayList(),
+                    SwitchValue = ReadSwitchMap(TARGET_FORMAT, switchMap, value),
+                    Value = value,
 #if PLATFORM_VS2010
-                switch2.MultiValues = true;
+                    MultiValues = true
 #else
-                switch2.MultipleValues = true;
+                    MultipleValues = true
 #endif
-                ActiveToolSwitches.Add(TARGET_FORMAT, switch2);
-                AddActiveSwitchToolValue(switch2);
+                };
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -470,29 +414,20 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public int BuildID
         {
-            get
-            {
-                if (IsPropertySet(BUILD_ID))
-                {
-                    return ActiveToolSwitches[BUILD_ID].Number;
-                }
-                return 0;
-            }
+            get { return GetSwitchAsInt32(BUILD_ID); }
             set
             {
-                ActiveToolSwitches.Remove(BUILD_ID);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Integer)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Integer)
                 {
+                    Name = BUILD_ID,
                     DisplayName = "Build Id",
-                    Description = "Set the build id (the fourth segment of the version). Must be a numbers from 0 to 65535"
+                    Description = "Set the build id (the fourth segment of the version). Must be a numbers from 0 to 65535",
+                    ArgumentRelationList = new ArrayList(),
+                    IsValid = ValidateInteger(BUILD_ID, 0, 65535, value),
+                    SwitchValue = "-buildId ",
+                    Number = value,
                 };
-                switch2.ArgumentRelationList = new ArrayList();
-                switch2.IsValid = ValidateInteger(BUILD_ID, 0, 65535, value);
-                switch2.Name = BUILD_ID;
-                switch2.Number = value;
-                switch2.SwitchValue = "-buildId ";
-                ActiveToolSwitches.Add(BUILD_ID, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -501,28 +436,19 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string BuildIDFile
         {
-            get
-            {
-                if (IsPropertySet(BUILD_ID_FILE))
-                {
-                    return ActiveToolSwitches[BUILD_ID_FILE].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(BUILD_ID_FILE); }
             set
             {
-                ActiveToolSwitches.Remove(BUILD_ID_FILE);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.File)
                 {
+                    Name = BUILD_ID_FILE,
                     DisplayName = "Build ID File",
                     Description = "set the build ID from an existing file",
                     ArgumentRelationList = new ArrayList(),
-                    Name = BUILD_ID_FILE,
                     SwitchValue = "-buildIdFile ",
                     Value = value
                 };
-                ActiveToolSwitches.Add(BUILD_ID_FILE, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -531,24 +457,19 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public bool DevMode
         {
-            get
-            {
-                return (IsPropertySet(DEV_MODE) && ActiveToolSwitches[DEV_MODE].BooleanValue);
-            }
+            get { return GetSwitchAsBool(DEV_MODE); }
             set
             {
-                ActiveToolSwitches.Remove(DEV_MODE);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = DEV_MODE,
                     DisplayName = "Development mode",
-                    Description = "Package in development mode ( -devMode)",
+                    Description = "Package in development mode (-devMode)",
                     ArgumentRelationList = new ArrayList(),
                     SwitchValue = "-devMode",
                     BooleanValue = value
                 };
-                ActiveToolSwitches.Add(DEV_MODE, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -557,14 +478,10 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public bool PackageManifestOnly
         {
-            get
-            {
-                return (IsPropertySet(PACKAGE_MANIFEST_ONLY) && ActiveToolSwitches[PACKAGE_MANIFEST_ONLY].BooleanValue);
-            }
+            get { return GetSwitchAsBool(PACKAGE_MANIFEST_ONLY); }
             set
             {
-                ActiveToolSwitches.Remove(PACKAGE_MANIFEST_ONLY);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     DisplayName = "Package manifest only.",
                     Description = "Package only the manifest file ( -packageManifest)",
@@ -573,8 +490,7 @@ namespace BlackBerry.BuildTasks
                     Name = PACKAGE_MANIFEST_ONLY,
                     BooleanValue = value
                 };
-                ActiveToolSwitches.Add(PACKAGE_MANIFEST_ONLY, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -583,13 +499,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public bool GetTargetFileMap
         {
-            get
-            {
-                return (IsPropertySet(GET_TARGET_FILE_MAP) && ActiveToolSwitches[GET_TARGET_FILE_MAP].BooleanValue);
-            }
+            get { return GetSwitchAsBool(GET_TARGET_FILE_MAP); }
             set
             {
-                ActiveToolSwitches.Remove(GET_TARGET_FILE_MAP);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = GET_TARGET_FILE_MAP,
@@ -599,8 +511,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-targetFileMap ",
                     BooleanValue = value
                 };
-                ActiveToolSwitches.Add(GET_TARGET_FILE_MAP, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -609,56 +520,21 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string DebugToken
         {
-            get
-            {
-                if (IsPropertySet(DEBUG_TOKEN))
-                {
-                    return ActiveToolSwitches[DEBUG_TOKEN].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(DEBUG_TOKEN); }
             set
             {
                 ActiveToolSwitches.Remove(DEBUG_TOKEN);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Directory)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Directory)
                 {
+                    Name = DEBUG_TOKEN,
                     DisplayName = "Debug Token",
                     Description = "Use debug token to generate author and author id ( -debugToken <token> only usable with -devMode)",
                     ArgumentRelationList = new ArrayList(),
                     SwitchValue = "-debugToken ",
                     Value = value
                 };
-                switch2.Parents.AddLast(DEV_MODE);
-                ActiveToolSwitches.Add(DEBUG_TOKEN, switch2);
-                AddActiveSwitchToolValue(switch2);
-            }
-        }
-
-        /// <summary>
-        /// Getter/Setter for TrackerLogDirectory property.
-        /// </summary>
-        public string TrackerLogDirectory
-        {
-            get
-            {
-                if (IsPropertySet(TRACKER_LOG_DIRECTORY))
-                {
-                    return ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
-                }
-                return null;
-            }
-            set
-            {
-                ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Directory)
-                {
-                    DisplayName = "Tracker Log Directory",
-                    Description = "Tracker Log Directory.",
-                    ArgumentRelationList = new ArrayList(),
-                    Value = EnsureTrailingSlash(value)
-                };
-                ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
-                AddActiveSwitchToolValue(switch2);
+                toolSwitch.Parents.AddLast(DEV_MODE);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -667,25 +543,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override ITaskItem[] TrackedInputFiles
         {
-            get
-            {
-                return Sources;
-            }
-        }
-
-        /// <summary>
-        /// Getter for the TrackerIntermediateDirectory
-        /// </summary>
-        protected override string TrackerIntermediateDirectory
-        {
-            get
-            {
-                if (TrackerLogDirectory != null)
-                {
-                    return TrackerLogDirectory;
-                }
-                return string.Empty;
-            }
+            get { return Sources; }
         }
 
         /// <summary>
@@ -694,26 +552,18 @@ namespace BlackBerry.BuildTasks
         [Required]
         public ITaskItem[] Sources
         {
-            get
-            {
-                if (IsPropertySet(SOURCES))
-                {
-                    return ActiveToolSwitches[SOURCES].TaskItemArray;
-                }
-                return null;
-            }
+            get { return GetSwitchAsItemArray(SOURCES); }
             set
             {
-                ActiveToolSwitches.Remove(SOURCES);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.ITaskItemArray)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.ITaskItemArray)
                 {
+                    Name = SOURCES,
                     Separator = " ",
                     Required = true,
                     ArgumentRelationList = new ArrayList(),
                     TaskItemArray = value
                 };
-                ActiveToolSwitches.Add(SOURCES, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 

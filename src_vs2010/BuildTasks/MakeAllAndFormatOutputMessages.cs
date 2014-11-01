@@ -421,7 +421,7 @@ namespace BlackBerry.BuildTasks
                     tilde = outputText.IndexOf("~", tilde + 1);
                 }
 
-                /// Send build output to the Output window and to the ErrorList window
+                // Send build output to the Output window and to the ErrorList window
                 if (outputText.IndexOf(": error:") > 0)
                 {
                     string fileName = outputText.Substring(0, outputText.IndexOf(": error:"));

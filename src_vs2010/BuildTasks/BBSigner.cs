@@ -27,15 +27,12 @@ namespace BlackBerry.BuildTasks
     {
         #region Member Variables and Constants Declaration
 
-        private readonly ArrayList _switchOrderList;
-
         private const string REGISTER = "Register";
         private const string KEYSTOREPASSWORD = "KeyStorePassword";
         private const string CSJPIN = "CSJPin";
         private const string CSJFILES = "Signing_AND_DEBUGTOKEN_CSJFiles";
         private const string SOURCES = "Sources";
         private const string OUTPUT_FILE = "OutputFiles";
-        private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
 
         #endregion
 
@@ -45,14 +42,7 @@ namespace BlackBerry.BuildTasks
         public BBSigner()
             : base(Resources.ResourceManager)
         {
-            _switchOrderList = new ArrayList();
-            _switchOrderList.Add("AlwaysAppend");
-            _switchOrderList.Add(REGISTER);
-            _switchOrderList.Add(CSJPIN);
-            _switchOrderList.Add(KEYSTOREPASSWORD);
-            _switchOrderList.Add(CSJFILES);
-            _switchOrderList.Add(OUTPUT_FILE);
-            _switchOrderList.Add(TRACKER_LOG_DIRECTORY);
+            DefineSwitchOrder("AlwaysAppend", REGISTER, CSJPIN, KEYSTOREPASSWORD, CSJFILES, OUTPUT_FILE);
         }
 
         #region Overrides
@@ -79,29 +69,17 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Return the Response File Commands string.
         /// </summary>
-        /// <returns></returns>
         protected override string GenerateResponseFileCommands()
         {
             if (!Register)
             {
-                _switchOrderList.Remove(REGISTER);
-                _switchOrderList.Remove(CSJPIN);
-                _switchOrderList.Remove(CSJFILES);
+                RemoveFromSwithOrder(REGISTER, CSJPIN, CSJFILES);
             }
             else
-                _switchOrderList.Remove(OUTPUT_FILE);
-            return base.GenerateResponseFileCommands();
-        }
-
-        /// <summary>
-        /// Getter for the SwitchOrderList property
-        /// </summary>
-        protected override ArrayList SwitchOrderList
-        {
-            get
             {
-                return _switchOrderList;
+                RemoveFromSwithOrder(OUTPUT_FILE);
             }
+            return base.GenerateResponseFileCommands();
         }
 
         /// <summary>
@@ -119,12 +97,10 @@ namespace BlackBerry.BuildTasks
         {
             get { return new[] { "BBSigner.read.1.tlog", "BBSigner.*.read.1.tlog" }; }
         }
+
         protected override string[] WriteTLogNames
         {
-            get
-            {
-                return new[] { "BBSigner.write.1.tlog", "BBSigner.*.write.1.tlog" };
-            }
+            get { return new[] { "BBSigner.write.1.tlog", "BBSigner.*.write.1.tlog" }; }
         }
 
         /// <summary>
@@ -132,25 +108,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string ToolName
         {
-            get
-            {
-                return ToolExe;
-            }
-        }
-
-        /// <summary>
-        /// Getter for the TrackerIntermediateDirectory property
-        /// </summary>
-        protected override string TrackerIntermediateDirectory
-        {
-            get
-            {
-                if (TrackerLogDirectory != null)
-                {
-                    return TrackerLogDirectory;
-                }
-                return string.Empty;
-            }
+            get { return ToolExe; }
         }
 
         /// <summary>
@@ -171,24 +129,19 @@ namespace BlackBerry.BuildTasks
         [Required]
         public bool Register
         {
-            get
-            {
-                return (IsPropertySet(REGISTER) && ActiveToolSwitches[REGISTER].BooleanValue);
-            }
+            get { return GetSwitchAsBool(REGISTER); }
             set
             {
-                ActiveToolSwitches.Remove(REGISTER);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Boolean)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
+                    Name = REGISTER,
                     DisplayName = "Register",
                     Description = "Register the computer with CSJ file to sign application( -register)",
                     ArgumentRelationList = new ArrayList(),
                     SwitchValue = "-register",
-                    Name = REGISTER,
                     BooleanValue = value
                 };
-                ActiveToolSwitches.Add(REGISTER, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -198,26 +151,18 @@ namespace BlackBerry.BuildTasks
         [Required]
         public ITaskItem[] Sources
         {
-            get
-            {
-                if (IsPropertySet(SOURCES))
-                {
-                    return ActiveToolSwitches[SOURCES].TaskItemArray;
-                }
-                return null;
-            }
+            get { return GetSwitchAsItemArray(SOURCES); }
             set
             {
-                ActiveToolSwitches.Remove(SOURCES);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.ITaskItemArray)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.ITaskItemArray)
                 {
+                    Name = SOURCES,
                     Separator = " ",
                     Required = true,
                     ArgumentRelationList = new ArrayList(),
                     TaskItemArray = value
                 };
-                ActiveToolSwitches.Add(SOURCES, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -226,27 +171,18 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public ITaskItem[] CSJFiles
         {
-            get
-            {
-                if (IsPropertySet(CSJFILES))
-                {
-                    return ActiveToolSwitches[CSJFILES].TaskItemArray;
-                }
-                return null;
-            }
+            get { return GetSwitchAsItemArray(CSJFILES); }
             set
             {
-                ActiveToolSwitches.Remove(CSJFILES);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.ITaskItemArray)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.ITaskItemArray)
                 {
+                    Name = CSJFILES,
                     Separator = " ",
                     Required = true,
                     ArgumentRelationList = new ArrayList(),
-                    Name = CSJFILES,
                     TaskItemArray = value
                 };
-                ActiveToolSwitches.Add(CSJFILES, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -255,30 +191,19 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string KeyStorePassword
         {
-            get
-            {
-                if (IsPropertySet(KEYSTOREPASSWORD))
-                {
-                    return ActiveToolSwitches[KEYSTOREPASSWORD].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(KEYSTOREPASSWORD); }
             set
             {
-                ActiveToolSwitches.Remove(KEYSTOREPASSWORD);
-
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.File)
                 {
+                    Name = KEYSTOREPASSWORD,
                     DisplayName = "Keystore password",
                     Description = "The -storepass option specifies the password.",
                     ArgumentRelationList = new ArrayList(),
                     SwitchValue = "-storepass ",
-                    Name = KEYSTOREPASSWORD,
                     Value = DecryptPassword(value)
                 };
-
-                ActiveToolSwitches.Add(KEYSTOREPASSWORD, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -287,28 +212,19 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string CSJPin
         {
-            get
-            {
-                if (IsPropertySet(CSJPIN))
-                {
-                    return ActiveToolSwitches[CSJPIN].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(CSJPIN); }
             set
             {
-                ActiveToolSwitches.Remove(CSJPIN);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.File)
                 {
+                    Name = CSJPIN,
                     DisplayName = "Keystore password",
                     Description = "The -csjpin option specifies the password.",
                     ArgumentRelationList = new ArrayList(),
                     SwitchValue = "-csjpin ",
-                    Name = CSJPIN,
                     Value = value
                 };
-                ActiveToolSwitches.Add(CSJPIN, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -319,55 +235,18 @@ namespace BlackBerry.BuildTasks
         [Output]
         public string OutputFile
         {
-            get
-            {
-                if (IsPropertySet(OUTPUT_FILE))
-                {
-                    return ActiveToolSwitches[OUTPUT_FILE].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(OUTPUT_FILE); }
             set
             {
-                ActiveToolSwitches.Remove(OUTPUT_FILE);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.File)
+                ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.File)
                 {
+                    Name = OUTPUT_FILE,
                     DisplayName = "Output bar file name to be signed",
                     Description = "Specifies the bar file name to be signed",
                     ArgumentRelationList = new ArrayList(),
-                    Name = OUTPUT_FILE,
                     Value = value
                 };
-                ActiveToolSwitches.Add(OUTPUT_FILE, switch2);
-                AddActiveSwitchToolValue(switch2);
-            }
-        }
-
-        /// <summary>
-        /// Getter/Setter for the TrackerLogDirectory property
-        /// </summary>
-        public string TrackerLogDirectory
-        {
-            get
-            {
-                if (IsPropertySet(TRACKER_LOG_DIRECTORY))
-                {
-                    return ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
-                }
-                return null;
-            }
-            set
-            {
-                ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Directory)
-                {
-                    DisplayName = "Tracker Log Directory",
-                    Description = "Tracker Log Directory.",
-                    ArgumentRelationList = new ArrayList(),
-                    Value = EnsureTrailingSlash(value)
-                };
-                ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
-                AddActiveSwitchToolValue(switch2);
+                SetSwitch(toolSwitch);
             }
         }
 

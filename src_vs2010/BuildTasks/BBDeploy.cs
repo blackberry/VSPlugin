@@ -12,8 +12,6 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
-using System;
-using System.Collections;
 using System.IO;
 using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
@@ -25,10 +23,6 @@ namespace BlackBerry.BuildTasks
     {
         #region Member Variable Declaration
 
-        private readonly ArrayList _switchOrdersList;
-
-        private string _localManifest;
-        private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
         private const string GET_FILE = "GetFile";
         private const string GET_FILE_SAVE_AS = "GetFileSaveAs";
         private const string PUT_FILE = "PutFile";
@@ -42,7 +36,8 @@ namespace BlackBerry.BuildTasks
         private const string LIST_INSTALLED_APPS = "ListInstalledApps";
         private const string DEBUG_NATIVE = "DebugNative";
         private const string PACKAGE = "Package";
-        private const string WORKSPACE_LOC = "${workspace_loc:/";
+
+        private string _localManifest;
         private string _flagFile;
 
         #endregion
@@ -53,20 +48,7 @@ namespace BlackBerry.BuildTasks
         public BBDeploy()
             : base(Resources.ResourceManager)
         {
-            _switchOrdersList = new ArrayList();
-            _switchOrdersList.Add(INSTALL_APP);
-            _switchOrdersList.Add(LAUNCH_APP);
-            _switchOrdersList.Add(LIST_INSTALLED_APPS);
-            _switchOrdersList.Add(DEBUG_NATIVE);
-            _switchOrdersList.Add(DEVICE);
-            _switchOrdersList.Add(PASSWORD);
-            _switchOrdersList.Add(PACKAGE);
-            _switchOrdersList.Add(PACKAGE_ID);
-            _switchOrdersList.Add(PACKAGE_NAME);
-            _switchOrdersList.Add(GET_FILE);
-            _switchOrdersList.Add(GET_FILE_SAVE_AS);
-            _switchOrdersList.Add(PUT_FILE);
-            _switchOrdersList.Add(PUT_FILE_SAVE_AS);
+            DefineSwitchOrder(INSTALL_APP, LAUNCH_APP, LIST_INSTALLED_APPS, DEBUG_NATIVE, DEVICE, PASSWORD, PACKAGE, PACKAGE_ID, PACKAGE_NAME, GET_FILE, GET_FILE_SAVE_AS, PUT_FILE, PUT_FILE_SAVE_AS);
         }
 
         #region Overrides
@@ -107,17 +89,6 @@ namespace BlackBerry.BuildTasks
         }
 
         /// <summary>
-        /// Getter for the SwitchOrderList property
-        /// </summary>
-        protected override ArrayList SwitchOrderList
-        {
-            get
-            {
-                return _switchOrdersList;
-            }
-        }
-
-        /// <summary>
         /// Getter for the CommandTLogName property
         /// </summary>
         protected override string CommandTLogName
@@ -138,12 +109,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string[] WriteTLogNames
         {
-            get
-            {
-                return new[] { "BBDeploy.write.1.tlog", "BBDeploy.*.write.1.tlog" };
-            }
+            get { return new[] { "BBDeploy.write.1.tlog", "BBDeploy.*.write.1.tlog" }; }
         }
-        
+
         /// <summary>
         /// Getter for the TrackedInputFiles property
         /// </summary>
@@ -163,31 +131,12 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         protected override string ToolName
         {
-            get
-            {
-                return ToolExe;
-            }
+            get { return ToolExe; }
         }
 
         /// <summary>
-        /// Getter for the TrackerIntermediateDirectory property
+        /// Returns the full path to the tool.
         /// </summary>
-        protected override string TrackerIntermediateDirectory
-        {
-            get
-            {
-                if (TrackerLogDirectory != null)
-                {
-                    return TrackerLogDirectory;
-                }
-                return string.Empty;
-            }
-        }
-
-        /// <summary>
-        /// Function to return the full path to the tool.
-        /// </summary>
-        /// <returns></returns>
         protected override string GenerateFullPathToTool()
         {
             return ToolName;
@@ -203,31 +152,20 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string GetFile
         {
-            get
-            {
-                if (IsPropertySet(GET_FILE))
-                {
-                    return ActiveToolSwitches[GET_FILE].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(GET_FILE); }
             set
             {
-                ActiveToolSwitches.Remove(GET_FILE);
-
                 // Value passed in is the file to get, relative to our app's directory.
                 // We determine the app's directory from the PackageName and PackageId.
-                String toolValue = "../../../../apps/" + PackageName + "." + PackageId + "/" + value;
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = GET_FILE,
                     DisplayName = "GetFile",
                     Description = "Get the given file from the application's directory.",
                     SwitchValue = "-getFile ",
-                    Value = toolValue
+                    Value = string.Concat("../../../../apps/", PackageName, ".", PackageId, "/", value)
                 };
-                ActiveToolSwitches.Add(GET_FILE, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -237,17 +175,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string GetFileSaveAs
         {
-            get
-            {
-                if (IsPropertySet(GET_FILE_SAVE_AS))
-                {
-                    return ActiveToolSwitches[GET_FILE_SAVE_AS].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(GET_FILE_SAVE_AS); }
             set
             {
-                ActiveToolSwitches.Remove(GET_FILE_SAVE_AS);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = GET_FILE_SAVE_AS,
@@ -255,8 +185,7 @@ namespace BlackBerry.BuildTasks
                     Description = "Save a file retrieved using GetFile to the given location.",
                     Value = value
                 };
-                ActiveToolSwitches.Add(GET_FILE_SAVE_AS, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -266,19 +195,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string PutFile
         {
-            get
-            {
-                if (IsPropertySet(PUT_FILE))
-                {
-                    return ActiveToolSwitches[PUT_FILE].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(PUT_FILE); }
             set
             {
-                ActiveToolSwitches.Remove(PUT_FILE);
-                //value = value.Replace(".exe", "");
-
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PUT_FILE,
@@ -286,9 +205,9 @@ namespace BlackBerry.BuildTasks
                     Description = "Put the given file into the application's directory.",
                     SwitchValue = "-putFile ",
                     Value = value
+                    //Value = value.Replace(".exe", "");
                 };
-                ActiveToolSwitches.Add(PUT_FILE, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -298,29 +217,18 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string PutFileSaveAs
         {
-            get
-            {
-                if (IsPropertySet(PUT_FILE_SAVE_AS))
-                {
-                    return ActiveToolSwitches[PUT_FILE_SAVE_AS].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(PUT_FILE_SAVE_AS); }
             set
             {
-                ActiveToolSwitches.Remove(PUT_FILE_SAVE_AS);
-
                 // We determine the app's directory from the PackageName and PackageId.
-                String toolValue = "../../../../apps/" + PackageName + "." + PackageId + "/" + value;
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PUT_FILE_SAVE_AS,
                     DisplayName = "PutFileSaveAs",
                     Description = "Save a file retrieved using PutFile to the given location.",
-                    Value = toolValue
+                    Value = string.Concat("../../../../apps/", PackageName, ".", PackageId + "/", value)
                 };
-                ActiveToolSwitches.Add(PUT_FILE_SAVE_AS, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -329,13 +237,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public bool InstallApp
         {
-            get
-            {
-                return (IsPropertySet(INSTALL_APP) && ActiveToolSwitches[INSTALL_APP].BooleanValue);
-            }
+            get { return GetSwitchAsBool(INSTALL_APP); }
             set
             {
-                ActiveToolSwitches.Remove(INSTALL_APP);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = INSTALL_APP,
@@ -344,8 +248,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-installApp",
                     BooleanValue = value
                 };
-                ActiveToolSwitches.Add(INSTALL_APP, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -354,13 +257,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public bool LaunchApp
         {
-            get
-            {
-                return (IsPropertySet(LAUNCH_APP) && ActiveToolSwitches[LAUNCH_APP].BooleanValue);
-            }
+            get { return GetSwitchAsBool(LAUNCH_APP); }
             set
             {
-                ActiveToolSwitches.Remove(LAUNCH_APP);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = LAUNCH_APP,
@@ -369,8 +268,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-launchApp ",
                     BooleanValue = value
                 };
-                ActiveToolSwitches.Add(LAUNCH_APP, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -380,13 +278,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public bool ListInstalledApps
         {
-            get
-            {
-                return (IsPropertySet(LIST_INSTALLED_APPS) && ActiveToolSwitches[LIST_INSTALLED_APPS].BooleanValue);            
-            }
+            get { return GetSwitchAsBool(LIST_INSTALLED_APPS); }
             set
             {
-                ActiveToolSwitches.Remove(LIST_INSTALLED_APPS);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = LIST_INSTALLED_APPS,
@@ -395,8 +289,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-listInstalledApps ",
                     BooleanValue = value
                 };
-                ActiveToolSwitches.Add(LIST_INSTALLED_APPS, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -417,17 +310,15 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public bool DebugNative
         {
-            get
-            {
-                return (IsPropertySet(DEBUG_NATIVE) && ActiveToolSwitches[DEBUG_NATIVE].BooleanValue);
-            }
+            get { return GetSwitchAsBool(DEBUG_NATIVE); }
 
             set
             {
                 if (File.Exists(_flagFile))
+                {
                     value = true;
+                }
 
-                ActiveToolSwitches.Remove(DEBUG_NATIVE);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.Boolean)
                 {
                     Name = DEBUG_NATIVE,
@@ -436,8 +327,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-debugNative ",
                     BooleanValue = value
                 };
-                ActiveToolSwitches.Add(DEBUG_NATIVE, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -447,17 +337,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string Device
         {
-            get
-            {
-                if (IsPropertySet(DEVICE))
-                {
-                    return ActiveToolSwitches[DEVICE].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(DEVICE); }
             set
             {
-                ActiveToolSwitches.Remove(DEVICE);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = DEVICE,
@@ -466,8 +348,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-device ",
                     Value = value
                 };
-                ActiveToolSwitches.Add(DEVICE, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -477,17 +358,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string Password
         {
-            get
-            {
-                if (IsPropertySet(PASSWORD))
-                {
-                    return ActiveToolSwitches[PASSWORD].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(PASSWORD); }
             set
             {
-                ActiveToolSwitches.Remove(PASSWORD);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PASSWORD,
@@ -496,9 +369,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-password ",
                     Value = DecryptPassword(value)
                 };
-
-                ActiveToolSwitches.Add(PASSWORD, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -508,17 +379,9 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string Package
         {
-            get
-            {
-                if (IsPropertySet(PACKAGE))
-                {
-                    return ActiveToolSwitches[PACKAGE].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(PACKAGE); }
             set
             {
-                ActiveToolSwitches.Remove(PACKAGE);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PACKAGE,
@@ -527,8 +390,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-package ",
                     Value = value
                 };
-                ActiveToolSwitches.Add(PACKAGE, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -538,17 +400,9 @@ namespace BlackBerry.BuildTasks
         [Output]
         public string PackageId
         {
-            get
-            {
-                if (IsPropertySet(PACKAGE_ID))
-                {
-                    return ActiveToolSwitches[PACKAGE_ID].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(PACKAGE_ID); }
             set
             {
-                ActiveToolSwitches.Remove(PACKAGE_ID);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PACKAGE_ID,
@@ -557,8 +411,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-package-id ",
                     Value = value
                 };
-                ActiveToolSwitches.Add(PACKAGE_ID, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -568,17 +421,9 @@ namespace BlackBerry.BuildTasks
         [Output]
         public string PackageName
         {
-            get
-            {
-                if (IsPropertySet(PACKAGE_NAME))
-                {
-                    return ActiveToolSwitches[PACKAGE_NAME].Value;
-                }
-                return null;
-            }
+            get { return GetSwitchAsString(PACKAGE_NAME); }
             set
             {
-                ActiveToolSwitches.Remove(PACKAGE_NAME);
                 ToolSwitch toolSwitch = new ToolSwitch(ToolSwitchType.String)
                 {
                     Name = PACKAGE_NAME,
@@ -587,8 +432,7 @@ namespace BlackBerry.BuildTasks
                     SwitchValue = "-package-name ",
                     Value = value
                 };
-                ActiveToolSwitches.Add(PACKAGE_NAME, toolSwitch);
-                AddActiveSwitchToolValue(toolSwitch);
+                SetSwitch(toolSwitch);
             }
         }
 
@@ -598,10 +442,7 @@ namespace BlackBerry.BuildTasks
         /// </summary>
         public string LocalManifestFile
         {
-            get
-            {
-                return _localManifest;
-            }
+            get { return _localManifest; }
             set
             {
                 _localManifest = value;
@@ -613,14 +454,12 @@ namespace BlackBerry.BuildTasks
                     if (lines[i].StartsWith("Package-Name: "))
                     {
                         string name = lines[i].Substring(14);
-                        if (PackageName != name)
-                            PackageName = name;
+                        PackageName = name;
                     }
                     else if (lines[i].StartsWith("Package-Id: "))
                     {
                         string id = lines[i].Substring(12);
-                        if (PackageId != id)
-                            PackageId = id;
+                        PackageId = id;
                     }
                 }
             }
@@ -632,37 +471,7 @@ namespace BlackBerry.BuildTasks
         [Output]
         public string TargetManifestFile
         {
-            get
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Getter/Setter for the TrackerLogDirectory property
-        /// </summary>
-        public string TrackerLogDirectory
-        {
-            get
-            {
-                if (IsPropertySet(TRACKER_LOG_DIRECTORY))
-                {
-                    return ActiveToolSwitches[TRACKER_LOG_DIRECTORY].Value;
-                }
-                return null;
-            }
-            set
-            {
-                ActiveToolSwitches.Remove(TRACKER_LOG_DIRECTORY);
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Directory)
-                {
-                    DisplayName = "Tracker Log Directory",
-                    Description = "Tracker Log Directory.",
-                    Value = EnsureTrailingSlash(value)
-                };
-                ActiveToolSwitches.Add(TRACKER_LOG_DIRECTORY, switch2);
-                AddActiveSwitchToolValue(switch2);
-            }
+            get { return null; }
         }
 
         #endregion
