@@ -221,6 +221,9 @@
     <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
       <Link>Model\bar-descriptor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.Extensions.cs">
+      <Link>Model\bar-descriptor.Extensions.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\Integration\ComboBoxItem.cs">
       <Link>Model\Integration\ComboBoxItem.cs</Link>
     </Compile>

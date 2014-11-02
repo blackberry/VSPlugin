@@ -96,10 +96,13 @@
     <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
-    <Compile Include="BarDescriptor\Parser.cs" />
-    <Compile Include="BarDescriptor\Schema\bar-descriptor.cs">
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.Extensions.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.Extensions.cs</Link>
+    </Compile>
+    <Compile Include="BarDescriptor\Parser.cs" />
     <Compile Include="AsyncExec.cs" />
     <Compile Include="BBDeploy.cs" />
     <Compile Include="BBNativePackager.cs" />
@@ -137,9 +140,6 @@
       <Link>Templates\MakefileTemplate.tt</Link>
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>MakefileTemplate.cs</LastGenOutput>
-    </None>
-    <None Include="BarDescriptor\Schema\bar-descriptor.xsd">
-      <SubType>Designer</SubType>
     </None>
     <Content Include="BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
       <SubType>Designer</SubType>
@@ -200,10 +200,6 @@
     </Content>
     <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml">
       <Link>BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="BarDescriptor\Schema\bar-descriptor.xml">
-      <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

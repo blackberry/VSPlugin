@@ -74,10 +74,6 @@
     <Compile Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Parser.cs">
       <Link>BarDescriptor\Parser.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.cs">
-      <Link>BarDescriptor\Schema\bar-descriptor.cs</Link>
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
-    </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\BBDeploy.cs">
       <Link>BBDeploy.cs</Link>
     </Compile>
@@ -168,12 +164,14 @@
     <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.Extensions.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.Extensions.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xsd">
-      <Link>BarDescriptor\Schema\bar-descriptor.xsd</Link>
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.Common.props">
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Common.props</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -244,11 +242,6 @@
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>MakefileTemplate.cs</LastGenOutput>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xml">
-      <Link>BarDescriptor\Schema\bar-descriptor.xml</Link>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">

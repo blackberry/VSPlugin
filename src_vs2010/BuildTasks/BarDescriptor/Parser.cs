@@ -17,6 +17,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Xml;
 using System.Xml.Serialization;
+using BlackBerry.BarDescriptor.Model;
 
 namespace BlackBerry.BuildTasks.BarDescriptor
 {
@@ -27,7 +28,7 @@ namespace BlackBerry.BuildTasks.BarDescriptor
         /// </summary>
         /// <param name="filename">Path to the bar-descriptor.xml file</param>
         /// <returns>BarDescriptor.qnx object containing the deserialized data from the bar-descriptor.</returns>
-        public static qnx Load(string filename)
+        public static QnxRootType Load(string filename)
         {
             if (!string.IsNullOrEmpty(filename))
             {
@@ -36,8 +37,8 @@ namespace BlackBerry.BuildTasks.BarDescriptor
                     using (FileStream fs = new FileStream(filename, FileMode.Open, FileAccess.Read))
                     {
                         XmlTextReader reader = new XmlTextReader(fs);
-                        XmlSerializer serializer = new XmlSerializer(typeof(qnx));
-                        return serializer.Deserialize(reader) as qnx;
+                        XmlSerializer serializer = new XmlSerializer(typeof(QnxRootType));
+                        return serializer.Deserialize(reader) as QnxRootType;
                     }
                 }
                 catch (Exception ex)

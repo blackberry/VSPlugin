@@ -203,6 +203,7 @@
     <Compile Include="Helpers\MessageBoxHelper.cs" />
     <Compile Include="Helpers\ProjectHelper.cs" />
     <Compile Include="Model\bar-descriptor.cs" />
+    <Compile Include="Model\bar-descriptor.Extensions.cs" />
     <Compile Include="Model\Integration\ComboBoxItem.cs" />
     <Compile Include="Model\Integration\DynamicMenuCommand.cs" />
     <Compile Include="Model\Integration\WebBrowserTurbo.cs">
@@ -438,6 +439,7 @@
     </Content>
     <Content Include="Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <SubType>Designer</SubType>
     </Content>
     <Content Include="Templates\VCWizards\BlackBerry\Shared\main-cascades.cpp">
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -457,6 +459,9 @@
     <Content Include="Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.h">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <None Include="Model\bar-descriptor.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Resources\TemplateIcons\CascadesProj.ico" />
     <None Include="Resources\TemplateIcons\NewQItem.ico" />
     <Content Include="Templates\ProjectItems\BlackBerry\Cascades\qcontrol.vsz">

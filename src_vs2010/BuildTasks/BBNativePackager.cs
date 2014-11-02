@@ -17,6 +17,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using BlackBerry.BarDescriptor.Model;
 using BlackBerry.BuildTasks.BarDescriptor;
 using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
@@ -29,7 +30,7 @@ namespace BlackBerry.BuildTasks
     {
         #region Member Variable and Constant Declarations
 
-        private qnx _descriptor;
+        private QnxRootType _descriptor;
         private string _projectDirectory;
         private string _appName;
         private string _barDescriptorPath = "";
@@ -163,14 +164,14 @@ namespace BlackBerry.BuildTasks
             {
                 _descriptor = Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
             }
-            asset[] globalAssets = _descriptor.assets;
-            asset[] configAssets = null;
+            AssetType[] globalAssets = _descriptor.asset;
+            AssetType[] configAssets = null;
 
             // You can call a configuration whatever you like, but these are the ones Momentics uses for its various
             // platform + configuration combinations.  Usually this is the same as the output directory, but asset paths
             // don't have anything to do with the configuration name.  I've based the config names on the platform
             // + configuration combination, not the output directory.
-            qnxConfiguration[] configs = _descriptor.configurations;
+            var configs = _descriptor.configuration;
             var expectedConfigName = string.Concat(Platform, "-", Configuration);
 
             foreach (var config in configs)
@@ -195,7 +196,7 @@ namespace BlackBerry.BuildTasks
             return items.ToArray();
         }
 
-        private void AppendAssets(ICollection<ITaskItem> result, IEnumerable<asset> assets)
+        private void AppendAssets(ICollection<ITaskItem> result, IEnumerable<AssetType> assets)
         {
             if (result == null)
                 throw new ArgumentNullException("result");
