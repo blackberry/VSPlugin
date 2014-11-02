@@ -366,8 +366,9 @@ namespace BlackBerry.Package.Wizards
             tokenProcessor.AddReplace("$SafeNameUpper$", safeNameUpper);
 
             // QML development info:
-            tokenProcessor.AddReplace("$cascadesversion$", PackageViewModel.Instance.ActiveNDK.CascadesVersion.ToString());
-            tokenProcessor.AddReplace("$CascadesVersion$", PackageViewModel.Instance.ActiveNDK.CascadesVersion.ToString());
+            var cascadesVersion = PackageViewModel.Instance.ActiveNDK != null ? PackageViewModel.Instance.ActiveNDK.CascadesVersion.ToString() : "1.2";
+            tokenProcessor.AddReplace("$cascadesversion$", cascadesVersion);
+            tokenProcessor.AddReplace("$CascadesVersion$", cascadesVersion);
 
             return tokenProcessor;
         }
