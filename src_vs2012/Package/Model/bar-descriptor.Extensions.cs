@@ -98,7 +98,7 @@ namespace BlackBerry.BarDescriptor.Model
     partial class AssetType
     {
         private static readonly string[] AssetTypeList = {"Other", "Library", "Executable", "Entry-point"}; 
-         private string _assetType = "Other"; 
+        private string _assetType = "Other"; 
 
 
         [XmlIgnore]
@@ -148,25 +148,20 @@ namespace BlackBerry.BarDescriptor.Model
 
         private string GetAssetType()
         {
-            if (this.Value.StartsWith("lib/"))
+            if (Value.StartsWith("lib/"))
             {
                 return "Library";
             }
-            else if (this.typeField == "Qnx/Elf")
+            if (typeField == "Qnx/Elf")
             {
-                if (this.entry == "true")
+                if (entry == "true")
                 {
                     return "Entry-point";
                 }
-                else
-                {
-                    return "Executable";
-                }
+                return "Executable";
             }
-            else
-            {
-                return "Other";
-            }
+
+            return "Other";
         }
     }
 
