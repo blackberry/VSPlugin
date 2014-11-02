@@ -84,6 +84,7 @@
     <Compile Include="Model\ApiLevelListTypes.cs" />
     <Compile Include="Model\ApiLevelTarget.cs" />
     <Compile Include="Model\ApiLevelTask.cs" />
+    <Compile Include="Model\AuthorInfo.cs" />
     <Compile Include="Model\CertificateInfo.cs" />
     <Compile Include="Model\CskTokenInfo.cs" />
     <Compile Include="Model\DebugTokenInfo.cs" />

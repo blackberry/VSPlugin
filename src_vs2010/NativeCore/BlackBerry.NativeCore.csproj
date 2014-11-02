@@ -167,6 +167,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiLevelTask.cs">
       <Link>Model\ApiLevelTask.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\AuthorInfo.cs">
+      <Link>Model\AuthorInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\CertificateInfo.cs">
       <Link>Model\CertificateInfo.cs</Link>
     </Compile>

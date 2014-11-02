@@ -891,10 +891,10 @@ namespace BlackBerry.Package.ViewModels
             var debugToken = _debugTokenInfoRunner.DebugToken;
             _debugTokenInfoRunner = null;
 
-            if (e.IsSuccessfull && debugToken != null)
+            if (e.IsSuccessfull && debugToken != null && debugToken.Author != null)
             {
-                Author = debugToken.AuthorName;
-                AuthorID = debugToken.AuthorID;
+                Author = debugToken.Author.Name;
+                AuthorID = debugToken.Author.ID;
             }
             else
             {

@@ -42,13 +42,7 @@ namespace BlackBerry.NativeCore.Model
             private set;
         }
 
-        public string AuthorName
-        {
-            get;
-            private set;
-        }
-
-        public string AuthorID
+        public AuthorInfo Author
         {
             get;
             private set;
@@ -124,7 +118,10 @@ namespace BlackBerry.NativeCore.Model
             if (!mostImportantOnly)
             {
                 result.Append("Name: ").Append(Name).Append(" (").Append(ID).AppendLine(")");
-                result.Append("Author: ").AppendLine(AuthorName);
+                if (Author != null)
+                {
+                    result.Append("Author: ").AppendLine(Author.Name);
+                }
             }
 
             // print dates:
@@ -154,8 +151,11 @@ namespace BlackBerry.NativeCore.Model
 
             if (mostImportantOnly)
             {
-                result.Append("Author: ").AppendLine(AuthorName);
-                result.Append("Author ID: ").AppendLine(AuthorID);
+                if (Author != null)
+                {
+                    result.Append("Author: ").AppendLine(Author.Name);
+                    result.Append("Author ID: ").AppendLine(Author.ID);
+                }
 
                 result.AppendLine();
                 result.Append("App ID: ").AppendLine(ID);
@@ -187,13 +187,9 @@ namespace BlackBerry.NativeCore.Model
         {
             var result = new StringBuilder();
 
-            if (!string.IsNullOrEmpty(AuthorName))
+            if (Author != null)
             {
-                result.Append(AuthorName);
-            }
-            else
-            {
-                result.Append(AuthorID);
+                result.Append(!string.IsNullOrEmpty(Author.Name) ? Author.Name : Author.ID);
             }
             result.Append(" (");
             result.Append(ExpiryDate.ToLocalTime().ToString("yyyy-MM-dd HH:mm:ss"));
@@ -225,6 +221,8 @@ namespace BlackBerry.NativeCore.Model
             var items = text.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
             DebugTokenInfo result = new DebugTokenInfo();
             bool isDebugToken = false;
+            string authorName = null;
+            string authorID = null;
 
             foreach (var line in items)
             {
@@ -251,10 +249,10 @@ namespace BlackBerry.NativeCore.Model
                             result.VersionID = value;
                             break;
                         case "package-author":
-                            result.AuthorName = value;
+                            authorName = value;
                             break;
                         case "package-author-id":
-                            result.AuthorID = value;
+                            authorID = value;
                             break;
                         case "package-author-certificate-hash":
                             result.AuthorCertificateHash = value;
@@ -275,7 +273,12 @@ namespace BlackBerry.NativeCore.Model
                 }
             }
 
-            return !isDebugToken || string.IsNullOrEmpty(result.ID) || string.IsNullOrEmpty(result.AuthorName) ? null : result;
+            if (!string.IsNullOrEmpty(authorID) || !string.IsNullOrEmpty(authorName))
+            {
+                result.Author = new AuthorInfo(authorID, authorName);
+            }
+
+            return !isDebugToken || string.IsNullOrEmpty(result.ID) || result.Author == null ? null : result;
         }
 
         private static string[] ParseSystemActions(string text)
