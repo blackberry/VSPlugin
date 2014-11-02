@@ -40,7 +40,8 @@ using Microsoft.VisualStudio.Shell.Interop;
 namespace BlackBerry.Package.Components
 {
     /// <summary>
-    /// 
+    /// Manager class helpful in hijacking the Visual Studio's UI to initiate the build and deployment of BlackBerry project.
+    /// It exposes some detection mechanisms for external usages.
     /// </summary>
     internal sealed class BuildPlatformsManager
     {
@@ -314,6 +315,11 @@ namespace BlackBerry.Package.Components
             {
                 TraceLog.WriteException(e);
                 return false;
+            }
+            finally
+            {
+                // update IntelliSense state:
+                OnSolutionOpened();
             }
         }
 
