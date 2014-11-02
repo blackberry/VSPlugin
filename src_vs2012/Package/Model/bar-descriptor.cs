@@ -50,6 +50,8 @@ namespace BlackBerry.BarDescriptor.Model {
         
         private ConfigurationType[] configurationField;
         
+        private EntryPointType[] entryPointField;
+        
         private ImageType iconField;
         
         private ImageType splashScreensField;
@@ -206,6 +208,18 @@ namespace BlackBerry.BarDescriptor.Model {
             set {
                 this.configurationField = value;
                 this.RaisePropertyChanged("configuration");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("entryPoint")]
+        public EntryPointType[] entryPoint {
+            get {
+                return this.entryPointField;
+            }
+            set {
+                this.entryPointField = value;
+                this.RaisePropertyChanged("entryPoint");
             }
         }
         
@@ -615,6 +629,78 @@ namespace BlackBerry.BarDescriptor.Model {
             set {
                 this.valueField = value;
                 this.RaisePropertyChanged("Value");
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    /// <remarks/>
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("xsd", "4.0.30319.1")]
+    [System.SerializableAttribute()]
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.ComponentModel.DesignerCategoryAttribute("code")]
+    [System.Xml.Serialization.XmlTypeAttribute(Namespace="http://www.qnx.com/schemas/application/1.0")]
+    public partial class EntryPointType : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private string nameField;
+        
+        private string entryPointTypeField;
+        
+        private PermissionType[] permissionField;
+        
+        private string idField;
+        
+        /// <remarks/>
+        public string name {
+            get {
+                return this.nameField;
+            }
+            set {
+                this.nameField = value;
+                this.RaisePropertyChanged("name");
+            }
+        }
+        
+        /// <remarks/>
+        public string entryPointType {
+            get {
+                return this.entryPointTypeField;
+            }
+            set {
+                this.entryPointTypeField = value;
+                this.RaisePropertyChanged("entryPointType");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlElementAttribute("permission")]
+        public PermissionType[] permission {
+            get {
+                return this.permissionField;
+            }
+            set {
+                this.permissionField = value;
+                this.RaisePropertyChanged("permission");
+            }
+        }
+        
+        /// <remarks/>
+        [System.Xml.Serialization.XmlAttributeAttribute()]
+        public string id {
+            get {
+                return this.idField;
+            }
+            set {
+                this.idField = value;
+                this.RaisePropertyChanged("id");
             }
         }
         

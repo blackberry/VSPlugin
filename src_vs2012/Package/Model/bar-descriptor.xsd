@@ -100,6 +100,7 @@
       <xs:element name="initialWindow" type="WindowType" minOccurs="0" />
       <xs:element name="asset" type="AssetType" minOccurs="0" maxOccurs="unbounded" />
       <xs:element name="configuration" type="ConfigurationType" minOccurs="0" maxOccurs="unbounded" />
+      <xs:element name="entryPoint" type="EntryPointType" minOccurs="0" maxOccurs="unbounded" />
       <xs:element name="icon" type="ImageType" minOccurs="0" />
       <xs:element name="splashScreens" type="ImageType" minOccurs="0" />
       <xs:element name="splashscreen" type="xs:string" minOccurs="0" />
