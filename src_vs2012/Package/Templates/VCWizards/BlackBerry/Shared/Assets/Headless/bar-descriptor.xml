@@ -66,6 +66,7 @@
   <entryPoint id="$ProjectName$">
     <name>$ProjectName$</name>
   </entryPoint>
+  <!-- ID of an entry-point can't exceed 18 chars -->
   <entryPoint id="$ProjectName$Service">
     <name>$ProjectName$ Service</name>
     <entryPointType>Qnx/Elf</entryPointType>

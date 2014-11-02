@@ -214,7 +214,7 @@
     <value>Creates a headless application consisting of a project for the UI component and a project for the background service</value>
   </data>
   <data name="5102" xml:space="preserve">
-    <value>CascadesHeadlessApp</value>
+    <value>HeadlessApp</value>
   </data>
   <data name="5110" xml:space="preserve">
     <value>Cascades - Card Application</value>
