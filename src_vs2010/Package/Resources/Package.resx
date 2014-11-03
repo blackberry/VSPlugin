@@ -174,4 +174,7 @@
   <data name="1006" xml:space="preserve">
     <value>Signing</value>
   </data>
+  <data name="1007" xml:space="preserve">
+    <value>Backup</value>
+  </data>
 </root>

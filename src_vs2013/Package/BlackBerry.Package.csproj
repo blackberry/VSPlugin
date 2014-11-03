@@ -170,6 +170,14 @@
       <Link>Dialogs\BinaryDiscoveryForm.designer.cs</Link>
       <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.cs">
+      <Link>Dialogs\CachedAuthorForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.designer.cs">
+      <Link>Dialogs\CachedAuthorForm.designer.cs</Link>
+      <DependentUpon>CachedAuthorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Dialogs\FolderForm.cs">
       <Link>Dialogs\FolderForm.cs</Link>
       <SubType>Form</SubType>
@@ -367,6 +375,18 @@
       <Link>Dialogs\UpdateManagerStatusForm.designer.cs</Link>
       <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\BackupOptionControl.cs">
+      <Link>Options\BackupOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\BackupOptionControl.designer.cs">
+      <Link>Options\BackupOptionControl.designer.cs</Link>
+      <DependentUpon>BackupOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\BackupOptionPage.cs">
+      <Link>Options\BackupOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.cs">
       <Link>Options\GeneralOptionControl.cs</Link>
       <SubType>UserControl</SubType>
@@ -442,6 +462,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\BackupOptionViewModel.cs">
+      <Link>ViewModels\BackupOptionViewModel.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\BarEditorViewModel.cs">
       <Link>ViewModels\BarEditorViewModel.cs</Link>
@@ -810,6 +833,14 @@
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="Resources\TemplateIcons\EmptyProj.ico" />
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.resx">
+      <Link>Dialogs\CachedAuthorForm.resx</Link>
+      <DependentUpon>CachedAuthorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\BackupOptionControl.resx">
+      <Link>Options\BackupOptionControl.resx</Link>
+      <DependentUpon>BackupOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Template.Strings.resx">
       <Link>Resources\Template.Strings.resx</Link>
     </EmbeddedResource>

@@ -323,10 +323,11 @@ namespace BlackBerry.Package.Wizards
             var safeName = CreateSafeName(name);
             var safeNameUpper = safeName.ToUpperInvariant();
 
-            var author = PackageViewModel.Instance.Developer.Name ?? "Example Inc.";
-            var authorID = "ABCD1234";
+            var authorInfo = PackageViewModel.Instance.Developer != null ? PackageViewModel.Instance.Developer.CachedAuthor : null;
+            var authorName = authorInfo != null && !string.IsNullOrEmpty(authorInfo.Name) ? authorInfo.Name : "Example Inc.";
+            var authorID = authorInfo != null && !string.IsNullOrEmpty(authorInfo.ID) ? authorInfo.ID : "ABCD1234";
             var now = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss");
-            var authorSafe = CreateSafeName(author).ToLowerInvariant();
+            var authorSafe = CreateSafeName(authorName).ToLowerInvariant();
 
             // project & file info:
             tokenProcessor.AddReplace("$projectname$", projectName);
@@ -350,8 +351,8 @@ namespace BlackBerry.Package.Wizards
             // developer info:
             tokenProcessor.AddReplace("$user$", Environment.UserName);
             tokenProcessor.AddReplace("$User$", Environment.UserName);
-            tokenProcessor.AddReplace("$author$", author);
-            tokenProcessor.AddReplace("$Author$", author);
+            tokenProcessor.AddReplace("$author$", authorName);
+            tokenProcessor.AddReplace("$Author$", authorName);
             tokenProcessor.AddReplace("$authorid$", authorID);
             tokenProcessor.AddReplace("$AuthorID$", authorID);
             tokenProcessor.AddReplace("$now$", now);

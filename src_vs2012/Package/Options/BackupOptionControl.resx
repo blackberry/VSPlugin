@@ -117,4 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="label4.Text" xml:space="preserve">
+    <value>If you lose your signing keys, or forget your password, you will be required to re-register with BlackBerry. After re-registration, new versions of your applications will appear as new applications, and will not have access to shared data from previous releases. Exporting your signing keys will also allow you to import them on multiple computers and sign from any of them.</value>
+  </data>
 </root>

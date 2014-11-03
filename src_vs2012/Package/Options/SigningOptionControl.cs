@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows.Forms;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Dialogs;
 using BlackBerry.Package.Helpers;
@@ -99,44 +98,6 @@ namespace BlackBerry.Package.Options
             ReloadAuthor();
         }
 
-        private void bttBackup_Click(object sender, EventArgs e)
-        {
-            var form = DialogHelper.SaveZipFile("Exporting Developer Profile", "profile_backup_" + DateTime.Now.ToString("yyyy-MM-dd") + ".zip");
-
-            if (form.ShowDialog() == DialogResult.OK)
-            {
-                if (_vm.Developer.BackupProfile(form.FileName))
-                {
-                    MessageBoxHelper.Show("Developer profile exported", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBoxHelper.Show("Error while exporting developer profile", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
-                UpdateUI();
-            }
-        }
-
-        private void bttRestore_Click(object sender, EventArgs e)
-        {
-            var form = DialogHelper.OpenZipFile("Restoring Developer Profile");
-
-            if (form.ShowDialog() == DialogResult.OK)
-            {
-                if (_vm.Developer.RestoreProfile(form.FileName))
-                {
-                    MessageBoxHelper.Show("Developer profile restored", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    MessageBoxHelper.Show("Error while importing developer profile", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
-
-                ReloadAuthor();
-            }
-        }
-
         private void bttUnregister_Click(object sender, EventArgs e)
         {
             if (MessageBoxHelper.Show("Do you want to unregister and remove the BlackBerry ID Token file?\r\nThis operation can not be reverted. Make sure you have created a backup.", "UNREGISTRATION!!", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
@@ -187,6 +148,16 @@ namespace BlackBerry.Package.Options
             registrationForm.ShowDialog();
 
             UpdateUI();
+        }
+
+        private void bttEditPublisher_Click(object sender, EventArgs e)
+        {
+            var form = new CachedAuthorForm(null, _vm.Developer.CachedAuthor);
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                _vm.Developer.CachedAuthor = form.ToAuthor();
+            }
         }
     }
 }
