@@ -895,6 +895,9 @@ namespace BlackBerry.Package.ViewModels
             {
                 Author = debugToken.Author.Name;
                 AuthorID = debugToken.Author.ID;
+
+                // order cache update...
+                PackageViewModel.Instance.UpdateCachedAuthor(debugToken.Author);
             }
             else
             {

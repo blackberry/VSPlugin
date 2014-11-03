@@ -240,5 +240,14 @@ namespace BlackBerry.Package.ViewModels
             _activeSimulator = null;
             _details = null;
         }
+
+        /// <summary>
+        /// Updates the cached info about author (publisher).
+        /// </summary>
+        public void Update(AuthorInfo info)
+        {
+            // do it instantly:
+            PackageViewModel.Instance.UpdateCachedAuthor(info);
+        }
     }
 }

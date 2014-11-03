@@ -204,6 +204,10 @@ namespace BlackBerry.Package.Dialogs
             if (success)
             {
                 _tokenInfo = _tokenInfoRunner.DebugToken;
+                if (_tokenInfo != null)
+                {
+                    _vm.Update(_tokenInfo.Author);
+                }
 
                 TraceLog.WriteLine("Loaded debug token: {0}", _tokenInfoRunner.DebugToken);
                 AppendTokenLog("Debug token found:" + Environment.NewLine + _tokenInfoRunner.DebugToken.ToLongDescription(true));
