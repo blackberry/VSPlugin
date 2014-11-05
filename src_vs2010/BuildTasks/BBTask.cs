@@ -187,24 +187,39 @@ namespace BlackBerry.BuildTasks
                 return false;
 
             string message = null;
+            bool skipPrinting = false;
 
             if (text.StartsWith("Error: ", StringComparison.OrdinalIgnoreCase))
             {
                 message = text.Substring(7).Trim();
+                skipPrinting = true;
             }
             else
             {
                 if (text.StartsWith("[ERROR] ", StringComparison.OrdinalIgnoreCase))
                 {
                     message = text.Substring(8).Trim();
+                    skipPrinting = true;
+                }
+                else
+                {
+                    if (text.StartsWith("result::failure ", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // skip the error-id, if specified before message:
+                        int i = text.Length > 16 && char.IsDigit(text[16]) ? text.IndexOf(' ', 16) : 15;
+                        if (i > 0)
+                        {
+                            message = text.Substring(i + 1);
+                        }
+                    }
                 }
             }
 
             if (!string.IsNullOrWhiteSpace(message))
             {
                 // add a dedicated error for the tool failure:
-                BuildEngine.LogErrorEvent(new BuildErrorEventArgs(null, null, GetType().Name, 0, 0, 0, 0, text.Substring(7).Trim(), null, GetType().Name));
-                return true;
+                BuildEngine.LogErrorEvent(new BuildErrorEventArgs(null, null, GetType().Name, 0, 0, 0, 0, message, null, GetType().Name));
+                return skipPrinting;
             }
 
             return false;
