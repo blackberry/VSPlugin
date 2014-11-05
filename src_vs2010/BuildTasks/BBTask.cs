@@ -177,5 +177,53 @@ namespace BlackBerry.BuildTasks
             }
             return null;
         }
+
+        /// <summary>
+        /// Reports specified error returned from BlackBerry tool (by removing leading 'Error: ' prefix).
+        /// </summary>
+        protected bool LogToolError(string text)
+        {
+            if (string.IsNullOrEmpty(text))
+                return false;
+
+            string message = null;
+
+            if (text.StartsWith("Error: ", StringComparison.OrdinalIgnoreCase))
+            {
+                message = text.Substring(7).Trim();
+            }
+            else
+            {
+                if (text.StartsWith("[ERROR] ", StringComparison.OrdinalIgnoreCase))
+                {
+                    message = text.Substring(8).Trim();
+                }
+            }
+
+            if (!string.IsNullOrWhiteSpace(message))
+            {
+                // add a dedicated error for the tool failure:
+                BuildEngine.LogErrorEvent(new BuildErrorEventArgs(null, null, GetType().Name, 0, 0, 0, 0, text.Substring(7).Trim(), null, GetType().Name));
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Parses a single line of text to identify any errors or warnings in canonical format.
+        /// </summary>
+        /// <param name="singleLine">A single line of text for the method to parse.</param><param name="messageImportance">A value of <see cref="T:Microsoft.Build.Framework.MessageImportance"/> that indicates the importance level with which to log the message.</param>
+        protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
+        {
+            // is it a failure result?
+            // then add a dedicated error-task for it:
+            if (LogToolError(singleLine))
+            {
+                return;
+            }
+
+            base.LogEventsFromTextOutput(singleLine, messageImportance);
+        }
     }
 }

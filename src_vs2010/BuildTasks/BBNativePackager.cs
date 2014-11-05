@@ -48,6 +48,8 @@ namespace BlackBerry.BuildTasks
         private const string GET_TARGET_FILE_MAP = "GetTargetFileMap";
         private const string WORKSPACE_LOC = "${workspace_loc:/";
 
+        private StreamWriter _localLogWriter;
+
         #endregion
 
         /// <summary>
@@ -93,17 +95,56 @@ namespace BlackBerry.BuildTasks
             AppendResources(packagerBuilder);
             resultCommand.Append(' ').Append(packagerBuilder);
 
+            return resultCommand.ToString();
+        }
+
+        /// <summary>
+        /// Creates a temporary response (.rsp) file and runs the executable file.
+        /// </summary>
+        /// <returns>
+        /// The returned exit code of the executable file. If the task logged errors, but the executable returned an exit code of 0, this method returns -1.
+        /// </returns>
+        /// <param name="pathToTool">The path to the executable file.</param><param name="responseFileCommands">The command line arguments to place in the .rsp file.</param><param name="commandLineCommands">The command line arguments to pass directly to the executable file.</param>
+        protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
+        {
             // Output the .bar file's manifest to a file so we can parse it.
             if (PackageManifestOnly)
             {
-                resultCommand.Append(" > localManifest.mf");
+                _localLogWriter = File.CreateText("localManifest.mf");
+                _localLogWriter.WriteLine("Info: Generating local manifest ({0})", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             }
             else if (GetTargetFileMap)
             {
-                resultCommand.Append(" > targetFileMap.txt");
+                _localLogWriter = File.CreateText("targetFileMap.txt");
+                _localLogWriter.WriteLine("Info: Generating target map-file ({0})", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             }
-            
-            return resultCommand.ToString();
+
+            var result = base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
+
+            if (_localLogWriter != null)
+            {
+                _localLogWriter.Dispose();
+                _localLogWriter = null;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Parses a single line of text to identify any errors or warnings in canonical format.
+        /// </summary>
+        /// <param name="singleLine">A single line of text for the method to parse.</param><param name="messageImportance">A value of <see cref="T:Microsoft.Build.Framework.MessageImportance"/> that indicates the importance level with which to log the message.</param>
+        protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
+        {
+            // dump all printouts of this tool into dedicated logger:
+            if (_localLogWriter != null)
+            {
+                _localLogWriter.WriteLine(singleLine);
+                LogToolError(singleLine);
+                return;
+            }
+
+            base.LogEventsFromTextOutput(singleLine, messageImportance);
         }
 
         /// <summary>

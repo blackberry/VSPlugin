@@ -12,6 +12,7 @@
 //* See the License for the specific language governing permissions and
 //* limitations under the License.
 
+using System;
 using System.IO;
 using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
@@ -39,6 +40,8 @@ namespace BlackBerry.BuildTasks
 
         private string _localManifest;
         private string _flagFile;
+
+        private StreamWriter _localLogWriter;
 
         #endregion
 
@@ -73,19 +76,46 @@ namespace BlackBerry.BuildTasks
         }
 
         /// <summary>
-        /// Helper function to generate response file string
+        /// Creates a temporary response (.rsp) file and runs the executable file.
         /// </summary>
-        /// <returns>response file command line string</returns>
-        protected override string GenerateResponseFileCommands()
+        /// <returns>
+        /// The returned exit code of the executable file. If the task logged errors, but the executable returned an exit code of 0, this method returns -1.
+        /// </returns>
+        /// <param name="pathToTool">The path to the executable file.</param><param name="responseFileCommands">The command line arguments to place in the .rsp file.</param><param name="commandLineCommands">The command line arguments to pass directly to the executable file.</param>
+        protected override int ExecuteTool(string pathToTool, string responseFileCommands, string commandLineCommands)
         {
-            string cmd = base.GenerateResponseFileCommands();
-
             if (ListInstalledApps)
             {
-                cmd += " > installedApps.txt";
+                _localLogWriter = File.CreateText("installedApps.txt");
+                _localLogWriter.WriteLine("Info: Generating list of applications from the device ({0})", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             }
 
-            return cmd;
+            var result = base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
+
+            if (_localLogWriter != null)
+            {
+                _localLogWriter.Dispose();
+                _localLogWriter = null;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Parses a single line of text to identify any errors or warnings in canonical format.
+        /// </summary>
+        /// <param name="singleLine">A single line of text for the method to parse.</param><param name="messageImportance">A value of <see cref="T:Microsoft.Build.Framework.MessageImportance"/> that indicates the importance level with which to log the message.</param>
+        protected override void LogEventsFromTextOutput(string singleLine, MessageImportance messageImportance)
+        {
+            // dump all printouts of this tool into dedicated logger:
+            if (_localLogWriter != null)
+            {
+                _localLogWriter.WriteLine(singleLine);
+                LogToolError(singleLine);
+                return;
+            }
+
+            base.LogEventsFromTextOutput(singleLine, messageImportance);
         }
 
         /// <summary>
