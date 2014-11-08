@@ -535,6 +535,19 @@
       <DependentUpon>BackupOptionControl.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Template.Icons.resx" />
+    <Content Include="..\..\src_vs2012\Package\Resources\License.txt">
+      <Link>Resources\License.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Resources\ReleaseNotes.txt">
+      <Link>Resources\ReleaseNotes.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Resources\StartGuide.txt">
+      <Link>Resources\StartGuide.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\applicationui.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\applicationui.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>

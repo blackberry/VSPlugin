@@ -402,6 +402,18 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Wizards\PuppetMasterWizardEngine.cs" />
+    <Content Include="Resources\License.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\ReleaseNotes.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\StartGuide.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\VCWizards\BlackBerry\Shared\applicationui.cpp">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

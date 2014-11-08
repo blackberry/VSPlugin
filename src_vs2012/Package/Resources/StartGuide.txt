@@ -1,0 +1,4 @@
+﻿Start Guide
+===========
+
+Please visit the wiki pages at https://github.com/phofman/vs-plugin/wiki for details.

@@ -532,6 +532,21 @@
     <Compile Include="..\..\src_vs2012\Package\Wizards\PuppetMasterWizardEngine.cs">
       <Link>Wizards\PuppetMasterWizardEngine.cs</Link>
     </Compile>
+    <Content Include="..\..\src_vs2012\Package\Resources\License.txt">
+      <Link>Resources\License.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Resources\ReleaseNotes.txt">
+      <Link>Resources\ReleaseNotes.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Resources\StartGuide.txt">
+      <Link>Resources\StartGuide.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry.vsdir">
       <Link>Templates\Projects\BlackBerry.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
