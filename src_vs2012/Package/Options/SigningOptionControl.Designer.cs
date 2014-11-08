@@ -29,6 +29,7 @@
         private void InitializeComponent()
         {
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.bttEditPublisher = new System.Windows.Forms.Button();
             this.lblStatus = new System.Windows.Forms.Label();
             this.bttUnregister = new System.Windows.Forms.Button();
             this.bttRegister = new System.Windows.Forms.Button();
@@ -44,7 +45,6 @@
             this.bttChangeCert = new System.Windows.Forms.Button();
             this.bttNavigate = new System.Windows.Forms.Button();
             this.label5 = new System.Windows.Forms.Label();
-            this.bttEditPublisher = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -65,6 +65,17 @@
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "BlackBerry Signing Authority";
+            // 
+            // bttEditPublisher
+            // 
+            this.bttEditPublisher.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.bttEditPublisher.Location = new System.Drawing.Point(9, 99);
+            this.bttEditPublisher.Name = "bttEditPublisher";
+            this.bttEditPublisher.Size = new System.Drawing.Size(156, 23);
+            this.bttEditPublisher.TabIndex = 9;
+            this.bttEditPublisher.Text = "&Edit Publisher info...";
+            this.bttEditPublisher.UseVisualStyleBackColor = true;
+            this.bttEditPublisher.Click += new System.EventHandler(this.bttEditPublisher_Click);
             // 
             // lblStatus
             // 
@@ -225,22 +236,13 @@
             // label5
             // 
             this.label5.AutoSize = true;
+            this.label5.BackColor = System.Drawing.SystemColors.Control;
+            this.label5.ForeColor = System.Drawing.Color.Red;
             this.label5.Location = new System.Drawing.Point(87, 71);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(121, 13);
             this.label5.TabIndex = 0;
             this.label5.Text = "(if empty, signing will fail)";
-            // 
-            // bttEditPublisher
-            // 
-            this.bttEditPublisher.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.bttEditPublisher.Location = new System.Drawing.Point(9, 99);
-            this.bttEditPublisher.Name = "bttEditPublisher";
-            this.bttEditPublisher.Size = new System.Drawing.Size(156, 23);
-            this.bttEditPublisher.TabIndex = 9;
-            this.bttEditPublisher.Text = "&Edit Publisher info...";
-            this.bttEditPublisher.UseVisualStyleBackColor = true;
-            this.bttEditPublisher.Click += new System.EventHandler(this.bttEditPublisher_Click);
             // 
             // SigningOptionControl
             // 
