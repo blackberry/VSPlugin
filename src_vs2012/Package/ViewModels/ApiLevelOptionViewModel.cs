@@ -53,11 +53,24 @@ namespace BlackBerry.Package.ViewModels
                     return false;
                 }
 
-                _runner = new ApiLevelListLoadRunner(ConfigDefaults.NdkDirectory, _type);
-                _runner.Dispatcher = dispatcher;
-                _runner.Finished += RunnerOnFinished;
-                _runner.ExecuteAsync();
-                return true;
+                // is it possible to load any info?
+                if (string.IsNullOrEmpty(ConfigDefaults.NdkDirectory))
+                {
+                    Remote = _type != ApiLevelListTypes.Simulators && _type != ApiLevelListTypes.Runtimes
+                        ? ApiLevelListLoadRunner.GroupList(null, true) // list only 'injected'
+                        : new[] { new ApiInfoArray(ApiInfo.CreateMissingNdkDirectoryInfo()) };
+                    NotifyListLoaded();
+                    return false;
+                }
+                else
+                {
+                    // then load it
+                    _runner = new ApiLevelListLoadRunner(ConfigDefaults.NdkDirectory, _type);
+                    _runner.Dispatcher = dispatcher;
+                    _runner.Finished += RunnerOnFinished;
+                    _runner.ExecuteAsync();
+                    return true;
+                }
             }
 
             private void RunnerOnFinished(object sender, ToolRunnerEventArgs e)
@@ -152,7 +165,7 @@ namespace BlackBerry.Package.ViewModels
                 if (ndkInfo != null)
                 {
                     // is it NDK owned by the plugin itself?
-                    if (isInstalled && ndkInfo.TargetPath != null && ndkInfo.TargetPath.StartsWith(ConfigDefaults.NdkDirectory, StringComparison.InvariantCultureIgnoreCase))
+                    if (isInstalled && ndkInfo.TargetPath != null && !string.IsNullOrEmpty(ConfigDefaults.NdkDirectory) && ndkInfo.TargetPath.StartsWith(ConfigDefaults.NdkDirectory, StringComparison.InvariantCultureIgnoreCase))
                     {
                         return IsProcessing(info) ? ApiLevelTask.Nothing : ApiLevelTask.Uninstall;
                     }
@@ -243,6 +256,8 @@ namespace BlackBerry.Package.ViewModels
                 // nothing should be displayed for invalid simulator:
                 if (info == null)
                     return ApiLevelTask.Hide;
+                if (info.Type == DeviceFamilyType.Unknown)
+                    return ApiLevelTask.Nothing;
 
                 // check, if it exists on disk:
                 var infoArray = info as ApiInfoArray;
@@ -298,6 +313,8 @@ namespace BlackBerry.Package.ViewModels
                 // nothing should be displayed for invalid runtime libraries:
                 if (info == null)
                     return ApiLevelTask.Hide;
+                if (info.Type == DeviceFamilyType.Unknown)
+                    return ApiLevelTask.Nothing;
 
                 // check, if it exists on disk:
                 var infoArray = info as ApiInfoArray;

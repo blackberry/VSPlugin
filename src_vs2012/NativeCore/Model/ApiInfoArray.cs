@@ -7,10 +7,25 @@ namespace BlackBerry.NativeCore.Model
     /// </summary>
     public sealed class ApiInfoArray : ApiInfo
     {
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public ApiInfoArray(string name, Version version, ApiInfo[] items)
             : base(name, version, DeviceFamilyType.Unknown)
         {
             Items = items ?? new ApiInfo[0];
+        }
+
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
+        public ApiInfoArray(ApiInfo item)
+            : base(item != null ? item.Name : null, item != null ? item.Version : null, item != null ? item.Type : DeviceFamilyType.Unknown)
+        {
+            if (item == null)
+                throw new ArgumentNullException("item");
+
+            Items = new[] { item };
         }
 
         #region Properties

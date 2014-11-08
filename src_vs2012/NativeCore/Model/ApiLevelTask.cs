@@ -6,7 +6,7 @@
     public enum ApiLevelTask
     {
         /// <summary>
-        /// Nothing can be done with this API Level (it was installed separatelly and just detected).
+        /// Nothing can be done with this API Level (it was installed separately and just detected).
         /// </summary>
         Nothing = 0,
         /// <summary>

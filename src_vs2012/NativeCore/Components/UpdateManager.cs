@@ -364,7 +364,7 @@ namespace BlackBerry.NativeCore.Components
                 return;
             if (CurrentAction != null)
                 return;
-            // no bbndk_vs folder known
+            // no NdkDirectory folder found
             if (string.IsNullOrEmpty(SyncFilePath))
                 return;
 

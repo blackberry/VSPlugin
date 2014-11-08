@@ -128,6 +128,14 @@ namespace BlackBerry.NativeCore.Model
         }
 
         /// <summary>
+        /// Creates an instance of the API to inform that NdkDirectory doesn't exist.
+        /// </summary>
+        public static ApiInfo CreateMissingNdkDirectoryInfo()
+        {
+            return new ApiInfo("No \"BBNDK for Visual Studio\" (bbndk_vs) folder found", new Version(), DeviceFamilyType.Unknown);
+        }
+
+        /// <summary>
         /// Returns an index of NdkInfo inside a collection that has the same version.
         /// </summary>
         public static int IndexOf(IEnumerable<ApiInfo> list, Version version)

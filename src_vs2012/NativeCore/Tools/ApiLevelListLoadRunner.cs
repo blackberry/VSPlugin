@@ -155,14 +155,17 @@ namespace BlackBerry.NativeCore.Tools
             ApiLevels = GroupList(APIs, Type != ApiLevelListTypes.Simulators && Type != ApiLevelListTypes.Runtimes);
         }
 
-        private static ApiInfoArray[] GroupList(ApiInfo[] list, bool injectPlayBook)
+        /// <summary>
+        /// Sorts the list of given API levels and injects some special ones (to download PlayBook NDK and 'Add custom local NDK')
+        /// </summary>
+        public static ApiInfoArray[] GroupList(ApiInfo[] list, bool injectExtraActions)
         {
-            if (list == null || list.Length == 0)
+            if ((list == null || list.Length == 0) && !injectExtraActions)
                 return new ApiInfoArray[0];
 
             var groups = new List<List<ApiInfo>>();
 
-            if (injectPlayBook)
+            if (injectExtraActions)
             {
                 // inject info about tablet NDK:
                 Add(groups, ApiInfo.CreateTabletInfo());
@@ -172,9 +175,12 @@ namespace BlackBerry.NativeCore.Tools
             }
 
             // group BlackBerry 10 items together:
-            foreach (var item in list)
+            if (list != null && list.Length > 0)
             {
-                Add(groups, item);
+                foreach (var item in list)
+                {
+                    Add(groups, item);
+                }
             }
 
             // convert to pure arrays and assign the name for each group:
