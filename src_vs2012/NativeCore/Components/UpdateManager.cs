@@ -225,14 +225,13 @@ namespace BlackBerry.NativeCore.Components
         private readonly List<ActionData> _actions;
         private Timer _timer;
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public UpdateManager(string folder)
         {
-            if (string.IsNullOrEmpty(folder))
-                throw new ArgumentNullException("folder");
-
-            Folder = folder;
             _sync = new object();
-            _syncPath = Path.Combine(Folder, "vsplugin.lock");
+            _syncPath = string.IsNullOrEmpty(folder) || !Directory.Exists(folder) ? null : Path.Combine(folder, "vsplugin.lock");
             _actions = new List<ActionData>();
             Actions = new ActionData[0];
         }
@@ -260,15 +259,6 @@ namespace BlackBerry.NativeCore.Components
         {
             get;
             private set;
-        }
-
-        /// <summary>
-        /// Gets the playground folder for sync between different instances of Visual Studio.
-        /// </summary>
-        private string Folder
-        {
-            get;
-            set;
         }
 
         private StreamWriter SyncFile
@@ -373,6 +363,9 @@ namespace BlackBerry.NativeCore.Components
             if (SyncFile != null)
                 return;
             if (CurrentAction != null)
+                return;
+            // no bbndk_vs folder known
+            if (string.IsNullOrEmpty(SyncFilePath))
                 return;
 
             lock (_sync)

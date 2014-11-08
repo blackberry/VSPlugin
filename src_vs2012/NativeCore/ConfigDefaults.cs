@@ -144,13 +144,29 @@ namespace BlackBerry.NativeCore
 
             ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            ToolsDirectory = !string.IsNullOrEmpty(defaultToolsDirectory) ? defaultToolsDirectory : GetToolsDefaultLocation();
+            ToolsDirectory = !string.IsNullOrEmpty(defaultToolsDirectory) ? defaultToolsDirectory : GetEmbeddedToolsLocation();
+            ToolsDirectory = ExistingPathOrNull(ToolsDirectory) ?? GetToolsDefaultLocation();
+
             NdkDirectory = !string.IsNullOrEmpty(defaultNdkDirectory) ? defaultNdkDirectory : GetNdkDefaultLocation();
-            JavaHome = FindJavaHomePath(defaultJavaHomeDirectory, NdkDirectory);
-            SupplementaryInstallationConfigDirectory = !string.IsNullOrEmpty(defaultNdkConfigDirectory) ? defaultNdkConfigDirectory : Path.Combine(NdkDirectory, "..", "qconfig");
+            JavaHome = FindJavaHomePath(defaultJavaHomeDirectory, NdkDirectory) ?? GetOracleJavaDefaultLocation();
+            SupplementaryInstallationConfigDirectory = !string.IsNullOrEmpty(defaultNdkConfigDirectory) ? defaultNdkConfigDirectory : Path.Combine(Path.GetDirectoryName(NdkDirectory), "qconfig");
+
+            // make sure paths exist:
+            ToolsDirectory = ExistingPathOrNull(ToolsDirectory);
+            NdkDirectory = ExistingPathOrNull(NdkDirectory);
+            JavaHome = ExistingPathOrNull(JavaHome);
+            SupplementaryInstallationConfigDirectory = ExistingPathOrNull(SupplementaryInstallationConfigDirectory);
         }
 
         #region Default Locations
+
+        /// <summary>
+        /// Returns specified path, or null, when it doesn't exist.
+        /// </summary>
+        private static string ExistingPathOrNull(string path)
+        {
+            return Directory.Exists(path) ? path : null;
+        }
 
         private static string GetToolsDefaultLocation()
         {
@@ -161,6 +177,17 @@ namespace BlackBerry.NativeCore
             return Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
         }
 
+        private static string GetEmbeddedToolsLocation()
+        {
+            var executingAssemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
+            var path = Path.Combine(Path.GetDirectoryName(executingAssemblyLocation), "QnxTools", "bin");
+
+            // HACK: somehow the location is written in capitals, what doesn't look good on UI
+            // so convert it to short path and back to long, to force to OS to provide the location
+            // using the true folder names
+            return NativeMethods.GetLongPathName(NativeMethods.GetShortPathName(path));
+        }
+
         private static string GetNdkDefaultLocation()
         {
             return Path.Combine(Path.GetPathRoot(Environment.GetFolderPath(Environment.SpecialFolder.System)), "bbndk_vs");
@@ -169,6 +196,12 @@ namespace BlackBerry.NativeCore
         private static string GetJavaHomeDefaultLocation(string vsndkDirectory)
         {
             return Path.Combine(vsndkDirectory, "features", "com.qnx.tools.jre.win32_1.6.0.43", "jre");
+        }
+
+        private static string GetOracleJavaDefaultLocation()
+        {
+            var path = FindJavaHomePath(null, Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
+            return !string.IsNullOrEmpty(path) ? path : FindJavaHomePath(null, Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles));
         }
 
         #endregion
@@ -231,7 +264,7 @@ namespace BlackBerry.NativeCore
         /// </summary>
         private static string GetJavaHomeFromNdk(string vsndkDirectory)
         {
-            if (string.IsNullOrEmpty(vsndkDirectory))
+            if (string.IsNullOrEmpty(vsndkDirectory) || !Directory.Exists(vsndkDirectory))
                 return null;
 
             // or if not, enumerate all folders (2-levels only) and finding one with 'java.exe' inside:
@@ -265,7 +298,7 @@ namespace BlackBerry.NativeCore
             try
             {
                 settings = registry.CreateSubKey(RegistryPath);
-                SetOrDelete(settings, FieldJavaHomePath, IsValidJavaHomePath(path) ? path : null, GetJavaHomeDefaultLocation(NdkDirectory));
+                SetOrDelete(settings, FieldJavaHomePath, IsValidJavaHomePath(path) ? path : null, GetJavaHomeDefaultLocation(NdkDirectory), null);
             }
             finally
             {
@@ -285,9 +318,9 @@ namespace BlackBerry.NativeCore
             try
             {
                 settings = registry.CreateSubKey(RegistryPath);
-                SetOrDelete(settings, FieldVsNdkPath, vsndkDirectory, GetNdkDefaultLocation());
-                SetOrDelete(settings, FieldQnxToolsPath, toolsDirectory, GetToolsDefaultLocation());
-                SetOrDelete(settings, FieldJavaHomePath, javaHomeDirectory, GetJavaHomeDefaultLocation(vsndkDirectory));
+                SetOrDelete(settings, FieldVsNdkPath, vsndkDirectory, GetNdkDefaultLocation(), null);
+                SetOrDelete(settings, FieldQnxToolsPath, toolsDirectory, GetEmbeddedToolsLocation(), GetToolsDefaultLocation());
+                SetOrDelete(settings, FieldJavaHomePath, javaHomeDirectory, GetJavaHomeDefaultLocation(vsndkDirectory), null);
             }
             finally
             {
@@ -299,14 +332,16 @@ namespace BlackBerry.NativeCore
             LoadDynamicSettings();
         }
 
-        private static void SetOrDelete(RegistryKey context, string fieldName, string value, string defaultValue)
+        private static void SetOrDelete(RegistryKey context, string fieldName, string value, string defaultValue1, string defaultValue2)
         {
             if (string.IsNullOrEmpty(fieldName))
                 throw new ArgumentNullException("fieldName");
 
             if (context != null)
             {
-                if (string.IsNullOrEmpty(value) || string.Compare(value, defaultValue, StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.IsNullOrEmpty(value)
+                    || string.Compare(value, defaultValue1, StringComparison.OrdinalIgnoreCase) == 0
+                    || string.Compare(value, defaultValue2, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     context.DeleteValue(fieldName, false);
                 }
