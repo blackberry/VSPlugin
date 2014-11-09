@@ -25,7 +25,7 @@ namespace BlackBerry.NativeCore.Model
             if (item == null)
                 throw new ArgumentNullException("item");
 
-            Items = new[] { item };
+            Items = new ApiInfo[0];
         }
 
         #region Properties

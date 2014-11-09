@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Model;
@@ -19,6 +20,7 @@ namespace BlackBerry.Package.ViewModels
 
             private ApiLevelListLoadRunner _runner;
             private readonly ApiLevelListTypes _type;
+            private readonly Semaphore _syncObject;
 
             #region Properties
 
@@ -30,9 +32,13 @@ namespace BlackBerry.Package.ViewModels
 
             #endregion
 
-            public LoaderViewModel(ApiLevelListTypes type)
+            public LoaderViewModel(ApiLevelListTypes type, Semaphore syncObject)
             {
+                if (syncObject == null)
+                    throw new ArgumentNullException("syncObject");
+
                 _type = type;
+                _syncObject = syncObject;
             }
 
             ~LoaderViewModel()
@@ -62,15 +68,38 @@ namespace BlackBerry.Package.ViewModels
                     NotifyListLoaded();
                     return false;
                 }
-                else
+
+                // then load it
+                _runner = new ApiLevelListLoadRunner(ConfigDefaults.NdkDirectory, _type);
+                _runner.Dispatcher = dispatcher;
+                _runner.Finished += RunnerOnFinished;
+
+                var execAction = new Action(StartRunner);
+                execAction.BeginInvoke(StartRunnerCompleted, execAction);
+                return true;
+            }
+
+            private void StartRunner()
+            {
+                if (_runner == null)
+                    throw new InvalidOperationException("Runner should be setup at this point");
+
+                try
                 {
-                    // then load it
-                    _runner = new ApiLevelListLoadRunner(ConfigDefaults.NdkDirectory, _type);
-                    _runner.Dispatcher = dispatcher;
-                    _runner.Finished += RunnerOnFinished;
-                    _runner.ExecuteAsync();
-                    return true;
+                    _syncObject.WaitOne();
                 }
+                catch
+                {
+                }
+
+                _runner.ExecuteAsync();
+            }
+
+            private void StartRunnerCompleted(IAsyncResult ar)
+            {
+                // release async-call system resources:
+                var action = (Action)ar.AsyncState;
+                action.EndInvoke(ar);
             }
 
             private void RunnerOnFinished(object sender, ToolRunnerEventArgs e)
@@ -80,6 +109,14 @@ namespace BlackBerry.Package.ViewModels
                 _runner = null;
 
                 NotifyListLoaded();
+
+                try
+                {
+                    _syncObject.Release();
+                }
+                catch
+                {
+                }
             }
 
             private void NotifyListLoaded()
@@ -128,8 +165,8 @@ namespace BlackBerry.Package.ViewModels
 
         private sealed class NdkLoaderViewModel : LoaderViewModel
         {
-            public NdkLoaderViewModel()
-                : base(ApiLevelListTypes.Full)
+            public NdkLoaderViewModel(Semaphore syncObject)
+                : base(ApiLevelListTypes.Full, syncObject)
             {
             }
 
@@ -233,8 +270,8 @@ namespace BlackBerry.Package.ViewModels
 
         private sealed class SimulatorLoaderViewModel : LoaderViewModel
         {
-            public SimulatorLoaderViewModel()
-                : base(ApiLevelListTypes.Simulators)
+            public SimulatorLoaderViewModel(Semaphore syncObject)
+                : base(ApiLevelListTypes.Simulators, syncObject)
             {
             }
 
@@ -256,8 +293,6 @@ namespace BlackBerry.Package.ViewModels
                 // nothing should be displayed for invalid simulator:
                 if (info == null)
                     return ApiLevelTask.Hide;
-                if (info.Type == DeviceFamilyType.Unknown)
-                    return ApiLevelTask.Nothing;
 
                 // check, if it exists on disk:
                 var infoArray = info as ApiInfoArray;
@@ -290,8 +325,8 @@ namespace BlackBerry.Package.ViewModels
 
         private sealed class RuntimeLoaderViewModel : LoaderViewModel
         {
-            public RuntimeLoaderViewModel()
-                : base(ApiLevelListTypes.Runtimes)
+            public RuntimeLoaderViewModel(Semaphore syncObject)
+                : base(ApiLevelListTypes.Runtimes, syncObject)
             {
             }
 
@@ -313,8 +348,6 @@ namespace BlackBerry.Package.ViewModels
                 // nothing should be displayed for invalid runtime libraries:
                 if (info == null)
                     return ApiLevelTask.Hide;
-                if (info.Type == DeviceFamilyType.Unknown)
-                    return ApiLevelTask.Nothing;
 
                 // check, if it exists on disk:
                 var infoArray = info as ApiInfoArray;
@@ -368,12 +401,14 @@ namespace BlackBerry.Package.ViewModels
         private readonly NdkLoaderViewModel _ndk;
         private readonly SimulatorLoaderViewModel _simulator;
         private readonly RuntimeLoaderViewModel _runtime;
+        private Semaphore _loadSyncObject;
 
         public ApiLevelOptionViewModel()
         {
-            _ndk = new NdkLoaderViewModel();
-            _simulator = new SimulatorLoaderViewModel();
-            _runtime = new RuntimeLoaderViewModel();
+            _loadSyncObject = new Semaphore(1, 1);
+            _ndk = new NdkLoaderViewModel(_loadSyncObject);
+            _simulator = new SimulatorLoaderViewModel(_loadSyncObject);
+            _runtime = new RuntimeLoaderViewModel(_loadSyncObject);
         }
 
         ~ApiLevelOptionViewModel()
@@ -497,8 +532,8 @@ namespace BlackBerry.Package.ViewModels
 
         public void Dispose()
         {
-            GC.SuppressFinalize(this);
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         private void Dispose(bool disposing)
@@ -508,6 +543,12 @@ namespace BlackBerry.Package.ViewModels
                 _ndk.Dispose();
                 _simulator.Dispose();
                 _runtime.Dispose();
+
+                if (_loadSyncObject != null)
+                {
+                    _loadSyncObject.Dispose();
+                    _loadSyncObject = null;
+                }
             }
         }
 
