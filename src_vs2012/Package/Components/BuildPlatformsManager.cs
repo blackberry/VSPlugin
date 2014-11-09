@@ -105,7 +105,6 @@ namespace BlackBerry.Package.Components
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
-            _buildEvents.OnBuildDone += OnWholeBuildDone;
 
             // to monitor, when to disable IntelliSense errors,
             // TODO: however there is still one case not covered - when project is added as Win32 and manually platform is added and configuration converted co BlackBerry...
@@ -460,7 +459,7 @@ namespace BlackBerry.Package.Components
         {
             TraceLog.WriteLine("BUILD: Start no Debug");
             _startDebugger = false;
-            StartBuild(out cancelDefault);
+            cancelDefault = StartBuild();
         }
 
         /// <summary> 
@@ -475,7 +474,7 @@ namespace BlackBerry.Package.Components
         {
             TraceLog.WriteLine("BUILD: Start Debug");
             _startDebugger = true;
-            StartBuild(out cancelDefault);
+            cancelDefault = StartBuild();
         }
 
         /// <summary> 
@@ -504,15 +503,14 @@ namespace BlackBerry.Package.Components
             }
         }
 
-        private void StartBuild(out bool cancelDefault)
+        private bool StartBuild()
         {
             if (DebugEngineStatus.IsRunning)
             {
                 TraceLog.WriteLine("BUILD: StartBuild - Debugger running");
 
                 // Disable the override of F5 (this allows the debugged process to continue execution)
-                cancelDefault = false;
-                return;
+                return false;
             }
 
             if (!IsBlackBerryConfigurationActive())
@@ -520,8 +518,7 @@ namespace BlackBerry.Package.Components
                 TraceLog.WriteLine("BUILD: StartBuild - not a BlackBerry project");
 
                 // Disable the override of F5 (this allows the debugged process to continue execution)
-                cancelDefault = false;
-                return;
+                return false;
             }
 
             try
@@ -556,26 +553,8 @@ namespace BlackBerry.Package.Components
             _outputWindowPane = ow.OutputWindowPanes.Item("Build");
             _outputWindowPane.Activate();
 
-            if (_startDebugger)
-            {
-                /*
-                     PH: FIXME: update API Level vs current project verification...
-                    UpdateManagerData upData;
-                    if (_targetDir.Count > 0)
-                        upData = new UpdateManagerData(_targetDir[0][1]);
-                    else
-                        upData = new UpdateManagerData();
-
-                    if (!upData.validateDeviceVersion(_isSimulator))
-                    {
-                        cancelDefault = true;
-                    }
-                    else
-                     */
-            }
-
             BuildBar();
-            cancelDefault = true;
+            return true;
         }
 
         /// <summary> 
@@ -687,9 +666,11 @@ namespace BlackBerry.Package.Components
                 _isDeploying = true;
                 _dte.Solution.SolutionBuild.Deploy(true);
             }
+
+            OnWholeBuildDone();
         }
 
-        private void OnWholeBuildDone(vsBuildScope scope, vsBuildAction action)
+        private void OnWholeBuildDone()
         {
             // remove all temporary flag files created during build:
             foreach (var fileName in _filesToDelete)
