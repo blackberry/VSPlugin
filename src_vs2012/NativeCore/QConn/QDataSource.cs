@@ -249,7 +249,7 @@ namespace BlackBerry.NativeCore.QConn
                     length = _socket.Receive(_buffer, 0, _buffer.Length, SocketFlags.None);
 
                     // reading failed?
-                    if (length < 0)
+                    if (length < 0 || _socket == null)
                     {
                         break;
                     }
@@ -257,7 +257,7 @@ namespace BlackBerry.NativeCore.QConn
                     totalLength += length;
 
                     // read enough or whole data?
-                    if (totalLength >= maxLength || _buffer.Length != length || _socket.Available == 0)
+                    if (totalLength >= maxLength || _buffer.Length != length || (_socket != null && _socket.Available == 0))
                     {
                         break;
                     }
