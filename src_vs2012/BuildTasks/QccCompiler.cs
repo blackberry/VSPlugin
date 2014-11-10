@@ -319,7 +319,11 @@ namespace BlackBerry.BuildTasks
                 switch2.SwitchValue = ReadSwitchMap("FavorSizeOrSpeed", switchMap, value);
                 switch2.Name = "FavorSizeOrSpeed";
                 switch2.Value = value;
+#if PLATFORM_VS2010
+                switch2.MultiValues = true;
+#else
                 switch2.MultipleValues = true;
+#endif
                 ActiveToolSwitches.Add("FavorSizeOrSpeed", switch2);
                 AddActiveSwitchToolValue(switch2);
             }

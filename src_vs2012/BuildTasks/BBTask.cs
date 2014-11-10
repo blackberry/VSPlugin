@@ -18,7 +18,9 @@ namespace BlackBerry.BuildTasks
 
         private const string TRACKER_LOG_DIRECTORY = "TrackerLogDirectory";
 
-
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         internal BBTask(ResourceManager taskResources)
             : base(taskResources)
         {
