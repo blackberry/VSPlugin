@@ -49,16 +49,20 @@ namespace BlackBerry.DebugEngine
         /// Constructor.
         /// </summary>
         /// <param name="fileName"> Short path file name. </param>
-        /// <param name="begPos"> Start position. </param>
-        /// <param name="endPosition"> End position. In VSNDK debug engine, both begPos and endPos have the same value. </param>
+        /// <param name="line"> Start position. </param>
         /// <param name="codeContext"> An address in a program's execution stream. </param>
-        public AD7DocumentContext(string fileName, TEXT_POSITION begPos, TEXT_POSITION endPosition, AD7MemoryAddress codeContext)
+        public AD7DocumentContext(string fileName, uint line, AD7MemoryAddress codeContext)
         {
             // Need to lengthen the path to be used by Visual Studio.
-            _fileName = NativeMethods.GetLongPathName(fileName);
+            _fileName = NativeMethods.GetLongPathName(fileName.Replace(@"\\\\", @"\\").Replace(@"\\", @"\")).Replace('\\', '/');
 
-            _beginPosition = begPos;
-            _endPosition = endPosition;
+            // Assume source code matching breakpoint begins and ends at the beginning of the line:
+            _beginPosition = new TEXT_POSITION();
+            _beginPosition.dwLine = line;
+            _beginPosition.dwColumn = 0;
+            _endPosition = new TEXT_POSITION();
+            _endPosition.dwLine = line;
+            _endPosition.dwColumn = 0;
             _codeContext = codeContext;
         }
 

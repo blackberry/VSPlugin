@@ -551,9 +551,6 @@ namespace BlackBerry.DebugEngine
             if (eventDispatcher.Engine.State == AD7Engine.DebugEngineState.Step)
             {
                 eventDispatcher.Engine.State = AD7Engine.DebugEngineState.Break;
-
-                // Visual Studio shows the line position one more than it actually is
-                eventDispatcher.Engine._docContext = eventDispatcher.GetDocumentContext(file, line - 1);
                 AD7StepCompletedEvent.Send(eventDispatcher.Engine);
             }
         }
@@ -567,12 +564,6 @@ namespace BlackBerry.DebugEngine
             if (_eventDispatcher.Engine.State == AD7Engine.DebugEngineState.Run)
             {
                 _eventDispatcher.Engine.State = AD7Engine.DebugEngineState.Break;
-
-                if (_fileName != "" && _line > 0)
-                {
-                    // Visual Studio shows the line position one more than it actually is
-                    _eventDispatcher.Engine._docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint) (_line - 1));
-                }
 
                 // Only send OnAsyncBreakComplete if break-all was requested by the user
                 if (!NeedsResumeAfterInterrupt)

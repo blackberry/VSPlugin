@@ -62,7 +62,7 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// This object manages debug events in the engine.
         /// </summary>
-        private EventDispatcher _eventDispatcher;
+        private readonly EventDispatcher _eventDispatcher;
 
         /// <summary>
         /// GDB_ID Property
@@ -285,8 +285,6 @@ namespace BlackBerry.DebugEngine
                         }
                         else
                         {
-                            // Visual Studio shows the line position one more than it actually is
-                            _eventDispatcher.Engine._docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint)(_line - 1));
                             _eventDispatcher.BreakpointHit((uint)_number, _threadID);
                         }
                         _eventDispatcher.Engine._updatingConditionalBreakpoint.Set();

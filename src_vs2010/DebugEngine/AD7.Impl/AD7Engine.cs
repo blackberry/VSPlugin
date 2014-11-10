@@ -136,11 +136,6 @@ namespace BlackBerry.DebugEngine
         /// The position in the m_threads array that corresponds to the current thread.
         /// </summary>
         public int _currentThreadIndex = -1;
-        
-        /// <summary>
-        /// Allows IDE to show current position in a source file
-        /// </summary>
-        public AD7DocumentContext _docContext;
 
         /// <summary>
         /// Used to avoid race condition when there are conditional breakpoints and the user hit break all. Both events will pause 
@@ -352,7 +347,6 @@ namespace BlackBerry.DebugEngine
 
                     Callback = null;
                     BreakpointManager = null;
-                    _docContext = null;
                     EventDispatcher.Dispose();
                     EventDispatcher = null;
                     _module = null;
