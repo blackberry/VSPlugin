@@ -566,7 +566,12 @@ namespace BlackBerry.Package
 
         private static bool IsMatchingProject(Project project, ProcessInfo process, out string outputPath)
         {
-            outputPath = ProjectHelper.GetTargetFullName(project);
+            outputPath = ProjectHelper.GuessTargetFullName(project);
+            if (string.IsNullOrEmpty(outputPath) || !File.Exists(outputPath))
+            {
+                outputPath = ProjectHelper.GetTargetFullName(project);
+            }
+
             if (!string.IsNullOrEmpty(outputPath))
             {
                 var name = Path.GetFileName(outputPath);
