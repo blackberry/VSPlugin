@@ -2,8 +2,8 @@
 <Vsix xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="1.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2010">
   <Identifier Id="db9f9c5f-fb27-4297-ab44-fa8774e962ca">
     <Name>BlackBerry Native Plugin for Visual Studio 2010</Name>
-    <Author>BlackBerry</Author>
-    <Version>2.0.1</Version>
+    <Author>CodeTitans</Author>
+    <Version>3.0.1</Version>
     <Description xml:space="preserve">Package providing Native SDK support inside Visual Studio for PlayBook and BlackBerry 10 devices</Description>
     <Locale>1033</Locale>
     <MoreInfoUrl>http://github.com/phofman/vs-plugin/wiki</MoreInfoUrl>
