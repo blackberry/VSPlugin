@@ -157,7 +157,7 @@ namespace BlackBerry.BuildTasks.Templates
                     {
                         WritePath(prefix, items1[i].Replace('\\', '/'), "/", items2[j], suffix);
 
-                        if (i != lastIndex1 && j != lastIndex2)
+                        if (i != lastIndex1 || j != lastIndex2)
                         {
                             WriteLine(" \\");
                         }
