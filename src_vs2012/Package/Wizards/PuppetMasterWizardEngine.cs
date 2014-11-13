@@ -150,7 +150,7 @@ namespace BlackBerry.Package.Wizards
             // calculate default location, where the project should be written:
             SourceActions reserved;
             var templatePath = Path.Combine(WizardDataFolder, GetSourceName(projectTemplateName, out reserved));
-            var projectRoot = context.IsExclusive || !singleProject ? context.LocalDirectory : Path.Combine(context.LocalDirectory, context.ProjectName);
+            var projectRoot = context.IsExclusive || singleProject ? context.LocalDirectory : Path.Combine(context.LocalDirectory, context.ProjectName);
             var destinationPath = Path.Combine(projectRoot, context.ProjectName + Path.GetExtension(templatePath));
 
             // apply the name change transformations as for ordinary files to the project:
