@@ -22,6 +22,11 @@ namespace BlackBerry.Package.Wizards
     [ProgId("BlackBerry.PuppetMasterWizardEngine")]
     public sealed class PuppetMasterWizardEngine : BaseWizardEngine
     {
+        public const string FilterNameAssets = "assets";
+        public const string FilterNameSourceFiles = "src";
+        public const string FilterNameConfig = "config";
+        public const string DefaultFilters = FilterNameAssets + ";" + FilterNameConfig + ";" + FilterNameSourceFiles;
+
         private const char ProjectNumberSeparator = '#';
         private const char PlatformSeparator = '@';
 
@@ -99,11 +104,7 @@ namespace BlackBerry.Package.Wizards
                         // filters:
                         if (IsMatchingKey(subItem.Key, filtersParamName))
                         {
-                            var vcProject = project.Object as VCProject;
-                            if (vcProject != null)
-                            {
-                                CreateFilters(subItem.Value, vcProject);
-                            }
+                            CreateFilters(subItem.Value, project);
                         }
 
                         // library references:
@@ -163,43 +164,77 @@ namespace BlackBerry.Package.Wizards
             return destinationPath;
         }
 
-        private static void CreateFilters(string filtersDefinition, VCProject vcProject)
+        /// <summary>
+        /// Creates basic set of filters inside the project.
+        /// </summary>
+        public static VCFilter[] CreateFilters(string filtersDefinition, Project project)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+            
+            var vcProject = project.Object as VCProject;
+            if (vcProject != null)
+            {
+                return CreateFilters(filtersDefinition, vcProject);
+            }
+
+            return null;
+        }
+
+        private static VCFilter[] CreateFilters(string filtersDefinition, VCProject vcProject)
         {
             if (string.IsNullOrEmpty(filtersDefinition))
-                return;
+                return null;
+
+            var result = new List<VCFilter>();
 
             foreach (var filterName in filtersDefinition.Split(';', ',', ' '))
             {
                 if (string.Compare(filterName, "sources", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    VCFilter filter = vcProject.AddFilter("Source Files");
+                    VCFilter filter = FindOrAddFilter("Source Files", vcProject);
                     filter.Filter = "cpp;c;cc;cxx;def;bat";
+                    result.Add(filter);
                 }
 
                 if (string.Compare(filterName, "headers", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    VCFilter filter = vcProject.AddFilter("Header Files");
+                    VCFilter filter = FindOrAddFilter("Header Files", vcProject);
                     filter.Filter = "h;hpp;hxx;hm;inl;inc;xsd";
+                    result.Add(filter);
                 }
 
-                if (string.Compare(filterName, "src", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(filterName, FilterNameSourceFiles, StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    VCFilter filter = vcProject.AddFilter("Source Files");
+                    VCFilter filter = FindOrAddFilter("Source Files", vcProject);
                     filter.Filter = "cpp;c;cc;cxx;def;bat;h;hpp;hxx;hm;inl;inc;xsd";
+                    result.Add(filter);
                 }
 
-                if (string.Compare(filterName, "assets", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(filterName, FilterNameAssets, StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    VCFilter filter = vcProject.AddFilter("Assets");
-                    filter.Filter = "qml;js;jpg;png;gif";
+                    VCFilter filter = FindOrAddFilter("Assets", vcProject);
+                    filter.Filter = "qml;js;jpg;png;gif;amd";
+                    result.Add(filter);
                 }
 
-                if (string.Compare(filterName, "config", StringComparison.OrdinalIgnoreCase) == 0)
+                if (string.Compare(filterName, FilterNameConfig, StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    VCFilter filter = vcProject.AddFilter("Config Files");
+                    VCFilter filter = FindOrAddFilter("Config Files", vcProject);
                     filter.Filter = "pri;pro;xml";
+                    result.Add(filter);
                 }
             }
+
+            return result.ToArray();
+        }
+
+        private static VCFilter FindOrAddFilter(string name, VCProject vcProject)
+        {
+            IVCCollection filters = vcProject.Filters;
+            VCFilter filter = filters.Item(name);
+
+            return filter ?? vcProject.AddFilter(name);
         }
 
         private static string GetTag(string name, char separator)
