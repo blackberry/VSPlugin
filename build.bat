@@ -156,9 +156,18 @@ if exist "%PackageResults%\Microsoft.Cpp" rmdir /Q "%PackageResults%\Microsoft.C
 
 echo   Creating folder structure compatible with MSBuild v4.0
 xcopy "%QnxToolsDir%" "%PackageResults%\BlackBerry\QnxTools" /e /i /y /q
-if exist "%BuildResults%\VS2010\BlackBerry" xcopy "%BuildResults%\VS2010\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\Platforms\BlackBerry\" /e /i /y /q
-if exist "%BuildResults%\VS2012\BlackBerry" xcopy "%BuildResults%\VS2012\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\V110\Platforms\BlackBerry\" /e /i /y /q
-if exist "%BuildResults%\VS2013\BlackBerry" xcopy "%BuildResults%\VS2013\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\V120\Platforms\BlackBerry\" /e /i /y /q
+if exist "%BuildResults%\VS2010\BlackBerry" (
+  xcopy "%BuildResults%\VS2010\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\Platforms\BlackBerry\" /e /i /y /q
+  copy "%BuildResults%\VS2010\BlackBerry.BuildTasks.dll" "%PackageResults%\Microsoft.Cpp\v4.0\Platforms\BlackBerry\BlackBerry.BuildTasks.dll"
+)
+if exist "%BuildResults%\VS2012\BlackBerry" (
+  xcopy "%BuildResults%\VS2012\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\V110\Platforms\BlackBerry\" /e /i /y /q
+  copy "%BuildResults%\VS2012\BlackBerry.BuildTasks.dll" "%PackageResults%\Microsoft.Cpp\v4.0\V110\Platforms\BlackBerry\BlackBerry.BuildTasks.dll"
+)
+if exist "%BuildResults%\VS2013\BlackBerry" (
+  xcopy "%BuildResults%\VS2013\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\V120\Platforms\BlackBerry\" /e /i /y /q
+  copy "%BuildResults%\VS2013\BlackBerry.BuildTasks.dll" "%PackageResults%\Microsoft.Cpp\v4.0\V120\Platforms\BlackBerry\BlackBerry.BuildTasks.dll"
+)
 
 echo   Compressing...
 %ZipTool% a -tzip -mx9 "%PackageResults%\MSBuild_Platforms_v%PackageVersion%.zip" "%PackageResults%\BlackBerry" "%PackageResults%\Microsoft.Cpp" > nul
