@@ -174,7 +174,7 @@ namespace BlackBerry.NativeCore
             if (string.IsNullOrEmpty(programFilesX86))
                 programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
 
-            return Path.Combine(programFilesX86, "BlackBerry", "VSPlugin-NDK", "qnxtools", "bin");
+            return Path.Combine(programFilesX86, "MSBuild", "BlackBerry", "QnxTools", "bin");
         }
 
         private static string GetEmbeddedToolsLocation()

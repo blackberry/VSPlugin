@@ -56,7 +56,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <QccLinker>qcc.exe</QccLinker>
     <QccLibrarian>qcc.exe</QccLibrarian>
     <QnxToolsPath>$(registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@QNXToolsPath)</QnxToolsPath>
-    <QnxToolsPath Condition="'$(QnxToolsPath)' == ''">$(MSBuildProgramFiles32)\BlackBerry\VSPlugin-NDK\qnxtools\bin</QnxToolsPath>
+    <QnxToolsPath Condition="'$(QnxToolsPath)' == ''">$(MSBuildProgramFiles32)\MSBuild\BlackBerry\QnxTools\bin</QnxToolsPath>
     <SignerBarToolExe>$(QnxToolsPath)\blackberry-signer.bat</SignerBarToolExe>
     <BuildBarToolPath>$(QnxToolsPath)</BuildBarToolPath>
     <BuildBarToolExe>$(QnxToolsPath)\blackberry-nativepackager.bat</BuildBarToolExe>

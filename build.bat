@@ -63,6 +63,7 @@ if "%CustomOutputDir%" == "" goto skip_buildoutput_override
 
 set ProgFilesRoot=%ProgramFiles(x86)%
 if "%ProgFilesRoot%" == "" set ProgFilesRoot=%ProgramFiles%
+set QnxToolsDir=%thisDir%\qnxtools
 
 set ZipTool=%thisDir%\ext\7zip\7z.exe
 set MsBuild="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MsBuild.exe"
@@ -150,18 +151,21 @@ if exist "%PackageResults%" rmdir /Q "%PackageResults%" /S
 mkdir "%PackageResults%"
 
 echo %actionNo%: Creating release package version: v%PackageVersion% (MSBuild platforms part)
+if exist "%PackageResults%\BlackBerry" rmdir /Q "%PackageResults%\BlackBerry" /S
 if exist "%PackageResults%\Microsoft.Cpp" rmdir /Q "%PackageResults%\Microsoft.Cpp" /S
 
 echo   Creating folder structure compatible with MSBuild v4.0
+xcopy "%QnxToolsDir%" "%PackageResults%\BlackBerry\QnxTools" /e /i /y /q
 if exist "%BuildResults%\VS2010\BlackBerry" xcopy "%BuildResults%\VS2010\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\Platforms\BlackBerry\" /e /i /y /q
 if exist "%BuildResults%\VS2012\BlackBerry" xcopy "%BuildResults%\VS2012\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\V110\Platforms\BlackBerry\" /e /i /y /q
 if exist "%BuildResults%\VS2013\BlackBerry" xcopy "%BuildResults%\VS2013\BlackBerry" "%PackageResults%\Microsoft.Cpp\v4.0\V120\Platforms\BlackBerry\" /e /i /y /q
 
 echo   Compressing...
-%ZipTool% a -tzip -mx9 "%PackageResults%\MSBuild_Platforms_v%PackageVersion%.zip" "%PackageResults%\Microsoft.Cpp" > nul
+%ZipTool% a -tzip -mx9 "%PackageResults%\MSBuild_Platforms_v%PackageVersion%.zip" "%PackageResults%\BlackBerry" "%PackageResults%\Microsoft.Cpp" > nul
 if errorlevel 1 ( exit /b %errorlevel% )
 echo   Created ZIP archive
 
+if exist "%PackageResults%\BlackBerry" rmdir /Q "%PackageResults%\BlackBerry" /S
 if exist "%PackageResults%\Microsoft.Cpp" rmdir /Q "%PackageResults%\Microsoft.Cpp" /S
 echo %actionNo%: Package - MSBuild - DONE
 set /a actionNo += 1
