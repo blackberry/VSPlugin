@@ -81,7 +81,7 @@ namespace BlackBerry.Package
 
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", VersionString, IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", ConfigDefaults.VersionString, IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
 
@@ -121,7 +121,6 @@ namespace BlackBerry.Package
     [ProvideToolWindow(typeof(TargetNavigatorPane), Style = VsDockStyle.Tabbed, MultiInstances = false)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService, IAttachDiscoveryService
     {
-        public const string VersionString = "2.1.2014.922";
         public const string OptionsCategoryName = "BlackBerry";
 
         private BlackBerryPaneTraceListener _mainTraceWindow;
@@ -298,7 +297,7 @@ namespace BlackBerry.Package
                 TraceLog.WriteLine(" * initialized menus");
             }
 
-            TraceLog.WriteLine("-------------------- DONE ({0})", VersionString);
+            TraceLog.WriteLine("-------------------- DONE ({0})", ConfigDefaults.VersionString);
 
             // make sure there is an NDK selected and developer knows about it:
             EnsureActiveNDK();

@@ -9,6 +9,11 @@ namespace BlackBerry.NativeCore
 #endif
     static class ConfigDefaults
     {
+        /// <summary>
+        /// Global version of the plugin. It is set as a property of all projects.
+        /// </summary>
+        public const string VersionString = "3.0.1";
+
         public static string ToolsDirectory
         {
             get;
