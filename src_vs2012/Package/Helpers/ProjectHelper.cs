@@ -1,9 +1,11 @@
 ﻿using System;
 using System.IO;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.VCProjectEngine;
+using Microsoft.Win32;
 
 namespace BlackBerry.Package.Helpers
 {
@@ -251,6 +253,34 @@ namespace BlackBerry.Package.Helpers
                 throw new ArgumentNullException("flagName");
 
             return Path.Combine(Path.GetDirectoryName(project.FullName), string.Concat("vsndk-", flagName, ".flag"));
+        }
+
+        /// <summary>
+        /// Gets the global default folder, where Visual Studio is supposed to store projects (generally suggesting it at startup of New Project Wizard).
+        /// </summary>
+        public static string GetDefaultProjectFolder(DTE2 dte)
+        {
+            if (dte == null)
+                throw new ArgumentNullException("dte");
+
+            RegistryKey key = null;
+            try
+            {
+                key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\" + dte.Version);
+
+                return key != null ? key.GetValue("DefaultNewProjectLocation", null).ToString() : null;
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                if (key != null)
+                {
+                    key.Close();
+                }
+            }
         }
     }
 }

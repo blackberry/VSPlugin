@@ -472,20 +472,27 @@ namespace BlackBerry.Package
 
         private void ImportBlackBerryProject(object sender, EventArgs e)
         {
-            var form = DialogHelper.OpenNativeCoreProject("Open Core Native Application Project", null);
-            if (form.ShowDialog() == DialogResult.OK)
+            var form = new ImportProjectForm();
+
+            // configure dialog to display info about current solution:
+            form.AddTargetProjects(_dte.Solution);
+
+            // ask for .cproject location:
+            if (form.UpdateSourceProject())
             {
-                string filename = form.FileName;
-                FileInfo fi = new FileInfo(filename);
-                string folderName = fi.DirectoryName;
+                // commit the list of found files:
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // create new project/use existing and add files:
+                    var project = form.FillProject(_dte);
+                    if (project == null)
+                    {
+                        MessageBoxHelper.Show("Unable to create or access requested project, please try again with saved solution", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
-                Array projects = (Array)_dte.ActiveSolutionProjects;
-                Project project = (Project)projects.GetValue(0);
-                string name = project.FullName;
-
-                // Create the dialog instance without Help support.
-                var importSummary = new Import.Import(project, folderName, name);
-                importSummary.ShowModel2();
+                    MessageBoxHelper.Show(form.CopyFiles ? "All files has been copied" : null, "Project has been imported into: " + project.Name, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
@@ -549,7 +556,7 @@ namespace BlackBerry.Package
             {
                 foreach (Project project in _dte.Solution.Projects)
                 {
-                    if (_buildPlatformsManager.IsBlackBerryProject(project))
+                    if (BuildPlatformsManager.IsBlackBerryProject(project))
                     {
                         string outputPath;
                         if (IsMatchingProject(project, process, out outputPath))
@@ -589,7 +596,7 @@ namespace BlackBerry.Package
             // try to automatically select the project:
             foreach (Project project in _dte.Solution.Projects)
             {
-                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                if (BuildPlatformsManager.IsBlackBerryProject(project))
                 {
                     string outputPath;
                     if (IsMatchingProject(project, process, out outputPath))
@@ -610,7 +617,7 @@ namespace BlackBerry.Package
 
             foreach (Project project in _dte.Solution.Projects)
             {
-                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                if (BuildPlatformsManager.IsBlackBerryProject(project))
                 {
                     string outputPath;
                     if (IsMatchingProject(project, process, out outputPath))

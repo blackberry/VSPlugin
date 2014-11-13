@@ -36,6 +36,7 @@ using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.VCProjectEngine;
 
 namespace BlackBerry.Package.Components
 {
@@ -866,9 +867,12 @@ namespace BlackBerry.Package.Components
             return false;
         }
 
-        public bool IsBlackBerryProject(Project project)
+        /// <summary>
+        /// Checks if specified project supports build for BlackBerry device or simulator.
+        /// </summary>
+        public static bool IsBlackBerryProject(Project project)
         {
-            if (project == null)
+            if (project == null || !(project.Object is VCProject))
                 return false;
 
             var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;

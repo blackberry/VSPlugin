@@ -154,13 +154,6 @@
     <Compile Include="..\..\src_vs2010\Package\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\Import\Import.xaml.cs">
-      <Link>Import\Import.xaml.cs</Link>
-      <DependentUpon>Import.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\Import\Model\ImportModel.cs">
-      <Link>Import\Model\ImportModel.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
@@ -192,6 +185,12 @@
     </Compile>
     <Compile Include="Dialogs\FolderForm.Designer.cs">
       <DependentUpon>FolderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ImportProjectForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Dialogs\ImportProjectForm.Designer.cs">
+      <DependentUpon>ImportProjectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Editors\BarDescriptorEditorControl.xaml.cs">
       <DependentUpon>BarDescriptorEditorControl.xaml</DependentUpon>
@@ -383,6 +382,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="ViewModels\Common\NullToVisibilityConverter.cs" />
+    <Compile Include="ViewModels\ImportProjectViewModel.cs" />
     <Compile Include="ViewModels\PackageViewModel.cs" />
     <Compile Include="ViewModels\SigningOptionViewModel.cs" />
     <Compile Include="ViewModels\TargetNavigatorViewModel.cs" />
@@ -716,6 +716,9 @@
     <EmbeddedResource Include="Dialogs\CachedAuthorForm.resx">
       <DependentUpon>CachedAuthorForm.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Dialogs\ImportProjectForm.resx">
+      <DependentUpon>ImportProjectForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Options\BackupOptionControl.resx">
       <DependentUpon>BackupOptionControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -1009,11 +1012,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\..\src_vs2010\Package\Import\Import.xaml">
-      <Link>Import\Import.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Editors\BarDescriptorEditorControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

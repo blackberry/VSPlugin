@@ -176,6 +176,14 @@
       <Link>Dialogs\FolderForm.designer.cs</Link>
       <DependentUpon>FolderForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\ImportProjectForm.cs">
+      <Link>Dialogs\ImportProjectForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\ImportProjectForm.designer.cs">
+      <Link>Dialogs\ImportProjectForm.designer.cs</Link>
+      <DependentUpon>ImportProjectForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml.cs">
       <Link>Editors\BarDescriptorEditorControl.xaml.cs</Link>
       <DependentUpon>BarDescriptorEditorControl.xaml</DependentUpon>
@@ -471,6 +479,9 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\Common\NullToVisibilityConverter.cs">
       <Link>ViewModels\Common\NullToVisibilityConverter.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\ImportProjectViewModel.cs">
+      <Link>ViewModels\ImportProjectViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageViewModel.cs">
       <Link>ViewModels\PackageViewModel.cs</Link>
     </Compile>
@@ -522,13 +533,13 @@
     <Compile Include="..\..\src_vs2012\Package\Wizards\PuppetMasterWizardEngine.cs">
       <Link>Wizards\PuppetMasterWizardEngine.cs</Link>
     </Compile>
-    <Compile Include="Import\Model\ImportModel.cs" />
-    <Compile Include="Import\Import.xaml.cs">
-      <DependentUpon>Import.xaml</DependentUpon>
-    </Compile>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.resx">
       <Link>Dialogs\CachedAuthorForm.resx</Link>
       <DependentUpon>CachedAuthorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\ImportProjectForm.resx">
+      <Link>Dialogs\ImportProjectForm.resx</Link>
+      <DependentUpon>ImportProjectForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Options\BackupOptionControl.resx">
       <Link>Options\BackupOptionControl.resx</Link>
@@ -1300,10 +1311,6 @@
       <Link>ToolWindows\TargetNavigatorControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Import\Import.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>
   <ItemGroup>
