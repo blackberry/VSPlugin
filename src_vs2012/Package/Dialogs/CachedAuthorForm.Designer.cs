@@ -31,14 +31,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CachedAuthorForm));
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.bttLoad = new System.Windows.Forms.Button();
+            this.bttClear = new System.Windows.Forms.Button();
+            this.txtID = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtName = new System.Windows.Forms.TextBox();
+            this.label2 = new System.Windows.Forms.Label();
             this.bttOK = new System.Windows.Forms.Button();
             this.bttCancel = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.txtName = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
-            this.txtID = new System.Windows.Forms.TextBox();
-            this.bttClear = new System.Windows.Forms.Button();
-            this.bttLoad = new System.Windows.Forms.Button();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -70,6 +70,62 @@
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Publisher";
             // 
+            // bttLoad
+            // 
+            this.bttLoad.Location = new System.Drawing.Point(157, 80);
+            this.bttLoad.Name = "bttLoad";
+            this.bttLoad.Size = new System.Drawing.Size(152, 23);
+            this.bttLoad.TabIndex = 4;
+            this.bttLoad.Text = "Load from &debug-token...";
+            this.bttLoad.UseVisualStyleBackColor = true;
+            this.bttLoad.Click += new System.EventHandler(this.bttLoad_Click);
+            // 
+            // bttClear
+            // 
+            this.bttClear.Location = new System.Drawing.Point(315, 80);
+            this.bttClear.Name = "bttClear";
+            this.bttClear.Size = new System.Drawing.Size(75, 23);
+            this.bttClear.TabIndex = 5;
+            this.bttClear.Text = "C&lear";
+            this.bttClear.UseVisualStyleBackColor = true;
+            this.bttClear.Click += new System.EventHandler(this.bttClear_Click);
+            // 
+            // txtID
+            // 
+            this.txtID.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtID.Location = new System.Drawing.Point(82, 54);
+            this.txtID.Name = "txtID";
+            this.txtID.Size = new System.Drawing.Size(308, 20);
+            this.txtID.TabIndex = 3;
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(16, 57);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(50, 13);
+            this.label3.TabIndex = 2;
+            this.label3.Text = "Identifier:";
+            // 
+            // txtName
+            // 
+            this.txtName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtName.Location = new System.Drawing.Point(82, 23);
+            this.txtName.Name = "txtName";
+            this.txtName.Size = new System.Drawing.Size(308, 20);
+            this.txtName.TabIndex = 1;
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(16, 26);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(38, 13);
+            this.label2.TabIndex = 0;
+            this.label2.Text = "Name:";
+            // 
             // bttOK
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
@@ -92,62 +148,6 @@
             this.bttCancel.Text = "&Cancel";
             this.bttCancel.UseVisualStyleBackColor = true;
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(16, 26);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(38, 13);
-            this.label2.TabIndex = 0;
-            this.label2.Text = "Name:";
-            // 
-            // txtName
-            // 
-            this.txtName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtName.Location = new System.Drawing.Point(82, 23);
-            this.txtName.Name = "txtName";
-            this.txtName.Size = new System.Drawing.Size(308, 20);
-            this.txtName.TabIndex = 1;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(16, 57);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(50, 13);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "Identifier:";
-            // 
-            // txtID
-            // 
-            this.txtID.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtID.Location = new System.Drawing.Point(82, 54);
-            this.txtID.Name = "txtID";
-            this.txtID.Size = new System.Drawing.Size(308, 20);
-            this.txtID.TabIndex = 3;
-            // 
-            // bttClear
-            // 
-            this.bttClear.Location = new System.Drawing.Point(315, 80);
-            this.bttClear.Name = "bttClear";
-            this.bttClear.Size = new System.Drawing.Size(75, 23);
-            this.bttClear.TabIndex = 5;
-            this.bttClear.Text = "C&lear";
-            this.bttClear.UseVisualStyleBackColor = true;
-            this.bttClear.Click += new System.EventHandler(this.bttClear_Click);
-            // 
-            // bttLoad
-            // 
-            this.bttLoad.Location = new System.Drawing.Point(157, 80);
-            this.bttLoad.Name = "bttLoad";
-            this.bttLoad.Size = new System.Drawing.Size(152, 23);
-            this.bttLoad.TabIndex = 4;
-            this.bttLoad.Text = "Load from &debug-token...";
-            this.bttLoad.UseVisualStyleBackColor = true;
-            this.bttLoad.Click += new System.EventHandler(this.bttLoad_Click);
-            // 
             // CachedAuthorForm
             // 
             this.AcceptButton = this.bttOK;
@@ -164,6 +164,7 @@
             this.MinimizeBox = false;
             this.Name = "CachedAuthorForm";
             this.ShowIcon = false;
+            this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Cached Publisher Summary";
             this.groupBox1.ResumeLayout(false);
