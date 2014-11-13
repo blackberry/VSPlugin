@@ -28,7 +28,6 @@ namespace BlackBerry.NativeCore.Model
 
         #endregion
 
-
         /// <summary>
         /// Retrieves info about used runtime libraries from registry.
         /// </summary>

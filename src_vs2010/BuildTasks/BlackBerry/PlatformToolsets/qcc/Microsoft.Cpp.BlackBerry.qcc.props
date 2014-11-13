@@ -26,14 +26,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <ConfigurationAppType Condition="'$(ConfigurationAppType)' == ''">Regular</ConfigurationAppType>
     <CharacterSet Condition="'$(CharacterSet)' == ''">Unicode</CharacterSet>
     <QccLibPath>$(QNX_TARGET)\$(CPUVARDIR)\lib</QccLibPath>    
-    <AppDataPath>$(AppData)</AppDataPath>
+    <AppDataPath>$(LocalAppData)</AppDataPath>
 
     <!-- for Windows XP the AppDataPath is different! -->
     <OSVersion>$(registry:HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion@CurrentVersion)</OSVersion>
     <AppDataPath Condition="'$(OSVersion)' == '5.1'">$(HomeDrive)$(HomePath)\Local Settings\Application Data</AppDataPath>
-    
-    <SSHPublicKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa.pub</SSHPublicKeyPath>
-    <SSHPrivateKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa</SSHPrivateKeyPath>
+
+    <SSHKeyDir>$(AppDataPath)\Research In Motion</SSHKeyDir>
+    <SSHPublicKeyPath>$(SSHKeyDir)\bbt_id_rsa.pub</SSHPublicKeyPath>
+    <SSHPrivateKeyPath>$(SSHKeyDir)\bbt_id_rsa</SSHPrivateKeyPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Platform)'=='BlackBerry'">

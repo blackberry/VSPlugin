@@ -35,14 +35,15 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <from_file Condition="'$(QNX_HOST)' != ''">$([System.IO.File]::ReadAllText("$(QNX_HOST)\etc\qcc\gcc\default").Substring(4,5))</from_file>
     <QCC_CONF_PATH Condition="'$(QCC_CONF_PATH)' == ''">$(QNX_HOST)\etc\qcc\gcc</QCC_CONF_PATH>
     <TargetCompilerVersion>$(from_file)</TargetCompilerVersion>
-    <AppDataPath>$(AppData)</AppDataPath>
+    <AppDataPath>$(LocalAppData)</AppDataPath>
 
     <!-- for Windows XP the AppDataPath is different! -->
     <OSVersion>$(registry:HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion@CurrentVersion)</OSVersion>
     <AppDataPath Condition="'$(OSVersion)' == '5.1'">$(HomeDrive)$(HomePath)\Local Settings\Application Data</AppDataPath>
 
-    <SSHPublicKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa.pub</SSHPublicKeyPath>
-    <SSHPrivateKeyPath>$(AppDataPath)\Research In Motion\bbt_id_rsa</SSHPrivateKeyPath>
+    <SSHKeyDir>$(AppDataPath)\Research In Motion</SSHKeyDir>
+    <SSHPublicKeyPath>$(SSHKeyDir)\bbt_id_rsa.pub</SSHPublicKeyPath>
+    <SSHPrivateKeyPath>$(SSHKeyDir)\bbt_id_rsa</SSHPrivateKeyPath>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Common.props" />
