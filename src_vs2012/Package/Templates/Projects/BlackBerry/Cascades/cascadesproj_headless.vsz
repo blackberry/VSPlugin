@@ -2,7 +2,7 @@ VSWIZARD 7.0
 Wizard={0cb934ba-06c8-4919-9498-bc6517940bcd}
 Param="TITLE = BlackBerry Cascades Headless Application"
 Param="PROJECT#1 = cascades-default.vcxproj -> $Name$/$Name$.vcxproj"
-Param="FILTERS#1 = assets;config;src"
+Param="FILTERS#1 = assets;config;src;trans"
 Param="FILE#1 = Shared/Assets/Headless/bar-descriptor.xml -> bar-descriptor.xml"
 Param="FILE#1 = Shared/makefile-cascades -> makefile"
 Param="FILE#1 = Shared/Assets/Headless/qmake.pro -> $ProjectName$.pro"
@@ -16,7 +16,7 @@ Param="FILE#1 = Shared/Assets/Headless/applicationui.hpp -> src/ApplicationUI.hp
 Param="FILE#1 = Shared/Assets/Headless/main.qml -> assets/main.qml"
 
 Param="PROJECT#2 = cascades-default.vcxproj -> $Name$Service/$Name$Service.vcxproj"
-Param="FILTERS#2 = assets;config;src"
+Param="FILTERS#2 = assets;config;src;trans"
 Param="FILE#2 = Shared/makefile-cascades -> makefile"
 Param="FILE#2 = Shared/Assets/Headless/qmake-service.pro -> $ProjectName$.pro"
 Param="FILE#2 = Shared/qmake-config.pri -> config.pri"

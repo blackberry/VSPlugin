@@ -170,7 +170,7 @@ namespace BlackBerry.Package.Dialogs
 
             if (itemAsProject != null)
             {
-                _vm.UpdateProjectState(itemAsProject, null, null);
+                _vm.UpdateProject(itemAsProject);
                 return itemAsProject;
             }
 

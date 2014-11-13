@@ -25,7 +25,8 @@ namespace BlackBerry.Package.Wizards
         public const string FilterNameAssets = "assets";
         public const string FilterNameSourceFiles = "src";
         public const string FilterNameConfig = "config";
-        public const string DefaultFilters = FilterNameAssets + ";" + FilterNameConfig + ";" + FilterNameSourceFiles;
+        public const string FilterNameTranslations = "trans";
+        public const string DefaultFilters = FilterNameAssets + ";" + FilterNameConfig + ";" + FilterNameSourceFiles + ";" + FilterNameTranslations;
 
         private const char ProjectNumberSeparator = '#';
         private const char PlatformSeparator = '@';
@@ -222,6 +223,13 @@ namespace BlackBerry.Package.Wizards
                 {
                     VCFilter filter = FindOrAddFilter("Config Files", vcProject);
                     filter.Filter = "pri;pro;xml";
+                    result.Add(filter);
+                }
+
+                if (string.Compare(filterName, FilterNameTranslations, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    VCFilter filter = FindOrAddFilter("Translations", vcProject);
+                    filter.Filter = "ts;qm";
                     result.Add(filter);
                 }
             }

@@ -20,7 +20,8 @@ namespace BlackBerry.Package.ViewModels
 
         private VCProject _vcProject;
         private VCFilter _sourceFilter;
-        private VCFilter _assetsFilter;
+        private VCFilter _assetFilter;
+        private VCFilter _translationFilter;
         private Dictionary<string, VCFilter> _filters;
 
 
@@ -125,7 +126,7 @@ namespace BlackBerry.Package.ViewModels
                 outputPath = hasSuggestedLocation ? suggestedOutputPath : Path.GetDirectoryName(solution.FullName);
                 if (string.IsNullOrEmpty(outputPath))
                 {
-                    UpdateProjectState(null, null, null);
+                    UpdateProject(null);
                     return null;
                 }
             }
@@ -134,7 +135,7 @@ namespace BlackBerry.Package.ViewModels
                 outputPath = hasSuggestedLocation ? suggestedOutputPath : ProjectHelper.GetDefaultProjectFolder(dte);
                 if (string.IsNullOrEmpty(outputPath))
                 {
-                    UpdateProjectState(null, null, null);
+                    UpdateProject(null);
                     return null;
                 }
                 saveSolution = true;
@@ -155,12 +156,12 @@ namespace BlackBerry.Package.ViewModels
             }
 
             // create new NativeCore or Cascades project:
-            projectName = Path.Combine(outputPath, projectName + ".vcxproj");
-            File.Copy(Path.Combine(PuppetMasterWizardEngine.WizardDataFolder, createNativeCoreApp ? TemplateNativeCoreApp : TemplateCascadesApp), projectName, true);
+            var projectFullPath = Path.Combine(outputPath, projectName + ".vcxproj");
+            File.Copy(Path.Combine(PuppetMasterWizardEngine.WizardDataFolder, createNativeCoreApp ? TemplateNativeCoreApp : TemplateCascadesApp), projectFullPath, true);
 
             // add project into solution:
-            var project = solution.AddFromFile(projectName);
-            var createdFilters = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.DefaultFilters, project);
+            var project = solution.AddFromFile(projectFullPath);
+            PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.DefaultFilters, project);
             project.Save();
 
             if (saveSolution)
@@ -169,11 +170,11 @@ namespace BlackBerry.Package.ViewModels
             }
 
             // update state for adding items:
-            UpdateProjectState(project, createdFilters[0], createdFilters[2]);
+            UpdateProject(project);
             return project;
         }
 
-        public void UpdateProjectState(Project project, VCFilter sourceFilter, VCFilter assetFilter)
+        public void UpdateProject(Project project)
         {
             var newProject = project != null ? project.Object as VCProject : null;
 
@@ -181,42 +182,41 @@ namespace BlackBerry.Package.ViewModels
             {
                 _vcProject = null;
                 _sourceFilter = null;
-                _assetsFilter = null;
+                _assetFilter = null;
+                _translationFilter = null;
                 _filters = null;
             }
             else
             {
                 _vcProject = newProject;
-                _sourceFilter = assetFilter;
-                _assetsFilter = sourceFilter;
                 _filters = new Dictionary<string, VCFilter>();
 
+                IVCCollection filters = _vcProject.Filters;
+                _sourceFilter = filters.Item("Source Files");
                 if (_sourceFilter == null)
                 {
-                    IVCCollection filters = _vcProject.Filters;
-                    _sourceFilter = filters.Item("Source Files");
-                    if (_sourceFilter == null)
-                    {
-                        _sourceFilter = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.FilterNameSourceFiles, project)[0];
-                    }
+                    _sourceFilter = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.FilterNameSourceFiles, project)[0];
                 }
 
-                if (_assetsFilter == null)
+                _assetFilter = filters.Item("Assets");
+                if (_assetFilter == null)
                 {
-                    IVCCollection filters = _vcProject.Filters;
-                    _assetsFilter = filters.Item("Assets");
-                    if (_assetsFilter == null)
-                    {
-                        _assetsFilter = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.FilterNameAssets, project)[0];
-                    }
+                    _assetFilter = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.FilterNameAssets, project)[0];
+                }
+
+                _translationFilter = filters.Item("Translations");
+                if (_translationFilter == null)
+                {
+                    _translationFilter = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.FilterNameTranslations, project)[0];
                 }
 
                 // default directories already point to specific filters to shorten the path:
                 _filters.Add("src", _sourceFilter);
                 _filters.Add("sources", _sourceFilter);
                 _filters.Add("code", _sourceFilter);
-                _filters.Add("asset", _assetsFilter);
-                _filters.Add("assets", _assetsFilter);
+                _filters.Add("asset", _assetFilter);
+                _filters.Add("assets", _assetFilter);
+                _filters.Add("translations", _translationFilter);
             }
         }
 

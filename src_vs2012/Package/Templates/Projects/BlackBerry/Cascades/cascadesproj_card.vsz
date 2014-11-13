@@ -2,7 +2,7 @@ VSWIZARD 7.0
 Wizard={0cb934ba-06c8-4919-9498-bc6517940bcd}
 Param="TITLE = BlackBerry Cascades Card Application"
 Param="PROJECT = cascades-default.vcxproj"
-Param="FILTERS = assets;config;src"
+Param="FILTERS = assets;config;src;trans"
 Param="FILE = Shared/Assets/Card/bar-descriptor.xml -> bar-descriptor.xml"
 Param="FILE = Shared/makefile-cascades -> makefile"
 Param="FILE = Shared/Assets/Card/qmake.pro -> $ProjectName$.pro"
