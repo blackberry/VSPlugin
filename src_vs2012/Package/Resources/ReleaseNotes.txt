@@ -1,3 +1,8 @@
-﻿v3.0.1
+v3.0.2 (2014-11-16)
 Changes in this version:
+ * VSIX package verifies, if proper MSBuild 'BlackBerry' platform exists (#28)
+ * made GDB output-window shown in public releases
+ * fixed PlayBook QNX-tools selection
+
+v3.0.1 (2014-11-13)
  * initial release of the plugin
