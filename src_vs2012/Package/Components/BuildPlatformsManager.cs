@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -68,12 +69,17 @@ namespace BlackBerry.Package.Components
         private bool _solutionOpened;
         private int _openedBlackBerryProjects;
 
+        private IServiceProvider _serviceProvider;
+        private ErrorManager _errorManager;
+
         private const string ConfigNameBlackBerry = "BlackBerry";
         private const string ToolbarNameStandard = "Standard";
         private const string SolutionConfigurationsName = "Solution Configurations";
         private const string SolutionPlatformsName = "Solution Platforms";
         private const string BarDescriptorFileName = "bar-descriptor.xml";
         private const string BarDescriptorTemplate = @"Shared\bar-descriptor.xml";
+
+        public event Action<string> Navigate;
 
         /// <summary>
         /// Init constructor.
@@ -91,6 +97,8 @@ namespace BlackBerry.Package.Components
         {
             if (_buildEvents != null)
                 return;
+
+            _serviceProvider = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider) _dte);
 
             // register for command events, when accessing build platforms:
             _deploymentEvents = CommandHelper.Register(_dte, VSConstants.GUID_VSStandardCommandSet97, VSConstants.VSStd2KCmdID.SolutionPlatform, null, OnNewPlatform_AfterExecute);
@@ -114,6 +122,8 @@ namespace BlackBerry.Package.Components
             _solutionEvents.AfterClosing += OnSolutionClosed;
             _solutionEvents.ProjectAdded += OnProjectAdded;
             _solutionEvents.ProjectRemoved += OnProjectRemoved;
+
+            _errorManager = new ErrorManager(_serviceProvider, new Guid("{54340ee9-e59e-4ff1-8e5d-0370f700eaed}"), "BlackBerry Errors");
         }
 
         #region Properties
@@ -207,6 +217,8 @@ namespace BlackBerry.Package.Components
 
         private void OnSolutionClosed()
         {
+            _errorManager.Clear();
+
             _solutionOpened = false;
             _openedBlackBerryProjects = 0;
             UpdateIntelliSenseState();
@@ -226,6 +238,45 @@ namespace BlackBerry.Package.Components
             }
 
             UpdateIntelliSenseState();
+
+            // check if appropriate platform exists and matches expected version:
+            var buildTasksAssemblyPath = Path.Combine(ConfigDefaults.MSBuildVCTargetsPath, "Platforms", "BlackBerry", "BlackBerry.BuildTasks.dll");
+            if (!File.Exists(buildTasksAssemblyPath))
+            {
+                _errorManager.Add(TaskErrorCategory.Error, "MSBuild \"BlackBerry\" build platform was not found. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " for details, how to install it.", OpenInstallationPage);
+            }
+            else
+            {
+                try
+                {
+                    var existingVersion = AssemblyName.GetAssemblyName(buildTasksAssemblyPath).Version;
+                    var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+                    // verify versions:
+                    if (existingVersion.Major != currentVersion.Major || existingVersion.Minor != currentVersion.Minor)
+                    {
+                        _errorManager.Add(TaskErrorCategory.Warning, "Invalid version of existing MSBuild \"BlackBerry\" build platform. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " for details, how to update it.", OpenInstallationPage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to determine version of MSBuild \"BlackBerry\" build platform");
+                }
+            }
+        }
+
+        private void OpenInstallationPage(object sender, EventArgs e)
+        {
+            var url = ConfigDefaults.GithubProjectWikiInstallation;
+
+            if (Navigate != null)
+            {
+                Navigate(url);
+            }
+            else
+            {
+                DialogHelper.StartURL(url);
+            }
         }
 
         private void UpdateIntelliSenseState()
@@ -783,13 +834,8 @@ namespace BlackBerry.Package.Components
         {
             TraceLog.WriteLine("BUILD: Starting debugger (\"{0}\", \"{1}\")", pidOrTargetAppName, executablePath);
 
-            IVsDebugger dbg;
-            IVsUIShell shell;
-            using (var serviceProvider = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider) _dte))
-            {
-                dbg = (IVsDebugger)serviceProvider.GetService(typeof(SVsShellDebugger));
-                shell = (IVsUIShell)serviceProvider.GetService(typeof(SVsUIShell));
-            }
+            IVsDebugger dbg = (IVsDebugger) _serviceProvider.GetService(typeof(SVsShellDebugger));
+            IVsUIShell shell = (IVsUIShell) _serviceProvider.GetService(typeof(SVsUIShell));
 
             VsDebugTargetInfo info = new VsDebugTargetInfo();
             info.cbSize = (uint)Marshal.SizeOf(info);

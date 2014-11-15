@@ -194,6 +194,7 @@ namespace BlackBerry.Package
             TraceLog.WriteLine(" * registered editors");
 
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
+            _buildPlatformsManager.Navigate += OpenUrl;
             _buildPlatformsManager.Initialize();
             TraceLog.WriteLine(" * registered build-platforms manager");
 

@@ -146,6 +146,9 @@
     <Compile Include="..\..\src_vs2012\Package\Components\BuildPlatformsManager.cs">
       <Link>Components\BuildPlatformsManager.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\ErrorManager.cs">
+      <Link>Components\ErrorManager.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Components\LogManager.cs">
       <Link>Components\LogManager.cs</Link>
     </Compile>

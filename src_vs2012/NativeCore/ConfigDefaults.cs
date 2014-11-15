@@ -73,6 +73,49 @@ namespace BlackBerry.NativeCore
 #               endif
 #endif
 
+        /// <summary>
+        /// Gets the path to version of MSBuild used by Visual Studio.
+        /// </summary>
+        public static string MSBuildVCTargetsPath
+        {
+            get
+            {
+                var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+#if PLATFORM_VS2010
+                return Path.Combine(programFilesX86, "MSBuild", "Microsoft.Cpp", "v4.0");
+#elif PLATFORM_VS2012
+                return Path.Combine(programFilesX86, "MSBuild", "Microsoft.Cpp", "v4.0", "V110");
+#elif PLATFORM_VS2013
+                return Path.Combine(programFilesX86, "MSBuild", "Microsoft.Cpp", "v4.0", "V120");
+#else
+#               error Define MSBuild path for current version of Visual Studio.
+#endif
+            }
+        }
+
+        /// <summary>
+        /// Get the path to Wiki pages.
+        /// </summary>
+        public static string GithubProjectWikiInstallation
+        {
+            get { return "https://github.com/phofman/vs-plugin/wiki/Installation"; }
+        }
+
+        public static string GithubProjectSourceCode
+        {
+            get { return "https://github.com/phofman/vs-plugin"; } // "https://github.com/blackberry/VSPlugin"
+        }
+
+        public static string GithubProjectIssues
+        {
+            get { return "https://github.com/phofman/vs-plugin/issues"; } // "https://github.com/blackberry/VSPlugin/issues"
+        }
+
+        public static string GithubProjectAuthor
+        {
+            get { return "https://twitter.com/CodeTitans"; }
+        }
+
         static ConfigDefaults()
         {
             RegistryPath = @"Software\BlackBerry\VSPlugin";
