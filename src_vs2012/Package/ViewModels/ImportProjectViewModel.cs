@@ -12,7 +12,7 @@ namespace BlackBerry.Package.ViewModels
 {
     internal sealed class ImportProjectViewModel
     {
-        private static readonly string[] ForbiddenFiles = { "\\.settings", "\\.device", "\\.cproject", "\\.project", ".vcxproj", ".vcxproj.filters" };
+        private static readonly string[] ForbiddenFiles = { "\\.settings", "\\.device", "\\.cproject", "\\.project", "\\.gitignore", "\\.gitmodules", ".vcxproj", ".vcxproj.filters", ".suo", ".user" };
         private static readonly string[] ForbiddenDirs = { "\\arm", "\\x86", "\\.settings", "\\.git", "\\.svn", "\\.hg", "\\Device-Debug", "\\Debug", "\\Device-Release", "\\Release", "\\Simulator-Debug", "\\obj", "\\bin" };
 
         private const string TemplateNativeCoreApp = @"native-default.vcxproj";

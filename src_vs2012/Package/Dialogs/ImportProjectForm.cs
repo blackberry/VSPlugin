@@ -17,6 +17,7 @@ namespace BlackBerry.Package.Dialogs
     internal partial class ImportProjectForm : Form
     {
         private readonly ImportProjectViewModel _vm;
+        private string _newProjectName;
 
         public ImportProjectForm()
         {
@@ -78,6 +79,7 @@ namespace BlackBerry.Package.Dialogs
             txtSourceProject.Text = path;
 
             SourcePath = Path.GetDirectoryName(path);
+            _newProjectName = Path.GetFileName(SourcePath) ?? "NewProject";
             listFiles.Items.Clear();
 
             // traverse the source-tree to find all files, that could be added into the final solution:
@@ -119,12 +121,11 @@ namespace BlackBerry.Package.Dialogs
         /// <summary>
         /// Initializes the UI with 'new projects' section and projects from the current solution.
         /// </summary>
-        /// <param name="solution"></param>
         public void AddTargetProjects(Solution solution)
         {
             cmbProjects.Items.Clear();
-            cmbProjects.Items.Add(new ComboBoxItem("New Native Core project", "NativeProject"));
-            cmbProjects.Items.Add(new ComboBoxItem("New Cascades project", "CascadesProject"));
+            cmbProjects.Items.Add(new ComboBoxItem("New Native Core project", null));
+            cmbProjects.Items.Add(new ComboBoxItem("New Cascades project", null));
 
             if (solution != null)
             {
@@ -152,7 +153,7 @@ namespace BlackBerry.Package.Dialogs
             var itemAsProject = tag as Project;
 
             txtDestinationName.ReadOnly = item == null || itemAsProject != null;
-            txtDestinationName.Text = itemAsProject != null ? itemAsProject.Name : tag.ToString();
+            txtDestinationName.Text = itemAsProject != null ? itemAsProject.Name : _newProjectName;
             chkAtSourceLocation.Enabled = !txtDestinationName.ReadOnly;
         }
 
@@ -174,10 +175,16 @@ namespace BlackBerry.Package.Dialogs
                 return itemAsProject;
             }
 
-            // create new NativeCore or Cascades project:
-            var projectName = tag.ToString();
+            // verify inputs:
+            if (string.IsNullOrEmpty(_newProjectName))
+            {
+                MessageBoxHelper.Show("Sorry, name of the new project can't be empty", "Validation failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ActiveControl = txtDestinationName;
+                return null;
+            }
 
-            return _vm.CreateProject(dte, projectName, IsNativeCoreAppSelected, IsSaveAtSourceLocation ? SourcePath : null);
+            // create new NativeCore or Cascades project:
+            return _vm.CreateProject(dte, _newProjectName, IsNativeCoreAppSelected, IsSaveAtSourceLocation ? SourcePath : null);
         }
 
         /// <summary>

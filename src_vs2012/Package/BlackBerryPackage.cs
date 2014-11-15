@@ -473,12 +473,12 @@ namespace BlackBerry.Package
         {
             var form = new ImportProjectForm();
 
-            // configure dialog to display info about current solution:
-            form.AddTargetProjects(_dte.Solution);
-
             // ask for .cproject location:
             if (form.UpdateSourceProject())
             {
+                // configure dialog to display info about current solution:
+                form.AddTargetProjects(_dte.Solution);
+
                 // commit the list of found files:
                 if (form.ShowDialog() == DialogResult.OK)
                 {
