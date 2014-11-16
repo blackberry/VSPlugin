@@ -249,13 +249,13 @@ namespace BlackBerry.Package.Components
             {
                 try
                 {
-                    var existingVersion = AssemblyName.GetAssemblyName(buildTasksAssemblyPath).Version;
-                    var currentVersion = Assembly.GetExecutingAssembly().GetName().Version;
+                    var installedVersion = AssemblyName.GetAssemblyName(buildTasksAssemblyPath).Version;
+                    var expectedVersion = Assembly.GetExecutingAssembly().GetName().Version;
 
                     // verify versions:
-                    if (existingVersion.Major != currentVersion.Major || existingVersion.Minor != currentVersion.Minor)
+                    if (installedVersion.Major != expectedVersion.Major || installedVersion.Minor != expectedVersion.Minor || installedVersion.Build != expectedVersion.Build)
                     {
-                        _errorManager.Add(TaskErrorCategory.Warning, "Invalid version of existing MSBuild \"BlackBerry\" build platform. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " for details, how to update it.", OpenInstallationPage);
+                        _errorManager.Add(TaskErrorCategory.Warning, "Invalid version of existing MSBuild \"BlackBerry\" build platform (installed: " + ToShortVersion(installedVersion) + ", expected: " + ToShortVersion(expectedVersion) + "). Visit " + ConfigDefaults.GithubProjectWikiInstallation + " for details, how to upgrade it.", OpenInstallationPage);
                     }
                 }
                 catch (Exception ex)
@@ -263,6 +263,11 @@ namespace BlackBerry.Package.Components
                     TraceLog.WriteException(ex, "Unable to determine version of MSBuild \"BlackBerry\" build platform");
                 }
             }
+        }
+
+        private static string ToShortVersion(Version v)
+        {
+            return string.Concat("v", v.Major, ".", v.Minor, ".", v.Build);
         }
 
         private void OpenInstallationPage(object sender, EventArgs e)
