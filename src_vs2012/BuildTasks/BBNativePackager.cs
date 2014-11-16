@@ -174,24 +174,33 @@ namespace BlackBerry.BuildTasks
             }
             else
             {
-                // or Cascades application, where we can use directly the configuration with specified name from bar-descriptor file?
-                commandBuilder.AppendTextUnquoted("-configuration \"" + MakefileTargetName + "\"");
-
-                /*
-                ActiveToolSwitches.Remove(CONFIGURATION);
-
-                ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.String)
+                if (string.Compare(AppType, "Cascades", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    DisplayName = "Configuration Name",
-                    Description = "Name of the configuration from bar-descriptor.xml to use during BAR build",
-                    ArgumentRelationList = new ArrayList(),
-                    SwitchValue = "-configuration ",
-                    Name = CONFIGURATION,
-                    Value = MakefileTargetName
-                };
-                ActiveToolSwitches.Add(CONFIGURATION, switch2);
-                AddActiveSwitchToolValue(switch2);
-                 */
+                    // or Cascades application, where we can use directly the configuration with specified name from bar-descriptor file?
+                    commandBuilder.AppendTextUnquoted("-configuration \"" + MakefileTargetName + "\"");
+
+                    /*
+                    ActiveToolSwitches.Remove(CONFIGURATION);
+
+                    ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.String)
+                    {
+                        DisplayName = "Configuration Name",
+                        Description = "Name of the configuration from bar-descriptor.xml to use during BAR build",
+                        ArgumentRelationList = new ArrayList(),
+                        SwitchValue = "-configuration ",
+                        Name = CONFIGURATION,
+                        Value = MakefileTargetName
+                    };
+                    ActiveToolSwitches.Add(CONFIGURATION, switch2);
+                    AddActiveSwitchToolValue(switch2);
+                     */
+                }
+                else
+                {
+                    // custom makefile:
+                    var expectedTargetName = string.Concat(Platform, "-", Configuration);
+                    commandBuilder.AppendTextUnquoted("-configuration \"" + expectedTargetName + "\"");
+                }
             }
         }
 
