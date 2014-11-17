@@ -691,6 +691,12 @@
     <Content Include="Templates\ProjectItems\BlackBerry\bbutil.vsz">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\ProjectItems\BlackBerry\Cascades\qtab.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\qtab.qml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Resource Include="..\..\src_vs2010\Package\Resources\Images_24bit.bmp">
       <Link>Resources\Images_24bit.bmp</Link>
     </Resource>

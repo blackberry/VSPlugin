@@ -854,6 +854,14 @@
       <Link>Templates\ProjectItems\BlackBerry\bbutil.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qtab.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qtab.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qtab.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qtab.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Resources\TemplateIcons\EmptyProj.ico" />
     <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.resx">
       <Link>Dialogs\CachedAuthorForm.resx</Link>

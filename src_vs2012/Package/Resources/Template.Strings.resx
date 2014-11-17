@@ -297,4 +297,13 @@
   <data name="6072" xml:space="preserve">
     <value>bbutil.c</value>
   </data>
+  <data name="6080" xml:space="preserve">
+    <value>QML Tabbed Pane</value>
+  </data>
+  <data name="6081" xml:space="preserve">
+    <value>Adds new QML file defining a custom tabbed pane usage</value>
+  </data>
+  <data name="6082" xml:space="preserve">
+    <value>Tab.qml</value>
+  </data>
 </root>
