@@ -152,6 +152,9 @@
     <Compile Include="..\..\src_vs2012\Package\Components\LogManager.cs">
       <Link>Components\LogManager.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\ProjectFolderTree.cs">
+      <Link>Components\ProjectFolderTree.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
     </Compile>

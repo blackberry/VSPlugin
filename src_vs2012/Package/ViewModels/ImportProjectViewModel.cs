@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.Package.Components;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Wizards;
 using EnvDTE;
@@ -18,12 +19,8 @@ namespace BlackBerry.Package.ViewModels
         private const string TemplateNativeCoreApp = @"native-default.vcxproj";
         private const string TemplateCascadesApp = @"cascades-default.vcxproj";
 
+        private ProjectFolderTree _folders;
         private VCProject _vcProject;
-        private VCFilter _sourceFilter;
-        private VCFilter _assetFilter;
-        private VCFilter _translationFilter;
-        private Dictionary<string, VCFilter> _filters;
-
 
         /// <summary>
         /// Scans for all supported files recursively inside specified location.
@@ -161,7 +158,7 @@ namespace BlackBerry.Package.ViewModels
 
             // add project into solution:
             var project = solution.AddFromFile(projectFullPath);
-            PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.DefaultFilters, project);
+            ProjectFolderTree.CreateFilters(ProjectFolderTree.DefaultFilters, project);
             project.Save();
 
             if (saveSolution)
@@ -181,42 +178,12 @@ namespace BlackBerry.Package.ViewModels
             if (newProject == null)
             {
                 _vcProject = null;
-                _sourceFilter = null;
-                _assetFilter = null;
-                _translationFilter = null;
-                _filters = null;
+                _folders = null;
             }
             else
             {
                 _vcProject = newProject;
-                _filters = new Dictionary<string, VCFilter>();
-
-                IVCCollection filters = _vcProject.Filters;
-                _sourceFilter = filters.Item("Source Files");
-                if (_sourceFilter == null)
-                {
-                    _sourceFilter = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.FilterNameSourceFiles, project)[0];
-                }
-
-                _assetFilter = filters.Item("Assets");
-                if (_assetFilter == null)
-                {
-                    _assetFilter = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.FilterNameAssets, project)[0];
-                }
-
-                _translationFilter = filters.Item("Translations");
-                if (_translationFilter == null)
-                {
-                    _translationFilter = PuppetMasterWizardEngine.CreateFilters(PuppetMasterWizardEngine.FilterNameTranslations, project)[0];
-                }
-
-                // default directories already point to specific filters to shorten the path:
-                _filters.Add("src", _sourceFilter);
-                _filters.Add("sources", _sourceFilter);
-                _filters.Add("code", _sourceFilter);
-                _filters.Add("asset", _assetFilter);
-                _filters.Add("assets", _assetFilter);
-                _filters.Add("translations", _translationFilter);
+                _folders = new ProjectFolderTree(_vcProject, true);
             }
         }
 
@@ -251,14 +218,14 @@ namespace BlackBerry.Package.ViewModels
 
                     if (addFile)
                     {
-                        AddFile(relativePath, destinationPath);
+                        _folders.AddFile(relativePath, destinationPath);
                     }
                 }
                 else
                 {
                     if (addFile)
                     {
-                        AddFile(relativePath, sourcePath);
+                        _folders.AddFile(relativePath, sourcePath);
                     }
                 }
             }
@@ -266,56 +233,6 @@ namespace BlackBerry.Package.ViewModels
             {
                 TraceLog.WriteException(ex, "Unable to import file: \"{0}\"", sourcePath);
             }
-        }
-
-        private void AddFile(string relativePath, string path)
-        {
-            if (string.IsNullOrEmpty(relativePath))
-                throw new ArgumentNullException("relativePath");
-
-            var filter = GetFileFilter(relativePath);
-            if (filter != null)
-            {
-                filter.AddFile(path);
-            }
-            else
-            {
-                _vcProject.AddFile(path);
-            }
-        }
-
-        private VCFilter GetFileFilter(string relativePath)
-        {
-            var dir = Path.GetDirectoryName(relativePath);
-            return GetFolderFilter(dir);
-        }
-
-        private VCFilter GetFolderFilter(string relativePath)
-        {
-            // should be added directly into the project?
-            if (string.IsNullOrEmpty(relativePath))
-                return null;
-
-            VCFilter filter;
-            if (_filters.TryGetValue(relativePath, out filter))
-                return filter;
-
-            var parent = Path.GetDirectoryName(relativePath);
-            var parentFilter = GetFolderFilter(parent);
-            if (parentFilter == null)
-                return null;
-
-            var name = Path.GetFileName(relativePath);
-            IVCCollection filters = parentFilter.Filters;
-            VCFilter currentFilter = filters.Item(name);
-
-            if (currentFilter == null)
-            {
-                currentFilter = parentFilter.AddFilter(name);
-            }
-
-            _filters[relativePath] = currentFilter;
-            return currentFilter;
         }
     }
 }

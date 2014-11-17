@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
+using BlackBerry.Package.Components;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Wizards;
 using BlackBerry.Package.ViewModels;
@@ -22,12 +23,6 @@ namespace BlackBerry.Package.Wizards
     [ProgId("BlackBerry.PuppetMasterWizardEngine")]
     public sealed class PuppetMasterWizardEngine : BaseWizardEngine
     {
-        public const string FilterNameAssets = "assets";
-        public const string FilterNameSourceFiles = "src";
-        public const string FilterNameConfig = "config";
-        public const string FilterNameTranslations = "trans";
-        public const string DefaultFilters = FilterNameAssets + ";" + FilterNameConfig + ";" + FilterNameSourceFiles + ";" + FilterNameTranslations;
-
         private const char ProjectNumberSeparator = '#';
         private const char PlatformSeparator = '@';
 
@@ -65,6 +60,7 @@ namespace BlackBerry.Package.Wizards
                     // add the project itself:
                     var destinationPath = CreateProject(context, data.Value, masterProjectName ?? context.ProjectName, count == 1);
                     var project = dte.Solution.AddFromFile(destinationPath);
+                    var folders = new ProjectFolderTree(project, false);
 
                     // PH: HINT: remember the name of the 'first' project and assume it later, that this is what the developer input in VisualStudio as project name;
                     // as it could overwrite that value by renaming rules of the template:
@@ -99,13 +95,13 @@ namespace BlackBerry.Package.Wizards
                             SourceActions reserved;
                             var itemName = Path.Combine(projectRoot, Path.GetFileName(GetSourceName(subItem.Value, out reserved)));
                             var itemTokenProcessor = CreateTokenProcessor(project.Name, projectRoot, GetDestinationName(itemName, subItem.Value, tokenProcessor), masterProjectName);
-                            AddFile(dte, project, itemName, subItem.Value, itemTokenProcessor, false);
+                            AddFile(dte, folders, itemName, subItem.Value, itemTokenProcessor, false);
                         }
 
                         // filters:
                         if (IsMatchingKey(subItem.Key, filtersParamName))
                         {
-                            CreateFilters(subItem.Value, project);
+                            folders.CreateFilters(subItem.Value);
                         }
 
                         // library references:
@@ -165,86 +161,6 @@ namespace BlackBerry.Package.Wizards
             return destinationPath;
         }
 
-        /// <summary>
-        /// Creates basic set of filters inside the project.
-        /// </summary>
-        public static VCFilter[] CreateFilters(string filtersDefinition, Project project)
-        {
-            if (project == null)
-                throw new ArgumentNullException("project");
-            
-            var vcProject = project.Object as VCProject;
-            if (vcProject != null)
-            {
-                return CreateFilters(filtersDefinition, vcProject);
-            }
-
-            return null;
-        }
-
-        private static VCFilter[] CreateFilters(string filtersDefinition, VCProject vcProject)
-        {
-            if (string.IsNullOrEmpty(filtersDefinition))
-                return null;
-
-            var result = new List<VCFilter>();
-
-            foreach (var filterName in filtersDefinition.Split(';', ',', ' '))
-            {
-                if (string.Compare(filterName, "sources", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    VCFilter filter = FindOrAddFilter("Source Files", vcProject);
-                    filter.Filter = "cpp;c;cc;cxx;def;bat";
-                    result.Add(filter);
-                }
-
-                if (string.Compare(filterName, "headers", StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    VCFilter filter = FindOrAddFilter("Header Files", vcProject);
-                    filter.Filter = "h;hpp;hxx;hm;inl;inc;xsd";
-                    result.Add(filter);
-                }
-
-                if (string.Compare(filterName, FilterNameSourceFiles, StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    VCFilter filter = FindOrAddFilter("Source Files", vcProject);
-                    filter.Filter = "cpp;c;cc;cxx;def;bat;h;hpp;hxx;hm;inl;inc;xsd";
-                    result.Add(filter);
-                }
-
-                if (string.Compare(filterName, FilterNameAssets, StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    VCFilter filter = FindOrAddFilter("Assets", vcProject);
-                    filter.Filter = "qml;js;jpg;png;gif;amd";
-                    result.Add(filter);
-                }
-
-                if (string.Compare(filterName, FilterNameConfig, StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    VCFilter filter = FindOrAddFilter("Config Files", vcProject);
-                    filter.Filter = "pri;pro;xml";
-                    result.Add(filter);
-                }
-
-                if (string.Compare(filterName, FilterNameTranslations, StringComparison.OrdinalIgnoreCase) == 0)
-                {
-                    VCFilter filter = FindOrAddFilter("Translations", vcProject);
-                    filter.Filter = "ts;qm";
-                    result.Add(filter);
-                }
-            }
-
-            return result.ToArray();
-        }
-
-        private static VCFilter FindOrAddFilter(string name, VCProject vcProject)
-        {
-            IVCCollection filters = vcProject.Filters;
-            VCFilter filter = filters.Item(name);
-
-            return filter ?? vcProject.AddFilter(name);
-        }
-
         private static string GetTag(string name, char separator)
         {
             if (string.IsNullOrEmpty(name))
@@ -296,13 +212,14 @@ namespace BlackBerry.Package.Wizards
         internal override wizardResult ExecuteNewProjectItem(DTE2 dte, IntPtr owner, NewProjectItemParams context, KeyValuePair<string, string>[] customParams)
         {
             var project = context.ProjectItems.ContainingProject;
+            var folders = new ProjectFolderTree(project, false);
             var tokenProcessor = CreateTokenProcessor(context.ProjectName, context.LocalDirectory, context.ItemName, context.ProjectName);
 
             foreach (var data in customParams)
             {
                 if (string.Compare(data.Key, "file", StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    AddFile(dte, project, context.ItemName, data.Value, tokenProcessor, true);
+                    AddFile(dte, folders, context.ItemName, data.Value, tokenProcessor, true);
                 }
             }
 
@@ -312,12 +229,12 @@ namespace BlackBerry.Package.Wizards
         /// <summary>
         /// Processes item and adds it to the project.
         /// </summary>
-        private void AddFile(DTE2 dte, Project project, string itemName, string templateDefinition, TokenProcessor tokenProcessor, bool forceOpen)
+        private void AddFile(DTE2 dte, ProjectFolderTree folders, string itemName, string templateDefinition, TokenProcessor tokenProcessor, bool forceOpen)
         {
             if (dte == null)
                 throw new ArgumentNullException("dte");
-            if (project == null)
-                throw new ArgumentNullException("project");
+            if (folders == null)
+                throw new ArgumentNullException("folders");
             if (string.IsNullOrEmpty(itemName))
                 throw new ArgumentNullException("itemName");
             if (string.IsNullOrEmpty(templateDefinition))
@@ -333,7 +250,7 @@ namespace BlackBerry.Package.Wizards
             // then add that file to the project items:
             if ((flags & SourceActions.AddToProject) == SourceActions.AddToProject)
             {
-                project.ProjectItems.AddFromFile(destinationPath);
+                folders.AddFile(destinationPath);
                 TraceLog.WriteLine("Added file: \"{0}\"", destinationPath);
             }
             else
