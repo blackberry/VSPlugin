@@ -300,7 +300,7 @@ namespace BlackBerry.Package.ViewModels
             LoadModelFromXmlModel();
 
             IList<ImageItemClass> iconImageList = new List<ImageItemClass>();
-            if ((_qnxSchema.icon != null) && (_qnxSchema.icon.image != null))
+            if (_qnxSchema != null && _qnxSchema.icon != null && _qnxSchema.icon.image != null)
             {
                 string iconPngPath = "";  //added to avoid duplication. That's because I didn't find the template to remove teh ICON.PNG.
                 foreach (string iconImage in _qnxSchema.icon.image)
@@ -325,7 +325,7 @@ namespace BlackBerry.Package.ViewModels
             LoadPermissions();
 
             IList<ImageItemClass> splashScreenImageList = new List<ImageItemClass>();
-            if ((_qnxSchema.splashScreens != null) && (_qnxSchema.splashScreens.image != null))
+            if (_qnxSchema != null && _qnxSchema.splashScreens != null && _qnxSchema.splashScreens.image != null)
             {
                 foreach (string splashScreenImage in _qnxSchema.splashScreens.image)
                 {
@@ -338,39 +338,41 @@ namespace BlackBerry.Package.ViewModels
             IList<ConfigurationItemClass> configurationList = new List<ConfigurationItemClass>();
             ConfigurationItemClass configItem = new ConfigurationItemClass("All Configurations");
             configurationList.Add(configItem);
-            foreach (var config in _qnxSchema.configuration)
+            if (_qnxSchema != null)
             {
-                configItem = new ConfigurationItemClass(config.name);
-                configurationList.Add(configItem);
+                foreach (var config in _qnxSchema.configuration)
+                {
+                    configItem = new ConfigurationItemClass(config.name);
+                    configurationList.Add(configItem);
+                }
             }
             _configurationList = new CollectionView(configurationList);
 
             IList<OrientationItemClass> orientationList = new List<OrientationItemClass>();
             OrientationItemClass orientationItem = new OrientationItemClass("Default");
             orientationList.Add(orientationItem);
-            if (_qnxSchema.initialWindow.autoOrients == "") 
+            if (_qnxSchema != null && string.IsNullOrEmpty(_qnxSchema.initialWindow.autoOrients))
             {
                 _orientationItem = orientationItem;
             }            
 
             orientationItem = new OrientationItemClass("Auto-orient");
             orientationList.Add(orientationItem);
-            if (_qnxSchema.initialWindow.autoOrients == "true") 
+            if (_qnxSchema != null && _qnxSchema.initialWindow.autoOrients == "true") 
             {
                 _orientationItem = orientationItem;
             }
 
-
             orientationItem = new OrientationItemClass("Landscape");
             orientationList.Add(orientationItem);
-            if (_qnxSchema.initialWindow.aspectRatio == "landscape") 
+            if (_qnxSchema != null && _qnxSchema.initialWindow.aspectRatio == "landscape") 
             {
                 _orientationItem = orientationItem;
             }
 
             orientationItem = new OrientationItemClass("Portrait");
             orientationList.Add(orientationItem);
-            if (_qnxSchema.initialWindow.aspectRatio == "portrait")
+            if (_qnxSchema != null && _qnxSchema.initialWindow.aspectRatio == "portrait")
             {
                 _orientationItem = orientationItem;
             }
