@@ -6,6 +6,8 @@ namespace BlackBerry.BuildTasks.Templates
 {
     partial class ConfigPriTemplate
     {
+        private string _precompiledHeaderName;
+
         #region Properties
 
         public string SolutionName
@@ -48,8 +50,18 @@ namespace BlackBerry.BuildTasks.Templates
 
         public string PrecompiledHeaderName
         {
-            get;
-            set;
+            get { return _precompiledHeaderName; }
+            set
+            {
+                if (!string.IsNullOrEmpty(value))
+                {
+                    _precompiledHeaderName = value.Replace('\\', '/');
+                }
+                else
+                {
+                    _precompiledHeaderName = null;
+                }
+            }
         }
 
         public ITaskItem[] QmlItems

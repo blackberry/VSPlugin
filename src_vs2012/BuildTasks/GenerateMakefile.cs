@@ -231,7 +231,7 @@ namespace BlackBerry.BuildTasks
                 template.SolutionName = SolutionName;
                 template.CompileItems = toCompile;
                 template.CompileDirs = ExtractDirectories(template.CompileItems);
-                template.IncludeItems = FilterByExtension(IncludeItems, new[] { ".h", ".hpp", ".hxx", ".h++", ".hh" }, new[] { "precompiled.h", "precompiled.hpp", "stdafx.h" }, out excludedHeader);
+                template.IncludeItems = FilterByExtension(IncludeItems, new[] { ".h", ".hpp", ".hxx", ".h++", ".hh" }, new[] { "precompiled.h", "precompiled.hpp", "stdafx.h", "src\\precompiled.h", "src\\precompiled.hpp", "src\\stdafx.h" }, out excludedHeader);
                 template.IncludeDirs = ExtractDirectories(template.IncludeItems);
                 template.PrecompiledHeaderName = excludedHeader != null ? excludedHeader.ItemSpec : null;
                 template.QmlItems = FilterByExtension(IncludeItems, new[] {".qml", ".js", ".qs"}, null, out excludedItem);
