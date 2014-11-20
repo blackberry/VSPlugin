@@ -37,7 +37,7 @@
                 </Grid>
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsFileList">
-                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" ContextMenuOpening="OnContextMenuOpening" SelectionMode="Single">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" ContextMenuOpening="OnContextMenuOpening" SelectionMode="Single"  KeyDown="ListPreview_OnKeyDown">
                     <ListView.ContextMenu>
                         <!-- This is just a stub, without it, it would be required to right-click twice to show the dynamic context-menu -->
                         <ContextMenu />
@@ -70,7 +70,7 @@
                 </ListView>
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsItemList">
-                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" ContextMenuOpening="OnContextMenuOpening" SelectionMode="Single">
+                <ListView ItemsSource="{Binding}" MouseDoubleClick="ListPreview_OnMouseDoubleClick" ContextMenuOpening="OnContextMenuOpening" SelectionMode="Single" KeyDown="ListPreview_OnKeyDown">
                     <ListView.ContextMenu>
                         <!-- This is just a stub, without it, it would be required to right-click twice to show the dynamic context-menu -->
                         <ContextMenu />
@@ -202,7 +202,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <TextBlock Text="Path:" Margin="4" VerticalAlignment="Center" />
-            <TextBox x:Name="NavigationPath" Text="{Binding SelectedItem.NavigationPath, Mode=OneWay}" Margin="4" Padding="2" Grid.Column="1" />
+            <TextBox x:Name="NavigationPath" Text="{Binding SelectedItem.NavigationPath, Mode=OneWay}" Margin="4" Padding="2" Grid.Column="1" KeyDown="NavigationPath_OnKeyDown" />
             <Button Margin="4" Padding="8,2,8,2" Content="Go" Grid.Column="2" Click="NavigateToItem_OnClick" />
         </Grid>
 

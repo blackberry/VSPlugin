@@ -32,7 +32,10 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (!IsDisposed)
             {
                 // disconnect with target service:
-                Post("q");
+                if (Connection.IsConnected)
+                {
+                    Post("q");
+                }
             }
 
             base.Dispose(disposing);

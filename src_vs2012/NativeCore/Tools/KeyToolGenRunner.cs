@@ -7,7 +7,7 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to create a pair of signing keys for developer of specified name.
     /// </summary>
-    public sealed class KeyToolGenRunner : ToolRunner
+    public sealed class KeyToolGenRunner : BBToolRunner
     {
         private string _name;
         private string _password;
@@ -16,12 +16,10 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
         /// <param name="name">Name of the developer</param>
         /// <param name="password">Password protection, required later to use the keys</param>
         /// <param name="storeFileName">Name of the certificate, where to store specified data; if null, 'author.p12' is used</param>
-        public KeyToolGenRunner(string workingDirectory, string name, string password, string storeFileName)
-            : base("cmd.exe", workingDirectory)
+        public KeyToolGenRunner(string name, string password, string storeFileName)
         {
             if (string.IsNullOrEmpty(name))
                 throw new ArgumentNullException("name");

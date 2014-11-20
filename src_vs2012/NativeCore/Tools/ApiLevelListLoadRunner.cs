@@ -8,12 +8,15 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to list available NDKs or simulator versions.
     /// </summary>
-    public sealed class ApiLevelListLoadRunner : ToolRunner
+    public sealed class ApiLevelListLoadRunner : BBToolRunner
     {
         private ApiLevelListTypes _type;
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public ApiLevelListLoadRunner(string workingDirectory, ApiLevelListTypes type)
-            : base("cmd.exe", workingDirectory)
+            : base(workingDirectory)
         {
             Type = type;
         }

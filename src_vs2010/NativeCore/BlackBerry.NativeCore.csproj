@@ -407,6 +407,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Visitors\ZipPackageVisitor.cs">
       <Link>QConn\Visitors\ZipPackageVisitor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Services\IAttachDiscoveryService.cs">
+      <Link>Services\IAttachDiscoveryService.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Services\IDeviceDiscoveryService.cs">
       <Link>Services\IDeviceDiscoveryService.cs</Link>
     </Compile>
@@ -421,6 +424,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\ApplicationRemoveRunner.cs">
       <Link>Tools\ApplicationRemoveRunner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\BBToolRunner.cs">
+      <Link>Tools\BBToolRunner.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\DebugTokenCreateRunner.cs">
       <Link>Tools\DebugTokenCreateRunner.cs</Link>

@@ -49,12 +49,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="envdte, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="envdte80, Version=8.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.CPPTasks.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Build.Framework" />
@@ -68,11 +62,9 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Security" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
+    <Reference Include="System.Security" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -143,6 +135,30 @@
     <Compile Include="..\..\src_vs2010\BuildTasks\SSHDelete.cs">
       <Link>SSHDelete.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\ProcessSetupHelper.cs">
+      <Link>Helpers\ProcessSetupHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccExec.cs">
+      <Link>QccExec.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.cs">
+      <Link>Templates\ConfigPriTemplate.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ConfigPriTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.Properties.cs">
+      <Link>Templates\ConfigPriTemplate.Properties.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.cs">
+      <Link>Templates\MakefileTemplate.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MakefileTemplate.tt</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.Properties.cs">
+      <Link>Templates\MakefileTemplate.Properties.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\ConfigDefaults.cs">
       <Link>ConfigDefaults.cs</Link>
     </Compile>
@@ -158,136 +174,80 @@
       <Link>BarDescriptor\Schema\bar-descriptor.xsd</Link>
       <SubType>Designer</SubType>
     </None>
-    <None Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets">
-      <Link>BlackBerrySimulator\Microsoft.Cpp.BlackBerrySimulator.Packager.targets</Link>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.Common.props">
+      <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Common.props</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets">
-      <Link>BlackBerrySimulator\Microsoft.CppBuild.BlackBerrySimulator.targets</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\src_vs2010\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="..\..\src_vs2010\BuildTasks\BlackBerry\Microsoft.CppBuild.BlackBerry.targets">
-      <Link>BlackBerry\Microsoft.CppBuild.BlackBerry.targets</Link>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\cl.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\cl.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Platform.default.props">
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\debugger_general.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\debugger_general.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Platform.props">
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\directories.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\directories.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\Platform.targets">
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\general.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\general.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props">
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\lib.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\lib.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.targets">
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\link.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\link.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\Platform.default.props">
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\packager.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\packager.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\Platform.props">
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml">
+      <Link>BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\Platform.targets">
-      <SubType>Designer</SubType>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.default.props">
+      <Link>BlackBerry\Platform.default.props</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Include="BlackBerrySimulator\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerrySimulator.qcc.props">
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.props">
+      <Link>BlackBerry\Platform.props</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="BlackBerrySimulator\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerrySimulator.qcc.targets">
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.targets">
+      <Link>BlackBerry\Platform.targets</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.props">
+      <Link>BlackBerry\PlatformToolsets\qcc\Toolset.props</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\PlatformToolsets\qcc\Microsoft.Cpp.BlackBerry.qcc.targets">
+      <Link>BlackBerry\PlatformToolsets\qcc\Toolset.targets</Link>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <None Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt">
+      <Link>Templates\ConfigPriTemplate.tt</Link>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>ConfigPriTemplate.cs</LastGenOutput>
+    </None>
+    <None Include="..\..\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt">
+      <Link>Templates\MakefileTemplate.tt</Link>
+      <Generator>TextTemplatingFilePreprocessor</Generator>
+      <LastGenOutput>MakefileTemplate.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xml">
       <Link>BarDescriptor\Schema\bar-descriptor.xml</Link>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\debugger_ndk.xml">
-      <Link>BlackBerrySimulator\Rules\debugger_ndk.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml">
-      <Link>BlackBerrySimulator\Rules\ndkProjectItemsSchema.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\ndk_directories.xml">
-      <Link>BlackBerrySimulator\Rules\ndk_directories.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\ndk_general.xml">
-      <Link>BlackBerrySimulator\Rules\ndk_general.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\ndk_general_ps.xml">
-      <Link>BlackBerrySimulator\Rules\ndk_general_ps.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\packager.xml">
-      <Link>BlackBerrySimulator\Rules\packager.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\qcc_cl.xml">
-      <Link>BlackBerrySimulator\Rules\qcc_cl.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\qcc_lib.xml">
-      <Link>BlackBerrySimulator\Rules\qcc_lib.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerrySimulator\Rules\qcc_link.xml">
-      <Link>BlackBerrySimulator\Rules\qcc_link.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\debugger_ndk.xml">
-      <Link>BlackBerry\Rules\debugger_ndk.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\ndkProjectItemsSchema.xml">
-      <Link>BlackBerry\Rules\ndkProjectItemsSchema.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\ndk_directories.xml">
-      <Link>BlackBerry\Rules\ndk_directories.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\ndk_general.xml">
-      <Link>BlackBerry\Rules\ndk_general.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\ndk_general_ps.xml">
-      <Link>BlackBerry\Rules\ndk_general_ps.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\packager.xml">
-      <Link>BlackBerry\Rules\packager.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\qcc_cl.xml">
-      <Link>BlackBerry\Rules\qcc_cl.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\qcc_lib.xml">
-      <Link>BlackBerry\Rules\qcc_lib.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="..\..\src_vs2010\BuildTasks\BlackBerry\Rules\qcc_link.xml">
-      <Link>BlackBerry\Rules\qcc_link.xml</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
@@ -312,7 +272,9 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="..\..\src_vs2010\BuildTasks\Properties\Resources.resx">
       <Link>Properties\Resources.resx</Link>

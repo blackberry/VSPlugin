@@ -49,7 +49,7 @@ namespace BlackBerry.Package.Dialogs
                     _developer.UpdatePassword(form.Password, form.ShouldRemember);
                 }
 
-                _runner = new KeyToolInfoRunner(ConfigDefaults.ToolsDirectory, Path, _developer.CskPassword);
+                _runner = new KeyToolInfoRunner(Path, _developer.CskPassword);
                 _runner.Dispatcher = EventDispatcher.From(this);
                 _runner.Finished += OnInfoLoaded;
                 _runner.ExecuteAsync();

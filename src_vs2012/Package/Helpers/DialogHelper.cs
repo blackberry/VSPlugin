@@ -149,7 +149,7 @@ namespace BlackBerry.Package.Helpers
         {
             var openFile = new OpenFileDialog();
             openFile.Title = title;
-            openFile.DefaultExt = ".bar";
+            openFile.DefaultExt = string.Empty;
             openFile.Filter = "All files|*.*";
             openFile.FilterIndex = 1;
             openFile.CheckFileExists = true;

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using Microsoft.VisualStudio.Shell;
 
 namespace BlackBerry.Package.Options
@@ -43,18 +44,32 @@ namespace BlackBerry.Package.Options
 
         #region Properties
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string NdkPath
         {
             get { return Control.NdkPath; }
             set { Control.NdkPath = value; }
         }
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public string ToolsPath
         {
             get { return Control.ToolsPath; }
             set { Control.ToolsPath = value; }
         }
 
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        public string JavaHomePath
+        {
+            get { return Control.JavaHomePath; }
+            set { Control.JavaHomePath = value; }
+        }
+
+        [Browsable(false)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool IsOpeningExternal
         {
             get { return Control.IsOpeningExternal; }
@@ -62,6 +77,23 @@ namespace BlackBerry.Package.Options
         }
 
         #endregion
+
+        protected override void OnActivate(CancelEventArgs e)
+        {
+            base.OnActivate(e);
+            NdkPath = ConfigDefaults.NdkDirectory;
+            ToolsPath = ConfigDefaults.ToolsDirectory;
+            JavaHomePath = ConfigDefaults.JavaHome;
+        }
+
+        protected override void OnApply(PageApplyEventArgs e)
+        {
+            base.OnApply(e);
+            if (e.ApplyBehavior == ApplyKind.Apply)
+            {
+                ConfigDefaults.Apply(NdkPath, ToolsPath, JavaHomePath);
+            }
+        }
 
         protected override void OnClosed(System.EventArgs e)
         {

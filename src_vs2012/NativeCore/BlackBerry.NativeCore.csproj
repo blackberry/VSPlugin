@@ -167,10 +167,12 @@
     <Compile Include="QConn\Model\VisitorProgressChangedEventArgs.cs" />
     <Compile Include="QConn\Visitors\ZipPackageVisitor.cs" />
     <Compile Include="Services\IDeviceDiscoveryService.cs" />
+    <Compile Include="Services\IAttachDiscoveryService.cs" />
     <Compile Include="Tools\ApiLevelListLoadRunner.cs" />
     <Compile Include="Tools\ApiLevelUpdateLogEventArgs.cs" />
     <Compile Include="Tools\ApiLevelUpdateRunner.cs" />
     <Compile Include="Tools\ApplicationRemoveRunner.cs" />
+    <Compile Include="Tools\BBToolRunner.cs" />
     <Compile Include="Tools\GdbHostRunner.cs" />
     <Compile Include="Tools\DebugTokenCreateRunner.cs" />
     <Compile Include="Tools\DebugTokenInfoRunner.cs" />

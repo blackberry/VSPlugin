@@ -7,7 +7,7 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to load info about developer's signing keys.
     /// </summary>
-    public sealed class KeyToolInfoRunner : ToolRunner
+    public sealed class KeyToolInfoRunner : BBToolRunner
     {
         private string _password;
         private string _storeFileName;
@@ -15,11 +15,9 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
         /// <param name="storeFileName">Name of the certificate file</param>
         /// <param name="password">Required password to decrypt info inside the certificate file</param>
-        public KeyToolInfoRunner(string workingDirectory, string storeFileName, string password)
-            : base("cmd.exe", workingDirectory)
+        public KeyToolInfoRunner(string storeFileName, string password)
         {
             if (string.IsNullOrEmpty(storeFileName))
                 throw new ArgumentNullException("storeFileName");

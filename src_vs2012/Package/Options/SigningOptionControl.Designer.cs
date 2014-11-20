@@ -95,7 +95,7 @@
             this.bttRegister.Name = "bttRegister";
             this.bttRegister.Size = new System.Drawing.Size(75, 23);
             this.bttRegister.TabIndex = 2;
-            this.bttRegister.Text = "&Register";
+            this.bttRegister.Text = "&Register...";
             this.bttRegister.UseVisualStyleBackColor = true;
             this.bttRegister.Click += new System.EventHandler(this.bttRegister_Click);
             // 

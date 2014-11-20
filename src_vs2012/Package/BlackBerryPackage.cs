@@ -20,6 +20,7 @@ using System.ComponentModel.Design;
 using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
@@ -62,7 +63,7 @@ namespace BlackBerry.Package
     [ProvideEditorExtension(typeof(BarDescriptorEditorFactory), BarDescriptorEditorFactory.DefaultExtension, 0x40, NameResourceID = 106)]
     // We register that our editor supports LOGVIEWID_Designer logical view
     [ProvideEditorLogicalView(typeof(BarDescriptorEditorFactory), LogicalViewID.Designer)]
-    // Microsoft Visual C# Project
+    // Microsoft Visual C++ Project
     [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", BarDescriptorEditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
     // Registration of custom debugger
@@ -98,10 +99,11 @@ namespace BlackBerry.Package
     // This attribute registers public services exposed by this package.
     // The package itself will be automatically loaded if needed.
     [ProvideService(typeof(IDeviceDiscoveryService), ServiceName = "BlackBerry Device Discovery")]
+    [ProvideService(typeof(IAttachDiscoveryService), ServiceName = "BlackBerry Process-Attach Executable Discovery")]
 
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(TargetNavigatorPane), Style = VsDockStyle.Tabbed, MultiInstances = false)]
-    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService
+    public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService, IAttachDiscoveryService
     {
         public const string VersionString = "2.1.2014.922";
         public const string OptionsCategoryName = "BlackBerry";
@@ -140,8 +142,11 @@ namespace BlackBerry.Package
             Trace.WriteLine (string.Format(CultureInfo.CurrentCulture, "Entering Initialize() of: {0}", ToString()));
             base.Initialize();
 
-            MessageBoxHelper.Initialise(this);
-            _dte = (DTE2)GetService(typeof(SDTE));
+            _dte = (DTE2) GetService(typeof(SDTE));
+
+            // create dedicated persistent logs
+            var logOptions = (LogsOptionPage)GetDialogPage(typeof(LogsOptionPage));
+            LogManager.Initialize(logOptions.Path, logOptions.LimitLogs ? logOptions.LimitCount : -1, TraceLog.Category, TraceLog.CategoryGDB);
 
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
             _mainTraceWindow = new BlackBerryPaneTraceListener("BlackBerry", TraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceMainOutputWindowPane);
@@ -160,28 +165,11 @@ namespace BlackBerry.Package
             // add this package to the globally-proffed services:
             IServiceContainer serviceContainer = this;
             serviceContainer.AddService(typeof(IDeviceDiscoveryService), this, true);
+            serviceContainer.AddService(typeof(IAttachDiscoveryService), this, true);
 
             TraceLog.WriteLine(" * registered services");
 
             TraceLog.WriteLine(" * loaded NDK descriptions");
-
-            // setup called before running any 'tool':
-            ToolRunner.Startup += (s, e) =>
-                {
-                    var ndk = PackageViewModel.Instance.ActiveNDK;
-
-                    if (ndk != null)
-                    {
-                        e["QNX_TARGET"] = ndk.TargetPath;
-                        e["QNX_HOST"] = ndk.HostPath;
-                        e["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", e["PATH"],
-                                                  Path.Combine(ndk.HostPath, "usr", "bin"), ";");
-                    }
-                    else
-                    {
-                        e["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", e["PATH"]);
-                    }
-                };
 
             // inform Targets, that list of target-devices has been changed and maybe it should force some disconnections:
             PackageViewModel.Instance.TargetsChanged += (s, e) => Targets.DisconnectIfOutside(e.TargetDevices);
@@ -451,11 +439,11 @@ namespace BlackBerry.Package
 
             if (projects == null || projects.Length == 0)
             {
-                MessageBoxHelper.Show("Unable to add BlackBerry Platforms.", "Please open a solution with Visual C++ projects", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Unable to add BlackBerry platform.", "Please open a solution with Visual C++ projects", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            if (MessageBoxHelper.Show("Do you want to add BlackBerry target platforms for all C/C++ projects?", null, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            if (MessageBoxHelper.Show("Do you want to add BlackBerry target platform for all C/C++ projects?", null, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 
             foreach (var project in projects)
@@ -463,7 +451,7 @@ namespace BlackBerry.Package
                 _buildPlatformsManager.AddPlatforms(project);
             }
 
-            MessageBoxHelper.Show("You might now:\r\n * restart Visual Studio, as it has the 'deploy' option disabled\r\n * update the Author Information within the bar-descriptor.xml", "BlackBerry and BlackBerrySimulator targets have been added to solution configurations.", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBoxHelper.Show("You might now:\r\n * restart Visual Studio, as it has the 'deploy' option disabled\r\n * update the Author Information within the bar-descriptor.xml", "BlackBerry target have been added to solution configurations.", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         private void ImportBlackBerryProject(object sender, EventArgs e)
@@ -522,7 +510,7 @@ namespace BlackBerry.Package
 
         #endregion
 
-        #region IDeviceDiscoveryService
+        #region IDeviceDiscoveryService Implementation
 
         DeviceDefinition IDeviceDiscoveryService.FindDevice()
         {
@@ -530,6 +518,96 @@ namespace BlackBerry.Package
             if (dialog.ShowDialog() == DialogResult.OK)
             {
                 return dialog.ToDevice();
+            }
+
+            return null;
+        }
+
+        #endregion
+
+        #region IAttachDiscoveryService Implementation
+
+        private string FindMatchingProject(ProcessInfo process)
+        {
+            if (process != null)
+            {
+                foreach (Project project in _dte.Solution.Projects)
+                {
+                    if (_buildPlatformsManager.IsBlackBerryProject(project))
+                    {
+                        string outputPath;
+                        if (IsMatchingProject(project, process, out outputPath))
+                        {
+                            TraceLog.WarnLine("Suggesting executable path: \"{0}\"", outputPath);
+                            return outputPath;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        private static bool IsMatchingProject(Project project, ProcessInfo process, out string outputPath)
+        {
+            outputPath = ProjectHelper.GetTargetFullName(project);
+            if (!string.IsNullOrEmpty(outputPath))
+            {
+                var name = Path.GetFileName(outputPath);
+                if (process != null && string.Compare(name, process.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        string IAttachDiscoveryService.FindExecutable(ProcessInfo process)
+        {
+            // try to automatically select the project:
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                {
+                    string outputPath;
+                    if (IsMatchingProject(project, process, out outputPath))
+                    {
+                        if (File.Exists(outputPath))
+                        {
+                            TraceLog.WarnLine("Suggesting executable path: \"{0}\"", outputPath);
+                            return outputPath;
+                        }
+                    }
+                }
+            }
+
+            // PH: HINT: this code will be for sure executed, when attaching to a process without any solution opened:
+
+            // ask developer via any UI to point the executable (binary):
+            var form = new BinaryDiscoveryForm("Select Matching Target Process Binary");
+
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                {
+                    string outputPath;
+                    if (IsMatchingProject(project, process, out outputPath))
+                    {
+                        form.AddTarget(project, outputPath, true);
+                    }
+                    else
+                    {
+                        form.AddTarget(project, outputPath, false);
+                    }
+                }
+            }
+
+            form.AddCustomTarget("Custom executable");
+
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                return form.SelectedPath;
             }
 
             return null;

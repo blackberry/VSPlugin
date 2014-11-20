@@ -880,7 +880,7 @@ namespace BlackBerry.Package.ViewModels
                 return;
             }
 
-            _debugTokenInfoRunner = new DebugTokenInfoRunner(ConfigDefaults.ToolsDirectory, debugTokenFileName);
+            _debugTokenInfoRunner = new DebugTokenInfoRunner(debugTokenFileName);
             _debugTokenInfoRunner.Tag = failHandler;
             _debugTokenInfoRunner.Dispatcher = dispatcher;
             _debugTokenInfoRunner.Finished += DebugTokenInfoLoaded;

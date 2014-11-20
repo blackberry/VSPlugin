@@ -153,8 +153,22 @@
     <Compile Include="..\..\src_vs2012\Package\Components\BuildPlatformsManager.cs">
       <Link>Components\BuildPlatformsManager.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\LogManager.cs">
+      <Link>Components\LogManager.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Diagnostics\PersistentTraceListener.cs">
+      <Link>Diagnostics\PersistentTraceListener.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.cs">
+      <Link>Dialogs\BinaryDiscoveryForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.designer.cs">
+      <Link>Dialogs\BinaryDiscoveryForm.designer.cs</Link>
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Dialogs\FolderForm.cs">
       <Link>Dialogs\FolderForm.cs</Link>
@@ -200,6 +214,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Helpers\MessageBoxHelper.cs">
       <Link>Helpers\MessageBoxHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Helpers\ProjectHelper.cs">
+      <Link>Helpers\ProjectHelper.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
       <Link>Model\bar-descriptor.cs</Link>
@@ -577,6 +594,10 @@
     <None Include="..\..\src_vs2012\Package\Resources\Package.Bitmaps.vsct">
       <Link>Resources\Package.Bitmaps.vsct</Link>
     </None>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\BinaryDiscoveryForm.resx">
+      <Link>Dialogs\BinaryDiscoveryForm.resx</Link>
+      <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\FolderForm.resx">
       <Link>Dialogs\FolderForm.resx</Link>
       <DependentUpon>FolderForm.cs</DependentUpon>
@@ -758,6 +779,13 @@
     <ProjectReference Include="..\DebugEngine\BlackBerry.DebugEngine.csproj">
       <Project>{59a7b188-e307-4495-a3af-4ed76b086a87}</Project>
       <Name>BlackBerry.DebugEngine</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GDBHost\BlackBerry.GDBHost.vcxproj">
+      <Project>{9a560339-44db-413f-868c-403962c2cf01}</Project>
+      <Name>BlackBerry.GDBHost</Name>
+      <IncludeOutputGroupsInVSIX>BuiltProjectOutputGroup%3bBuiltProjectOutputGroupDependencies%3bGetCopyToOutputDirectoryItems%3bSatelliteDllsProjectOutputGroup%3b</IncludeOutputGroupsInVSIX>
+      <IncludeOutputGroupsInVSIXLocalOnly>DebugSymbolsProjectOutputGroup%3b</IncludeOutputGroupsInVSIXLocalOnly>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{AE6BEE3E-3273-4214-A215-2924E33246CA}</Project>

@@ -124,7 +124,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="breakpoint"> The Bound breakpoint to enable. </param>
         public void RemoteEnable(AD7BoundBreakpoint breakpoint)
-        {            
+        {
             _engine.EventDispatcher.EnableBreakpoint(breakpoint.GdbInfo.ID, true);
         }
 
@@ -133,7 +133,7 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         /// <param name="breakpoint"> The Bound breakpoint to disable. </param>
         public void RemoteDisable(AD7BoundBreakpoint breakpoint)
-        {            
+        {
             _engine.EventDispatcher.EnableBreakpoint(breakpoint.GdbInfo.ID, false);
         }
 

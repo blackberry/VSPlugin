@@ -144,7 +144,7 @@ namespace BlackBerry.Package.Options
                 ///////////////////////
                 // UNREGISTER
                 // this is the only place, where doing it synchronously is OK:
-                var runner = new KeyToolRemoveRunner(ConfigDefaults.ToolsDirectory);
+                var runner = new KeyToolRemoveRunner();
                 var success = runner.Execute();
 
                 // and delete all profile-related files:

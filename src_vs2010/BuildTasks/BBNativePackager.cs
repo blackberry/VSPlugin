@@ -14,7 +14,9 @@
 
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using BlackBerry.BuildTasks.BarDescriptor;
 using BlackBerry.BuildTasks.Properties;
 using Microsoft.Build.CPPTasks;
 using Microsoft.Build.Framework;
@@ -27,7 +29,7 @@ namespace BlackBerry.BuildTasks
         #region Member Variable and Constant Declarations
 
         private readonly ArrayList _switchOrderList;
-        private static BarDescriptor.qnx _descriptor;
+        private qnx _descriptor;
         private string _projectDirectory;
         private string _appName;
         private string _barDescriptorPath = "";
@@ -134,97 +136,100 @@ namespace BlackBerry.BuildTasks
         }
 
         /// <summary>
-        /// Return the assets from the bardescriptor.xml
+        /// Return the assets from the bar-descriptor.xml
         /// </summary>
         private ITaskItem[] GetAssetsFile()
         {
-
             //make sure the _descriptor is loaded
             if (_descriptor == null)
             {
-                _descriptor = BarDescriptor.Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
+                _descriptor = Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
             }
-            BarDescriptor.asset[] globalAssets = _descriptor.assets;
-            BarDescriptor.asset[] configAssets = null;
+            asset[] globalAssets = _descriptor.assets;
+            asset[] configAssets = null;
 
             // You can call a configuration whatever you like, but these are the ones Momentics uses for its various
             // platform + configuration combinations.  Usually this is the same as the output directory, but asset paths
             // don't have anything to do with the configuration name.  I've based the config names on the platform
             // + configuration combination, not the output directory.
-            BarDescriptor.qnxConfiguration[] configs = _descriptor.configurations;
+            qnxConfiguration[] configs = _descriptor.configurations;
             foreach (var config in configs)
             {
-                if (Configuration == "Debug" && Platform == "BlackBerry" && config.name == "Device-Debug")
+                if (Configuration == "Debug" && Platform == "Device" && config.name == "Device-Debug")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Release" && Platform == "BlackBerry" && config.name == "Device-Release")
+                if (Configuration == "Release" && Platform == "Device" && config.name == "Device-Release")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Profile" && Platform == "BlackBerry" && config.name == "Device-Profile")
+                if (Configuration == "Profile" && Platform == "Device" && config.name == "Device-Profile")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Coverage" && Platform == "BlackBerry" && config.name == "Device-Coverage")
+                if (Configuration == "Coverage" && Platform == "Device" && config.name == "Device-Coverage")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Debug" && Platform == "BlackBerrySimulator" && (config.name == "Simulator" || config.name == "Simulator-Debug"))
+                if (Configuration == "Debug" && Platform == "Simulator" && (config.name == "Simulator" || config.name == "Simulator-Debug"))
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Profile" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Profile")
+                if (Configuration == "Profile" && Platform == "Simulator" && config.name == "Simulator-Profile")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Coverage" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Coverage")
+                if (Configuration == "Coverage" && Platform == "Simulator" && config.name == "Simulator-Coverage")
                 {
                     configAssets = config.asset;
                     break;
                 }
-                if (Configuration == "Release" && Platform == "BlackBerrySimulator" && config.name == "Simulator-Release")
+                if (Configuration == "Release" && Platform == "Simulator" && config.name == "Simulator-Release")
                 {
                     configAssets = config.asset;
                     break;
                 }
             }
 
-            int clen = configAssets == null ? 0 : configAssets.Length;
-            int glen = globalAssets == null ? 0 : globalAssets.Length;
-            var items = new ITaskItem[glen + clen];
+            var items = new List<ITaskItem>();
 
-            if (globalAssets != null)
+            AppendAssets(items, globalAssets);
+            AppendAssets(items, configAssets);
+
+            return items.ToArray();
+        }
+
+        private void AppendAssets(List<ITaskItem> result, IEnumerable<asset> assets)
+        {
+            if (result == null)
+                throw new ArgumentNullException("result");
+
+            if (assets != null)
             {
-                for (int i = 0; i < glen; i++)
+                foreach (var asset in assets)
                 {
-                    string path = globalAssets[i].path;
-                    path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
-                    string target = globalAssets[i].Value;
-                    items[i] = new TaskItem(path);
-                    items[i].SetMetadata("target", target);
+                    string path = asset.path;
+                    path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, ProjectDir);
+                    string target = asset.Value;
+
+                    if (!string.IsNullOrEmpty(target))
+                    {
+                        var item = new TaskItem(path);
+                        item.SetMetadata("target", target);
+                        result.Add(item);
+                    }
+                    else
+                    {
+                        Log.LogWarning("Asset \"{0}\" has no value set. Ignoring.", path);
+                    }
                 }
             }
-
-            if (configAssets != null)
-            {
-                for (int i = 0; i < configAssets.Length; i++)
-                {
-                    string path = configAssets[i].path;
-                    path = path.Replace("}", string.Empty).Replace(WORKSPACE_LOC, SolutionDir);
-                    string target = configAssets[i].Value;
-                    items[i + glen] = new TaskItem(path);
-                    items[i + glen].SetMetadata("target", target);
-                }
-            }
-
-            return items;
         }
 
         /// <summary>
@@ -350,7 +355,7 @@ namespace BlackBerry.BuildTasks
             set
             {
                 _projectDirectory = value;
-                _descriptor = BarDescriptor.Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
+                _descriptor = Parser.Load(Path.Combine(ProjectDir, ApplicationDescriptorXml));
             }
         }
 
@@ -404,6 +409,7 @@ namespace BlackBerry.BuildTasks
         [Required]
         public string SolutionDir { get; set; }
 
+        [Required]
         public string ApplicationDescriptorXml
         {
             get
@@ -439,7 +445,7 @@ namespace BlackBerry.BuildTasks
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.String)
                 {
                     DisplayName = "Target format",
-                    Description = "Select the build target format( -target bar -target bar-debug)",
+                    Description = "Select the build target format (-target bar -target bar-debug)",
                     ArgumentRelationList = new ArrayList()
                 };
                 string[][] switchMap =
@@ -479,7 +485,7 @@ namespace BlackBerry.BuildTasks
                 ToolSwitch switch2 = new ToolSwitch(ToolSwitchType.Integer)
                 {
                     DisplayName = "Build Id",
-                    Description = "set the build id ( the fourth segment of the version ). Must be a number from 0 to 65535"
+                    Description = "Set the build id (the fourth segment of the version). Must be a numbers from 0 to 65535"
                 };
                 switch2.ArgumentRelationList = new ArrayList();
                 switch2.IsValid = ValidateInteger(BUILD_ID, 0, 65535, value);

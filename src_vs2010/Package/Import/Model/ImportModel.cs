@@ -31,7 +31,6 @@ namespace BlackBerry.Package.Import.Model
         #region Member Variables and Constants
         private const string _colSumaryString = "SummaryString";
         private const string BLACKBERRY = "BlackBerry";
-        private const string BLACKBERRYSIMULATOR = "BlackBerrySimulator";
         
         private IList<String> _summaryList;
         private CollectionView _summaryString;
@@ -248,16 +247,13 @@ namespace BlackBerry.Package.Import.Model
         /// <summary>
         /// add blackberry configurations
         /// </summary>
-        /// <param name="proj"></param>
-        public void AddBlackBerryConfigurations(Project proj)
+        public void AddBlackBerryConfigurations(Project project)
         {
             try
             {
-                ConfigurationManager mgr = proj.ConfigurationManager;
+                ConfigurationManager mgr = project.ConfigurationManager;
                 Configurations cfgs = mgr.AddPlatform(BLACKBERRY, "Win32", true);
                 AddSummaryString("Added BlackBerry Configuration");
-                cfgs = mgr.AddPlatform(BLACKBERRYSIMULATOR, "Win32", true);
-                AddSummaryString("Added BlackBerry Simulator Configuration");
             }
             catch (Exception e)
             {
@@ -272,7 +268,6 @@ namespace BlackBerry.Package.Import.Model
         /// <summary>
         /// Fire the PropertyChnaged event handler on change of property
         /// </summary>
-        /// <param name="propName"></param>
         protected void OnPropertyChanged(string propName)
         {
             if (PropertyChanged != null)

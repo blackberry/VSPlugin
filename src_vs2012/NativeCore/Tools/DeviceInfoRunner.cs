@@ -6,7 +6,7 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to get information about specified device.
     /// </summary>
-    public sealed class DeviceInfoRunner : ToolRunner
+    public sealed class DeviceInfoRunner : BBToolRunner
     {
         private string _ip;
         private string _password;
@@ -14,11 +14,9 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
         /// <param name="ip">Device IP</param>
         /// <param name="password">Device password</param>
-        public DeviceInfoRunner(string workingDirectory, string ip, string password)
-            : base("cmd.exe", workingDirectory)
+        public DeviceInfoRunner(string ip, string password)
         {
             if (string.IsNullOrEmpty(ip))
                 throw new ArgumentNullException("ip");

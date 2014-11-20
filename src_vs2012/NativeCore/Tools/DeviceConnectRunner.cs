@@ -5,7 +5,7 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to establish secured connection to specified device.
     /// </summary>
-    public sealed class DeviceConnectRunner : ToolRunner
+    public sealed class DeviceConnectRunner : BBToolRunner
     {
         private string _ip;
         private string _password;
@@ -16,12 +16,10 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
         /// <param name="ip">Device IP</param>
         /// <param name="password">Device password</param>
         /// <param name="publicKeyPath">Path to SSH public key to be used, to establish connection to the device</param>
-        public DeviceConnectRunner(string workingDirectory, string ip, string password, string publicKeyPath)
-            : base("cmd.exe", workingDirectory)
+        public DeviceConnectRunner(string ip, string password, string publicKeyPath)
         {
             if (string.IsNullOrEmpty(ip))
                 throw new ArgumentNullException("ip");

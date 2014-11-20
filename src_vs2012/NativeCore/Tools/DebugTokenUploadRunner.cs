@@ -5,7 +5,7 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to upload debug-token onto the device.
     /// </summary>
-    public sealed class DebugTokenUploadRunner : ToolRunner
+    public sealed class DebugTokenUploadRunner : BBToolRunner
     {
         private string _location;
         private string _ip;
@@ -14,12 +14,10 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
         /// <param name="debugTokenLocation">File name and directory of the debug-token bar file</param>
         /// <param name="ip">Device IP</param>
         /// <param name="password">Device password</param>
-        public DebugTokenUploadRunner(string workingDirectory, string debugTokenLocation, string ip, string password)
-            : base("cmd.exe", workingDirectory)
+        public DebugTokenUploadRunner(string debugTokenLocation, string ip, string password)
         {
             if (string.IsNullOrEmpty(debugTokenLocation))
                 throw new ArgumentNullException("debugTokenLocation");

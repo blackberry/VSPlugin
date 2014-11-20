@@ -51,7 +51,7 @@ namespace BlackBerry.Package.Helpers
                 {
                     if (string.Compare(configuration.ConfigurationName, currentConfigurationName, StringComparison.InvariantCulture) == 0)
                     {
-                        var platformName = configuration.GetEvaluatedPropertyValue("PlatformName");
+                        var platformName = ((VCPlatform) configuration.Platform).Name;
                         if (string.Compare(platformName, currentPlatformName, StringComparison.InvariantCulture) == 0)
                         {
                             var rulePropertyStorage = configuration.Rules.Item(rule) as IVCRulePropertyStorage;
@@ -133,8 +133,72 @@ namespace BlackBerry.Package.Helpers
             // 4) "folder"
             var folder = Path.GetDirectoryName(project.FullName);
             if (string.IsNullOrEmpty(folder))
-                return targetName;
-            return Path.Combine(folder, targetName);
+                return Path.Combine(outputPath, targetName);
+            return Path.Combine(folder, outputPath, targetName);
+        }
+
+        /// <summary>
+        /// Gets the project's target architecture (x86 for simulator and armle-v7 for device).
+        /// </summary>
+        public static string GetTargetArchitecture(Project project)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            return GetValue(project, "ConfigurationGeneral", "TargetArch");
+        }
+
+        /// <summary>
+        /// Tries to guess the full path to the target outcome of specified Visual C++ project.
+        /// This is a complimentary method to GetTargetFullName(). As the extended BlackBerry projects
+        /// are mostly based on makefiles it might be quite hard to say sure (based on Visual Studio settings only),
+        /// where the target binary is created. That's why we use some non-common knowledge
+        /// about the Cascades make system.
+        /// </summary>
+        public static string GuessTargetFullName(Project project)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            if (project.ConfigurationManager == null || project.ConfigurationManager.ActiveConfiguration == null)
+                return null;
+
+            var appType = GetValue(project, "ConfigurationGeneral", "ConfigurationAppType");
+            if (string.Compare(appType, "Regular", StringComparison.OrdinalIgnoreCase) == 0
+                || string.IsNullOrEmpty(appType))
+            {
+                return GetTargetFullName(project);
+            }
+
+            // get file name and extension:
+            var targetName = GetValue(project, "ConfigurationGeneral", "TargetName");
+            if (string.IsNullOrEmpty(targetName))
+                return null;
+
+            targetName += GetValue(project, "ConfigurationGeneral", "TargetExt");
+
+            // check, whether we compile against device or simulator:
+            var targetCpu = GetValue(project, "ConfigurationGeneral", "TargetArch");
+            var projectDir = Path.GetDirectoryName(project.FullName);
+
+            if (string.Compare(targetCpu, "armle-v7", StringComparison.OrdinalIgnoreCase) == 0 && !string.IsNullOrEmpty(projectDir))
+            {
+                var path = Path.Combine(projectDir, "arm", "o.le-v7-g", targetName);
+                if (File.Exists(path))
+                    return path;
+                return Path.Combine(projectDir, "arm", "o.le-v7", targetName);
+            }
+
+            if (string.Compare(targetCpu, "x86", StringComparison.OrdinalIgnoreCase) == 0 && !string.IsNullOrEmpty(projectDir))
+            {
+                var path = Path.Combine(projectDir, "x86", "o-g", targetName);
+                if (File.Exists(path))
+                    return path;
+                return Path.Combine(projectDir, "x86", "o", targetName);
+            }
+
+            // unsupported architecture:
+            return null;
         }
     }
 }

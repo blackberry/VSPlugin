@@ -15,6 +15,7 @@
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
+using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System;
@@ -154,7 +155,7 @@ namespace BlackBerry.DebugEngine
                         return VSConstants.S_OK;
                     }
                     
-                    MessageBox.Show("Too few information about device you are trying to connect.\n\nPlease, follow the pattern: \"(device|simulator) IP password\".", "Unable to create device connection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBoxHelper.Show("Too few information about device you are trying to connect.\n\nPlease, follow the pattern: \"(device|simulator) IP password\".", "Unable to create device connection", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 }
                 else
                 {
@@ -250,7 +251,7 @@ namespace BlackBerry.DebugEngine
             // Returning because VS can debug only one app at a time.
             if (DebugEngineStatus.IsRunning)
             {
-                MessageBox.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxHelper.Show("Visual Studio can debug only one BlackBerry application at a time.\n\nPlease, select a different transport or close the current debug session.", "Visual Studio is already debugging an application", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ppEnum = null;
                 return VSConstants.S_FALSE;
             }
@@ -258,13 +259,13 @@ namespace BlackBerry.DebugEngine
             var defaultPorts = CreateDefaultPorts();
             if (defaultPorts == null)
             {
-                MessageBox.Show("You must select an API Level to be able to attach to a running process.\n\nPlease, use \"BlackBerry -> Options -> API Level\" to download or select one.", "Missing NDK", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBoxHelper.Show("You must select an API Level to be able to attach to a running process.\n\nPlease, use \"BlackBerry -> Options -> API Level\" to download or select one.", "Missing NDK", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 ppEnum = null;
                 return VSConstants.S_FALSE;
             }
             if (defaultPorts.Length == 0)
             {
-                MessageBox.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ppEnum = null;
                 return VSConstants.S_FALSE;
             }
@@ -367,7 +368,7 @@ namespace BlackBerry.DebugEngine
 
             if (service == null)
             {
-                MessageBox.Show(
+                MessageBoxHelper.Show(
                     "Searching is not supported.\r\nPlease add more devices at \"BlackBerry -> Options -> Targets\", if you want to quickly switch between them. They will automatically appear, when \"Qualifier\" list is expanded.",
                     "Microsoft Visual Studio", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 pbstrPortId = null;

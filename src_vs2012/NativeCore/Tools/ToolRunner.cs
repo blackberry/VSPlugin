@@ -247,6 +247,7 @@ namespace BlackBerry.NativeCore.Tools
 
             try
             {
+                _process.Exited -= AsyncProcessExited;
                 _process.Exited += AsyncProcessExited;
                 _process.EnableRaisingEvents = true;
 
@@ -267,13 +268,16 @@ namespace BlackBerry.NativeCore.Tools
 
         private void AsyncProcessExited(object sender, EventArgs e)
         {
-            ExitCode = _process.ExitCode;
-            _process.Exited -= AsyncProcessExited;
+            if (_process != null)
+            {
+                ExitCode = _process.ExitCode;
+                _process.Exited -= AsyncProcessExited;
 
-            // release process resources:
-            _process.Close();
+                // release process resources:
+                _process.Close();
 
-            CompleteExecution();
+                CompleteExecution();
+            }
         }
 
         private void NotifyFinished(int exitCode, string output, string error)
@@ -490,6 +494,7 @@ namespace BlackBerry.NativeCore.Tools
         {
             if (_process != null)
             {
+                _process.Exited -= AsyncProcessExited;
                 _process.OutputDataReceived -= OutputDataReceived;
                 _process.ErrorDataReceived -= ErrorDataReceived;
 

@@ -14,6 +14,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
@@ -24,6 +25,7 @@ using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Services;
 using BlackBerry.Package.Dialogs;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.ViewModels;
@@ -59,7 +61,6 @@ namespace BlackBerry.Package.Components
         private CommandEvents _eventsDebugContext;
 
         private const string ConfigNameBlackBerry = "BlackBerry";
-        private const string ConfigNameBlackBerrySimulator = "BlackBerrySimulator";
         private const string ToolbarNameStandard = "Standard";
         private const string SolutionConfigurationsName = "Solution Configurations";
         private const string SolutionPlatformsName = "Solution Platforms";
@@ -140,10 +141,16 @@ namespace BlackBerry.Package.Components
         {
             get
             {
-                bool isSimulator = _startProject != null && _startProject.ConfigurationManager != null
-                                        && _startProject.ConfigurationManager.ActiveConfiguration != null
-                                        && _startProject.ConfigurationManager.ActiveConfiguration.PlatformName == ConfigNameBlackBerrySimulator;
-                return isSimulator ? ActiveSimulator : ActiveDevice;
+                if (_startProject != null && IsBlackBerryProject(_startProject))
+                {
+                    var projectArch = ProjectHelper.GetTargetArchitecture(_startProject);
+                    var simulatorArch = DeviceDefinition.GetArchitecture(DeviceDefinitionType.Simulator);
+                    if (string.Compare(projectArch, simulatorArch, StringComparison.OrdinalIgnoreCase) == 0)
+                        return ActiveSimulator;
+                }
+
+                // by default, try to run on a device:
+                return ActiveDevice;
             }
         }
 
@@ -224,7 +231,6 @@ namespace BlackBerry.Package.Components
             {
                 AddBarDescriptorToProject(project);
                 project.ConfigurationManager.AddPlatform(ConfigNameBlackBerry, ConfigNameBlackBerry, true);
-                project.ConfigurationManager.AddPlatform(ConfigNameBlackBerrySimulator, ConfigNameBlackBerrySimulator, true);
                 EnableDeploymentForSolutionPlatforms();
 
                 project.ConfigurationManager.DeletePlatform("Win32");
@@ -252,7 +258,7 @@ namespace BlackBerry.Package.Components
             {
                 foreach (SolutionContext context in configuration.SolutionContexts)
                 {
-                    if (context.PlatformName == ConfigNameBlackBerry || context.PlatformName == ConfigNameBlackBerrySimulator)
+                    if (context.PlatformName == ConfigNameBlackBerry)
                     {
                         context.ShouldDeploy = true;
                     }
@@ -601,8 +607,7 @@ namespace BlackBerry.Package.Components
                 return;
             }
 
-            var targetName = _startProject.Name;  // name of the binary... should be better way to detect it... although whole deploying fails, if binary-name != project-name
-            var executablePath = Path.Combine(DteHelper.GetOutputPath(_startProject), targetName);
+            var executablePath = ProjectHelper.GetTargetFullName(_startProject);
             var ndk = ActiveNDK;
             var device = ActiveTarget;
             var runtime = ActiveRuntime;
@@ -620,9 +625,26 @@ namespace BlackBerry.Package.Components
                 return;
             }
 
+            // if the path to binary is invalid GDB might have problems with loading correct symbols;
+            // maybe try to guess better or ask developer, what is wrong, why the project doesn't define it correctly
+            // (possible causes: dev is using any kind of makefile and plugin can't detect the outcomes automatically):
+            if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
+            {
+                executablePath = ProjectHelper.GuessTargetFullName(_startProject);
+
+                if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
+                {
+                    var attachDiscoveryService = (IAttachDiscoveryService) Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IAttachDiscoveryService));
+                    Debug.Assert(attachDiscoveryService != null, "Invalid project references (make sure VisualStudio.Shell.dll is not references, as it duplicates the Package definition from VisualStudio.Shell.<version>.dll)");
+
+                    // ask the developer to specify the path:
+                    executablePath = attachDiscoveryService.FindExecutable(null);
+                }
+            }
+
             if (_startDebugger)
             {
-                LaunchDebugTarget(targetName, ndk, device, runtime, null, executablePath);
+                LaunchDebugTarget(_startProject.Name, ndk, device, runtime, null, executablePath);
             }
         }
 
@@ -710,12 +732,23 @@ namespace BlackBerry.Package.Components
                 {
                     foreach (Project project in projects)
                     {
-                        var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
-                        if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
+                        if (IsBlackBerryProject(project))
                             return true;
                     }
                 }
             }
+
+            return false;
+        }
+
+        public bool IsBlackBerryProject(Project project)
+        {
+            if (project == null)
+                return false;
+
+            var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
+            if (platformName == ConfigNameBlackBerry)
+                return true;
 
             return false;
         }
@@ -727,7 +760,7 @@ namespace BlackBerry.Package.Components
                 foreach (SolutionContext context in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
                 {
                     string platformName = context.PlatformName;
-                    if (platformName == ConfigNameBlackBerry || platformName == ConfigNameBlackBerrySimulator)
+                    if (platformName == ConfigNameBlackBerry)
                         return true;
                 }
             }

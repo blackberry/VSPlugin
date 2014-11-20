@@ -6,7 +6,7 @@ namespace BlackBerry.NativeCore.Tools
     /// <summary>
     /// Runner, that calls specific tool to register Signing Authority based on CSJ files.
     /// </summary>
-    public sealed class KeyToolRegisterRunner : ToolRunner
+    public sealed class KeyToolRegisterRunner : BBToolRunner
     {
         private string _pin;
         private string _password;
@@ -16,9 +16,7 @@ namespace BlackBerry.NativeCore.Tools
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
-        public KeyToolRegisterRunner(string workingDirectory, string pin, string password, string rdkFileName, string pbdtFileName)
-            : base("cmd.exe", workingDirectory)
+        public KeyToolRegisterRunner(string pin, string password, string rdkFileName, string pbdtFileName)
         {
             if (string.IsNullOrEmpty(pin))
                 throw new ArgumentNullException("pin");

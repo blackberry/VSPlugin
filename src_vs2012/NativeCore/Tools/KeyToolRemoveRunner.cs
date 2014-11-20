@@ -3,14 +3,12 @@
     /// <summary>
     /// Runner, that calls specific tool to remove instaled pair of signing keys.
     /// </summary>
-    public sealed class KeyToolRemoveRunner : ToolRunner
+    public sealed class KeyToolRemoveRunner : BBToolRunner
     {
         /// <summary>
         /// Init constructor.
         /// </summary>
-        /// <param name="workingDirectory">Tools directory</param>
-        public KeyToolRemoveRunner(string workingDirectory)
-            : base("cmd.exe", workingDirectory)
+        public KeyToolRemoveRunner()
         {
             Arguments = @"/C blackberry-signer.bat -cskdelete";
         }

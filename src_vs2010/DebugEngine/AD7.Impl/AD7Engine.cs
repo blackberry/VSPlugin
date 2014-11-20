@@ -19,6 +19,8 @@ using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.Services;
+using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 using System.Diagnostics;
@@ -99,7 +101,7 @@ namespace BlackBerry.DebugEngine
         /// A module loaded in the debuggee process to the debugger. It is always null because the AD7Module class is 
         /// not implemented yet.
         /// </summary>
-        internal AD7Module _module;
+        private AD7Module _module;
 
         /// <summary>
         /// A process running on a port. A process "Is a container for a set of programs".
@@ -114,7 +116,7 @@ namespace BlackBerry.DebugEngine
         /// <summary>
         /// A program that is running in a process.
         /// </summary>
-        internal IDebugProgram2 _program;
+        private IDebugProgram2 _program;
 
         /// <summary>
         /// TRUE whenever a thread is created/ended, so the debug engine can update the m_threads data structure.
@@ -168,6 +170,16 @@ namespace BlackBerry.DebugEngine
         {
             get;
             set;
+        }
+
+        public AD7Module Module
+        {
+            get { return _module; }
+        }
+
+        public IDebugProgram2 Program
+        {
+            get { return _program; }
         }
 
         /// <summary>
@@ -231,49 +243,25 @@ namespace BlackBerry.DebugEngine
                     DebugEngineStatus.IsRunning = true;
                     Callback = new EngineCallback(this, ad7Callback);
 
-                    AD7ProgramNodeAttach pnt = (AD7ProgramNodeAttach)_program;
-                    _process = pnt.Process;
-                    AD7Port port = pnt.Process.Port as AD7Port;
-                    string progName = _process.Details.Name;
+                    var programNode = (AD7ProgramNodeAttach)_program;
+                    _process = programNode.Process;
+                    var port = (AD7Port)programNode.Process.Port;
 
-                    string exePath;
-                    string processesPaths;
-                    System.IO.StreamReader readProcessesPathsFile;
-                    // Read the file ProcessesPath.txt to try to get the file location of the executable file.
-                    try
-                    {
-                        readProcessesPathsFile = new System.IO.StreamReader(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Research In Motion\ProcessesPath.txt");
-                        processesPaths = readProcessesPathsFile.ReadToEnd();
-                        readProcessesPathsFile.Close();
-                    }
-                    catch (Exception)
-                    {
-                        processesPaths = "";
-                    }
+                    var attachDiscoveryService = (IAttachDiscoveryService) Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IAttachDiscoveryService));
+                    Debug.Assert(attachDiscoveryService != null, "Invalid project references (make sure VisualStudio.Shell.dll is not references, as it duplicates the Package definition from VisualStudio.Shell.<version>.dll)");
 
-                    string searchProgName = progName + "_" + (port.Device.Type == DeviceDefinitionType.Simulator);
-                    int begin = processesPaths.IndexOf(searchProgName + ":>");
+                    // ask the package about opened BlackBerry projects and find matching one:
+                    var exePath = attachDiscoveryService.FindExecutable(_process.Details);
 
-                    if (begin != -1)
-                    {
-                        begin += searchProgName.Length + 2;
-                        int end = processesPaths.IndexOf("\r\n", begin);
-
-                        exePath = processesPaths.Substring(begin, end - begin) + progName;
-                    }
-                    else
-                    {
-                        exePath = "CannotAttachToRunningProcess";
-                    }
-
-                    var runtime = RuntimeDefinition.Load(); // load from registry
+                    // load from registry
+                    var runtime = RuntimeDefinition.Load();
 
                     uint aux;
-                    if (GdbWrapper.AttachToProcess(pnt.Process.ID.ToString(), exePath, port.NDK, port.Device, runtime, out aux))
+                    if (GdbWrapper.AttachToProcess(programNode.Process.ID.ToString(), exePath, port.NDK, port.Device, runtime, out aux))
                     {
                         if (exePath == "CannotAttachToRunningProcess")
                         {
-                            MessageBox.Show(progName + " is attached to the debugger. However, to be able to debug your application, you must build and deploy it from this computer first.", "No executable file with symbols found.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            MessageBoxHelper.Show(_process.Details.Name + " is attached to the debugger. However, to be able to debug your application, you must build and deploy it from this computer first.", "No executable file with symbols found.", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         }
                         EventDispatcher = new EventDispatcher(this);
                         _module = new AD7Module();
@@ -593,11 +581,9 @@ namespace BlackBerry.DebugEngine
 
                     return VSConstants.S_OK;
                 }
-                else
-                {
-                    DebugEngineStatus.IsRunning = false;
-                    return VSConstants.E_FAIL;
-                }
+
+                DebugEngineStatus.IsRunning = false;
+                return VSConstants.E_FAIL;
             }
             catch (Exception e)
             {
