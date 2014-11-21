@@ -601,14 +601,20 @@ namespace BlackBerry.Package.Components
             }
 
 
-            // Create a reference to the Output window.
-            // Create a tool window reference for the Output window
-            // and window pane.
-            OutputWindow ow = _dte.ToolWindows.OutputWindow;
+            try
+            {
+                // Create a reference to the Output window.
+                // Create a tool window reference for the Output window
+                // and window pane.
+                OutputWindow ow = _dte.ToolWindows.OutputWindow;
 
-            // Select the Build pane in the Output window.
-            _outputWindowPane = ow.OutputWindowPanes.Item("Build");
-            _outputWindowPane.Activate();
+                // Select the Build pane in the Output window.
+                _outputWindowPane = ow.OutputWindowPanes.Item("Build");
+                _outputWindowPane.Activate();
+            }
+            catch
+            {
+            }
 
             BuildBar();
             return true;
