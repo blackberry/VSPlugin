@@ -120,7 +120,17 @@ namespace BlackBerry.NativeCore.QConn.Services
                     reader.Skip(127 - name.Length);
                 }
 
-                result.Add(new SystemInfoProcess(id, parentID, name));
+                if (id != 0 && parentID != 0 && !string.IsNullOrEmpty(name))
+                {
+                    result.Add(new SystemInfoProcess(id, parentID, name));
+                }
+                else
+                {
+#if DEBUG
+                    if (System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
+#endif
+                }
             }
 
             return result.ToArray();
