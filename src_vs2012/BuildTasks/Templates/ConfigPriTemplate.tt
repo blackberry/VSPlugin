@@ -15,6 +15,18 @@ CONFIG += precompile_header
 PRECOMPILED_HEADER = $$quote($$BASEDIR/<#= PrecompiledHeaderName #>)
 
 <# } #>
+
+#############################################
+# Libs, undefines and defines
+
+LIBS += <# WriteDependencyLibrariesReferences(); #>
+
+<#
+    WriteCollection(UndefinePreprocessorDefinitions, "\r\nDEFINES -= ");
+    WriteCollection(PreprocessorDefinitions, "\r\nDEFINES += ");
+#>
+
+
 #############################################
 # Source files, headers and QMLs
 SOURCES += <# WriteRelativePaths(CompileItems, "    $$quote($$BASEDIR/", ")"); #>

@@ -94,6 +94,7 @@
     <Compile Include="DiffManifests.cs" />
     <Compile Include="GenerateMakefile.cs" />
     <Compile Include="GetAppInfo.cs" />
+    <Compile Include="Helpers\TemplateHelper.cs" />
     <Compile Include="MakeAllAndFormatOutputMessages.cs" />
     <Compile Include="PackagerCmdBuilder.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

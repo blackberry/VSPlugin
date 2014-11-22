@@ -96,6 +96,9 @@
     <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\ProcessSetupHelper.cs">
       <Link>Helpers\ProcessSetupHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\TemplateHelper.cs">
+      <Link>Helpers\TemplateHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\MakeAllAndFormatOutputMessages.cs">
       <Link>MakeAllAndFormatOutputMessages.cs</Link>
     </Compile>

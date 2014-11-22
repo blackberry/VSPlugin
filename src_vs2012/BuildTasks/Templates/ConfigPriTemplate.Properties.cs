@@ -1,11 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
+using BlackBerry.BuildTasks.Helpers;
 using Microsoft.Build.Framework;
 
 namespace BlackBerry.BuildTasks.Templates
 {
-    partial class ConfigPriTemplate
+    partial class ConfigPriTemplate : TemplateHelper.IWriter
     {
+        private string[] _additionalLibraryDirs;
+        private string[] _additionalIncludeDirs;
+
         private string _precompiledHeaderName;
 
         #region Properties
@@ -22,6 +27,12 @@ namespace BlackBerry.BuildTasks.Templates
         public Version Version
         {
             get { return Assembly.GetExecutingAssembly().GetName().Version; }
+        }
+
+        public ITaskItem LinkItem
+        {
+            get;
+            set;
         }
 
         public ITaskItem[] CompileItems
@@ -48,20 +59,34 @@ namespace BlackBerry.BuildTasks.Templates
             set;
         }
 
+        public string[] AdditionalLibraryDirs
+        {
+            get { return _additionalLibraryDirs; }
+            set { _additionalLibraryDirs = TemplateHelper.NormalizePaths(value); }
+        }
+
+        public string[] AdditionalIncludeDirs
+        {
+            get { return _additionalIncludeDirs; }
+            set { _additionalIncludeDirs = TemplateHelper.NormalizePaths(value); }
+        }
+
+        public string[] PreprocessorDefinitions
+        {
+            get;
+            set;
+        }
+
+        public string[] UndefinePreprocessorDefinitions
+        {
+            get;
+            set;
+        }
+
         public string PrecompiledHeaderName
         {
             get { return _precompiledHeaderName; }
-            set
-            {
-                if (!string.IsNullOrEmpty(value))
-                {
-                    _precompiledHeaderName = value.Replace('\\', '/');
-                }
-                else
-                {
-                    _precompiledHeaderName = null;
-                }
-            }
+            set { _precompiledHeaderName = TemplateHelper.Normalize(value); }
         }
 
         public ITaskItem[] QmlItems
@@ -78,108 +103,34 @@ namespace BlackBerry.BuildTasks.Templates
 
         #endregion
 
-        private static bool IsDirSeparator(char c)
+        private void WriteCollection(IEnumerable<string> items, string prefix)
         {
-            return c == '\\' || c == '/';
-        }
-
-        private void WritePath(params string[] segments)
-        {
-            if (segments != null)
-            {
-                bool trailing = false;
-                foreach (var s in segments)
-                {
-                    if (string.IsNullOrEmpty(s))
-                    {
-                        continue;
-                    }
-
-                    if (trailing)
-                    {
-                        if (IsDirSeparator(s[0]))
-                        {
-                            Write(s.Substring(1));
-                            if (s.Length > 1)
-                                trailing = IsDirSeparator(s[s.Length - 1]);
-                            continue;
-                        }
-                    }
-                    Write(s);
-                    trailing = IsDirSeparator(s[s.Length - 1]);
-                }
-            }
+            TemplateHelper.WriteCollection(this, items, prefix);
         }
 
         private void WriteRelativePaths(ITaskItem[] items, string prefix, string suffix)
         {
-            if (items != null && items.Length > 0)
-            {
-                int lastIndex = items.Length - 1;
-
-                // print items:
-                for (int i = 0; i < lastIndex; i++)
-                {
-                    WritePath(prefix, items[i].ItemSpec.Replace('\\', '/'), suffix);
-                    WriteLine(" \\");
-                }
-
-                // print last item without 'move to next line char':
-                WritePath(prefix, items[lastIndex].ItemSpec.Replace('\\', '/'), suffix);
-                WriteLine(string.Empty);
-            }
+            TemplateHelper.WriteRelativePaths(this, items, prefix, suffix);
         }
 
         private void WriteRelativePaths(string[] items, string prefix, string suffix)
         {
-            if (items != null && items.Length > 0)
-            {
-                int lastIndex = items.Length - 1;
-
-                // print items:
-                for (int i = 0; i < lastIndex; i++)
-                {
-                    WritePath(prefix, items[i].Replace('\\', '/'), suffix);
-                    WriteLine(" \\");
-                }
-
-                // print last item without 'move to next line char':
-                WritePath(prefix, items[lastIndex].Replace('\\', '/'), suffix);
-                WriteLine(string.Empty);
-            }
+            TemplateHelper.WriteRelativePaths(this, items, prefix, suffix);
         }
 
         private void WriteRelativePathsTuple(string[] items1, string[] items2, string prefix, string suffix)
         {
-            if (items1 != null && items1.Length > 0)
-            {
-                if (items2 == null || items2.Length == 0)
-                {
-                    WriteRelativePaths(items1, prefix, suffix);
-                    return;
-                }
-
-                int lastIndex1 = items1.Length - 1;
-                int lastIndex2 = items2.Length - 1;
-
-                // print items:
-                for (int i = 0; i <= lastIndex1; i++)
-                {
-                    for (int j = 0; j <= lastIndex2; j++)
-                    {
-                        WritePath(prefix, items1[i].Replace('\\', '/'), "/", items2[j], suffix);
-
-                        if (i != lastIndex1 || j != lastIndex2)
-                        {
-                            WriteLine(" \\");
-                        }
-                        else
-                        {
-                            WriteLine(string.Empty);
-                        }
-                    }
-                }
-            }
+            TemplateHelper.WriteRelativePathsTuple(this, items1, items2, prefix, suffix);
         }
+
+        private void WriteDependencyLibrariesReferences()
+        {
+            TemplateHelper.WriteDependencyLibrariesReferences(this, LinkItem);
+        }
+
+        /* PH: for now, additional directories set via Visual Studio are disabled...
+QMAKE_LIBDIR += <# WriteRelativePaths(AdditionalLibraryDirs, "    ", null); #>
+INCLUDEPATH += <# WriteRelativePaths(AdditionalIncludeDirs, "    ", null); #>
+         */
     }
 }

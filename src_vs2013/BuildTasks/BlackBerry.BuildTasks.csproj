@@ -71,6 +71,9 @@
     <Compile Include="..\..\src_vs2010\BuildTasks\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\TemplateHelper.cs">
+      <Link>Helpers\TemplateHelper.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\Properties\Resources.Designer.cs">
       <Link>Properties\Resources.Designer.cs</Link>
       <AutoGen>True</AutoGen>

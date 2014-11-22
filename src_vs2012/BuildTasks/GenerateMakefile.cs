@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using BlackBerry.BuildTasks.Helpers;
 using BlackBerry.BuildTasks.Templates;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -219,8 +220,10 @@ namespace BlackBerry.BuildTasks
             ITaskItem[] toCompile;
             ITaskItem[] toCompileAsC;
             ITaskItem[] toCompileAsCpp;
+            ITaskItem additionalInfo;
 
-            SplitCompileItems(out toCompile, out toCompileAsC, out toCompileAsCpp);
+            SplitCompileItems(CompileItems, ExcludeDirectories, out toCompile, out toCompileAsC, out toCompileAsCpp);
+            additionalInfo = toCompile != null && toCompile.Length > 0 ? toCompile[0] : null;
 
             using (var outputFile = new StreamWriter(ProjectDir + "config.pri"))
             {
@@ -236,6 +239,11 @@ namespace BlackBerry.BuildTasks
                 template.PrecompiledHeaderName = excludedHeader != null ? excludedHeader.ItemSpec : null;
                 template.QmlItems = FilterByExtension(IncludeItems, new[] {".qml", ".js", ".qs"}, null, out excludedItem);
                 template.QmlDirs = ExtractDirectories(template.QmlItems);
+                template.LinkItem = LinkItems != null && LinkItems.Length > 0 ? LinkItems[0] : null;
+                template.AdditionalIncludeDirs = TemplateHelper.GetRootedDirs(ProjectDir, AdditionalIncludeDirectories);
+                template.AdditionalLibraryDirs = TemplateHelper.GetRootedDirs(ProjectDir, AdditionalLibraryDirectories);
+                template.PreprocessorDefinitions = additionalInfo != null ? additionalInfo.GetMetadata("PreprocessorDefinitions").Split(';') : null;
+                template.UndefinePreprocessorDefinitions = additionalInfo != null ? additionalInfo.GetMetadata("UndefinePreprocessorDefinitions").Split(';') : null;
 
                 outputFile.Write(template.TransformText());
             }
@@ -243,32 +251,11 @@ namespace BlackBerry.BuildTasks
 
         private void GenerateRegularMakefile()
         {
-            // normalize excluded list:
-            if (ExcludeDirectories != null)
-            {
-                for (int i = 0; i < ExcludeDirectories.Length; i++)
-                    ExcludeDirectories[i] = ExcludeDirectories[i].Replace('\\', '/');
-            }
-
-            // normalize additional included list:
-            if (AdditionalIncludeDirectories != null)
-            {
-                for (int i = 0; i < AdditionalIncludeDirectories.Length; i++)
-                    AdditionalIncludeDirectories[i] = AdditionalIncludeDirectories[i].Replace('\\', '/');
-            }
-
-            // normalize additional library paths list:
-            if (AdditionalLibraryDirectories != null)
-            {
-                for (int i = 0; i < AdditionalLibraryDirectories.Length; i++)
-                    AdditionalLibraryDirectories[i] = AdditionalLibraryDirectories[i].Replace('\\', '/');
-            }
-
             // generate list of items to compile:
             ITaskItem[] toCompile;
             ITaskItem[] toCompileAsC;
             ITaskItem[] toCompileAsCpp;
-            SplitCompileItems(out toCompile, out toCompileAsC, out toCompileAsCpp);
+            SplitCompileItems(CompileItems, ExcludeDirectories, out toCompile, out toCompileAsC, out toCompileAsCpp);
 
             using (var outputFile = new StreamWriter(IntDir + "makefile"))
             {
@@ -288,25 +275,29 @@ namespace BlackBerry.BuildTasks
                 template.CompileItemsAsC = toCompileAsC;
                 template.CompileItemsAsCpp = toCompileAsCpp;
                 template.LinkItem = LinkItems != null && LinkItems.Length > 0 ? LinkItems[0] : null;
-                template.AdditionalIncludeDirectories = MakefileTemplate.GetRootedDirs(ProjectDir, AdditionalIncludeDirectories);
-                template.AdditionalLibraryDirectories = MakefileTemplate.GetRootedDirs(ProjectDir, AdditionalLibraryDirectories);
+                template.AdditionalIncludeDirectories = TemplateHelper.GetRootedDirs(ProjectDir, AdditionalIncludeDirectories);
+                template.AdditionalLibraryDirectories = TemplateHelper.GetRootedDirs(ProjectDir, AdditionalLibraryDirectories);
 
                 outputFile.Write(template.TransformText());
             }
         }
 
-        private void SplitCompileItems(out ITaskItem[] toCompile, out ITaskItem[] toCompileAsC, out ITaskItem[] toCompileAsCpp)
+        private static void SplitCompileItems(ITaskItem[] compileItems, string[] excludedDirectories, out ITaskItem[] toCompile, out ITaskItem[] toCompileAsC, out ITaskItem[] toCompileAsCpp)
         {
+            if (compileItems == null)
+                throw new ArgumentNullException("compileItems");
+
             var listCompile = new List<ITaskItem>();
             var listCompileAsC = new List<ITaskItem>();
             var listCompileAsCpp = new List<ITaskItem>();
 
-            foreach (var item in CompileItems)
+            excludedDirectories = TemplateHelper.NormalizePaths(excludedDirectories);
+            foreach (var item in compileItems)
             {
-                var fullPath = GetFullPath(item);
+                var fullPath = TemplateHelper.GetFullPath(item);
 
                 // skip the ones, that are explicitly excluded:
-                if (!IsExcludedPath(fullPath))
+                if (!IsExcludedPath(excludedDirectories, fullPath))
                 {
                     listCompile.Add(item);
 
@@ -326,11 +317,6 @@ namespace BlackBerry.BuildTasks
         private static bool IsCompileAsC(ITaskItem item)
         {
             return item.GetMetadata("CompileAs") == "CompileAsC";
-        }
-
-        private static string GetFullPath(ITaskItem item)
-        {
-            return item.GetMetadata("FullPath").Replace('\\', '/');
         }
 
         private static ITaskItem[] FilterByExtension(IEnumerable<ITaskItem> items, string[] extensions, string[] excludedItemSpecs, out ITaskItem excludedItem)
@@ -418,18 +404,18 @@ namespace BlackBerry.BuildTasks
         /// <summary>
         /// Check to see if path is in the excluded list.
         /// </summary>
-        private bool IsExcludedPath(string path)
+        private static bool IsExcludedPath(IEnumerable<string> excludedDirectories, string path)
         {
             if (string.IsNullOrEmpty(path))
                 return false;
 
-            if (ExcludeDirectories != null)
+            if (excludedDirectories != null)
             {
-                var fullPath = Path.GetFullPath(path);
+                var fullPath = TemplateHelper.NormalizePath(path);
 
-                foreach (string excludedDir in ExcludeDirectories)
+                foreach (string excludedDir in excludedDirectories)
                 {
-                    if (fullPath.StartsWith(Path.GetFullPath(excludedDir), StringComparison.OrdinalIgnoreCase))
+                    if (fullPath.StartsWith(excludedDir, StringComparison.OrdinalIgnoreCase))
                     {
                         return true;
                     }
