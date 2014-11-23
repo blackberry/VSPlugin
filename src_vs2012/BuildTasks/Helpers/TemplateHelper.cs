@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using BlackBerry.BuildTasks.Templates;
 using BlackBerry.NativeCore;
 using Microsoft.Build.Framework;
 
@@ -66,7 +65,7 @@ namespace BlackBerry.BuildTasks.Helpers
         /// <summary>
         /// Writes a collection of space-separated items, where each has given prefix.
         /// </summary>
-        public static void WriteCollection(IWriter output, IEnumerable<string> items, string prefix)
+        public static void WriteCollection(IWriter output, IEnumerable<string> items, string prefix, string separator)
         {
             if (output == null)
                 throw new ArgumentNullException("output");
@@ -90,7 +89,10 @@ namespace BlackBerry.BuildTasks.Helpers
                             output.Write(item);
                         }
 
-                        output.Write(" ");
+                        if (!string.IsNullOrEmpty(separator))
+                        {
+                            output.Write(separator);
+                        }
                     }
                 }
             }
@@ -134,7 +136,7 @@ namespace BlackBerry.BuildTasks.Helpers
         /// <summary>
         /// Gets the short name of the file.
         /// </summary>
-        public static string GetFullPath8dot3(ITaskItem item)
+        public static string GetFullPath8Dot3(ITaskItem item)
         {
             var path = item.GetMetadata("FullPath");
             return Normalize(NativeMethods.GetShortPathName(path));
@@ -143,7 +145,7 @@ namespace BlackBerry.BuildTasks.Helpers
         /// <summary>
         /// Writes a collection of specified ITaskItems, using their 8.3-style full paths, where each item has specified prefix and suffix.
         /// </summary>
-        public static void Write8dot3Collection(IWriter output, ITaskItem[] items, string prefix, string suffix)
+        public static void Write8Dot3Collection(IWriter output, ITaskItem[] items, string prefix, string suffix)
         {
             if (output == null)
                 throw new ArgumentNullException("output");
@@ -156,14 +158,14 @@ namespace BlackBerry.BuildTasks.Helpers
                 for (int i = 0; i < lastIndex; i++)
                 {
                     output.Write(prefix);
-                    output.Write(GetFullPath8dot3(items[i]));
+                    output.Write(GetFullPath8Dot3(items[i]));
                     output.Write(suffix);
                     output.WriteLine(" \\");
                 }
 
                 // print last item without 'move to next line char':
                 output.Write(prefix);
-                output.Write(GetFullPath8dot3(items[lastIndex]));
+                output.Write(GetFullPath8Dot3(items[lastIndex]));
                 output.WriteLine(suffix);
             }
         }
@@ -316,6 +318,11 @@ namespace BlackBerry.BuildTasks.Helpers
                     }
                 }
             }
+        }
+
+        public static bool HasDependencyLibrariesReferences(ITaskItem linkItem)
+        {
+            return linkItem != null && !string.IsNullOrEmpty(linkItem.GetMetadata("AdditionalDependencies"));
         }
 
         public static void WriteDependencyLibrariesReferences(IWriter output, ITaskItem linkItem)

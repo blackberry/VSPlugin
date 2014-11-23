@@ -120,17 +120,17 @@ namespace BlackBerry.BuildTasks.Templates
 
         private void WriteCollection(IEnumerable<string> items, string prefix)
         {
-            TemplateHelper.WriteCollection(this, items, prefix);
+            TemplateHelper.WriteCollection(this, items, prefix, " ");
         }
 
-        private string GetFullPath8dot3(ITaskItem item)
+        private string GetFullPath8Dot3(ITaskItem item)
         {
-            return TemplateHelper.GetFullPath8dot3(item);
+            return TemplateHelper.GetFullPath8Dot3(item);
         }
 
-        private void Write8dot3Collection(ITaskItem[] items, string prefix, string suffix)
+        private void Write8Dot3Collection(ITaskItem[] items, string prefix, string suffix)
         {
-            TemplateHelper.Write8dot3Collection(this, items, prefix, suffix);
+            TemplateHelper.Write8Dot3Collection(this, items, prefix, suffix);
         }
 
         private void WriteNameCollection(ITaskItem[] items, string prefix, string suffix)

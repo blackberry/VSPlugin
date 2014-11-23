@@ -18,14 +18,19 @@ PRECOMPILED_HEADER = $$quote($$BASEDIR/<#= PrecompiledHeaderName #>)
 
 #############################################
 # Libs, undefines and defines
-
+<# if (HasDependencyLibrariesReferences()) {
+    /* PH: for now, additional directories set via Visual Studio are disabled...
+QMAKE_LIBDIR += < # WriteRelativePaths(AdditionalLibraryDirs, "    ", null); # >
+INCLUDEPATH += < # WriteRelativePaths(AdditionalIncludeDirs, "    ", null); # >
+     */
+#>
 LIBS += <# WriteDependencyLibrariesReferences(); #>
 
+<# } #>
 <#
-    WriteCollection(UndefinePreprocessorDefinitions, "\r\nDEFINES -= ");
-    WriteCollection(PreprocessorDefinitions, "\r\nDEFINES += ");
+    WriteCollectionNewLine(UndefinePreprocessorDefinitions, "DEFINES -= ");
+    WriteCollectionNewLine(PreprocessorDefinitions, "DEFINES += ");
 #>
-
 
 #############################################
 # Source files, headers and QMLs

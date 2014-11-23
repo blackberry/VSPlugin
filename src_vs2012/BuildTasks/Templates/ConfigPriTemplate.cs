@@ -71,49 +71,66 @@ namespace BlackBerry.BuildTasks.Templates
             
             #line default
             #line hidden
-            this.Write("\r\n#############################################\r\n# Libs, undefines and defines\r\n\r" +
-                    "\nLIBS += ");
+            this.Write("\r\n#############################################\r\n# Libs, undefines and defines\r\n");
             
-            #line 22 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 21 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+ if (HasDependencyLibrariesReferences()) {
+    /* PH: for now, additional directories set via Visual Studio are disabled...
+QMAKE_LIBDIR += < # WriteRelativePaths(AdditionalLibraryDirs, "    ", null); # >
+INCLUDEPATH += < # WriteRelativePaths(AdditionalIncludeDirs, "    ", null); # >
+     */
+
+            
+            #line default
+            #line hidden
+            this.Write("LIBS += ");
+            
+            #line 27 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
  WriteDependencyLibrariesReferences(); 
             
             #line default
             #line hidden
             this.Write("\r\n");
             
-            #line 24 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 29 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+ } 
+            
+            #line default
+            #line hidden
+            
+            #line 30 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
 
-    WriteCollection(UndefinePreprocessorDefinitions, "\r\nDEFINES -= ");
-    WriteCollection(PreprocessorDefinitions, "\r\nDEFINES += ");
+    WriteCollectionNewLine(UndefinePreprocessorDefinitions, "DEFINES -= ");
+    WriteCollectionNewLine(PreprocessorDefinitions, "DEFINES += ");
 
             
             #line default
             #line hidden
-            this.Write("\r\n\r\n#############################################\r\n# Source files, headers and QM" +
-                    "Ls\r\nSOURCES += ");
+            this.Write("\r\n#############################################\r\n# Source files, headers and QMLs" +
+                    "\r\nSOURCES += ");
             
-            #line 32 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 37 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
  WriteRelativePaths(CompileItems, "    $$quote($$BASEDIR/", ")"); 
             
             #line default
             #line hidden
             this.Write("\r\nHEADERS += ");
             
-            #line 34 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 39 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
  WriteRelativePaths(IncludeItems, "    $$quote($$BASEDIR/", ")"); 
             
             #line default
             #line hidden
             this.Write("\r\nINCLUDEPATH += ");
             
-            #line 36 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 41 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
  WriteRelativePaths(IncludeDirs, "    $$quote($$BASEDIR/", ")"); 
             
             #line default
             #line hidden
             this.Write("\r\nOTHER_FILES += ");
             
-            #line 38 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 43 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
  WriteRelativePaths(QmlItems, "    $$quote($$BASEDIR/", ")"); 
             
             #line default
@@ -121,21 +138,21 @@ namespace BlackBerry.BuildTasks.Templates
             this.Write("\r\n#############################################\r\n# Translations\r\nTRANSLATIONS = $" +
                     "$quote($${TARGET}.ts)\r\n\r\nlupdate_inclusion {\r\n\r\n    SOURCES += ");
             
-            #line 46 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 51 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
  WriteRelativePathsTuple(CompileDirs, new[] { "*.c", "*.c++", "*.cc", "*.cpp", "*.cxx" }, "        $$quote($$BASEDIR/../", ")"); 
             
             #line default
             #line hidden
             this.Write("\r\n    SOURCES += ");
             
-            #line 48 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 53 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
  WriteRelativePathsTuple(QmlDirs, new[] { "*.qml", "*.js", "*.qs" }, "        $$quote($$BASEDIR/../", ")"); 
             
             #line default
             #line hidden
             this.Write("\r\n    HEADERS += ");
             
-            #line 50 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
+            #line 55 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt"
  WriteRelativePathsTuple(IncludeDirs, new[] { "*.h", "*.h++", "*.hh", "*.hpp", "*.hxx" }, "        $$quote($$BASEDIR/../", ")"); 
             
             #line default

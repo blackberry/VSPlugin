@@ -95,7 +95,7 @@ LIBS :=
             this.Write("C_SRCS += ");
             
             #line 43 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
- Write8dot3Collection(CompileItemsAsC, "    ", ""); 
+ Write8Dot3Collection(CompileItemsAsC, "    ", ""); 
             
             #line default
             #line hidden
@@ -123,7 +123,7 @@ LIBS :=
             this.Write("CPP_SRCS += ");
             
             #line 50 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
- Write8dot3Collection(CompileItemsAsCpp, "    ", ""); 
+ Write8Dot3Collection(CompileItemsAsCpp, "    ", ""); 
             
             #line default
             #line hidden
@@ -410,7 +410,7 @@ LIBS :=
     foreach(var compileItem in CompileItems)
     {
         var filename = compileItem.GetMetadata("Filename");
-        var shortPath = GetFullPath8dot3(compileItem);
+        var shortPath = GetFullPath8Dot3(compileItem);
 
         // Now add a compile rule for this item.
         
@@ -433,7 +433,7 @@ LIBS :=
             this.Write("\r\n\tqcc -o $@ ");
             
             #line 140 "T:\vs-plugin\src_vs2012\BuildTasks\Templates\MakefileTemplate.tt"
-            this.Write(this.ToStringHelper.ToStringWithCulture(GetFullPath8dot3(compileItem)));
+            this.Write(this.ToStringHelper.ToStringWithCulture(GetFullPath8Dot3(compileItem)));
             
             #line default
             #line hidden

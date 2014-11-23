@@ -40,14 +40,14 @@ LIBS :=
 
 <#  if (CompileItemsAsC.Length > 0)
     { #>
-C_SRCS += <# Write8dot3Collection(CompileItemsAsC, "    ", ""); #>
+C_SRCS += <# Write8Dot3Collection(CompileItemsAsC, "    ", ""); #>
 
 C_DEPS += <# WriteNameCollection(CompileItemsAsC, "    ./", ".d"); #>
 <#  } /* CompileItemsAsC.Length > 0 */ #>
 
 <#  if (CompileItemsAsCpp.Length > 0)
     { #>
-CPP_SRCS += <# Write8dot3Collection(CompileItemsAsCpp, "    ", ""); #>
+CPP_SRCS += <# Write8Dot3Collection(CompileItemsAsCpp, "    ", ""); #>
 
 CPP_DEPS += <# WriteNameCollection(CompileItemsAsCpp, "    ./", ".d"); #>
 <#  } /* CompileItemsAsCpp.Length > 0 */ #>
@@ -133,11 +133,11 @@ FORCE:
     foreach(var compileItem in CompileItems)
     {
         var filename = compileItem.GetMetadata("Filename");
-        var shortPath = GetFullPath8dot3(compileItem);
+        var shortPath = GetFullPath8Dot3(compileItem);
 
         // Now add a compile rule for this item.
         #><#= filename #>.o: <#= shortPath #>
-	qcc -o $@ <#= GetFullPath8dot3(compileItem) #> <#= CompilerFlags #> -c -Wp,-MMD,$(basename $@).d -Wp,-MT,$@ <#
+	qcc -o $@ <#= GetFullPath8Dot3(compileItem) #> <#= CompilerFlags #> -c -Wp,-MMD,$(basename $@).d -Wp,-MT,$@ <#
 
         if (compileItem.GetMetadata("CompileAs") == "CompileAsC")
         {

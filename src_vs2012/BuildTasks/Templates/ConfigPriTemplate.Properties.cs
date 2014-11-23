@@ -103,9 +103,9 @@ namespace BlackBerry.BuildTasks.Templates
 
         #endregion
 
-        private void WriteCollection(IEnumerable<string> items, string prefix)
+        private void WriteCollectionNewLine(IEnumerable<string> items, string prefix)
         {
-            TemplateHelper.WriteCollection(this, items, prefix);
+            TemplateHelper.WriteCollection(this, items, prefix, Environment.NewLine);
         }
 
         private void WriteRelativePaths(ITaskItem[] items, string prefix, string suffix)
@@ -123,14 +123,14 @@ namespace BlackBerry.BuildTasks.Templates
             TemplateHelper.WriteRelativePathsTuple(this, items1, items2, prefix, suffix);
         }
 
+        private bool HasDependencyLibrariesReferences()
+        {
+            return TemplateHelper.HasDependencyLibrariesReferences(LinkItem);
+        }
+
         private void WriteDependencyLibrariesReferences()
         {
             TemplateHelper.WriteDependencyLibrariesReferences(this, LinkItem);
         }
-
-        /* PH: for now, additional directories set via Visual Studio are disabled...
-QMAKE_LIBDIR += <# WriteRelativePaths(AdditionalLibraryDirs, "    ", null); #>
-INCLUDEPATH += <# WriteRelativePaths(AdditionalIncludeDirs, "    ", null); #>
-         */
     }
 }
