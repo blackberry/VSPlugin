@@ -34,6 +34,9 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|BlackBerry'">
     <OutDir>$(TargetCPU)-$(Configuration)\</OutDir>
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
   </PropertyGroup>
   <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|BlackBerry'">
     <OutDir>$(TargetCPU)-$(Configuration)\</OutDir>

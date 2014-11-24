@@ -38,6 +38,12 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup />
 
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|BlackBerry'">
+    <ClCompile>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+
   <ItemDefinitionGroup></ItemDefinitionGroup>
   <ItemGroup></ItemGroup>
 
