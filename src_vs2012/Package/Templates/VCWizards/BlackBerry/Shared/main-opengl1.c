@@ -17,7 +17,7 @@
 static GLfloat vertices[8];
 static GLfloat colors[16];
 
-void handleScreenEvent(bps_event_t *event)
+static void handleScreenEvent(bps_event_t *event)
 {
     screen_event_t screen_event = screen_event_get_event(event);
 
@@ -33,7 +33,7 @@ void handleScreenEvent(bps_event_t *event)
     }
 }
 
-int initialize()
+static int initialize()
 {
     //Initialize vertex and color data
     vertices[0] = -0.25f;
@@ -100,7 +100,7 @@ int initialize()
     return EXIT_SUCCESS;
 }
 
-void render()
+static void render()
 {
     //Typical render pass
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

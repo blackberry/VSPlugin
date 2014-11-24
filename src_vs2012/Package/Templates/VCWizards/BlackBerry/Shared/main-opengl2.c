@@ -32,7 +32,7 @@ static GLuint colorID;
 static screen_context_t screen_cxt;
 
 
-void handleScreenEvent(bps_event_t *event)
+static void handleScreenEvent(bps_event_t *event)
 {
     screen_event_t screen_event = screen_event_get_event(event);
 
@@ -48,7 +48,7 @@ void handleScreenEvent(bps_event_t *event)
     }
 }
 
-int initialize()
+static int initialize()
 {
     //Initialize vertex and color data
     vertices[0] = -0.25f;
@@ -236,7 +236,7 @@ int initialize()
     return EXIT_SUCCESS;
 }
 
-void render()
+static void render()
 {
     // Increment the angle by 0.5 degrees
     static float angle = 0.0f;
