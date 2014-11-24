@@ -30,6 +30,6 @@ NavigationPane {
     ]
     
     onPopTransitionEnded: {
-        page.deleteLater();
+        page.destroy();
     }
 }
