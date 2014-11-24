@@ -10,11 +10,31 @@
 using namespace bb::cascades;
 using namespace bb::system;
 
+#if _DEBUG
+/**
+ * Redirect all Cascades logs on standard console.
+ */
+static void WriteLogsToConsole(QtMsgType type, const char *message)
+{
+    Q_UNUSED(type);
+    std::fprintf(stdout, "%s\n", message);
+    std::fflush(stdout);
+}
+#endif /* _DEBUG */
+
+
+/**
+ * Cascades Application Entry Point
+ */
 Q_DECL_EXPORT int main(int argc, char **argv)
 {
     Application app(argc, argv);
 
     InvokeManager invokeManager;
+
+#if _DEBUG
+    qInstallMsgHandler(WriteLogsToConsole);
+#endif /* _DEBUG */
 
     QObject *appui = 0;
     if (invokeManager.startupMode() == ApplicationStartupMode::InvokeCard)
