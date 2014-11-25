@@ -11,7 +11,7 @@ namespace BlackBerry.NativeCore.Model
         /// Init constructor.
         /// </summary>
         public ApiInfoArray(string name, Version version, ApiInfo[] items)
-            : base(name, version, DeviceFamilyType.Unknown)
+            : base(name, version, items != null && items.Length > 0 ? items[0].Type : DeviceFamilyType.Unknown)
         {
             Items = items ?? new ApiInfo[0];
         }
