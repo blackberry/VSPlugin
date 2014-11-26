@@ -1,3 +1,16 @@
+v3.0.3 (2014-11-26)
+Changes in this version:
+ * improved stability, when no satellite components are installed (bbndk_vs, QNX tools, MSBuild extensions, Java)
+ * fixed missing [Download] button next to PlayBook NDK in API-Levels
+ * revisited project and projec-item templates
+ * added default '_DEBUG' preprocessor definition into each new project
+ * enabled IntelliSense code-completion, while C++ coding
+ * respecting library references via properties of Cascades Application project
+ * fixed usage of precompiled header
+ * hidden GDB output in release builds
+ * more strictly following directory structure, when adding new files into a project, by producting expected sub-filters
+ * other small tweaks and refactorings
+
 v3.0.2 (2014-11-16)
 Changes in this version:
  * VSIX package verifies, if proper MSBuild 'BlackBerry' platform exists (#28)
