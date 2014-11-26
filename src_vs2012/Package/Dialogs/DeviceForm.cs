@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -209,6 +208,9 @@ namespace BlackBerry.Package.Dialogs
 
         private void AppendLog(string text)
         {
+            if (string.IsNullOrEmpty(text))
+                return;
+
             if (InvokeRequired)
             {
                 Invoke(new Action<string>(AppendLog), text);

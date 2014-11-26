@@ -153,6 +153,9 @@ namespace BlackBerry.Package.Dialogs
 
         private void AppendTokenLog(string message)
         {
+            if (string.IsNullOrEmpty(message))
+                return;
+
             if (InvokeRequired)
                 Invoke(new Action<string>(AppendTokenLog), message);
             else
@@ -168,6 +171,9 @@ namespace BlackBerry.Package.Dialogs
 
         private void AppendDeviceLog(string message)
         {
+            if (string.IsNullOrEmpty(message))
+                return;
+
             if (InvokeRequired)
                 Invoke(new Action<string>(AppendDeviceLog), message);
             else
