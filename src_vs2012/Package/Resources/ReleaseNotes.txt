@@ -1,3 +1,8 @@
+v3.0.4 (2014-11-27)
+Changes in this version:
+ * improved first-launch experience (when nothing is configured and installed yet)
+ * avoiding new project wizard, when MSBuild 'BlackBerry' build platform is missing
+
 v3.0.3 (2014-11-26)
 Changes in this version:
  * improved stability, when no satellite components are installed (bbndk_vs, QNX tools, MSBuild extensions, Java)

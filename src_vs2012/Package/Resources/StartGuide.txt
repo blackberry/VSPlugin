@@ -1,4 +1,31 @@
 ﻿Start Guide
 ===========
 
-Please visit the wiki pages at https://github.com/phofman/vs-plugin/wiki for details.
+  Unless Momentics (or any previous version of this plugin) was used before, few extra
+MANUAL steps have to be made before this package works smoothly without errors and warnings.
+
+1) Ensure BlackBerry Native SDK (NDK) is installed. It can be any available edition (distributed as MSI installer,
+   or using Momentics, or via BBNDK_VS - compacted NDK skeleton, allowing downloads of new NDKs directly),
+   although the last option is preferred as it enables UI to manipulate NDKs inside Visual Studio.
+
+2) Ensure MSBuild extensions (distributed separately) has been copied into "C:\Program Files (x86)\MSBuild".
+   Without them it won't be possible to create new project, compile and deploy applications.
+
+In case of any problems, please visit the wiki pages at https://github.com/phofman/vs-plugin/wiki/Installation
+or https://github.com/phofman/vs-plugin/wiki/ for general details and documentation.
+
+
+Also note, that the plugin doesn't spy on you. It doesn't collect any usage statistics, nor send any crash-reports.
+Then if you want anything fixed or imporved visit the project page at https://github.com/phofman/vs-plugin/.
+
+
+Contact info
+============
+
+ Paweł Hofman
+ CodeTitans.pl
+ Wroclaw, Poland
+
+Twitter: https://twitter.com/CodeTitans
+Email:   pawel@codetitans.pl
+
