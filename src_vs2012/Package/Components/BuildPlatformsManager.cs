@@ -29,6 +29,7 @@ using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
 using BlackBerry.Package.Dialogs;
 using BlackBerry.Package.Helpers;
+using BlackBerry.Package.Options;
 using BlackBerry.Package.ViewModels;
 using BlackBerry.Package.Wizards;
 using EnvDTE;
@@ -80,6 +81,7 @@ namespace BlackBerry.Package.Components
         private const string BarDescriptorTemplate = @"Shared\bar-descriptor.xml";
 
         public event Action<string> Navigate;
+        public event Action<Type> OpenSettingsPage;
 
         /// <summary>
         /// Init constructor.
@@ -124,6 +126,8 @@ namespace BlackBerry.Package.Components
             _solutionEvents.ProjectRemoved += OnProjectRemoved;
 
             _errorManager = new ErrorManager(_serviceProvider, new Guid("{54340ee9-e59e-4ff1-8e5d-0370f700eaed}"), "BlackBerry Errors");
+
+            PackageViewModel.Instance.TargetsChanged += (s, e) => VerifyCommonErrors();
         }
 
         #region Properties
@@ -180,6 +184,22 @@ namespace BlackBerry.Package.Components
             }
         }
 
+        /// <summary>
+        /// Gets the list of all available target devices.
+        /// </summary>
+        private DeviceDefinition[] TargetDevices
+        {
+            get { return PackageViewModel.Instance.TargetDevices; }
+        }
+
+        /// <summary>
+        /// Gets the list of installed NDKs on the machine.
+        /// </summary>
+        private NdkInfo[] InstalledNDKs
+        {
+            get { return PackageViewModel.Instance.InstalledNDKs; }
+        }
+
         #endregion
 
         /// <summary> 
@@ -191,6 +211,114 @@ namespace BlackBerry.Package.Components
 
         #region Managing IntelliSense Error Reporting
 
+        /// <summary>
+        /// Checks the current plugin and Visual Studio state for most common errors to minimize developer's frustration, why things are not working.
+        /// </summary>
+        public void VerifyCommonErrors()
+        {
+            _errorManager.Clear();
+
+            // check if appropriate platform exists and matches expected version:
+            var buildTasksAssemblyPath = Path.Combine(ConfigDefaults.MSBuildVCTargetsPath, "Platforms", "BlackBerry", "BlackBerry.BuildTasks.dll");
+            if (!File.Exists(buildTasksAssemblyPath))
+            {
+                _errorManager.Add(TaskErrorCategory.Error, "MSBuild \"BlackBerry\" build platform was not found. Building projects won't be possible at all. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " [double-click] for details, how to install it.", OpenInstallationPage);
+            }
+            else
+            {
+                try
+                {
+                    var installedVersion = AssemblyName.GetAssemblyName(buildTasksAssemblyPath).Version;
+                    var expectedVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+                    // verify versions:
+                    if (installedVersion.Major != expectedVersion.Major || installedVersion.Minor != expectedVersion.Minor || installedVersion.Build != expectedVersion.Build)
+                    {
+                        _errorManager.Add(TaskErrorCategory.Warning, "Invalid version of existing MSBuild \"BlackBerry\" build platform (installed: " + ToShortVersion(installedVersion) + ", expected: " + ToShortVersion(expectedVersion) + "). Some features might simply stop working. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " [double-click] for details, how to upgrade it.", OpenInstallationPage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to determine version of MSBuild \"BlackBerry\" build platform");
+                }
+            }
+
+            // is Java detected?
+            if (string.IsNullOrEmpty(ConfigDefaults.JavaHome) || !Directory.Exists(ConfigDefaults.JavaHome))
+            {
+                _errorManager.Add(TaskErrorCategory.Warning, "Java was not detected. Underlying BlackBerry tools might stop working. Please specify one at \"BlackBerry -> Options -> General\" [double-click].", OpenGeneralSettings);
+            }
+
+            // check, if any project is placed on incorrect location, not supported by underlying makefile system:
+            if (_dte != null && _dte.Solution != null && _dte.Solution.Projects.Count > 0)
+            {
+                foreach (Project project in _dte.Solution.Projects)
+                {
+                    if (IsBlackBerryProject(project))
+                    {
+                        // is path valid?
+                        var projectPath = Path.GetDirectoryName(project.FullName);
+                        if (!string.IsNullOrEmpty(projectPath) && !IsValidProjectPath(projectPath))
+                        {
+                            _errorManager.Add(TaskErrorCategory.Warning, string.Concat("Project path: \"", projectPath, "\" is invalid and might lead to problems in underlying makefile system. Please move the project to the one without spaces and non-ASCII characters."), project, null, OpenGeneralSettings);
+                        }
+
+                        // is name valid?
+                        var projectName = project.Name;
+                        if (!string.IsNullOrEmpty(projectPath) && !IsValidProjectName(projectName))
+                        {
+                            _errorManager.Add(TaskErrorCategory.Error, string.Concat("Project name: \"", projectName, "\" is invalid. Please remove all spaces and non-ASCII characters."), project, null, OpenGeneralSettings);
+                        }
+                    }
+                }
+            }
+
+            // check if any NDK is installed:
+            if (InstalledNDKs.Length == 0)
+            {
+                _errorManager.Add(TaskErrorCategory.Error, "Missing any BlackBerry NativeCore SDK. Compilation won't be possible at all. Add one on \"BlackBerry -> Options -> API-Levels\" [double-click] to be able to perform builds your applications.", OpenApiLevelSettings);
+
+                if (string.IsNullOrEmpty(ConfigDefaults.NdkDirectory) || !Directory.Exists(ConfigDefaults.NdkDirectory))
+                {
+                    _errorManager.Add(TaskErrorCategory.Warning, "Customized NDK for Visual Studio (bbndk_vs) was not found. It won't be possible to automatically download new versions of BlackBerry NativeCore SDKs, simulators nor runtime-libraries for debugging. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " [double-click] for details, how to install it.", OpenInstallationPage);
+                }
+            }
+
+            // verify targets defined:
+            if (TargetDevices.Length == 0)
+            {
+                _errorManager.Add(TaskErrorCategory.Warning, "No target device or simulator is defined. Specify one on \"BlackBerry -> Options -> Targets\" [double-click] to be able to deploy and test your applications.", OpenTargetsSettings);
+            }
+
+            // bring errors to front:
+            if (_errorManager.Count > 0)
+            {
+                _errorManager.Show();
+            }
+        }
+
+        /// <summary>
+        /// Checks if given path matches the makefile assumptions used to build the BlackBerry projects.
+        /// </summary>
+        private static bool IsValidProjectPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+
+            return path.IndexOf(' ') < 0;
+        }
+
+        /// <summary>
+        /// Checks if given project name matches the makefile assumptions used to build the BlackBerry projects.
+        /// </summary>
+        private static bool IsValidProjectName(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+
+            return path.IndexOf(' ') < 0;
+        }
+
         private void OnProjectRemoved(Project project)
         {
             if (_solutionOpened)
@@ -200,6 +328,8 @@ namespace BlackBerry.Package.Components
                     _openedBlackBerryProjects--;
                     UpdateIntelliSenseState();
                 }
+
+                VerifyCommonErrors();
             }
         }
 
@@ -212,6 +342,8 @@ namespace BlackBerry.Package.Components
                     _openedBlackBerryProjects++;
                     UpdateIntelliSenseState();
                 }
+
+                VerifyCommonErrors();
             }
         }
 
@@ -222,6 +354,7 @@ namespace BlackBerry.Package.Components
             _solutionOpened = false;
             _openedBlackBerryProjects = 0;
             UpdateIntelliSenseState();
+            VerifyCommonErrors();
         }
 
         private void OnSolutionOpened()
@@ -238,31 +371,7 @@ namespace BlackBerry.Package.Components
             }
 
             UpdateIntelliSenseState();
-
-            // check if appropriate platform exists and matches expected version:
-            var buildTasksAssemblyPath = Path.Combine(ConfigDefaults.MSBuildVCTargetsPath, "Platforms", "BlackBerry", "BlackBerry.BuildTasks.dll");
-            if (!File.Exists(buildTasksAssemblyPath))
-            {
-                _errorManager.Add(TaskErrorCategory.Error, "MSBuild \"BlackBerry\" build platform was not found. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " for details, how to install it.", OpenInstallationPage);
-            }
-            else
-            {
-                try
-                {
-                    var installedVersion = AssemblyName.GetAssemblyName(buildTasksAssemblyPath).Version;
-                    var expectedVersion = Assembly.GetExecutingAssembly().GetName().Version;
-
-                    // verify versions:
-                    if (installedVersion.Major != expectedVersion.Major || installedVersion.Minor != expectedVersion.Minor || installedVersion.Build != expectedVersion.Build)
-                    {
-                        _errorManager.Add(TaskErrorCategory.Warning, "Invalid version of existing MSBuild \"BlackBerry\" build platform (installed: " + ToShortVersion(installedVersion) + ", expected: " + ToShortVersion(expectedVersion) + "). Visit " + ConfigDefaults.GithubProjectWikiInstallation + " for details, how to upgrade it.", OpenInstallationPage);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    TraceLog.WriteException(ex, "Unable to determine version of MSBuild \"BlackBerry\" build platform");
-                }
-            }
+            VerifyCommonErrors();
         }
 
         private static string ToShortVersion(Version v)
@@ -282,6 +391,29 @@ namespace BlackBerry.Package.Components
             {
                 DialogHelper.StartURL(url);
             }
+        }
+
+        private void RequestSettingsOpened(Type optionPageType)
+        {
+            if (OpenSettingsPage != null)
+            {
+                OpenSettingsPage(optionPageType);
+            }
+        }
+
+        private void OpenGeneralSettings(object sender, EventArgs e)
+        {
+            RequestSettingsOpened(typeof(GeneralOptionPage));
+        }
+
+        public void OpenTargetsSettings(object sender, EventArgs e)
+        {
+            RequestSettingsOpened(typeof(TargetsOptionPage));
+        }
+
+        public void OpenApiLevelSettings(object sender, EventArgs e)
+        {
+            RequestSettingsOpened(typeof(ApiLevelOptionPage));
         }
 
         private void UpdateIntelliSenseState()
@@ -484,8 +616,15 @@ namespace BlackBerry.Package.Components
         {
             if (IsBlackBerrySolution() && ActiveNDK == null)
             {
-                var form = new MissingNdkInstalledForm();
-                form.ShowDialog();
+                if (InstalledNDKs.Length > 0)
+                {
+                    var form = new MissingNdkInstalledForm();
+                    form.ShowDialog();
+                }
+                else
+                {
+                    MessageBoxHelper.Show("Project build is impossible as any BlackBerry NativeCore SDK was detected. Please install or add existing one in \"BlackBerry -> Options -> API-Levels\" and try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 return;
             }
 

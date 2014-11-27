@@ -195,6 +195,7 @@ namespace BlackBerry.Package
 
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
             _buildPlatformsManager.Navigate += OpenUrl;
+            _buildPlatformsManager.OpenSettingsPage += ShowOptionPage;
             _buildPlatformsManager.Initialize();
             TraceLog.WriteLine(" * registered build-platforms manager");
 
@@ -302,12 +303,14 @@ namespace BlackBerry.Package
 
             // make sure there is an NDK selected and developer knows about it:
             EnsureActiveNDK();
-            if (_buildPlatformsManager.IsBlackBerrySolution() && ActiveNDK == null)
+            if (_buildPlatformsManager.IsBlackBerrySolution() && ActiveNDK == null && InstalledNDKs.Length > 0)
             {
                 var form = new MissingNdkInstalledForm();
                 form.ShowDialog();
                 EnsureActiveNDK();
             }
+
+            _buildPlatformsManager.VerifyCommonErrors();
         }
 
         protected override void Dispose(bool disposing)
@@ -437,6 +440,14 @@ namespace BlackBerry.Package
         private NdkInfo ActiveNDK
         {
             get { return PackageViewModel.Instance.ActiveNDK; }
+        }
+
+        /// <summary>
+        /// Gets the list of installed NDKs on the machine.
+        /// </summary>
+        private NdkInfo[] InstalledNDKs
+        {
+            get { return PackageViewModel.Instance.InstalledNDKs; }
         }
 
         /// <summary>

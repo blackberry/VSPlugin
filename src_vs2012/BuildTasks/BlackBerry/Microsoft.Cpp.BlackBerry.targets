@@ -44,7 +44,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     
     " Importance="High" />
 
-    <Error Condition="$(QNX_HOST) == ''" Text="The NDK is missing, please make sure NDK is downloaded and selected." />
+    <Error Condition="$(QNX_HOST) == ''" Text="The BlackBerry NativeCore SDK is missing, please make sure one is downloaded and selected." />
 
     <SetEnv Name="QNX_HOST" Value="$(QNX_HOST)" Prefix="false">
       <Output TaskParameter="OutputEnvironmentVariable" PropertyName="QNX_HOST"/>
@@ -186,6 +186,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
   </PropertyGroup>
   
   <Target Name="MakeClean">
+    <Error Condition="$(QNX_HOST) == ''" Text="The BlackBerry NativeCore SDK is missing, please make sure one is downloaded and selected." />
+
     <QccExec Command="$(QccToolsPath)\make clean"
              WorkingDirectory="$(ProjectDir)"
              QnxHost="$(QNX_HOST)"
