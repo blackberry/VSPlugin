@@ -212,6 +212,18 @@ namespace BlackBerry.Package.Components
         #region Managing IntelliSense Error Reporting
 
         /// <summary>
+        /// Checks, if BlackBerry-dedicated MSBuild platform has been installed.
+        /// </summary>
+        public static bool IsMSBuildPlatformInstalled
+        {
+            get
+            {
+                var buildTasksAssemblyPath = Path.Combine(ConfigDefaults.MSBuildVCTargetsPath, "Platforms", "BlackBerry", "BlackBerry.BuildTasks.dll");
+                return File.Exists(buildTasksAssemblyPath);
+            }
+        }
+
+        /// <summary>
         /// Checks the current plugin and Visual Studio state for most common errors to minimize developer's frustration, why things are not working.
         /// </summary>
         public void VerifyCommonErrors()

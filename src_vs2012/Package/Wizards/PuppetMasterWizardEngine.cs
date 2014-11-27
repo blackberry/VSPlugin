@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.Package.Components;
@@ -50,6 +52,15 @@ namespace BlackBerry.Package.Wizards
         /// </summary>
         internal override wizardResult ExecuteNewProject(DTE2 dte, IntPtr owner, NewProjectParams context, KeyValuePair<string, string>[] customParams)
         {
+            TraceLog.WriteLine("Adding new project...");
+
+            if (!BuildPlatformsManager.IsMSBuildPlatformInstalled)
+            {
+                MessageBoxHelper.Show("More info at: " + ConfigDefaults.GithubProjectWikiInstallation,
+                    "Unable to create any BlackBerry project.\r\nPlease make sure whether \"BlackBerry\" build platform has been added to MSBuild.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return wizardResult.wizardResultFailure;
+            }
+
             int count = GetProjectsCount(customParams);
             string masterProjectName = null;
 
@@ -211,6 +222,15 @@ namespace BlackBerry.Package.Wizards
         /// </summary>
         internal override wizardResult ExecuteNewProjectItem(DTE2 dte, IntPtr owner, NewProjectItemParams context, KeyValuePair<string, string>[] customParams)
         {
+            TraceLog.WriteLine("Adding new project item...");
+
+            if (!BuildPlatformsManager.IsMSBuildPlatformInstalled)
+            {
+                MessageBoxHelper.Show("More info at: " + ConfigDefaults.GithubProjectWikiInstallation,
+                    "Unable to create any BlackBerry project item.\r\nPlease make sure whether \"BlackBerry\" build platform has been added to MSBuild.", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return wizardResult.wizardResultFailure;
+            }
+
             var project = context.ProjectItems.ContainingProject;
             var folders = new ProjectFolderTree(project, false);
             var tokenProcessor = CreateTokenProcessor(context.ProjectName, context.LocalDirectory, context.ItemName, context.ProjectName);
