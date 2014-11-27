@@ -190,7 +190,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <BuildBar Include="@(None)" />
     </ItemGroup>
 
-    <Error Condition="$(TargetDeviceIP) == ''" Text=" Target device ip is not set. See menu BlackBerry -> Settings" />
+    <Error Condition="$(TargetDeviceIP) == ''" Text=" Target device ip is not set. See menu BlackBerry -> Options -> Targets" />
 
     <!-- Get app's ID from bar descriptor. -->
     <GetAppInfo
