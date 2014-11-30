@@ -75,6 +75,19 @@ namespace BlackBerry.NativeCore.QConn.Services
             public long vstacksize;
             public char name[128];
         }
+
+        public static class SystemInfoEnv
+        {
+            public int env_str_length;
+            public String env_str;
+        }
+
+        public static class SystemInfoArgs
+        {
+            public int args_str_length;
+            public String args_str;
+        }
+
          */
 
         #endregion
@@ -134,6 +147,72 @@ namespace BlackBerry.NativeCore.QConn.Services
             }
 
             return result.ToArray();
+        }
+
+        /// <summary>
+        /// Loads environment variables for specified process.
+        /// </summary>
+        public string[] LoadEnvironmentVariables(ProcessInfo process)
+        {
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return LoadEnvironmentVariables(process.ID);
+        }
+
+        /// <summary>
+        /// Loads environment variables for specified process.
+        /// </summary>
+        public string[] LoadEnvironmentVariables(uint processID)
+        {
+            var reader = Connection.Request("get env " + processID);
+
+            if (reader != null)
+            {
+                // read header:
+                var header = new Header();
+                header.Read(reader);
+
+                // read environment string:
+                uint length = reader.ReadUInt32();
+                var variables = reader.ReadString(length, '\0');
+
+                return string.IsNullOrEmpty(variables) ? null : variables.Split(new[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Loads startup arguments for specified process.
+        /// </summary>
+        public string LoadArguments(ProcessInfo process)
+        {
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return LoadArguments(process.ID);
+        }
+
+        /// <summary>
+        /// Loads startup arguments for specified process.
+        /// </summary>
+        public string LoadArguments(uint processID)
+        {
+            var reader = Connection.Request("get args " + processID);
+
+            if (reader != null)
+            {
+                // read header:
+                var header = new Header();
+                header.Read(reader);
+
+                // read arguments string:
+                uint length = reader.ReadUInt32();
+                return reader.ReadString(length, '\0');
+            }
+
+            return null;
         }
 
         /// <summary>
