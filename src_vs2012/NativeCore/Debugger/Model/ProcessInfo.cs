@@ -32,9 +32,13 @@ namespace BlackBerry.NativeCore.Debugger.Model
         private static string ExtractShortPath(string executablePath)
         {
             const string startToken = "accounts/1000/appdata/";
+            const string startToken2 = "/accounts/1000/appdata/";
+
             // is it a sandbox application?
             if (executablePath.StartsWith(startToken, StringComparison.OrdinalIgnoreCase))
                 return executablePath.Substring(startToken.Length);
+            if (executablePath.StartsWith(startToken2, StringComparison.OrdinalIgnoreCase))
+                return executablePath.Substring(startToken2.Length);
 
             return executablePath;
         }

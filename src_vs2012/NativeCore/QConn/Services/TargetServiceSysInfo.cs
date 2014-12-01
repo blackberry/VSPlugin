@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.QConn.Model;
 
@@ -135,6 +136,12 @@ namespace BlackBerry.NativeCore.QConn.Services
 
                 if (id != 0 && parentID != 0 && !string.IsNullOrEmpty(name))
                 {
+                    // some fixes around name:
+                    if (name[0] != Path.DirectorySeparatorChar && name[0] != Path.AltDirectorySeparatorChar)
+                    {
+                        name = "/" + name;
+                    }
+
                     result.Add(new SystemInfoProcess(id, parentID, name));
                 }
                 else
