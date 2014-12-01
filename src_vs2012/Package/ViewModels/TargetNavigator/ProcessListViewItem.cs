@@ -52,7 +52,10 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
                 items = new BaseViewItem[processes.Length];
                 for (int i = 0; i < processes.Length; i++)
                 {
-                    items[i] = new ProcessViewItem(ViewModel, Control, processes[i]);
+                    var arguments = Service.LoadArguments(processes[i]);
+                    var environmentVariables = Service.LoadEnvironmentVariables(processes[i]);
+
+                    items[i] = new ProcessViewItem(ViewModel, Control, processes[i], arguments, environmentVariables);
                 }
             }
             catch (Exception ex)

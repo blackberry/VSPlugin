@@ -15,7 +15,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public ProcessViewItem(TargetNavigatorViewModel viewModel, TargetServiceControl service, SystemInfoProcess process)
+        public ProcessViewItem(TargetNavigatorViewModel viewModel, TargetServiceControl service, SystemInfoProcess process, string arguments, string[] environmentVariables)
             : base(viewModel)
         {
             if (service == null)
@@ -26,7 +26,18 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             ContextMenuName = "ContextForProcess";
             _service = service;
             _process = process;
+            Arguments = arguments ?? string.Empty;
             ImageSource = ViewModel.GetIconForProcess();
+
+            if (environmentVariables == null || environmentVariables.Length == 0)
+            {
+                EnvironmentVariables = string.Empty;
+            }
+            else
+            {
+                Array.Sort(environmentVariables);
+                EnvironmentVariables = string.Join(Environment.NewLine, environmentVariables);
+            }
         }
 
         #region Properties
@@ -49,6 +60,18 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
         public string ExecutablePath
         {
             get { return _process.ExecutablePath; }
+        }
+
+        public string Arguments
+        {
+            get;
+            private set;
+        }
+
+        public string EnvironmentVariables
+        {
+            get;
+            private set;
         }
 
         public override bool IsEnumerable
