@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using BlackBerry.NativeCore.Debugger.Model;
@@ -15,14 +16,19 @@ namespace BlackBerry.NativeCore.QConn.Services
     /// </summary>
     public sealed class TargetServiceConsoleLog : TargetService
     {
+        #region Internal Classes
+
         /// <summary>
         /// Helper class storing current state of log file to read.
         /// </summary>
         sealed class LogMonitorStatus : IDisposable
         {
             private ulong _readBytes;
-            private List<byte[]> _chunks; 
+            private readonly List<byte[]> _chunks;
 
+            /// <summary>
+            /// Init constructor.
+            /// </summary>
             public LogMonitorStatus(TargetServiceFile fileService, string path, TargetFileDescriptor handle, ProcessInfo process)
             {
                 if (fileService == null)
@@ -74,13 +80,17 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             #endregion
 
+            /// <summary>
+            /// Read all new log entries, if available or null.
+            /// </summary>
             public string[] Read()
             {
                 try
                 {
                     const int ChunkSize = 20 * 1024;
 
-
+                    // read one or more available chunks of data from the file, than glue them into one buffer,
+                    // convert to UTF8 string and split per lines:
                     while (true)
                     {
                         var data = FileService.Read(Handle, _readBytes, ChunkSize);
@@ -90,6 +100,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                             _readBytes += (ulong) data.Length;
                             if (data.Length == ChunkSize)
                             {
+                                // store the chunk and try again:
                                 _chunks.Add(data);
                                 continue;
                             }
@@ -102,6 +113,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                             return GetString(data);
                         }
 
+                        // if there are no more new chunks, but we did read any previously:
                         if (_chunks.Count > 0)
                         {
                             return GetString(BitHelper.Combine(_chunks, null, 0));
@@ -117,9 +129,23 @@ namespace BlackBerry.NativeCore.QConn.Services
                 return null;
             }
 
+            private static bool IsWhiteSpace(byte c)
+            {
+                return c <= 32;
+            }
+
             private static string[] GetString(byte[] data)
             {
-                return Encoding.UTF8.GetString(data).Split(new[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
+                // since new-line will be automatically added at the end of log entry
+                // trim-end now, before doing any conversions to save processor & memory:
+                int length = data.Length;
+
+                while (length > 0 && IsWhiteSpace(data[length - 1]))
+                {
+                    length--;
+                }
+
+                return Encoding.UTF8.GetString(data, 0, length).Split(new[] { "\r\n", "\n\r", "\n" }, StringSplitOptions.None);
             }
 
             public bool HasPath(string path)
@@ -152,7 +178,9 @@ namespace BlackBerry.NativeCore.QConn.Services
             #endregion
         }
 
-        private const uint Interval = 500; // milliseconds
+        #endregion
+
+        private const uint Interval = 800; // how often to check the remote log file for new content; in milliseconds
 
         private TargetServiceFile _fileService;
         private readonly object _lock;
@@ -208,36 +236,47 @@ namespace BlackBerry.NativeCore.QConn.Services
                 if (homeIndex > 0)
                 {
                     var logFilePath = process.ExecutablePath.Substring(0, homeIndex) + "/logs/log";
-                    TraceLog.WriteLine("> Log file: \"{0}\"", logFilePath);
-
-                    if (Find(logFilePath) == null)
-                    {
-                        // open the file:
-                        var fileHandle = _fileService.Open(logFilePath, TargetFile.ModeOpenReadOnly, uint.MaxValue, false);
-                        if (fileHandle != null)
-                        {
-                            lock (_lock)
-                            {
-                                var status = new LogMonitorStatus(_fileService, logFilePath, fileHandle, process);
-                                _logMonitors.Add(status);
-
-                                // start the timer:
-                                if (_keepReadingTimer == null)
-                                    _keepReadingTimer = new Timer(OnReaderTick, this, Interval, Timeout.Infinite);
-                            }
-
-                            return true;
-                        }
-
-                        TraceLog.WriteLine("> Error: Unable to open log file: \"{0}\"", logFilePath);
-                        return false;
-                    }
-
-                    TraceLog.WarnLine("> Warning: Log file is already monitored: \"{0}\"", logFilePath);
+                    return Start(logFilePath, process);
                 }
             }
 
             TraceLog.WarnLine("> Error: Unable to calculate location of the console log file");
+            return false;
+        }
+
+        private bool Start(string logFilePath, ProcessInfo process)
+        {
+            if (string.IsNullOrEmpty(logFilePath))
+                throw new ArgumentNullException("logFilePath");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            TraceLog.WriteLine("> Log file: \"{0}\"", logFilePath);
+
+            if (Find(logFilePath) == null)
+            {
+                // open the file:
+                var fileHandle = _fileService.Open(logFilePath, TargetFile.ModeOpenReadOnly, uint.MaxValue, false);
+                if (fileHandle != null)
+                {
+                    lock (_lock)
+                    {
+                        var status = new LogMonitorStatus(_fileService, logFilePath, fileHandle, process);
+                        _logMonitors.Add(status);
+
+                        // start the timer:
+                        if (_keepReadingTimer == null)
+                            _keepReadingTimer = new Timer(OnReaderTick, this, Interval, Timeout.Infinite);
+                    }
+
+                    return true;
+                }
+
+                TraceLog.WriteLine("> Error: Unable to open log file: \"{0}\"", logFilePath);
+                return false;
+            }
+
+            TraceLog.WarnLine("> Warning: Log file is already monitored: \"{0}\"", logFilePath);
             return false;
         }
 
@@ -265,6 +304,9 @@ namespace BlackBerry.NativeCore.QConn.Services
             }
         }
 
+        /// <summary>
+        /// Finds existing monitor that is attached to the specified log file or null.
+        /// </summary>
         private LogMonitorStatus Find(string path)
         {
             lock (_lock)
@@ -294,6 +336,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                         foreach (var message in logEntries)
                         {
                             TraceLog.WriteLine(message);
+                            Trace.WriteLine(message, TraceLog.CategoryDevice);
                         }
                     }
                 }

@@ -126,6 +126,7 @@ namespace BlackBerry.Package
         private BlackBerryPaneTraceListener _mainTraceWindow;
         private BlackBerryPaneTraceListener _gdbTraceWindow;
         private BlackBerryPaneTraceListener _qconnTraceWindow;
+        private BlackBerryPaneTraceListener _standardOutputWindow;
         private DTE2 _dte;
         private BuildPlatformsManager _buildPlatformsManager;
 
@@ -164,17 +165,20 @@ namespace BlackBerry.Package
             LogManager.Initialize(logOptions.Path, logOptions.LimitLogs ? logOptions.LimitCount : -1, TraceLog.Category, TraceLog.CategoryGDB);
 
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
-            _mainTraceWindow = new BlackBerryPaneTraceListener("BlackBerry", TraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceMainOutputWindowPane);
+            var outputWindowService = GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            _mainTraceWindow = new BlackBerryPaneTraceListener("BlackBerry", TraceLog.Category, true, outputWindowService, GuidList.GUID_TraceMainOutputWindowPane);
 #if DEBUG
-            _gdbTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - GDB", TraceLog.CategoryGDB, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceGdbOutputWindowPane);
+            _gdbTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - GDB", TraceLog.CategoryGDB, true, outputWindowService, GuidList.GUID_TraceGdbOutputWindowPane);
 #endif
-            _qconnTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - QConn", QTraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceQConnOutputWindowPane);
+            _qconnTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - QConn", QTraceLog.Category, true, outputWindowService, GuidList.GUID_TraceQConnOutputWindowPane);
+            _standardOutputWindow = new BlackBerryPaneTraceListener("Debug", TraceLog.CategoryDevice, false, outputWindowService, VSConstants.GUID_OutWindowDebugPane);
             _mainTraceWindow.Activate();
 
             // and set it to monitor all logs (they have to be marked with 'BlackBerry' category! aka TraceLog.Category):
             TraceLog.Add(_mainTraceWindow);
             TraceLog.Add(_gdbTraceWindow);
             TraceLog.Add(_qconnTraceWindow);
+            TraceLog.Add(_standardOutputWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
 
             // add this package to the globally-proffed services:
