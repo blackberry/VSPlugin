@@ -917,17 +917,26 @@ namespace BlackBerry.Package.Components
             {
                 foreach (SolutionContext sc in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
                 {
-                    var project = _dte.Solution.Item(sc.ProjectName);
-                    var cskPasswordFileName = ProjectHelper.GetFlagFileNameForCSKPassword(project);
+                    Project project = null;
 
-                    // remove old value:
-                    DeleteFlagFile(cskPasswordFileName);
-
-                    if (sc.ProjectName == startupProject && shouldSaveLocally)
+                    try
                     {
-                        // write CSK-password, if not stored persistently inside registry, to let signing process to succeed:
-                        File.WriteAllText(cskPasswordFileName, GlobalHelper.Encrypt(developer.CskPassword));
-                        _filesToDelete.Add(cskPasswordFileName);
+                        project = _dte.Solution.Item(sc.ProjectName);
+                        var cskPasswordFileName = ProjectHelper.GetFlagFileNameForCSKPassword(project);
+
+                        // remove old value:
+                        DeleteFlagFile(cskPasswordFileName);
+
+                        if (sc.ProjectName == startupProject && shouldSaveLocally)
+                        {
+                            // write CSK-password, if not stored persistently inside registry, to let signing process to succeed:
+                            File.WriteAllText(cskPasswordFileName, GlobalHelper.Encrypt(developer.CskPassword));
+                            _filesToDelete.Add(cskPasswordFileName);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteException(ex, "Unable to delete deployment temporary flag files (project: \"{0}\")", sc != null ? sc.ProjectName : "unknown");
                     }
                 }
             }
