@@ -339,6 +339,7 @@ namespace BlackBerry.NativeCore.QConn
                     SysInfoService = null;
                     ControlService = null;
                     FileService = null;
+                    ConsoleLogService = null;
                 }
             }
         }
