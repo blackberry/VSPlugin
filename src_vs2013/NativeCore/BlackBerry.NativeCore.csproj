@@ -360,6 +360,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetService.cs">
       <Link>QConn\Services\TargetService.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceConsoleLog.cs">
+      <Link>QConn\Services\TargetServiceConsoleLog.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceControl.cs">
       <Link>QConn\Services\TargetServiceControl.cs</Link>
     </Compile>

@@ -90,6 +90,12 @@ namespace BlackBerry.NativeCore.QConn
             private set;
         }
 
+        public TargetServiceConsoleLog ConsoleLogService
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         /// <summary>
@@ -139,10 +145,13 @@ namespace BlackBerry.NativeCore.QConn
             List<TargetService> services = new List<TargetService>();
 
             FileService = null;
+            ConsoleLogService = null;
             if (HasService(serviceNames, "file"))
             {
                 FileService = new TargetServiceFile(GetServiceVersion(connection, "file"), new QConnConnection(host, port, "file", Endian));
+                ConsoleLogService = new TargetServiceConsoleLog(FileService);
                 services.Add(FileService);
+                services.Add(ConsoleLogService);
             }
 
             ControlService = null;

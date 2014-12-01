@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using BlackBerry.NativeCore.Components;
+using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Debugger.Requests;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
@@ -76,12 +77,13 @@ namespace BlackBerry.NativeCore.Debugger
         /// </summary>
         /// <param name="pidOrBinaryName">PID of the process or name of the binary.</param>
         /// <param name="localBinaryPath">Local path to the executable being debugged. It is required by GDB to load debug symbols.</param>
+        /// <param name="existingProcessOrNull">Info about existing process running on the device or null, if not known.</param>
         /// <param name="ndk">Location of the NDK used to compile the binary.</param>
         /// <param name="device">Target device to connect to.</param>
         /// <param name="runtime">Path to the runtime with matching device libraries. Used to decipher OS callstacks.</param>
         /// <param name="pidNumber">Numerical PID of the process the GDB attached to.</param>
         /// <returns>Returns 'true', when attaching succeeded, otherwise 'false'. It will automatically close GDB, if anything failed.</returns>
-        public static bool AttachToProcess(string pidOrBinaryName, string localBinaryPath, NdkDefinition ndk, DeviceDefinition device, RuntimeDefinition runtime, out uint pidNumber)
+        public static bool AttachToProcess(string pidOrBinaryName, string localBinaryPath, ProcessInfo existingProcessOrNull, NdkDefinition ndk, DeviceDefinition device, RuntimeDefinition runtime, out uint pidNumber)
         {
             if (ndk == null)
                 throw new ArgumentNullException("device");
@@ -149,21 +151,39 @@ namespace BlackBerry.NativeCore.Debugger
 
                 // this should succeed as we already used GDB successfully, so secure communication is working...
                 var qClient = Targets.Get(device);
-                if (qClient == null)
+                if (qClient == null || qClient.FileService == null)
                 {
                     throw new InvalidOperationException("Missing the client connected to target - this should never happen");
                 }
-                var existingProcess = qClient.SysInfoService.FindProcess(pidOrBinaryName);
 
+                var existingProcess = qClient.SysInfoService.FindProcess(pidOrBinaryName);
                 if (existingProcess != null)
                 {
                     // doesn't run
                     pidNumber = existingProcess.ID;
+
+                    // start monitoring for console logs:
+                    qClient.ConsoleLogService.Start(existingProcess);
                 }
                 else
                 {
                     _gdbRunner.Send(RequestsFactory.Exit());
                     return false;
+                }
+            }
+            else
+            {
+                if (existingProcessOrNull != null)
+                {
+                    // this should succeed as we already used GDB successfully, so secure communication is working...
+                    var qClient = Targets.Get(device);
+                    if (qClient == null || qClient.FileService == null)
+                    {
+                        throw new InvalidOperationException("Missing the client connected to target - this should never happen");
+                    }
+
+                    // start monitoring for console logs:
+                    qClient.ConsoleLogService.Start(existingProcessOrNull);
                 }
             }
 
@@ -276,6 +296,12 @@ namespace BlackBerry.NativeCore.Debugger
         {
             if (_gdbRunner != null)
             {
+                var qClient = Targets.Get(_gdbRunner.GDB.Device);
+                if (qClient != null)
+                {
+                    qClient.ConsoleLogService.StopAll();
+                }
+
                 _gdbRunner.Finished -= GdbRunnerUnexpectedlyFinished;
                 _gdbRunner.Dispose();
                 _gdbRunner = null;

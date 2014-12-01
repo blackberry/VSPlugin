@@ -109,6 +109,7 @@
     <Compile Include="QConn\Model\VisitorCompletionEventArgs.cs" />
     <Compile Include="QConn\Model\VisitorEventArgs.cs" />
     <Compile Include="QConn\Model\VisitorFailureEventArgs.cs" />
+    <Compile Include="QConn\Services\TargetServiceConsoleLog.cs" />
     <Compile Include="QConn\Visitors\BaseFileServiceEnumerator.cs" />
     <Compile Include="QConn\Visitors\BaseVisitorMonitor.cs" />
     <Compile Include="QConn\Visitors\BufferVisitor.cs" />

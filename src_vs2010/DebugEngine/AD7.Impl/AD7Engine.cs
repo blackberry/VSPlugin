@@ -252,7 +252,7 @@ namespace BlackBerry.DebugEngine
                     var runtime = RuntimeDefinition.Load();
 
                     uint aux;
-                    if (GdbWrapper.AttachToProcess(programNode.Process.ID.ToString(), exePath, port.NDK, port.Device, runtime, out aux))
+                    if (GdbWrapper.AttachToProcess(programNode.Process.ID.ToString(), exePath, _process.Details, port.NDK, port.Device, runtime, out aux))
                     {
                         if (exePath == "CannotAttachToRunningProcess")
                         {
@@ -561,7 +561,7 @@ namespace BlackBerry.DebugEngine
                     return VSConstants.E_FAIL;
                 }
 
-                var result = GdbWrapper.AttachToProcess(pidOrName, exe, ndk, target, runtime, out pidNumber);
+                var result = GdbWrapper.AttachToProcess(pidOrName, exe, null, ndk, target, runtime, out pidNumber);
                 if (result)
                 {
                     process = _process = new AD7Process(port, new ProcessInfo(pidNumber, exe), target);

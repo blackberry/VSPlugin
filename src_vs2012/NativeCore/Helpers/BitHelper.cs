@@ -180,6 +180,12 @@ namespace BlackBerry.NativeCore.Helpers
             int resultLength = lastChunkLength;
             if (buffers != null)
             {
+                // or is it a special case, when abandoned buffer is the only item:
+                if (buffers.Count == 1 && (lastChunk == null || lastChunkLength == 0))
+                {
+                    return buffers[0];
+                }
+
                 for (int i = 0; i < buffers.Count; i++)
                 {
                     resultLength += buffers[i].Length;

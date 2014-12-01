@@ -30,6 +30,9 @@ namespace BlackBerry.NativeCore.QConn.Services
 
         #region Properties
 
+        /// <summary>
+        /// Gets the version of the service.
+        /// </summary>
         public Version Version
         {
             get;
