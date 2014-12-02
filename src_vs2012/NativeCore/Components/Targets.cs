@@ -5,6 +5,7 @@ using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.QConn;
+using BlackBerry.NativeCore.QConn.Model;
 
 namespace BlackBerry.NativeCore.Components
 {
@@ -67,6 +68,12 @@ namespace BlackBerry.NativeCore.Components
                 private set;
             }
 
+            public TargetProcess SLog2Info
+            {
+                get;
+                private set;
+            }
+
             public TargetStatus Status
             {
                 get;
@@ -91,6 +98,17 @@ namespace BlackBerry.NativeCore.Components
                     {
                         _hasStatusEvent.Dispose();
                         _hasStatusEvent = null;
+                    }
+
+                    if (SLog2Info != null)
+                    {
+                        if (Client != null && Client.ControlService != null)
+                        {
+                            Client.ControlService.Terminate(SLog2Info);
+                        }
+
+                        SLog2Info.Dispose();
+                        SLog2Info = null;
                     }
 
                     if (Client != null)
@@ -138,6 +156,7 @@ namespace BlackBerry.NativeCore.Components
                 try
                 {
                     Client.Load(Device.IP, QConnClient.DefaultPort, 1000);
+                    InitializeSLog2Info();
 
                     // all is fine, connection established, no need to have own QConnDoor
                     NotifyStatusChange(TargetStatus.Connected, null);
@@ -179,6 +198,8 @@ namespace BlackBerry.NativeCore.Components
                         TraceLog.WriteException(ex, "Failed to start keeping the connection alive");
                         NotifyStatusChange(TargetStatus.Failed, "Lost connection to the device");
                     }
+
+                    InitializeSLog2Info();
                 }
                 else
                 {
@@ -194,6 +215,22 @@ namespace BlackBerry.NativeCore.Components
 
                 // then notify Targets class, so it updates the internal state:
                 OnChildConnectionStatusChanged(this, Status);
+            }
+
+            private void InitializeSLog2Info()
+            {
+                // setup slog2info monitor to grab all the logs from the device:
+                try
+                {
+                    if (SLog2Info == null)
+                    {
+                        SLog2Info = Client.LauncherService.Start("/bin/slog2info", new[] { "-w", "-W", "-s" });
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to launch slog2info to monitor all activities on the device");
+                }
             }
 
             private void NotifyStatusChange(TargetStatus status, string message)
