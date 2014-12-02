@@ -214,5 +214,58 @@ namespace BlackBerry.NativeCore.Helpers
 
             return result;
         }
+
+        /// <summary>
+        /// Combines two arrays into one.
+        /// </summary>
+        public static byte[] Combine(byte[] buffer, byte[] chunk, int chunkAt, int chunkLength)
+        {
+            if (buffer == null)
+            {
+                if (chunk == null)
+                {
+                    return null;
+                }
+
+                // extract only the part of the chunk:
+                var result = new byte[chunkLength];
+                Array.Copy(chunk, chunkAt, result, 0, chunkLength);
+                return result;
+            }
+
+            if (chunk == null || chunkLength == 0)
+            {
+                return buffer;
+            }
+
+            var bothArrays = new byte[buffer.Length + chunkLength];
+            Array.Copy(buffer, 0, bothArrays, 0, buffer.Length);
+            Array.Copy(chunk, 0, bothArrays, buffer.Length, chunkLength);
+            return bothArrays;
+        }
+
+        /// <summary>
+        /// Combines two arrays into one.
+        /// </summary>
+        public static byte[] Combine(byte[] buffer, int bufferAt, int bufferLength, byte[] chunk)
+        {
+            if (buffer == null || bufferLength == 0)
+            {
+                return chunk;
+            }
+
+            if (chunk == null)
+            {
+                // extract only the part of the buffer:
+                var result = new byte[bufferLength];
+                Array.Copy(buffer, bufferAt, result, 0, bufferLength);
+                return result;
+            }
+
+            var bothArrays = new byte[bufferLength + chunk.Length];
+            Array.Copy(buffer, 0, bothArrays, bufferAt, bufferLength);
+            Array.Copy(chunk, 0, bothArrays, bufferLength, chunk.Length);
+            return bothArrays;
+        }
     }
 }
