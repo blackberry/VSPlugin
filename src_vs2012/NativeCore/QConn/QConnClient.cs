@@ -96,6 +96,12 @@ namespace BlackBerry.NativeCore.QConn
             private set;
         }
 
+        public TargetServiceLauncher LauncherService
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         /// <summary>
@@ -166,6 +172,13 @@ namespace BlackBerry.NativeCore.QConn
             {
                 SysInfoService = new TargetServiceSysInfo(GetServiceVersion(connection, "sinfo"), new QConnConnection(host, port, "sinfo", Endian));
                 services.Add(SysInfoService);
+            }
+
+            LauncherService = null;
+            if (HasService(serviceNames, "launcher"))
+            {
+                LauncherService = new TargetServiceLauncher(GetServiceVersion(connection, "launcher"), new QConnConnection(host, port, "launcher", Endian));
+                services.Add(LauncherService);
             }
 
             return services.ToArray();
@@ -340,6 +353,7 @@ namespace BlackBerry.NativeCore.QConn
                     ControlService = null;
                     FileService = null;
                     ConsoleLogService = null;
+                    LauncherService = null;
                 }
             }
         }

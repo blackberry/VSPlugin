@@ -469,5 +469,36 @@ namespace UnitTests
             // and close
             qdoor.Close();
         }
+
+        [Test]
+        public void LaunchSLog2Info()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            Assert.AreEqual(Endianess.Unknown, qclient.Endian);
+            Assert.AreEqual(TargetSystemType.Unknown, qclient.System);
+            Assert.IsNotNull(qclient.Services);
+            Assert.AreEqual(0, qclient.Services.Length);
+            Assert.IsNull(qclient.Version);
+            Assert.IsNull(qclient.Name);
+            Assert.IsNull(qclient.Locale);
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.Services);
+            Assert.IsNotNull(qclient.LauncherService);
+
+            var process = qclient.LauncherService.Start("/bin/slog2info", new[] { "-w", "-W", "-s" });
+            //var process = qclient.LauncherService.Start("echo", new[] { "abcd", "def", "ghi" });
+            Assert.IsNotNull(process);
+
+            process.Join();
+
+            // and close
+            qdoor.Close();
+        }
     }
 }

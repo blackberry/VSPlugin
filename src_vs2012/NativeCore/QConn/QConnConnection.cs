@@ -308,6 +308,21 @@ namespace BlackBerry.NativeCore.QConn
         }
 
         /// <summary>
+        /// Removes the data-source from current connection and disposes it.
+        /// This is a dedicated method for accessing remote process outputs/inputs directly (see: TargetProcess) and nothing else is suppose to use it.
+        /// </summary>
+        internal QDataSource DetachDataSource()
+        {
+            // get response as proper stream-reader object with given endianess support:
+            var result = _source;
+            _source = null;
+
+            // this will make the connection object useless, throwing ObjectAlreadyDisposed() exceptions an each usage...
+            Dispose();
+            return result;
+        }
+
+        /// <summary>
         /// Converts raw response to string object, removing all controls chars and any types of TELNET negotiations.
         /// </summary>
         private static string ResponseToString(byte[] data)

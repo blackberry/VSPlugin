@@ -63,6 +63,7 @@ namespace BlackBerry.NativeCore.QConn
 
         /// <summary>
         /// Gets or sets the sending data timeout.
+        /// Caution: any negative value will disable the timeout.
         /// </summary>
         public int SendTimeout
         {
@@ -71,13 +72,14 @@ namespace BlackBerry.NativeCore.QConn
             {
                 if (_socket != null)
                 {
-                    _socket.SendTimeout = value <= 0 ? Timeout : value;
+                    _socket.SendTimeout = value == 0 ? Timeout : (value < 0 ? System.Threading.Timeout.Infinite: value);
                 }
             }
         }
 
         /// <summary>
         /// Gets or sets the receiving data timeout.
+        /// Caution: any negative value will disable the timeout.
         /// </summary>
         public int ReceiveTimeout 
         {
@@ -86,7 +88,7 @@ namespace BlackBerry.NativeCore.QConn
             {
                 if (_socket != null)
                 {
-                    _socket.ReceiveTimeout = value <= 0 ? Timeout : value;
+                    _socket.ReceiveTimeout = value == 0 ? Timeout : (value < 0 ? System.Threading.Timeout.Infinite : value);
                 }
             }
         }

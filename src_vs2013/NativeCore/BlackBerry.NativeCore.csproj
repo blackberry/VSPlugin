@@ -255,6 +255,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetFileDescriptor.cs">
       <Link>QConn\Model\TargetFileDescriptor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetProcess.cs">
+      <Link>QConn\Model\TargetProcess.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetSystemType.cs">
       <Link>QConn\Model\TargetSystemType.cs</Link>
     </Compile>
@@ -368,6 +371,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceFile.cs">
       <Link>QConn\Services\TargetServiceFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceLauncher.cs">
+      <Link>QConn\Services\TargetServiceLauncher.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceSysInfo.cs">
       <Link>QConn\Services\TargetServiceSysInfo.cs</Link>
