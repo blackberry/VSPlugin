@@ -230,12 +230,12 @@ namespace BlackBerry.NativeCore.QConn.Model
                     // is it the first line?
                     if (lineStart < 0)
                     {
-                        result.Add(GetString(lastLine, data, lineStart + 1, i));
+                        AddString(result, GetString(lastLine, data, lineStart + 1, i));
                         lastLine = null;
                     }
                     else
                     {
-                        result.Add(GetString(null, data, lineStart + 1, i - lineStart - 1));
+                        AddString(result, GetString(null, data, lineStart + 1, i - lineStart - 1));
                     }
 
                     // move the end of line marker:
@@ -244,12 +244,23 @@ namespace BlackBerry.NativeCore.QConn.Model
             }
 
             // the end of the message is not a properly finished new line:
-            if (lineStart < 0 || lineStart == data.Length - 1)
+            if (lineStart < 0 || lineStart != data.Length - 1)
             {
-                lastLine = BitHelper.Combine(data, lineStart + 1, data.Length - lineStart - 1, lastLine);
+                lastLine = BitHelper.Combine(lastLine, data, lineStart + 1, data.Length - lineStart - 1);
             }
 
             return result.Count > 0 ? result.ToArray() : null;
+        }
+
+        private void AddString(List<string> result, string message)
+        {
+            if (message == null)
+                return;
+
+            if (result.Count == 0 || string.Compare(result[result.Count - 1], message, StringComparison.Ordinal) != 0)
+            {
+                result.Add(message);
+            }
         }
 
         private string GetString(byte[] lineStart, byte[] data, int dataFrom, int dataLength)

@@ -240,7 +240,7 @@ namespace BlackBerry.NativeCore.Helpers
 
             var bothArrays = new byte[buffer.Length + chunkLength];
             Array.Copy(buffer, 0, bothArrays, 0, buffer.Length);
-            Array.Copy(chunk, 0, bothArrays, buffer.Length, chunkLength);
+            Array.Copy(chunk, chunkAt, bothArrays, buffer.Length, chunkLength);
             return bothArrays;
         }
 
@@ -263,7 +263,7 @@ namespace BlackBerry.NativeCore.Helpers
             }
 
             var bothArrays = new byte[bufferLength + chunk.Length];
-            Array.Copy(buffer, 0, bothArrays, bufferAt, bufferLength);
+            Array.Copy(buffer, bufferAt, bothArrays, 0, bufferLength);
             Array.Copy(chunk, 0, bothArrays, bufferLength, chunk.Length);
             return bothArrays;
         }
