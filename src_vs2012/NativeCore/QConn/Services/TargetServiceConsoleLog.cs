@@ -26,6 +26,8 @@ namespace BlackBerry.NativeCore.QConn.Services
             private ulong _readBytes;
             private readonly List<byte[]> _chunks;
 
+            public event EventHandler<EventArgs> Finished;
+
             /// <summary>
             /// Init constructor.
             /// </summary>
@@ -124,6 +126,9 @@ namespace BlackBerry.NativeCore.QConn.Services
                 catch (Exception ex)
                 {
                     TraceLog.WriteException(ex, "Unable to read from log file: \"{0}\"", Path);
+
+                    if (Finished != null)
+                        Finished(this, EventArgs.Empty);
                 }
 
                 return null;
@@ -166,6 +171,8 @@ namespace BlackBerry.NativeCore.QConn.Services
                     {
                         Handle.Close();
                     }
+
+                    Finished = null;
                 }
             }
 
@@ -183,7 +190,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         private const uint Interval = 800; // how often to check the remote log file for new content; in milliseconds
 
         private TargetServiceFile _fileService;
-        private readonly object _lock;
+        private readonly object _sync;
         private readonly List<LogMonitorStatus> _logMonitors;
         private Timer _keepReadingTimer;
 
@@ -197,7 +204,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                 throw new ArgumentNullException("fileService");
 
             _fileService = fileService;
-            _lock = new object();
+            _sync = new object();
             _logMonitors = new List<LogMonitorStatus>();
         }
 
@@ -259,9 +266,10 @@ namespace BlackBerry.NativeCore.QConn.Services
                 var fileHandle = _fileService.Open(logFilePath, TargetFile.ModeOpenReadOnly, uint.MaxValue, false);
                 if (fileHandle != null)
                 {
-                    lock (_lock)
+                    lock (_sync)
                     {
                         var status = new LogMonitorStatus(_fileService, logFilePath, fileHandle, process);
+                        status.Finished += OnMonitorStatusFinished;
                         _logMonitors.Add(status);
 
                         // start the timer:
@@ -280,6 +288,70 @@ namespace BlackBerry.NativeCore.QConn.Services
             return false;
         }
 
+        private void OnMonitorStatusFinished(object sender, EventArgs e)
+        {
+            var status = (LogMonitorStatus) sender;
+            status.Finished -= OnMonitorStatusFinished;
+
+            Stop(status.Process);
+        }
+
+        /// <summary>
+        /// Checks, if console outputs are specified for specified process.
+        /// </summary>
+        public bool IsMonitoring(ProcessInfo process)
+        {
+            if (process == null)
+                return false;
+
+            lock (_sync)
+            {
+                return FindNoSync(process) != null;
+            }
+        }
+
+        /// <summary>
+        /// Stops monitoring of console outputs for specified process.
+        /// </summary>
+        public bool Stop(ProcessInfo process)
+        {
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            bool killTimer = false;
+            LogMonitorStatus monitor;
+
+            lock (_sync)
+            {
+                monitor = FindNoSync(process);
+
+                if (monitor != null)
+                {
+                    _logMonitors.Remove(monitor);
+                    killTimer = _logMonitors.Count == 0;
+                }
+            }
+
+            if (killTimer)
+            {
+                if (_keepReadingTimer != null)
+                {
+                    _keepReadingTimer.Dispose();
+                    _keepReadingTimer = null;
+                }
+            }
+
+            if (monitor != null)
+            {
+                TraceLog.WriteLine("> Stopping console-logs monitor for: \"{0}\"", monitor.Path);
+                monitor.Dispose();
+
+                return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         /// Stops monitoring for all console logs.
         /// </summary>
@@ -293,7 +365,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                 _keepReadingTimer = null;
             }
 
-            lock (_lock)
+            lock (_sync)
             {
                 foreach (var monitor in _logMonitors)
                 {
@@ -305,11 +377,12 @@ namespace BlackBerry.NativeCore.QConn.Services
         }
 
         /// <summary>
-        /// Finds existing monitor that is attached to the specified log file or null.
+        /// Finds existing monitor that is attached to the specified log.
+        /// In case of non-existence it returns null.
         /// </summary>
         private LogMonitorStatus Find(string path)
         {
-            lock (_lock)
+            lock (_sync)
             {
                 foreach (var monitor in _logMonitors)
                 {
@@ -323,9 +396,29 @@ namespace BlackBerry.NativeCore.QConn.Services
             return null;
         }
 
+        /// <summary>
+        /// Finds existing monitor that is attached to the specified process.
+        /// In case of non-existence it returns null.
+        /// </summary>
+        private LogMonitorStatus FindNoSync(ProcessInfo process)
+        {
+            if (process == null)
+                return null;
+
+            foreach (var monitor in _logMonitors)
+            {
+                if (monitor.Process.ID == process.ID || string.Compare(monitor.Process.ExecutablePath, process.ExecutablePath, StringComparison.Ordinal) == 0)
+                {
+                    return monitor;
+                }
+            }
+
+            return null;
+        }
+
         private void OnReaderTick(object state)
         {
-            lock (_lock)
+            lock (_sync)
             {
                 // ask each monitor, if there are now log entries and forward them onto the console:
                 foreach (var monitor in _logMonitors)
