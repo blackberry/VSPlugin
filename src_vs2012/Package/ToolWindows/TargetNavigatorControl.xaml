@@ -131,7 +131,11 @@
                     <TextBlock Text="Variables:" Margin="0,3,10,0" VerticalAlignment="Top" Grid.Row="5" Grid.Column="0" />
                     <TextBox Text="{Binding EnvironmentVariables, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Visible" />
 
-                    <Button Content="Terminate" IsEnabled="{Binding CanTerminate}" Margin="2" Padding="5" Click="TerminateProcess_OnClick" Grid.Row="6" Grid.Column="1" HorizontalAlignment="Left" />
+                    <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1">
+                        <Button Content="Terminate" IsEnabled="{Binding CanTerminate}" Margin="2" Padding="5" Click="TerminateProcess_OnClick" HorizontalAlignment="Left" />
+                        <Button Content="Capture Console" IsEnabled="{Binding CanCapture}" Margin="2" Padding="5" Click="CaptureConsoleForProcess_OnClick" HorizontalAlignment="Left" />
+                        <Button Content="Stop Console Capture" IsEnabled="{Binding CanStopCapture}" Margin="2" Padding="5" Click="StopCaptureConsoleForProcess_OnClick" HorizontalAlignment="Left" />
+                    </StackPanel>
                 </Grid>
             </DataTemplate>
 
@@ -152,10 +156,15 @@
             <ContextMenu x:Key="ContextForTarget">
                 <MenuItem Header="Edit..." Click="EditTarget_OnClick" />
                 <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+                <MenuItem Header="Stop Console Captures" Visibility="{Binding CanDisconnect}" Click="StopConsoleCaptures_OnClick" />
                 <Separator />
+                <MenuItem Header="Connect" Click="ConnectTarget_OnClick" />
                 <MenuItem Header="Disconnect" Click="DisconnectTarget_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForProcess">
+                <MenuItem Header="Capture Console" IsEnabled="{Binding CanCapture}" Click="CaptureConsoleForProcess_OnClick" />
+                <MenuItem Header="Stop Console Capture" IsEnabled="{Binding CanStopCapture}" Click="StopCaptureConsoleForProcess_OnClick" />
+                <Separator />
                 <MenuItem Header="Terminate" IsEnabled="{Binding CanTerminate}" Click="TerminateProcess_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForFile">

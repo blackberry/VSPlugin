@@ -69,7 +69,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
                 case TargetStatus.Connected:
                     items = new BaseViewItem[]
                         {
-                            new ProcessListViewItem(ViewModel, e.Client.SysInfoService, e.Client.ControlService),
+                            new ProcessListViewItem(ViewModel, e.Device, e.Client.SysInfoService, e.Client.ControlService),
                             new FileSystemViewItem(ViewModel, "Sandboxes", e.Client.FileService, "/accounts/1000/appdata", file => !file.NoAccess),
                             new FileSystemViewItem(ViewModel, "Shared", e.Client.FileService, "/accounts/1000/shared", null),
                             new FileSystemViewItem(ViewModel, "Developer", e.Client.FileService, "/accounts/devuser", null), 

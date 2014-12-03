@@ -54,6 +54,26 @@ namespace BlackBerry.Package.ToolWindows
             }
         }
 
+        private void CaptureConsoleForProcess_OnClick(object sender, RoutedEventArgs e)
+        {
+            var process = GetViewItem(sender) as ProcessViewItem;
+
+            if (process != null)
+            {
+                process.CaptureConsole();
+            }
+        }
+
+        private void StopCaptureConsoleForProcess_OnClick(object sender, RoutedEventArgs e)
+        {
+            var process = GetViewItem(sender) as ProcessViewItem;
+
+            if (process != null)
+            {
+                process.StopCaptureConsole();
+            }
+        }
+
         private void TreeView_OnMouseRightButtonUp(object sender, MouseButtonEventArgs e)
         {
             var item = FindVisualUpward(e.OriginalSource as DependencyObject);
@@ -120,6 +140,29 @@ namespace BlackBerry.Package.ToolWindows
             if (selectedTarget != null)
             {
                 selectedTarget.EditProperties();
+            }
+        }
+
+        private void StopConsoleCaptures_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedTarget = GetViewItem(sender) as TargetViewItem;
+
+            if (selectedTarget != null)
+            {
+                // stop all console logs processing:
+                Targets.TraceStop(selectedTarget.Device);
+            }
+        }
+
+        private void ConnectTarget_OnClick(object sender, RoutedEventArgs e)
+        {
+            var selectedTarget = GetViewItem(sender) as TargetViewItem;
+
+            if (selectedTarget != null)
+            {
+                // enforce expanions, that will internally force another Connect() request:
+                selectedTarget.IsExpanded = false;
+                selectedTarget.IsExpanded = true;
             }
         }
 
