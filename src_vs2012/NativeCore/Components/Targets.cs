@@ -225,11 +225,25 @@ namespace BlackBerry.NativeCore.Components
                     if (SLog2Info == null)
                     {
                         SLog2Info = Client.LauncherService.Start("/bin/slog2info", new[] { "-w", "-W", "-s" });
+
+                        if (SLog2Info != null)
+                        {
+                            SLog2Info.Finished += OnSLog2InfoFinished;
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
                     TraceLog.WriteException(ex, "Unable to launch slog2info to monitor all activities on the device");
+                }
+            }
+
+            private void OnSLog2InfoFinished(object sender, EventArgs e)
+            {
+                if (SLog2Info != null)
+                {
+                    SLog2Info.Finished -= OnSLog2InfoFinished;
+                    SLog2Info = null;
                 }
             }
 
@@ -259,6 +273,14 @@ namespace BlackBerry.NativeCore.Components
             public TargetConnectionEventArgs ToEventArgs()
             {
                 return new TargetConnectionEventArgs(Device, Client, Status, null);
+            }
+
+            /// <summary>
+            /// Method to verify internal state, when another connection is supposed to be opened to this target.
+            /// </summary>
+            public void NewConnectionRequested()
+            {
+                InitializeSLog2Info();
             }
         }
 
@@ -415,6 +437,8 @@ namespace BlackBerry.NativeCore.Components
                 }
                 else
                 {
+                    existingTarget.NewConnectionRequested();
+
                     if (resultHandler != null)
                     {
                         existingTarget.StatusChanged += resultHandler;
@@ -425,7 +449,7 @@ namespace BlackBerry.NativeCore.Components
             // check if already connected:
             if (existingTarget != null)
             {
-                // and notify the caller:
+                // and notify the caller (it was already mounted to monitor the future status changes):
                 if (resultHandler != null)
                 {
                     resultHandler.BeginInvoke(null, existingTarget.ToEventArgs(), StatusHandlerAsyncCleanup, resultHandler);

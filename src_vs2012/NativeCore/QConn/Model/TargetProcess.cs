@@ -20,6 +20,8 @@ namespace BlackBerry.NativeCore.QConn.Model
         private bool _isSuspended;
         private Thread _monitoringThread;
 
+        public event EventHandler<EventArgs> Finished;
+
         /// <summary>
         /// Init constructor.
         /// </summary>
@@ -176,6 +178,11 @@ namespace BlackBerry.NativeCore.QConn.Model
 
             // done...
             _monitoringThread = null;
+
+            if (Finished != null)
+            {
+                Finished(this, EventArgs.Empty);
+            }
         }
 
         private void ReadOutputs()
