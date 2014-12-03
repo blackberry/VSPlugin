@@ -220,7 +220,7 @@ namespace BlackBerry.NativeCore.Debugger
 
         private static void GdbRunnerResponseReceived(object sender, ResponseReceivedEventArgs e)
         {
-            // process the data only of asychronous responses:
+            // process the data only of asynchronous responses:
             if (IsAsync(e.Response))
             {
                 Instruction instruction;
