@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.QConn;
@@ -224,7 +225,7 @@ namespace BlackBerry.NativeCore.Components
                 {
                     if (SLog2Info == null)
                     {
-                        SLog2Info = Client.LauncherService.Start("/bin/slog2info", new[] { "-w", "-W", "-s" });
+                        SLog2Info = Client.LauncherService.Start("/bin/slog2info", new[] { "-n", "-W", "-s" });
 
                         if (SLog2Info != null)
                         {
@@ -646,6 +647,135 @@ namespace BlackBerry.NativeCore.Components
                     Disconnect(target.Device);
                 }
             }
+        }
+
+        /// <summary>
+        /// Starts tracing console output for specified process on a target device.
+        /// It will fail, if not connected to that device before.
+        /// </summary>
+        public static bool Trace(string ip, ProcessInfo process)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            var qClient = Get(ip);
+            if (qClient == null || qClient.FileService == null || qClient.ConsoleLogService == null)
+            {
+                TraceLog.WarnLine("Unable to start tracing console outputs for: {0}:\"{1}\"", process.ID, process.ExecutablePath);
+                return false;
+            }
+
+            // start monitoring for console logs:
+            return qClient.ConsoleLogService.Start(process);
+        }
+
+        /// <summary>
+        /// Starts tracing console output for specified process on a target device.
+        /// It will fail, if not connected to that device before.
+        /// </summary>
+        public static bool Trace(DeviceDefinition device, ProcessInfo process)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return Trace(device.IP, process);
+        }
+
+        /// <summary>
+        /// Stops tracing console output from all processes on a given target device.
+        /// </summary>
+        public static bool TraceStop(DeviceDefinition device)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            return TraceStop(device.IP);
+        }
+
+        /// <summary>
+        /// Stops tracing console output from specified process on a given target device.
+        /// </summary>
+        public static bool TraceStop(DeviceDefinition device, ProcessInfo process)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return TraceStop(device.IP, process);
+        }
+
+        /// <summary>
+        /// Stops tracing console output from all processes on a given target device.
+        /// </summary>
+        public static bool TraceStop(string ip)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+
+            var qClient = Get(ip);
+            if (qClient != null)
+            {
+                qClient.ConsoleLogService.StopAll();
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Stops tracing console outputs from specified process on a given target device.
+        /// </summary>
+        public static bool TraceStop(string ip, ProcessInfo process)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            var qClient = Get(ip);
+            if (qClient != null)
+            {
+                return qClient.ConsoleLogService.Stop(process);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks, whether specified process' console output is traced.
+        /// </summary>
+        public static bool TraceIs(DeviceDefinition device, ProcessInfo process)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return TraceIs(device.IP, process);
+        }
+
+        /// <summary>
+        /// Checks, whether specified process' console output is traced.
+        /// </summary>
+        public static bool TraceIs(string ip, ProcessInfo process)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            var qClient = Get(ip);
+            if (qClient != null)
+            {
+                return qClient.ConsoleLogService.IsMonitoring(process);
+            }
+
+            return false;
         }
     }
 }

@@ -163,7 +163,7 @@ namespace BlackBerry.NativeCore.Debugger
                     pidNumber = existingProcess.ID;
 
                     // start monitoring for console logs:
-                    qClient.ConsoleLogService.Start(existingProcess);
+                    Targets.Trace(device, existingProcess);
                 }
                 else
                 {
@@ -175,15 +175,8 @@ namespace BlackBerry.NativeCore.Debugger
             {
                 if (existingProcessOrNull != null)
                 {
-                    // this should succeed as we already used GDB successfully, so secure communication is working...
-                    var qClient = Targets.Get(device);
-                    if (qClient == null || qClient.FileService == null)
-                    {
-                        throw new InvalidOperationException("Missing the client connected to target - this should never happen");
-                    }
-
                     // start monitoring for console logs:
-                    qClient.ConsoleLogService.Start(existingProcessOrNull);
+                    Targets.Trace(device, existingProcessOrNull);
                 }
             }
 
@@ -296,11 +289,8 @@ namespace BlackBerry.NativeCore.Debugger
         {
             if (_gdbRunner != null)
             {
-                var qClient = Targets.Get(_gdbRunner.GDB.Device);
-                if (qClient != null)
-                {
-                    qClient.ConsoleLogService.StopAll();
-                }
+                // stop all tracing for specified device:
+                Targets.TraceStop(_gdbRunner.GDB.Device);
 
                 _gdbRunner.Finished -= GdbRunnerUnexpectedlyFinished;
                 _gdbRunner.Dispose();
