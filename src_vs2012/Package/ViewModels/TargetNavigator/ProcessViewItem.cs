@@ -93,12 +93,12 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
 
         public bool CanCapture
         {
-            get { return !Targets.TraceIs(_device, _process); }
+            get { return CanTerminate && !Targets.TraceIs(_device, _process); }
         }
 
         public bool CanStopCapture
         {
-            get { return Targets.TraceIs(_device, _process); }
+            get { return CanTerminate && Targets.TraceIs(_device, _process); }
         }
 
         #endregion
@@ -116,6 +116,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
                 {
                     try
                     {
+                        Targets.TraceStop(_device, _process);
                         _service.Terminate(_process);
                     }
                     catch (Exception ex)
