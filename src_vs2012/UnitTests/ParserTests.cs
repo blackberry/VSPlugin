@@ -1,5 +1,6 @@
 ﻿using System;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.QConn.Model;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -398,6 +399,30 @@ Token=44444444444444444444444444\=\=";
             Assert.IsNotNull(result);
             Assert.AreEqual(new DateTime(2013, 9, 2, 6, 43, 07, DateTimeKind.Utc), result.CreatedAt);
             Assert.AreEqual("3", result.Version);
+        }
+
+        [Test]
+        public void ParseSLog2InfoOutput()
+        {
+            const string slog2output = @"
+Dec 04 03:05:54.082 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383209714                           0  0  -----ONLINE-----
+Dec 04 03:05:54.082 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383209714              default*  8900  5  PPS helper initialized for thread
+Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370              default   8900  5  PPS helper destructor
+Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370              default   8900  5  BPS shutdown
+Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370              default   8900  5  Shutting down navigator
+Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370              default   8900  5  navigator_thread quitting
+";
+
+            var entries = TargetLogEntry.ParseSLog2(slog2output.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+
+            Assert.IsNotNull(entries);
+            Assert.AreEqual(6, entries.Length);
+
+            var lastItem = entries[entries.Length - 1];
+            Assert.AreEqual(383152370, lastItem.PID);
+            Assert.AreEqual("navigator_thread quitting", lastItem.Message);
+            Assert.AreEqual("default", lastItem.BufferSet);
+            Assert.AreEqual("com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370", lastItem.AppID);
         }
     }
 }

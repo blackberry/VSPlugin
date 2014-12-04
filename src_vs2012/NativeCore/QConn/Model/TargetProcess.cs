@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Text;
 using System.Threading;
 using BlackBerry.NativeCore.Diagnostics;
-using BlackBerry.NativeCore.Helpers;
 using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.QConn.Model
@@ -12,7 +8,7 @@ namespace BlackBerry.NativeCore.QConn.Model
     /// <summary>
     /// Class providing information about manually started process.
     /// </summary>
-    public sealed class TargetProcess : IDisposable
+    public class TargetProcess : IDisposable
     {
         private TargetServiceLauncher _service;
         private QConnConnection _connection;
@@ -110,7 +106,10 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         #region IDisposable Implementation
 
-        private void Dispose(bool disposing)
+        /// <summary>
+        /// Disposing used resources.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
@@ -183,12 +182,16 @@ namespace BlackBerry.NativeCore.QConn.Model
             {
                 Finished(this, EventArgs.Empty);
             }
+
+            Dispose();
         }
 
+        /// <summary>
+        /// Reads raw binary data from running processes output-stream.
+        /// </summary>
         private void ReadOutputs()
         {
-            byte[] data;
-            byte[] lastLine = null;
+            ProcessOutputInitialize();
 
             while (true)
             {
@@ -198,81 +201,54 @@ namespace BlackBerry.NativeCore.QConn.Model
                     return;
                 }
 
+                byte[] data;
                 var result = _dataSource.Receive(int.MaxValue, out data);
                 switch (result)
                 {
                     case HResult.OK:
-                        // new data arrived, split it into lines of text:
-                        var logEntries = ReadLines(data, ref lastLine);
 
-                        // and print:
-                        if (logEntries != null)
+                        if (data != null && data.Length > 0)
                         {
-                            foreach (var message in logEntries)
+                            // new data arrived, process it somehow:
+                            if (ProcessOutputData(result, data))
                             {
-                                TraceLog.WriteLine(message);
-                                Trace.WriteLine(message, TraceLog.CategoryDevice);
+                                ProcessOutputDone();
+                                return;
                             }
                         }
                         break;
                     default:
                         QTraceLog.WriteLine("Finishing monitoring remote process outputs, result: " + result);
+                        ProcessOutputDone();
                         return;
                 }
             }
         }
 
-        private string[] ReadLines(byte[] data, ref byte[] lastLine)
+        #region Virtual Methods
+
+        /// <summary>
+        /// Method called once, when preparing to receive running processes output stream.
+        /// </summary>
+        protected virtual void ProcessOutputInitialize()
         {
-            if (data == null || data.Length == 0)
-                return null;
-
-            var result = new List<string>();
-            int lineStart = -1;
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                if (data[i] == 10) // '\n'
-                {
-                    // is it the first line?
-                    if (lineStart < 0)
-                    {
-                        AddString(result, GetString(lastLine, data, lineStart + 1, i));
-                        lastLine = null;
-                    }
-                    else
-                    {
-                        AddString(result, GetString(null, data, lineStart + 1, i - lineStart - 1));
-                    }
-
-                    // move the end of line marker:
-                    lineStart = i + 1 < data.Length && data[i + 1] == 13 ? i + 1 : i;
-                }
-            }
-
-            // the end of the message is not a properly finished new line:
-            if (lineStart < 0 || lineStart != data.Length - 1)
-            {
-                lastLine = BitHelper.Combine(lastLine, data, lineStart + 1, data.Length - lineStart - 1);
-            }
-
-            return result.Count > 0 ? result.ToArray() : null;
         }
 
-        private void AddString(List<string> result, string message)
+        /// <summary>
+        /// Method called in a loop to perform actions over received output data.
+        /// </summary>
+        protected virtual bool ProcessOutputData(HResult result, byte[] data)
         {
-            if (message == null)
-                return;
-
-            if (result.Count == 0 || string.Compare(result[result.Count - 1], message, StringComparison.Ordinal) != 0)
-            {
-                result.Add(message);
-            }
+            return false;
         }
 
-        private string GetString(byte[] lineStart, byte[] data, int dataFrom, int dataLength)
+        /// <summary>
+        /// Method called once, when cleaning up after running process terminated and no output data will be delivered.
+        /// </summary>
+        protected virtual void ProcessOutputDone()
         {
-            return Encoding.UTF8.GetString(BitHelper.Combine(lineStart, data, dataFrom, dataLength));
         }
+
+        #endregion
     }
 }

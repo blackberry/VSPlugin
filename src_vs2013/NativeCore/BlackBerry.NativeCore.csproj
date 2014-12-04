@@ -228,6 +228,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\HResult.cs">
       <Link>QConn\HResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\CapturedLogsEventArgs.cs">
+      <Link>QConn\Model\CapturedLogsEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\DataReaderBigEndian.cs">
       <Link>QConn\Model\DataReaderBigEndian.cs</Link>
     </Compile>
@@ -255,8 +258,14 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetFileDescriptor.cs">
       <Link>QConn\Model\TargetFileDescriptor.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetLogEntry.cs">
+      <Link>QConn\Model\TargetLogEntry.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetProcess.cs">
       <Link>QConn\Model\TargetProcess.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetProcessSLog2Info.cs">
+      <Link>QConn\Model\TargetProcessSLog2Info.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetSystemType.cs">
       <Link>QConn\Model\TargetSystemType.cs</Link>

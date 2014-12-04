@@ -69,7 +69,7 @@ namespace BlackBerry.NativeCore.Components
                 private set;
             }
 
-            public TargetProcess SLog2Info
+            public TargetProcessSLog2Info SLog2Info
             {
                 get;
                 private set;
@@ -114,6 +114,10 @@ namespace BlackBerry.NativeCore.Components
 
                     if (Client != null)
                     {
+                        if (Client.ConsoleLogService != null)
+                        {
+                            Client.ConsoleLogService.Captured -= OnRemoteLogsCaptured;
+                        }
                         Client.Dispose();
                         Client = null;
                     }
@@ -157,7 +161,7 @@ namespace BlackBerry.NativeCore.Components
                 try
                 {
                     Client.Load(Device.IP, QConnClient.DefaultPort, 1000);
-                    InitializeSLog2Info();
+                    InitializeLogServices();
 
                     // all is fine, connection established, no need to have own QConnDoor
                     NotifyStatusChange(TargetStatus.Connected, null);
@@ -181,6 +185,7 @@ namespace BlackBerry.NativeCore.Components
                     try
                     {
                         Client.Load(Device.IP);
+                        InitializeLogServices();
                     }
                     catch (Exception ex)
                     {
@@ -200,7 +205,6 @@ namespace BlackBerry.NativeCore.Components
                         NotifyStatusChange(TargetStatus.Failed, "Lost connection to the device");
                     }
 
-                    InitializeSLog2Info();
                 }
                 else
                 {
@@ -218,17 +222,25 @@ namespace BlackBerry.NativeCore.Components
                 OnChildConnectionStatusChanged(this, Status);
             }
 
-            private void InitializeSLog2Info()
+            private void InitializeLogServices()
             {
+                // setup console logging:
+                if (Client != null && Client.ConsoleLogService != null)
+                {
+                    Client.ConsoleLogService.Captured -= OnRemoteLogsCaptured;
+                    Client.ConsoleLogService.Captured += OnRemoteLogsCaptured;
+                }
+
                 // setup slog2info monitor to grab all the logs from the device:
                 try
                 {
-                    if (SLog2Info == null)
+                    if (Client != null && Client.LauncherService != null && SLog2Info == null)
                     {
-                        SLog2Info = Client.LauncherService.Start("/bin/slog2info", new[] { "-n", "-W", "-s" });
+                        SLog2Info = Client.LauncherService.Start<TargetProcessSLog2Info>("/bin/slog2info", new[] { "-n", "-W", "-s" });
 
                         if (SLog2Info != null)
                         {
+                            SLog2Info.Captured += OnRemoteLogsCaptured;
                             SLog2Info.Finished += OnSLog2InfoFinished;
                         }
                     }
@@ -243,8 +255,34 @@ namespace BlackBerry.NativeCore.Components
             {
                 if (SLog2Info != null)
                 {
+                    SLog2Info.Captured -= OnRemoteLogsCaptured;
                     SLog2Info.Finished -= OnSLog2InfoFinished;
                     SLog2Info = null;
+                }
+            }
+
+            private static void PrintLog(string message)
+            {
+                TraceLog.WriteLine(message);
+                System.Diagnostics.Trace.WriteLine(message, TraceLog.CategoryDevice);
+            }
+
+            private void OnRemoteLogsCaptured(object sender, CapturedLogsEventArgs e)
+            {
+                foreach (var log in e.Entries)
+                {
+                    // print each console log and slog2 log, which matches the PID with console one:
+                    if (log.Type == TargetLogEntry.LogType.Console || log.PID == 0 || (Client.ConsoleLogService.IsMonitoring(log.PID) && log.BufferSet == "default"))
+                    {
+                        if (log.Type == TargetLogEntry.LogType.SLog2 && string.IsNullOrEmpty(log.BufferSet))
+                        {
+                            PrintLog(string.Concat(log.Message, " (", log.AppID, ")"));
+                        }
+                        else
+                        {
+                            PrintLog(log.Message);
+                        }
+                    }
                 }
             }
 
@@ -281,7 +319,7 @@ namespace BlackBerry.NativeCore.Components
             /// </summary>
             public void NewConnectionRequested()
             {
-                InitializeSLog2Info();
+                InitializeLogServices();
             }
         }
 

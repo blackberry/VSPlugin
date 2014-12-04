@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using BlackBerry.NativeCore.Debugger.Model;
@@ -90,6 +89,8 @@ namespace BlackBerry.NativeCore.QConn.Services
                 try
                 {
                     const int ChunkSize = 20 * 1024;
+
+                    _chunks.Clear();
 
                     // read one or more available chunks of data from the file, than glue them into one buffer,
                     // convert to UTF8 string and split per lines:
@@ -192,7 +193,13 @@ namespace BlackBerry.NativeCore.QConn.Services
         private TargetServiceFile _fileService;
         private readonly object _sync;
         private readonly List<LogMonitorStatus> _logMonitors;
+        private uint[] _processIDs;
         private Timer _keepReadingTimer;
+
+        /// <summary>
+        /// Event notifying that new console log entries are available for processing.
+        /// </summary>
+        public event EventHandler<CapturedLogsEventArgs> Captured;
 
         /// <summary>
         /// Init constructor.
@@ -206,6 +213,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             _fileService = fileService;
             _sync = new object();
             _logMonitors = new List<LogMonitorStatus>();
+            UpdateProcessIDsNoSync();
         }
 
         protected override void Dispose(bool disposing)
@@ -219,8 +227,21 @@ namespace BlackBerry.NativeCore.QConn.Services
                 _fileService = null;
             }
 
+            Captured = null;
             base.Dispose(disposing);
         }
+
+        #region Properties
+
+        /// <summary>
+        /// Gets an array of PIDs of monitored logs.
+        /// </summary>
+        public uint[] ProcessIDs
+        {
+            get { return _processIDs; }
+        }
+
+        #endregion
 
         /// <summary>
         /// Starts monitoring of the logs printed on console for specified process.
@@ -271,6 +292,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                         var status = new LogMonitorStatus(_fileService, logFilePath, fileHandle, process);
                         status.Finished += OnMonitorStatusFinished;
                         _logMonitors.Add(status);
+                        UpdateProcessIDsNoSync();
 
                         // start the timer:
                         if (_keepReadingTimer == null)
@@ -329,6 +351,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                 {
                     _logMonitors.Remove(monitor);
                     killTimer = _logMonitors.Count == 0;
+                    UpdateProcessIDsNoSync();
                 }
             }
 
@@ -373,7 +396,22 @@ namespace BlackBerry.NativeCore.QConn.Services
                 }
 
                 _logMonitors.Clear();
+                UpdateProcessIDsNoSync();
             }
+        }
+
+        /// <summary>
+        /// Checks, if log file for specified process is monitored.
+        /// </summary>
+        public bool IsMonitoring(uint processID)
+        {
+            for (int i = 0; i < _processIDs.Length; i++)
+            {
+                if (_processIDs[i] == processID)
+                    return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -416,6 +454,21 @@ namespace BlackBerry.NativeCore.QConn.Services
             return null;
         }
 
+        private void UpdateProcessIDsNoSync()
+        {
+            // copy the PIDs into separate array:
+            var newArray = new uint[_logMonitors.Count];
+            for (int i = 0; i < _logMonitors.Count; i++)
+            {
+                newArray[i] = _logMonitors[i].Process.ID;
+            }
+
+            // PH: and replace the whole array,
+            //     since this array changes rarely, thanks to this trick, none of the external code,
+            //     which only enumerates over this array need any sync-locks!
+            _processIDs = newArray;
+        }
+
         private void OnReaderTick(object state)
         {
             lock (_sync)
@@ -424,12 +477,13 @@ namespace BlackBerry.NativeCore.QConn.Services
                 foreach (var monitor in _logMonitors)
                 {
                     var logEntries = monitor.Read();
-                    if (logEntries != null)
+                    if (logEntries != null && Captured != null)
                     {
-                        foreach (var message in logEntries)
+                        var targetLogs = TargetLogEntry.ParseConsole(monitor.Process, logEntries);
+
+                        if (targetLogs != null)
                         {
-                            TraceLog.WriteLine(message);
-                            Trace.WriteLine(message, TraceLog.CategoryDevice);
+                            Captured(this, new CapturedLogsEventArgs(targetLogs));
                         }
                     }
                 }

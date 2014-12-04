@@ -36,19 +36,30 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Executes specified command on a target device.
         /// </summary>
-        public TargetProcess Start(string command, string[] arguments)
+        public T Start<T>(string command, string[] arguments) where T : TargetProcess
         {
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
 
-            return Start(command, arguments, null, null, string.Empty, LaunchDefault);
+            return Start<T>(command, arguments, null, null, string.Empty, LaunchDefault);
         }
 
         /// <summary>
         /// Executes specified command on a target device.
         /// </summary>
-        public TargetProcess Start(string command, string[] arguments, IEnumerable<KeyValuePair<string, string>> environmentVariables, string workingDirectory, string pty,
-            uint flags)
+        public TargetProcess Start(string command, string[] arguments)
+        {
+            if (string.IsNullOrEmpty(command))
+                throw new ArgumentNullException("command");
+
+            return Start<TargetProcess>(command, arguments, null, null, string.Empty, LaunchDefault);
+        }
+
+        /// <summary>
+        /// Executes specified command on a target device.
+        /// </summary>
+        public T Start<T>(string command, string[] arguments, IEnumerable<KeyValuePair<string, string>> environmentVariables, string workingDirectory, string pty, uint flags)
+            where T : TargetProcess
         {
             if (string.IsNullOrEmpty(command))
                 throw new ArgumentNullException("command");
@@ -124,7 +135,8 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (startupResult != null && startupResult.StartsWith("ok ", StringComparison.OrdinalIgnoreCase)
                 && uint.TryParse(startupResult.Substring(3), out pid))
             {
-                return new TargetProcess(this, newConnection, pid, (flags & LaunchSuspended) == LaunchSuspended);
+                // create new instance of the class wrapping process functionalities:
+                return (T)Activator.CreateInstance(typeof(T), this, newConnection, pid, (flags & LaunchSuspended) == LaunchSuspended);
             }
 
             QTraceLog.WriteLine("Failed to startup the command, result: {0}", startupResult);
