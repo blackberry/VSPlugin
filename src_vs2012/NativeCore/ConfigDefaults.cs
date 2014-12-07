@@ -42,7 +42,6 @@ namespace BlackBerry.NativeCore
         public static readonly string InstallationConfigDirectory;
         public static readonly string SupplementaryPlayBookInstallationConfigDirectory;
         public static readonly string SshPublicKeyPath;
-        public static readonly string BuildDebugNativePath;
         public static readonly string GdbHostPath;
 
         private const string FieldQnxToolsPath = "QNXToolsPath";
@@ -139,7 +138,6 @@ namespace BlackBerry.NativeCore
             PluginInstallationConfigDirectory = Path.Combine(DataDirectory, "VSPlugin", "qconfig");
 
             SshPublicKeyPath = Path.Combine(DataDirectory, "bbt_id_rsa.pub");
-            BuildDebugNativePath = Path.Combine(DataDirectory, "vsndk-debugNative.txt");
 
 #if DEBUG
             // PH: INFO: here is a small trick - since we develop this plugin in 'debug build', we also overwrite in that build
