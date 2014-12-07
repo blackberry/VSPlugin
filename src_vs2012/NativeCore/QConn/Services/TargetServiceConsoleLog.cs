@@ -82,6 +82,14 @@ namespace BlackBerry.NativeCore.QConn.Services
             #endregion
 
             /// <summary>
+            /// Resets the reading offset to start logs from the beginning.
+            /// </summary>
+            public void Reset()
+            {
+                _readBytes = 0;
+            }
+
+            /// <summary>
             /// Read all new log entries, if available or null.
             /// </summary>
             public string[] Read()
@@ -281,7 +289,9 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             TraceLog.WriteLine("> Log file: \"{0}\"", logFilePath);
 
-            if (Find(logFilePath) == null)
+            var existingMonitor = Find(logFilePath);
+
+            if (existingMonitor == null)
             {
                 // open the file:
                 var fileHandle = _fileService.Open(logFilePath, TargetFile.ModeOpenReadOnly, uint.MaxValue, false);
@@ -289,9 +299,9 @@ namespace BlackBerry.NativeCore.QConn.Services
                 {
                     lock (_sync)
                     {
-                        var status = new LogMonitorStatus(_fileService, logFilePath, fileHandle, process);
-                        status.Finished += OnMonitorStatusFinished;
-                        _logMonitors.Add(status);
+                        var monitor = new LogMonitorStatus(_fileService, logFilePath, fileHandle, process);
+                        monitor.Finished += OnMonitorStatusFinished;
+                        _logMonitors.Add(monitor);
                         UpdateProcessIDsNoSync();
 
                         // start the timer:
@@ -306,7 +316,8 @@ namespace BlackBerry.NativeCore.QConn.Services
                 return false;
             }
 
-            TraceLog.WarnLine("> Warning: Log file is already monitored: \"{0}\"", logFilePath);
+            existingMonitor.Reset();
+            TraceLog.WarnLine("> Warning: Log file is already monitored, resetting: \"{0}\"", logFilePath);
             return false;
         }
 
