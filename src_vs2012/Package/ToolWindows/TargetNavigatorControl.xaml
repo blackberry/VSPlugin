@@ -133,8 +133,8 @@
 
                     <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1">
                         <Button Content="Terminate" IsEnabled="{Binding CanTerminate}" Margin="2" Padding="5" Click="TerminateProcess_OnClick" HorizontalAlignment="Left" />
-                        <Button Content="Capture Console" IsEnabled="{Binding CanCapture}" Margin="2" Padding="5" Click="CaptureConsoleForProcess_OnClick" HorizontalAlignment="Left" />
-                        <Button Content="Stop Console Capture" IsEnabled="{Binding CanStopCapture}" Margin="2" Padding="5" Click="StopCaptureConsoleForProcess_OnClick" HorizontalAlignment="Left" />
+                        <Button Content="Capture Logs" IsEnabled="{Binding CanCapture}" Margin="2" Padding="5" Click="CaptureConsoleForProcess_OnClick" HorizontalAlignment="Left" />
+                        <Button Content="Stop Logs Capture" IsEnabled="{Binding CanStopCapture}" Margin="2" Padding="5" Click="StopCaptureConsoleForProcess_OnClick" HorizontalAlignment="Left" />
                     </StackPanel>
                 </Grid>
             </DataTemplate>
