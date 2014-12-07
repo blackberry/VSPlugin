@@ -24,6 +24,11 @@ namespace BlackBerry.BuildTasks
     {
         #region Member Variable Declaration
 
+        private const string RunInfoFileName = "vsndk-runinfo.flag";
+        private const string LogInfo_Lanuching = "Info: Launching ";
+        private const string LogInfo_ProcessID = "result::";
+        private const string LogInfo_ProcessIDRunning = "result::running,";
+
         private const string GET_FILE = "GetFile";
         private const string GET_FILE_SAVE_AS = "GetFileSaveAs";
         private const string PUT_FILE = "PutFile";
@@ -42,6 +47,9 @@ namespace BlackBerry.BuildTasks
         private string _flagFile;
 
         private StreamWriter _localLogWriter;
+
+        private string _packageName; // actual_dname of installed package
+        private uint _processID; // ID of the launched process
 
         #endregion
 
@@ -90,12 +98,27 @@ namespace BlackBerry.BuildTasks
                 _localLogWriter.WriteLine("Info: Generating list of applications from the device ({0})", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
             }
 
+            // delete the run-info file:
+            if (File.Exists(RunInfoFileName))
+            {
+                File.Delete(RunInfoFileName);
+            }
+
+            _packageName = null;
+            _processID = 0;
+
             var result = base.ExecuteTool(pathToTool, responseFileCommands, commandLineCommands);
 
             if (_localLogWriter != null)
             {
                 _localLogWriter.Dispose();
                 _localLogWriter = null;
+            }
+
+            // create run-info file, if proper info was extracted from logs:
+            if (!string.IsNullOrEmpty(_packageName) && _processID != 0)
+            {
+                File.WriteAllText(RunInfoFileName, string.Concat("dname=", _packageName, Environment.NewLine, "pid=", _processID, Environment.NewLine));
             }
 
             return result;
@@ -115,7 +138,46 @@ namespace BlackBerry.BuildTasks
                 return;
             }
 
+            // preprocess the 'install' part returned by the deployment tool
+            // (since we install whole .bar file or only selected files, when optimized deploy is on,
+            // we can't trust the 'BAR build' part of it):
+            if (string.IsNullOrEmpty(_packageName) && singleLine.StartsWith(LogInfo_Lanuching))
+            {
+                int dots = CountAtEnd(singleLine, '.');
+                _packageName = singleLine.Substring(LogInfo_Lanuching.Length, singleLine.Length - LogInfo_Lanuching.Length - dots);
+            }
+
+            // expect PID, after the package name:
+            if (!string.IsNullOrEmpty(_packageName) && _processID == 0 && singleLine.StartsWith(LogInfo_ProcessID))
+            {
+                uint.TryParse(singleLine.Substring(LogInfo_ProcessID.Length), out _processID);
+            }
+            if (!string.IsNullOrEmpty(_packageName) && _processID == 0 && singleLine.StartsWith(LogInfo_ProcessIDRunning))
+            {
+                uint.TryParse(singleLine.Substring(LogInfo_ProcessIDRunning.Length), out _processID);
+            }
+
             base.LogEventsFromTextOutput(singleLine, messageImportance);
+        }
+
+        /// <summary>
+        /// Counts occurrences of specified char at the end given text.
+        /// </summary>
+        private static int CountAtEnd(string text, char c)
+        {
+            if (string.IsNullOrEmpty(text))
+                return 0;
+
+            int i = text.Length - 1;
+            int result = 0;
+
+            while (i > 0 && text[i] == c)
+            {
+                result++;
+                i--;
+            }
+
+            return result;
         }
 
         /// <summary>
