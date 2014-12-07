@@ -18,7 +18,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
@@ -48,6 +47,114 @@ namespace BlackBerry.Package.Components
     /// </summary>
     internal sealed class BuildPlatformsManager
     {
+        #region Internal Classes
+
+        /// <summary>
+        /// Class carrying arguments required to attach to console logs for specified process.
+        /// </summary>
+        sealed class LogAttachRequest
+        {
+            /// <summary>
+            /// Init constructor.
+            /// </summary>
+            public LogAttachRequest(Project project, uint pid)
+            {
+                if (project == null)
+                    throw new ArgumentNullException("project");
+
+                PID = pid;
+                Project = project;
+            }
+
+            #region Properties
+
+            /// <summary>
+            /// Gets the process ID to start capturing logs.
+            /// </summary>
+            public uint PID
+            {
+                get;
+                private set;
+            }
+
+            public Project Project
+            {
+                get;
+                private set;
+            }
+
+            #endregion
+
+            /// <summary>
+            /// Issues request to attach to running process and capture output logs.
+            /// </summary>
+            public void Attach(DeviceDefinition device)
+            {
+                if (device == null)
+                    throw new ArgumentNullException("device");
+
+                Targets.Connect(device, OnConnected);
+            }
+
+            private void OnConnected(object sender, TargetConnectionEventArgs e)
+            {
+                if (e.Status == TargetStatus.Connected)
+                {
+                    Targets.Unsubscribe(e.Device, OnConnected);
+
+                    var process = e.Client.SysInfoService.FindProcess(PID);
+                    if (process != null)
+                    {
+                        Targets.Trace(e.Device, process);
+                    }
+                    else
+                    {
+                        TraceLog.WarnLine("Process to capture logs doesn't exist anymore.");
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Creates new request to attach to output logs.
+            /// </summary>
+            public static LogAttachRequest Create(Project project)
+            {
+                if (project == null)
+                    throw new ArgumentNullException("project");
+
+                // deployment was done, look for a file with run info:
+                // (HINT: this file is created by BBDeploy task, as a result of successful .bar file deployment and launch)
+                var runInfoFileName = ProjectHelper.GetFlagFileNameForRunInfo(project);
+
+                if (!File.Exists(runInfoFileName))
+                {
+                    TraceLog.WarnLine("Unable to find 'runinfo' file to correctly capture logs.");
+                    return null;
+                }
+
+                var runInfo = File.ReadAllLines(runInfoFileName);
+                uint pid = 0;
+
+                foreach (var info in runInfo)
+                {
+                    if (info.StartsWith("pid=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        uint.TryParse(info.Substring(4), out pid);
+                    }
+                }
+
+                if (pid != 0)
+                {
+                    return new LogAttachRequest(project, pid);
+                }
+
+                TraceLog.WarnLine("Invalid PID inside 'runinfo' file to correctly capture logs.");
+                return null;
+            }
+        }
+
+        #endregion
+
         private readonly DTE2 _dte;
 
         private List<string> _buildThese;
@@ -57,8 +164,7 @@ namespace BlackBerry.Package.Components
         private bool _isDeploying;
         private Project _startProject;
         private bool _startDebugger;
-
-        private OutputWindowPane _outputWindowPane;
+        private LogAttachRequest _currentAttachRequest;
 
         private BuildEvents _buildEvents;
         private SolutionEvents _solutionEvents;
@@ -116,6 +222,7 @@ namespace BlackBerry.Package.Components
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
+            _buildEvents.OnBuildDone += OnDeploymentDoneAttachLogs;
 
             // to monitor, when to disable IntelliSense errors,
             // TODO: however there is still one case not covered - when project is added as Win32 and manually platform is added and configuration converted co BlackBerry...
@@ -128,6 +235,23 @@ namespace BlackBerry.Package.Components
             _errorManager = new ErrorManager(_serviceProvider, new Guid("{54340ee9-e59e-4ff1-8e5d-0370f700eaed}"), "BlackBerry Errors");
 
             PackageViewModel.Instance.TargetsChanged += (s, e) => VerifyCommonErrors();
+        }
+
+        private void OnDeploymentDoneAttachLogs(vsBuildScope scope, vsBuildAction action)
+        {
+            if (action == vsBuildAction.vsBuildActionDeploy)
+            {
+                var project = GetActiveSolutionProject(_dte);
+                if (!_startDebugger && project != null)
+                {
+                    // deployment was done, look for a file with run info:
+                    _currentAttachRequest = LogAttachRequest.Create(project);
+                    if (_currentAttachRequest != null)
+                    {
+                        _currentAttachRequest.Attach(ActiveTarget);
+                    }
+                }
+            }
         }
 
         #region Properties
@@ -207,6 +331,44 @@ namespace BlackBerry.Package.Components
         /// </summary>
         public void Close()
         {
+        }
+
+        private static Project GetActiveSolutionProject(DTE2 dte)
+        {
+            if (dte == null)
+                throw new ArgumentNullException("dte");
+
+            if (dte.ActiveSolutionProjects != null)
+            {
+                foreach (Project project in (Array) dte.ActiveSolutionProjects)
+                {
+                    return project;
+                }
+            }
+
+            return null;
+        }
+
+        private static Project GetBuildStartupProject(DTE2 dte)
+        {
+            if (dte == null)
+                throw new ArgumentNullException("dte");
+
+            if (dte.Solution != null && dte.Solution.SolutionBuild != null && dte.Solution.SolutionBuild.StartupProjects != null)
+            {
+                foreach (string startupProject in (Array) dte.Solution.SolutionBuild.StartupProjects)
+                {
+                    foreach (Project project in dte.Solution.Projects)
+                    {
+                        if (project.UniqueName == startupProject)
+                        {
+                            return project;
+                        }
+                    }
+                }
+            }
+
+            return null;
         }
 
         #region Managing IntelliSense Error Reporting
@@ -732,7 +894,7 @@ namespace BlackBerry.Package.Components
             try
             {
                 _buildThese = new List<String>();
-                _startProject = null;
+                _startProject = GetBuildStartupProject(_dte);
 
                 foreach (String startupProject in (Array) _dte.Solution.SolutionBuild.StartupProjects)
                 {
@@ -741,7 +903,6 @@ namespace BlackBerry.Package.Components
                         if (project.UniqueName == startupProject)
                         {
                             _buildThese.Add(project.FullName);
-                            _startProject = project;
                         }
                     }
                 }
@@ -760,8 +921,8 @@ namespace BlackBerry.Package.Components
                 OutputWindow ow = _dte.ToolWindows.OutputWindow;
 
                 // Select the Build pane in the Output window.
-                _outputWindowPane = ow.OutputWindowPanes.Item("Build");
-                _outputWindowPane.Activate();
+                var outputWindowPane = ow.OutputWindowPanes.Item("Build");
+                outputWindowPane.Activate();
             }
             catch
             {
@@ -838,10 +999,8 @@ namespace BlackBerry.Package.Components
         {
             TraceLog.WriteLine("BUILD: Built");
 
-            _outputWindowPane.TextDocument.Selection.SelectAll();
-            string outputText = _outputWindowPane.TextDocument.Selection.Text;
-
-            if (string.IsNullOrEmpty(outputText) || Regex.IsMatch(outputText, ">Build succeeded.\r\n") || !outputText.Contains("): error :"))
+            // when build succeeded:
+            if (_dte.Solution.SolutionBuild.LastBuildInfo == 0)
             {
                 foreach (string startupProject in (Array) _dte.Solution.SolutionBuild.StartupProjects)
                 {
@@ -897,6 +1056,7 @@ namespace BlackBerry.Package.Components
             {
                 _buildThese.Clear();
             }
+            _startProject = null;
             _startDebugger = false;
             _isDeploying = false;
             _hitPlay = false;
@@ -913,32 +1073,48 @@ namespace BlackBerry.Package.Components
             bool shouldSaveLocally = developer != null && !developer.IsPasswordSaved && !string.IsNullOrEmpty(developer.CskPassword);
 
             // store CSK-password inside a local flag-file, in case dev doesn't want to store it persistently:
-            foreach (string startupProject in (Array) _dte.Solution.SolutionBuild.StartupProjects)
+            foreach (Project project in _dte.Solution.Projects)
             {
-                foreach (SolutionContext sc in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
+                try
                 {
-                    Project project = null;
+                    var cskPasswordFileName = ProjectHelper.GetFlagFileNameForCSKPassword(project);
 
-                    try
-                    {
-                        project = _dte.Solution.Item(sc.ProjectName);
-                        var cskPasswordFileName = ProjectHelper.GetFlagFileNameForCSKPassword(project);
-
-                        // remove old value:
-                        DeleteFlagFile(cskPasswordFileName);
-
-                        if (sc.ProjectName == startupProject && shouldSaveLocally)
-                        {
-                            // write CSK-password, if not stored persistently inside registry, to let signing process to succeed:
-                            File.WriteAllText(cskPasswordFileName, GlobalHelper.Encrypt(developer.CskPassword));
-                            _filesToDelete.Add(cskPasswordFileName);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        TraceLog.WriteException(ex, "Unable to delete deployment temporary flag files (project: \"{0}\")", sc != null ? sc.ProjectName : "unknown");
-                    }
+                    // remove old value:
+                    DeleteFlagFile(cskPasswordFileName);
                 }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to delete deployment temporary flag files (project: \"{0}\")", project != null ? project.Name : "unknown");
+                }
+            }
+
+            if (shouldSaveLocally)
+            {
+                foreach (Project project in (Array) _dte.Solution.SolutionBuild.StartupProjects)
+                {
+                    WriteCskPassword(project, developer);
+                }
+
+                foreach (Project project in (Array) _dte.ActiveSolutionProjects)
+                {
+                    WriteCskPassword(project, developer);
+                }
+            }
+        }
+
+        private void WriteCskPassword(Project project, DeveloperDefinition developer)
+        {
+            try
+            {
+                var cskPasswordFileName = ProjectHelper.GetFlagFileNameForCSKPassword(project);
+
+                // write CSK-password, if not stored persistently inside registry, to let signing process to succeed:
+                File.WriteAllText(cskPasswordFileName, GlobalHelper.Encrypt(developer.CskPassword));
+                _filesToDelete.Add(cskPasswordFileName);
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to write deployment temporary flag files (project: \"{0}\")", project != null ? project.Name : "unknown");
             }
         }
 
