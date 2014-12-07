@@ -169,7 +169,7 @@ namespace BlackBerry.NativeCore.Components
                 }
                 catch
                 {
-                    // invalid device or QConnDoor not opened by others...
+                    // invalid device nor QConnDoor not yet opened by others...
                 }
 
                 Door.OpenAsync(Device.IP, Device.Password, _sshPublicKeyPath);
@@ -513,7 +513,7 @@ namespace BlackBerry.NativeCore.Components
         private static void OnChildConnectionStatusChanged(TargetInfo target, TargetStatus status)
         {
             if (target == null)
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException("target");
 
             bool dispose = false;
 
@@ -756,7 +756,7 @@ namespace BlackBerry.NativeCore.Components
                 throw new ArgumentNullException("ip");
 
             var qClient = Get(ip);
-            if (qClient != null)
+            if (qClient != null && qClient.ConsoleLogService != null)
             {
                 qClient.ConsoleLogService.StopAll();
                 return true;
@@ -776,7 +776,7 @@ namespace BlackBerry.NativeCore.Components
                 throw new ArgumentNullException("process");
 
             var qClient = Get(ip);
-            if (qClient != null)
+            if (qClient != null && qClient.ConsoleLogService != null)
             {
                 return qClient.ConsoleLogService.Stop(process);
             }
@@ -808,7 +808,7 @@ namespace BlackBerry.NativeCore.Components
                 throw new ArgumentNullException("process");
 
             var qClient = Get(ip);
-            if (qClient != null)
+            if (qClient != null && qClient.ConsoleLogService != null)
             {
                 return qClient.ConsoleLogService.IsMonitoring(process);
             }
