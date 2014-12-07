@@ -233,5 +233,24 @@ namespace BlackBerry.NativeCore.QConn.Services
 
             return (SystemInfoProcess) ProcessInfo.Find(LoadProcesses(), executable);
         }
+
+        /// <summary>
+        /// Searches for a running process with specified ID.
+        /// It will return null, if not found.
+        /// </summary>
+        public SystemInfoProcess FindProcess(uint pid)
+        {
+            if (pid == 0)
+                throw new ArgumentOutOfRangeException("pid");
+
+            var processes = LoadProcesses();
+            foreach (var proc in processes)
+            {
+                if (proc.ID == pid)
+                    return proc;
+            }
+
+            return null;
+        }
     }
 }
