@@ -230,6 +230,14 @@ namespace BlackBerry.Package.Helpers
         }
 
         /// <summary>
+        /// Gets the name of the file with info about run application on the target for passed deployment in MSBuild.
+        /// </summary>
+        public static string GetFlagFileNameForRunInfo(Project project)
+        {
+            return GetFlagFileName(project, "runinfo");
+        }
+
+        /// <summary>
         /// Gets the name of the file for debug-native flag passed to MSBuild.
         /// </summary>
         public static string GetFlagFileNameForDebugNative(Project project)
@@ -251,6 +259,10 @@ namespace BlackBerry.Package.Helpers
                 throw new ArgumentNullException("project");
             if (string.IsNullOrEmpty(flagName))
                 throw new ArgumentNullException("flagName");
+
+            // is it 'miscellaneous files'?
+            if (string.IsNullOrEmpty(project.FullName))
+                return null;
 
             return Path.Combine(Path.GetDirectoryName(project.FullName), string.Concat("vsndk-", flagName, ".flag"));
         }
