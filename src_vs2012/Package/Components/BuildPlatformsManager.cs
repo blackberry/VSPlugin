@@ -248,6 +248,7 @@ namespace BlackBerry.Package.Components
                     _currentAttachRequest = LogAttachRequest.Create(project);
                     if (_currentAttachRequest != null)
                     {
+                        ActivateOutputWindowPane("Debug");
                         _currentAttachRequest.Attach(ActiveTarget);
                     }
                 }
@@ -912,24 +913,25 @@ namespace BlackBerry.Package.Components
                 TraceLog.WriteException(ex);
             }
 
+            ActivateOutputWindowPane("Build");
+            BuildBar();
+            return true;
+        }
 
+        private void ActivateOutputWindowPane(string build)
+        {
             try
             {
-                // Create a reference to the Output window.
-                // Create a tool window reference for the Output window
-                // and window pane.
+                // create a reference to the Output Window and window pane:
                 OutputWindow ow = _dte.ToolWindows.OutputWindow;
 
-                // Select the Build pane in the Output window.
-                var outputWindowPane = ow.OutputWindowPanes.Item("Build");
+                // and activate it:
+                var outputWindowPane = ow.OutputWindowPanes.Item(build);
                 outputWindowPane.Activate();
             }
             catch
             {
             }
-
-            BuildBar();
-            return true;
         }
 
         /// <summary> 
@@ -1168,7 +1170,10 @@ namespace BlackBerry.Package.Components
                     }
                 }
 
-                LaunchDebugTarget(_startProject.Name, ndk, device, runtime, null, executablePath);
+                if (LaunchDebugTarget(_startProject.Name, ndk, device, runtime, null, executablePath))
+                {
+                    ActivateOutputWindowPane("Debug");
+                }
             }
         }
 
@@ -1223,7 +1228,7 @@ namespace BlackBerry.Package.Components
 
                     TraceLog.WriteLine("LaunchDebugTargets: " + message);
                     MessageBoxHelper.Show(message, null, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return true;
+                    return false;
                 }
             }
             finally
@@ -1234,7 +1239,7 @@ namespace BlackBerry.Package.Components
                 }
             }
 
-            return false;
+            return true;
         }
 
         #endregion
