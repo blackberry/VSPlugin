@@ -44,7 +44,7 @@
             this.bttRefresh = new System.Windows.Forms.Button();
             this.bttChangeCert = new System.Windows.Forms.Button();
             this.bttNavigate = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
+            this.lblWarning = new System.Windows.Forms.Label();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.SuspendLayout();
@@ -190,7 +190,7 @@
             this.groupBox2.Controls.Add(this.bttNavigate);
             this.groupBox2.Controls.Add(this.txtAuthor);
             this.groupBox2.Controls.Add(this.txtCertPath);
-            this.groupBox2.Controls.Add(this.label5);
+            this.groupBox2.Controls.Add(this.lblWarning);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Location = new System.Drawing.Point(3, 145);
@@ -233,16 +233,16 @@
             this.bttNavigate.UseVisualStyleBackColor = true;
             this.bttNavigate.Click += new System.EventHandler(this.bttNavigate_Click);
             // 
-            // label5
+            // lblWarning
             // 
-            this.label5.AutoSize = true;
-            this.label5.BackColor = System.Drawing.SystemColors.Control;
-            this.label5.ForeColor = System.Drawing.Color.Red;
-            this.label5.Location = new System.Drawing.Point(87, 71);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(121, 13);
-            this.label5.TabIndex = 0;
-            this.label5.Text = "(if empty, signing will fail)";
+            this.lblWarning.AutoSize = true;
+            this.lblWarning.BackColor = System.Drawing.SystemColors.Control;
+            this.lblWarning.ForeColor = System.Drawing.Color.Red;
+            this.lblWarning.Location = new System.Drawing.Point(87, 71);
+            this.lblWarning.Name = "lblWarning";
+            this.lblWarning.Size = new System.Drawing.Size(121, 13);
+            this.lblWarning.TabIndex = 0;
+            this.lblWarning.Text = "(if empty, signing will fail)";
             // 
             // SigningOptionControl
             // 
@@ -277,7 +277,7 @@
         private System.Windows.Forms.Button bttRefresh;
         private System.Windows.Forms.Button bttChangeCert;
         private System.Windows.Forms.Label lblStatus;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Label lblWarning;
         private System.Windows.Forms.Button bttEditPublisher;
     }
 }

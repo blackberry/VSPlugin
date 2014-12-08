@@ -37,6 +37,7 @@ namespace BlackBerry.Package.Options
         {
             CertificatePath = _vm.Developer.CertificateFileName;
             Author = _vm.Developer.Name;
+            lblWarning.Visible = string.IsNullOrEmpty(Author);
 
             //bttRegister.Enabled = !_vm.Developer.IsRegistered;
             //bttUnregister.Enabled = !bttRegister.Enabled;
