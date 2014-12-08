@@ -14,14 +14,14 @@
             <common:BinaryToStringConverter x:Key="BinaryToStringConverter" />
 
             <DataTemplate x:Key="PreviewImpossible">
-                <TextBlock Text="Preview is unavailable. Maybe the file is too big or has unsupported extension." HorizontalAlignment="Stretch" />
+                <TextBlock Margin="4" Text="Preview is unavailable. Maybe the file is too big or has unsupported extension." HorizontalAlignment="Stretch" />
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsString">
-                <TextBox Text="{Binding Mode=OneWay}" IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
+                <TextBox Margin="4" Text="{Binding Mode=OneWay}" IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
                          HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsBinary">
-                <TextBox Text="{Binding Mode=OneWay, Converter={StaticResource BinaryToStringConverter}}" FontFamily="Consolas"
+                <TextBox Margin="4" Text="{Binding Mode=OneWay, Converter={StaticResource BinaryToStringConverter}}" FontFamily="Consolas"
                          IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
                          HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
             </DataTemplate>
@@ -201,6 +201,12 @@
     </UserControl.Resources>
 
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FFDEDEDE" Offset="0" />
+                <GradientStop Color="#FFE8E8E8" Offset="1" />
+            </LinearGradientBrush>
+        </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="70*" />
