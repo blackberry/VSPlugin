@@ -162,8 +162,8 @@
                 <MenuItem Header="Disconnect" Click="DisconnectTarget_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForProcess">
-                <MenuItem Header="Capture Console" IsEnabled="{Binding CanCapture}" Click="CaptureConsoleForProcess_OnClick" />
-                <MenuItem Header="Stop Console Capture" IsEnabled="{Binding CanStopCapture}" Click="StopCaptureConsoleForProcess_OnClick" />
+                <MenuItem Header="Capture Logs" IsEnabled="{Binding CanCapture}" Click="CaptureConsoleForProcess_OnClick" />
+                <MenuItem Header="Stop Logs Capture" IsEnabled="{Binding CanStopCapture}" Click="StopCaptureConsoleForProcess_OnClick" />
                 <Separator />
                 <MenuItem Header="Terminate" IsEnabled="{Binding CanTerminate}" Click="TerminateProcess_OnClick" />
             </ContextMenu>

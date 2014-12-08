@@ -7,6 +7,7 @@ using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.QConn;
 using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.Components
 {
@@ -16,6 +17,11 @@ namespace BlackBerry.NativeCore.Components
     public static class Targets
     {
         #region Internal Classes
+
+        /// <summary>
+        /// Method to verify, if specified log entry should be populated to the developer according to current settings.
+        /// </summary>
+        private delegate bool LogPredicate(TargetServiceConsoleLog service, TargetLogEntry log);
 
         /// <summary>
         /// Class providing help information about connection parameters with the target device.
@@ -264,15 +270,20 @@ namespace BlackBerry.NativeCore.Components
             private static void PrintLog(string message)
             {
                 TraceLog.WriteLine(message);
-                System.Diagnostics.Trace.WriteLine(message, TraceLog.CategoryDevice);
+
+                // print logs on default 'Debug' output window, if allowed:
+                if (_optionInjectLogs)
+                {
+                    System.Diagnostics.Trace.WriteLine(message, _optionCategoryInject);
+                }
             }
 
             private void OnRemoteLogsCaptured(object sender, CapturedLogsEventArgs e)
             {
                 foreach (var log in e.Entries)
                 {
-                    // print each console log and slog2 log, which matches the PID with console one:
-                    if (log.Type == TargetLogEntry.LogType.Console || log.PID == 0 || (Client.ConsoleLogService.IsMonitoring(log.PID) && log.BufferSet == "default"))
+                    // print each console log and slog2 which matches current settings:
+                    if (log.Type == TargetLogEntry.LogType.Console || _optionSLog2Filter(Client.ConsoleLogService, log))
                     {
                         if (log.Type == TargetLogEntry.LogType.SLog2 && string.IsNullOrEmpty(log.BufferSet))
                         {
@@ -328,10 +339,23 @@ namespace BlackBerry.NativeCore.Components
         private static readonly List<TargetInfo> _activeTargets;
         private static readonly object _sync;
 
+        private static bool _optionInjectLogs;
+        private static bool _optionAcceptTracingDebuggedOnly;
+        private static uint _optionLogInterval;
+        private static LogPredicate _optionSLog2Filter;
+        private static string[] _optionSLog2BufferSets;
+        private static string _optionCategoryInject;
+
         static Targets()
         {
             _activeTargets = new List<TargetInfo>();
             _sync = new object();
+
+            _optionInjectLogs = true;
+            _optionAcceptTracingDebuggedOnly = false;
+            _optionLogInterval = 0;
+            _optionSLog2Filter = SLog2FilterDefault;
+            _optionCategoryInject = TraceLog.CategoryDevice;
         }
 
         private static TargetInfo NoSyncFind(string ip)
@@ -705,8 +729,14 @@ namespace BlackBerry.NativeCore.Components
                 return false;
             }
 
+            if (_optionAcceptTracingDebuggedOnly && !isDebugging)
+            {
+                TraceLog.WarnLine("Tracing console outputs for non-debugged applications is disabled, change it in Options or manually start capturing logs in Target Navigator ({0}:\"{1}\")", process.ID, process.ExecutablePath);
+                return false;
+            }
+
             // start monitoring for console logs:
-            return qClient.ConsoleLogService.Start(process, isDebugging);
+            return qClient.ConsoleLogService.Start(process, _optionLogInterval, isDebugging);
         }
 
         /// <summary>
@@ -815,5 +845,99 @@ namespace BlackBerry.NativeCore.Components
 
             return false;
         }
+
+        /// <summary>
+        /// Sets the logging options.
+        /// </summary>
+        public static void TraceOptions(bool debuggedOnly, uint logsInterval, int slog2Level, string[] slog2BufferSets, bool injectLogs, string injectCategory)
+        {
+            _optionInjectLogs = injectLogs;
+            _optionAcceptTracingDebuggedOnly = debuggedOnly;
+            _optionLogInterval = logsInterval;
+            _optionSLog2BufferSets = slog2BufferSets;
+
+            if (!string.IsNullOrEmpty(injectCategory))
+            {
+                _optionCategoryInject = injectCategory;
+            }
+
+            switch (slog2Level)
+            {
+                case 0: // nothing should be monitored
+                    _optionSLog2Filter = SLog2FilterNone;
+                    break;
+                case 1: // only developed applications
+                    if (slog2BufferSets == null || slog2BufferSets.Length == 0)
+                    {
+                        _optionSLog2Filter = SLog2FilterApps;
+                    }
+                    else
+                    {
+                        _optionSLog2Filter = SLog2FilterAppsWithBufferSet;
+                    }
+                    break;
+                case 2: // whole system
+                    _optionSLog2Filter = SLog2FilterSystem;
+                    break;
+                default: // restore default, if out-of-range
+                    _optionSLog2Filter = SLog2FilterDefault;
+                    break;
+            }
+
+            // and update the console log interval for already running loggers:
+            lock (_sync)
+            {
+                foreach (var target in _activeTargets)
+                {
+                    if (target.Client != null && target.Client.ConsoleLogService != null)
+                    {
+                        target.Client.ConsoleLogService.Interval = logsInterval;
+                    }
+                }
+            }
+        }
+
+        #region slog2 Filters
+
+        private static bool SLog2FilterDefault(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return log.PID == 0 || (service.IsMonitoring(log.PID) && log.BufferSet == "default");
+        }
+
+        private static bool SLog2FilterNone(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return false;
+        }
+
+        private static bool SLog2FilterSystem(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return true;
+        }
+
+        private static bool SLog2FilterApps(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return log.PID == 0 || service.IsMonitoring(log.PID);
+        }
+
+        private static bool SLog2FilterAppsWithBufferSet(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return log.PID == 0 || (service.IsMonitoring(log.PID) && InBufferSet(log.BufferSet));
+        }
+
+        private static bool InBufferSet(string name)
+        {
+            if (_optionSLog2BufferSets == null || string.IsNullOrEmpty(name))
+                return false;
+
+            foreach (var bufferName in _optionSLog2BufferSets)
+            {
+                if (string.Compare(bufferName, name, StringComparison.Ordinal) == 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        #endregion
     }
 }

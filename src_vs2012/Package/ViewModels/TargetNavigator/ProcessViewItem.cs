@@ -140,7 +140,7 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
 
         public void CaptureConsole()
         {
-            Targets.Trace(_device, _process, false);
+            Targets.Trace(_device, _process, true); // pretending to be a 'debugged' application to ignore settings
 
             NotifyPropertyChanged("CanCapture");
             NotifyPropertyChanged("CanStopCapture");

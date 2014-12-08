@@ -1,7 +1,9 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.Package.Components;
 using Microsoft.VisualStudio.Shell;
 
@@ -44,12 +46,6 @@ namespace BlackBerry.Package.Options
 
         #region Properties
 
-        public bool InjectLogs
-        {
-            get { return Control.InjectLogs; }
-            set { Control.InjectLogs = value; }
-        }
-
         public bool LimitLogs
         {
             get { return Control.LimitLogs; }
@@ -68,7 +64,42 @@ namespace BlackBerry.Package.Options
             set { Control.Path = value; }
         }
 
+        public bool InjectLogs
+        {
+            get { return Control.InjectLogs; }
+            set { Control.InjectLogs = value; }
+        }
+
+        public bool DebuggedOnly
+        {
+            get { return Control.DebuggedOnly; }
+            set { Control.DebuggedOnly = value; }
+        }
+
+        public uint LogsInterval
+        {
+            get { return Control.LogsInterval; }
+            set { Control.LogsInterval = value; }
+        }
+
+        public int SLog2Level
+        {
+            get { return Control.SLog2Level; }
+            set { Control.SLog2Level = value; }
+        }
+
+        public string SLog2BufferSets
+        {
+            get { return Control.SLog2BufferSets; }
+            set { Control.SLog2BufferSets = value; }
+        }
+
         #endregion
+
+        internal string[] GetSLog2BufferSets()
+        {
+            return SLog2BufferSets.Split(new[] { ',', '|', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+        }
 
         protected override void OnApply(PageApplyEventArgs e)
         {
@@ -77,6 +108,14 @@ namespace BlackBerry.Package.Options
             if (e.ApplyBehavior == ApplyKind.Apply)
             {
                 LogManager.Update(Path, LimitLogs ? LimitCount : -1);
+                Targets.TraceOptions(DebuggedOnly, LogsInterval, SLog2Level, GetSLog2BufferSets(), InjectLogs, null);
+            }
+            else
+            {
+                if (e.ApplyBehavior == ApplyKind.Cancel || e.ApplyBehavior == ApplyKind.CancelNoNavigate)
+                {
+                    Control.OnReset();
+                }
             }
         }
     }
