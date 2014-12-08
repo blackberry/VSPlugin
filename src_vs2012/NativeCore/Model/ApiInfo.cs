@@ -124,7 +124,15 @@ namespace BlackBerry.NativeCore.Model
         /// </summary>
         public static ApiInfo CreateAddCustomInfo()
         {
-            return new ApiInfo("Add Custom NDK", new Version(), DeviceFamilyType.Unknown);
+            return new ApiInfo("Add Custom NDK", new Version(0, 0), DeviceFamilyType.Unknown);
+        }
+
+        /// <summary>
+        /// Creates an instance of the API to allow BBNDK for VS insertion.
+        /// </summary>
+        public static ApiInfo CreateBBNDKforVSInfo()
+        {
+            return new ApiInfo("Download BBNDK for Visual Studio", new Version(0, 1), DeviceFamilyType.Unknown);
         }
 
         /// <summary>

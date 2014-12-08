@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using BlackBerry.NativeCore.Model;
 
 namespace BlackBerry.NativeCore.Tools
@@ -167,11 +168,17 @@ namespace BlackBerry.NativeCore.Tools
 
             if (injectExtraActions)
             {
+                // inject info about BBNDK for VS:
+                if (!Directory.Exists(ConfigDefaults.NdkDirectory))
+                {
+                    AddUnique(groups, ApiInfo.CreateBBNDKforVSInfo());
+                }
+
                 // inject info about tablet NDK:
-                Add(groups, ApiInfo.CreateTabletInfo());
+                AddUnique(groups, ApiInfo.CreateTabletInfo());
 
                 // inject info about 'custom NDK':
-                Add(groups, ApiInfo.CreateAddCustomInfo());
+                AddUnique(groups, ApiInfo.CreateAddCustomInfo());
             }
 
             // group BlackBerry 10 items together:
@@ -210,6 +217,9 @@ namespace BlackBerry.NativeCore.Tools
 
         private static void Add(ICollection<List<ApiInfo>> groups, ApiInfo item)
         {
+            if (groups == null)
+                throw new ArgumentNullException("groups");
+
             var group = Find(groups, item.Level);
             if (group != null)
             {
@@ -217,10 +227,18 @@ namespace BlackBerry.NativeCore.Tools
             }
             else
             {
-                group = new List<ApiInfo>();
-                group.Add(item);
-                groups.Add(group);
+                AddUnique(groups, item);
             }
+        }
+
+        private static void AddUnique(ICollection<List<ApiInfo>> groups, ApiInfo item)
+        {
+            if (groups == null)
+                throw new ArgumentNullException("groups");
+
+            var group = new List<ApiInfo>();
+            group.Add(item);
+            groups.Add(group);
         }
 
         private static List<ApiInfo> Find(IEnumerable<List<ApiInfo>> groups, Version level)

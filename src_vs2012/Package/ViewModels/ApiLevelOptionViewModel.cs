@@ -221,6 +221,13 @@ namespace BlackBerry.Package.ViewModels
                     return ApiLevelTask.AddExisting;
                 }
 
+                // download BBNDK for Visual Studio?
+                if (info.Version.Major == 0 && info.Version.Minor == 1)
+                {
+                    argument = ConfigDefaults.GithubProjectReleaseBBNDKforVS;
+                    return ApiLevelTask.InstallManually;
+                }
+
                 // is it a PlayBook NDK?
                 if (info.Type == DeviceFamilyType.Tablet)
                 {

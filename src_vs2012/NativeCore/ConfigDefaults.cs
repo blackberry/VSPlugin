@@ -115,6 +115,11 @@ namespace BlackBerry.NativeCore
             get { return "https://twitter.com/CodeTitans"; }
         }
 
+        public static string GithubProjectReleaseBBNDKforVS
+        {
+            get { return "https://github.com/phofman/vs-plugin/releases/tag/v3.0.1-bbndk"; }
+        }
+
         static ConfigDefaults()
         {
             RegistryPath = @"Software\BlackBerry\VSPlugin";
