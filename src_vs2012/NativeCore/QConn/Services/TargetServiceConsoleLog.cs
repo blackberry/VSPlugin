@@ -206,12 +206,13 @@ namespace BlackBerry.NativeCore.QConn.Services
 
         #endregion
 
-        private const uint Interval = 800; // how often to check the remote log file for new content; in milliseconds
+        public const uint DefaultInterval = 750; // how often to check the remote log file for new content; in milliseconds
 
         private TargetServiceFile _fileService;
         private readonly object _sync;
         private readonly List<LogMonitorStatus> _logMonitors;
         private uint[] _processIDs;
+        private uint _interval;
         private Timer _keepReadingTimer;
 
         /// <summary>
@@ -231,6 +232,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             _fileService = fileService;
             _sync = new object();
             _logMonitors = new List<LogMonitorStatus>();
+            _interval = DefaultInterval;
             UpdateProcessIDsNoSync();
         }
 
@@ -259,17 +261,30 @@ namespace BlackBerry.NativeCore.QConn.Services
             get { return _processIDs; }
         }
 
+        /// <summary>
+        /// Gets or sets the interval of pinging the logs for new content.
+        /// </summary>
+        public uint Interval
+        {
+            get { return _interval; }
+            set
+            {
+                _interval = value == 0 ? DefaultInterval : value; // it will automatically pickup this value on next round of log refresh
+            }
+        }
+
         #endregion
 
         /// <summary>
         /// Starts monitoring of the logs printed on console for specified process.
         /// </summary>
-        public bool Start(ProcessInfo process, bool isDebugging)
+        public bool Start(ProcessInfo process, uint interval, bool isDebugging)
         {
             if (process == null)
                 throw new ArgumentNullException("process");
 
             TraceLog.WriteLine("> Starting console-logs monitor for: {0}", process.Name);
+            Interval = interval;
 
             // PH: this is the same 'trick' used by Momentics, since console dumps everything into a log file
             //     let's continuously read that file and truncate it, if needed:
@@ -282,7 +297,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                 if (homeIndex > 0)
                 {
                     var logFilePath = process.ExecutablePath.Substring(0, homeIndex) + "/logs/log";
-                    return Start(logFilePath, process, isDebugging);
+                    return Start(logFilePath, process, interval, isDebugging);
                 }
             }
 
@@ -290,7 +305,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             return false;
         }
 
-        private bool Start(string logFilePath, ProcessInfo process, bool isDebugging)
+        private bool Start(string logFilePath, ProcessInfo process, uint interval, bool isDebugging)
         {
             if (string.IsNullOrEmpty(logFilePath))
                 throw new ArgumentNullException("logFilePath");
@@ -316,7 +331,7 @@ namespace BlackBerry.NativeCore.QConn.Services
 
                         // start the timer:
                         if (_keepReadingTimer == null)
-                            _keepReadingTimer = new Timer(OnReaderTick, this, Interval, Timeout.Infinite);
+                            _keepReadingTimer = new Timer(OnReaderTick, this, interval, Timeout.Infinite);
                     }
 
                     return true;
