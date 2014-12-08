@@ -105,7 +105,7 @@ namespace BlackBerry.Package.Components
                     var process = e.Client.SysInfoService.FindProcess(PID);
                     if (process != null)
                     {
-                        Targets.Trace(e.Device, process);
+                        Targets.Trace(e.Device, process, false);
                     }
                     else
                     {

@@ -163,7 +163,7 @@ namespace BlackBerry.NativeCore.Debugger
                     pidNumber = existingProcess.ID;
 
                     // start monitoring for console logs:
-                    Targets.Trace(device, existingProcess);
+                    Targets.Trace(device, existingProcess, true);
                 }
                 else
                 {
@@ -176,7 +176,7 @@ namespace BlackBerry.NativeCore.Debugger
                 if (existingProcessOrNull != null)
                 {
                     // start monitoring for console logs:
-                    Targets.Trace(device, existingProcessOrNull);
+                    Targets.Trace(device, existingProcessOrNull, true);
                 }
             }
 

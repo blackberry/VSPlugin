@@ -691,7 +691,7 @@ namespace BlackBerry.NativeCore.Components
         /// Starts tracing console output for specified process on a target device.
         /// It will fail, if not connected to that device before.
         /// </summary>
-        public static bool Trace(string ip, ProcessInfo process)
+        public static bool Trace(string ip, ProcessInfo process, bool isDebugging)
         {
             if (string.IsNullOrEmpty(ip))
                 throw new ArgumentNullException("ip");
@@ -706,21 +706,21 @@ namespace BlackBerry.NativeCore.Components
             }
 
             // start monitoring for console logs:
-            return qClient.ConsoleLogService.Start(process);
+            return qClient.ConsoleLogService.Start(process, isDebugging);
         }
 
         /// <summary>
         /// Starts tracing console output for specified process on a target device.
         /// It will fail, if not connected to that device before.
         /// </summary>
-        public static bool Trace(DeviceDefinition device, ProcessInfo process)
+        public static bool Trace(DeviceDefinition device, ProcessInfo process, bool isDebugging)
         {
             if (device == null)
                 throw new ArgumentNullException("device");
             if (process == null)
                 throw new ArgumentNullException("process");
 
-            return Trace(device.IP, process);
+            return Trace(device.IP, process, isDebugging);
         }
 
         /// <summary>

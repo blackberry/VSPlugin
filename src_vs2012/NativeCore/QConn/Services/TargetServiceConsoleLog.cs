@@ -30,7 +30,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             /// <summary>
             /// Init constructor.
             /// </summary>
-            public LogMonitorStatus(TargetServiceFile fileService, string path, TargetFileDescriptor handle, ProcessInfo process)
+            public LogMonitorStatus(TargetServiceFile fileService, string path, TargetFileDescriptor handle, ProcessInfo process, bool isDebugging)
             {
                 if (fileService == null)
                     throw new ArgumentNullException("fileService");
@@ -45,6 +45,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                 Path = path;
                 Handle = handle;
                 Process = process;
+                IsDebugging = isDebugging;
                 _chunks = new List<byte[]>();
             }
 
@@ -74,6 +75,15 @@ namespace BlackBerry.NativeCore.QConn.Services
             }
 
             public ProcessInfo Process
+            {
+                get;
+                private set;
+            }
+
+            /// <summary>
+            /// Gets an indication, if this log monitoring is attached to debugged app or not.
+            /// </summary>
+            public bool IsDebugging
             {
                 get;
                 private set;
@@ -254,7 +264,7 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// <summary>
         /// Starts monitoring of the logs printed on console for specified process.
         /// </summary>
-        public bool Start(ProcessInfo process)
+        public bool Start(ProcessInfo process, bool isDebugging)
         {
             if (process == null)
                 throw new ArgumentNullException("process");
@@ -272,7 +282,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                 if (homeIndex > 0)
                 {
                     var logFilePath = process.ExecutablePath.Substring(0, homeIndex) + "/logs/log";
-                    return Start(logFilePath, process);
+                    return Start(logFilePath, process, isDebugging);
                 }
             }
 
@@ -280,7 +290,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             return false;
         }
 
-        private bool Start(string logFilePath, ProcessInfo process)
+        private bool Start(string logFilePath, ProcessInfo process, bool isDebugging)
         {
             if (string.IsNullOrEmpty(logFilePath))
                 throw new ArgumentNullException("logFilePath");
@@ -299,7 +309,7 @@ namespace BlackBerry.NativeCore.QConn.Services
                 {
                     lock (_sync)
                     {
-                        var monitor = new LogMonitorStatus(_fileService, logFilePath, fileHandle, process);
+                        var monitor = new LogMonitorStatus(_fileService, logFilePath, fileHandle, process, isDebugging);
                         monitor.Finished += OnMonitorStatusFinished;
                         _logMonitors.Add(monitor);
                         UpdateProcessIDsNoSync();
