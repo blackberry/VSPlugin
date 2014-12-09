@@ -4,11 +4,14 @@
   Unless Momentics (or any previous version of this plugin) was used before, few extra
 MANUAL steps have to be made before this package works smoothly without errors and warnings.
 
-1) Ensure BlackBerry Native SDK (NDK) is installed. It can be any available edition (distributed as MSI installer,
-   or using Momentics, or via BBNDK_VS - compacted NDK skeleton, allowing downloads of new NDKs directly),
-   although the last option is preferred as it enables UI to manipulate NDKs inside Visual Studio.
+1) Ensure BlackBerry Native SDK (NDK) is installed. It can be any available edition (distributed directly by
+   BlackBerry as MSI installer, or using Momentics, or as BBNDK_VS - compacted NDK skeleton - available as
+   separate part of this plugin at https://github.com/phofman/vs-plugin/releases/tag/v3.0.1-bbndk, allowing
+   downloads of new NDKs automatically), although the last option is preferred as it enables UI to manipulate
+   NDKs inside Visual Studio.
 
-2) Ensure MSBuild extensions (distributed separately) has been copied into "C:\Program Files (x86)\MSBuild".
+2) Ensure MSBuild extensions (also distributed separately at https://github.com/phofman/vs-plugin/releases/latest)
+   has been copied into "C:\Program Files (x86)\MSBuild".
    Without them it won't be possible to create new project, compile and deploy applications.
 
 In case of any problems, please visit the wiki pages at https://github.com/phofman/vs-plugin/wiki/Installation

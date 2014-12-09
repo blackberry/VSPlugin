@@ -1,3 +1,15 @@
+v3.1.0 (2014-12-09):
+Changes in this version:
+ * introduced device logs capture feature
+ * added process launcher (on target device)
+ * updated Target Navigator
+   - exposing buttons to manage logs
+   - presenting command-line of running process
+   - presenting environment variables of running process
+   - small UI fixes (i.e. improper background in dark theme)
+ * suggesting download of BBNDK for VS, when not found
+ * other small tweaks and refactorings
+
 v3.0.4 (2014-11-27)
 Changes in this version:
  * improved first-launch experience (when nothing is configured and installed yet)

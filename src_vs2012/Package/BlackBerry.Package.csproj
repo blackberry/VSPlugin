@@ -544,7 +544,10 @@
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Resources\Template.Strings.resx" />
-    <None Include="Resources\TemplateIcons\EmptyProj.ico" />
+    <Content Include="Resources\TemplateIcons\EmptyProj.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\Projects\BlackBerry\OpenGL\items.vsdir">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>

@@ -865,7 +865,10 @@
       <Link>Templates\VCWizards\BlackBerry\Shared\qtab.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="Resources\TemplateIcons\EmptyProj.ico" />
+    <Content Include="Resources\TemplateIcons\EmptyProj.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.resx">
       <Link>Dialogs\CachedAuthorForm.resx</Link>
       <DependentUpon>CachedAuthorForm.cs</DependentUpon>

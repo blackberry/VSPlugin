@@ -1090,7 +1090,10 @@
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qclass.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <None Include="Resources\TemplateIcons\EmptyProj.ico" />
+    <Content Include="Resources\TemplateIcons\EmptyProj.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Compile Include="Resources\Strings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
