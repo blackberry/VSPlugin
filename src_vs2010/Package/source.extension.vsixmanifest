@@ -9,7 +9,7 @@
     <MoreInfoUrl>http://github.com/phofman/vs-plugin/wiki</MoreInfoUrl>
     <License>Resources/License.txt</License>
     <GettingStartedGuide>http://github.com/phofman/vs-plugin/wiki</GettingStartedGuide>
-    <Icon>EmptyProj.ico</Icon>
+    <Icon>Resources/TemplateIcons/EmptyProj.ico</Icon>
     <InstalledByMsi>false</InstalledByMsi>
     <SupportedProducts>
       <VisualStudio Version="10.0">
