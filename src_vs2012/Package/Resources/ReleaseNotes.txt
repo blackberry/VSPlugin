@@ -1,6 +1,6 @@
 v3.1.0 (2014-12-09):
 Changes in this version:
- * introduced device logs capture feature
+ * introduced device logs capture feature (#32)
  * added process launcher (on target device)
  * updated Target Navigator
    - exposing buttons to manage logs
