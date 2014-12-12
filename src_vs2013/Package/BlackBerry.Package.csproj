@@ -203,9 +203,6 @@
     <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorPane.cs">
       <Link>Editors\BarDescriptorEditorPane.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Editors\EditorFactoryNotifyForProject.cs">
-      <Link>Editors\EditorFactoryNotifyForProject.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2012\Package\GuidList.cs">
       <Link>GuidList.cs</Link>
     </Compile>

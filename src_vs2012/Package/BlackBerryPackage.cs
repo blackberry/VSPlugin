@@ -57,14 +57,12 @@ namespace BlackBerry.Package
     /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // Register the editor factory
-    [XmlEditorDesignerViewRegistration("XML", "xml", LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(BarDescriptorEditorFactory),
+    [XmlEditorDesignerViewRegistration("BarDescriptor", BarDescriptorEditorFactory.DefaultExtension, LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(BarDescriptorEditorFactory),
         Namespace = "http://www.qnx.com/schemas/application/1.0", MatchExtensionAndNamespace = true)]
-    // And which type of files we want to handle
-    [ProvideEditorExtension(typeof(BarDescriptorEditorFactory), BarDescriptorEditorFactory.DefaultExtension, 0x40, NameResourceID = 106)]
+    // And which type of files we want to handle and notify about file changes, while in Microsoft Visual C++ Projects
+    [ProvideEditorExtension(typeof(BarDescriptorEditorFactory), BarDescriptorEditorFactory.DefaultExtension, 0x10, NameResourceID = 106, EditorFactoryNotify = true, ProjectGuid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}")]
     // We register that our editor supports LOGVIEWID_Designer logical view
     [ProvideEditorLogicalView(typeof(BarDescriptorEditorFactory), LogicalViewID.Designer)]
-    // Microsoft Visual C++ Project
-    [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", BarDescriptorEditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
     // Registration of custom debugger
     [DebugEngineRegistration(AD7PortSupplier.PublicName, AD7Engine.DebugEngineGuid,

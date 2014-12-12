@@ -199,7 +199,6 @@
     </Compile>
     <Compile Include="Editors\BarDescriptorEditorFactory.cs" />
     <Compile Include="Editors\BarDescriptorEditorPane.cs" />
-    <Compile Include="Editors\EditorFactoryNotifyForProject.cs" />
     <Compile Include="GuidList.cs" />
     <Compile Include="Helpers\AttributeHelper.cs" />
     <Compile Include="Helpers\CertHelper.cs" />

@@ -56,7 +56,7 @@ namespace BlackBerry.Package.Registration
 
             // Set Member Variables 
             _keyName = keyName;
-            _defaultExtension = defaultExtension;
+            _defaultExtension = defaultExtension.StartsWith(".") ? defaultExtension.Substring(1) : defaultExtension;
             _defaultLogicalView = AttributeHelper.GetGuidFrom(defaultLogicalViewEditorFactory);
             _xmlChooserPriority = xmlChooserPriority;
 
