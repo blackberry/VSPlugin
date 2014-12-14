@@ -846,6 +846,14 @@
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qtab.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\makefile.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\makefile.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\makefile-empty">
+      <Link>Templates\VCWizards\BlackBerry\Shared\makefile-empty</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <None Include="Resources\TemplateIcons\NewItem.ico" />
     <None Include="Resources\TemplateIcons\NewQItem.ico" />
     <None Include="Resources\TemplateIcons\CascadesProj.ico" />

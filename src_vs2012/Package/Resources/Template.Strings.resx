@@ -306,4 +306,13 @@
   <data name="6082" xml:space="preserve">
     <value>Tab.qml</value>
   </data>
+  <data name="6090" xml:space="preserve">
+    <value>makefile</value>
+  </data>
+  <data name="6091" xml:space="preserve">
+    <value>Adds new empty makefile for custom build actions</value>
+  </data>
+  <data name="6092" xml:space="preserve">
+    <value>makefile</value>
+  </data>
 </root>
