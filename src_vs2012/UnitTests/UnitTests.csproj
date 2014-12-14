@@ -59,6 +59,7 @@
     <Compile Include="DiagnosticTests.cs" />
     <Compile Include="MakeAllAndFormatOutputMessagesTestClass.cs" />
     <Compile Include="ParserTests.cs" />
+    <Compile Include="ProjectHelperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Defaults.cs" />
     <Compile Include="QConnTests.cs" />

@@ -68,6 +68,9 @@
     <Compile Include="..\..\src_vs2012\UnitTests\ParserTests.cs">
       <Link>ParserTests.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ProjectHelperTests.cs">
+      <Link>ProjectHelperTests.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\QConnTests.cs">
       <Link>QConnTests.cs</Link>
     </Compile>
@@ -92,6 +95,10 @@
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{ae6bee3e-3273-4214-a215-2924e33246ca}</Project>
       <Name>BlackBerry.NativeCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
+      <Project>{3d6effaf-ff39-497d-b6f8-0b6169e90c6d}</Project>
+      <Name>BlackBerry.Package</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

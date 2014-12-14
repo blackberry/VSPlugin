@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
@@ -34,12 +36,14 @@ namespace BlackBerry.Package.Helpers
         /// <summary>
         /// Updates specific project settings. It can be used to setup value only for particular platform (or 'null' to overwrite for all of them).
         /// </summary>
-        public static void SetValue(VCProject project, string ruleName, string propertyName, string platformName, string value, string valueSeparator)
+        public static void SetValue(VCProject project, string ruleName, string propertyName, string platformName, string value, char valueSeparator, string inheritDefaults)
         {
             if (project == null)
                 throw new ArgumentNullException("project");
             if (string.IsNullOrEmpty(value))
                 return;
+            if (valueSeparator == '\0')
+                throw new ArgumentNullException("valueSeparator");
 
             foreach (VCConfiguration configuration in (IVCCollection) project.Configurations)
             {
@@ -49,12 +53,92 @@ namespace BlackBerry.Package.Helpers
                     var currentPlatformName = ((VCPlatform) configuration.Platform).Name;
                     if (string.IsNullOrEmpty(platformName) || string.Compare(currentPlatformName, platformName, StringComparison.OrdinalIgnoreCase) == 0)
                     {
-                        var existingDependencies = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
-                        var dependencies = string.IsNullOrEmpty(existingDependencies) ? value : string.Concat(existingDependencies, valueSeparator, value);
-                        rulePropertyStore.SetPropertyValue(propertyName, dependencies);
+                        var existingPropertyValue = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
+                        var newPropertyValue = MergePropertyValues(existingPropertyValue, value, valueSeparator, inheritDefaults);
+
+                        // set new value, if it's really new:
+                        if (!string.IsNullOrEmpty(newPropertyValue) && newPropertyValue != existingPropertyValue && newPropertyValue != inheritDefaults)
+                        {
+                            rulePropertyStore.SetPropertyValue(propertyName, newPropertyValue);
+                        }
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Merges existing and new values set to the project (MSBuild) property.
+        /// If 'inheritDefaults' value is specified, it is enforced to be placed at the very end.
+        /// </summary>
+        public static string MergePropertyValues(string existingValue, string value, char valueSeparator, string inheritDefaults)
+        {
+            if (valueSeparator == '\0')
+                throw new ArgumentNullException("valueSeparator");
+            if (string.IsNullOrEmpty(value))
+                return existingValue;
+
+            var resultArray = new List<string>();
+            bool canAddInheritDefaults = false;
+
+            // first add existing values:
+            if (!string.IsNullOrEmpty(existingValue))
+            {
+                var existingValueArray = existingValue.Split(new[] { valueSeparator }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (string.IsNullOrEmpty(inheritDefaults))
+                {
+                    resultArray.AddRange(existingValueArray);
+                }
+                else
+                {
+                    foreach (var ev in existingValueArray)
+                    {
+                        if (string.CompareOrdinal(ev, inheritDefaults) != 0)
+                        {
+                            resultArray.Add(ev);
+                        }
+                        else
+                        {
+                            canAddInheritDefaults = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                canAddInheritDefaults = true;
+            }
+
+            // than append new values:
+            var valueArray = value.Split(new[] { valueSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var v in valueArray)
+            {
+                if (!resultArray.Contains(v))
+                {
+                    resultArray.Add(v);
+                }
+            }
+
+            // and add inherited marker, if specified:
+            if (!string.IsNullOrEmpty(inheritDefaults) && resultArray.Count > 0 && canAddInheritDefaults)
+            {
+                resultArray.Add(inheritDefaults);
+            }
+
+            // serialize final value:
+            var result = new StringBuilder();
+
+            for (int i = 0; i < resultArray.Count; i++)
+            {
+                result.Append(resultArray[i]);
+
+                if (i < resultArray.Count - 1)
+                {
+                    result.Append(valueSeparator);
+                }
+            }
+
+            return result.ToString();
         }
 
         /// <summary>

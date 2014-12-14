@@ -87,6 +87,7 @@ namespace BlackBerry.Package.Wizards
                     var filtersParamName = "filters";
                     var fileParamName = "file";
                     var dependencyParamName = "dependency";
+                    var dependencyDirectoryParamName = "dependency-dir";
                     var defineParamName = "define";
 
                     if (!string.IsNullOrEmpty(projectNumber))
@@ -94,6 +95,7 @@ namespace BlackBerry.Package.Wizards
                         filtersParamName = string.Concat(filtersParamName, ProjectNumberSeparator, projectNumber);
                         fileParamName = string.Concat(fileParamName, ProjectNumberSeparator, projectNumber);
                         dependencyParamName = string.Concat(dependencyParamName, ProjectNumberSeparator, projectNumber);
+                        dependencyDirectoryParamName = string.Concat(dependencyDirectoryParamName, ProjectNumberSeparator, projectNumber);
                         defineParamName = string.Concat(defineParamName, ProjectNumberSeparator, projectNumber);
                     }
 
@@ -121,7 +123,17 @@ namespace BlackBerry.Package.Wizards
                             var vcProject = project.Object as VCProject;
                             if (vcProject != null)
                             {
-                                ProjectHelper.SetValue(vcProject, "Link", "AdditionalDependencies", GetTag(projectNumber, PlatformSeparator), subItem.Value, ";");
+                                ProjectHelper.SetValue(vcProject, "Link", "AdditionalDependencies", GetTag(projectNumber, PlatformSeparator), subItem.Value, ';', "%(AdditionalDependencies)");
+                            }
+                        }
+
+                        // library reference directories:
+                        if (IsMatchingKey(subItem.Key, dependencyDirectoryParamName))
+                        {
+                            var vcProject = project.Object as VCProject;
+                            if (vcProject != null)
+                            {
+                                ProjectHelper.SetValue(vcProject, "Link", "AdditionalLibraryDirectories", GetTag(projectNumber, PlatformSeparator), subItem.Value, ';', "%(AdditionalLibraryDirectories)");
                             }
                         }
 
@@ -132,7 +144,7 @@ namespace BlackBerry.Package.Wizards
                             if (vcProject != null)
                             {
                                 // HINT: you can specify per-platform settings using '@':
-                                ProjectHelper.SetValue(vcProject, "CL", "PreprocessorDefinitions", GetTag(projectNumber, PlatformSeparator), subItem.Value, ";");
+                                ProjectHelper.SetValue(vcProject, "CL", "PreprocessorDefinitions", GetTag(projectNumber, PlatformSeparator), subItem.Value, ';', "%(PreprocessorDefinitions)");
                             }
                         }
                     }

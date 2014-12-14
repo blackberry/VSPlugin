@@ -13,7 +13,6 @@
 //* limitations under the License.
 
 using BlackBerry.BuildTasks;
-using Microsoft.Build.Framework;
 using NUnit.Framework;
 
 namespace UnitTests
