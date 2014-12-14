@@ -1,5 +1,6 @@
 Cascades| |Cascades|10
-OpenGL| |OpenGL|20
+OpenGL| |OpenGL|30
+Qt| |Qt|20
 EmptyProj.vsz|{db9f9c5f-fb27-4297-ab44-fa8774e962ca}|#5000|10|#5001|{db9f9c5f-fb27-4297-ab44-fa8774e962ca}|#5003|0|#5002
 ScreenProj.vsz|{db9f9c5f-fb27-4297-ab44-fa8774e962ca}|#5010|30|#5011|{db9f9c5f-fb27-4297-ab44-fa8774e962ca}|#5003|0|#5012
 CascadesProj.vsz|{db9f9c5f-fb27-4297-ab44-fa8774e962ca}|#5020|20|#5021|{db9f9c5f-fb27-4297-ab44-fa8774e962ca}|#5013|0|#5022

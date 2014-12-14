@@ -630,6 +630,18 @@
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\main.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\main.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\README.txt">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\README.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
@@ -852,6 +864,14 @@
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\makefile-empty">
       <Link>Templates\VCWizards\BlackBerry\Shared\makefile-empty</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Qt\items.vsdir">
+      <Link>Templates\Projects\BlackBerry\Qt\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Qt\qtproj_playbook.vsz">
+      <Link>Templates\Projects\BlackBerry\Qt\qtproj_playbook.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <None Include="Resources\TemplateIcons\NewItem.ico" />

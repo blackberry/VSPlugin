@@ -466,6 +466,21 @@
     <Content Include="Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml">
       <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
+    <Content Include="Templates\Projects\BlackBerry\Qt\items.vsdir">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\Projects\BlackBerry\Qt\qtproj_playbook.vsz">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\bar-descriptor.xml">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\main.cpp">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\README.txt">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Content Include="Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml">
       <IncludeInVSIX>true</IncludeInVSIX>
       <SubType>Designer</SubType>

@@ -225,6 +225,15 @@
   <data name="5112" xml:space="preserve">
     <value>CascadesCardApp</value>
   </data>
+  <data name="5120" xml:space="preserve">
+    <value>PlayBook - Qt4 Application</value>
+  </data>
+  <data name="5121" xml:space="preserve">
+    <value>Creates a Qt4 application with initial user UI. It requires PlayBook NDK 2.1+ installed for Qt headers and additional set of libraries downloaded and extracted manually into project's "QtLibs" folder. The ones distributed with the NDK somehow doesn't load properly on the device.</value>
+  </data>
+  <data name="5122" xml:space="preserve">
+    <value>QtAppForPlayBook</value>
+  </data>
   <data name="6000" xml:space="preserve">
     <value>BAR Descriptor</value>
   </data>
