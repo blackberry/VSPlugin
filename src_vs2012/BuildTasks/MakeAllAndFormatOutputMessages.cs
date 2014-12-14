@@ -255,7 +255,6 @@ namespace BlackBerry.BuildTasks
         {
             if (!string.IsNullOrEmpty(text))
             {
-                //text = UpdateToLongFileName(text);
                 message = text;
                 return MessageType.Nothing;
             }
@@ -552,59 +551,6 @@ namespace BlackBerry.BuildTasks
 
             return path.Substring(at + 1);
         }
-
-        /*
-         * PH: some old code from BlackBerry implementation... not working...
-        private static string UpdateToLongFileName(string text)
-        {
-            if (string.IsNullOrEmpty(text))
-                return string.Empty;
-
-            int tilde = text.IndexOf("~", StringComparison.InvariantCulture);
-            while (tilde != -1)
-            {
-                int end = text.IndexOf(':', tilde);
-                int end1 = text.IndexOf(' ', tilde);
-                int end2 = text.IndexOf('\n', tilde);
-                if ((end == -1) && (end1 == -1) && (end2 == -1))
-                    break;
-                if (end == -1)
-                    end = text.Length - 1;
-                if (end1 == -1)
-                    end1 = text.Length - 1;
-                if (end2 == -1)
-                    end2 = text.Length - 1;
-                if (end > end1)
-                    end = end1;
-                if (end > end2)
-                    end = end2;
-                int begin = text.LastIndexOf('\n', tilde) + 1;
-                int begin1 = text.LastIndexOf(' ', tilde) + 1;
-                if (begin < begin1)
-                    begin = begin1;
-                string shortPathName = text.Substring(begin, end - begin);
-                var longPathName = NativeMethods.GetLongPathName(shortPathName);
-                if (string.IsNullOrEmpty(longPathName))
-                {
-                    int sep = shortPathName.LastIndexOf('/');
-                    int sep2 = shortPathName.LastIndexOf('\\');
-                    if (sep2 > sep)
-                        sep = sep2;
-                    if (sep != -1)
-                    {
-                        shortPathName = shortPathName.Remove(sep + 1);
-                        longPathName = NativeMethods.GetLongPathName(shortPathName);
-                    }
-                }
-                if (!string.IsNullOrEmpty(longPathName))
-                    text = text.Replace(shortPathName, longPathName);
-
-                tilde = text.IndexOf("~", tilde + 1, StringComparison.InvariantCulture);
-            }
-
-            return text;
-        }
-         */
 
         /// <summary>
         /// Perform Cancel Code
