@@ -35,4 +35,4 @@ Changes in this version:
  * fixed PlayBook QNX-tools selection
 
 v3.0.1 (2014-11-13)
- * initial release of the plugin
+ * initial release of the plugin after 6 months of refactorings of original BlackBerry source-code and development of new features
