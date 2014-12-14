@@ -256,7 +256,7 @@ namespace BlackBerry.BuildTasks
             if (!string.IsNullOrEmpty(text))
             {
                 message = text;
-                return MessageType.Nothing;
+                return MessageType.Message;
             }
 
             message = null;
