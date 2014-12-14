@@ -495,6 +495,10 @@ namespace BlackBerry.BuildTasks
             {
                 try
                 {
+#if PLATFORM_VS2010
+                    // PH: somehow in VS2010 the column count starts from 0, not 1 as the whole code assumes:
+                    column--;
+#endif
                     BuildEngine.LogWarningEvent(new BuildWarningEventArgs(string.Empty, string.Empty, GetProjectAwareFileName(fileName), line, column, 0, 0, message, string.Empty, string.Empty));
                 }
                 catch (Exception ex)
@@ -510,6 +514,10 @@ namespace BlackBerry.BuildTasks
             {
                 try
                 {
+#if PLATFORM_VS2010
+                    // PH: somehow in VS2010 the column count starts from 0, not 1 as the whole code assumes:
+                    column--;
+#endif
                     BuildEngine.LogErrorEvent(new BuildErrorEventArgs(string.Empty, string.Empty, GetProjectAwareFileName(fileName), line, column, 0, 0, message, string.Empty, string.Empty));
                 }
                 catch (Exception ex)
