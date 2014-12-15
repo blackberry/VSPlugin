@@ -242,7 +242,17 @@ namespace BlackBerry.NativeCore.Components
                 {
                     if (Client != null && Client.LauncherService != null && SLog2Info == null)
                     {
-                        SLog2Info = Client.LauncherService.Start<TargetProcessSLog2Info>("/bin/slog2info", new[] { "-n", "-W", "-s" });
+                        try
+                        {
+                            SLog2Info = Client.LauncherService.Start<TargetProcessSLog2Info>("/bin/slog2info", new[] { "-n", "-W", "-s" });
+                        }
+                        catch (Exception ex)
+                        {
+                            SLog2Info = null;
+
+                            // probably PlayBook...
+                            TraceLog.WriteException(ex, "Unable to start slog2info remotely");
+                        }
 
                         if (SLog2Info != null)
                         {
