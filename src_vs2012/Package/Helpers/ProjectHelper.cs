@@ -36,7 +36,7 @@ namespace BlackBerry.Package.Helpers
         /// <summary>
         /// Updates specific project settings. It can be used to setup value only for particular platform (or 'null' to overwrite for all of them).
         /// </summary>
-        public static void SetValue(VCProject project, string ruleName, string propertyName, string platformName, string value, char valueSeparator, string inheritDefaults)
+        public static void SetValue(VCProject project, string ruleName, string propertyName, string platformName, string value, bool appendValues, char valueSeparator, string inheritDefaults)
         {
             if (project == null)
                 throw new ArgumentNullException("project");
@@ -54,7 +54,9 @@ namespace BlackBerry.Package.Helpers
                     if (string.IsNullOrEmpty(platformName) || string.Compare(currentPlatformName, platformName, StringComparison.OrdinalIgnoreCase) == 0)
                     {
                         var existingPropertyValue = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
-                        var newPropertyValue = MergePropertyValues(existingPropertyValue, value, valueSeparator, inheritDefaults);
+                        var newPropertyValue = appendValues
+                            ? MergePropertyValues(existingPropertyValue, value, valueSeparator, inheritDefaults)
+                            : MergePropertyValues(null, value, valueSeparator, inheritDefaults);
 
                         // set new value, if it's really new:
                         if (!string.IsNullOrEmpty(newPropertyValue) && newPropertyValue != existingPropertyValue && newPropertyValue != inheritDefaults)
@@ -139,6 +141,39 @@ namespace BlackBerry.Package.Helpers
             }
 
             return result.ToString();
+        }
+
+        /// <summary>
+        /// Adds additional set of dependencies (libraries) at the end of existing list in project properties.
+        /// </summary>
+        public static void AddAdditionalDependencies(VCProject project, string platformName, params string[] values)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "Link", "AdditionalDependencies", platformName, string.Join(";", values), true, ';', "%(AdditionalDependencies)");
+        }
+
+        /// <summary>
+        /// Adds additional set of dependency-directories (search directories for libraries) at the end of existing list in project properties.
+        /// </summary>
+        public static void AddAdditionalDependencyDirectories(VCProject project, string platformName, params string[] values)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "Link", "AdditionalLibraryDirectories", platformName, string.Join(";", values), true, ';', "%(AdditionalLibraryDirectories)");
+        }
+
+        /// <summary>
+        /// Adds additional set of preprocessor definitions at the end of existing list in project properties.
+        /// </summary>
+        public static void AddPreprocessorDefines(VCProject project, string platformName, params string[] values)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "CL", "PreprocessorDefinitions", platformName, string.Join(";", values), true, ';', "%(PreprocessorDefinitions)");
         }
 
         /// <summary>

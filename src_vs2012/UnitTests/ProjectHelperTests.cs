@@ -17,6 +17,7 @@ namespace UnitTests
             Assert.AreEqual("", ProjectHelper.MergePropertyValues("", "", ';', "%(def)"));
             Assert.AreEqual("a", ProjectHelper.MergePropertyValues("a", "", ';', "%(def)"));
             Assert.AreEqual("a;b;c", ProjectHelper.MergePropertyValues("a", "a;b;b;c", ';', "%(def)"));
+            Assert.AreEqual("a;b;c;%(def)", ProjectHelper.MergePropertyValues("a", "b;c", ';', "%(def)"));
         }
     }
 }
