@@ -203,6 +203,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Model\GdbInfo.cs">
       <Link>Model\GdbInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\ImportProjectInfo.cs">
+      <Link>Model\ImportProjectInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\NdkDefinition.cs">
       <Link>Model\NdkDefinition.cs</Link>
     </Compile>

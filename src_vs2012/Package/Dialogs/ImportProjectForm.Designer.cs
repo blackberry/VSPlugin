@@ -33,6 +33,10 @@
             this.txtSourceProject = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
+            this.txtDependencies = new System.Windows.Forms.TextBox();
+            this.txtDefines = new System.Windows.Forms.TextBox();
             this.chkAtSourceLocation = new System.Windows.Forms.CheckBox();
             this.chkCopyFiles = new System.Windows.Forms.CheckBox();
             this.txtDestinationName = new System.Windows.Forms.TextBox();
@@ -49,7 +53,7 @@
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bttOK.DialogResult = System.Windows.Forms.DialogResult.OK;
-            this.bttOK.Location = new System.Drawing.Point(406, 391);
+            this.bttOK.Location = new System.Drawing.Point(406, 462);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
             this.bttOK.TabIndex = 0;
@@ -60,7 +64,7 @@
             // 
             this.bttCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bttCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.bttCancel.Location = new System.Drawing.Point(487, 391);
+            this.bttCancel.Location = new System.Drawing.Point(487, 462);
             this.bttCancel.Name = "bttCancel";
             this.bttCancel.Size = new System.Drawing.Size(75, 23);
             this.bttCancel.TabIndex = 1;
@@ -90,6 +94,10 @@
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.label4);
+            this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.txtDependencies);
+            this.groupBox1.Controls.Add(this.txtDefines);
             this.groupBox1.Controls.Add(this.chkAtSourceLocation);
             this.groupBox1.Controls.Add(this.chkCopyFiles);
             this.groupBox1.Controls.Add(this.txtDestinationName);
@@ -100,10 +108,42 @@
             this.groupBox1.Controls.Add(this.txtSourceProject);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(550, 103);
+            this.groupBox1.Size = new System.Drawing.Size(550, 155);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Project info";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(18, 128);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(49, 13);
+            this.label4.TabIndex = 13;
+            this.label4.Text = "Libraries:";
+            // 
+            // label3
+            // 
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(18, 102);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(46, 13);
+            this.label3.TabIndex = 12;
+            this.label3.Text = "Defines:";
+            // 
+            // txtDependencies
+            // 
+            this.txtDependencies.Location = new System.Drawing.Point(103, 125);
+            this.txtDependencies.Name = "txtDependencies";
+            this.txtDependencies.Size = new System.Drawing.Size(400, 20);
+            this.txtDependencies.TabIndex = 11;
+            // 
+            // txtDefines
+            // 
+            this.txtDefines.Location = new System.Drawing.Point(103, 99);
+            this.txtDefines.Name = "txtDefines";
+            this.txtDefines.Size = new System.Drawing.Size(400, 20);
+            this.txtDefines.TabIndex = 10;
             // 
             // chkAtSourceLocation
             // 
@@ -175,7 +215,7 @@
             // 
             this.txtWarnings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtWarnings.Location = new System.Drawing.Point(12, 341);
+            this.txtWarnings.Location = new System.Drawing.Point(12, 412);
             this.txtWarnings.Multiline = true;
             this.txtWarnings.Name = "txtWarnings";
             this.txtWarnings.ReadOnly = true;
@@ -195,9 +235,9 @@
             this.listFiles.FullRowSelect = true;
             this.listFiles.GridLines = true;
             this.listFiles.HideSelection = false;
-            this.listFiles.Location = new System.Drawing.Point(12, 121);
+            this.listFiles.Location = new System.Drawing.Point(12, 173);
             this.listFiles.Name = "listFiles";
-            this.listFiles.Size = new System.Drawing.Size(550, 214);
+            this.listFiles.Size = new System.Drawing.Size(550, 233);
             this.listFiles.TabIndex = 7;
             this.listFiles.UseCompatibleStateImageBehavior = false;
             this.listFiles.View = System.Windows.Forms.View.Details;
@@ -213,7 +253,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bttCancel;
-            this.ClientSize = new System.Drawing.Size(574, 426);
+            this.ClientSize = new System.Drawing.Size(574, 497);
             this.Controls.Add(this.listFiles);
             this.Controls.Add(this.txtWarnings);
             this.Controls.Add(this.groupBox1);
@@ -250,5 +290,9 @@
         private System.Windows.Forms.CheckBox chkAtSourceLocation;
         private System.Windows.Forms.ListView listFiles;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox txtDependencies;
+        private System.Windows.Forms.TextBox txtDefines;
     }
 }

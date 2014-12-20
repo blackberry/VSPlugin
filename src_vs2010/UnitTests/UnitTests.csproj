@@ -64,6 +64,9 @@
     <Compile Include="..\..\src_vs2012\UnitTests\DiagnosticTests.cs">
       <Link>DiagnosticTests.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ImportProjectTests.cs">
+      <Link>ImportProjectTests.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\MakeAllAndFormatOutputMessagesTestClass.cs">
       <Link>MakeAllAndFormatOutputMessagesTestClass.cs</Link>
     </Compile>

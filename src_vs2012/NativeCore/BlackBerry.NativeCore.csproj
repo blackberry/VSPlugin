@@ -95,6 +95,7 @@
     <Compile Include="Model\DeviceInfo.cs" />
     <Compile Include="Model\DeviceTheme.cs" />
     <Compile Include="Model\GdbInfo.cs" />
+    <Compile Include="Model\ImportProjectInfo.cs" />
     <Compile Include="Model\NdkDefinition.cs" />
     <Compile Include="Model\DeviceFamilyType.cs" />
     <Compile Include="Model\NdkInfo.cs" />

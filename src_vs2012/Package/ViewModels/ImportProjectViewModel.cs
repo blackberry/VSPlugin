@@ -13,9 +13,6 @@ namespace BlackBerry.Package.ViewModels
 {
     internal sealed class ImportProjectViewModel
     {
-        private static readonly string[] ForbiddenFiles = { "\\.settings", "\\.device", "\\.cproject", "\\.project", "\\.gitignore", "\\.gitmodules", ".vcxproj", ".vcxproj.filters", ".suo", ".user" };
-        private static readonly string[] ForbiddenDirs = { "\\arm", "\\x86", "\\.settings", "\\.git", "\\.svn", "\\.hg", "\\Device-Debug", "\\Debug", "\\Device-Release", "\\Release", "\\Simulator-Debug", "\\obj", "\\bin" };
-
         private const string TemplateNativeCoreApp = @"native-default.vcxproj";
         private const string TemplateCascadesApp = @"cascades-default.vcxproj";
 
@@ -23,91 +20,9 @@ namespace BlackBerry.Package.ViewModels
         private VCProject _vcProject;
 
         /// <summary>
-        /// Scans for all supported files recursively inside specified location.
-        /// </summary>
-        public IEnumerable<string> ScanForFiles(string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                throw new ArgumentNullException("path");
-
-            var result = new List<string>();
-            ScanForFiles(result, path, true);
-
-            return result;
-        }
-
-        private static void ScanForFiles(List<string> result, string path, bool root)
-        {
-            if (!Directory.Exists(path))
-                return;
-
-            string[] files;
-            try
-            {
-                files = Directory.GetFiles(path, "*.*");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return;
-            }
-
-            foreach (var file in files)
-            {
-                // filter a bit root level folder:
-                if (root)
-                {
-                    if (IsForbidden(ForbiddenFiles, file))
-                    {
-                        continue;
-                    }
-                }
-
-                result.Add(file);
-            }
-
-            string[] directories;
-            try
-            {
-                directories = Directory.GetDirectories(path, "*.*");
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return;
-            }
-
-            foreach (var subDirectory in directories)
-            {
-                // filter a bit root level folder:
-                if (root)
-                {
-                    if (IsForbidden(ForbiddenDirs, subDirectory))
-                    {
-                        continue;
-                    }
-                }
-
-                ScanForFiles(result, subDirectory, false);
-            }
-        }
-
-        private static bool IsForbidden(IEnumerable<string> collection, string path)
-        {
-            if (string.IsNullOrEmpty(path))
-                return false;
-
-            foreach (var pattern in collection)
-            {
-                if (path.EndsWith(pattern, StringComparison.OrdinalIgnoreCase))
-                    return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Creates new project and adds it into solution.
         /// </summary>
-        public Project CreateProject(DTE2 dte, string projectName, bool createNativeCoreApp, string suggestedOutputPath)
+        public Project CreateProject(DTE2 dte, string projectName, bool createNativeCoreApp, string suggestedOutputPath, string[] defines, string[] dependencies)
         {
             if (dte == null)
                 throw new ArgumentNullException("dte");
@@ -123,7 +38,7 @@ namespace BlackBerry.Package.ViewModels
                 outputPath = hasSuggestedLocation ? suggestedOutputPath : Path.GetDirectoryName(solution.FullName);
                 if (string.IsNullOrEmpty(outputPath))
                 {
-                    UpdateProject(null);
+                    UpdateProject(null, null, null);
                     return null;
                 }
             }
@@ -132,7 +47,7 @@ namespace BlackBerry.Package.ViewModels
                 outputPath = hasSuggestedLocation ? suggestedOutputPath : ProjectHelper.GetDefaultProjectFolder(dte);
                 if (string.IsNullOrEmpty(outputPath))
                 {
-                    UpdateProject(null);
+                    UpdateProject(null, null, null);
                     return null;
                 }
                 saveSolution = true;
@@ -167,11 +82,11 @@ namespace BlackBerry.Package.ViewModels
             }
 
             // update state for adding items:
-            UpdateProject(project);
+            UpdateProject(project, defines, dependencies);
             return project;
         }
 
-        public void UpdateProject(Project project)
+        public void UpdateProject(Project project, string[] defines, string[] dependencies)
         {
             var newProject = project != null ? project.Object as VCProject : null;
 
@@ -184,6 +99,9 @@ namespace BlackBerry.Package.ViewModels
             {
                 _vcProject = newProject;
                 _folders = new ProjectFolderTree(_vcProject, true);
+
+                ProjectHelper.AddPreprocessorDefines(_vcProject, null, defines);
+                ProjectHelper.AddAdditionalDependencies(_vcProject, null, dependencies);
             }
         }
 

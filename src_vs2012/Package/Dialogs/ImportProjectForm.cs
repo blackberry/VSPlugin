@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
+using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Components;
 using BlackBerry.Package.Helpers;
 using BlackBerry.Package.Model.Integration;
@@ -16,6 +18,9 @@ namespace BlackBerry.Package.Dialogs
     /// </summary>
     internal partial class ImportProjectForm : Form
     {
+        private const string SeparatorChar = ";";
+        private readonly char[] Separators = new[] { ' ', '\t', ';' };
+
         private readonly ImportProjectViewModel _vm;
         private string _newProjectName;
 
@@ -77,17 +82,19 @@ namespace BlackBerry.Package.Dialogs
                 throw new ArgumentNullException("path");
 
             txtSourceProject.Text = path;
-
             SourcePath = Path.GetDirectoryName(path);
-            _newProjectName = Path.GetFileName(SourcePath) ?? "NewProject";
+
+            // load info about the project:
+            var info = ImportProjectInfo.Load(SourcePath);
+
+            _newProjectName = info != null ? info.Name : "NewProject";
+            txtDefines.Text = info != null ? AsString(SeparatorChar, info.Defines) : null;
+            txtDependencies.Text = info != null ? AsString(SeparatorChar, info.Dependencies) : null;
             listFiles.Items.Clear();
 
-            // traverse the source-tree to find all files, that could be added into the final solution:
-            var files = _vm.ScanForFiles(SourcePath);
-
-            if (files != null)
+            if (info != null && info.Files.Length > 0)
             {
-                foreach (var file in files)
+                foreach (var file in info.Files)
                 {
                     if (file.EndsWith(".qml"))
                     {
@@ -100,6 +107,11 @@ namespace BlackBerry.Package.Dialogs
                     listFiles.Items.Add(item);
                 }
             }
+        }
+
+        private static string AsString(string separator, IEnumerable<string> list)
+        {
+            return string.Join(separator, list);
         }
 
         /// <summary>
@@ -171,7 +183,7 @@ namespace BlackBerry.Package.Dialogs
 
             if (itemAsProject != null)
             {
-                _vm.UpdateProject(itemAsProject);
+                _vm.UpdateProject(itemAsProject, txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries));
                 return itemAsProject;
             }
 
@@ -184,7 +196,9 @@ namespace BlackBerry.Package.Dialogs
             }
 
             // create new NativeCore or Cascades project:
-            return _vm.CreateProject(dte, _newProjectName, IsNativeCoreAppSelected, IsSaveAtSourceLocation ? SourcePath : null);
+            return _vm.CreateProject(dte, _newProjectName, IsNativeCoreAppSelected, IsSaveAtSourceLocation ? SourcePath : null,
+                txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
+                txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries));
         }
 
         /// <summary>
