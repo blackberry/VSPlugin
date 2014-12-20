@@ -25,6 +25,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <TargetDeviceIP>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@device_IP)</TargetDeviceIP>
     <TargetDevicePassword>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@device_password)</TargetDevicePassword>
     <CPUVARDIR>armle-v7</CPUVARDIR>
+    <TargetArchPre>arm</TargetArchPre>
+    <TargetArchPost>.le-v7</TargetArchPost>
   </PropertyGroup>
   
   <PropertyGroup Condition="'$(TargetArch)' == 'x86'">
@@ -38,6 +40,8 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <TargetDeviceIP>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_IP)</TargetDeviceIP>
     <TargetDevicePassword>$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@simulator_password)</TargetDevicePassword>
     <CPUVARDIR>x86</CPUVARDIR>
+    <TargetArchPre>x86</TargetArchPre>
+    <TargetArchPost></TargetArchPost>
   </PropertyGroup>
 
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Common.props" Condition="Exists('$(VCTargetsPath)\Microsoft.Cpp.Common.props')" />
