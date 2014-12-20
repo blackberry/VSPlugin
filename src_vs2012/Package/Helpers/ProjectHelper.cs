@@ -36,32 +36,35 @@ namespace BlackBerry.Package.Helpers
         /// <summary>
         /// Updates specific project settings. It can be used to setup value only for particular platform (or 'null' to overwrite for all of them).
         /// </summary>
-        public static void SetValue(VCProject project, string ruleName, string propertyName, string platformName, string value, bool appendValues, char valueSeparator, string inheritDefaults)
+        public static void SetValue(VCProject project, string ruleName, string propertyName, string platformName, string configurationName, string value, bool appendValues, char valueSeparator, string inheritDefaults)
         {
             if (project == null)
                 throw new ArgumentNullException("project");
             if (string.IsNullOrEmpty(value))
                 return;
-            if (valueSeparator == '\0')
+            if (valueSeparator == '\0' && (appendValues || !string.IsNullOrEmpty(inheritDefaults)))
                 throw new ArgumentNullException("valueSeparator");
 
             foreach (VCConfiguration configuration in (IVCCollection) project.Configurations)
             {
-                var rulePropertyStore = configuration.Rules.Item(ruleName) as IVCRulePropertyStorage;
-                if (rulePropertyStore != null)
+                if (string.IsNullOrEmpty(configurationName) || string.Compare(configuration.ConfigurationName, configurationName, StringComparison.OrdinalIgnoreCase) == 0)
                 {
-                    var currentPlatformName = ((VCPlatform) configuration.Platform).Name;
-                    if (string.IsNullOrEmpty(platformName) || string.Compare(currentPlatformName, platformName, StringComparison.OrdinalIgnoreCase) == 0)
+                    var rulePropertyStore = configuration.Rules.Item(ruleName) as IVCRulePropertyStorage;
+                    if (rulePropertyStore != null)
                     {
-                        var existingPropertyValue = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
-                        var newPropertyValue = appendValues
-                            ? MergePropertyValues(existingPropertyValue, value, valueSeparator, inheritDefaults)
-                            : MergePropertyValues(null, value, valueSeparator, inheritDefaults);
-
-                        // set new value, if it's really new:
-                        if (!string.IsNullOrEmpty(newPropertyValue) && newPropertyValue != existingPropertyValue && newPropertyValue != inheritDefaults)
+                        var currentPlatformName = ((VCPlatform) configuration.Platform).Name;
+                        if (string.IsNullOrEmpty(platformName) || string.Compare(currentPlatformName, platformName, StringComparison.OrdinalIgnoreCase) == 0)
                         {
-                            rulePropertyStore.SetPropertyValue(propertyName, newPropertyValue);
+                            var existingPropertyValue = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
+                            var newPropertyValue = appendValues
+                                ? MergePropertyValues(existingPropertyValue, value, valueSeparator, inheritDefaults)
+                                : (string.IsNullOrEmpty(inheritDefaults) ? value : MergePropertyValues(null, value, valueSeparator, inheritDefaults));
+
+                            // set new value, if it's really new:
+                            if (!string.IsNullOrEmpty(newPropertyValue) && newPropertyValue != existingPropertyValue && newPropertyValue != inheritDefaults)
+                            {
+                                rulePropertyStore.SetPropertyValue(propertyName, newPropertyValue);
+                            }
                         }
                     }
                 }
@@ -146,34 +149,46 @@ namespace BlackBerry.Package.Helpers
         /// <summary>
         /// Adds additional set of dependencies (libraries) at the end of existing list in project properties.
         /// </summary>
-        public static void AddAdditionalDependencies(VCProject project, string platformName, params string[] values)
+        public static void AddAdditionalDependencies(VCProject project, string platformName, string configurationName, params string[] values)
         {
             if (project == null)
                 throw new ArgumentNullException("project");
 
-            SetValue(project, "Link", "AdditionalDependencies", platformName, string.Join(";", values), true, ';', "%(AdditionalDependencies)");
+            SetValue(project, "Link", "AdditionalDependencies", platformName, configurationName, string.Join(";", values), true, ';', "%(AdditionalDependencies)");
         }
 
         /// <summary>
         /// Adds additional set of dependency-directories (search directories for libraries) at the end of existing list in project properties.
         /// </summary>
-        public static void AddAdditionalDependencyDirectories(VCProject project, string platformName, params string[] values)
+        public static void AddAdditionalDependencyDirectories(VCProject project, string platformName, string configurationName, params string[] values)
         {
             if (project == null)
                 throw new ArgumentNullException("project");
 
-            SetValue(project, "Link", "AdditionalLibraryDirectories", platformName, string.Join(";", values), true, ';', "%(AdditionalLibraryDirectories)");
+            SetValue(project, "Link", "AdditionalLibraryDirectories", platformName, configurationName, string.Join(";", values), true, ';', "%(AdditionalLibraryDirectories)");
         }
 
         /// <summary>
         /// Adds additional set of preprocessor definitions at the end of existing list in project properties.
         /// </summary>
-        public static void AddPreprocessorDefines(VCProject project, string platformName, params string[] values)
+        public static void AddPreprocessorDefines(VCProject project, string platformName, string configurationName, params string[] values)
         {
             if (project == null)
                 throw new ArgumentNullException("project");
 
-            SetValue(project, "CL", "PreprocessorDefinitions", platformName, string.Join(";", values), true, ';', "%(PreprocessorDefinitions)");
+            SetValue(project, "CL", "PreprocessorDefinitions", platformName, configurationName, string.Join(";", values), true, ';', "%(PreprocessorDefinitions)");
+        }
+
+        /// <summary>
+        /// Updates build-output and build-intermediate directories in project properties.
+        /// </summary>
+        public static void SetBuildOutputDirectory(VCProject project, string platformName, string configurationName, string value)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "ConfigurationGeneral", "OutDir", platformName, configurationName, value, false, '\0', null);
+            SetValue(project, "ConfigurationGeneral", "IntDir", platformName, configurationName, value, false, '\0', null);
         }
 
         /// <summary>
