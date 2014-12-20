@@ -276,6 +276,14 @@ namespace BlackBerry.BuildTasks
                     return MessageType.Error;
                 }
 
+                separatorStart = text.IndexOf(": fatal error:");
+                if (separatorStart > 0)
+                {
+                    fileName = ExtractFileName(text, separatorStart, out line, out column);
+                    message = text.Substring(separatorStart + 15);
+                    return MessageType.Error;
+                }
+
                 separatorStart = text.IndexOf(": warning:");
                 if (separatorStart > 0)
                 {
