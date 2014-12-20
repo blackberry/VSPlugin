@@ -151,6 +151,7 @@
             this.chkAtSourceLocation.Checked = true;
             this.chkAtSourceLocation.CheckState = System.Windows.Forms.CheckState.Checked;
             this.chkAtSourceLocation.Enabled = false;
+            this.chkAtSourceLocation.ForeColor = System.Drawing.Color.Red;
             this.chkAtSourceLocation.Location = new System.Drawing.Point(320, 76);
             this.chkAtSourceLocation.Name = "chkAtSourceLocation";
             this.chkAtSourceLocation.Size = new System.Drawing.Size(179, 17);

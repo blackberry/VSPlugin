@@ -107,9 +107,9 @@ namespace BlackBerry.NativeCore.Model
             ///////////
             // Files
 
-            string[] projectFiles = null;
-            string[] projectDependencies = null;
-            string[] projectDefines = null;
+            var projectFiles = new List<string>();
+            var projectDependencies = new List<string>();
+            var projectDefines = new List<string>();
 
             // is there redefining all manifest file?
             var manifestFileName = System.IO.Path.Combine(path, "manifest.properties");
@@ -126,22 +126,27 @@ namespace BlackBerry.NativeCore.Model
                         projectName = name;
                     }
 
-                    if (files != null && files.Length > 0)
-                    {
-                        projectFiles = files;
-                    }
+                    AppendUniquely(projectFiles, files);
+                    AppendUniquely(projectDependencies, dependencies);
+                }
+            }
 
-                    if (dependencies != null && dependencies.Length > 0)
-                    {
-                        projectDependencies = dependencies;
-                    }
+            var cprojectFileName = System.IO.Path.Combine(path, ".cproject");
+            if (File.Exists(cprojectFileName))
+            {
+                string[] defines;
+                string[] dependencies;
+                if (ReadCProjectFile(cprojectFileName, out defines, out dependencies))
+                {
+                    AppendUniquely(projectDefines, defines);
+                    AppendUniquely(projectDependencies, dependencies);
                 }
             }
 
             // default list of files is everything from the folder:
-            if (projectFiles == null || projectFiles.Length == 0)
+            if (projectFiles.Count == 0)
             {
-                projectFiles = ScanForFiles(path);
+                AppendUniquely(projectFiles, ScanForFiles(path));
             }
 
             ///////////
@@ -174,7 +179,21 @@ namespace BlackBerry.NativeCore.Model
                 }
             }
 
-            return new ImportProjectInfo(path, projectName, projectFiles, projectDefines, projectDependencies, projectBuildOutputDependsOnTargetArch);
+            return new ImportProjectInfo(path, projectName, projectFiles.ToArray(), projectDefines.ToArray(), projectDependencies.ToArray(), projectBuildOutputDependsOnTargetArch);
+        }
+
+        private static void AppendUniquely(List<string> list, IEnumerable<string> newItems)
+        {
+            if (newItems != null)
+            {
+                foreach (var value in newItems)
+                {
+                    if (!list.Contains(value))
+                    {
+                        list.Add(value);
+                    }
+                }
+            }
         }
 
         private static bool ReadProjectFile(string projectFileName, out string name)
@@ -204,6 +223,85 @@ namespace BlackBerry.NativeCore.Model
 
             name = null;
             return false;
+        }
+
+        private static bool ReadCProjectFile(string cprojectFileName, out string[] defines, out string[] dependencies)
+        {
+            if (string.IsNullOrEmpty(cprojectFileName))
+                throw new ArgumentNullException("cprojectFileName");
+
+            var defs = new List<string>();
+            var libs = new List<string>();
+
+            defines = null;
+            dependencies = null;
+
+            try
+            {
+                var xmlDoc = new XmlDocument();
+                xmlDoc.Load(cprojectFileName);
+
+                // process the 'option' items of any configuration:
+                var options = xmlDoc.GetElementsByTagName("option");
+                for (int i = 0; i < options.Count; i++)
+                {
+                    var node = options[i];
+                    if (node != null && node.Attributes != null)
+                    {
+                        var attrSuperClass = node.Attributes["superClass"];
+                        if (attrSuperClass != null)
+                        {
+                            if (string.Compare(attrSuperClass.Value, "com.qnx.qcc.option.linker.libraries", StringComparison.Ordinal) == 0)
+                            {
+                                AddFromNodeList(libs, node.ChildNodes);
+                            }
+                            else
+                            {
+                                if (string.Compare(attrSuperClass.Value, "com.qnx.qcc.option.compiler.defines", StringComparison.Ordinal) == 0)
+                                {
+                                    AddFromNodeList(defs, node.ChildNodes);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to read .cproject file: \"{0}\"", cprojectFileName);
+                return false;
+            }
+
+            defines = defs.ToArray();
+            dependencies = libs.ToArray();
+            return true;
+        }
+
+        private static void AddFromNodeList(List<string> list, XmlNodeList nodeList)
+        {
+            if (nodeList != null)
+            {
+                for (int i = 0; i < nodeList.Count; i++)
+                {
+                    var node = nodeList[i];
+                    if (node != null && node.Attributes != null)
+                    {
+                        // for non-built-in options:
+                        var attrBuiltIn = node.Attributes["builtIn"];
+                        if (attrBuiltIn != null && string.Compare(attrBuiltIn.Value, "false", StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            var attrValue = node.Attributes["value"];
+                            if (attrValue != null)
+                            {
+                                if (!list.Contains(attrValue.Value))
+                                {
+                                    list.Add(attrValue.Value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -332,7 +430,7 @@ namespace BlackBerry.NativeCore.Model
                             // is it a referenced library?
                             if (string.Compare(ruleName, "libs", StringComparison.OrdinalIgnoreCase) == 0)
                             {
-                                libs.AddRange(ruleValue.Split(separators, StringSplitOptions.RemoveEmptyEntries));
+                                AppendUniquely(libs, ruleValue.Split(separators, StringSplitOptions.RemoveEmptyEntries));
                             }
 
                             // is it a file, part of the project?
@@ -407,6 +505,9 @@ namespace BlackBerry.NativeCore.Model
 
         private static bool ReadProjectBarDescriptor(string barDescriptorFileName, out bool buildOutputsDependsOnTargetArch)
         {
+            if (string.IsNullOrEmpty(barDescriptorFileName))
+                throw new ArgumentNullException("barDescriptorFileName");
+
             buildOutputsDependsOnTargetArch = false;
 
             try
