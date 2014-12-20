@@ -52,13 +52,13 @@
             // bttOK
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOK.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.bttOK.Location = new System.Drawing.Point(406, 462);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
             this.bttOK.TabIndex = 0;
             this.bttOK.Text = "&OK";
             this.bttOK.UseVisualStyleBackColor = true;
+            this.bttOK.Click += new System.EventHandler(this.bttOK_Click);
             // 
             // bttCancel
             // 

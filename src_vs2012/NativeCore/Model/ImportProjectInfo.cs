@@ -17,7 +17,7 @@ namespace BlackBerry.NativeCore.Model
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public ImportProjectInfo(string path, string name, string[] files, string[] defines, string[] dependencies)
+        public ImportProjectInfo(string path, string name, string[] files, string[] defines, string[] dependencies, bool buildOutputDependsOnTargetArch)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -29,6 +29,7 @@ namespace BlackBerry.NativeCore.Model
             Files = files ?? new string[0];
             Defines = defines ?? new string[0];
             Dependencies = dependencies ?? new string[0];
+            BuildOutputDependsOnTargetArch = buildOutputDependsOnTargetArch;
         }
 
         #region Properties
@@ -61,6 +62,12 @@ namespace BlackBerry.NativeCore.Model
         /// Gets the collection of names of referenced shared libraries.
         /// </summary>
         public string[] Dependencies
+        {
+            get;
+            private set;
+        }
+
+        public bool BuildOutputDependsOnTargetArch
         {
             get;
             private set;
@@ -100,8 +107,7 @@ namespace BlackBerry.NativeCore.Model
             ///////////
             // Files
 
-            // default list of files is everything from the folder:
-            var projectFiles = ScanForFiles(path);
+            string[] projectFiles = null;
             string[] projectDependencies = null;
             string[] projectDefines = null;
 
@@ -132,7 +138,43 @@ namespace BlackBerry.NativeCore.Model
                 }
             }
 
-            return new ImportProjectInfo(path, projectName, projectFiles, projectDefines, projectDependencies);
+            // default list of files is everything from the folder:
+            if (projectFiles == null || projectFiles.Length == 0)
+            {
+                projectFiles = ScanForFiles(path);
+            }
+
+            ///////////
+            // Outputs
+
+            bool projectBuildOutputDependsOnTargetArch = false;
+
+            // is there any 'entry' definition in bar-descriptor.xml that looks like: arm/o.le-v7-g or x86/o-g or similar?
+            var barDescriptorFileName = System.IO.Path.Combine(path, "bar-descriptor.xml");
+
+            // if it's not in standard location, try to find it among project files:
+            if (!File.Exists(barDescriptorFileName))
+            {
+                foreach (var fileName in projectFiles)
+                {
+                    if (fileName.EndsWith("\\bar-descriptor.xml", StringComparison.OrdinalIgnoreCase))
+                    {
+                        barDescriptorFileName = fileName;
+                        break;
+                    }
+                }
+            }
+
+            if (File.Exists(barDescriptorFileName))
+            {
+                bool outputsBasedOnTargetArch;
+                if (ReadProjectBarDescriptor(barDescriptorFileName, out outputsBasedOnTargetArch))
+                {
+                    projectBuildOutputDependsOnTargetArch = outputsBasedOnTargetArch;
+                }
+            }
+
+            return new ImportProjectInfo(path, projectName, projectFiles, projectDefines, projectDependencies, projectBuildOutputDependsOnTargetArch);
         }
 
         private static bool ReadProjectFile(string projectFileName, out string name)
@@ -361,6 +403,51 @@ namespace BlackBerry.NativeCore.Model
             }
 
             return File.Exists(fullName) ? fullName : null;
+        }
+
+        private static bool ReadProjectBarDescriptor(string barDescriptorFileName, out bool buildOutputsDependsOnTargetArch)
+        {
+            buildOutputsDependsOnTargetArch = false;
+
+            try
+            {
+                var xmlDoc = new XmlDocument();
+                xmlDoc.Load(barDescriptorFileName);
+
+                // get all assets and verify if the 'entry' ones have special output path:
+                var assets = xmlDoc.GetElementsByTagName("asset");
+                for(int i = 0; i < assets.Count; i++)
+                {
+                    var node = assets[i];
+                    if (node != null && node.Attributes != null)
+                    {
+                        var attrEntry = node.Attributes["entry"];
+                        if (attrEntry != null && string.Compare(attrEntry.Value, "true", StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            var attrPath = node.Attributes["path"];
+                            if (attrPath != null)
+                            {
+                                buildOutputsDependsOnTargetArch = IsTargetArchBuildOutput(attrPath.Value);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        private static bool IsTargetArchBuildOutput(string path)
+        {
+            return !string.IsNullOrEmpty(path) &&
+                   (path.StartsWith("arm/o.le-v7-g/", StringComparison.OrdinalIgnoreCase) ||
+                    path.StartsWith("arm/o.le-v7/", StringComparison.OrdinalIgnoreCase) ||
+                    path.StartsWith("x86/o-g/", StringComparison.OrdinalIgnoreCase));
         }
     }
 }

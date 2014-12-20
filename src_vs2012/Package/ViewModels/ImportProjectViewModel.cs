@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.Package.Components;
@@ -22,7 +21,7 @@ namespace BlackBerry.Package.ViewModels
         /// <summary>
         /// Creates new project and adds it into solution.
         /// </summary>
-        public Project CreateProject(DTE2 dte, string projectName, bool createNativeCoreApp, string suggestedOutputPath, string[] defines, string[] dependencies)
+        public Project CreateProject(DTE2 dte, string projectName, bool createNativeCoreApp, string suggestedProjectOutputPath, string[] defines, string[] dependencies, bool buildOutputsDependsOnTargetArch)
         {
             if (dte == null)
                 throw new ArgumentNullException("dte");
@@ -31,23 +30,23 @@ namespace BlackBerry.Package.ViewModels
             string outputPath;
             var solution = dte.Solution;
             bool saveSolution = false;
-            bool hasSuggestedLocation = !string.IsNullOrEmpty(suggestedOutputPath);
+            bool hasSuggestedLocation = !string.IsNullOrEmpty(suggestedProjectOutputPath);
 
             if (solution.IsOpen && File.Exists(solution.FullName))
             {
-                outputPath = hasSuggestedLocation ? suggestedOutputPath : Path.GetDirectoryName(solution.FullName);
+                outputPath = hasSuggestedLocation ? suggestedProjectOutputPath : Path.GetDirectoryName(solution.FullName);
                 if (string.IsNullOrEmpty(outputPath))
                 {
-                    UpdateProject(null, null, null);
+                    UpdateProject(null, null, null, false);
                     return null;
                 }
             }
             else
             {
-                outputPath = hasSuggestedLocation ? suggestedOutputPath : ProjectHelper.GetDefaultProjectFolder(dte);
+                outputPath = hasSuggestedLocation ? suggestedProjectOutputPath : ProjectHelper.GetDefaultProjectFolder(dte);
                 if (string.IsNullOrEmpty(outputPath))
                 {
-                    UpdateProject(null, null, null);
+                    UpdateProject(null, null, null, false);
                     return null;
                 }
                 saveSolution = true;
@@ -82,11 +81,14 @@ namespace BlackBerry.Package.ViewModels
             }
 
             // update state for adding items:
-            UpdateProject(project, defines, dependencies);
+            UpdateProject(project, defines, dependencies, buildOutputsDependsOnTargetArch);
             return project;
         }
 
-        public void UpdateProject(Project project, string[] defines, string[] dependencies)
+        /// <summary>
+        /// Sets a project to be used by add-file functionality and updates few of its properties.
+        /// </summary>
+        public void UpdateProject(Project project, string[] defines, string[] dependencies, bool buildOutputsDependsOnTargetArch)
         {
             var newProject = project != null ? project.Object as VCProject : null;
 
@@ -100,8 +102,14 @@ namespace BlackBerry.Package.ViewModels
                 _vcProject = newProject;
                 _folders = new ProjectFolderTree(_vcProject, true);
 
-                ProjectHelper.AddPreprocessorDefines(_vcProject, null, defines);
-                ProjectHelper.AddAdditionalDependencies(_vcProject, null, dependencies);
+                ProjectHelper.AddPreprocessorDefines(_vcProject, "BlackBerry", null, defines);
+                ProjectHelper.AddAdditionalDependencies(_vcProject, "BlackBerry", null, dependencies);
+
+                if (buildOutputsDependsOnTargetArch)
+                {
+                    ProjectHelper.SetBuildOutputDirectory(_vcProject, "BlackBerry", "Release", "$(TargetArchPre)\\o$(TargetArchPost)\\");
+                    ProjectHelper.SetBuildOutputDirectory(_vcProject, "BlackBerry", "Debug", "$(TargetArchPre)\\o$(TargetArchPost)-g\\");
+                }
             }
         }
 

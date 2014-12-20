@@ -13,15 +13,13 @@ using Microsoft.VisualStudio.VCProjectEngine;
 
 namespace BlackBerry.Package.Dialogs
 {
-    /// <summary>
-    /// 
-    /// </summary>
     internal partial class ImportProjectForm : Form
     {
         private const string SeparatorChar = ";";
         private readonly char[] Separators = new[] { ' ', '\t', ';' };
 
         private readonly ImportProjectViewModel _vm;
+        private Solution _solution;
         private string _newProjectName;
 
         public ImportProjectForm()
@@ -74,6 +72,12 @@ namespace BlackBerry.Package.Dialogs
             set { chkAtSourceLocation.Checked = value; }
         }
 
+        public bool BuildOutputDependsOnTargetArch
+        {
+            get;
+            private set;
+        }
+
         #endregion
 
         public void SetSourceProject(string path)
@@ -90,6 +94,7 @@ namespace BlackBerry.Package.Dialogs
             _newProjectName = info != null ? info.Name : "NewProject";
             txtDefines.Text = info != null ? AsString(SeparatorChar, info.Defines) : null;
             txtDependencies.Text = info != null ? AsString(SeparatorChar, info.Dependencies) : null;
+            BuildOutputDependsOnTargetArch = info != null && info.BuildOutputDependsOnTargetArch;
             listFiles.Items.Clear();
 
             if (info != null && info.Files.Length > 0)
@@ -139,6 +144,7 @@ namespace BlackBerry.Package.Dialogs
             cmbProjects.Items.Add(new ComboBoxItem("New Native Core project", null));
             cmbProjects.Items.Add(new ComboBoxItem("New Cascades project", null));
 
+            _solution = solution;
             if (solution != null)
             {
                 foreach (Project project in solution.Projects)
@@ -183,22 +189,15 @@ namespace BlackBerry.Package.Dialogs
 
             if (itemAsProject != null)
             {
-                _vm.UpdateProject(itemAsProject, txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries));
+                _vm.UpdateProject(itemAsProject, txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), false);
                 return itemAsProject;
-            }
-
-            // verify inputs:
-            if (string.IsNullOrEmpty(_newProjectName))
-            {
-                MessageBoxHelper.Show("Sorry, name of the new project can't be empty", "Validation failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                ActiveControl = txtDestinationName;
-                return null;
             }
 
             // create new NativeCore or Cascades project:
             return _vm.CreateProject(dte, _newProjectName, IsNativeCoreAppSelected, IsSaveAtSourceLocation ? SourcePath : null,
                 txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
-                txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries));
+                txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
+                BuildOutputDependsOnTargetArch);
         }
 
         /// <summary>
@@ -237,7 +236,48 @@ namespace BlackBerry.Package.Dialogs
             if (item != null)
             {
                 item.Tag = txtDestinationName.Text;
+                _newProjectName = txtDestinationName.Text;
             }
+        }
+
+        private void bttOK_Click(object sender, EventArgs e)
+        {
+            // verify inputs:
+            if (string.IsNullOrEmpty(_newProjectName))
+            {
+                MessageBoxHelper.Show("Sorry, name of the new project can't be empty", "Validation failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ActiveControl = txtDestinationName;
+                return;
+            }
+
+            if (SolutionHasProject(_solution, _newProjectName))
+            {
+                MessageBoxHelper.Show("Project with name \"" + _newProjectName + "\" already exists inside the solution", "Validation failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                ActiveControl = txtDestinationName;
+                return;
+            }
+
+            DialogResult = DialogResult.OK;
+            Close();
+        }
+
+        /// <summary>
+        /// Checks, if project with specified name is already inside the solution.
+        /// </summary>
+        private static bool SolutionHasProject(Solution solution, string projectName)
+        {
+            if (solution == null)
+                return false;
+            if (string.IsNullOrEmpty(projectName))
+                return false;
+
+            foreach (Project project in solution.Projects)
+            {
+                if (string.Compare(projectName, project.Name, StringComparison.OrdinalIgnoreCase) == 0)
+                    return true;
+            }
+
+            return false;
         }
     }
 }
