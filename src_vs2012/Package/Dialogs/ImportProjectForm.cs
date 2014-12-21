@@ -16,7 +16,7 @@ namespace BlackBerry.Package.Dialogs
     internal partial class ImportProjectForm : Form
     {
         private const string SeparatorChar = ";";
-        private readonly char[] Separators = new[] { ' ', '\t', ';' };
+        private readonly char[] Separators = { ' ', '\t', ';' };
 
         private readonly ImportProjectViewModel _vm;
         private Solution _solution;
@@ -63,7 +63,13 @@ namespace BlackBerry.Package.Dialogs
         public bool IsCascadesAppSelected
         {
             get { return cmbProjects.SelectedIndex == 1; }
-            set { cmbProjects.SelectedIndex = 1; }
+            set
+            {
+                if (cmbProjects.Items.Count > 1)
+                {
+                    cmbProjects.SelectedIndex = 1;
+                }
+            }
         }
 
         public bool IsSaveAtSourceLocation
@@ -97,14 +103,16 @@ namespace BlackBerry.Package.Dialogs
             BuildOutputDependsOnTargetArch = info != null && info.BuildOutputDependsOnTargetArch;
             listFiles.Items.Clear();
 
+            bool isCascadesProject = false;
+
             if (info != null && info.Files.Length > 0)
             {
                 foreach (var file in info.Files)
                 {
                     if (file.EndsWith(".qml"))
                     {
-                        IsCascadesAppSelected = true;
-                    }
+                        isCascadesProject = true;
+                    } 
 
                     var item = new ListViewItem(string.IsNullOrEmpty(SourcePath) ? file : file.Substring(SourcePath.Length + 1));
                     item.Checked = true;
@@ -112,6 +120,8 @@ namespace BlackBerry.Package.Dialogs
                     listFiles.Items.Add(item);
                 }
             }
+
+            cmbProjects.SelectedIndex = isCascadesProject ? 1 : 0;
         }
 
         private static string AsString(string separator, IEnumerable<string> list)
@@ -155,8 +165,6 @@ namespace BlackBerry.Package.Dialogs
                     }
                 }
             }
-
-            cmbProjects.SelectedIndex = 0;
         }
 
         private void bttFindProject_Click(object sender, EventArgs e)
@@ -167,7 +175,7 @@ namespace BlackBerry.Package.Dialogs
         private void cmbProjects_SelectedIndexChanged(object sender, EventArgs e)
         {
             var item = cmbProjects.SelectedItem;
-            object tag = ((ComboBoxItem) item).Tag;
+            object tag = item != null ? ((ComboBoxItem) item).Tag : null;
             var itemAsProject = tag as Project;
 
             txtDestinationName.ReadOnly = item == null || itemAsProject != null;

@@ -30,5 +30,17 @@ namespace UnitTests
             Assert.IsNotNull(info.Files);
             Assert.IsTrue(info.Files.Length > 0);
         }
+
+        [TestCase]
+        public void LoadAdSampleCascadesProjectInfo()
+        {
+            var projectDirectory = Path.Combine(Defaults.SampleCascadesProjectPath, "AdSample");
+
+            var info = ImportProjectInfo.Load(projectDirectory);
+            Assert.IsNotNull(info);
+            Assert.AreEqual("AdSample", info.Name);
+            Assert.IsNotNull(info.Files);
+            Assert.IsTrue(info.Files.Length > 0);
+        }
     }
 }
