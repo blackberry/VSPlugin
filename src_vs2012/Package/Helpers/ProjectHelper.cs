@@ -180,7 +180,7 @@ namespace BlackBerry.Package.Helpers
         }
 
         /// <summary>
-        /// Updates build-output and build-intermediate directories in project properties.
+        /// Updates build-output directories in project properties.
         /// </summary>
         public static void SetBuildOutputDirectory(VCProject project, string platformName, string configurationName, string value)
         {
@@ -188,7 +188,6 @@ namespace BlackBerry.Package.Helpers
                 throw new ArgumentNullException("project");
 
             SetValue(project, "ConfigurationGeneral", "OutDir", platformName, configurationName, value, false, '\0', null);
-            SetValue(project, "ConfigurationGeneral", "IntDir", platformName, configurationName, value, false, '\0', null);
         }
 
         /// <summary>
