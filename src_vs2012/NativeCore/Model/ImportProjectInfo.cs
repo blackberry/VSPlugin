@@ -117,9 +117,10 @@ namespace BlackBerry.NativeCore.Model
             {
                 string name;
                 string[] files;
+                string[] defines;
                 string[] dependencies;
 
-                if (ReadProjectManifest(manifestFileName, path, out name, out files, out dependencies))
+                if (ReadProjectManifest(manifestFileName, path, out name, out files, out defines, out dependencies))
                 {
                     if (!string.IsNullOrEmpty(name))
                     {
@@ -127,6 +128,7 @@ namespace BlackBerry.NativeCore.Model
                     }
 
                     AppendUniquely(projectFiles, files);
+                    AppendUniquely(projectDefines, defines);
                     AppendUniquely(projectDependencies, dependencies);
                 }
             }
@@ -386,7 +388,7 @@ namespace BlackBerry.NativeCore.Model
             return false;
         }
 
-        private static bool ReadProjectManifest(string manifestFileName, string filesRoot, out string name, out string[] files, out string[] dependencies)
+        private static bool ReadProjectManifest(string manifestFileName, string filesRoot, out string name, out string[] files, out string[] defines, out string[] dependencies)
         {
             if (string.IsNullOrEmpty(manifestFileName))
                 throw new ArgumentNullException("manifestFileName");
@@ -395,6 +397,7 @@ namespace BlackBerry.NativeCore.Model
 
             char[] separators = { ' ', '\t' };
             var contents = new List<string>();
+            var defs = new List<string>();
             var libs = new List<string>();
             var paths = new Dictionary<string, string>();
 
@@ -402,6 +405,7 @@ namespace BlackBerry.NativeCore.Model
 
             name = null;
             files = null;
+            defines = null;
             dependencies = null;
             try
             {
@@ -431,6 +435,22 @@ namespace BlackBerry.NativeCore.Model
                             if (string.Compare(ruleName, "libs", StringComparison.OrdinalIgnoreCase) == 0)
                             {
                                 AppendUniquely(libs, ruleValue.Split(separators, StringSplitOptions.RemoveEmptyEntries));
+                            }
+
+                            // is it a define?
+                            if (string.Compare(ruleName, "flags.compiler", StringComparison.OrdinalIgnoreCase) == 0)
+                            {
+                                foreach (var value in ruleValue.Split(separators, StringSplitOptions.RemoveEmptyEntries))
+                                {
+                                    if (value.StartsWith("-D"))
+                                    {
+                                        var define = value.Substring(2);
+                                        if (!defs.Contains(define))
+                                        {
+                                            defs.Add(define);
+                                        }
+                                    }
+                                }
                             }
 
                             // is it a file, part of the project?
@@ -471,6 +491,7 @@ namespace BlackBerry.NativeCore.Model
             fullPaths.Sort();
 
             files = fullPaths.ToArray();
+            defines = defs.ToArray();
             dependencies = libs.ToArray();
             return true;
         }
