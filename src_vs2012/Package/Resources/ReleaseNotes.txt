@@ -1,3 +1,19 @@
+v3.2.0 (2014-12-25):
+Changes in this version:
+ * .bar file editor is not default one for all XML files anymore!
+ * improved presentation of compilation errors (#35) to let Visual Studio jump into right place in source-code
+ * totally changed the way importing Momentics project works:
+   - loads original project name (#34)
+   - loads properties from manifest.properties too
+   - can check/uncheck/remove files by whole folders (#35)
+   - can specify custom list of defines (among the ones read from existing settings)
+   - can specify custom references to libraries
+   - detects the output location by parsing bar-descriptor.xml (using new MSBuild properties: $(TargetArchPre) / $(TargetArchPost) to build that path)
+ * added project-item template for new empty makefile
+ * added project template of Qt4 on PlayBook (experimental)
+ * fixed problem with launching slog2info on PlayBook (it's simply not supported there)
+ * other small tweaks and refactorings
+
 v3.1.0 (2014-12-09):
 Changes in this version:
  * introduced device logs capture feature (#32)
