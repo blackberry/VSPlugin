@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.bttOK = new System.Windows.Forms.Button();
             this.bttCancel = new System.Windows.Forms.Button();
             this.txtSourceProject = new System.Windows.Forms.TextBox();
@@ -46,7 +47,19 @@
             this.txtWarnings = new System.Windows.Forms.TextBox();
             this.listFiles = new System.Windows.Forms.ListView();
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.contextMenuFiles = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.contextToggleMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextSeparatorMenuItem = new System.Windows.Forms.ToolStripSeparator();
+            this.contextCheckMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.xToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextUncheckMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.yToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.contextRemoveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.zToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uncheckAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.checkAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
+            this.contextMenuFiles.SuspendLayout();
             this.SuspendLayout();
             // 
             // bttOK
@@ -233,6 +246,7 @@
             this.listFiles.CheckBoxes = true;
             this.listFiles.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
+            this.listFiles.ContextMenuStrip = this.contextMenuFiles;
             this.listFiles.FullRowSelect = true;
             this.listFiles.GridLines = true;
             this.listFiles.HideSelection = false;
@@ -247,6 +261,88 @@
             // 
             this.columnHeader1.Text = "Relative location";
             this.columnHeader1.Width = 520;
+            // 
+            // contextMenuFiles
+            // 
+            this.contextMenuFiles.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.contextToggleMenuItem,
+            this.contextSeparatorMenuItem,
+            this.contextCheckMenuItem,
+            this.contextUncheckMenuItem,
+            this.contextRemoveMenuItem,
+            this.checkAllToolStripMenuItem,
+            this.uncheckAllToolStripMenuItem});
+            this.contextMenuFiles.Name = "contextMenuFiles";
+            this.contextMenuFiles.Size = new System.Drawing.Size(153, 164);
+            this.contextMenuFiles.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuFiles_Opening);
+            // 
+            // contextToggleMenuItem
+            // 
+            this.contextToggleMenuItem.Name = "contextToggleMenuItem";
+            this.contextToggleMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contextToggleMenuItem.Text = "&Toggle item";
+            this.contextToggleMenuItem.Click += new System.EventHandler(this.contextToggleMenuItem_Click);
+            // 
+            // contextSeparatorMenuItem
+            // 
+            this.contextSeparatorMenuItem.Name = "contextSeparatorMenuItem";
+            this.contextSeparatorMenuItem.Size = new System.Drawing.Size(149, 6);
+            // 
+            // contextCheckMenuItem
+            // 
+            this.contextCheckMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.xToolStripMenuItem});
+            this.contextCheckMenuItem.Name = "contextCheckMenuItem";
+            this.contextCheckMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contextCheckMenuItem.Text = "&Check";
+            // 
+            // xToolStripMenuItem
+            // 
+            this.xToolStripMenuItem.Name = "xToolStripMenuItem";
+            this.xToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.xToolStripMenuItem.Text = "x";
+            // 
+            // contextUncheckMenuItem
+            // 
+            this.contextUncheckMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.yToolStripMenuItem});
+            this.contextUncheckMenuItem.Name = "contextUncheckMenuItem";
+            this.contextUncheckMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contextUncheckMenuItem.Text = "&Uncheck";
+            // 
+            // yToolStripMenuItem
+            // 
+            this.yToolStripMenuItem.Name = "yToolStripMenuItem";
+            this.yToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.yToolStripMenuItem.Text = "y";
+            // 
+            // contextRemoveMenuItem
+            // 
+            this.contextRemoveMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.zToolStripMenuItem});
+            this.contextRemoveMenuItem.Name = "contextRemoveMenuItem";
+            this.contextRemoveMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contextRemoveMenuItem.Text = "&Remove";
+            // 
+            // zToolStripMenuItem
+            // 
+            this.zToolStripMenuItem.Name = "zToolStripMenuItem";
+            this.zToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.zToolStripMenuItem.Text = "z";
+            // 
+            // uncheckAllToolStripMenuItem
+            // 
+            this.uncheckAllToolStripMenuItem.Name = "uncheckAllToolStripMenuItem";
+            this.uncheckAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.uncheckAllToolStripMenuItem.Text = "&Uncheck all";
+            this.uncheckAllToolStripMenuItem.Click += new System.EventHandler(this.uncheckAllToolStripMenuItem_Click);
+            // 
+            // checkAllToolStripMenuItem
+            // 
+            this.checkAllToolStripMenuItem.Name = "checkAllToolStripMenuItem";
+            this.checkAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.checkAllToolStripMenuItem.Text = "Check all";
+            this.checkAllToolStripMenuItem.Click += new System.EventHandler(this.checkAllToolStripMenuItem_Click);
             // 
             // ImportProjectForm
             // 
@@ -270,6 +366,7 @@
             this.Text = "Import Momentics Project";
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            this.contextMenuFiles.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -295,5 +392,16 @@
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtDependencies;
         private System.Windows.Forms.TextBox txtDefines;
+        private System.Windows.Forms.ContextMenuStrip contextMenuFiles;
+        private System.Windows.Forms.ToolStripMenuItem contextToggleMenuItem;
+        private System.Windows.Forms.ToolStripSeparator contextSeparatorMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem contextUncheckMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem contextRemoveMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem contextCheckMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem xToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem yToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem zToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem checkAllToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem uncheckAllToolStripMenuItem;
     }
 }

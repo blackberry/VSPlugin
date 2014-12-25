@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
+using System.Text;
 using System.Windows.Forms;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Components;
@@ -112,9 +114,9 @@ namespace BlackBerry.Package.Dialogs
                     if (file.EndsWith(".qml"))
                     {
                         isCascadesProject = true;
-                    } 
+                    }
 
-                    var item = new ListViewItem(string.IsNullOrEmpty(SourcePath) ? file : file.Substring(SourcePath.Length + 1));
+                    var item = new ListViewItem(string.IsNullOrEmpty(SourcePath) || !file.StartsWith(SourcePath) ? file : file.Substring(SourcePath.Length + 1));
                     item.Checked = true;
                     item.Tag = file;
                     listFiles.Items.Add(item);
@@ -286,6 +288,242 @@ namespace BlackBerry.Package.Dialogs
             }
 
             return false;
+        }
+
+        private void contextMenuFiles_Opening(object sender, CancelEventArgs e)
+        {
+            if (listFiles.SelectedItems.Count == 0)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            e.Cancel = false;
+            var folders = GetFolderNames(listFiles.SelectedItems, SourcePath);
+
+            contextCheckMenuItem.DropDownItems.Clear();
+            contextUncheckMenuItem.DropDownItems.Clear();
+            contextRemoveMenuItem.DropDownItems.Clear();
+
+            contextToggleMenuItem.Text = listFiles.SelectedItems.Count > 1 ? "Toggle items" : "Toggle item";
+
+            if (folders != null)
+            {
+                bool allChecked = AreAllChecked(listFiles.SelectedItems);
+                bool allUnchecked = AreAllUnchecked(listFiles.SelectedItems);
+
+                if (!allChecked)
+                {
+                    foreach (var folder in folders)
+                    {
+                        var item = new ToolStripMenuItem(folder + "/*");
+                        item.Click += CheckForFolderButton;
+                        item.Tag = folder;
+
+                        contextCheckMenuItem.DropDownItems.Add(item);
+                    }
+                }
+
+                if (!allUnchecked)
+                {
+                    foreach (var folder in folders)
+                    {
+                        var item = new ToolStripMenuItem(folder + "/*");
+                        item.Click += UncheckForFolderButton;
+                        item.Tag = folder;
+
+                        contextUncheckMenuItem.DropDownItems.Add(item);
+                    }
+                }
+
+                foreach (var folder in folders)
+                {
+                    var item = new ToolStripMenuItem(folder + "/*");
+                    item.Click += RemoveForFolderButton;
+                    item.Tag = folder;
+
+                    contextRemoveMenuItem.DropDownItems.Add(item);
+                }
+
+                checkAllToolStripMenuItem.Visible = false;
+                uncheckAllToolStripMenuItem.Visible = false;
+            }
+            else
+            {
+                checkAllToolStripMenuItem.Visible = true;
+                uncheckAllToolStripMenuItem.Visible = true;
+            }
+
+            contextCheckMenuItem.Visible = contextCheckMenuItem.DropDownItems.Count > 0;
+            contextUncheckMenuItem.Visible = contextUncheckMenuItem.DropDownItems.Count > 0;
+            contextRemoveMenuItem.Visible = contextRemoveMenuItem.DropDownItems.Count > 0;
+        }
+
+        private bool AreAllUnchecked(ListView.SelectedListViewItemCollection items)
+        {
+            if (items == null)
+                return false;
+
+            foreach (ListViewItem item in items)
+            {
+                if (item.Checked)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private bool AreAllChecked(ListView.SelectedListViewItemCollection items)
+        {
+            if (items == null)
+                return false;
+
+            foreach (ListViewItem item in items)
+            {
+                if (!item.Checked)
+                    return false;
+            }
+
+            return true;
+        }
+
+        private static IEnumerable<string> GetFolderNames(ListView.SelectedListViewItemCollection activeItems, string sourcePath)
+        {
+            if (activeItems == null || activeItems.Count == 0)
+                return null;
+
+            var result = new List<string>();
+            var buffer = new StringBuilder();
+
+            foreach (ListViewItem item in activeItems)
+            {
+                var fileName = item.Tag != null ? item.Tag.ToString() : null;
+                if (string.IsNullOrEmpty(fileName))
+                    continue;
+
+                if (!string.IsNullOrEmpty(sourcePath) && fileName.StartsWith(sourcePath))
+                {
+                    fileName = fileName.Substring(sourcePath.Length);
+                }
+                else
+                {
+                    if (fileName.Length > 1 && fileName[1] == Path.VolumeSeparatorChar)
+                    {
+                        fileName = fileName.Substring(2);
+                    }
+                }
+
+                var chunks = fileName.Split(new[] { Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar }, StringSplitOptions.RemoveEmptyEntries);
+
+                for (int i = 0; i < chunks.Length - 1; i++)
+                {
+                    buffer.Remove(0, buffer.Length);
+
+                    for (int j = 0; j <= i; j++)
+                    {
+                        buffer.Append(chunks[j]);
+                        if (j != i)
+                        {
+                            buffer.Append('/');
+                        }
+                    }
+
+                    var pathPart = buffer.ToString();
+                    if (!result.Contains(pathPart))
+                    {
+                        result.Add(pathPart);
+                    }
+                }
+            }
+
+            return result.Count == 0 ? null : result;
+        }
+
+        private static bool Matches(ListViewItem item, string path)
+        {
+            return item != null && !string.IsNullOrEmpty(path) && item.Text.StartsWith(path, StringComparison.Ordinal);
+        }
+
+        private void CheckForFolderButton(object sender, EventArgs eventArgs)
+        {
+            var contextMenu = (ToolStripMenuItem) sender;
+            var partPath = contextMenu != null && contextMenu.Tag != null ? contextMenu.Tag.ToString().Replace('/', '\\') : null;
+
+            if (partPath != null)
+            {
+                foreach (ListViewItem item in listFiles.Items)
+                {
+                    if (Matches(item, partPath))
+                    {
+                        item.Checked = true;
+                    }
+                }
+            }
+        }
+
+        private void UncheckForFolderButton(object sender, EventArgs eventArgs)
+        {
+            var contextMenu = (ToolStripMenuItem)sender;
+            var partPath = contextMenu != null && contextMenu.Tag != null ? contextMenu.Tag.ToString().Replace('/', '\\') : null;
+
+            if (partPath != null)
+            {
+                foreach (ListViewItem item in listFiles.Items)
+                {
+                    if (Matches(item, partPath))
+                    {
+                        item.Checked = false;
+                    }
+                }
+            }
+        }
+
+        private void RemoveForFolderButton(object sender, EventArgs eventArgs)
+        {
+            var contextMenu = (ToolStripMenuItem)sender;
+            var partPath = contextMenu != null && contextMenu.Tag != null ? contextMenu.Tag.ToString().Replace('/', '\\') : null;
+
+            if (partPath != null)
+            {
+                var toRemove = new List<ListViewItem>();
+
+                foreach (ListViewItem item in listFiles.Items)
+                {
+                    if (Matches(item, partPath))
+                    {
+                        toRemove.Add(item);
+                    }
+                }
+
+                foreach (var item in toRemove)
+                {
+                    listFiles.Items.Remove(item);
+                }
+            }
+        }
+
+        private void contextToggleMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in listFiles.SelectedItems)
+            {
+                item.Checked = !item.Checked;
+            }
+        }
+
+        private void checkAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in listFiles.SelectedItems)
+            {
+                item.Checked = true;
+            }
+        }
+
+        private void uncheckAllToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in listFiles.SelectedItems)
+            {
+                item.Checked = false;
+            }
         }
     }
 }
