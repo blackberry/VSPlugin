@@ -144,14 +144,14 @@ namespace BlackBerry.Package.ViewModels
 
                     if (addFile)
                     {
-                        _folders.AddFile(relativePath, destinationPath);
+                        _folders.AddFile(destinationPath, relativePath);
                     }
                 }
                 else
                 {
                     if (addFile)
                     {
-                        _folders.AddFile(relativePath, sourcePath);
+                        _folders.AddFile(sourcePath, relativePath);
                     }
                 }
             }
