@@ -1,4 +1,5 @@
 ﻿using System;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.QConn.Services;
 
@@ -62,8 +63,28 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
                 items = new BaseViewItem[processes.Length];
                 for (int i = 0; i < processes.Length; i++)
                 {
-                    var arguments = Service.LoadArguments(processes[i]);
-                    var environmentVariables = Service.LoadEnvironmentVariables(processes[i]);
+                    string arguments;
+                    string[] environmentVariables;
+
+                    try
+                    {
+                        arguments = Service.LoadArguments(processes[i]);
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteException(ex, "Unable to load arguments for process: {0} ({1})", processes[i].Name, processes[i].ID);
+                        arguments = "Error: Unable to load";
+                    }
+
+                    try
+                    {
+                        environmentVariables = Service.LoadEnvironmentVariables(processes[i]);
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteException(ex, "Unable to load environment variables for process: {0} ({1})", processes[i].Name, processes[i].ID);
+                        environmentVariables = new[] { "Error: Unable to load" };
+                    }
 
                     items[i] = new ProcessViewItem(ViewModel, Device, Control, processes[i], arguments, environmentVariables);
                 }
