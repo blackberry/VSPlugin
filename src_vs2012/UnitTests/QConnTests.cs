@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Packaging;
 using System.Text;
 using System.Threading;
+using BlackBerry.NativeCore.Components;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.QConn;
 using BlackBerry.NativeCore.QConn.Model;
@@ -496,6 +497,65 @@ namespace UnitTests
             Assert.IsNotNull(process);
 
             process.Join();
+
+            // and close
+            qdoor.Close();
+        }
+
+        [Test]
+        public void LaunchMultipleSLog2Info()
+        {
+            var qdoor = new QConnDoor();
+            var qclient = new QConnClient();
+
+            Assert.AreEqual(Endianess.Unknown, qclient.Endian);
+            Assert.AreEqual(TargetSystemType.Unknown, qclient.System);
+            Assert.IsNotNull(qclient.Services);
+            Assert.AreEqual(0, qclient.Services.Length);
+            Assert.IsNull(qclient.Version);
+            Assert.IsNull(qclient.Name);
+            Assert.IsNull(qclient.Locale);
+
+            // connect:
+            qdoor.Open(Defaults.IP, Defaults.Password, Defaults.SshPublicKeyPath);
+            qclient.Load(Defaults.IP);
+
+            Assert.IsNotNull(qclient.Services);
+            Assert.IsNotNull(qclient.LauncherService);
+
+            TargetProcess[] process = new TargetProcess[8];
+            string[] args = new string[process.Length];
+            string[][] envs = new string[process.Length][];
+
+            try
+            {
+                for (int i = 0; i < process.Length; i++)
+                {
+                    process[i] = qclient.LauncherService.Start("/bin/slog2info", new[] { "-w", "-W", "-s" });
+                    args[i] = qclient.SysInfoService.LoadArguments(process[i].PID);
+                    envs[i] = qclient.SysInfoService.LoadEnvironmentVariables(process[i].PID);
+                    Assert.IsNotNull(process[i]);
+                }
+            }
+            catch
+            {
+                Assert.Fail();
+            }
+
+            QTraceLog.WriteLine("Loading processes");
+            var processes = qclient.SysInfoService.LoadProcesses();
+            QTraceLog.WriteLine("- DONE -");
+            Assert.IsNotNull(processes);
+
+            for (int i = 0; i < process.Length; i++)
+            {
+                qclient.ControlService.Terminate(process[i]);
+            }
+
+            var afterProcesses = qclient.SysInfoService.LoadProcesses();
+            Assert.IsNotNull(afterProcesses);
+
+            Targets.TraceStop(Defaults.IP);
 
             // and close
             qdoor.Close();

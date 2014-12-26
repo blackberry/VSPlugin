@@ -121,11 +121,24 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         public void Skip(int bytes)
         {
+            if (bytes == 0)
+                return;
+
             _at += bytes;
+            if (_at > _data.Length)
+            {
+                int skip = _at - _data.Length;
+
+                VerifyData();
+                Skip(skip);
+            }
         }
 
         public string ReadString(uint maxLength, char terminatorChar)
         {
+            if (maxLength == 0)
+                return string.Empty;
+
             VerifyData();
 
             List<byte[]> buffers = null;
