@@ -179,11 +179,11 @@ namespace BlackBerry.Package.Editors
             if (VSConstants.LOGVIEWID_Primary == rguidLogicalView)
             {
                 // primary view uses NULL as pbstrPhysicalView
-                return VSConstants.S_OK;        
+                return VSConstants.S_OK;
             }
 
-            // you must return E_NOTIMPL for any unrecognized rguidLogicalView values
-            return EngineUtils.NotImplemented();
+            // must return E_NOTIMPL for any unrecognized rguidLogicalView values
+            return VSConstants.E_NOTIMPL;
         }
 
         /// <summary>
