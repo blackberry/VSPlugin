@@ -38,7 +38,9 @@
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.txtSlog2BufferSets = new System.Windows.Forms.TextBox();
             this.label4 = new System.Windows.Forms.Label();
+            this.cmbSlog2Formatter = new System.Windows.Forms.ComboBox();
             this.cmbSlog2Level = new System.Windows.Forms.ComboBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.cmbLogsInterval = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
@@ -56,7 +58,7 @@
             this.chbInjectLogs.Location = new System.Drawing.Point(9, 19);
             this.chbInjectLogs.Name = "chbInjectLogs";
             this.chbInjectLogs.Size = new System.Drawing.Size(216, 17);
-            this.chbInjectLogs.TabIndex = 5;
+            this.chbInjectLogs.TabIndex = 0;
             this.chbInjectLogs.Text = "Inject logs into standard \'Debug\' window";
             this.chbInjectLogs.UseVisualStyleBackColor = true;
             // 
@@ -125,8 +127,8 @@
             this.groupBox1.Controls.Add(this.bttBrowse);
             this.groupBox1.Location = new System.Drawing.Point(6, 3);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(610, 93);
-            this.groupBox1.TabIndex = 6;
+            this.groupBox1.Size = new System.Drawing.Size(610, 80);
+            this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Host";
             // 
@@ -137,16 +139,18 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.txtSlog2BufferSets);
             this.groupBox2.Controls.Add(this.label4);
+            this.groupBox2.Controls.Add(this.cmbSlog2Formatter);
             this.groupBox2.Controls.Add(this.cmbSlog2Level);
+            this.groupBox2.Controls.Add(this.label5);
             this.groupBox2.Controls.Add(this.label3);
             this.groupBox2.Controls.Add(this.cmbLogsInterval);
             this.groupBox2.Controls.Add(this.label2);
             this.groupBox2.Controls.Add(this.chbDebuggedOnly);
             this.groupBox2.Controls.Add(this.chbInjectLogs);
-            this.groupBox2.Location = new System.Drawing.Point(6, 102);
+            this.groupBox2.Location = new System.Drawing.Point(6, 89);
             this.groupBox2.Name = "groupBox2";
-            this.groupBox2.Size = new System.Drawing.Size(610, 189);
-            this.groupBox2.TabIndex = 7;
+            this.groupBox2.Size = new System.Drawing.Size(610, 204);
+            this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Device";
             // 
@@ -154,19 +158,40 @@
             // 
             this.txtSlog2BufferSets.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSlog2BufferSets.Location = new System.Drawing.Point(119, 147);
+            this.txtSlog2BufferSets.Location = new System.Drawing.Point(121, 163);
             this.txtSlog2BufferSets.Name = "txtSlog2BufferSets";
             this.txtSlog2BufferSets.Size = new System.Drawing.Size(473, 20);
-            this.txtSlog2BufferSets.TabIndex = 12;
+            this.txtSlog2BufferSets.TabIndex = 9;
             // 
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(6, 150);
+            this.label4.Location = new System.Drawing.Point(8, 166);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(87, 13);
-            this.label4.TabIndex = 11;
+            this.label4.TabIndex = 8;
             this.label4.Text = "slog2 buffer-sets:";
+            // 
+            // cmbSlog2Formatter
+            // 
+            this.cmbSlog2Formatter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmbSlog2Formatter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.cmbSlog2Formatter.FormattingEnabled = true;
+            this.cmbSlog2Formatter.Items.AddRange(new object[] {
+            "message-only",
+            "~ + message",
+            "# + message",
+            "PID + message",
+            "appID + message",
+            "buffer + message",
+            "appID + buffer + message",
+            "PID + buffer + message",
+            "PID + appID + message"});
+            this.cmbSlog2Formatter.Location = new System.Drawing.Point(121, 133);
+            this.cmbSlog2Formatter.Name = "cmbSlog2Formatter";
+            this.cmbSlog2Formatter.Size = new System.Drawing.Size(402, 21);
+            this.cmbSlog2Formatter.TabIndex = 7;
             // 
             // cmbSlog2Level
             // 
@@ -176,36 +201,45 @@
             "nothing",
             "applications",
             "system"});
-            this.cmbSlog2Level.Location = new System.Drawing.Point(119, 118);
+            this.cmbSlog2Level.Location = new System.Drawing.Point(121, 103);
             this.cmbSlog2Level.Name = "cmbSlog2Level";
             this.cmbSlog2Level.Size = new System.Drawing.Size(117, 21);
-            this.cmbSlog2Level.TabIndex = 10;
+            this.cmbSlog2Level.TabIndex = 5;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(8, 136);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(79, 13);
+            this.label5.TabIndex = 6;
+            this.label5.Text = "slog2 formatter:";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 121);
+            this.label3.Location = new System.Drawing.Point(8, 106);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(99, 13);
-            this.label3.TabIndex = 9;
+            this.label3.TabIndex = 4;
             this.label3.Text = "slog2 capture level:";
             // 
             // cmbLogsInterval
             // 
             this.cmbLogsInterval.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbLogsInterval.FormattingEnabled = true;
-            this.cmbLogsInterval.Location = new System.Drawing.Point(119, 88);
+            this.cmbLogsInterval.Location = new System.Drawing.Point(121, 73);
             this.cmbLogsInterval.Name = "cmbLogsInterval";
             this.cmbLogsInterval.Size = new System.Drawing.Size(117, 21);
-            this.cmbLogsInterval.TabIndex = 8;
+            this.cmbLogsInterval.TabIndex = 3;
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 91);
+            this.label2.Location = new System.Drawing.Point(8, 76);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(107, 13);
-            this.label2.TabIndex = 7;
+            this.label2.TabIndex = 2;
             this.label2.Text = "Console logs interval:";
             // 
             // chbDebuggedOnly
@@ -214,7 +248,7 @@
             this.chbDebuggedOnly.Location = new System.Drawing.Point(9, 45);
             this.chbDebuggedOnly.Name = "chbDebuggedOnly";
             this.chbDebuggedOnly.Size = new System.Drawing.Size(227, 17);
-            this.chbDebuggedOnly.TabIndex = 6;
+            this.chbDebuggedOnly.TabIndex = 1;
             this.chbDebuggedOnly.Text = "Monitor logs of debugged applications only";
             this.chbDebuggedOnly.UseVisualStyleBackColor = true;
             // 
@@ -252,5 +286,7 @@
         private System.Windows.Forms.ComboBox cmbLogsInterval;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chbDebuggedOnly;
+        private System.Windows.Forms.ComboBox cmbSlog2Formatter;
+        private System.Windows.Forms.Label label5;
     }
 }

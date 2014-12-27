@@ -66,6 +66,12 @@ namespace BlackBerry.Package.Options
             set { cmbSlog2Level.SelectedIndex = value; }
         }
 
+        public int SLog2Formatter
+        {
+            get { return cmbSlog2Formatter.SelectedIndex; }
+            set { cmbSlog2Formatter.SelectedIndex = value; }
+        }
+
         public string SLog2BufferSets
         {
             get { return txtSlog2BufferSets.Text; }
@@ -109,6 +115,7 @@ namespace BlackBerry.Package.Options
             chbDebuggedOnly.Checked = false;
             cmbLogsInterval.SelectedIndex = GetNearest(LogsIntervals, TargetServiceConsoleLog.DefaultInterval);
             cmbSlog2Level.SelectedIndex = 1;
+            cmbSlog2Formatter.SelectedIndex = 0;
             txtSlog2BufferSets.Text = "default";
         }
     }

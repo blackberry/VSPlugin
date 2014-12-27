@@ -161,7 +161,7 @@ namespace BlackBerry.Package
             // create dedicated persistent logs
             var logOptions = (LogsOptionPage)GetDialogPage(typeof(LogsOptionPage));
             LogManager.Initialize(logOptions.Path, logOptions.LimitLogs ? logOptions.LimitCount : -1, TraceLog.Category, TraceLog.CategoryGDB);
-            Targets.TraceOptions(logOptions.DebuggedOnly, logOptions.LogsInterval, logOptions.SLog2Level, logOptions.GetSLog2BufferSets(), logOptions.InjectLogs, TraceLog.CategoryDevice);
+            Targets.TraceOptions(logOptions.DebuggedOnly, logOptions.LogsInterval, logOptions.SLog2Level, logOptions.SLog2Formatter, logOptions.GetSLog2BufferSets(), logOptions.InjectLogs, TraceLog.CategoryDevice);
 
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
             var outputWindowService = GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
@@ -341,6 +341,8 @@ namespace BlackBerry.Package
                     _buildPlatformsManager.Close();
                     _buildPlatformsManager = null;
                 }
+
+                Targets.TraceStop();
             }
 
             base.Dispose(disposing);

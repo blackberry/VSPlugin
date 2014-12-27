@@ -269,6 +269,14 @@ namespace BlackBerry.NativeCore.QConn.Services
         }
 
         /// <summary>
+        /// Gets an indication, if there is anything monitored at the moment.
+        /// </summary>
+        public bool IsMonitoringAnything
+        {
+            get { return _processIDs != null && _processIDs.Length > 0; }
+        }
+
+        /// <summary>
         /// Gets or sets the interval of pinging the logs for new content.
         /// </summary>
         public uint Interval
@@ -364,7 +372,7 @@ namespace BlackBerry.NativeCore.QConn.Services
             }
             catch (Exception ex)
             {
-                TraceLog.WriteException(ex, "Faile to stop console-logs monitor for: {0}", status.Process != null ? status.Process.Name : "unknown process");
+                TraceLog.WriteException(ex, "Failed to stop console-logs monitor for: {0}", status.Process != null ? status.Process.Name : "unknown process");
             }
         }
 

@@ -88,6 +88,12 @@ namespace BlackBerry.Package.Options
             set { Control.SLog2Level = value; }
         }
 
+        public int SLog2Formatter
+        {
+            get { return Control.SLog2Formatter; }
+            set { Control.SLog2Formatter = value; }
+        }
+
         public string SLog2BufferSets
         {
             get { return Control.SLog2BufferSets; }
@@ -108,7 +114,7 @@ namespace BlackBerry.Package.Options
             if (e.ApplyBehavior == ApplyKind.Apply)
             {
                 LogManager.Update(Path, LimitLogs ? LimitCount : -1);
-                Targets.TraceOptions(DebuggedOnly, LogsInterval, SLog2Level, GetSLog2BufferSets(), InjectLogs, null);
+                Targets.TraceOptions(DebuggedOnly, LogsInterval, SLog2Level, SLog2Formatter, GetSLog2BufferSets(), InjectLogs, null);
             }
             else
             {

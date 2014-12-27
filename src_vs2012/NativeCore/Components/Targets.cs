@@ -24,12 +24,18 @@ namespace BlackBerry.NativeCore.Components
         private delegate bool LogPredicate(TargetServiceConsoleLog service, TargetLogEntry log);
 
         /// <summary>
+        /// Method to format the output of the log message populated to all registered outputs.
+        /// </summary>
+        private delegate string LogFormatter(TargetLogEntry log);
+
+        /// <summary>
         /// Class providing help information about connection parameters with the target device.
         /// </summary>
-        sealed class TargetInfo : IDisposable
+        private sealed class TargetInfo : IDisposable
         {
             private AutoResetEvent _hasStatusEvent;
             private readonly string _sshPublicKeyPath;
+            private volatile bool _startingSLog2;
 
             public event EventHandler<TargetConnectionEventArgs> StatusChanged;
 
@@ -107,30 +113,10 @@ namespace BlackBerry.NativeCore.Components
                         _hasStatusEvent = null;
                     }
 
-                    if (SLog2Info != null)
-                    {
-                        if (Client != null && Client.ControlService != null)
-                        {
-                            try
-                            {
-                                Client.ControlService.Terminate(SLog2Info);
-                            }
-                            catch (Exception ex)
-                            {
-                                TraceLog.WriteException(ex, "Unable to terminate slog2info");
-                            }
-                        }
-
-                        SLog2Info.Dispose();
-                        SLog2Info = null;
-                    }
+                    StopLogServices();
 
                     if (Client != null)
                     {
-                        if (Client.ConsoleLogService != null)
-                        {
-                            Client.ConsoleLogService.Captured -= OnRemoteLogsCaptured;
-                        }
                         Client.Dispose();
                         Client = null;
                     }
@@ -235,6 +221,43 @@ namespace BlackBerry.NativeCore.Components
                 OnChildConnectionStatusChanged(this, Status);
             }
 
+            public bool StopLogServices()
+            {
+                bool disposed = false;
+
+                var slog2 = SLog2Info;
+                SLog2Info = null;
+
+                if (slog2 != null)
+                {
+                    if (Client != null && Client.ControlService != null)
+                    {
+                        try
+                        {
+                            Client.ControlService.Terminate(slog2);
+                        }
+                        catch (Exception ex)
+                        {
+                            TraceLog.WriteException(ex, "Unable to terminate slog2info");
+                        }
+                    }
+
+                    slog2.Dispose();
+                    disposed = true;
+                }
+
+                if (Client != null)
+                {
+                    if (Client.ConsoleLogService != null)
+                    {
+                        Client.ConsoleLogService.Captured -= OnRemoteLogsCaptured;
+                        disposed = true;
+                    }
+                }
+
+                return disposed;
+            }
+
             private void InitializeLogServices()
             {
                 // setup console logging:
@@ -245,20 +268,27 @@ namespace BlackBerry.NativeCore.Components
                 }
 
                 // setup slog2info monitor to grab all the logs from the device:
+                if (_startingSLog2)
+                {
+                    return;
+                }
+
                 try
                 {
+                    _startingSLog2 = true;
                     if (Client != null && Client.LauncherService != null && SLog2Info == null)
                     {
                         try
                         {
                             SLog2Info = Client.LauncherService.Start<TargetProcessSLog2Info>("/bin/slog2info", new[] { "-n", "-W", "-s" });
+                            TraceLog.WriteLine("Started slog2info with PID: {0}", SLog2Info.PID);
                         }
                         catch (Exception ex)
                         {
                             SLog2Info = null;
 
                             // probably PlayBook...
-                            TraceLog.WriteException(ex, "Unable to start slog2info remotely");
+                            TraceLog.WriteException(ex, "Failed to start slog2info remotely");
                         }
 
                         if (SLog2Info != null)
@@ -272,26 +302,23 @@ namespace BlackBerry.NativeCore.Components
                 {
                     TraceLog.WriteException(ex, "Unable to launch slog2info to monitor all activities on the device");
                 }
+                finally
+                {
+                    _startingSLog2 = false;
+                }
             }
 
             private void OnSLog2InfoFinished(object sender, EventArgs e)
             {
-                if (SLog2Info != null)
-                {
-                    SLog2Info.Captured -= OnRemoteLogsCaptured;
-                    SLog2Info.Finished -= OnSLog2InfoFinished;
-                    SLog2Info = null;
-                }
-            }
+                TraceLog.WriteLine("Terminated slog2info");
 
-            private static void PrintLog(string message)
-            {
-                TraceLog.WriteLine(message);
+                var slog2 = SLog2Info;
+                SLog2Info = null;
 
-                // print logs on default 'Debug' output window, if allowed:
-                if (_optionInjectLogs)
+                if (slog2 != null)
                 {
-                    System.Diagnostics.Trace.WriteLine(message, _optionCategoryInject);
+                    slog2.Captured -= OnRemoteLogsCaptured;
+                    slog2.Finished -= OnSLog2InfoFinished;
                 }
             }
 
@@ -302,14 +329,7 @@ namespace BlackBerry.NativeCore.Components
                     // print each console log and slog2 which matches current settings:
                     if (log.Type == TargetLogEntry.LogType.Console || _optionSLog2Filter(Client.ConsoleLogService, log))
                     {
-                        if (log.Type == TargetLogEntry.LogType.SLog2 && string.IsNullOrEmpty(log.BufferSet))
-                        {
-                            PrintLog(string.Concat(log.Message, " (", log.AppID, ")"));
-                        }
-                        else
-                        {
-                            PrintLog(log.Message);
-                        }
+                        PrintLog(log);
                     }
                 }
             }
@@ -360,6 +380,7 @@ namespace BlackBerry.NativeCore.Components
         private static bool _optionAcceptTracingDebuggedOnly;
         private static uint _optionLogInterval;
         private static LogPredicate _optionSLog2Filter;
+        private static LogFormatter _optionSLog2Formatter;
         private static string[] _optionSLog2BufferSets;
         private static string _optionCategoryInject;
 
@@ -372,6 +393,7 @@ namespace BlackBerry.NativeCore.Components
             _optionAcceptTracingDebuggedOnly = false;
             _optionLogInterval = 0;
             _optionSLog2Filter = SLog2FilterDefault;
+            _optionSLog2Formatter = SLog2FormatterDefault;
             _optionCategoryInject = TraceLog.CategoryDevice;
         }
 
@@ -748,7 +770,8 @@ namespace BlackBerry.NativeCore.Components
 
             if (_optionAcceptTracingDebuggedOnly && !isDebugging)
             {
-                TraceLog.WarnLine("Tracing console outputs for non-debugged applications is disabled, change it in Options or manually start capturing logs in Target Navigator ({0}:\"{1}\")", process.ID, process.ExecutablePath);
+                TraceLog.WarnLine("Tracing console outputs for non-debugged applications is disabled, change it in Options or manually start capturing logs in Target Navigator ({0}:\"{1}\")",
+                    process.ID, process.ExecutablePath);
                 return false;
             }
 
@@ -768,6 +791,34 @@ namespace BlackBerry.NativeCore.Components
                 throw new ArgumentNullException("process");
 
             return Trace(device.IP, process, isDebugging);
+        }
+
+        /// <summary>
+        /// Stops all tracing.
+        /// </summary>
+        public static int TraceStop()
+        {
+            TargetInfo[] activeTargets;
+
+            lock (_sync)
+            {
+                activeTargets = _activeTargets.ToArray();
+            }
+
+            int result = 0;
+
+            if (activeTargets.Length > 0)
+            {
+                foreach (var target in activeTargets)
+                {
+                    if (target.StopLogServices())
+                    {
+                        result++;
+                    }
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -882,7 +933,7 @@ namespace BlackBerry.NativeCore.Components
         /// <summary>
         /// Sets the logging options.
         /// </summary>
-        public static void TraceOptions(bool debuggedOnly, uint logsInterval, int slog2Level, string[] slog2BufferSets, bool injectLogs, string injectCategory)
+        public static void TraceOptions(bool debuggedOnly, uint logsInterval, int slog2Level, int slog2FormatterLevel, string[] slog2BufferSets, bool injectLogs, string injectCategory)
         {
             _optionInjectLogs = injectLogs;
             _optionAcceptTracingDebuggedOnly = debuggedOnly;
@@ -917,6 +968,40 @@ namespace BlackBerry.NativeCore.Components
                     break;
             }
 
+            switch (slog2FormatterLevel)
+            {
+                case 0: // default:
+                    _optionSLog2Formatter = SLog2FormatterDefault;
+                    break;
+                case 1: // prefixed with title:
+                    _optionSLog2Formatter = SLog2FormatterTildeMessage;
+                    break;
+                case 2: // prefixed with hash:
+                    _optionSLog2Formatter = SLog2FormatterHashMessage;
+                    break;
+                case 3: // prefixed with PID:
+                    _optionSLog2Formatter = SLog2FormatterPidMessage;
+                    break;
+                case 4: // prefixed with appID:
+                    _optionSLog2Formatter = SLog2FormatterAppIdMessage;
+                    break;
+                case 5: // prefixed with buffer-set:
+                    _optionSLog2Formatter = SLog2FormatterBufferSetMessage;
+                    break;
+                case 6: // prefixed with appID and buffer-set:
+                    _optionSLog2Formatter = SLog2FormatterAppIdBufferSetMessage;
+                    break;
+                case 7: // prefixed with PID and buffer-set:
+                    _optionSLog2Formatter = SLog2FormatterPidBufferSetMessage;
+                    break;
+                case 8: // prefixed with PID and appID:
+                    _optionSLog2Formatter = SLog2FormatterPidAppIdMessage;
+                    break;
+                default: // restore default, if out-of-range
+                    _optionSLog2Formatter = SLog2FormatterDefault;
+                    break;
+            }
+
             // and update the console log interval for already running loggers:
             lock (_sync)
             {
@@ -930,11 +1015,91 @@ namespace BlackBerry.NativeCore.Components
             }
         }
 
+        /// <summary>
+        /// Writes the log with current formatting settings into the output.
+        /// </summary>
+        private static void PrintLog(TargetLogEntry log)
+        {
+            if (log.Type == TargetLogEntry.LogType.SLog2)
+            {
+                PrintLogMessage(_optionSLog2Formatter(log));
+            }
+            else
+            {
+                PrintLogMessage(log.Message);
+            }
+        }
+
+        private static void PrintLogMessage(string message)
+        {
+            TraceLog.WriteLine(message);
+
+            // print logs on default 'Debug' output window, if allowed:
+            if (_optionInjectLogs)
+            {
+                System.Diagnostics.Trace.WriteLine(message, _optionCategoryInject);
+            }
+        }
+
+        #region slog2 Formatter
+
+        private static string SLog2FormatterDefault(TargetLogEntry log)
+        {
+            return log.Message;
+        }
+
+        private static string SLog2FormatterTildeMessage(TargetLogEntry log)
+        {
+            return string.Concat("~ ", log.Message);
+        }
+
+        private static string SLog2FormatterHashMessage(TargetLogEntry log)
+        {
+            return string.Concat("# ", log.Message);
+        }
+
+        private static string SLog2FormatterPidMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.PID, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterAppIdMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.AppID, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterBufferSetMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.BufferSet, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterAppIdBufferSetMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.AppID, "::", log.BufferSet, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterPidBufferSetMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.PID, "::", log.BufferSet, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterPidAppIdMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.PID, "::", log.AppID, ": ", log.Message);
+        }
+
+        #endregion
+
         #region slog2 Filters
+
+        private static bool IsMonitoring(TargetServiceConsoleLog service, uint pid)
+        {
+            return !service.IsMonitoringAnything || service.IsMonitoring(pid);
+        }
 
         private static bool SLog2FilterDefault(TargetServiceConsoleLog service, TargetLogEntry log)
         {
-            return log.PID == 0 || (service.IsMonitoring(log.PID) && log.BufferSet == "default");
+            return log.PID == 0 || string.IsNullOrEmpty(log.BufferSet) || (IsMonitoring(service, log.PID) && log.BufferSet == "default");
         }
 
         private static bool SLog2FilterNone(TargetServiceConsoleLog service, TargetLogEntry log)
@@ -949,18 +1114,18 @@ namespace BlackBerry.NativeCore.Components
 
         private static bool SLog2FilterApps(TargetServiceConsoleLog service, TargetLogEntry log)
         {
-            return log.PID == 0 || service.IsMonitoring(log.PID);
+            return log.PID == 0 || IsMonitoring(service, log.PID);
         }
 
         private static bool SLog2FilterAppsWithBufferSet(TargetServiceConsoleLog service, TargetLogEntry log)
         {
-            return log.PID == 0 || (service.IsMonitoring(log.PID) && InBufferSet(log.BufferSet));
+            return log.PID == 0 || (IsMonitoring(service, log.PID) && InBufferSet(log.BufferSet));
         }
 
         private static bool InBufferSet(string name)
         {
             if (_optionSLog2BufferSets == null || string.IsNullOrEmpty(name))
-                return false;
+                return true;
 
             foreach (var bufferName in _optionSLog2BufferSets)
             {
