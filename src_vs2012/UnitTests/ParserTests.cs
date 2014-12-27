@@ -422,7 +422,51 @@ Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383
             Assert.AreEqual(383152370, lastItem.PID);
             Assert.AreEqual("navigator_thread quitting", lastItem.Message);
             Assert.AreEqual("default", lastItem.BufferSet);
-            Assert.AreEqual("com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370", lastItem.AppID);
+            Assert.AreEqual("com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40", lastItem.AppID);
+        }
+
+
+        [Test]
+        public void ParseSLog2InfoOutput2()
+        {
+            const string slog2output = @"
+Dec 26 02:05:05.568         mm_renderer_QC.5599368                           0  0  -----ONLINE----- ()
+";
+
+            var entries = TargetLogEntry.ParseSLog2(slog2output.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+
+            Assert.IsNotNull(entries);
+            Assert.AreEqual(1, entries.Length);
+
+            var lastItem = entries[0];
+            Assert.AreEqual(5599368, lastItem.PID);
+            Assert.AreEqual("-----ONLINE----- ()", lastItem.Message);
+            Assert.AreEqual("default", lastItem.BufferSet); // all empty buffers fallback to 'default'
+            Assert.AreEqual("mm_renderer_QC", lastItem.AppID);
+        }
+
+        [Test]
+        public void ParseSLog2InfoOutput3()
+        {
+            const string slog2output = @"
+Dec 26 00:04:22.278                AdSDK.591851775                           0  0  -----ONLINE----- ()
+Dec 26 00:04:22.278                AdSDK.591851775                           0  0  -----ONLINE----- ()
+Dec 26 00:04:22.278                AdSDK.591851775          NativeAdSDK*     0  5  banner.cpp(349): bbads_banner_create called. ()
+Dec 26 00:04:22.280                AdSDK.591851775          NativeAdSDK      0  5  VisibilityListener.cpp(76): Visibility listener thread launched. ()
+Dec 26 00:04:22.280                AdSDK.591851775          NativeAdSDK      0  5  BPSEventListener.cpp(69): BPS event listener thread launched. ()
+Dec 26 00:04:22.280                AdSDK.591851775          NativeAdSDK      0  5  VisibilityListener.cpp(87): Visibility listener thread posting. ()
+";
+
+            var entries = TargetLogEntry.ParseSLog2(slog2output.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+
+            Assert.IsNotNull(entries);
+            Assert.AreEqual(6, entries.Length);
+
+            var lastItem = entries[entries.Length - 1];
+            Assert.AreEqual(591851775, lastItem.PID);
+            Assert.AreEqual("VisibilityListener.cpp(87): Visibility listener thread posting. ()", lastItem.Message);
+            Assert.AreEqual("NativeAdSDK", lastItem.BufferSet);
+            Assert.AreEqual("AdSDK", lastItem.AppID);
         }
     }
 }

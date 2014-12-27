@@ -168,16 +168,20 @@ namespace BlackBerry.NativeCore.QConn.Model
             if (i < 0)
                 return null;
 
-            // read the application-id:
+            // skip all white-chars:
+            if (SkipSpaces(nativeEntry, ref i))
+                return null;
+
+            // read the application-id + process-id:
             int idEndAt = nativeEntry.IndexOf(' ', i + 1);
             if (idEndAt < 0)
                 return null;
 
-            string appID = nativeEntry.Substring(i + 1, idEndAt - i - 1);
-            if (string.IsNullOrEmpty(appID))
+            string sandboxInfo = nativeEntry.Substring(i, idEndAt - i);
+            if (string.IsNullOrEmpty(sandboxInfo))
                 return null;
 
-            // jump to the beggin of the buffer name:
+            // jump to the beginning of the buffer name:
             i = idEndAt;
             if (SkipSpaces(nativeEntry, ref i))
                 return null;
@@ -194,7 +198,11 @@ namespace BlackBerry.NativeCore.QConn.Model
             string bufferSetID = nativeEntry.Substring(bufferSetStartAt, bufferSetEndAt - bufferSetStartAt);
 
             // PH: this means, there is no bufferSet and we already read the first number
-            if (bufferSetID != "0")
+            if (bufferSetID == "0")
+            {
+                bufferSetID = "default";
+            }
+            else
             {
                 // skip spaces till the first number:
                 if (SkipSpaces(nativeEntry, ref i))
@@ -220,7 +228,9 @@ namespace BlackBerry.NativeCore.QConn.Model
                 i += 2;
 
             string message = nativeEntry.Substring(i);
-            return new TargetLogEntry(LogType.SLog2, GetProcessID(appID), appID, bufferSetID, message);
+            string appID;
+            uint processID = SplitToProcessAndAppID(sandboxInfo, out appID);
+            return new TargetLogEntry(LogType.SLog2, processID, appID, bufferSetID, message);
         }
 
         private static bool SkipSpaces(string text, ref int i)
@@ -232,24 +242,34 @@ namespace BlackBerry.NativeCore.QConn.Model
             return false;
         }
 
-        private static uint GetProcessID(string appID)
+        private static uint SplitToProcessAndAppID(string text, out string appID)
         {
-            if (string.IsNullOrEmpty(appID))
-                throw new ArgumentNullException("appID");
+            if (string.IsNullOrEmpty(text))
+                throw new ArgumentNullException("text");
 
             // card apps can spawn multiple instances of the same application
             // then they share the same appID-base part, but end with "..<number>"
-            int i = appID.Length - 1;
-            int instanceSuffix = char.IsDigit(appID[i]) && appID[i - 1] == '.' && appID[i - 2] == '.' ? 3 : 0;
-            int processIdStartAt = appID.LastIndexOf('.', i - instanceSuffix);
+            int i = text.Length - 1;
+            int instanceSuffix = char.IsDigit(text[i]) && text[i - 1] == '.' && text[i - 2] == '.' ? 3 : 0;
+            int processIdStartAt = text.LastIndexOf('.', i - instanceSuffix);
 
             if (processIdStartAt < 0)
+            {
+                appID = text;
                 return 0;
+            }
 
-            string processIdText = appID.Substring(processIdStartAt + 1, i - instanceSuffix - processIdStartAt);
+            string processIdText = text.Substring(processIdStartAt + 1, i - instanceSuffix - processIdStartAt);
             uint id;
 
-            return uint.TryParse(processIdText, out id) ? id : 0;
+            if (uint.TryParse(processIdText, out id))
+            {
+                appID = text.Substring(0, processIdStartAt);
+                return id;
+            }
+
+            appID = text;
+            return 0;
         }
     }
 }
