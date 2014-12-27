@@ -111,7 +111,14 @@ namespace BlackBerry.NativeCore.Components
                     {
                         if (Client != null && Client.ControlService != null)
                         {
-                            Client.ControlService.Terminate(SLog2Info);
+                            try
+                            {
+                                Client.ControlService.Terminate(SLog2Info);
+                            }
+                            catch (Exception ex)
+                            {
+                                TraceLog.WriteException(ex, "Unable to terminate slog2info");
+                            }
                         }
 
                         SLog2Info.Dispose();
@@ -798,8 +805,16 @@ namespace BlackBerry.NativeCore.Components
             var qClient = Get(ip);
             if (qClient != null && qClient.ConsoleLogService != null)
             {
-                qClient.ConsoleLogService.StopAll();
-                return true;
+                try
+                {
+                    qClient.ConsoleLogService.StopAll();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to stop console log monitors for: {0}", qClient.Name);
+                    return false;
+                }
             }
 
             return false;
@@ -818,7 +833,15 @@ namespace BlackBerry.NativeCore.Components
             var qClient = Get(ip);
             if (qClient != null && qClient.ConsoleLogService != null)
             {
-                return qClient.ConsoleLogService.Stop(process);
+                try
+                {
+                    return qClient.ConsoleLogService.Stop(process);
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to stop console log monitors for: {0}", qClient.Name);
+                    return false;
+                }
             }
 
             return false;

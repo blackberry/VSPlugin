@@ -238,7 +238,14 @@ namespace BlackBerry.NativeCore.QConn.Services
 
         protected override void Dispose(bool disposing)
         {
-            StopAll();
+            try
+            {
+                StopAll();
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to stop console-logs for all monitored processes");
+            }
 
             // first close the original service, that should close the connection, if opened:
             if (_fileService != null)
@@ -351,7 +358,14 @@ namespace BlackBerry.NativeCore.QConn.Services
             var status = (LogMonitorStatus) sender;
             status.Finished -= OnMonitorStatusFinished;
 
-            Stop(status.Process);
+            try
+            {
+                Stop(status.Process);
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Faile to stop console-logs monitor for: {0}", status.Process != null ? status.Process.Name : "unknown process");
+            }
         }
 
         /// <summary>
@@ -441,9 +455,10 @@ namespace BlackBerry.NativeCore.QConn.Services
         /// </summary>
         public bool IsMonitoring(uint processID)
         {
-            for (int i = 0; i < _processIDs.Length; i++)
+            var processes = _processIDs;
+            foreach (uint procID in processes)
             {
-                if (_processIDs[i] == processID)
+                if (procID == processID)
                     return true;
             }
 
@@ -510,8 +525,9 @@ namespace BlackBerry.NativeCore.QConn.Services
             lock (_sync)
             {
                 // ask each monitor, if there are now log entries and forward them onto the console:
-                foreach (var monitor in _logMonitors)
+                for(int i = 0; i < _logMonitors.Count; i++)
                 {
+                    var monitor = _logMonitors[i];
                     var logEntries = monitor.Read();
                     if (logEntries != null && Captured != null)
                     {
