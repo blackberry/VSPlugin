@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="db9f9c5f-fb27-4297-ab44-fa8774e962ca" Version="3.2.0" Language="en-US" Publisher="CodeTitans" />
+    <Identity Id="db9f9c5f-fb27-4297-ab44-fa8774e962ca" Version="3.2.1" Language="en-US" Publisher="CodeTitans" />
     <DisplayName>BlackBerry Native Plugin for Visual Studio 2013</DisplayName>
     <Description xml:space="preserve">Package providing Native SDK support inside Visual Studio for PlayBook and BlackBerry 10 devices</Description>
     <MoreInfo>http://github.com/phofman/vs-plugin/wiki</MoreInfo>
