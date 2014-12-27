@@ -211,35 +211,35 @@ namespace BlackBerry.Package.Components
                 if (string.Compare(filterName, "sources", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     VCFilter filter = FindOrAddFilter("Source Files", vcProject);
-                    filter.Filter = "cpp;c;cc;cxx;def;bat";
+                    filter.Filter = "cpp;c;cc;cxx;asm";
                     result.Add(filter);
                 }
 
                 if (string.Compare(filterName, "headers", StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     VCFilter filter = FindOrAddFilter("Header Files", vcProject);
-                    filter.Filter = "h;hpp;hxx;hm;inl;inc;xsd";
+                    filter.Filter = "h;hpp;hxx;hm;def;inl;inc";
                     result.Add(filter);
                 }
 
                 if (string.Compare(filterName, FilterNameSourceFiles, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     VCFilter filter = FindOrAddFilter("Source Files", vcProject);
-                    filter.Filter = "cpp;c;cc;cxx;def;bat;h;hpp;hxx;hm;inl;inc;xsd";
+                    filter.Filter = "cpp;c;cc;cxx;asm;h;hpp;hxx;hm;def;inl;inc";
                     result.Add(filter);
                 }
 
                 if (string.Compare(filterName, FilterNameAssets, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     VCFilter filter = FindOrAddFilter("Assets", vcProject);
-                    filter.Filter = "qml;js;jpg;png;gif;amd";
+                    filter.Filter = "qml;js;qmljs;jpg;png;gif;bmp;ico;amd;wav;mp3;mp4";
                     result.Add(filter);
                 }
 
                 if (string.Compare(filterName, FilterNameConfig, StringComparison.OrdinalIgnoreCase) == 0)
                 {
                     VCFilter filter = FindOrAddFilter("Config Files", vcProject);
-                    filter.Filter = "pri;pro;xml";
+                    filter.Filter = "pri;pro;mk;properties;project;cproject;xml;xsd;bat;cmd;ps;ps1";
                     result.Add(filter);
                 }
 
