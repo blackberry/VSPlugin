@@ -13,20 +13,17 @@ BASEDIR = $$quote($$_PRO_FILE_PWD_)
 # Precompiled header
 CONFIG += precompile_header
 PRECOMPILED_HEADER = $$quote($$BASEDIR/<#= PrecompiledHeaderName #>)
-
 <# } #>
 
 #############################################
 # Libs, undefines and defines
-<# if (HasDependencyLibrariesReferences()) {
-    /* PH: for now, additional directories set via Visual Studio are disabled...
-QMAKE_LIBDIR += < # WriteRelativePaths(AdditionalLibraryDirs, "    ", null); # >
-INCLUDEPATH += < # WriteRelativePaths(AdditionalIncludeDirs, "    ", null); # >
-     */
-#>
-LIBS += <# WriteDependencyLibrariesReferences(); #>
-
+<# if (HasAdditionalLibraryDirs) { #>
+QMAKE_LIBDIR += <# WriteRelativePaths(AdditionalLibraryDirs, "    \"", "\""); #>
 <# } #>
+<# if (HasDependencyLibrariesReferences()) { #>
+LIBS += <# WriteDependencyLibrariesReferences(); #>
+<# } #>
+
 <#
     WriteCollectionNewLine(UndefinePreprocessorDefinitions, "DEFINES -= ");
     WriteCollectionNewLine(PreprocessorDefinitions, "DEFINES += ");
@@ -39,6 +36,10 @@ SOURCES += <# WriteRelativePaths(CompileItems, "    $$quote($$BASEDIR/", ")"); #
 HEADERS += <# WriteRelativePaths(IncludeItems, "    $$quote($$BASEDIR/", ")"); #>
 
 INCLUDEPATH += <# WriteRelativePaths(IncludeDirs, "    $$quote($$BASEDIR/", ")"); #>
+
+<# if (HasAdditionalIncludeDirs) { #>
+INCLUDEPATH += <# WriteRelativePaths(AdditionalIncludeDirs, "    \"", "\""); #>
+<# } #>
 
 OTHER_FILES += <# WriteRelativePaths(QmlItems, "    $$quote($$BASEDIR/", ")"); #>
 

@@ -221,6 +221,7 @@ namespace BlackBerry.BuildTasks
             ITaskItem[] toCompileAsC;
             ITaskItem[] toCompileAsCpp;
             ITaskItem additionalInfo;
+            var linkInfo = LinkItems != null && LinkItems.Length > 0 ? LinkItems[0] : null;
 
             SplitCompileItems(CompileItems, ExcludeDirectories, out toCompile, out toCompileAsC, out toCompileAsCpp);
             additionalInfo = toCompile != null && toCompile.Length > 0 ? toCompile[0] : null;
@@ -239,9 +240,9 @@ namespace BlackBerry.BuildTasks
                 template.PrecompiledHeaderName = excludedHeader != null ? excludedHeader.ItemSpec : null;
                 template.QmlItems = FilterByExtension(IncludeItems, new[] {".qml", ".js", ".qs"}, null, out excludedItem);
                 template.QmlDirs = ExtractDirectories(template.QmlItems);
-                template.LinkItem = LinkItems != null && LinkItems.Length > 0 ? LinkItems[0] : null;
-                template.AdditionalIncludeDirs = TemplateHelper.GetRootedDirs(ProjectDir, AdditionalIncludeDirectories);
-                template.AdditionalLibraryDirs = TemplateHelper.GetRootedDirs(ProjectDir, AdditionalLibraryDirectories);
+                template.LinkItem = linkInfo;
+                template.AdditionalIncludeDirs = TemplateHelper.GetRootedDirs(ProjectDir, TemplateHelper.MergeArrays(AdditionalIncludeDirectories, additionalInfo != null ? additionalInfo.GetMetadata("AdditionalIncludeDirectories").Split(';') : null));
+                template.AdditionalLibraryDirs = TemplateHelper.GetRootedDirs(ProjectDir, TemplateHelper.MergeArrays(AdditionalLibraryDirectories, linkInfo != null ? linkInfo.GetMetadata("AdditionalLibraryDirectories").Split(';') : null));
                 template.PreprocessorDefinitions = additionalInfo != null ? additionalInfo.GetMetadata("PreprocessorDefinitions").Split(';') : null;
                 template.UndefinePreprocessorDefinitions = additionalInfo != null ? additionalInfo.GetMetadata("UndefinePreprocessorDefinitions").Split(';') : null;
 

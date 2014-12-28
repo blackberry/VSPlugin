@@ -106,15 +106,17 @@ namespace BlackBerry.BuildTasks.Helpers
             if (collection == null)
                 return null;
 
-            var result = new string[collection.Count];
-            int i = 0;
+            var result = new List<string>();
 
             foreach (var item in collection)
             {
-                result[i++] = NormalizePath(item);
+                if (!string.IsNullOrEmpty(item))
+                {
+                    result.Add(NormalizePath(item));
+                }
             }
 
-            return result;
+            return result.ToArray();
         }
 
         /// <summary>
@@ -363,6 +365,29 @@ namespace BlackBerry.BuildTasks.Helpers
                     output.Write(" ");
                 }
             }
+        }
+
+        /// <summary>
+        /// Merges arrays into one.
+        /// </summary>
+        public static string[] MergeArrays(string[] a1, string[] a2)
+        {
+            if (a1 == null || a1.Length == 0)
+                return a2;
+            if (a2 == null || a2.Length == 0)
+                return a1;
+
+            var result = new string[a1.Length + a2.Length];
+            for (int i = 0; i < a1.Length; i++)
+            {
+                result[i] = a1[i];
+            }
+            for (int i = 0, j = a1.Length; i < a2.Length; i++, j++)
+            {
+                result[j] = a2[i];
+            }
+
+            return result;
         }
     }
 }

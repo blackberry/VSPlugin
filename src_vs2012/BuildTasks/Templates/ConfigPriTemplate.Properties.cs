@@ -65,10 +65,20 @@ namespace BlackBerry.BuildTasks.Templates
             set { _additionalLibraryDirs = TemplateHelper.NormalizePaths(value); }
         }
 
+        public bool HasAdditionalLibraryDirs
+        {
+            get { return _additionalLibraryDirs != null && _additionalLibraryDirs.Length > 0; }
+        }
+
         public string[] AdditionalIncludeDirs
         {
             get { return _additionalIncludeDirs; }
             set { _additionalIncludeDirs = TemplateHelper.NormalizePaths(value); }
+        }
+
+        public bool HasAdditionalIncludeDirs
+        {
+            get { return _additionalIncludeDirs != null && _additionalIncludeDirs.Length > 0; }
         }
 
         public string[] PreprocessorDefinitions
