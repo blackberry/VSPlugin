@@ -74,6 +74,11 @@ namespace BlackBerry.Package.Dialogs
             }
         }
 
+        public bool IsNewProjectSelected
+        {
+            get { return IsNativeCoreAppSelected || IsCascadesAppSelected; }
+        }
+
         public bool IsSaveAtSourceLocation
         {
             get { return chkAtSourceLocation.Checked; }
@@ -100,6 +105,7 @@ namespace BlackBerry.Package.Dialogs
             var info = ImportProjectInfo.Load(SourcePath);
 
             _newProjectName = info != null ? info.Name : "NewProject";
+            txtDestinationName.Text = _newProjectName;
             txtDefines.Text = info != null ? AsString(SeparatorChar, info.Defines) : null;
             txtDependencies.Text = info != null ? AsString(SeparatorChar, info.Dependencies) : null;
             BuildOutputDependsOnTargetArch = info != null && info.BuildOutputDependsOnTargetArch;
@@ -124,6 +130,7 @@ namespace BlackBerry.Package.Dialogs
             }
 
             cmbProjects.SelectedIndex = isCascadesProject ? 1 : 0;
+            UpdateSummary();
         }
 
         private static string AsString(string separator, IEnumerable<string> list)
@@ -183,6 +190,8 @@ namespace BlackBerry.Package.Dialogs
             txtDestinationName.ReadOnly = item == null || itemAsProject != null;
             txtDestinationName.Text = itemAsProject != null ? itemAsProject.Name : _newProjectName;
             chkAtSourceLocation.Enabled = !txtDestinationName.ReadOnly;
+
+            UpdateSummary();
         }
 
         /// <summary>
@@ -199,7 +208,7 @@ namespace BlackBerry.Package.Dialogs
 
             if (itemAsProject != null)
             {
-                _vm.UpdateProject(itemAsProject, txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), false);
+                _vm.UpdateProject(itemAsProject, txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), false, false);
                 return itemAsProject;
             }
 
@@ -245,26 +254,70 @@ namespace BlackBerry.Package.Dialogs
             var item = cmbProjects.SelectedItem as ComboBoxItem;
             if (item != null)
             {
-                item.Tag = txtDestinationName.Text;
                 _newProjectName = txtDestinationName.Text;
             }
+
+            UpdateSummary();
+        }
+
+        private void UpdateSummary()
+        {
+            var comment = new StringBuilder();
+
+            comment.AppendLine("All colliding files will be overwritten without notice.");
+
+            if (IsNewProjectSelected)
+            {
+                if (string.IsNullOrEmpty(_newProjectName))
+                {
+                    comment.AppendLine("Project creation will fail as its name is empty!");
+                }
+                else
+                {
+                    if (SolutionHasProject(_solution, _newProjectName))
+                    {
+                        comment.AppendLine("Project creation will fail as its already taken.");
+                        if (cmbProjects.Items.Count > 2)
+                        {
+                            comment.AppendLine("To merged it, select project with the same name from the list.");
+                        }
+                    }
+                    else
+                    {
+                        if (chkAtSourceLocation.Checked)
+                        {
+                            comment.AppendLine("Project will be placed next to the existing source-code.");
+                        }
+                    }
+                }
+
+                if (_vm.Author != null)
+                {
+                    comment.AppendLine("Author will be updated to: " + _vm.Author.Name);
+                }
+            }
+
+            txtWarnings.Text = comment.ToString();
         }
 
         private void bttOK_Click(object sender, EventArgs e)
         {
             // verify inputs:
-            if (string.IsNullOrEmpty(_newProjectName))
+            if (IsNewProjectSelected)
             {
-                MessageBoxHelper.Show("Sorry, name of the new project can't be empty", "Validation failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                ActiveControl = txtDestinationName;
-                return;
-            }
+                if (string.IsNullOrEmpty(_newProjectName))
+                {
+                    MessageBoxHelper.Show("Sorry, name of the new project can't be empty", "Validation failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ActiveControl = txtDestinationName;
+                    return;
+                }
 
-            if (SolutionHasProject(_solution, _newProjectName))
-            {
-                MessageBoxHelper.Show("Project with name \"" + _newProjectName + "\" already exists inside the solution", "Validation failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                ActiveControl = txtDestinationName;
-                return;
+                if (SolutionHasProject(_solution, _newProjectName))
+                {
+                    MessageBoxHelper.Show("Project with name \"" + _newProjectName + "\" already exists inside the solution", "Validation failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    ActiveControl = txtDestinationName;
+                    return;
+                }
             }
 
             DialogResult = DialogResult.OK;
@@ -524,6 +577,11 @@ namespace BlackBerry.Package.Dialogs
             {
                 item.Checked = false;
             }
+        }
+
+        private void chkAtSourceLocation_CheckedChanged(object sender, EventArgs e)
+        {
+            UpdateSummary();
         }
     }
 }

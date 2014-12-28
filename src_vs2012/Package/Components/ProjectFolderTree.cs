@@ -122,11 +122,17 @@ namespace BlackBerry.Package.Components
             var filter = GetFileFilter(relativePath);
             if (filter != null)
             {
-                filter.AddFile(fullPath);
+                if (filter.CanAddFile(fullPath))
+                {
+                    filter.AddFile(fullPath);
+                }
             }
             else
             {
-                _vcProject.AddFile(fullPath);
+                if (_vcProject.CanAddFile(fullPath))
+                {
+                    _vcProject.AddFile(fullPath);
+                }
             }
         }
 

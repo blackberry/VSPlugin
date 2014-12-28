@@ -14,6 +14,8 @@ namespace BlackBerry.NativeCore.Model
         private static readonly string[] ForbiddenFiles = { "\\.settings", "\\.device", "\\.cproject", "\\.project", "\\.gitignore", "\\.gitmodules", "\\manifest.properties", "\\installedApps.txt", "\\vsndk-compile-ran.flag", ".vcxproj", ".vcxproj.filters", ".suo", ".user" };
         private static readonly string[] ForbiddenDirs = { "\\arm", "\\x86", "\\.settings", "\\.git", "\\.svn", "\\.hg", "\\Device-Debug", "\\Debug", "\\Device-Release", "\\Release", "\\Simulator-Debug", "\\obj", "\\bin" };
 
+        private const string DefaultBarDescriptorFileName = "bar-descriptor.xml";
+
         /// <summary>
         /// Init constructor.
         /// </summary>
@@ -157,14 +159,14 @@ namespace BlackBerry.NativeCore.Model
             bool projectBuildOutputDependsOnTargetArch = false;
 
             // is there any 'entry' definition in bar-descriptor.xml that looks like: arm/o.le-v7-g or x86/o-g or similar?
-            var barDescriptorFileName = System.IO.Path.Combine(path, "bar-descriptor.xml");
+            var barDescriptorFileName = System.IO.Path.Combine(path, DefaultBarDescriptorFileName);
 
             // if it's not in standard location, try to find it among project files:
             if (!File.Exists(barDescriptorFileName))
             {
                 foreach (var fileName in projectFiles)
                 {
-                    if (fileName.EndsWith("\\bar-descriptor.xml", StringComparison.OrdinalIgnoreCase))
+                    if (IsBarDescriptorFile(fileName))
                     {
                         barDescriptorFileName = fileName;
                         break;
@@ -182,6 +184,14 @@ namespace BlackBerry.NativeCore.Model
             }
 
             return new ImportProjectInfo(path, projectName, projectFiles.ToArray(), projectDefines.ToArray(), projectDependencies.ToArray(), projectBuildOutputDependsOnTargetArch);
+        }
+
+        /// <summary>
+        /// Checks, if specified file refers to bar-descriptor.
+        /// </summary>
+        public static bool IsBarDescriptorFile(string fileName)
+        {
+            return !string.IsNullOrEmpty(fileName) && fileName.EndsWith(System.IO.Path.DirectorySeparatorChar + DefaultBarDescriptorFileName, StringComparison.OrdinalIgnoreCase);
         }
 
         private static void AppendUniquely(List<string> list, IEnumerable<string> newItems)

@@ -56,8 +56,8 @@
             this.yToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextRemoveMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.uncheckAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.checkAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.uncheckAllToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.groupBox1.SuspendLayout();
             this.contextMenuFiles.SuspendLayout();
             this.SuspendLayout();
@@ -65,7 +65,7 @@
             // bttOK
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOK.Location = new System.Drawing.Point(406, 462);
+            this.bttOK.Location = new System.Drawing.Point(406, 497);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
             this.bttOK.TabIndex = 0;
@@ -77,7 +77,7 @@
             // 
             this.bttCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bttCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.bttCancel.Location = new System.Drawing.Point(487, 462);
+            this.bttCancel.Location = new System.Drawing.Point(487, 497);
             this.bttCancel.Name = "bttCancel";
             this.bttCancel.Size = new System.Drawing.Size(75, 23);
             this.bttCancel.TabIndex = 1;
@@ -171,6 +171,7 @@
             this.chkAtSourceLocation.TabIndex = 9;
             this.chkAtSourceLocation.Text = "Create at source project location";
             this.chkAtSourceLocation.UseVisualStyleBackColor = true;
+            this.chkAtSourceLocation.CheckedChanged += new System.EventHandler(this.chkAtSourceLocation_CheckedChanged);
             // 
             // chkCopyFiles
             // 
@@ -229,12 +230,12 @@
             // 
             this.txtWarnings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtWarnings.Location = new System.Drawing.Point(12, 412);
+            this.txtWarnings.Location = new System.Drawing.Point(12, 431);
             this.txtWarnings.Multiline = true;
             this.txtWarnings.Name = "txtWarnings";
             this.txtWarnings.ReadOnly = true;
             this.txtWarnings.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtWarnings.Size = new System.Drawing.Size(550, 44);
+            this.txtWarnings.Size = new System.Drawing.Size(550, 60);
             this.txtWarnings.TabIndex = 6;
             this.txtWarnings.Text = "All colliding files will be overwritten without notice.";
             // 
@@ -252,7 +253,7 @@
             this.listFiles.HideSelection = false;
             this.listFiles.Location = new System.Drawing.Point(12, 173);
             this.listFiles.Name = "listFiles";
-            this.listFiles.Size = new System.Drawing.Size(550, 233);
+            this.listFiles.Size = new System.Drawing.Size(550, 252);
             this.listFiles.TabIndex = 7;
             this.listFiles.UseCompatibleStateImageBehavior = false;
             this.listFiles.View = System.Windows.Forms.View.Details;
@@ -273,33 +274,33 @@
             this.checkAllToolStripMenuItem,
             this.uncheckAllToolStripMenuItem});
             this.contextMenuFiles.Name = "contextMenuFiles";
-            this.contextMenuFiles.Size = new System.Drawing.Size(153, 164);
+            this.contextMenuFiles.Size = new System.Drawing.Size(139, 142);
             this.contextMenuFiles.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuFiles_Opening);
             // 
             // contextToggleMenuItem
             // 
             this.contextToggleMenuItem.Name = "contextToggleMenuItem";
-            this.contextToggleMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contextToggleMenuItem.Size = new System.Drawing.Size(138, 22);
             this.contextToggleMenuItem.Text = "&Toggle item";
             this.contextToggleMenuItem.Click += new System.EventHandler(this.contextToggleMenuItem_Click);
             // 
             // contextSeparatorMenuItem
             // 
             this.contextSeparatorMenuItem.Name = "contextSeparatorMenuItem";
-            this.contextSeparatorMenuItem.Size = new System.Drawing.Size(149, 6);
+            this.contextSeparatorMenuItem.Size = new System.Drawing.Size(135, 6);
             // 
             // contextCheckMenuItem
             // 
             this.contextCheckMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.xToolStripMenuItem});
             this.contextCheckMenuItem.Name = "contextCheckMenuItem";
-            this.contextCheckMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contextCheckMenuItem.Size = new System.Drawing.Size(138, 22);
             this.contextCheckMenuItem.Text = "&Check";
             // 
             // xToolStripMenuItem
             // 
             this.xToolStripMenuItem.Name = "xToolStripMenuItem";
-            this.xToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.xToolStripMenuItem.Size = new System.Drawing.Size(79, 22);
             this.xToolStripMenuItem.Text = "x";
             // 
             // contextUncheckMenuItem
@@ -307,13 +308,13 @@
             this.contextUncheckMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.yToolStripMenuItem});
             this.contextUncheckMenuItem.Name = "contextUncheckMenuItem";
-            this.contextUncheckMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contextUncheckMenuItem.Size = new System.Drawing.Size(138, 22);
             this.contextUncheckMenuItem.Text = "&Uncheck";
             // 
             // yToolStripMenuItem
             // 
             this.yToolStripMenuItem.Name = "yToolStripMenuItem";
-            this.yToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.yToolStripMenuItem.Size = new System.Drawing.Size(80, 22);
             this.yToolStripMenuItem.Text = "y";
             // 
             // contextRemoveMenuItem
@@ -321,28 +322,28 @@
             this.contextRemoveMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.zToolStripMenuItem});
             this.contextRemoveMenuItem.Name = "contextRemoveMenuItem";
-            this.contextRemoveMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.contextRemoveMenuItem.Size = new System.Drawing.Size(138, 22);
             this.contextRemoveMenuItem.Text = "&Remove";
             // 
             // zToolStripMenuItem
             // 
             this.zToolStripMenuItem.Name = "zToolStripMenuItem";
-            this.zToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.zToolStripMenuItem.Size = new System.Drawing.Size(79, 22);
             this.zToolStripMenuItem.Text = "z";
-            // 
-            // uncheckAllToolStripMenuItem
-            // 
-            this.uncheckAllToolStripMenuItem.Name = "uncheckAllToolStripMenuItem";
-            this.uncheckAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
-            this.uncheckAllToolStripMenuItem.Text = "&Uncheck all";
-            this.uncheckAllToolStripMenuItem.Click += new System.EventHandler(this.uncheckAllToolStripMenuItem_Click);
             // 
             // checkAllToolStripMenuItem
             // 
             this.checkAllToolStripMenuItem.Name = "checkAllToolStripMenuItem";
-            this.checkAllToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.checkAllToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
             this.checkAllToolStripMenuItem.Text = "Check all";
             this.checkAllToolStripMenuItem.Click += new System.EventHandler(this.checkAllToolStripMenuItem_Click);
+            // 
+            // uncheckAllToolStripMenuItem
+            // 
+            this.uncheckAllToolStripMenuItem.Name = "uncheckAllToolStripMenuItem";
+            this.uncheckAllToolStripMenuItem.Size = new System.Drawing.Size(138, 22);
+            this.uncheckAllToolStripMenuItem.Text = "&Uncheck all";
+            this.uncheckAllToolStripMenuItem.Click += new System.EventHandler(this.uncheckAllToolStripMenuItem_Click);
             // 
             // ImportProjectForm
             // 
@@ -350,7 +351,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bttCancel;
-            this.ClientSize = new System.Drawing.Size(574, 497);
+            this.ClientSize = new System.Drawing.Size(574, 532);
             this.Controls.Add(this.listFiles);
             this.Controls.Add(this.txtWarnings);
             this.Controls.Add(this.groupBox1);
