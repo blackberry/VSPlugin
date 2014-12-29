@@ -34,8 +34,10 @@
             this.txtSourceProject = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
+            this.txtIncludes = new System.Windows.Forms.TextBox();
             this.txtDependencies = new System.Windows.Forms.TextBox();
             this.txtDefines = new System.Windows.Forms.TextBox();
             this.chkAtSourceLocation = new System.Windows.Forms.CheckBox();
@@ -65,7 +67,7 @@
             // bttOK
             // 
             this.bttOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttOK.Location = new System.Drawing.Point(406, 497);
+            this.bttOK.Location = new System.Drawing.Point(406, 528);
             this.bttOK.Name = "bttOK";
             this.bttOK.Size = new System.Drawing.Size(75, 23);
             this.bttOK.TabIndex = 0;
@@ -77,7 +79,7 @@
             // 
             this.bttCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.bttCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.bttCancel.Location = new System.Drawing.Point(487, 497);
+            this.bttCancel.Location = new System.Drawing.Point(487, 528);
             this.bttCancel.Name = "bttCancel";
             this.bttCancel.Size = new System.Drawing.Size(75, 23);
             this.bttCancel.TabIndex = 1;
@@ -92,7 +94,7 @@
             this.txtSourceProject.Name = "txtSourceProject";
             this.txtSourceProject.ReadOnly = true;
             this.txtSourceProject.Size = new System.Drawing.Size(400, 20);
-            this.txtSourceProject.TabIndex = 2;
+            this.txtSourceProject.TabIndex = 1;
             // 
             // label1
             // 
@@ -100,15 +102,17 @@
             this.label1.Location = new System.Drawing.Point(18, 25);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(79, 13);
-            this.label1.TabIndex = 3;
+            this.label1.TabIndex = 0;
             this.label1.Text = "Source project:";
             // 
             // groupBox1
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.label3);
+            this.groupBox1.Controls.Add(this.txtIncludes);
             this.groupBox1.Controls.Add(this.txtDependencies);
             this.groupBox1.Controls.Add(this.txtDefines);
             this.groupBox1.Controls.Add(this.chkAtSourceLocation);
@@ -121,10 +125,19 @@
             this.groupBox1.Controls.Add(this.txtSourceProject);
             this.groupBox1.Location = new System.Drawing.Point(12, 12);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(550, 155);
-            this.groupBox1.TabIndex = 4;
+            this.groupBox1.Size = new System.Drawing.Size(550, 186);
+            this.groupBox1.TabIndex = 2;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Project info";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(18, 154);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(66, 13);
+            this.label5.TabIndex = 12;
+            this.label5.Text = "Include Dirs:";
             // 
             // label4
             // 
@@ -132,7 +145,7 @@
             this.label4.Location = new System.Drawing.Point(18, 128);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(49, 13);
-            this.label4.TabIndex = 13;
+            this.label4.TabIndex = 10;
             this.label4.Text = "Libraries:";
             // 
             // label3
@@ -141,8 +154,15 @@
             this.label3.Location = new System.Drawing.Point(18, 102);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(46, 13);
-            this.label3.TabIndex = 12;
+            this.label3.TabIndex = 8;
             this.label3.Text = "Defines:";
+            // 
+            // txtIncludes
+            // 
+            this.txtIncludes.Location = new System.Drawing.Point(103, 151);
+            this.txtIncludes.Name = "txtIncludes";
+            this.txtIncludes.Size = new System.Drawing.Size(400, 20);
+            this.txtIncludes.TabIndex = 13;
             // 
             // txtDependencies
             // 
@@ -156,7 +176,7 @@
             this.txtDefines.Location = new System.Drawing.Point(103, 99);
             this.txtDefines.Name = "txtDefines";
             this.txtDefines.Size = new System.Drawing.Size(400, 20);
-            this.txtDefines.TabIndex = 10;
+            this.txtDefines.TabIndex = 9;
             // 
             // chkAtSourceLocation
             // 
@@ -168,7 +188,7 @@
             this.chkAtSourceLocation.Location = new System.Drawing.Point(320, 76);
             this.chkAtSourceLocation.Name = "chkAtSourceLocation";
             this.chkAtSourceLocation.Size = new System.Drawing.Size(179, 17);
-            this.chkAtSourceLocation.TabIndex = 9;
+            this.chkAtSourceLocation.TabIndex = 7;
             this.chkAtSourceLocation.Text = "Create at source project location";
             this.chkAtSourceLocation.UseVisualStyleBackColor = true;
             this.chkAtSourceLocation.CheckedChanged += new System.EventHandler(this.chkAtSourceLocation_CheckedChanged);
@@ -181,7 +201,7 @@
             this.chkCopyFiles.Location = new System.Drawing.Point(103, 76);
             this.chkCopyFiles.Name = "chkCopyFiles";
             this.chkCopyFiles.Size = new System.Drawing.Size(106, 17);
-            this.chkCopyFiles.TabIndex = 8;
+            this.chkCopyFiles.TabIndex = 6;
             this.chkCopyFiles.Text = "Copy source files";
             this.chkCopyFiles.UseVisualStyleBackColor = true;
             // 
@@ -193,7 +213,7 @@
             this.txtDestinationName.Name = "txtDestinationName";
             this.txtDestinationName.ReadOnly = true;
             this.txtDestinationName.Size = new System.Drawing.Size(183, 20);
-            this.txtDestinationName.TabIndex = 7;
+            this.txtDestinationName.TabIndex = 5;
             this.txtDestinationName.TextChanged += new System.EventHandler(this.txtDestinationName_TextChanged);
             // 
             // cmbProjects
@@ -203,7 +223,7 @@
             this.cmbProjects.Location = new System.Drawing.Point(103, 48);
             this.cmbProjects.Name = "cmbProjects";
             this.cmbProjects.Size = new System.Drawing.Size(211, 21);
-            this.cmbProjects.TabIndex = 6;
+            this.cmbProjects.TabIndex = 4;
             this.cmbProjects.SelectedIndexChanged += new System.EventHandler(this.cmbProjects_SelectedIndexChanged);
             // 
             // label2
@@ -212,7 +232,7 @@
             this.label2.Location = new System.Drawing.Point(18, 51);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(63, 13);
-            this.label2.TabIndex = 5;
+            this.label2.TabIndex = 3;
             this.label2.Text = "Destination:";
             // 
             // bttFindProject
@@ -221,7 +241,7 @@
             this.bttFindProject.Location = new System.Drawing.Point(509, 21);
             this.bttFindProject.Name = "bttFindProject";
             this.bttFindProject.Size = new System.Drawing.Size(35, 23);
-            this.bttFindProject.TabIndex = 4;
+            this.bttFindProject.TabIndex = 2;
             this.bttFindProject.Text = "...";
             this.bttFindProject.UseVisualStyleBackColor = true;
             this.bttFindProject.Click += new System.EventHandler(this.bttFindProject_Click);
@@ -230,13 +250,13 @@
             // 
             this.txtWarnings.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtWarnings.Location = new System.Drawing.Point(12, 431);
+            this.txtWarnings.Location = new System.Drawing.Point(12, 462);
             this.txtWarnings.Multiline = true;
             this.txtWarnings.Name = "txtWarnings";
             this.txtWarnings.ReadOnly = true;
             this.txtWarnings.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.txtWarnings.Size = new System.Drawing.Size(550, 60);
-            this.txtWarnings.TabIndex = 6;
+            this.txtWarnings.TabIndex = 4;
             this.txtWarnings.Text = "All colliding files will be overwritten without notice.";
             // 
             // listFiles
@@ -251,10 +271,10 @@
             this.listFiles.FullRowSelect = true;
             this.listFiles.GridLines = true;
             this.listFiles.HideSelection = false;
-            this.listFiles.Location = new System.Drawing.Point(12, 173);
+            this.listFiles.Location = new System.Drawing.Point(12, 204);
             this.listFiles.Name = "listFiles";
             this.listFiles.Size = new System.Drawing.Size(550, 252);
-            this.listFiles.TabIndex = 7;
+            this.listFiles.TabIndex = 3;
             this.listFiles.UseCompatibleStateImageBehavior = false;
             this.listFiles.View = System.Windows.Forms.View.Details;
             // 
@@ -351,7 +371,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.bttCancel;
-            this.ClientSize = new System.Drawing.Size(574, 532);
+            this.ClientSize = new System.Drawing.Size(574, 563);
             this.Controls.Add(this.listFiles);
             this.Controls.Add(this.txtWarnings);
             this.Controls.Add(this.groupBox1);
@@ -404,5 +424,7 @@
         private System.Windows.Forms.ToolStripMenuItem zToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem checkAllToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem uncheckAllToolStripMenuItem;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox txtIncludes;
     }
 }

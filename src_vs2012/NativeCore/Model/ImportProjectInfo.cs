@@ -19,7 +19,7 @@ namespace BlackBerry.NativeCore.Model
         /// <summary>
         /// Init constructor.
         /// </summary>
-        public ImportProjectInfo(string path, string name, string[] files, string[] defines, string[] dependencies, bool buildOutputDependsOnTargetArch)
+        public ImportProjectInfo(string path, string name, string[] files, string[] defines, string[] dependencies, string[] includeDirectories, bool buildOutputDependsOnTargetArch)
         {
             if (string.IsNullOrEmpty(path))
                 throw new ArgumentNullException("path");
@@ -31,6 +31,7 @@ namespace BlackBerry.NativeCore.Model
             Files = files ?? new string[0];
             Defines = defines ?? new string[0];
             Dependencies = dependencies ?? new string[0];
+            IncludeDirectories = includeDirectories ?? new string[0];
             BuildOutputDependsOnTargetArch = buildOutputDependsOnTargetArch;
         }
 
@@ -64,6 +65,15 @@ namespace BlackBerry.NativeCore.Model
         /// Gets the collection of names of referenced shared libraries.
         /// </summary>
         public string[] Dependencies
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// Gets the collection of additional include directories.
+        /// </summary>
+        public string[] IncludeDirectories
         {
             get;
             private set;
@@ -112,6 +122,7 @@ namespace BlackBerry.NativeCore.Model
             var projectFiles = new List<string>();
             var projectDependencies = new List<string>();
             var projectDefines = new List<string>();
+            var projectIncludeDirectories = new List<string>();
 
             // is there redefining all manifest file?
             var manifestFileName = System.IO.Path.Combine(path, "manifest.properties");
@@ -140,10 +151,12 @@ namespace BlackBerry.NativeCore.Model
             {
                 string[] defines;
                 string[] dependencies;
-                if (ReadCProjectFile(cprojectFileName, out defines, out dependencies))
+                string[] includes;
+                if (ReadCProjectFile(cprojectFileName, out defines, out dependencies, out includes))
                 {
                     AppendUniquely(projectDefines, defines);
                     AppendUniquely(projectDependencies, dependencies);
+                    AppendUniquely(projectIncludeDirectories, includes);
                 }
             }
 
@@ -183,7 +196,7 @@ namespace BlackBerry.NativeCore.Model
                 }
             }
 
-            return new ImportProjectInfo(path, projectName, projectFiles.ToArray(), projectDefines.ToArray(), projectDependencies.ToArray(), projectBuildOutputDependsOnTargetArch);
+            return new ImportProjectInfo(path, projectName, projectFiles.ToArray(), projectDefines.ToArray(), projectDependencies.ToArray(), projectIncludeDirectories.ToArray(), projectBuildOutputDependsOnTargetArch);
         }
 
         /// <summary>
@@ -237,16 +250,18 @@ namespace BlackBerry.NativeCore.Model
             return false;
         }
 
-        private static bool ReadCProjectFile(string cprojectFileName, out string[] defines, out string[] dependencies)
+        private static bool ReadCProjectFile(string cprojectFileName, out string[] defines, out string[] dependencies, out string[] includeDirectories)
         {
             if (string.IsNullOrEmpty(cprojectFileName))
                 throw new ArgumentNullException("cprojectFileName");
 
             var defs = new List<string>();
             var libs = new List<string>();
+            var includes = new List<string>();
 
             defines = null;
             dependencies = null;
+            includeDirectories = null;
 
             try
             {
@@ -273,6 +288,13 @@ namespace BlackBerry.NativeCore.Model
                                 {
                                     AddFromNodeList(defs, node.ChildNodes);
                                 }
+                                else
+                                {
+                                    if (string.Compare(attrSuperClass.Value, "com.qnx.qcc.option.compiler.includePath", StringComparison.Ordinal) == 0)
+                                    {
+                                        AddFromNodeList(includes, node.ChildNodes);
+                                    }
+                                }
                             }
                         }
                     }
@@ -284,8 +306,17 @@ namespace BlackBerry.NativeCore.Model
                 return false;
             }
 
+            // fix the difference environment variables are named in Momentics:
+            for (int i = 0; i < includes.Count; i++)
+            {
+                includes[i] = includes[i].Replace('{', '(').Replace('}', ')').Replace(System.IO.Path.AltDirectorySeparatorChar, System.IO.Path.DirectorySeparatorChar);
+            }
+
+
             defines = defs.ToArray();
             dependencies = libs.ToArray();
+            includeDirectories = includes.ToArray();
+
             return true;
         }
 

@@ -44,7 +44,7 @@ namespace BlackBerry.Package.ViewModels
         /// <summary>
         /// Creates new project and adds it into solution.
         /// </summary>
-        public Project CreateProject(DTE2 dte, string projectName, bool createNativeCoreApp, string suggestedProjectOutputPath, string[] defines, string[] dependencies, bool buildOutputsDependsOnTargetArch)
+        public Project CreateProject(DTE2 dte, string projectName, bool createNativeCoreApp, string suggestedProjectOutputPath, string[] defines, string[] dependencies, string[] includeDirectories, bool buildOutputsDependsOnTargetArch)
         {
             if (dte == null)
                 throw new ArgumentNullException("dte");
@@ -60,7 +60,7 @@ namespace BlackBerry.Package.ViewModels
                 outputPath = hasSuggestedLocation ? suggestedProjectOutputPath : Path.GetDirectoryName(solution.FullName);
                 if (string.IsNullOrEmpty(outputPath))
                 {
-                    UpdateProject(null, null, null, false, false);
+                    UpdateProject(null, null, null, null, false, false);
                     return null;
                 }
             }
@@ -69,7 +69,7 @@ namespace BlackBerry.Package.ViewModels
                 outputPath = hasSuggestedLocation ? suggestedProjectOutputPath : ProjectHelper.GetDefaultProjectFolder(dte);
                 if (string.IsNullOrEmpty(outputPath))
                 {
-                    UpdateProject(null, null, null, false, false);
+                    UpdateProject(null, null, null, null, false, false);
                     return null;
                 }
                 saveSolution = true;
@@ -104,14 +104,14 @@ namespace BlackBerry.Package.ViewModels
             }
 
             // update state for adding items:
-            UpdateProject(project, defines, dependencies, buildOutputsDependsOnTargetArch, true);
+            UpdateProject(project, defines, dependencies, includeDirectories, buildOutputsDependsOnTargetArch, true);
             return project;
         }
 
         /// <summary>
         /// Sets a project to be used by add-file functionality and updates few of its properties.
         /// </summary>
-        public void UpdateProject(Project project, string[] defines, string[] dependencies, bool buildOutputsDependsOnTargetArch, bool updateAuthorInfo)
+        public void UpdateProject(Project project, string[] defines, string[] dependencies, string[] includeDirectories, bool buildOutputsDependsOnTargetArch, bool updateAuthorInfo)
         {
             var newProject = project != null ? project.Object as VCProject : null;
 
@@ -128,6 +128,7 @@ namespace BlackBerry.Package.ViewModels
 
                 ProjectHelper.AddPreprocessorDefines(_vcProject, "BlackBerry", null, defines);
                 ProjectHelper.AddAdditionalDependencies(_vcProject, "BlackBerry", null, dependencies);
+                ProjectHelper.AddAdditionalIncludeDirectories(_vcProject, "BlackBerry", null, includeDirectories);
 
                 if (buildOutputsDependsOnTargetArch)
                 {

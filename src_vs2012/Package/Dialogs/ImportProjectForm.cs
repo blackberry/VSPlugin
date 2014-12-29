@@ -108,6 +108,7 @@ namespace BlackBerry.Package.Dialogs
             txtDestinationName.Text = _newProjectName;
             txtDefines.Text = info != null ? AsString(SeparatorChar, info.Defines) : null;
             txtDependencies.Text = info != null ? AsString(SeparatorChar, info.Dependencies) : null;
+            txtIncludes.Text = info != null ? AsString(SeparatorChar, info.IncludeDirectories) : null;
             BuildOutputDependsOnTargetArch = info != null && info.BuildOutputDependsOnTargetArch;
             listFiles.Items.Clear();
 
@@ -208,7 +209,10 @@ namespace BlackBerry.Package.Dialogs
 
             if (itemAsProject != null)
             {
-                _vm.UpdateProject(itemAsProject, txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries), false, false);
+                _vm.UpdateProject(itemAsProject, txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
+                    txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
+                    txtIncludes.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
+                    false, false);
                 return itemAsProject;
             }
 
@@ -216,6 +220,7 @@ namespace BlackBerry.Package.Dialogs
             return _vm.CreateProject(dte, _newProjectName, IsNativeCoreAppSelected, IsSaveAtSourceLocation ? SourcePath : null,
                 txtDefines.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
                 txtDependencies.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
+                txtIncludes.Text.Split(Separators, StringSplitOptions.RemoveEmptyEntries),
                 BuildOutputDependsOnTargetArch);
         }
 
