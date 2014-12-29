@@ -86,12 +86,14 @@ namespace BlackBerry.Package.Components
                 _filters.Add("src", _sourceFilter);
                 _filters.Add("sources", _sourceFilter);
                 _filters.Add("code", _sourceFilter);
+                _filters.Add("classes", _sourceFilter);
             }
 
             if (_assetFilter != null)
             {
                 _filters.Add("asset", _assetFilter);
                 _filters.Add("assets", _assetFilter);
+                _filters.Add("data", _assetFilter);
             }
 
             if (_translationFilter != null)
