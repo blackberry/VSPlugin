@@ -34,7 +34,14 @@ namespace BlackBerry.NativeCore.QConn.Services
                 // disconnect with target service:
                 if (Connection.IsConnected)
                 {
-                    Post("q");
+                    try
+                    {
+                        Post("q");
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteException(ex, "Unable to close {0}", this);
+                    }
                 }
             }
 
