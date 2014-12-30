@@ -362,7 +362,10 @@ namespace BlackBerry.BuildTasks.Helpers
                         }
                     }
 
-                    output.Write(" ");
+                    if (i != libs.Length - 1)
+                    {
+                        output.Write(" ");
+                    }
                 }
             }
         }
