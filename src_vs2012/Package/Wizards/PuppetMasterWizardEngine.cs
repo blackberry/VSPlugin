@@ -71,7 +71,10 @@ namespace BlackBerry.Package.Wizards
                     // add the project itself:
                     var destinationPath = CreateProject(context, data.Value, masterProjectName ?? context.ProjectName, count == 1);
                     var project = dte.Solution.AddFromFile(destinationPath);
-                    var vcProject = project != null ? project.Object as VCProject : null;
+                    if (project == null)
+                        continue;
+
+                    var vcProject = project.Object as VCProject;
                     var folders = new ProjectFolderTree(project, false);
 
                     // PH: HINT: remember the name of the 'first' project and assume it later, that this is what the developer input in VisualStudio as project name;
@@ -121,20 +124,20 @@ namespace BlackBerry.Package.Wizards
                         // library references:
                         if (vcProject != null && IsMatchingKey(subItem.Key, dependencyParamName))
                         {
-                            ProjectHelper.AddAdditionalDependencies(vcProject, GetTag(projectNumber, PlatformSeparator), subItem.Value);
+                            ProjectHelper.AddAdditionalDependencies(vcProject, null, GetTag(projectNumber, PlatformSeparator), subItem.Value);
                         }
 
                         // library reference directories:
                         if (vcProject != null && IsMatchingKey(subItem.Key, dependencyDirectoryParamName))
                         {
-                            ProjectHelper.AddAdditionalDependencyDirectories(vcProject, GetTag(projectNumber, PlatformSeparator), subItem.Value);
+                            ProjectHelper.AddAdditionalDependencyDirectories(vcProject, null, GetTag(projectNumber, PlatformSeparator), subItem.Value);
                         }
 
                         // defines:
                         if (vcProject != null && IsMatchingKey(subItem.Key, defineParamName))
                         {
                             // HINT: you can specify per-platform settings using '@':
-                            ProjectHelper.AddPreprocessorDefines(vcProject, GetTag(projectNumber, PlatformSeparator), subItem.Value);
+                            ProjectHelper.AddPreprocessorDefines(vcProject, null, GetTag(projectNumber, PlatformSeparator), subItem.Value);
                         }
                     }
 
