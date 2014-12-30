@@ -1,3 +1,15 @@
+v3.2.2 (2014-12-30):
+Changes in this version:
+ * improved importing Momentics project:
+   - updates author info inside bar-descriptor.xml on the fly (#38)
+   - updates displayed project name on UI, when loaded another project
+   - avoids adding the same file several times into the project, when doing merge
+   - updating import-summary at runtime
+   - recognizes also additional-include-dirs from the original project
+ * added extra handlers to avoid Visual Studio crash, when lost connection to the device and trying to close used services
+ * small update to main project filters
+ * other small tweaks and refactorings
+
 v3.2.1 (2014-12-27):
 Changes in this version:
  * fixed loading process-list, when 5+ applications running simultaneously (#37)
