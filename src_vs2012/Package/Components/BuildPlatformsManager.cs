@@ -1273,9 +1273,18 @@ namespace BlackBerry.Package.Components
             if (project == null || !(project.Object is VCProject))
                 return false;
 
-            var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
-            if (platformName == ConfigNameBlackBerry)
-                return true;
+            try
+            {
+                var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null
+                    ? project.ConfigurationManager.ActiveConfiguration.PlatformName
+                    : null;
+                if (platformName == ConfigNameBlackBerry)
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to determine type of native project");
+            }
 
             return false;
         }
