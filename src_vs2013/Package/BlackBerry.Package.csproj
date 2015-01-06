@@ -230,6 +230,15 @@
     <Compile Include="..\..\src_vs2012\Package\Helpers\ProjectHelper.cs">
       <Link>Helpers\ProjectHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Languages\Qml\QmlColorizer.cs">
+      <Link>Languages\Qml\QmlColorizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Languages\Qml\QmlLanguageService.cs">
+      <Link>Languages\Qml\QmlLanguageService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Languages\Qml\QmlWindowManager.cs">
+      <Link>Languages\Qml\QmlWindowManager.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
       <Link>Model\bar-descriptor.cs</Link>
     </Compile>

@@ -208,6 +208,9 @@
     <Compile Include="Helpers\IconHelper.cs" />
     <Compile Include="Helpers\MessageBoxHelper.cs" />
     <Compile Include="Helpers\ProjectHelper.cs" />
+    <Compile Include="Languages\Qml\QmlColorizer.cs" />
+    <Compile Include="Languages\Qml\QmlLanguageService.cs" />
+    <Compile Include="Languages\Qml\QmlWindowManager.cs" />
     <Compile Include="Model\bar-descriptor.cs" />
     <Compile Include="Model\bar-descriptor.Extensions.cs" />
     <Compile Include="Model\Integration\ComboBoxItem.cs" />

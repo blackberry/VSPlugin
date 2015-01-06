@@ -41,6 +41,7 @@ using Microsoft.VisualStudio.Shell;
 using System.IO;
 using EnvDTE;
 using System.Windows.Forms;
+using BlackBerry.Package.Languages.Qml;
 using EnvDTE80;
 
 namespace BlackBerry.Package
@@ -115,6 +116,12 @@ namespace BlackBerry.Package
     [ProvideService(typeof(IDeviceDiscoveryService), ServiceName = "BlackBerry Device Discovery")]
     [ProvideService(typeof(IAttachDiscoveryService), ServiceName = "BlackBerry Process-Attach Executable Discovery")]
 
+    // This set of attributes registers QML language service to allow colorizing and IntelliSense support.
+    [ProvideService(typeof(QmlLanguageService), ServiceName = "QML")]
+    [ProvideLanguageExtension(typeof(QmlLanguageService), ".qml")]
+    [ProvideLanguageExtension(typeof(QmlLanguageService), ".jsqml")]
+    [ProvideLanguageService(typeof(QmlLanguageService), QmlLanguageService.LanguageName, 0)]
+
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(TargetNavigatorPane), Style = VsDockStyle.Tabbed, MultiInstances = false)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService, IAttachDiscoveryService
@@ -184,6 +191,7 @@ namespace BlackBerry.Package
             IServiceContainer serviceContainer = this;
             serviceContainer.AddService(typeof(IDeviceDiscoveryService), this, true);
             serviceContainer.AddService(typeof(IAttachDiscoveryService), this, true);
+            serviceContainer.AddService(typeof(QmlLanguageService), new QmlLanguageService(), true);
 
             TraceLog.WriteLine(" * registered services");
 
