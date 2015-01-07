@@ -1,12 +1,137 @@
 ﻿using System;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.TextManager.Interop;
 
 namespace BlackBerry.Package.Languages.Qml
 {
-    sealed class QmlColorizer : IVsColorizer, IVsColorizer2
+    /// <summary>
+    /// Colorizer class responsible for correctly assigning colors to particular chars inside QML file.
+    /// </summary>
+    internal sealed class QmlColorizer : IVsColorizer, IVsColorizer2
     {
+        #region Internal Classes
+
+        private const string Operators = "+-~=/\\*%&.,:;@|!?#$^(){}[]<>";
+
+        private static readonly string[] Keywords = new string[]
+        {
+            "alias", "and", "break", "case", "continue", "do", "decimal", "else", "if", "false", "for", "function", "import", "not", "or", "property", "return", "signal", "switch", "true", "var", "while", "ListItemData",
+            "ListItem"
+        };
+
+        private static readonly string[] BasicTypes = new string[] { "bool", "double", "int", "string", "variant", "QTimer" };
+
+        private static readonly string[] CascadeBasicTypes = new string[]
+        {
+            "ActionBar", "ActionBarPlacement", "Color", "ExpandMode", "FocusPolicy", "FontSize", "FontWeight", "InputType", "PickerKind", "ScalingMethod", "ScalingMode", "ScrollIndicatorMode",
+            "ScrollMode", "ScrollPosition", "SnapMode", "SupportedDisplayOrientation", "SystemDefaults", "UIOrientation", "TitleBarAppearance", "VisualStyle",
+            "AbsoluteLayout", "AbsoluteLayoutProperties", "DockLayout", "FlowListLayout", "FlowListLayoutProperties", "FreeFormTitleBarKindProperties", "GridLayout", "GridListLayout",
+            "HorizontalAlignment", "Layout", "LayoutOrientation", "LayoutProperties",
+            "ListHeaderMode", "ListLayout", "StackLayout", "StackLayoutProperties", "StackListLayout", "StackLayoutProperties", "TitleBarExpandableAreaIndicatorVisibility", "TitleBarKind", "TouchType",
+            "VerticalAlignment"
+        };
+
+        private static readonly string[] CascadesBasicSignals = new string[]
+        {
+            "actions", "animations", "attachedObjects", "eventHandlers", "gestureHandlers", "onClicked", "onCreationCompleted", "onEnded", "onHeaderDateChanged", "onSelectedValueChanged", "onStarted", "onTextChanged", "onTextChanging", "onTapped",
+            "onTimeout", "onTriggered", "onValueChanged"
+        };
+
+        private static readonly string[] CascadesControlTypes = new string[]
+        {
+            "ActionItem", "ActionSet", "ActivityIndicator", "Button", "CheckBox", "ComponentDefinition", "Container", "ControlDelegate", "CustomControl", "CustomListItem",
+            "DateTimePicker", "Divider", "DropDown", "ExpandableView", "ForeignWindowControl", "GroupDataModel", "Header", "ImageButton", "ImageToggleButton", "ImageView", "ImplicitAnimationController", "InvokeActionItem",
+            "Label", "ListItemComponent", "ListView", "NavigationPane", "Option", "OrientationSupport", "Page", "Picker", "PickerItemComponent", "ProgressIndicator", "RadioGroup",
+            "ScrollView", "SegmentedControl", "Sheet", "Slider", "StandardsListItem", "StandardPickerItem", "Tab", "TabbedPane", "TapHandler", "TextArea", "TextField", "ToggleButton", "TitleBar", "WebView"
+        };
+
+        private static readonly string[] SpecialWords = new string[] { "bb", "cascades", "codetitans", "qsTr", "system", "ui", "Retranslate", "onLocaleOrLanguageChanged", "onLanguageChanged" };
+
+        private enum Colors : uint
+        {
+            Unused = 0,
+            Text = 1,
+            Identifier = 2,
+            Comment = 3,
+            Keyword = 4,
+            Number = 5,
+            String = 6,
+            Operator = 7,
+            Type = 8,
+            Signals = 9
+        }
+
+        private enum States
+        {
+            Text = 0,
+            SingleLineComment = 1,
+            MultiLineComment = 2,
+            StringSingleQuoted = 3,
+            StringDoubleQuoted = 4,
+            Number = 5
+        }
+
+        /// <summary>
+        /// Structure representing a status of the scanner.
+        /// </summary>
+        private struct ScannerStatus
+        {
+            private States _state;
+            private int _level;
+
+            /// <summary>
+            /// Init constructor.
+            /// </summary>
+            public ScannerStatus(int state)
+            {
+                _state = (States) ((state >> 16) & 0x0F);
+                _level = state & 0xFF;
+            }
+
+            /// <summary>
+            /// Init constructor.
+            /// </summary>
+            public ScannerStatus(States state, int level)
+            {
+                _state = state;
+                _level = level;
+            }
+
+            /// <summary>
+            /// Gets simple representation of the state.
+            /// </summary>
+            public int ToInt32()
+            {
+                return (((int) _state) << 16) | _level;
+            }
+
+            public static implicit operator int(ScannerStatus s)
+            {
+                return s.ToInt32();
+            }
+
+            #region Properties
+
+            public States State
+            {
+                get { return _state; }
+                set { _state = value; }
+            }
+
+            public int Level
+            {
+                get { return _level; }
+                set { _level = value; }
+            }
+
+            #endregion
+        }
+
+        #endregion
+
         private readonly IVsTextLines _buffer;
 
         /// <summary>
@@ -44,7 +169,7 @@ namespace BlackBerry.Package.Languages.Qml
         /// <param name="startState">[out] Pointer to a long integer that represents the start state of the colorizer.</param>
         int IVsColorizer.GetStartState(out int startState)
         {
-            startState = 0;
+            startState = new ScannerStatus(States.Text, 0);
             return VSConstants.S_OK;
         }
 
@@ -63,14 +188,7 @@ namespace BlackBerry.Package.Languages.Qml
         {
             string text = Marshal.PtrToStringUni(pszText, length);
 
-            // perform some dummy colorizing, simply marking numbers out of text:
-            for (int i = 0; i < length; i++)
-            {
-                attributes[i] = char.IsDigit(text[i]) ? 5u : 1u; // must match index of "colorable-item" + 1
-            }
-            attributes[length] = 1u;
-
-            return 0; // new-state
+            return ScanLine(new ScannerStatus(state), text, attributes);
         }
 
         /// <summary>
@@ -85,7 +203,9 @@ namespace BlackBerry.Package.Languages.Qml
         /// <param name="state">[in] The colorizer's state at the beginning of the line.</param>
         int IVsColorizer.GetStateAtEndOfLine(int line, int length, IntPtr pszText, int state)
         {
-            return 0; // new-state
+            string text = Marshal.PtrToStringUni(pszText, length);
+
+            return ScanLine(new ScannerStatus(state), text, null);
         }
 
         /// <summary>
@@ -113,6 +233,309 @@ namespace BlackBerry.Package.Languages.Qml
         int IVsColorizer2.EndColorization()
         {
             return VSConstants.S_OK;
+        }
+
+        #endregion
+
+        #region Scanning
+
+        private static ScannerStatus ScanLine(ScannerStatus status, string text, uint[] colors)
+        {
+            var lastWord = new StringBuilder();
+            int i = 0;
+
+            while (i < text.Length)
+            {
+                switch (status.State)
+                {
+                    case States.Text:
+                        // go through all the text and search for particular:
+                        while (i < text.Length)
+                        {
+                            if (!char.IsLetterOrDigit(text[i]) && lastWord.Length > 0)
+                            {
+                                MarkKeyword(colors, i, lastWord.ToString());
+                                lastWord.Remove(0, lastWord.Length);
+                            }
+
+                            if (IsSingleLineComment(text, i))
+                            {
+                                status.State = States.SingleLineComment;
+                                Advance(colors, ref i, 2, Colors.Comment);
+                                break;
+                            }
+
+                            if (IsMultiLineCommentStart(text, i))
+                            {
+                                status.State = States.MultiLineComment;
+                                Advance(colors, ref i, 2, Colors.Comment);
+                                break;
+                            }
+
+                            if (IsStringSingleQuoteStartChar(text, i))
+                            {
+                                status.State = States.StringSingleQuoted;
+                                Advance(colors, ref i, 1, Colors.String);
+                                break;
+                            }
+
+                            if (IsStringDoubleQuoteStartChar(text, i))
+                            {
+                                status.State = States.StringDoubleQuoted;
+                                Advance(colors, ref i, 1, Colors.String);
+                                break;
+                            }
+
+                            if (IsNumberStart(text, i))
+                            {
+                                status.State = States.Number;
+                                break;
+                            }
+
+                            if (IsOperator(text, i))
+                            {
+                                SetColor(colors, i, Colors.Operator);
+                                i++;
+                                continue;
+                            }
+
+                            if (char.IsLetterOrDigit(text[i]) && colors != null)
+                            {
+                                lastWord.Append(text[i]);
+                            }
+
+                            SetColor(colors, i, Colors.Text);
+                            i++;
+                        }
+
+                        break;
+                    case States.SingleLineComment:
+                        // scan single-line comment, by marking till the end of the line:
+                        Advance(colors, ref i, text.Length - i, Colors.Comment);
+                        break;
+                    case States.MultiLineComment:
+                        // scan multi-line comment, by searching the end of the comment:
+                        while (i < text.Length)
+                        {
+                            if (IsMultiLineCommentEnd(text, i))
+                            {
+                                status.State = States.Text;
+                                Advance(colors, ref i, 2, Colors.Comment);
+                                break;
+                            }
+
+                            SetColor(colors, i, Colors.Comment);
+                            i++;
+                        }
+                        break;
+                    case States.StringSingleQuoted:
+                        // look for the end of single-quoted string:
+                        while (i < text.Length)
+                        {
+                            if (IsStringSingleQuoteEndChar(text, i))
+                            {
+                                status.State = States.Text;
+                                Advance(colors, ref i, 1, Colors.String);
+                                break;
+                            }
+
+                            SetColor(colors, i, Colors.String);
+                            i++;
+                        }
+                        break;
+                    case States.StringDoubleQuoted:
+                        // look for the end of double-quoted string:
+                        while (i < text.Length)
+                        {
+                            if (IsStringDoubleQuoteEndChar(text, i))
+                            {
+                                status.State = States.Text;
+                                Advance(colors, ref i, 1, Colors.String);
+                                break;
+                            }
+
+                            SetColor(colors, i, Colors.String);
+                            i++;
+                        }
+                        break;
+                    case States.Number:
+                        // scan text to find end of the number:
+                        while (i < text.Length)
+                        {
+                            if (IsNumber(text, i))
+                            {
+                                SetColor(colors, i, Colors.Number);
+                                i++;
+                                continue;
+                            }
+
+                            status.State = States.Text;
+                            break;
+                        }
+                        break;
+                    default:
+                        throw new InvalidDataException("Invalid state, while colorizing QML file");
+                }
+            }
+
+            switch (status.State)
+            {
+                case States.SingleLineComment:
+                    SetColor(colors, text.Length, Colors.Comment);
+                    status.State = States.Text;
+                    break;
+
+                case States.MultiLineComment:
+                    SetColor(colors, text.Length, Colors.Comment);
+                    break;
+                default:
+                    if (lastWord.Length > 0)
+                    {
+                        MarkKeyword(colors, text.Length, lastWord.ToString());
+                    }
+
+                    SetColor(colors, text.Length, Colors.Text);
+                    break;
+            }
+
+            return status;
+        }
+
+        private static void SetColor(uint[] colors, int index, Colors color)
+        {
+            if (colors != null)
+                colors[index] = (uint) color;
+        }
+
+        private static void Advance(uint[] colors, ref int index, int length, Colors color)
+        {
+            if (colors != null)
+            {
+                for (int i = 0; i < length; i++, index++)
+                {
+                    colors[index] = (uint) color;
+                }
+            }
+            else
+            {
+                index += length;
+            }
+        }
+
+        private static void MarkKeyword(uint[] colors, int index, string word)
+        {
+            Colors color;
+
+            if (colors != null && IsKeyword(word, out color))
+            {
+                for (int i = index - word.Length; i < index; i++)
+                {
+                    colors[i] = (uint) color;
+                }
+            }
+        }
+
+        private static bool IsSingleLineComment(string text, int index)
+        {
+            return index + 1 < text.Length && text[index] == '/' && text[index + 1] == '/';
+        }
+
+        private static bool IsMultiLineCommentStart(string text, int index)
+        {
+            return index + 1 < text.Length && text[index] == '/' && text[index + 1] == '*';
+        }
+
+        private static bool IsMultiLineCommentEnd(string text, int index)
+        {
+            return index + 1 < text.Length && text[index] == '*' && text[index + 1] == '/';
+        }
+
+        private static bool IsStringSingleQuoteStartChar(string text, int index)
+        {
+            return index < text.Length && text[index] == '\'';
+        }
+
+        private static bool IsStringDoubleQuoteStartChar(string text, int index)
+        {
+            return index < text.Length && text[index] == '"';
+        }
+
+        private static bool IsStringSingleQuoteEndChar(string text, int index)
+        {
+            return index > 0 && index < text.Length && text[index - 1] != '\\' && text[index] == '\'';
+        }
+
+        private static bool IsStringDoubleQuoteEndChar(string text, int index)
+        {
+            return index > 0 && index < text.Length && text[index - 1] != '\\' && text[index] == '"';
+        }
+
+        private static bool IsNumberStart(string text, int index)
+        {
+            return index < text.Length && IsHexDigit(text[index]) && (index == 0 || (index > 0 && !char.IsLetter(text[index - 1]) && text[index - 1] != '_'));
+        }
+
+        private static bool IsNumber(string text, int index)
+        {
+            return index < text.Length && (IsHexDigit(text[index]) || text[index] == '.');
+        }
+
+        private static bool IsHexDigit(char c)
+        {
+            return char.IsDigit(c); //(c >= '0' && c <= '9') || c == 'x' || c == 'X' || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F') || c == 'h' || c == 'H';
+        }
+
+        private static bool IsOperator(string text, int index)
+        {
+            return index < text.Length && Operators.IndexOf(text[index]) >= 0;
+        }
+
+        private static bool IsKeyword(string text, out Colors color)
+        {
+            if (string.IsNullOrEmpty(text))
+            {
+                color = Colors.Unused;
+                return false;
+            }
+
+            if (Array.IndexOf(Keywords, text) >= 0)
+            {
+                color = Colors.Keyword;
+                return true;
+            }
+
+            if (Array.IndexOf(BasicTypes, text) >= 0)
+            {
+                color = Colors.Type;
+                return true;
+            }
+
+            if (Array.IndexOf(CascadeBasicTypes, text) >= 0)
+            {
+                color = Colors.Signals;
+                return true;
+            }
+
+            if (Array.IndexOf(CascadesControlTypes, text) >= 0)
+            {
+                color = Colors.Type;
+                return true;
+            }
+
+            if (Array.IndexOf(CascadesBasicSignals, text) >= 0)
+            {
+                color = Colors.Signals;
+                return true;
+            }
+
+            if (Array.IndexOf(SpecialWords, text) >= 0)
+            {
+                color = Colors.Identifier;
+                return true;
+            }
+
+            color = Colors.Unused;
+            return false;
         }
 
         #endregion

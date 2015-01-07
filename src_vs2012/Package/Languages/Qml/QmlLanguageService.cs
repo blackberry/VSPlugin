@@ -23,9 +23,11 @@ namespace BlackBerry.Package.Languages.Qml
                 new ColorableItem("QML - Identifier", "QML - Identifier", COLORINDEX.CI_USERTEXT_FG, COLORINDEX.CI_USERTEXT_BK, Color.Empty, Color.Empty, FONTFLAGS.FF_BOLD),
                 new ColorableItem("QML - Comment", "QML - Comment", COLORINDEX.CI_DARKGREEN, COLORINDEX.CI_USERTEXT_BK, Color.Empty, Color.Empty, FONTFLAGS.FF_DEFAULT),
                 new ColorableItem("QML - Keyword", "QML - Keyword", COLORINDEX.CI_BLUE, COLORINDEX.CI_USERTEXT_BK, Color.Empty, Color.Empty, FONTFLAGS.FF_DEFAULT),
-                new ColorableItem("QML - Number", "QML - Number", COLORINDEX.CI_DARKBLUE, COLORINDEX.CI_USERTEXT_BK, Color.Empty, Color.Empty, FONTFLAGS.FF_BOLD),
-                new ColorableItem("QML - String", "QML - String", COLORINDEX.CI_BROWN, COLORINDEX.CI_USERTEXT_BK, Color.Empty, Color.Empty, FONTFLAGS.FF_DEFAULT),
-                new ColorableItem("QML - Operator", "QML - Operator", COLORINDEX.CI_LIGHTGRAY, COLORINDEX.CI_USERTEXT_BK, Color.Empty, Color.Empty, FONTFLAGS.FF_DEFAULT)
+                new ColorableItem("QML - Number", "QML - Number", COLORINDEX.CI_USERTEXT_FG, COLORINDEX.CI_USERTEXT_BK, Color.DodgerBlue, Color.Empty, FONTFLAGS.FF_BOLD),
+                new ColorableItem("QML - String", "QML - String", COLORINDEX.CI_USERTEXT_FG, COLORINDEX.CI_USERTEXT_BK, Color.DarkRed, Color.Empty, FONTFLAGS.FF_DEFAULT),
+                new ColorableItem("QML - Operator", "QML - Operator", COLORINDEX.CI_DARKGRAY, COLORINDEX.CI_USERTEXT_BK, Color.Empty, Color.Empty, FONTFLAGS.FF_DEFAULT),
+                new ColorableItem("QML - Types", "QML - Types", COLORINDEX.CI_USERTEXT_FG, COLORINDEX.CI_USERTEXT_BK, Color.LightSeaGreen, Color.Empty, FONTFLAGS.FF_BOLD),
+                new ColorableItem("QML - Signals", "QML - Signals", COLORINDEX.CI_USERTEXT_FG, COLORINDEX.CI_USERTEXT_BK, Color.SeaGreen, Color.Empty, FONTFLAGS.FF_DEFAULT)
             };
         }
 
