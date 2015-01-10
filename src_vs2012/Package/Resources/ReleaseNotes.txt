@@ -1,10 +1,10 @@
-v3.3.0 (2015-01-09):
+v3.3.0 (2015-01-09)
 Changes in this version:
  * added basic QML colorizer (#29)
  * fixed missing separator in makefile liner command
  * fixed crash, when upgrading VC++ non-BlackBerry project
 
-v3.2.2 (2014-12-30):
+v3.2.2 (2014-12-30)
 Changes in this version:
  * improved importing Momentics project:
    - updates author info inside bar-descriptor.xml on the fly (#38)
@@ -16,11 +16,11 @@ Changes in this version:
  * small update to main project filters
  * other small tweaks and refactorings
 
-v3.2.1 (2014-12-27):
+v3.2.1 (2014-12-27)
 Changes in this version:
  * fixed loading process-list, when 5+ applications running simultaneously (#37)
 
-v3.2.0 (2014-12-25):
+v3.2.0 (2014-12-25)
 Changes in this version:
  * .bar file editor is not default one for all XML files anymore! (#36)
  * improved presentation of compilation errors (#35) to let Visual Studio jump into right place in source-code
@@ -36,7 +36,7 @@ Changes in this version:
  * fixed problem with launching slog2info on PlayBook (it's simply not supported there)
  * other small tweaks and refactorings
 
-v3.1.0 (2014-12-09):
+v3.1.0 (2014-12-09)
 Changes in this version:
  * introduced device logs capture feature (#32)
  * added process launcher (on target device)
