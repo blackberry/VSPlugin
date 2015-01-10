@@ -159,6 +159,8 @@
             // 
             // txtIncludes
             // 
+            this.txtIncludes.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtIncludes.Location = new System.Drawing.Point(103, 151);
             this.txtIncludes.Name = "txtIncludes";
             this.txtIncludes.Size = new System.Drawing.Size(400, 20);
@@ -166,6 +168,8 @@
             // 
             // txtDependencies
             // 
+            this.txtDependencies.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDependencies.Location = new System.Drawing.Point(103, 125);
             this.txtDependencies.Name = "txtDependencies";
             this.txtDependencies.Size = new System.Drawing.Size(400, 20);
@@ -173,6 +177,8 @@
             // 
             // txtDefines
             // 
+            this.txtDefines.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtDefines.Location = new System.Drawing.Point(103, 99);
             this.txtDefines.Name = "txtDefines";
             this.txtDefines.Size = new System.Drawing.Size(400, 20);
