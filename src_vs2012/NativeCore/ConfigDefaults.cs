@@ -80,6 +80,12 @@ namespace BlackBerry.NativeCore
             get
             {
                 var programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+
+                if (string.IsNullOrEmpty(programFilesX86))
+                {
+                    programFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+                }
+
 #if PLATFORM_VS2010
                 return Path.Combine(programFilesX86, "MSBuild", "Microsoft.Cpp", "v4.0");
 #elif PLATFORM_VS2012
