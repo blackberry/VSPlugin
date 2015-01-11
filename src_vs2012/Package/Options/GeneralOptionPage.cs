@@ -68,8 +68,6 @@ namespace BlackBerry.Package.Options
             set { Control.JavaHomePath = value; }
         }
 
-        [Browsable(false)]
-        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
         public bool IsOpeningExternal
         {
             get { return Control.IsOpeningExternal; }
