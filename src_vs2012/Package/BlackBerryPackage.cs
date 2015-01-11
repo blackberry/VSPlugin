@@ -186,6 +186,9 @@ namespace BlackBerry.Package
             TraceLog.Add(_qconnTraceWindow);
             TraceLog.Add(_standardOutputWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
+#if DEBUG
+            TraceLog.WriteLine(" * location: \"{0}\"", System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
+#endif
 
             // add this package to the globally-proffed services:
             IServiceContainer serviceContainer = this;
