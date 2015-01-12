@@ -118,6 +118,9 @@ REM Build VS2013
 REM ********************************************************************************************
 if %ActionBuildVS2013% equ 0 (goto skip_vs2013)
 
+echo Creating vs2013 Directory 
+mkdir "%BuildResults%\VS2013"
+
 echo %actionNo%: Building Solution for Visual Studio 2013
 %MsBuild2013Cmd% %SolutionPath2013% /p:OutputPath="%BuildResults%\VS2013" /p:VisualStudioVersion=12.0 > "%BuildResults%\VS2013_buildlog.txt"
 if errorlevel 1 ( exit /b %errorlevel% )
