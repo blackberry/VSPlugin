@@ -50,11 +50,15 @@ if "%CustomOutputDir%" == "" goto skip_buildoutput_override
   if "%BuildResults:~-1%" == "\" set BuildResults=%BuildResults:~0,-1%
 :skip_buildoutput_override
 
-set ProgFilesRoot=%ProgramFiles(x86)%
-if "%ProgFilesRoot%" == "" set ProgFilesRoot=%ProgramFiles%
-
 set MsBuild="C:\Windows\Microsoft.NET\Framework\v4.0.30319\MsBuild.exe"
-set MsBuild2013="%ProgFilesRoot%\MSBuild\12.0\Bin\MsBuild.exe"
+
+if exist "%ProgramFiles(x86)%\MSBuild\12.0\Bin\MsBuild.exe" (
+  echo Setting MsBuild2013 to "%ProgramFiles(x86)%\MSBuild\12.0\Bin\MsBuild.exe"
+  set MsBuild2013="%ProgramFiles(x86)%\MSBuild\12.0\Bin\MsBuild.exe"
+) else (
+  echo Setting MsBuild2013 to "%ProgramFiles%\MSBuild\12.0\Bin\MsBuild.exe"
+  set MsBuild2013="%ProgramFiles%\MSBuild\12.0\Bin\MsBuild.exe"
+)
 set MsBuildCmd=%MsBuild% /property:Configuration=Release /target:Rebuild
 set MsBuild2013Cmd=%MsBuild2013% /property:Configuration=Release /target:Rebuild
 
@@ -117,9 +121,6 @@ REM ****************************************************************************
 REM Build VS2013
 REM ********************************************************************************************
 if %ActionBuildVS2013% equ 0 (goto skip_vs2013)
-
-echo Creating vs2013 Directory 
-mkdir "%BuildResults%\VS2013"
 
 echo %actionNo%: Building Solution for Visual Studio 2013
 %MsBuild2013Cmd% %SolutionPath2013% /p:OutputPath="%BuildResults%\VS2013" /p:VisualStudioVersion=12.0 > "%BuildResults%\VS2013_buildlog.txt"
