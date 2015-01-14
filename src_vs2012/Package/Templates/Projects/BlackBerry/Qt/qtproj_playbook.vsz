@@ -1,0 +1,11 @@
+VSWIZARD 7.0
+Wizard={0cb934ba-06c8-4919-9498-bc6517940bcd}
+Param="TITLE = BlackBerry Qt4 for PlayBook Application"
+Param="PROJECT = native-default.vcxproj"
+Param="FILTERS = assets;config;src;trans"
+Param="DEFINE = QT_BOOTSTRAPPED"
+Param="DEPENDENCY = QtCore;QtGui;QtOpenGL"
+Param="DEPENDENCY-DIR = $(QNX_TARGET)\$(CPUVARDIR)\usr\lib\qt4\lib"
+Param="FILE = Shared/Assets/QtPlayBook/bar-descriptor.xml -> bar-descriptor.xml"
+Param="FILE = Shared/Assets/QtPlayBook/main.cpp -> src/main.cpp"
+Param="FILE = * Shared/Assets/QtPlayBook/README.txt -> README.txt"

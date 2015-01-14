@@ -139,6 +139,11 @@ namespace BlackBerry.NativeCore.Model
             }
         }
 
+        public Version CascadesVersion
+        {
+            get { return new Version(1, Version.Minor); }
+        }
+
         #endregion
 
         /// <summary>

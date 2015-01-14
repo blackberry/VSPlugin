@@ -1,0 +1,11 @@
+VSWIZARD 7.0
+Wizard={0cb934ba-06c8-4919-9498-bc6517940bcd}
+Param="TITLE = BlackBerry Empty OpenGL 1.1 Project"
+Param="PROJECT = opengl-default.vcxproj"
+Param="FILTERS = assets;config;src"
+Param="DEPENDENCY = bps;screen;EGL;GLESv1_CM;freetype;png;m"
+Param="DEFINE = USING_GL11"
+Param="FILE = Shared/bar-descriptor.xml"
+Param="FILE = * Shared/main-opengl1.c -> src/main.c"
+Param="FILE = Shared/Utils/bbutil.c -> src/bbutil.c"
+Param="FILE = Shared/Utils/bbutil.h -> src/bbutil.h"

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using BlackBerry.NativeCore.Model;
 
 namespace BlackBerry.NativeCore.Tools
@@ -155,26 +156,38 @@ namespace BlackBerry.NativeCore.Tools
             ApiLevels = GroupList(APIs, Type != ApiLevelListTypes.Simulators && Type != ApiLevelListTypes.Runtimes);
         }
 
-        private static ApiInfoArray[] GroupList(ApiInfo[] list, bool injectPlayBook)
+        /// <summary>
+        /// Sorts the list of given API levels and injects some special ones (to download PlayBook NDK and 'Add custom local NDK')
+        /// </summary>
+        public static ApiInfoArray[] GroupList(ApiInfo[] list, bool injectExtraActions)
         {
-            if (list == null || list.Length == 0)
+            if ((list == null || list.Length == 0) && !injectExtraActions)
                 return new ApiInfoArray[0];
 
             var groups = new List<List<ApiInfo>>();
 
-            if (injectPlayBook)
+            if (injectExtraActions)
             {
+                // inject info about BBNDK for VS:
+                if (!Directory.Exists(ConfigDefaults.NdkDirectory))
+                {
+                    AddUnique(groups, ApiInfo.CreateBBNDKforVSInfo());
+                }
+
                 // inject info about tablet NDK:
-                Add(groups, ApiInfo.CreateTabletInfo());
+                AddUnique(groups, ApiInfo.CreateTabletInfo());
 
                 // inject info about 'custom NDK':
-                Add(groups, ApiInfo.CreateAddCustomInfo());
+                AddUnique(groups, ApiInfo.CreateAddCustomInfo());
             }
 
             // group BlackBerry 10 items together:
-            foreach (var item in list)
+            if (list != null && list.Length > 0)
             {
-                Add(groups, item);
+                foreach (var item in list)
+                {
+                    Add(groups, item);
+                }
             }
 
             // convert to pure arrays and assign the name for each group:
@@ -204,6 +217,9 @@ namespace BlackBerry.NativeCore.Tools
 
         private static void Add(ICollection<List<ApiInfo>> groups, ApiInfo item)
         {
+            if (groups == null)
+                throw new ArgumentNullException("groups");
+
             var group = Find(groups, item.Level);
             if (group != null)
             {
@@ -211,10 +227,18 @@ namespace BlackBerry.NativeCore.Tools
             }
             else
             {
-                group = new List<ApiInfo>();
-                group.Add(item);
-                groups.Add(group);
+                AddUnique(groups, item);
             }
+        }
+
+        private static void AddUnique(ICollection<List<ApiInfo>> groups, ApiInfo item)
+        {
+            if (groups == null)
+                throw new ArgumentNullException("groups");
+
+            var group = new List<ApiInfo>();
+            group.Add(item);
+            groups.Add(group);
         }
 
         private static List<ApiInfo> Find(IEnumerable<List<ApiInfo>> groups, Version level)

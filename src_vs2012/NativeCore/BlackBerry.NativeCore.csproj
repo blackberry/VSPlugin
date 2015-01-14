@@ -84,6 +84,7 @@
     <Compile Include="Model\ApiLevelListTypes.cs" />
     <Compile Include="Model\ApiLevelTarget.cs" />
     <Compile Include="Model\ApiLevelTask.cs" />
+    <Compile Include="Model\AuthorInfo.cs" />
     <Compile Include="Model\CertificateInfo.cs" />
     <Compile Include="Model\CskTokenInfo.cs" />
     <Compile Include="Model\DebugTokenInfo.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Model\DeviceInfo.cs" />
     <Compile Include="Model\DeviceTheme.cs" />
     <Compile Include="Model\GdbInfo.cs" />
+    <Compile Include="Model\ImportProjectInfo.cs" />
     <Compile Include="Model\NdkDefinition.cs" />
     <Compile Include="Model\DeviceFamilyType.cs" />
     <Compile Include="Model\NdkInfo.cs" />
@@ -104,10 +106,16 @@
     <Compile Include="Model\Size.cs" />
     <Compile Include="NativeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QConn\Model\CapturedLogsEventArgs.cs" />
+    <Compile Include="QConn\Model\TargetLogEntry.cs" />
+    <Compile Include="QConn\Model\TargetProcess.cs" />
+    <Compile Include="QConn\Model\TargetProcessSLog2Info.cs" />
     <Compile Include="QConn\Model\TransferOperation.cs" />
     <Compile Include="QConn\Model\VisitorCompletionEventArgs.cs" />
     <Compile Include="QConn\Model\VisitorEventArgs.cs" />
     <Compile Include="QConn\Model\VisitorFailureEventArgs.cs" />
+    <Compile Include="QConn\Services\TargetServiceConsoleLog.cs" />
+    <Compile Include="QConn\Services\TargetServiceLauncher.cs" />
     <Compile Include="QConn\Visitors\BaseFileServiceEnumerator.cs" />
     <Compile Include="QConn\Visitors\BaseVisitorMonitor.cs" />
     <Compile Include="QConn\Visitors\BufferVisitor.cs" />

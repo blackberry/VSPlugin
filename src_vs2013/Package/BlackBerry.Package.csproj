@@ -131,13 +131,6 @@
     <Compile Include="..\..\src_vs2010\Package\GlobalSuppressions.cs">
       <Link>GlobalSuppressions.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\Package\Import\Import.xaml.cs">
-      <Link>Import\Import.xaml.cs</Link>
-      <DependentUpon>Import.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\Package\Import\Model\ImportModel.cs">
-      <Link>Import\Model\ImportModel.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\Package\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
@@ -153,8 +146,14 @@
     <Compile Include="..\..\src_vs2012\Package\Components\BuildPlatformsManager.cs">
       <Link>Components\BuildPlatformsManager.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\ErrorManager.cs">
+      <Link>Components\ErrorManager.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Components\LogManager.cs">
       <Link>Components\LogManager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Components\ProjectFolderTree.cs">
+      <Link>Components\ProjectFolderTree.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Diagnostics\BlackBerryPaneTraceListener.cs">
       <Link>Diagnostics\BlackBerryPaneTraceListener.cs</Link>
@@ -170,6 +169,14 @@
       <Link>Dialogs\BinaryDiscoveryForm.designer.cs</Link>
       <DependentUpon>BinaryDiscoveryForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.cs">
+      <Link>Dialogs\CachedAuthorForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.designer.cs">
+      <Link>Dialogs\CachedAuthorForm.designer.cs</Link>
+      <DependentUpon>CachedAuthorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Dialogs\FolderForm.cs">
       <Link>Dialogs\FolderForm.cs</Link>
       <SubType>Form</SubType>
@@ -177,6 +184,14 @@
     <Compile Include="..\..\src_vs2012\Package\Dialogs\FolderForm.designer.cs">
       <Link>Dialogs\FolderForm.designer.cs</Link>
       <DependentUpon>FolderForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\ImportProjectForm.cs">
+      <Link>Dialogs\ImportProjectForm.cs</Link>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Dialogs\ImportProjectForm.designer.cs">
+      <Link>Dialogs\ImportProjectForm.designer.cs</Link>
+      <DependentUpon>ImportProjectForm.cs</DependentUpon>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml.cs">
       <Link>Editors\BarDescriptorEditorControl.xaml.cs</Link>
@@ -187,9 +202,6 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorPane.cs">
       <Link>Editors\BarDescriptorEditorPane.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2012\Package\Editors\EditorFactoryNotifyForProject.cs">
-      <Link>Editors\EditorFactoryNotifyForProject.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\GuidList.cs">
       <Link>GuidList.cs</Link>
@@ -218,8 +230,20 @@
     <Compile Include="..\..\src_vs2012\Package\Helpers\ProjectHelper.cs">
       <Link>Helpers\ProjectHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Languages\Qml\QmlColorizer.cs">
+      <Link>Languages\Qml\QmlColorizer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Languages\Qml\QmlLanguageService.cs">
+      <Link>Languages\Qml\QmlLanguageService.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Languages\Qml\QmlWindowManager.cs">
+      <Link>Languages\Qml\QmlWindowManager.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
       <Link>Model\bar-descriptor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.Extensions.cs">
+      <Link>Model\bar-descriptor.Extensions.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Model\Integration\ComboBoxItem.cs">
       <Link>Model\Integration\ComboBoxItem.cs</Link>
@@ -230,6 +254,15 @@
     <Compile Include="..\..\src_vs2012\Package\Model\Integration\WebBrowserTurbo.cs">
       <Link>Model\Integration\WebBrowserTurbo.cs</Link>
       <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Wizards\ContextParams.cs">
+      <Link>Model\Wizards\ContextParams.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Wizards\NewProjectItemParams.cs">
+      <Link>Model\Wizards\NewProjectItemParams.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\Wizards\NewProjectParams.cs">
+      <Link>Model\Wizards\NewProjectParams.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\ApiLevelOptionControl.cs">
       <Link>Options\ApiLevelOptionControl.cs</Link>
@@ -355,6 +388,18 @@
       <Link>Dialogs\UpdateManagerStatusForm.designer.cs</Link>
       <DependentUpon>UpdateManagerStatusForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\BackupOptionControl.cs">
+      <Link>Options\BackupOptionControl.cs</Link>
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\BackupOptionControl.designer.cs">
+      <Link>Options\BackupOptionControl.designer.cs</Link>
+      <DependentUpon>BackupOptionControl.cs</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Options\BackupOptionPage.cs">
+      <Link>Options\BackupOptionPage.cs</Link>
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Options\GeneralOptionControl.cs">
       <Link>Options\GeneralOptionControl.cs</Link>
       <SubType>UserControl</SubType>
@@ -409,6 +454,12 @@
     <Compile Include="..\..\src_vs2012\Package\Registration\DebugEngineRegistrationAttribute.cs">
       <Link>Registration\DebugEngineRegistrationAttribute.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Registration\ProvideProjects.cs">
+      <Link>Registration\ProvideProjects.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Registration\ProvideWizardEngineAttribute.cs">
+      <Link>Registration\ProvideWizardEngineAttribute.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\Registration\XmlEditorDesignerViewRegistrationAttribute.cs">
       <Link>Registration\XmlEditorDesignerViewRegistrationAttribute.cs</Link>
     </Compile>
@@ -425,6 +476,9 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\ApiLevelOptionViewModel.cs">
       <Link>ViewModels\ApiLevelOptionViewModel.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\BackupOptionViewModel.cs">
+      <Link>ViewModels\BackupOptionViewModel.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\BarEditorViewModel.cs">
       <Link>ViewModels\BarEditorViewModel.cs</Link>
     </Compile>
@@ -439,6 +493,9 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\Common\NullToVisibilityConverter.cs">
       <Link>ViewModels\Common\NullToVisibilityConverter.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\ViewModels\ImportProjectViewModel.cs">
+      <Link>ViewModels\ImportProjectViewModel.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\Package\ViewModels\PackageViewModel.cs">
       <Link>ViewModels\PackageViewModel.cs</Link>
@@ -485,27 +542,422 @@
     <Compile Include="..\..\src_vs2012\Package\ViewModels\TargetsOptionViewModel.cs">
       <Link>ViewModels\TargetsOptionViewModel.cs</Link>
     </Compile>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.cs</Link>
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+    <Compile Include="..\..\src_vs2012\Package\Wizards\BaseWizardEngine.cs">
+      <Link>Wizards\BaseWizardEngine.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Wizards\PuppetMasterWizardEngine.cs">
+      <Link>Wizards\PuppetMasterWizardEngine.cs</Link>
+    </Compile>
+    <Content Include="..\..\src_vs2012\Package\Resources\License.txt">
+      <Link>Resources\License.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\src_vs2010\Package\Templates\bar-descriptor.cs">
-      <Link>Templates\bar-descriptor.cs</Link>
+    <Content Include="..\..\src_vs2012\Package\Resources\ReleaseNotes.txt">
+      <Link>Resources\ReleaseNotes.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Scripts\1033\default.js</Link>
+    <Content Include="..\..\src_vs2012\Package\Resources\StartGuide.txt">
+      <Link>Resources\StartGuide.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xml</Link>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry.vsdir">
+      <Link>Templates\Projects\BlackBerry.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\emptyproj.vsz">
+      <Link>Templates\Projects\BlackBerry\emptyproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\items.vsdir">
+      <Link>Templates\Projects\BlackBerry\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\OpenGL\items.vsdir">
+      <Link>Templates\Projects\BlackBerry\OpenGL\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry.vsdir">
+      <Link>Templates\ProjectItems\BlackBerry.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\bar-descriptor.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\bar-descriptor.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\items.vsdir">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qclass.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qclass.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\items.vsdir">
+      <Link>Templates\ProjectItems\BlackBerry\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\applicationui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\applicationui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\applicationui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\applicationui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main-service.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main-service.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\main.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\main.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\README.txt">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\README.txt</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-cascades.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-cascades.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-empty.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-empty.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-opengl1.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-opengl1.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-opengl2.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-opengl2.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-screen.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\main-screen.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\precompiled-cascades.h">
+      <Link>Templates\VCWizards\BlackBerry\Shared\precompiled-cascades.h</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\precompiled-empty.h">
+      <Link>Templates\VCWizards\BlackBerry\Shared\precompiled-empty.h</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qcontrol.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qcontrol.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qdialog.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qdialog.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qpage.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qpage.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qpane.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qpane.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qsheet.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qsheet.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qcontrol.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qcontrol.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qdialog.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qdialog.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qpage.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qpage.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qpane.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qpane.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qsheet.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qsheet.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\items.vsdir">
+      <Link>Templates\Projects\BlackBerry\Cascades\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\cascadesproj.vsz">
+      <Link>Templates\Projects\BlackBerry\cascadesproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\libsharedproj.vsz">
+      <Link>Templates\Projects\BlackBerry\libsharedproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\libstaticproj.vsz">
+      <Link>Templates\Projects\BlackBerry\libstaticproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\openglproj1.vsz">
+      <Link>Templates\Projects\BlackBerry\openglproj1.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\openglproj2.vsz">
+      <Link>Templates\Projects\BlackBerry\openglproj2.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\screenproj.vsz">
+      <Link>Templates\Projects\BlackBerry\screenproj.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Translations\makefile-cascades">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Translations\makefile-cascades</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Translations\qmake-default.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Translations\qmake-default.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\main-helloworld.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\main-helloworld.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\makefile-cascades">
+      <Link>Templates\VCWizards\BlackBerry\Shared\makefile-cascades</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qmake-config.pri">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qmake-config.pri</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qmake-default.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qmake-default.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\main-tabs.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\main-tabs.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\card.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\card.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\qmake.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\qmake.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\ItemPage.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\ItemPage.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\qmake.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\qmake.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\DetailsPage.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\DetailsPage.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_card.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_card.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_listview.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_listview.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_navigationpane.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_navigationpane.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_tabs.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_tabs.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_headless.vsz">
+      <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_headless.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake-service.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake-service.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\bbutil.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\bbutil.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qtab.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\Cascades\qtab.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qtab.qml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qtab.qml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Resources\TemplateIcons\EmptyProj.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\CachedAuthorForm.resx">
+      <Link>Dialogs\CachedAuthorForm.resx</Link>
+      <DependentUpon>CachedAuthorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Dialogs\ImportProjectForm.resx">
+      <Link>Dialogs\ImportProjectForm.resx</Link>
+      <DependentUpon>ImportProjectForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Options\BackupOptionControl.resx">
+      <Link>Options\BackupOptionControl.resx</Link>
+      <DependentUpon>BackupOptionControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Template.Strings.resx">
+      <Link>Resources\Template.Strings.resx</Link>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\Template.Icons.resx">
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml">
+      <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\templates.inf</Link>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qclass.cpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qclass.cpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qclass.hpp">
+      <Link>Templates\VCWizards\BlackBerry\Shared\qclass.hpp</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\makefile.vsz">
+      <Link>Templates\ProjectItems\BlackBerry\makefile.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\makefile-empty">
+      <Link>Templates\VCWizards\BlackBerry\Shared\makefile-empty</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Qt\items.vsdir">
+      <Link>Templates\Projects\BlackBerry\Qt\items.vsdir</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Qt\qtproj_playbook.vsz">
+      <Link>Templates\Projects\BlackBerry\Qt\qtproj_playbook.vsz</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <None Include="Resources\TemplateIcons\CascadesProj.ico" />
+    <None Include="Resources\TemplateIcons\NewItem.ico" />
+    <None Include="Resources\TemplateIcons\NewQItem.ico" />
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.c">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.c</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.h">
+      <Link>Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.h</Link>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\opengl-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\cascades-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-libshared-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
+    <Content Include="Templates\VCWizards\BlackBerry\native-libstatic-default.vcxproj">
+      <IncludeInVSIX>true</IncludeInVSIX>
     </Content>
     <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\BlackBerryMessager.bmp">
       <Link>Resources\Permissions\BlackBerryMessager.bmp</Link>
@@ -681,12 +1133,6 @@
     <EmbeddedResource Include="..\..\src_vs2012\Package\Resources\Logo.png">
       <Link>Resources\Logo.png</Link>
     </EmbeddedResource>
-    <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsc">
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
-    </None>
-    <None Include="Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xss">
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
-    </None>
     <Content Include="..\..\src_vs2010\Package\Resources\File.ico">
       <Link>Resources\File.ico</Link>
     </Content>
@@ -720,11 +1166,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\src_vs2010\Package\Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsd">
-      <Link>Templates\VCWizards\BlackBerry\BarDescriptor\Templates\1033\bar-descriptor.xsd</Link>
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <None Include="source.extension.vsixmanifest">
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -737,11 +1178,6 @@
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>
-    <Page Include="..\..\src_vs2010\Package\Import\Import.xaml">
-      <Link>Import\Import.xaml</Link>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="..\..\src_vs2012\Package\Editors\BarDescriptorEditorControl.xaml">
       <Link>Editors\BarDescriptorEditorControl.xaml</Link>
       <Generator>MSBuild:Compile</Generator>

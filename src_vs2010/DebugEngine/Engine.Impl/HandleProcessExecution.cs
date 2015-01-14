@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Windows.Forms;
+using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.Package.Helpers;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -174,7 +175,15 @@ namespace BlackBerry.DebugEngine
                                 case 3:
                                     // Thread ID
                                     ini = end + 1;
-                                    _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    try
+                                    {
+                                        _threadId = Convert.ToInt32(ev.Substring(ini, (ev.Length - ini)));
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _threadId = -1;
+                                        TraceLog.WriteException(ex, "Unable to parse ThreadID from: \"{0}\"", ev);
+                                    }
                                     EventDispatcher._unknownCode = true;
                                     break;
                                 case 4:
@@ -542,9 +551,6 @@ namespace BlackBerry.DebugEngine
             if (eventDispatcher.Engine.State == AD7Engine.DebugEngineState.Step)
             {
                 eventDispatcher.Engine.State = AD7Engine.DebugEngineState.Break;
-
-                // Visual Studio shows the line position one more than it actually is
-                eventDispatcher.Engine._docContext = eventDispatcher.GetDocumentContext(file, line - 1);
                 AD7StepCompletedEvent.Send(eventDispatcher.Engine);
             }
         }
@@ -558,12 +564,6 @@ namespace BlackBerry.DebugEngine
             if (_eventDispatcher.Engine.State == AD7Engine.DebugEngineState.Run)
             {
                 _eventDispatcher.Engine.State = AD7Engine.DebugEngineState.Break;
-
-                if (_fileName != "" && _line > 0)
-                {
-                    // Visual Studio shows the line position one more than it actually is
-                    _eventDispatcher.Engine._docContext = _eventDispatcher.GetDocumentContext(_fileName, (uint) (_line - 1));
-                }
 
                 // Only send OnAsyncBreakComplete if break-all was requested by the user
                 if (!NeedsResumeAfterInterrupt)

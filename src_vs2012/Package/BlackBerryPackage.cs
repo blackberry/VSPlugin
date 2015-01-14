@@ -24,7 +24,6 @@ using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
-using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Components;
 using BlackBerry.Package.Diagnostics;
 using BlackBerry.Package.Dialogs;
@@ -35,12 +34,14 @@ using BlackBerry.Package.Options;
 using BlackBerry.Package.Registration;
 using BlackBerry.Package.ToolWindows;
 using BlackBerry.Package.ViewModels;
+using BlackBerry.Package.Wizards;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
 using System.IO;
 using EnvDTE;
 using System.Windows.Forms;
+using BlackBerry.Package.Languages.Qml;
 using EnvDTE80;
 
 namespace BlackBerry.Package
@@ -57,14 +58,12 @@ namespace BlackBerry.Package
     /// </summary>
     [PackageRegistration(UseManagedResourcesOnly = true)]
     // Register the editor factory
-    [XmlEditorDesignerViewRegistration("XML", "xml", LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(BarDescriptorEditorFactory),
+    [XmlEditorDesignerViewRegistration("BarDescriptor", BarDescriptorEditorFactory.DefaultExtension, LogicalViewID.Designer, 0x60, DesignerLogicalViewEditor = typeof(BarDescriptorEditorFactory),
         Namespace = "http://www.qnx.com/schemas/application/1.0", MatchExtensionAndNamespace = true)]
-    // And which type of files we want to handle
-    [ProvideEditorExtension(typeof(BarDescriptorEditorFactory), BarDescriptorEditorFactory.DefaultExtension, 0x40, NameResourceID = 106)]
+    // And which type of files we want to handle and notify about file changes, while in Microsoft Visual C++ Projects
+    [ProvideEditorExtension(typeof(BarDescriptorEditorFactory), BarDescriptorEditorFactory.DefaultExtension, 0x10, NameResourceID = 106, EditorFactoryNotify = true, ProjectGuid = "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}")]
     // We register that our editor supports LOGVIEWID_Designer logical view
     [ProvideEditorLogicalView(typeof(BarDescriptorEditorFactory), LogicalViewID.Designer)]
-    // Microsoft Visual C++ Project
-    [EditorFactoryNotifyForProject("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}", BarDescriptorEditorFactory.DefaultExtension, GuidList.guidVSNDK_PackageEditorFactoryString)]
 
     // Registration of custom debugger
     [DebugEngineRegistration(AD7PortSupplier.PublicName, AD7Engine.DebugEngineGuid,
@@ -81,12 +80,27 @@ namespace BlackBerry.Package
 
     // This attribute is used to register the informations needed to show the this package
     // in the Help/About dialog of Visual Studio.
-    [InstalledProductRegistration("#110", "#112", VersionString, IconResourceID = 400)]
+    [InstalledProductRegistration("#110", "#112", ConfigDefaults.VersionString, IconResourceID = 400)]
     // This attribute is needed to let the shell know that this package exposes some menus.
     [ProvideMenuResource("Menus.ctmenu", 1)]
 
     [ProvideAutoLoad(UIContextGuids80.SolutionExists)]
     [Guid(GuidList.guidVSNDK_PackageString)]
+
+    // This attribute adds top level node at [Add Project Item] dialog for Visual C++ projects only and showing
+    // new item wizards from '<Package>/Templates/ProjectItems' folder. This is an easy way to inject new templates
+    // without any need of copying them into Visual Studio folder itself.
+    // No extra permissions for the plugin are required in that case.
+    [ProvideProjectItem("{8bc9ceb8-8b4a-11d0-8d11-00a0c91bc942}", "BlackBerry", @"Templates\ProjectItems\BlackBerry", 10)]
+#if PLATFORM_VS2013
+    // PH: somehow for VS2013 it uses a different value for VC++ projects... don't ask, how I discovered it
+    [ProvideProjectItem("{8bc9ceb8-8b4a-11d0-8d11-00a0c91bc943}", "BlackBerry", @"Templates\ProjectItems\BlackBerry", 10)]
+#endif
+    [ProvideProjectItem("{a2fe74e1-b743-11d0-ae1a-00a0c90fffc3}", "BlackBerry", @"Templates\ProjectItems\BlackBerry", 11)]
+    [ProvideProjects(GuidList.guidVSNDK_PackageString, "BlackBerry Projects", @"Templates\Projects\BlackBerry", 31)]
+    // This attribute registers a custom wizard engine, that is used to populate new projects and items into a project.
+    // Reference to this engine is made directly from *.vsz file (from locations provided by both attributes above).
+    [ProvideWizardEngine(typeof(PuppetMasterWizardEngine))]
 
     // This attribute defines set of settings pages provided by this package.
     // They are automatically instantiated and displayed inside [Visual Studio -> Tools -> Options...] dialog.
@@ -95,22 +109,29 @@ namespace BlackBerry.Package
     [ProvideOptionPage(typeof(ApiLevelOptionPage), OptionsCategoryName, "API Levels", 1001, 1004, true)]
     [ProvideOptionPage(typeof(TargetsOptionPage), OptionsCategoryName, "Targets", 1001, 1005, true)]
     [ProvideOptionPage(typeof(SigningOptionPage), OptionsCategoryName, "Signing", 1001, 1006, true)]
+    [ProvideOptionPage(typeof(BackupOptionPage), OptionsCategoryName, "Backup", 1001, 1007, true)]
 
     // This attribute registers public services exposed by this package.
     // The package itself will be automatically loaded if needed.
     [ProvideService(typeof(IDeviceDiscoveryService), ServiceName = "BlackBerry Device Discovery")]
     [ProvideService(typeof(IAttachDiscoveryService), ServiceName = "BlackBerry Process-Attach Executable Discovery")]
 
+    // This set of attributes registers QML language service to allow colorizing and IntelliSense support.
+    [ProvideService(typeof(QmlLanguageService), ServiceName = "QML")]
+    [ProvideLanguageExtension(typeof(QmlLanguageService), ".qml")]
+    [ProvideLanguageExtension(typeof(QmlLanguageService), ".jsqml")]
+    [ProvideLanguageService(typeof(QmlLanguageService), QmlLanguageService.LanguageName, 0)]
+
     // This attribute registers a tool window exposed by this package.
     [ProvideToolWindow(typeof(TargetNavigatorPane), Style = VsDockStyle.Tabbed, MultiInstances = false)]
     public sealed class BlackBerryPackage : Microsoft.VisualStudio.Shell.Package, IDisposable, IDeviceDiscoveryService, IAttachDiscoveryService
     {
-        public const string VersionString = "2.1.2014.922";
         public const string OptionsCategoryName = "BlackBerry";
 
         private BlackBerryPaneTraceListener _mainTraceWindow;
         private BlackBerryPaneTraceListener _gdbTraceWindow;
         private BlackBerryPaneTraceListener _qconnTraceWindow;
+        private BlackBerryPaneTraceListener _standardOutputWindow;
         private DTE2 _dte;
         private BuildPlatformsManager _buildPlatformsManager;
 
@@ -147,25 +168,33 @@ namespace BlackBerry.Package
             // create dedicated persistent logs
             var logOptions = (LogsOptionPage)GetDialogPage(typeof(LogsOptionPage));
             LogManager.Initialize(logOptions.Path, logOptions.LimitLogs ? logOptions.LimitCount : -1, TraceLog.Category, TraceLog.CategoryGDB);
+            Targets.TraceOptions(logOptions.DebuggedOnly, logOptions.LogsInterval, logOptions.SLog2Level, logOptions.SLog2Formatter, logOptions.GetSLog2BufferSets(), logOptions.InjectLogs, TraceLog.CategoryDevice);
 
             // create dedicated trace-logs output window pane (available in combo-box at regular Visual Studio Output Window):
-            _mainTraceWindow = new BlackBerryPaneTraceListener("BlackBerry", TraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceMainOutputWindowPane);
+            var outputWindowService = GetService(typeof(SVsOutputWindow)) as IVsOutputWindow;
+            _mainTraceWindow = new BlackBerryPaneTraceListener("BlackBerry", TraceLog.Category, true, outputWindowService, GuidList.GUID_TraceMainOutputWindowPane);
 #if DEBUG
-            _gdbTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - GDB", TraceLog.CategoryGDB, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceGdbOutputWindowPane);
+            _gdbTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - GDB", TraceLog.CategoryGDB, true, outputWindowService, GuidList.GUID_TraceGdbOutputWindowPane);
 #endif
-            _qconnTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - QConn", QTraceLog.Category, true, GetService(typeof(SVsOutputWindow)) as IVsOutputWindow, GuidList.GUID_TraceQConnOutputWindowPane);
+            _qconnTraceWindow = new BlackBerryPaneTraceListener("BlackBerry - QConn", QTraceLog.Category, true, outputWindowService, GuidList.GUID_TraceQConnOutputWindowPane);
+            _standardOutputWindow = new BlackBerryPaneTraceListener("Debug", TraceLog.CategoryDevice, false, outputWindowService, VSConstants.GUID_OutWindowDebugPane);
             _mainTraceWindow.Activate();
 
             // and set it to monitor all logs (they have to be marked with 'BlackBerry' category! aka TraceLog.Category):
             TraceLog.Add(_mainTraceWindow);
             TraceLog.Add(_gdbTraceWindow);
             TraceLog.Add(_qconnTraceWindow);
+            TraceLog.Add(_standardOutputWindow);
             TraceLog.WriteLine("BlackBerry plugin started");
+#if DEBUG
+            TraceLog.WriteLine(" * location: \"{0}\"", System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
+#endif
 
             // add this package to the globally-proffed services:
             IServiceContainer serviceContainer = this;
             serviceContainer.AddService(typeof(IDeviceDiscoveryService), this, true);
             serviceContainer.AddService(typeof(IAttachDiscoveryService), this, true);
+            serviceContainer.AddService(typeof(QmlLanguageService), new QmlLanguageService(), true);
 
             TraceLog.WriteLine(" * registered services");
 
@@ -179,6 +208,8 @@ namespace BlackBerry.Package
             TraceLog.WriteLine(" * registered editors");
 
             _buildPlatformsManager = new BuildPlatformsManager(_dte);
+            _buildPlatformsManager.Navigate += OpenUrl;
+            _buildPlatformsManager.OpenSettingsPage += ShowOptionPage;
             _buildPlatformsManager.Initialize();
             TraceLog.WriteLine(" * registered build-platforms manager");
 
@@ -282,16 +313,18 @@ namespace BlackBerry.Package
                 TraceLog.WriteLine(" * initialized menus");
             }
 
-            TraceLog.WriteLine("-------------------- DONE ({0})", VersionString);
+            TraceLog.WriteLine("-------------------- DONE ({0})", ConfigDefaults.VersionString);
 
             // make sure there is an NDK selected and developer knows about it:
             EnsureActiveNDK();
-            if (_buildPlatformsManager.IsBlackBerrySolution() && ActiveNDK == null)
+            if (_buildPlatformsManager.IsBlackBerrySolution() && ActiveNDK == null && InstalledNDKs.Length > 0)
             {
                 var form = new MissingNdkInstalledForm();
                 form.ShowDialog();
                 EnsureActiveNDK();
             }
+
+            _buildPlatformsManager.VerifyCommonErrors();
         }
 
         protected override void Dispose(bool disposing)
@@ -319,6 +352,8 @@ namespace BlackBerry.Package
                     _buildPlatformsManager.Close();
                     _buildPlatformsManager = null;
                 }
+
+                Targets.TraceStop();
             }
 
             base.Dispose(disposing);
@@ -424,6 +459,14 @@ namespace BlackBerry.Package
         }
 
         /// <summary>
+        /// Gets the list of installed NDKs on the machine.
+        /// </summary>
+        private NdkInfo[] InstalledNDKs
+        {
+            get { return PackageViewModel.Instance.InstalledNDKs; }
+        }
+
+        /// <summary>
         /// Makes sure the NDK and runtime libraries are selected
         /// and their paths are stored inside registry for build toolset.
         /// </summary>
@@ -456,20 +499,27 @@ namespace BlackBerry.Package
 
         private void ImportBlackBerryProject(object sender, EventArgs e)
         {
-            var form = DialogHelper.OpenNativeCoreProject("Open Core Native Application Project", null);
-            if (form.ShowDialog() == DialogResult.OK)
+            var form = new ImportProjectForm();
+
+            // configure dialog to display info about current solution:
+            form.AddTargetProjects(_dte.Solution);
+
+            // ask for .cproject location:
+            if (form.UpdateSourceProject())
             {
-                string filename = form.FileName;
-                FileInfo fi = new FileInfo(filename);
-                string folderName = fi.DirectoryName;
+                // commit the list of found files:
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    // create new project/use existing and add files:
+                    var project = form.FillProject(_dte);
+                    if (project == null)
+                    {
+                        MessageBoxHelper.Show("Unable to create or access requested project, please try again with saved solution", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
 
-                Array projects = (Array)_dte.ActiveSolutionProjects;
-                Project project = (Project)projects.GetValue(0);
-                string name = project.FullName;
-
-                // Create the dialog instance without Help support.
-                var importSummary = new Import.Import(project, folderName, name);
-                importSummary.ShowModel2();
+                    MessageBoxHelper.Show(form.CopyFiles ? "All files has been copied" : null, "Project has been imported into: " + project.Name, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
             }
         }
 
@@ -533,7 +583,7 @@ namespace BlackBerry.Package
             {
                 foreach (Project project in _dte.Solution.Projects)
                 {
-                    if (_buildPlatformsManager.IsBlackBerryProject(project))
+                    if (BuildPlatformsManager.IsBlackBerryProject(project))
                     {
                         string outputPath;
                         if (IsMatchingProject(project, process, out outputPath))
@@ -550,7 +600,12 @@ namespace BlackBerry.Package
 
         private static bool IsMatchingProject(Project project, ProcessInfo process, out string outputPath)
         {
-            outputPath = ProjectHelper.GetTargetFullName(project);
+            outputPath = ProjectHelper.GuessTargetFullName(project);
+            if (string.IsNullOrEmpty(outputPath) || !File.Exists(outputPath))
+            {
+                outputPath = ProjectHelper.GetTargetFullName(project);
+            }
+
             if (!string.IsNullOrEmpty(outputPath))
             {
                 var name = Path.GetFileName(outputPath);
@@ -568,7 +623,7 @@ namespace BlackBerry.Package
             // try to automatically select the project:
             foreach (Project project in _dte.Solution.Projects)
             {
-                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                if (BuildPlatformsManager.IsBlackBerryProject(project))
                 {
                     string outputPath;
                     if (IsMatchingProject(project, process, out outputPath))
@@ -589,7 +644,7 @@ namespace BlackBerry.Package
 
             foreach (Project project in _dte.Solution.Projects)
             {
-                if (_buildPlatformsManager.IsBlackBerryProject(project))
+                if (BuildPlatformsManager.IsBlackBerryProject(project))
                 {
                     string outputPath;
                     if (IsMatchingProject(project, process, out outputPath))

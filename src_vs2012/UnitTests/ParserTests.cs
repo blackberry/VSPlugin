@@ -1,5 +1,6 @@
 ﻿using System;
 using BlackBerry.NativeCore.Model;
+using BlackBerry.NativeCore.QConn.Model;
 using NUnit.Framework;
 
 namespace UnitTests
@@ -31,7 +32,8 @@ Debug-Token-Device-Id: 1311521222,1311052217,1354621311,128366899
 
             var tokenData = DebugTokenInfo.Parse(text);
             Assert.IsNotNull(tokenData);
-            Assert.AreEqual("XyXyXyXyXy", tokenData.Author);
+            Assert.IsNotNull(tokenData.Author);
+            Assert.AreEqual("XyXyXyXyXy", tokenData.Author.Name);
             Assert.AreEqual("123XyXyQwhm4KpkL-Dy2241SOUw", tokenData.ID);
             Assert.AreEqual(new DateTime(2013, 01, 17, 1, 47, 50, DateTimeKind.Utc), tokenData.IssueDate);
             Assert.AreEqual(new DateTime(2013, 02, 16, 1, 47, 50, DateTimeKind.Utc), tokenData.ExpiryDate);
@@ -397,6 +399,74 @@ Token=44444444444444444444444444\=\=";
             Assert.IsNotNull(result);
             Assert.AreEqual(new DateTime(2013, 9, 2, 6, 43, 07, DateTimeKind.Utc), result.CreatedAt);
             Assert.AreEqual("3", result.Version);
+        }
+
+        [Test]
+        public void ParseSLog2InfoOutput()
+        {
+            const string slog2output = @"
+Dec 04 03:05:54.082 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383209714                           0  0  -----ONLINE-----
+Dec 04 03:05:54.082 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383209714              default*  8900  5  PPS helper initialized for thread
+Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370              default   8900  5  PPS helper destructor
+Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370              default   8900  5  BPS shutdown
+Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370              default   8900  5  Shutting down navigator
+Dec 04 03:05:54.970 com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40.383152370              default   8900  5  navigator_thread quitting
+";
+
+            var entries = TargetLogEntry.ParseSLog2(slog2output.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+
+            Assert.IsNotNull(entries);
+            Assert.AreEqual(6, entries.Length);
+
+            var lastItem = entries[entries.Length - 1];
+            Assert.AreEqual(383152370, lastItem.PID);
+            Assert.AreEqual("navigator_thread quitting", lastItem.Message);
+            Assert.AreEqual("default", lastItem.BufferSet);
+            Assert.AreEqual("com.codetitans.FallingBlocks.testDev_llingBlocksb07fdb40", lastItem.AppID);
+        }
+
+
+        [Test]
+        public void ParseSLog2InfoOutput2()
+        {
+            const string slog2output = @"
+Dec 26 02:05:05.568         mm_renderer_QC.5599368                           0  0  -----ONLINE----- ()
+";
+
+            var entries = TargetLogEntry.ParseSLog2(slog2output.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+
+            Assert.IsNotNull(entries);
+            Assert.AreEqual(1, entries.Length);
+
+            var lastItem = entries[0];
+            Assert.AreEqual(5599368, lastItem.PID);
+            Assert.AreEqual("-----ONLINE----- ()", lastItem.Message);
+            Assert.AreEqual("default", lastItem.BufferSet); // all empty buffers fallback to 'default'
+            Assert.AreEqual("mm_renderer_QC", lastItem.AppID);
+        }
+
+        [Test]
+        public void ParseSLog2InfoOutput3()
+        {
+            const string slog2output = @"
+Dec 26 00:04:22.278                AdSDK.591851775                           0  0  -----ONLINE----- ()
+Dec 26 00:04:22.278                AdSDK.591851775                           0  0  -----ONLINE----- ()
+Dec 26 00:04:22.278                AdSDK.591851775          NativeAdSDK*     0  5  banner.cpp(349): bbads_banner_create called. ()
+Dec 26 00:04:22.280                AdSDK.591851775          NativeAdSDK      0  5  VisibilityListener.cpp(76): Visibility listener thread launched. ()
+Dec 26 00:04:22.280                AdSDK.591851775          NativeAdSDK      0  5  BPSEventListener.cpp(69): BPS event listener thread launched. ()
+Dec 26 00:04:22.280                AdSDK.591851775          NativeAdSDK      0  5  VisibilityListener.cpp(87): Visibility listener thread posting. ()
+";
+
+            var entries = TargetLogEntry.ParseSLog2(slog2output.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.None));
+
+            Assert.IsNotNull(entries);
+            Assert.AreEqual(6, entries.Length);
+
+            var lastItem = entries[entries.Length - 1];
+            Assert.AreEqual(591851775, lastItem.PID);
+            Assert.AreEqual("VisibilityListener.cpp(87): Visibility listener thread posting. ()", lastItem.Message);
+            Assert.AreEqual("NativeAdSDK", lastItem.BufferSet);
+            Assert.AreEqual("AdSDK", lastItem.AppID);
         }
     }
 }

@@ -153,6 +153,9 @@ namespace BlackBerry.Package.Dialogs
 
         private void AppendTokenLog(string message)
         {
+            if (string.IsNullOrEmpty(message))
+                return;
+
             if (InvokeRequired)
                 Invoke(new Action<string>(AppendTokenLog), message);
             else
@@ -168,6 +171,9 @@ namespace BlackBerry.Package.Dialogs
 
         private void AppendDeviceLog(string message)
         {
+            if (string.IsNullOrEmpty(message))
+                return;
+
             if (InvokeRequired)
                 Invoke(new Action<string>(AppendDeviceLog), message);
             else
@@ -204,6 +210,10 @@ namespace BlackBerry.Package.Dialogs
             if (success)
             {
                 _tokenInfo = _tokenInfoRunner.DebugToken;
+                if (_tokenInfo != null)
+                {
+                    _vm.Update(_tokenInfo.Author);
+                }
 
                 TraceLog.WriteLine("Loaded debug token: {0}", _tokenInfoRunner.DebugToken);
                 AppendTokenLog("Debug token found:" + Environment.NewLine + _tokenInfoRunner.DebugToken.ToLongDescription(true));

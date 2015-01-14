@@ -1,0 +1,10 @@
+﻿Author: Paweł Hofman (@CodeTitans)
+Site: https://github.com/phofman/vs-plugin
+Wiki: https://github.com/phofman/vs-plugin/wiki
+
+This software is provided "AS IS" and distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+In no event shall the regents or contributors be liable for any direct, indirect, incidental, special, exemplary, or consequential damages (including, but not limited to, procurement of substitute goods or services; loss of use, data, or profits; or business interruption) however caused and on any theory of liability, whether in contract, strict liability, or tort (including negligence or otherwise) arising in any way out of the use of this software, even if advised of the possibility of such damage.
+
+I do not spy any user data, project information, nor usage statistics. If you like to share anything with me, please visit the project site. The same is also understood in context of bugs. I put my best skills to let this software keep highest standards. However if you do find any bug, please report at:
+https://github.com/phofman/vs-plugin/issues
+

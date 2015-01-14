@@ -82,10 +82,18 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <Output TaskParameter="AppId" PropertyName="AppId" />
     </GetAppInfo>
 
-    <ReadLinesFromFile File="CompileRan">
+    <ReadLinesFromFile File="vsndk-compile-ran.flag">
       <Output TaskParameter="Lines" PropertyName="CompileRan" />
     </ReadLinesFromFile>
-    <Delete Files="CompileRan" />    
+    <Message Condition="Exists('vsndk-compile-ran.flag')" Importance="Normal" Text="Deleting vsndk-compile-ran.flag file!" />
+    <Delete Files="vsndk-compile-ran.flag" />
+
+    <!-- Read CSK password, if specified via flag file -->
+    <ReadLinesFromFile File="vsndk-csk-password.flag">
+      <Output TaskParameter="Lines" PropertyName="CSKPass" />
+    </ReadLinesFromFile>
+    <Message Condition="Exists('vsndk-csk-password.flag')" Importance="Normal" Text="Deleting vsndk-csk-password.flag file!" />
+    <Delete Files="vsndk-csk-password.flag" />
 
     <!-- Check if the app is installed on the device or not. -->
     <CheckIfInstalled
@@ -107,13 +115,16 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     </PropertyGroup>
 
     <Message Text="Optimized deploy is disabled, performing full deployment" Condition="$(BuildBar_OptimizedDeploy) == 'false'" Importance="high" />
+    <Message Text="Preparing BAR for $(TargetCPU)" Importance="High" />
 
-    <BBNativePackager  Condition="'$(RunBuildBar)' == 'true' and ('$(CompileRan)' == 'true' or '$(IsAppInstalled)' == 'true')"
+    <BBNativePackager Condition="'$(RunBuildBar)' == 'true' and ('$(CompileRan)' == 'true' or '$(IsAppInstalled)' == 'true')"
         Sources                        ="@(BuildBar)"
         Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        ="$(ProjectName)"
+        AppType                        ="$(ConfigurationAppType)"
+        MakefileTargetName             ="$(MakefileTargetName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device                         ="$(TargetDeviceIP)"
@@ -144,12 +155,18 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Message Condition="'$(BuildBarSkippedExecution)' == 'false'" Text="$(MSBuildProjectFile) -&gt; $(OutputBar)" Importance="High" />
 
     <!-- Signing the bar file -->
-    <Message Condition="'$(BuildBarSkippedExecution)' == 'false' and '%(BuildBar.DevMode)' == 'false'" Text="Info: Signing $(OutputBar) ..." Importance="High" />
-    <BBSigner Condition="'$(BuildBarSkippedExecution)' == 'false' and '%(BuildBar.DevMode)' == 'false' and '$(CompileRan)' == 'true'"
+    <PropertyGroup>
+      <CSKPass Condition="'$(CSKPass)' == ''">$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@CSKPass)</CSKPass>
+      <SignBarNow>false</SignBarNow>
+      <SignBarNow Condition="'$(BuildBarSkippedExecution)' == 'false' and '%(BuildBar.DevMode)' == 'false'">true</SignBarNow>
+    </PropertyGroup>
+    <Message Condition="'$(SignBarNow)' == 'true'" Text="Info: Signing $(OutputBar) ..." Importance="High" />
+    <Error Condition="'$(CSKPass)' == '' and '$(SignBarNow)' == 'true' and '$(CompileRan)' == 'true'" Text="Missing password for developer certificate. Please specify one at BlackBerry -> Options -> Signing." />
+    <BBSigner Condition="'$(SignBarNow)' == 'true' and '$(CompileRan)' == 'true'"
       Sources                        ="@(BuildBar)"
       Register                       ="%(BuildBar.Register)"
       CSJFiles                       ="%(BuildBar.SigningCSJFilePath);%(BuildBar.DebugTokenCSJPath)"
-      KeyStorePassword               ="$(Registry:HKEY_CURRENT_USER\SOFTWARE\BlackBerry\VSPlugin@CSKPass)"
+      KeyStorePassword               ="$(CSKPass)"
       CSJPin                         ="%(BuildBar.CSJPin)"
       OutputFile                     ="%(BuildBar.OutputFile)"
       ToolExe                        ="$(SignerBarToolExe)"
@@ -173,21 +190,21 @@ Copyright (C) Microsoft Corporation. All rights reserved.
       <BuildBar Include="@(None)" />
     </ItemGroup>
 
-    <Error Condition="$(TargetDeviceIP) == ''" Text=" Target device ip is not set. See menu BlackBerry -> Settings" />
+    <Error Condition="$(TargetDeviceIP) == ''" Text=" Target device ip is not set. See menu BlackBerry -> Options -> Targets" />
 
     <!-- Get app's ID from bar descriptor. -->
     <GetAppInfo
-        ProjectDir="$(ProjectDir)"
-        ApplicationDescriptorXml ="%(BuildBar.ApplicationDescriptorXml)"
-        AppName = "$(ProjectName)"
-        Condition="%(BuildBar.DevMode) == 'true'"
+        ProjectDir                ="$(ProjectDir)"
+        ApplicationDescriptorXml  ="%(BuildBar.ApplicationDescriptorXml)"
+        AppName                   ="$(ProjectName)"
+        Condition                 ="%(BuildBar.DevMode) == 'true'"
       >
       <Output TaskParameter="AppId" PropertyName="AppId" />
     </GetAppInfo>
 
     <!-- Check if the app is installed on the device or not. -->
     <BBDeploy
-        Condition="%(BuildBar.DevMode) == 'true'"
+        Condition         ="%(BuildBar.DevMode) == 'true'"
         ToolExe           ="$(DeployToolExe)"
         ToolPath          ="$(BuildBarToolPath)"
         Device            ="$(TargetDeviceIP)"
@@ -217,9 +234,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <CallTarget Targets="OptimizedDeploy" Condition="$(BuildBar_OptimizedDeploy) == 'true' AND $(IsAppInstalled) == 'true'" />
 
     <!-- Remove the -debugNative flag if it was set. -->
-    <RemoveFlagFile Condition="Exists('$(AppDataPath)\Research In Motion\vsndk-debugNative.txt')"
-        FlagFile="$(AppDataPath)\Research In Motion\vsndk-debugNative.txt"
-      />
+    <Delete Files="vsndk-debug-native.flag" />
   </Target>
 
   <Target Name="FirstDeploy">
@@ -235,7 +250,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Package           ="$(ProjectDir)%(BuildBar.OutputFile)"
         InstallApp        ="true"
         LaunchApp         ="true"
-        FlagFile          ="$(AppDataPath)\Research In Motion\vsndk-debugNative.txt"
+        FlagFile          ="vsndk-debug-native.flag"
         DebugNative       ="false"
       />
   </Target>
@@ -251,7 +266,9 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
-        AppName                        = "$(ProjectName)"
+        AppName                        ="$(ProjectName)"
+        AppType                        ="$(ConfigurationAppType)"
+        MakefileTargetName             ="$(MakefileTargetName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device                         ="$(TargetDeviceIP)"
@@ -360,7 +377,7 @@ Copyright (C) Microsoft Corporation. All rights reserved.
         Device            ="$(TargetDeviceIP)"
         Password          ="$(TargetDevicePassword)"
         LaunchApp         ="true"
-        FlagFile          ="$(AppDataPath)\Research In Motion\vsndk-debugNative.txt"
+        FlagFile          ="vsndk-debug-native.flag"
         DebugNative       ="false"
       />
 
@@ -368,12 +385,14 @@ Copyright (C) Microsoft Corporation. All rights reserved.
     <Delete Files="localManifest.mf;targetManifest.mf;targetFileMap.txt;installedApps.txt" />
 
     <!-- App Descriptor changed, so re-package and perform full deploy. -->  
-    <BBNativePackager  Condition="$(AppDescriptorChanged)"
+    <BBNativePackager Condition="$(AppDescriptorChanged)"
         Sources                        ="@(BuildBar)"
         Platform                       ="$(TargetCPU)"
         Configuration                  ="$(Configuration)"
         ApplicationDescriptorXml       ="%(BuildBar.ApplicationDescriptorXml)"
         AppName                        ="$(ProjectName)"
+        AppType                        ="$(ConfigurationAppType)"
+        MakefileTargetName             ="$(MakefileTargetName)"
         ProjectDir                     ="$(ProjectDir)"
         SolutionDir                    ="$(SolutionDir)"
         Device                         ="$(TargetDeviceIP)"

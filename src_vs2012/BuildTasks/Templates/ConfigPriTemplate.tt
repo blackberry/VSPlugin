@@ -2,7 +2,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 #
-# Cascades Application config file for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual studio (v<#= Version #>).
+# Cascades Application config file for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual Studio (v<#= Version #>).
 # Any manual changes made by user will be overwritten! Use the project settings instead.
 #
 
@@ -13,8 +13,22 @@ BASEDIR = $$quote($$_PRO_FILE_PWD_)
 # Precompiled header
 CONFIG += precompile_header
 PRECOMPILED_HEADER = $$quote($$BASEDIR/<#= PrecompiledHeaderName #>)
-
 <# } #>
+
+#############################################
+# Libs, undefines and defines
+<# if (HasAdditionalLibraryDirs) { #>
+QMAKE_LIBDIR += <# WriteRelativePaths(AdditionalLibraryDirs, "    \"", "\""); #>
+<# } #>
+<# if (HasDependencyLibrariesReferences()) { #>
+LIBS += <# WriteDependencyLibrariesReferences(); #>
+<# } #>
+
+<#
+    WriteCollectionNewLine(UndefinePreprocessorDefinitions, "DEFINES -= ");
+    WriteCollectionNewLine(PreprocessorDefinitions, "DEFINES += ");
+#>
+
 #############################################
 # Source files, headers and QMLs
 SOURCES += <# WriteRelativePaths(CompileItems, "    $$quote($$BASEDIR/", ")"); #>
@@ -22,6 +36,10 @@ SOURCES += <# WriteRelativePaths(CompileItems, "    $$quote($$BASEDIR/", ")"); #
 HEADERS += <# WriteRelativePaths(IncludeItems, "    $$quote($$BASEDIR/", ")"); #>
 
 INCLUDEPATH += <# WriteRelativePaths(IncludeDirs, "    $$quote($$BASEDIR/", ")"); #>
+
+<# if (HasAdditionalIncludeDirs) { #>
+INCLUDEPATH += <# WriteRelativePaths(AdditionalIncludeDirs, "    \"", "\""); #>
+<# } #>
 
 OTHER_FILES += <# WriteRelativePaths(QmlItems, "    $$quote($$BASEDIR/", ")"); #>
 

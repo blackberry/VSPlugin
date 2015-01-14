@@ -22,13 +22,17 @@ namespace BlackBerry.NativeCore.Model
         private const string DefaultTabletSignerName = "barsigner.db";
         private const string DefaultTabletCskTokenName = "barsigner.csk";
         private const string FieldCertificateFileName = "certificate";
+
         private const string FieldCskPassword = "CSKPass";
+        private const string FieldCachedAuthorID = "CachedAuthorID";
+        private const string FieldCachedAuthorName = "CachedAuthorName";
 
         private string _name;
+        private AuthorInfo _cachedAuthor;
         private CskTokenInfo _cskToken;
         private CskTokenInfo _cskTabletToken;
 
-        public DeveloperDefinition(string dataPath, string certificatePath, string cskPassword)
+        public DeveloperDefinition(string dataPath, string certificatePath, string cskPassword, AuthorInfo authorInfo)
         {
             if (string.IsNullOrEmpty(dataPath))
                 throw new ArgumentNullException("dataPath");
@@ -36,6 +40,7 @@ namespace BlackBerry.NativeCore.Model
             DataPath = dataPath;
             CertificateFileName = certificatePath;
             CskPassword = cskPassword;
+            _cachedAuthor = authorInfo;
         }
 
         #region Properties
@@ -205,6 +210,33 @@ namespace BlackBerry.NativeCore.Model
                 return HasCertificate
                        && File.Exists(TabletCskTokenFullPath)
                        && File.Exists(TabletSignerFullPath) && GetFileSize(TabletSignerFullPath) > 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the cached info about author (publisher).
+        /// This is data put directly inside bar-descriptor.xml files and usually obtained, when creating debug-tokens.
+        /// </summary>
+        public AuthorInfo CachedAuthor
+        {
+            get { return _cachedAuthor; }
+            set
+            {
+                if (value == null)
+                {
+                    DeleteCachedAuthorInfo();
+                }
+                else
+                {
+                    // is there anything new?
+                    if (_cachedAuthor != null && string.CompareOrdinal(value.ID, _cachedAuthor.ID) == 0 && string.CompareOrdinal(value.Name, _cachedAuthor.Name) == 0)
+                    {
+                        return;
+                    }
+
+                    _cachedAuthor = value;
+                    SaveCachedAuthorInfo(value);
+                }
             }
         }
 
@@ -443,6 +475,9 @@ namespace BlackBerry.NativeCore.Model
 
             string certificateFileName = null;
             string cskPassword = null;
+            string authorID = null;
+            string authorName = null;
+            AuthorInfo authorInfo = null;
 
             try
             {
@@ -470,7 +505,7 @@ namespace BlackBerry.NativeCore.Model
             if (string.IsNullOrEmpty(certificateFileName))
                 certificateFileName = DefaultCertificateName;
 
-            // IP
+            // PASSWORD
             try
             {
                 object xPassword = settings.GetValue(FieldCskPassword);
@@ -481,10 +516,31 @@ namespace BlackBerry.NativeCore.Model
             {
             }
 
+            // CACHED AUTHOR ID + NAME
+            try
+            {
+                object xAuthorID = settings.GetValue(FieldCachedAuthorID);
+                if (xAuthorID != null)
+                    authorID = xAuthorID.ToString();
+
+                object xAuthorName = settings.GetValue(FieldCachedAuthorName);
+                if (xAuthorName != null)
+                    authorName = xAuthorName.ToString();
+            }
+            catch
+            {
+            }
+
             settings.Close();
             registry.Close();
 
-            return new DeveloperDefinition(dataPath, certificateFileName, cskPassword);
+            // having author info with any value set as non-'null' is OK, as it comes from caches...
+            if (!string.IsNullOrEmpty(authorID) || !string.IsNullOrEmpty(authorName))
+            {
+                authorInfo = new AuthorInfo(authorID, authorName);
+            }
+
+            return new DeveloperDefinition(dataPath, certificateFileName, cskPassword, authorInfo);
         }
 
         /// <summary>
@@ -525,6 +581,68 @@ namespace BlackBerry.NativeCore.Model
             {
                 TraceLog.WriteException(ex, "Unable to read data from certificate: \"{0}\"", certificateFileName);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Removes info about cached author (publisher) from registry.
+        /// </summary>
+        private static void DeleteCachedAuthorInfo()
+        {
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            try
+            {
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
+                if (settings == null)
+                    return;
+
+                settings.DeleteValue(FieldCachedAuthorID, false);
+                settings.DeleteValue(FieldCachedAuthorName, false);
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
+            }
+        }
+
+        /// <summary>
+        /// Stores info about specified author (publisher) inside registry.
+        /// </summary>
+        private static void SaveCachedAuthorInfo(AuthorInfo info)
+        {
+            if (info == null)
+                throw new ArgumentNullException("info");
+
+            RegistryKey registry = Registry.CurrentUser;
+            RegistryKey settings = null;
+
+            try
+            {
+                settings = registry.CreateSubKey(ConfigDefaults.RegistryPath);
+                if (settings == null)
+                    return;
+
+                // id
+                if (string.IsNullOrEmpty(info.ID))
+                    settings.DeleteValue(FieldCachedAuthorID, false);
+                else
+                    settings.SetValue(FieldCachedAuthorID, info.ID);
+
+                // name
+                if (string.IsNullOrEmpty(info.Name))
+                    settings.DeleteValue(FieldCachedAuthorName, false);
+                else
+                    settings.SetValue(FieldCachedAuthorName, info.Name);
+            }
+            finally
+            {
+                if (settings != null)
+                    settings.Close();
+                registry.Close();
             }
         }
 

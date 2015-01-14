@@ -166,7 +166,7 @@ namespace BlackBerry.DebugEngine
             if (processes == null)
             {
                 string deviceType = Device.Type == DeviceDefinitionType.Device ? "device" : "simulator";
-                MessageBoxHelper.Show(string.Concat("Please, verify if the ", deviceType, " (", Device.IP, ") is defined correctly. It can be modified at \"BlackBerry -> Settings\" menu."),
+                MessageBoxHelper.Show(string.Concat("Please, verify if the ", deviceType, " (", Device.IP, ") is defined correctly. It can be modified at \"BlackBerry -> Options -> Targets\" tab."),
                     "Connection failure or timeout", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
                 return new AD7Process[0];

@@ -18,6 +18,9 @@ namespace UnitTests
         public const string InstalledNdkPath = @"C:\bbndk\10_2_2674";
         public const string InstalledRuntimePath = @"C:\bbndk_vs\runtime_10_2_1_3247\qnx6";
         public const string GdbHostPath = @"T:\vs-plugin\src_vs2012\Debug\BlackBerry.GDBHost.exe";
+        public const string SampleCascadesProjectPath = @"T:\bb_samples\NDK-Samples\";
+        public const string SampleOpenGlesProjectPath = @"T:\bb_samples\OpenGLES-Samples\OpenGLES2-ProgrammingGuide";
+
         public static readonly string SshPublicKeyPath;
         public static readonly string DebugTokenPath;
 

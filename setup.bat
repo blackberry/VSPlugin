@@ -13,7 +13,6 @@ if "%~1" == "" (
   set ActionUninstall=0
   set ActionSkipTools=0
   set ActionMSBuildOnly=0
-  set ActionWizardsOnly=0
 ) else (
   set ActionVS2010=0
   set ActionVS2012=0
@@ -21,7 +20,6 @@ if "%~1" == "" (
   set ActionUninstall=0
   set ActionSkipTools=0
   set ActionMSBuildOnly=0
-  set ActionWizardsOnly=0
   for %%a in (%*) do (
     if /i "%%a" == "/all"          set ActionVS2010=1 && set ActionVS2012=1 && set ActionVS2013=1
     if /i "%%a" == "/uninstall"    set ActionUninstall=1
@@ -36,11 +34,6 @@ if "%~1" == "" (
     if /i "%%a" == "/msbuildonly"  set ActionMSBuildOnly=1
     if /i "%%a" == "/only-msbuild" set ActionMSBuildOnly=1
     if /i "%%a" == "/onlymsbuild"  set ActionMSBuildOnly=1
-    if /i "%%a" == "/wizards"      set ActionWizardsOnly=1
-    if /i "%%a" == "/wizards-only" set ActionWizardsOnly=1
-    if /i "%%a" == "/wizardsonly"  set ActionWizardsOnly=1
-    if /i "%%a" == "/only-wizards" set ActionWizardsOnly=1
-    if /i "%%a" == "/onlywizards"  set ActionWizardsOnly=1
     if /i "%%a" == "vs2010"        set ActionVS2010=1
     if /i "%%a" == "vs2012"        set ActionVS2012=1
     if /i "%%a" == "vs2013"        set ActionVS2013=1
@@ -121,7 +114,6 @@ set VSVersion=%~2
 set VSSelector=%~3
 set BuildPath=%BuildResults%\VS%VSYear%
 set VSPluginPath=%ProgFilesRoot%\Microsoft Visual Studio %VSVersion%\Common7\IDE\Extensions\NDK Plugin
-set VSWizardsPath=%ProgFilesRoot%\Microsoft Visual Studio %VSVersion%\VC\VCWizards\CodeWiz
 
 set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\Platforms
 if not "%VSSelector%" == "" set MSBuildTargetPath=%ProgFilesRoot%\MSBuild\Microsoft.Cpp\v4.0\%VSSelector%\Platforms
@@ -130,7 +122,6 @@ set /a actionNo += 1
 
 REM Skip tools&plugin, if only upgrading MSBuild (in case of debugger development)
 if %ActionMSBuildOnly% neq 0 goto msbuild_only
-if %ActionWizardsOnly% neq 0 goto wizards_only
 
 REM Skip installation of custom tools (in case upgrading only plugin during development)
 if %ActionSkipTools% neq 0 goto skip_tools
@@ -144,43 +135,9 @@ set /a actionNo += 1
 :msbuild_only
 call :processMSBuild "%BuildPath%" "%MSBuildTargetPath%"
 set /a actionNo += 1
-if %ActionWizardsOnly% neq 0 goto wizards_only
 if %ActionMSBuildOnly% neq 0 goto processSetup_End
 
-:wizards_only
-call :processTemplates "%BuildPath%" "%VSWizardsPath%"
-set /a actionNo += 1
-
 :processSetup_End
-endlocal
-exit /b
-
-REM ********************************************************************************************
-REM Templates
-REM ********************************************************************************************
-REM $1 - from
-REM $2 - Wizards path
-:processTemplates
-setlocal
-
-set InputPath=%~1
-set OutputWizardsPath=%~2
-
-if %ActionUninstall% neq 0 (goto uninstall_Templates)
-
-REM Templates
-echo %actionNo%: Installing BlackBerry Wizards
-xcopy "%InputPath%\Templates\VCWizards" "%OutputWizardsPath%" /e /i /y
-
-goto processTemplates_End
-
-:uninstall_Templates
-
-REM Remove Templates
-echo %actionNo%: Removing BlackBerry Wizards
-rd "%OutputWizardsPath%\BlackBerry" /s /q
-
-:processTemplates_End
 endlocal
 exit /b
 

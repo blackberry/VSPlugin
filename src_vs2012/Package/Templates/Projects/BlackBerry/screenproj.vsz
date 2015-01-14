@@ -1,0 +1,9 @@
+VSWIZARD 7.0
+Wizard={0cb934ba-06c8-4919-9498-bc6517940bcd}
+Param="TITLE = BlackBerry Empty Native Core Application with Screen API"
+Param="PROJECT = native-default.vcxproj"
+Param="FILTERS = assets;config;src"
+Param="DEPENDENCY = bps;screen;m"
+Param="FILE = Shared/bar-descriptor.xml"
+Param="FILE = * Shared/main-screen.c -> src/main.c"
+

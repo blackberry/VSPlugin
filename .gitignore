@@ -40,6 +40,7 @@ src_vs2012/DebugEngine/BlackBerry.DebugEngine.csproj.user
 src_vs2012/GDBHost/BlackBerry.GDBHost.vcxproj.user
 src_vs2012/NativeCore/BlackBerry.NativeCore.csproj.user
 src_vs2012/Package/BlackBerry.Package.csproj.user
+src_vs2012/Package/BlackBerry.Package.csproj.DotSettings
 src_vs2012/Tasks/BlackBerry.Tasks.csproj.user
 src_vs2012/UnitTests/UnitTests.csproj.user
 

@@ -77,17 +77,19 @@
         <Buttons>
 
             <!-- Common Action Buttons -->
+            <!--
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonAddPlatformTargets" priority="0x0100" type="Button">
               <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
               <Strings>
                 <ButtonText>Add BlackBerry Pla&amp;tforms...</ButtonText>
               </Strings>
             </Button>
-
+            -->
+          
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryCommonProjectImport" priority="0x0100" type="Button">
               <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryTopMenuGroup_Common" />
               <Strings>
-                <ButtonText>Import &amp;Core Native Project...</ButtonText>
+                <ButtonText>Import &amp;Momentics Project...</ButtonText>
               </Strings>
             </Button>
 

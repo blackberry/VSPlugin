@@ -15,7 +15,7 @@ static char gLogFilePath[_MAX_PATH]; // contains the path to the output log (nee
 
 void LogInitialize()
 {
-    GetEnvironmentVariableA("AppData", gLogFilePath, _countof(gLogFilePath));
+    GetEnvironmentVariableA("LocalAppData", gLogFilePath, _countof(gLogFilePath));
     strcat_s(gLogFilePath, _countof(gLogFilePath), "\\BlackBerry\\wrapper.log");
 
     FILE* file = NULL;

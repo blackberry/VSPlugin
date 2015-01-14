@@ -15,6 +15,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -380,10 +381,7 @@ namespace BlackBerry.DebugEngine
         public bool SetBreakpoint(string filename, uint line, out BreakpointInfo breakpoint)
         {
             string cmd = @"-break-insert --thread-group i1 -f " + filename + ":" + line;
-            int i = filename.LastIndexOf('\\');
-            if ((i != -1) && (i + 1 < filename.Length))
-                filename = filename.Substring(i + 1);
-            string cmd2 = @"-break-insert --thread-group i1 -f " + filename + ":" + line;
+            string cmd2 = @"-break-insert --thread-group i1 -f " + NativeMethods.GetShortPathName(filename) + ":" + line;
             return SetBreakpointImpl(cmd, cmd2, out breakpoint);
         }
 
@@ -792,28 +790,6 @@ namespace BlackBerry.DebugEngine
                     LeaveCriticalRegion();
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns the document context needed for showing the location of the current instruction pointer.
-        /// </summary>
-        /// <param name="filename"> File name. </param>
-        /// <param name="line"> Line number. </param>
-        /// <returns> Returns the document context needed for showing the location of the current instruction pointer. </returns>
-        public AD7DocumentContext GetDocumentContext(string filename, uint line)
-        {
-            // Get the location in the document that the breakpoint is in.
-            TEXT_POSITION[] startPosition = new TEXT_POSITION[1];
-            startPosition[0].dwLine = line;
-            startPosition[0].dwColumn = 0;
-            TEXT_POSITION[] endPosition = new TEXT_POSITION[1];
-            endPosition[0].dwLine = line;
-            endPosition[0].dwColumn = 0;
-
-            uint address = 0;
-            AD7MemoryAddress codeContext = new AD7MemoryAddress(Engine, address);
-
-            return new AD7DocumentContext(filename, startPosition[0], endPosition[0], codeContext);
         }
 
         /// <summary>

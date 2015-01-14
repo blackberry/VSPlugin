@@ -642,5 +642,20 @@ namespace BlackBerry.Package.ViewModels
             // and replace the old list with new one:
             TargetDevices = result;
         }
+
+        /// <summary>
+        /// Updates the cached info about author (publisher).
+        /// Null values are acceptable, to flush the cache.
+        /// 
+        /// This method is a 'common' place to update cached data.
+        /// In the future some 'filtering' or 'disable' would be required, so it will be placed here.
+        /// </summary>
+        public void UpdateCachedAuthor(AuthorInfo info)
+        {
+            if (Developer != null)
+            {
+                Developer.CachedAuthor = info;
+            }
+        }
     }
 }

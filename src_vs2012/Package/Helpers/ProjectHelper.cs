@@ -1,9 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using EnvDTE;
+using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.VCProjectEngine;
+using Microsoft.Win32;
 
 namespace BlackBerry.Package.Helpers
 {
@@ -27,6 +31,174 @@ namespace BlackBerry.Package.Helpers
                 project = obj as Project;
             }
             return project;
+        }
+
+        /// <summary>
+        /// Updates specific project settings. It can be used to setup value only for particular platform (or 'null' to overwrite for all of them).
+        /// </summary>
+        public static void SetValue(VCProject project, string ruleName, string propertyName, string platformName, string configurationName, string value, bool appendValues, char valueSeparator, string inheritDefaults)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+            if (string.IsNullOrEmpty(value))
+                return;
+            if (valueSeparator == '\0' && (appendValues || !string.IsNullOrEmpty(inheritDefaults)))
+                throw new ArgumentNullException("valueSeparator");
+
+            foreach (VCConfiguration configuration in (IVCCollection) project.Configurations)
+            {
+                if (string.IsNullOrEmpty(configurationName) || string.Compare(configuration.ConfigurationName, configurationName, StringComparison.OrdinalIgnoreCase) == 0)
+                {
+                    var rulePropertyStore = configuration.Rules.Item(ruleName) as IVCRulePropertyStorage;
+                    if (rulePropertyStore != null)
+                    {
+                        var currentPlatformName = ((VCPlatform) configuration.Platform).Name;
+                        if (string.IsNullOrEmpty(platformName) || string.Compare(currentPlatformName, platformName, StringComparison.OrdinalIgnoreCase) == 0)
+                        {
+                            var existingPropertyValue = rulePropertyStore.GetUnevaluatedPropertyValue(propertyName);
+                            var newPropertyValue = appendValues
+                                ? MergePropertyValues(existingPropertyValue, value, valueSeparator, inheritDefaults)
+                                : (string.IsNullOrEmpty(inheritDefaults) ? value : MergePropertyValues(null, value, valueSeparator, inheritDefaults));
+
+                            // set new value, if it's really new:
+                            if (!string.IsNullOrEmpty(newPropertyValue) && newPropertyValue != existingPropertyValue && newPropertyValue != inheritDefaults)
+                            {
+                                rulePropertyStore.SetPropertyValue(propertyName, newPropertyValue);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Merges existing and new values set to the project (MSBuild) property.
+        /// If 'inheritDefaults' value is specified, it is enforced to be placed at the very end.
+        /// </summary>
+        public static string MergePropertyValues(string existingValue, string value, char valueSeparator, string inheritDefaults)
+        {
+            if (valueSeparator == '\0')
+                throw new ArgumentNullException("valueSeparator");
+            if (string.IsNullOrEmpty(value))
+                return existingValue;
+
+            var resultArray = new List<string>();
+            bool canAddInheritDefaults = false;
+
+            // first add existing values:
+            if (!string.IsNullOrEmpty(existingValue))
+            {
+                var existingValueArray = existingValue.Split(new[] { valueSeparator }, StringSplitOptions.RemoveEmptyEntries);
+
+                if (string.IsNullOrEmpty(inheritDefaults))
+                {
+                    resultArray.AddRange(existingValueArray);
+                }
+                else
+                {
+                    foreach (var ev in existingValueArray)
+                    {
+                        if (string.CompareOrdinal(ev, inheritDefaults) != 0)
+                        {
+                            resultArray.Add(ev);
+                        }
+                        else
+                        {
+                            canAddInheritDefaults = true;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                canAddInheritDefaults = true;
+            }
+
+            // than append new values:
+            var valueArray = value.Split(new[] { valueSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var v in valueArray)
+            {
+                if (!resultArray.Contains(v))
+                {
+                    resultArray.Add(v);
+                }
+            }
+
+            // and add inherited marker, if specified:
+            if (!string.IsNullOrEmpty(inheritDefaults) && resultArray.Count > 0 && canAddInheritDefaults)
+            {
+                resultArray.Add(inheritDefaults);
+            }
+
+            // serialize final value:
+            var result = new StringBuilder();
+
+            for (int i = 0; i < resultArray.Count; i++)
+            {
+                result.Append(resultArray[i]);
+
+                if (i < resultArray.Count - 1)
+                {
+                    result.Append(valueSeparator);
+                }
+            }
+
+            return result.ToString();
+        }
+
+        /// <summary>
+        /// Adds additional set of dependencies (libraries) at the end of existing list in project properties.
+        /// </summary>
+        public static void AddAdditionalDependencies(VCProject project, string platformName, string configurationName, params string[] values)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "Link", "AdditionalDependencies", platformName, configurationName, string.Join(";", values), true, ';', "%(AdditionalDependencies)");
+        }
+
+        /// <summary>
+        /// Adds additional set of dependency-directories (search directories for libraries) at the end of existing list in project properties.
+        /// </summary>
+        public static void AddAdditionalDependencyDirectories(VCProject project, string platformName, string configurationName, params string[] values)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "Link", "AdditionalLibraryDirectories", platformName, configurationName, string.Join(";", values), true, ';', "%(AdditionalLibraryDirectories)");
+        }
+
+        /// <summary>
+        /// Adds additional set of preprocessor definitions at the end of existing list in project properties.
+        /// </summary>
+        public static void AddPreprocessorDefines(VCProject project, string platformName, string configurationName, params string[] values)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "CL", "PreprocessorDefinitions", platformName, configurationName, string.Join(";", values), true, ';', "%(PreprocessorDefinitions)");
+        }
+
+        /// <summary>
+        /// Adds additional set of include-directories (search directories for header files) at the end of existing list in project properties.
+        /// </summary>
+        public static void AddAdditionalIncludeDirectories(VCProject project, string platformName, string configurationName, params string[] values)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "CL", "AdditionalIncludeDirectories", platformName, configurationName, string.Join(";", values), true, ';', "%(AdditionalIncludeDirectories)");
+        }
+
+        /// <summary>
+        /// Updates build-output directories in project properties.
+        /// </summary>
+        public static void SetBuildOutputDirectory(VCProject project, string platformName, string configurationName, string value)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+
+            SetValue(project, "ConfigurationGeneral", "OutDir", platformName, configurationName, value, false, '\0', null);
         }
 
         /// <summary>
@@ -186,7 +358,7 @@ namespace BlackBerry.Package.Helpers
                 var path = Path.Combine(projectDir, "arm", "o.le-v7-g", targetName);
                 if (File.Exists(path))
                     return path;
-                return Path.Combine(projectDir, "arm", "o.le-v7", targetName);
+                return Path.Combine(projectDir, "arm", "o.le-v7", targetName + ".so"); // Cascades apps in Device-Release mode are regular shared-object!
             }
 
             if (string.Compare(targetCpu, "x86", StringComparison.OrdinalIgnoreCase) == 0 && !string.IsNullOrEmpty(projectDir))
@@ -199,6 +371,72 @@ namespace BlackBerry.Package.Helpers
 
             // unsupported architecture:
             return null;
+        }
+
+        /// <summary>
+        /// Gets the name of the file with info about run application on the target for passed deployment in MSBuild.
+        /// </summary>
+        public static string GetFlagFileNameForRunInfo(Project project)
+        {
+            return GetFlagFileName(project, "runinfo");
+        }
+
+        /// <summary>
+        /// Gets the name of the file for debug-native flag passed to MSBuild.
+        /// </summary>
+        public static string GetFlagFileNameForDebugNative(Project project)
+        {
+            return GetFlagFileName(project, "debug-native");
+        }
+
+        /// <summary>
+        /// Gets the name of the file for CSK-password passed to MSBuild.
+        /// </summary>
+        public static string GetFlagFileNameForCSKPassword(Project project)
+        {
+            return GetFlagFileName(project, "csk-password");
+        }
+
+        private static string GetFlagFileName(Project project, string flagName)
+        {
+            if (project == null)
+                throw new ArgumentNullException("project");
+            if (string.IsNullOrEmpty(flagName))
+                throw new ArgumentNullException("flagName");
+
+            // is it 'miscellaneous files'?
+            if (string.IsNullOrEmpty(project.FullName))
+                return null;
+
+            return Path.Combine(Path.GetDirectoryName(project.FullName), string.Concat("vsndk-", flagName, ".flag"));
+        }
+
+        /// <summary>
+        /// Gets the global default folder, where Visual Studio is supposed to store projects (generally suggesting it at startup of New Project Wizard).
+        /// </summary>
+        public static string GetDefaultProjectFolder(DTE2 dte)
+        {
+            if (dte == null)
+                throw new ArgumentNullException("dte");
+
+            RegistryKey key = null;
+            try
+            {
+                key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\VisualStudio\" + dte.Version);
+
+                return key != null ? key.GetValue("DefaultNewProjectLocation", null).ToString() : null;
+            }
+            catch
+            {
+                return null;
+            }
+            finally
+            {
+                if (key != null)
+                {
+                    key.Close();
+                }
+            }
         }
     }
 }

@@ -16,6 +16,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using BlackBerry.DebugEngine;
+using BlackBerry.NativeCore.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Shell;
@@ -136,12 +137,20 @@ namespace BlackBerry.Package.Editors
                 }
             }
 
-            // Create the Document (editor)
-            var newEditor = new BarDescriptorEditorPane(_vsServiceProvider, pszMkDocument, textBuffer);
-            ppunkDocView = Marshal.GetIUnknownForObject(newEditor);
-            ppunkDocData = Marshal.GetIUnknownForObject(textBuffer);
-            pbstrEditorCaption = "";
-            return VSConstants.S_OK;
+            try
+            {
+                // Create the Document (editor)
+                var newEditor = new BarDescriptorEditorPane(_vsServiceProvider, pszMkDocument, textBuffer);
+                ppunkDocView = Marshal.GetIUnknownForObject(newEditor);
+                ppunkDocData = Marshal.GetIUnknownForObject(textBuffer);
+                pbstrEditorCaption = "";
+                return VSConstants.S_OK;
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to open XML file: \"{0}\"", pszMkDocument);
+                return VSConstants.VS_E_INCOMPATIBLEDOCDATA;
+            }
         }
 
         /// <summary>
@@ -170,11 +179,11 @@ namespace BlackBerry.Package.Editors
             if (VSConstants.LOGVIEWID_Primary == rguidLogicalView)
             {
                 // primary view uses NULL as pbstrPhysicalView
-                return VSConstants.S_OK;        
+                return VSConstants.S_OK;
             }
 
-            // you must return E_NOTIMPL for any unrecognized rguidLogicalView values
-            return EngineUtils.NotImplemented();
+            // must return E_NOTIMPL for any unrecognized rguidLogicalView values
+            return VSConstants.E_NOTIMPL;
         }
 
         /// <summary>

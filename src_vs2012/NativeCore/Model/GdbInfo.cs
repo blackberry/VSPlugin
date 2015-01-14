@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 
 namespace BlackBerry.NativeCore.Model
@@ -10,6 +9,9 @@ namespace BlackBerry.NativeCore.Model
     /// </summary>
     public sealed class GdbInfo
     {
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public GdbInfo(NdkDefinition ndk, DeviceDefinition device, RuntimeDefinition runtime, IEnumerable<string> additionalLibraryPaths)
         {
             if (ndk == null)
@@ -31,6 +33,9 @@ namespace BlackBerry.NativeCore.Model
             Arguments = "--interpreter=mi2";
         }
 
+        /// <summary>
+        /// Init constructor.
+        /// </summary>
         public GdbInfo(NdkInfo ndk, DeviceDefinition device, RuntimeDefinition runtime, IEnumerable<string> additionalLibraryPaths)
             : this(ndk != null ? ndk.ToDefinition() : null, device, runtime, additionalLibraryPaths)
         {

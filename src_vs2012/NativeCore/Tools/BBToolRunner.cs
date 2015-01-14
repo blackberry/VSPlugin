@@ -30,7 +30,8 @@ namespace BlackBerry.NativeCore.Tools
             base.PrepareStartup();
 
             // make sure proper Java installation for BB NDK plugin is used:
-            if (!string.IsNullOrEmpty(Environment["PATH"]) && !Environment["PATH"].StartsWith(Path.Combine(ConfigDefaults.JavaHome, "bin"), StringComparison.OrdinalIgnoreCase))
+            if (!string.IsNullOrEmpty(Environment["PATH"]) && !string.IsNullOrEmpty(ConfigDefaults.JavaHome)
+                    && !Environment["PATH"].StartsWith(Path.Combine(ConfigDefaults.JavaHome, "bin"), StringComparison.OrdinalIgnoreCase))
             {
                 Environment["PATH"] = string.Concat(Path.Combine(ConfigDefaults.JavaHome, "bin"), ";", Environment["PATH"]);
             }

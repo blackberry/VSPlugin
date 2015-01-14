@@ -265,7 +265,7 @@ namespace BlackBerry.DebugEngine
             }
             if (defaultPorts.Length == 0)
             {
-                MessageBoxHelper.Show("Missing Device/Simulator information. Please, use menu BlackBerry -> Settings to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBoxHelper.Show("Missing Device/Simulator information. Please, use menu \"BlackBerry -> Options\" to add any of those information.", "Missing Device/Simulator Data", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 ppEnum = null;
                 return VSConstants.S_FALSE;
             }

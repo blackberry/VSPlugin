@@ -14,14 +14,14 @@
             <common:BinaryToStringConverter x:Key="BinaryToStringConverter" />
 
             <DataTemplate x:Key="PreviewImpossible">
-                <TextBlock Text="Preview is unavailable. Maybe the file is too big or has unsupported extension." HorizontalAlignment="Stretch" />
+                <TextBlock Margin="4" Text="Preview is unavailable. Maybe the file is too big or has unsupported extension." HorizontalAlignment="Stretch" />
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsString">
-                <TextBox Text="{Binding Mode=OneWay}" IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
+                <TextBox Margin="4" Text="{Binding Mode=OneWay}" IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
                          HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
             </DataTemplate>
             <DataTemplate x:Key="PreviewAsBinary">
-                <TextBox Text="{Binding Mode=OneWay, Converter={StaticResource BinaryToStringConverter}}" FontFamily="Consolas"
+                <TextBox Margin="4" Text="{Binding Mode=OneWay, Converter={StaticResource BinaryToStringConverter}}" FontFamily="Consolas"
                          IsReadOnly="True" HorizontalScrollBarVisibility="Visible" VerticalScrollBarVisibility="Visible"
                          HorizontalAlignment="Stretch" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" />
             </DataTemplate>
@@ -106,6 +106,7 @@
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -124,7 +125,17 @@
                     <TextBlock Text="Executable:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="3" Grid.Column="0" />
                     <TextBox Text="{Binding ExecutablePath, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="3" Grid.Column="1" Width="700" HorizontalAlignment="Left" />
 
-                    <Button Content="Terminate" IsEnabled="{Binding CanTerminate}" Margin="2" Padding="5" Click="TerminateProcess_OnClick" Grid.Row="4" Grid.Column="1" HorizontalAlignment="Left" />
+                    <TextBlock Text="Arguments:" Margin="0,0,10,0" VerticalAlignment="Center" Grid.Row="4" Grid.Column="0" />
+                    <TextBox Text="{Binding Arguments, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="4" Grid.Column="1" Width="700" HorizontalAlignment="Left" />
+
+                    <TextBlock Text="Variables:" Margin="0,3,10,0" VerticalAlignment="Top" Grid.Row="5" Grid.Column="0" />
+                    <TextBox Text="{Binding EnvironmentVariables, Mode=OneWay}" IsReadOnly="True" Background="{DynamicResource {x:Static SystemColors.ControlBrushKey}}" Margin="2" Grid.Row="5" Grid.Column="1" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Visible" />
+
+                    <StackPanel Orientation="Horizontal" Grid.Row="6" Grid.Column="1">
+                        <Button Content="Terminate" IsEnabled="{Binding CanTerminate}" Margin="2" Padding="5" Click="TerminateProcess_OnClick" HorizontalAlignment="Left" />
+                        <Button Content="Capture Logs" IsEnabled="{Binding CanCapture}" Margin="2" Padding="5" Click="CaptureConsoleForProcess_OnClick" HorizontalAlignment="Left" />
+                        <Button Content="Stop Logs Capture" IsEnabled="{Binding CanStopCapture}" Margin="2" Padding="5" Click="StopCaptureConsoleForProcess_OnClick" HorizontalAlignment="Left" />
+                    </StackPanel>
                 </Grid>
             </DataTemplate>
 
@@ -145,10 +156,15 @@
             <ContextMenu x:Key="ContextForTarget">
                 <MenuItem Header="Edit..." Click="EditTarget_OnClick" />
                 <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
+                <MenuItem Header="Stop Console Captures" Visibility="{Binding CanDisconnect}" Click="StopConsoleCaptures_OnClick" />
                 <Separator />
+                <MenuItem Header="Connect" Click="ConnectTarget_OnClick" />
                 <MenuItem Header="Disconnect" Click="DisconnectTarget_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForProcess">
+                <MenuItem Header="Capture Logs" IsEnabled="{Binding CanCapture}" Click="CaptureConsoleForProcess_OnClick" />
+                <MenuItem Header="Stop Logs Capture" IsEnabled="{Binding CanStopCapture}" Click="StopCaptureConsoleForProcess_OnClick" />
+                <Separator />
                 <MenuItem Header="Terminate" IsEnabled="{Binding CanTerminate}" Click="TerminateProcess_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForFile">
@@ -185,6 +201,12 @@
     </UserControl.Resources>
 
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                <GradientStop Color="#FFDEDEDE" Offset="0" />
+                <GradientStop Color="#FFE8E8E8" Offset="1" />
+            </LinearGradientBrush>
+        </Grid.Background>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="70*" />

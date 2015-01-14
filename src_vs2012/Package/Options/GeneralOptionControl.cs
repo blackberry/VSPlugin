@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+﻿using System;
 using System.Windows.Forms;
 using BlackBerry.NativeCore;
 using BlackBerry.Package.Helpers;
@@ -50,22 +50,22 @@ namespace BlackBerry.Package.Options
 
         #endregion
 
-        private void bttNdkBrowse_Click(object sender, System.EventArgs e)
+        private void bttNdkBrowse_Click(object sender, EventArgs e)
         {
             txtNdkPath.Text = DialogHelper.BrowseForFolder(txtNdkPath.Text, "Browse for NDK folder");
         }
 
-        private void bttToolsBrowse_Click(object sender, System.EventArgs e)
+        private void bttToolsBrowse_Click(object sender, EventArgs e)
         {
             txtToolsPath.Text = DialogHelper.BrowseForFolder(txtToolsPath.Text, "Browse for Tools folder");
         }
 
-        private void bttJavaBrowse_Click(object sender, System.EventArgs e)
+        private void bttJavaBrowse_Click(object sender, EventArgs e)
         {
             txtJavaPath.Text = DialogHelper.BrowseForFolder(txtJavaPath.Text, "Browse for Java Home folder");
         }
 
-        private void bttOpenProfile_Click(object sender, System.EventArgs e)
+        private void bttOpenProfile_Click(object sender, EventArgs e)
         {
             DialogHelper.StartExplorer(ProfilePath);
         }

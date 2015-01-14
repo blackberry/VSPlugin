@@ -16,8 +16,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using BlackBerry.DebugEngine;
 using BlackBerry.NativeCore;
@@ -28,44 +28,166 @@ using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Services;
 using BlackBerry.Package.Dialogs;
 using BlackBerry.Package.Helpers;
+using BlackBerry.Package.Options;
 using BlackBerry.Package.ViewModels;
+using BlackBerry.Package.Wizards;
 using EnvDTE;
 using EnvDTE80;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.CommandBars;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.VCProjectEngine;
 
 namespace BlackBerry.Package.Components
 {
     /// <summary>
-    /// 
+    /// Manager class helpful in hijacking the Visual Studio's UI to initiate the build and deployment of BlackBerry project.
+    /// It exposes some detection mechanisms for external usages.
     /// </summary>
     internal sealed class BuildPlatformsManager
     {
+        #region Internal Classes
+
+        /// <summary>
+        /// Class carrying arguments required to attach to console logs for specified process.
+        /// </summary>
+        sealed class LogAttachRequest
+        {
+            /// <summary>
+            /// Init constructor.
+            /// </summary>
+            public LogAttachRequest(Project project, uint pid)
+            {
+                if (project == null)
+                    throw new ArgumentNullException("project");
+
+                PID = pid;
+                Project = project;
+            }
+
+            #region Properties
+
+            /// <summary>
+            /// Gets the process ID to start capturing logs.
+            /// </summary>
+            public uint PID
+            {
+                get;
+                private set;
+            }
+
+            public Project Project
+            {
+                get;
+                private set;
+            }
+
+            #endregion
+
+            /// <summary>
+            /// Issues request to attach to running process and capture output logs.
+            /// </summary>
+            public void Attach(DeviceDefinition device)
+            {
+                if (device == null)
+                    throw new ArgumentNullException("device");
+
+                Targets.Connect(device, OnConnected);
+            }
+
+            private void OnConnected(object sender, TargetConnectionEventArgs e)
+            {
+                if (e.Status == TargetStatus.Connected)
+                {
+                    Targets.Unsubscribe(e.Device, OnConnected);
+
+                    var process = e.Client.SysInfoService.FindProcess(PID);
+                    if (process != null)
+                    {
+                        Targets.Trace(e.Device, process, false);
+                    }
+                    else
+                    {
+                        TraceLog.WarnLine("Process to capture logs doesn't exist anymore.");
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Creates new request to attach to output logs.
+            /// </summary>
+            public static LogAttachRequest Create(Project project)
+            {
+                if (project == null)
+                    throw new ArgumentNullException("project");
+
+                // deployment was done, look for a file with run info:
+                // (HINT: this file is created by BBDeploy task, as a result of successful .bar file deployment and launch)
+                var runInfoFileName = ProjectHelper.GetFlagFileNameForRunInfo(project);
+
+                if (!File.Exists(runInfoFileName))
+                {
+                    TraceLog.WarnLine("Unable to find 'runinfo' file to correctly capture logs.");
+                    return null;
+                }
+
+                var runInfo = File.ReadAllLines(runInfoFileName);
+                uint pid = 0;
+
+                foreach (var info in runInfo)
+                {
+                    if (info.StartsWith("pid=", StringComparison.OrdinalIgnoreCase))
+                    {
+                        uint.TryParse(info.Substring(4), out pid);
+                    }
+                }
+
+                if (pid != 0)
+                {
+                    return new LogAttachRequest(project, pid);
+                }
+
+                TraceLog.WarnLine("Invalid PID inside 'runinfo' file to correctly capture logs.");
+                return null;
+            }
+        }
+
+        #endregion
+
         private readonly DTE2 _dte;
 
-        private List<String> _buildThese;
+        private List<string> _buildThese;
+        private readonly List<string> _filesToDelete;
         private bool _hitPlay;
         private int _amountOfProjects;
         private bool _isDeploying;
         private Project _startProject;
         private bool _startDebugger;
-
-        private OutputWindowPane _outputWindowPane;
+        private LogAttachRequest _currentAttachRequest;
 
         private BuildEvents _buildEvents;
+        private SolutionEvents _solutionEvents;
         private CommandEvents _deploymentEvents;
         private CommandEvents _eventsDebug;
         private CommandEvents _eventsNoDebug;
         private CommandEvents _eventsDebugContext;
+
+        private bool _solutionOpened;
+        private int _openedBlackBerryProjects;
+
+        private IServiceProvider _serviceProvider;
+        private ErrorManager _errorManager;
 
         private const string ConfigNameBlackBerry = "BlackBerry";
         private const string ToolbarNameStandard = "Standard";
         private const string SolutionConfigurationsName = "Solution Configurations";
         private const string SolutionPlatformsName = "Solution Platforms";
         private const string BarDescriptorFileName = "bar-descriptor.xml";
-        private const string BarDescriptorFolder = @"..\VCWizards\CodeWiz\BlackBerry\BarDescriptor\Templates\1033";
+        private const string BarDescriptorTemplate = @"Shared\bar-descriptor.xml";
+
+        public event Action<string> Navigate;
+        public event Action<Type> OpenSettingsPage;
 
         /// <summary>
         /// Init constructor.
@@ -76,6 +198,7 @@ namespace BlackBerry.Package.Components
                 throw new ArgumentNullException("dte");
 
             _dte = dte;
+            _filesToDelete = new List<string>();
         }
 
         public void Initialize()
@@ -83,11 +206,12 @@ namespace BlackBerry.Package.Components
             if (_buildEvents != null)
                 return;
 
+            _serviceProvider = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider) _dte);
+
             // register for command events, when accessing build platforms:
             _deploymentEvents = CommandHelper.Register(_dte, VSConstants.GUID_VSStandardCommandSet97, VSConstants.VSStd2KCmdID.SolutionPlatform, null, OnNewPlatform_AfterExecute);
             //CommandHelper.Register(_dte, GuidList.guidVSDebugGroup, StandardCommands.cmdidDebugBreakatFunction, cmdNewFunctionBreakpoint_beforeExec, cmdNewFunctionBreakpoint_afterExec);
 
-            //DisableIntelliSenseErrorReport(true);
             ShowSolutionPlatformSelector();
 
             // INFO: the references to returned objects must be stored and live as long, as the handlers are needed,
@@ -98,6 +222,37 @@ namespace BlackBerry.Package.Components
 
             _buildEvents = _dte.Events.BuildEvents;
             _buildEvents.OnBuildBegin += OnBuildBegin;
+            _buildEvents.OnBuildDone += OnDeploymentDoneAttachLogs;
+
+            // to monitor, when to disable IntelliSense errors,
+            // TODO: however there is still one case not covered - when project is added as Win32 and manually platform is added and configuration converted co BlackBerry...
+            _solutionEvents = _dte.Events.SolutionEvents;
+            _solutionEvents.Opened += OnSolutionOpened;
+            _solutionEvents.AfterClosing += OnSolutionClosed;
+            _solutionEvents.ProjectAdded += OnProjectAdded;
+            _solutionEvents.ProjectRemoved += OnProjectRemoved;
+
+            _errorManager = new ErrorManager(_serviceProvider, new Guid("{54340ee9-e59e-4ff1-8e5d-0370f700eaed}"), "BlackBerry Errors");
+
+            PackageViewModel.Instance.TargetsChanged += (s, e) => VerifyCommonErrors();
+        }
+
+        private void OnDeploymentDoneAttachLogs(vsBuildScope scope, vsBuildAction action)
+        {
+            if (action == vsBuildAction.vsBuildActionDeploy)
+            {
+                var project = GetActiveSolutionProject(_dte);
+                if (!_startDebugger && project != null)
+                {
+                    // deployment was done, look for a file with run info:
+                    _currentAttachRequest = LogAttachRequest.Create(project);
+                    if (_currentAttachRequest != null)
+                    {
+                        ActivateOutputWindowPane("Debug");
+                        _currentAttachRequest.Attach(ActiveTarget);
+                    }
+                }
+            }
         }
 
         #region Properties
@@ -154,6 +309,22 @@ namespace BlackBerry.Package.Components
             }
         }
 
+        /// <summary>
+        /// Gets the list of all available target devices.
+        /// </summary>
+        private DeviceDefinition[] TargetDevices
+        {
+            get { return PackageViewModel.Instance.TargetDevices; }
+        }
+
+        /// <summary>
+        /// Gets the list of installed NDKs on the machine.
+        /// </summary>
+        private NdkInfo[] InstalledNDKs
+        {
+            get { return PackageViewModel.Instance.InstalledNDKs; }
+        }
+
         #endregion
 
         /// <summary> 
@@ -161,26 +332,288 @@ namespace BlackBerry.Package.Components
         /// </summary>
         public void Close()
         {
-            //DisableIntelliSenseErrorReport(false);
         }
 
-        /*
-        /// <summary> 
-        /// Set the DisableErrorReporting property value. 
-        /// </summary>
-        /// <param name="disable"> The property value to set. </param>
-        private void DisableIntelliSenseErrorReport(bool disable)
+        private static Project GetActiveSolutionProject(DTE2 dte)
         {
-            DTE dte = _dte as DTE;
-            var txtEdCpp = dte.get_Properties("TextEditor", "C/C++ Specific");
-            if (txtEdCpp != null)
+            if (dte == null)
+                throw new ArgumentNullException("dte");
+
+            if (dte.ActiveSolutionProjects != null)
             {
-                var prop = txtEdCpp.Item("DisableErrorReporting");
-                if (prop != null)
-                    prop.Value = disable;
+                foreach (Project project in (Array) dte.ActiveSolutionProjects)
+                {
+                    return project;
+                }
+            }
+
+            return null;
+        }
+
+        private static Project GetBuildStartupProject(DTE2 dte)
+        {
+            if (dte == null)
+                throw new ArgumentNullException("dte");
+
+            if (dte.Solution != null && dte.Solution.SolutionBuild != null && dte.Solution.SolutionBuild.StartupProjects != null)
+            {
+                foreach (string startupProject in (Array) dte.Solution.SolutionBuild.StartupProjects)
+                {
+                    foreach (Project project in dte.Solution.Projects)
+                    {
+                        if (project.UniqueName == startupProject)
+                        {
+                            return project;
+                        }
+                    }
+                }
+            }
+
+            return null;
+        }
+
+        #region Managing IntelliSense Error Reporting
+
+        /// <summary>
+        /// Checks, if BlackBerry-dedicated MSBuild platform has been installed.
+        /// </summary>
+        public static bool IsMSBuildPlatformInstalled
+        {
+            get
+            {
+                var buildTasksAssemblyPath = Path.Combine(ConfigDefaults.MSBuildVCTargetsPath, "Platforms", "BlackBerry", "BlackBerry.BuildTasks.dll");
+                return File.Exists(buildTasksAssemblyPath);
             }
         }
-         */
+
+        /// <summary>
+        /// Checks the current plugin and Visual Studio state for most common errors to minimize developer's frustration, why things are not working.
+        /// </summary>
+        public void VerifyCommonErrors()
+        {
+            _errorManager.Clear();
+
+            // check if appropriate platform exists and matches expected version:
+            var buildTasksAssemblyPath = Path.Combine(ConfigDefaults.MSBuildVCTargetsPath, "Platforms", "BlackBerry", "BlackBerry.BuildTasks.dll");
+            if (!File.Exists(buildTasksAssemblyPath))
+            {
+                _errorManager.Add(TaskErrorCategory.Error, "MSBuild \"BlackBerry\" build platform was not found. Building projects won't be possible at all. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " [double-click] for details, how to install it.", OpenInstallationPage);
+            }
+            else
+            {
+                try
+                {
+                    var installedVersion = AssemblyName.GetAssemblyName(buildTasksAssemblyPath).Version;
+                    var expectedVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+                    // verify versions:
+                    if (installedVersion.Major != expectedVersion.Major || installedVersion.Minor != expectedVersion.Minor || installedVersion.Build != expectedVersion.Build)
+                    {
+                        _errorManager.Add(TaskErrorCategory.Warning, "Invalid version of existing MSBuild \"BlackBerry\" build platform (installed: " + ToShortVersion(installedVersion) + ", expected: " + ToShortVersion(expectedVersion) + "). Some features might simply stop working. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " [double-click] for details, how to upgrade it.", OpenInstallationPage);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to determine version of MSBuild \"BlackBerry\" build platform");
+                }
+            }
+
+            // is Java detected?
+            if (string.IsNullOrEmpty(ConfigDefaults.JavaHome) || !Directory.Exists(ConfigDefaults.JavaHome))
+            {
+                _errorManager.Add(TaskErrorCategory.Warning, "Java was not detected. Underlying BlackBerry tools might stop working. Please specify one at \"BlackBerry -> Options -> General\" [double-click].", OpenGeneralSettings);
+            }
+
+            // check, if any project is placed on incorrect location, not supported by underlying makefile system:
+            if (_dte != null && _dte.Solution != null && _dte.Solution.Projects.Count > 0)
+            {
+                foreach (Project project in _dte.Solution.Projects)
+                {
+                    if (IsBlackBerryProject(project))
+                    {
+                        // is path valid?
+                        var projectPath = Path.GetDirectoryName(project.FullName);
+                        if (!string.IsNullOrEmpty(projectPath) && !IsValidProjectPath(projectPath))
+                        {
+                            _errorManager.Add(TaskErrorCategory.Warning, string.Concat("Project path: \"", projectPath, "\" is invalid and might lead to problems in underlying makefile system. Please move the project to the one without spaces and non-ASCII characters."), project, null, OpenGeneralSettings);
+                        }
+
+                        // is name valid?
+                        var projectName = project.Name;
+                        if (!string.IsNullOrEmpty(projectPath) && !IsValidProjectName(projectName))
+                        {
+                            _errorManager.Add(TaskErrorCategory.Error, string.Concat("Project name: \"", projectName, "\" is invalid. Please remove all spaces and non-ASCII characters."), project, null, OpenGeneralSettings);
+                        }
+                    }
+                }
+            }
+
+            // check if any NDK is installed:
+            if (InstalledNDKs.Length == 0)
+            {
+                _errorManager.Add(TaskErrorCategory.Error, "Missing any BlackBerry NativeCore SDK. Compilation won't be possible at all. Add one on \"BlackBerry -> Options -> API-Levels\" [double-click] to be able to perform builds your applications.", OpenApiLevelSettings);
+
+                if (string.IsNullOrEmpty(ConfigDefaults.NdkDirectory) || !Directory.Exists(ConfigDefaults.NdkDirectory))
+                {
+                    _errorManager.Add(TaskErrorCategory.Warning, "Customized NDK for Visual Studio (bbndk_vs) was not found. It won't be possible to automatically download new versions of BlackBerry NativeCore SDKs, simulators nor runtime-libraries for debugging. Visit " + ConfigDefaults.GithubProjectWikiInstallation + " [double-click] for details, how to install it.", OpenInstallationPage);
+                }
+            }
+
+            // verify targets defined:
+            if (TargetDevices.Length == 0)
+            {
+                _errorManager.Add(TaskErrorCategory.Warning, "No target device or simulator is defined. Specify one on \"BlackBerry -> Options -> Targets\" [double-click] to be able to deploy and test your applications.", OpenTargetsSettings);
+            }
+
+            // bring errors to front:
+            if (_errorManager.Count > 0)
+            {
+                _errorManager.Show();
+            }
+        }
+
+        /// <summary>
+        /// Checks if given path matches the makefile assumptions used to build the BlackBerry projects.
+        /// </summary>
+        private static bool IsValidProjectPath(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+
+            return path.IndexOf(' ') < 0;
+        }
+
+        /// <summary>
+        /// Checks if given project name matches the makefile assumptions used to build the BlackBerry projects.
+        /// </summary>
+        private static bool IsValidProjectName(string path)
+        {
+            if (string.IsNullOrEmpty(path))
+                return false;
+
+            return path.IndexOf(' ') < 0;
+        }
+
+        private void OnProjectRemoved(Project project)
+        {
+            if (_solutionOpened)
+            {
+                if (IsBlackBerryProject(project))
+                {
+                    _openedBlackBerryProjects--;
+                    UpdateIntelliSenseState();
+                }
+
+                VerifyCommonErrors();
+            }
+        }
+
+        private void OnProjectAdded(Project project)
+        {
+            if (_solutionOpened)
+            {
+                if (IsBlackBerryProject(project))
+                {
+                    _openedBlackBerryProjects++;
+                    UpdateIntelliSenseState();
+                }
+
+                VerifyCommonErrors();
+            }
+        }
+
+        private void OnSolutionClosed()
+        {
+            _errorManager.Clear();
+
+            _solutionOpened = false;
+            _openedBlackBerryProjects = 0;
+            UpdateIntelliSenseState();
+            VerifyCommonErrors();
+        }
+
+        private void OnSolutionOpened()
+        {
+            _solutionOpened = true;
+            _openedBlackBerryProjects = 0;
+
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                if (IsBlackBerryProject(project))
+                {
+                    _openedBlackBerryProjects++;
+                }
+            }
+
+            UpdateIntelliSenseState();
+            VerifyCommonErrors();
+        }
+
+        private static string ToShortVersion(Version v)
+        {
+            return string.Concat("v", v.Major, ".", v.Minor, ".", v.Build);
+        }
+
+        private void OpenInstallationPage(object sender, EventArgs e)
+        {
+            var url = ConfigDefaults.GithubProjectWikiInstallation;
+
+            if (Navigate != null)
+            {
+                Navigate(url);
+            }
+            else
+            {
+                DialogHelper.StartURL(url);
+            }
+        }
+
+        private void RequestSettingsOpened(Type optionPageType)
+        {
+            if (OpenSettingsPage != null)
+            {
+                OpenSettingsPage(optionPageType);
+            }
+        }
+
+        private void OpenGeneralSettings(object sender, EventArgs e)
+        {
+            RequestSettingsOpened(typeof(GeneralOptionPage));
+        }
+
+        public void OpenTargetsSettings(object sender, EventArgs e)
+        {
+            RequestSettingsOpened(typeof(TargetsOptionPage));
+        }
+
+        public void OpenApiLevelSettings(object sender, EventArgs e)
+        {
+            RequestSettingsOpened(typeof(ApiLevelOptionPage));
+        }
+
+        private void UpdateIntelliSenseState()
+        {
+            UpdateIntelliSenseState(_openedBlackBerryProjects != 0);
+        }
+
+        /// <summary>
+        /// Enables or disables error reporting detected by IntelliSense at runtime.
+        /// Unfortunately, no idea for now, how to extend the IntelliSense with extra Qt syntax.
+        /// </summary>
+        private void UpdateIntelliSenseState(bool state)
+        {
+            var intelliPropertyGroup = _dte.Properties["TextEditor", "C/C++ Specific"];
+            if (intelliPropertyGroup != null)
+            {
+                var intelliProperty = intelliPropertyGroup.Item("DisableErrorReporting");
+                if (intelliProperty != null)
+                {
+                    intelliProperty.Value = state;
+                }
+            }
+        }
+
+        #endregion
 
         #region Managing Configurations
 
@@ -246,6 +679,11 @@ namespace BlackBerry.Package.Components
                 TraceLog.WriteException(e);
                 return false;
             }
+            finally
+            {
+                // update IntelliSense state:
+                OnSolutionOpened();
+            }
         }
 
         /// <summary>
@@ -298,12 +736,10 @@ namespace BlackBerry.Package.Components
                     }
                 }
 
-                string templatePath = Path.Combine(_dte.Solution.ProjectItemsTemplatePath(project.Kind), BarDescriptorFolder, BarDescriptorFileName);
+                string templatePath = Path.Combine(PuppetMasterWizardEngine.WizardDataFolder, BarDescriptorTemplate);
                 string destination = string.IsNullOrEmpty(projectFolder) ? BarDescriptorFileName : Path.Combine(projectFolder, BarDescriptorFileName);
 
-                var tokenProcessor = new TokenProcessor();
-                tokenProcessor.AddReplace(@"[!output PROJECT_NAME]", project.Name);
-
+                var tokenProcessor = PuppetMasterWizardEngine.CreateTokenProcessor(project.Name, projectFolder, destination, null);
                 tokenProcessor.UntokenFile(templatePath, destination);
                 project.ProjectItems.AddFromFile(destination);
             }
@@ -355,8 +791,15 @@ namespace BlackBerry.Package.Components
         {
             if (IsBlackBerrySolution() && ActiveNDK == null)
             {
-                var form = new MissingNdkInstalledForm();
-                form.ShowDialog();
+                if (InstalledNDKs.Length > 0)
+                {
+                    var form = new MissingNdkInstalledForm();
+                    form.ShowDialog();
+                }
+                else
+                {
+                    MessageBoxHelper.Show("Project build is impossible as any BlackBerry NativeCore SDK was detected. Please install or add existing one in \"BlackBerry -> Options -> API-Levels\" and try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
                 return;
             }
 
@@ -370,6 +813,8 @@ namespace BlackBerry.Package.Components
                 }
                 _hitPlay = false;
             }
+
+            PrepareFlagFilesForDeployment();
         }
 
 
@@ -385,7 +830,7 @@ namespace BlackBerry.Package.Components
         {
             TraceLog.WriteLine("BUILD: Start no Debug");
             _startDebugger = false;
-            StartBuild(out cancelDefault);
+            cancelDefault = StartBuild();
         }
 
         /// <summary> 
@@ -400,7 +845,7 @@ namespace BlackBerry.Package.Components
         {
             TraceLog.WriteLine("BUILD: Start Debug");
             _startDebugger = true;
-            StartBuild(out cancelDefault);
+            cancelDefault = StartBuild();
         }
 
         /// <summary> 
@@ -429,15 +874,14 @@ namespace BlackBerry.Package.Components
             }
         }
 
-        private void StartBuild(out bool cancelDefault)
+        private bool StartBuild()
         {
             if (DebugEngineStatus.IsRunning)
             {
                 TraceLog.WriteLine("BUILD: StartBuild - Debugger running");
 
                 // Disable the override of F5 (this allows the debugged process to continue execution)
-                cancelDefault = false;
-                return;
+                return false;
             }
 
             if (!IsBlackBerryConfigurationActive())
@@ -445,14 +889,13 @@ namespace BlackBerry.Package.Components
                 TraceLog.WriteLine("BUILD: StartBuild - not a BlackBerry project");
 
                 // Disable the override of F5 (this allows the debugged process to continue execution)
-                cancelDefault = false;
-                return;
+                return false;
             }
 
             try
             {
                 _buildThese = new List<String>();
-                _startProject = null;
+                _startProject = GetBuildStartupProject(_dte);
 
                 foreach (String startupProject in (Array) _dte.Solution.SolutionBuild.StartupProjects)
                 {
@@ -461,7 +904,6 @@ namespace BlackBerry.Package.Components
                         if (project.UniqueName == startupProject)
                         {
                             _buildThese.Add(project.FullName);
-                            _startProject = project;
                         }
                     }
                 }
@@ -471,36 +913,25 @@ namespace BlackBerry.Package.Components
                 TraceLog.WriteException(ex);
             }
 
-
-            // Create a reference to the Output window.
-            // Create a tool window reference for the Output window
-            // and window pane.
-            OutputWindow ow = _dte.ToolWindows.OutputWindow;
-
-            // Select the Build pane in the Output window.
-            _outputWindowPane = ow.OutputWindowPanes.Item("Build");
-            _outputWindowPane.Activate();
-
-            if (_startDebugger)
-            {
-                /*
-                     PH: FIXME: update API Level vs current project verification...
-                    UpdateManagerData upData;
-                    if (_targetDir.Count > 0)
-                        upData = new UpdateManagerData(_targetDir[0][1]);
-                    else
-                        upData = new UpdateManagerData();
-
-                    if (!upData.validateDeviceVersion(_isSimulator))
-                    {
-                        cancelDefault = true;
-                    }
-                    else
-                     */
-            }
-
+            ActivateOutputWindowPane("Build");
             BuildBar();
-            cancelDefault = true;
+            return true;
+        }
+
+        private void ActivateOutputWindowPane(string build)
+        {
+            try
+            {
+                // create a reference to the Output Window and window pane:
+                OutputWindow ow = _dte.ToolWindows.OutputWindow;
+
+                // and activate it:
+                var outputWindowPane = ow.OutputWindowPanes.Item(build);
+                outputWindowPane.Activate();
+            }
+            catch
+            {
+            }
         }
 
         /// <summary> 
@@ -548,32 +979,50 @@ namespace BlackBerry.Package.Components
             return success;
         }
 
+        private static void DeleteFlagFile(string fileName)
+        {
+            try
+            {
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to delete flag file (\"{0}\")", fileName);
+            }
+        }
+
         /// <summary> 
         /// Verify if the build process was successful. If so, start deploying the app.
         /// </summary>
         private void Built()
         {
             TraceLog.WriteLine("BUILD: Built");
-            
-            _outputWindowPane.TextDocument.Selection.SelectAll();
-            string outputText = _outputWindowPane.TextDocument.Selection.Text;
 
-            if (string.IsNullOrEmpty(outputText) || Regex.IsMatch(outputText, ">Build succeeded.\r\n") || !outputText.Contains("): error :"))
+            // when build succeeded:
+            if (_dte.Solution.SolutionBuild.LastBuildInfo == 0)
             {
-                if (_startDebugger)
-                {
-                    // Write file to flag the deploy task that it should use the -debugNative option
-                    File.WriteAllText(ConfigDefaults.BuildDebugNativePath, "Use -debugNative.\r\n");
-                    _buildEvents.OnBuildDone += OnBuildDone;
-                }
-
-                foreach (string startupProject in (Array)_dte.Solution.SolutionBuild.StartupProjects)
+                foreach (string startupProject in (Array) _dte.Solution.SolutionBuild.StartupProjects)
                 {
                     foreach (SolutionContext sc in _dte.Solution.SolutionBuild.ActiveConfiguration.SolutionContexts)
                     {
+                        var project = _dte.Solution.Item(sc.ProjectName);
+                        var debugNativeFlagFileName = ProjectHelper.GetFlagFileNameForDebugNative(project);
+
+                        DeleteFlagFile(debugNativeFlagFileName);
+
                         if (sc.ProjectName == startupProject)
                         {
                             sc.ShouldDeploy = true;
+
+                            if (_startDebugger)
+                            {
+                                // write file to flag the deploy task that it should use the -debugNative option:
+                                File.WriteAllText(debugNativeFlagFileName, "Use -debugNative.\r\n");
+                                _buildEvents.OnBuildDone += OnBuildDone;
+                            }
                         }
                         else
                         {
@@ -591,6 +1040,83 @@ namespace BlackBerry.Package.Components
 
                 _isDeploying = true;
                 _dte.Solution.SolutionBuild.Deploy(true);
+            }
+
+            OnWholeBuildDone();
+        }
+
+        private void OnWholeBuildDone()
+        {
+            // remove all temporary flag files created during build:
+            foreach (var fileName in _filesToDelete)
+            {
+                DeleteFlagFile(fileName);
+            }
+
+            _filesToDelete.Clear();
+            if (_buildThese != null)
+            {
+                _buildThese.Clear();
+            }
+            _startProject = null;
+            _startDebugger = false;
+            _isDeploying = false;
+            _hitPlay = false;
+        }
+
+        /// <summary>
+        /// Writes down all flag files used by MSBuild.
+        /// NOTE: somehow passing values via environment variables seems not to work,
+        /// that's why we use local files deleted automatically after the build/deployment is completed.
+        /// </summary>
+        private void PrepareFlagFilesForDeployment()
+        {
+            var developer = PackageViewModel.Instance.Developer;
+            bool shouldSaveLocally = developer != null && !developer.IsPasswordSaved && !string.IsNullOrEmpty(developer.CskPassword);
+
+            // store CSK-password inside a local flag-file, in case dev doesn't want to store it persistently:
+            foreach (Project project in _dte.Solution.Projects)
+            {
+                try
+                {
+                    var cskPasswordFileName = ProjectHelper.GetFlagFileNameForCSKPassword(project);
+
+                    // remove old value:
+                    DeleteFlagFile(cskPasswordFileName);
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to delete deployment temporary flag files (project: \"{0}\")", project != null ? project.Name : "unknown");
+                }
+            }
+
+            if (shouldSaveLocally)
+            {
+                foreach (Project project in (Array) _dte.Solution.SolutionBuild.StartupProjects)
+                {
+                    WriteCskPassword(project, developer);
+                }
+
+                foreach (Project project in (Array) _dte.ActiveSolutionProjects)
+                {
+                    WriteCskPassword(project, developer);
+                }
+            }
+        }
+
+        private void WriteCskPassword(Project project, DeveloperDefinition developer)
+        {
+            try
+            {
+                var cskPasswordFileName = ProjectHelper.GetFlagFileNameForCSKPassword(project);
+
+                // write CSK-password, if not stored persistently inside registry, to let signing process to succeed:
+                File.WriteAllText(cskPasswordFileName, GlobalHelper.Encrypt(developer.CskPassword));
+                _filesToDelete.Add(cskPasswordFileName);
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to write deployment temporary flag files (project: \"{0}\")", project != null ? project.Name : "unknown");
             }
         }
 
@@ -628,23 +1154,26 @@ namespace BlackBerry.Package.Components
             // if the path to binary is invalid GDB might have problems with loading correct symbols;
             // maybe try to guess better or ask developer, what is wrong, why the project doesn't define it correctly
             // (possible causes: dev is using any kind of makefile and plugin can't detect the outcomes automatically):
-            if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
-            {
-                executablePath = ProjectHelper.GuessTargetFullName(_startProject);
-
-                if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
-                {
-                    var attachDiscoveryService = (IAttachDiscoveryService) Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IAttachDiscoveryService));
-                    Debug.Assert(attachDiscoveryService != null, "Invalid project references (make sure VisualStudio.Shell.dll is not references, as it duplicates the Package definition from VisualStudio.Shell.<version>.dll)");
-
-                    // ask the developer to specify the path:
-                    executablePath = attachDiscoveryService.FindExecutable(null);
-                }
-            }
-
             if (_startDebugger)
             {
-                LaunchDebugTarget(_startProject.Name, ndk, device, runtime, null, executablePath);
+                if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
+                {
+                    executablePath = ProjectHelper.GuessTargetFullName(_startProject);
+
+                    if (string.IsNullOrEmpty(executablePath) || !File.Exists(executablePath))
+                    {
+                        var attachDiscoveryService = (IAttachDiscoveryService) Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(IAttachDiscoveryService));
+                        Debug.Assert(attachDiscoveryService != null, "Invalid project references (make sure VisualStudio.Shell.dll is not references, as it duplicates the Package definition from VisualStudio.Shell.<version>.dll)");
+
+                        // ask the developer to specify the path:
+                        executablePath = attachDiscoveryService.FindExecutable(null);
+                    }
+                }
+
+                if (LaunchDebugTarget(_startProject.Name, ndk, device, runtime, null, executablePath))
+                {
+                    ActivateOutputWindowPane("Debug");
+                }
             }
         }
 
@@ -657,13 +1186,8 @@ namespace BlackBerry.Package.Components
         {
             TraceLog.WriteLine("BUILD: Starting debugger (\"{0}\", \"{1}\")", pidOrTargetAppName, executablePath);
 
-            IVsDebugger dbg;
-            IVsUIShell shell;
-            using (var serviceProvider = new ServiceProvider((Microsoft.VisualStudio.OLE.Interop.IServiceProvider) _dte))
-            {
-                dbg = (IVsDebugger)serviceProvider.GetService(typeof(SVsShellDebugger));
-                shell = (IVsUIShell)serviceProvider.GetService(typeof(SVsUIShell));
-            }
+            IVsDebugger dbg = (IVsDebugger) _serviceProvider.GetService(typeof(SVsShellDebugger));
+            IVsUIShell shell = (IVsUIShell) _serviceProvider.GetService(typeof(SVsUIShell));
 
             VsDebugTargetInfo info = new VsDebugTargetInfo();
             info.cbSize = (uint)Marshal.SizeOf(info);
@@ -704,7 +1228,7 @@ namespace BlackBerry.Package.Components
 
                     TraceLog.WriteLine("LaunchDebugTargets: " + message);
                     MessageBoxHelper.Show(message, null, MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return true;
+                    return false;
                 }
             }
             finally
@@ -715,7 +1239,7 @@ namespace BlackBerry.Package.Components
                 }
             }
 
-            return false;
+            return true;
         }
 
         #endregion
@@ -741,14 +1265,26 @@ namespace BlackBerry.Package.Components
             return false;
         }
 
-        public bool IsBlackBerryProject(Project project)
+        /// <summary>
+        /// Checks if specified project supports build for BlackBerry device or simulator.
+        /// </summary>
+        public static bool IsBlackBerryProject(Project project)
         {
-            if (project == null)
+            if (project == null || !(project.Object is VCProject))
                 return false;
 
-            var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null ? project.ConfigurationManager.ActiveConfiguration.PlatformName : null;
-            if (platformName == ConfigNameBlackBerry)
-                return true;
+            try
+            {
+                var platformName = project.ConfigurationManager != null && project.ConfigurationManager.ActiveConfiguration != null
+                    ? project.ConfigurationManager.ActiveConfiguration.PlatformName
+                    : null;
+                if (platformName == ConfigNameBlackBerry)
+                    return true;
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to determine type of native project");
+            }
 
             return false;
         }
