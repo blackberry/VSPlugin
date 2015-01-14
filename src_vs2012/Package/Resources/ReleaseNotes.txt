@@ -1,7 +1,13 @@
+v3.3.1 (2015-01-14)
+Changes in this version:
+ * small UI tweaks of project-import dialog
+ * fixed detection of MSBuild extensions on Windows XP
+ * fixed persistance of web-browser settings in Visual Studio 2010
+
 v3.3.0 (2015-01-09)
 Changes in this version:
  * added basic QML colorizer (#29)
- * fixed missing separator in makefile liner command
+ * fixed missing separator in makefile linker command
  * fixed crash, when upgrading VC++ non-BlackBerry project
 
 v3.2.2 (2014-12-30)
