@@ -80,7 +80,7 @@
                 Category="ProjectDefaults"
                 F1Keyword="VC.Project.VCConfiguration.ConfigurationType">
     <EnumValue Name="Application" DisplayName="Application (BAR file)" Description="Application" />
-    <EnumValue Name="DynamicLibrary" DisplayName="Dynamic Library (.so)" Description="Dynamic Library (.so)" />
+    <EnumValue Name="DynamicLibrary" DisplayName="Shared Library (.so)" Description="Shared Library (.so)" />
     <EnumValue Name="StaticLibrary" DisplayName="Static library (.a)" Description="Static Library (.a)" />
   </EnumProperty>
   <EnumProperty Name="ConfigurationAppType" DisplayName="Application Type" Visible="True"
@@ -100,7 +100,6 @@
     <EnumValue Name="Device-Profile" DisplayName="Device-Profile" Description="Device-Profile target for the Cascades Application" />
     <EnumValue Name="Device-Release" DisplayName="Device-Release" Description="Device-Release target for the Cascades Application" />
     <EnumValue Name="Simulator-Debug" DisplayName="Simulator-Debug" Description="Simulator-Debug target for the Cascades Application" />
-    <EnumValue Name="Simulator-Release" DisplayName="Simulator-Release" Description="Simulator-Release target for the Cascades Application" />
   </EnumProperty>
   <EnumProperty Name="CharacterSet" DisplayName="Character Set"
                 Description="Tells the compiler to use the specified character set; aids in localization issues."

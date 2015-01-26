@@ -1,0 +1,82 @@
+v3.3.1 (2015-01-14)
+Changes in this version:
+ * small UI tweaks of project-import dialog
+ * fixed detection of MSBuild extensions on Windows XP
+ * fixed persistance of web-browser settings in Visual Studio 2010
+
+v3.3.0 (2015-01-09)
+Changes in this version:
+ * added basic QML colorizer (#29)
+ * fixed missing separator in makefile linker command
+ * fixed crash, when upgrading VC++ non-BlackBerry project
+
+v3.2.2 (2014-12-30)
+Changes in this version:
+ * improved importing Momentics project:
+   - updates author info inside bar-descriptor.xml on the fly (#38)
+   - updates displayed project name on UI, when loaded another project
+   - avoids adding the same file several times into the project, when doing merge
+   - updating import-summary at runtime
+   - recognizes also additional-include-dirs from the original project
+ * added extra handlers to avoid Visual Studio crash, when lost connection to the device and trying to close used services
+ * small update to main project filters
+ * other small tweaks and refactorings
+
+v3.2.1 (2014-12-27)
+Changes in this version:
+ * fixed loading process-list, when 5+ applications running simultaneously (#37)
+
+v3.2.0 (2014-12-25)
+Changes in this version:
+ * .bar file editor is not default one for all XML files anymore! (#36)
+ * improved presentation of compilation errors (#35) to let Visual Studio jump into right place in source-code
+ * totally changed the way importing Momentics project works:
+   - loads original project name (#34)
+   - loads properties from manifest.properties too
+   - can check/uncheck/remove files by whole folders (#35)
+   - can specify custom list of defines (among the ones read from existing settings)
+   - can specify custom references to libraries
+   - detects the output location by parsing bar-descriptor.xml (using new MSBuild properties: $(TargetArchPre) / $(TargetArchPost) to build that path)
+ * added project-item template for new empty makefile
+ * added project template of Qt4 on PlayBook (experimental)
+ * fixed problem with launching slog2info on PlayBook (it's simply not supported there)
+ * other small tweaks and refactorings
+
+v3.1.0 (2014-12-09)
+Changes in this version:
+ * introduced device logs capture feature (#32)
+ * added process launcher (on target device)
+ * updated Target Navigator
+   - exposing buttons to manage logs
+   - presenting command-line of running process
+   - presenting environment variables of running process
+   - small UI fixes (i.e. improper background in dark theme)
+ * suggesting download of BBNDK for VS, when not found
+ * other small tweaks and refactorings
+
+v3.0.4 (2014-11-27)
+Changes in this version:
+ * improved first-launch experience (when nothing is configured and installed yet)
+ * avoiding new project wizard, when MSBuild 'BlackBerry' build platform is missing
+
+v3.0.3 (2014-11-26)
+Changes in this version:
+ * improved stability, when no satellite components are installed (bbndk_vs, QNX tools, MSBuild extensions, Java)
+ * fixed missing [Download] button next to PlayBook NDK in API-Levels
+ * revisited project and project-item templates
+ * added default '_DEBUG' preprocessor definition into each new project
+ * enabled IntelliSense code-completion, while C++ coding
+ * respecting library references via properties of Cascades Application project
+ * fixed usage of precompiled header
+ * hidden GDB output in release builds
+ * more strictly following directory structure, when adding new files into a project, by producting expected sub-filters
+ * other small tweaks and refactorings
+
+v3.0.2 (2014-11-16)
+Changes in this version:
+ * VSIX package verifies, if proper MSBuild 'BlackBerry' platform exists (#28)
+ * made GDB output-window shown in public releases
+ * fixed PlayBook QNX-tools selection
+
+v3.0.1 (2014-11-13)
+ * initial release of the plugin after 6 months of refactorings of original BlackBerry source-code and development of new features

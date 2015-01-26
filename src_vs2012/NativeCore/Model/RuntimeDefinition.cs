@@ -13,7 +13,7 @@ namespace BlackBerry.NativeCore.Model
         public RuntimeDefinition(string folder)
         {
             if (string.IsNullOrEmpty(folder))
-                throw new ArgumentNullException("path");
+                throw new ArgumentNullException("folder");
 
             Folder = folder;
         }
@@ -27,7 +27,6 @@ namespace BlackBerry.NativeCore.Model
         }
 
         #endregion
-
 
         /// <summary>
         /// Retrieves info about used runtime libraries from registry.

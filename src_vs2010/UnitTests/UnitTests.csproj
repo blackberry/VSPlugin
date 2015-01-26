@@ -64,11 +64,17 @@
     <Compile Include="..\..\src_vs2012\UnitTests\DiagnosticTests.cs">
       <Link>DiagnosticTests.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ImportProjectTests.cs">
+      <Link>ImportProjectTests.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\MakeAllAndFormatOutputMessagesTestClass.cs">
       <Link>MakeAllAndFormatOutputMessagesTestClass.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\ParserTests.cs">
       <Link>ParserTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ProjectHelperTests.cs">
+      <Link>ProjectHelperTests.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\QConnTests.cs">
       <Link>QConnTests.cs</Link>
@@ -94,6 +100,10 @@
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{36D4495B-9A92-478F-BF95-AEA13804A7BA}</Project>
       <Name>BlackBerry.NativeCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
+      <Project>{3D6EFFAF-FF39-497D-B6F8-0B6169E90C6D}</Project>
+      <Name>BlackBerry.Package</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

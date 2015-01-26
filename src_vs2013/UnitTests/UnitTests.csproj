@@ -36,18 +36,14 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Framework, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="nunit.framework, Version=2.6.3.13283, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\ext\NUnit\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
-    <Reference Include="System.Core" />
     <Reference Include="System.Security" />
     <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -66,11 +62,17 @@
     <Compile Include="..\..\src_vs2012\UnitTests\DiagnosticTests.cs">
       <Link>DiagnosticTests.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ImportProjectTests.cs">
+      <Link>ImportProjectTests.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\MakeAllAndFormatOutputMessagesTestClass.cs">
       <Link>MakeAllAndFormatOutputMessagesTestClass.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\ParserTests.cs">
       <Link>ParserTests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\UnitTests\ProjectHelperTests.cs">
+      <Link>ProjectHelperTests.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\UnitTests\QConnTests.cs">
       <Link>QConnTests.cs</Link>
@@ -96,6 +98,10 @@
     <ProjectReference Include="..\NativeCore\BlackBerry.NativeCore.csproj">
       <Project>{ae6bee3e-3273-4214-a215-2924e33246ca}</Project>
       <Name>BlackBerry.NativeCore</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Package\BlackBerry.Package.csproj">
+      <Project>{3d6effaf-ff39-497d-b6f8-0b6169e90c6d}</Project>
+      <Name>BlackBerry.Package</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

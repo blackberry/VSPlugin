@@ -167,6 +167,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Model\ApiLevelTask.cs">
       <Link>Model\ApiLevelTask.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\AuthorInfo.cs">
+      <Link>Model\AuthorInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\CertificateInfo.cs">
       <Link>Model\CertificateInfo.cs</Link>
     </Compile>
@@ -200,6 +203,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Model\GdbInfo.cs">
       <Link>Model\GdbInfo.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Model\ImportProjectInfo.cs">
+      <Link>Model\ImportProjectInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Model\NdkDefinition.cs">
       <Link>Model\NdkDefinition.cs</Link>
     </Compile>
@@ -230,6 +236,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\HResult.cs">
       <Link>QConn\HResult.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\CapturedLogsEventArgs.cs">
+      <Link>QConn\Model\CapturedLogsEventArgs.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\DataReaderBigEndian.cs">
       <Link>QConn\Model\DataReaderBigEndian.cs</Link>
     </Compile>
@@ -256,6 +265,15 @@
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetFileDescriptor.cs">
       <Link>QConn\Model\TargetFileDescriptor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetLogEntry.cs">
+      <Link>QConn\Model\TargetLogEntry.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetProcess.cs">
+      <Link>QConn\Model\TargetProcess.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetProcessSLog2Info.cs">
+      <Link>QConn\Model\TargetProcessSLog2Info.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Model\TargetSystemType.cs">
       <Link>QConn\Model\TargetSystemType.cs</Link>
@@ -362,11 +380,17 @@
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetService.cs">
       <Link>QConn\Services\TargetService.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceConsoleLog.cs">
+      <Link>QConn\Services\TargetServiceConsoleLog.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceControl.cs">
       <Link>QConn\Services\TargetServiceControl.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceFile.cs">
       <Link>QConn\Services\TargetServiceFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceLauncher.cs">
+      <Link>QConn\Services\TargetServiceLauncher.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\QConn\Services\TargetServiceSysInfo.cs">
       <Link>QConn\Services\TargetServiceSysInfo.cs</Link>

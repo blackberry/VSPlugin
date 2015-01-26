@@ -11,6 +11,7 @@ namespace BlackBerry.NativeCore.Diagnostics
     {
         public const string Category = "BlackBerry";
         public const string CategoryGDB = "GDB";
+        public const string CategoryDevice = "BBDeviceLog";
 
         /// <summary>
         /// Add new trace-log message listener.

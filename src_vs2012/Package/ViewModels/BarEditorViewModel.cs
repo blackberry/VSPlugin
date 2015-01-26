@@ -16,10 +16,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using BlackBerry.NativeCore;
+using BlackBerry.BarDescriptor.Model;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.Tools;
-using BlackBerry.Package.Model;
 using BlackBerry.Package.Resources;
 using Microsoft.VisualStudio.Package;
 using IOleServiceProvider = Microsoft.VisualStudio.OLE.Interop.IServiceProvider;
@@ -229,7 +228,7 @@ namespace BlackBerry.Package.ViewModels
         private long _dirtyTime;
         private LanguageService _xmlLanguageService;
         private IServiceProvider _serviceProvider;
-        private qnx _qnxSchema;
+        private QnxRootType _qnxSchema;
         private bool _synchronizing;
         private XmlModel _xmlModel;
         private XmlStore _xmlStore;
@@ -301,7 +300,7 @@ namespace BlackBerry.Package.ViewModels
             LoadModelFromXmlModel();
 
             IList<ImageItemClass> iconImageList = new List<ImageItemClass>();
-            if ((_qnxSchema.icon != null) && (_qnxSchema.icon.image != null))
+            if (_qnxSchema != null && _qnxSchema.icon != null && _qnxSchema.icon.image != null)
             {
                 string iconPngPath = "";  //added to avoid duplication. That's because I didn't find the template to remove teh ICON.PNG.
                 foreach (string iconImage in _qnxSchema.icon.image)
@@ -326,7 +325,7 @@ namespace BlackBerry.Package.ViewModels
             LoadPermissions();
 
             IList<ImageItemClass> splashScreenImageList = new List<ImageItemClass>();
-            if ((_qnxSchema.splashScreens != null) && (_qnxSchema.splashScreens.image != null))
+            if (_qnxSchema != null && _qnxSchema.splashScreens != null && _qnxSchema.splashScreens.image != null)
             {
                 foreach (string splashScreenImage in _qnxSchema.splashScreens.image)
                 {
@@ -339,39 +338,41 @@ namespace BlackBerry.Package.ViewModels
             IList<ConfigurationItemClass> configurationList = new List<ConfigurationItemClass>();
             ConfigurationItemClass configItem = new ConfigurationItemClass("All Configurations");
             configurationList.Add(configItem);
-            foreach (qnxConfiguration config in _qnxSchema.configuration)
+            if (_qnxSchema != null)
             {
-                configItem = new ConfigurationItemClass(config.name);
-                configurationList.Add(configItem);
+                foreach (var config in _qnxSchema.configuration)
+                {
+                    configItem = new ConfigurationItemClass(config.name);
+                    configurationList.Add(configItem);
+                }
             }
             _configurationList = new CollectionView(configurationList);
 
             IList<OrientationItemClass> orientationList = new List<OrientationItemClass>();
             OrientationItemClass orientationItem = new OrientationItemClass("Default");
             orientationList.Add(orientationItem);
-            if (_qnxSchema.initialWindow.autoOrients == "") 
+            if (_qnxSchema != null && string.IsNullOrEmpty(_qnxSchema.initialWindow.autoOrients))
             {
                 _orientationItem = orientationItem;
             }            
 
             orientationItem = new OrientationItemClass("Auto-orient");
             orientationList.Add(orientationItem);
-            if (_qnxSchema.initialWindow.autoOrients == "true") 
+            if (_qnxSchema != null && _qnxSchema.initialWindow.autoOrients == "true") 
             {
                 _orientationItem = orientationItem;
             }
 
-
             orientationItem = new OrientationItemClass("Landscape");
             orientationList.Add(orientationItem);
-            if (_qnxSchema.initialWindow.aspectRatio == "landscape") 
+            if (_qnxSchema != null && _qnxSchema.initialWindow.aspectRatio == "landscape") 
             {
                 _orientationItem = orientationItem;
             }
 
             orientationItem = new OrientationItemClass("Portrait");
             orientationList.Add(orientationItem);
-            if (_qnxSchema.initialWindow.aspectRatio == "portrait")
+            if (_qnxSchema != null && _qnxSchema.initialWindow.aspectRatio == "portrait")
             {
                 _orientationItem = orientationItem;
             }
@@ -388,7 +389,7 @@ namespace BlackBerry.Package.ViewModels
         {
             string imagePath = "";
 
-            foreach (asset assetItem in _qnxSchema.asset)
+            foreach (var assetItem in _qnxSchema.asset)
             {
                 if (assetItem.Value == imgName)
                 {
@@ -606,7 +607,7 @@ namespace BlackBerry.Package.ViewModels
                     throw new Exception();
                 }
 
-                XmlSerializer serializer = new XmlSerializer(typeof(qnx));
+                XmlSerializer serializer = new XmlSerializer(typeof(QnxRootType));
                 XDocument documentFromDesignerState = new XDocument();
                 using (XmlWriter w = documentFromDesignerState.CreateWriter())
                 {
@@ -767,11 +768,11 @@ namespace BlackBerry.Package.ViewModels
         {
             try
             {
-                XmlSerializer serializer = new XmlSerializer(typeof(qnx));
+                XmlSerializer serializer = new XmlSerializer(typeof(QnxRootType));
 
                 using (XmlReader reader = GetParseTree().CreateReader())
                 {
-                    _qnxSchema = (qnx)serializer.Deserialize(reader);
+                    _qnxSchema = (QnxRootType)serializer.Deserialize(reader);
                 }
 
                 if (_qnxSchema == null)
@@ -864,7 +865,7 @@ namespace BlackBerry.Package.ViewModels
         /// <summary>
         /// Read the author information from the debug token and update the appropriate boxes.
         /// </summary>
-        public void SetAuthorInfoFrom(string debugTokenFileName, IEventDispatcher dispatcher,  EventHandler failHandler)
+        public void SetAuthorInfoFrom(string debugTokenFileName, IEventDispatcher dispatcher, EventHandler failHandler)
         {
             if (string.IsNullOrEmpty(debugTokenFileName))
                 throw new ArgumentNullException("debugTokenFileName");
@@ -892,10 +893,13 @@ namespace BlackBerry.Package.ViewModels
             var debugToken = _debugTokenInfoRunner.DebugToken;
             _debugTokenInfoRunner = null;
 
-            if (e.IsSuccessfull && debugToken != null)
+            if (e.IsSuccessfull && debugToken != null && debugToken.Author != null)
             {
-                AuthorID = debugToken.AuthorID;
-                Author = debugToken.Author;
+                Author = debugToken.Author.Name;
+                AuthorID = debugToken.Author.ID;
+
+                // order cache update...
+                PackageViewModel.Instance.UpdateCachedAuthor(debugToken.Author);
             }
             else
             {
@@ -935,13 +939,13 @@ namespace BlackBerry.Package.ViewModels
         {
             get
             {
-                return _qnxSchema.name;
+                return _qnxSchema.name.Value;
             }
             set
             {
-                if (_qnxSchema.name != value)
+                if (_qnxSchema.name.Value != value)
                 {
-                    _qnxSchema.name = value;
+                    _qnxSchema.name.Value = value;
                     DesignerDirty = true;
                     NotifyPropertyChanged("AppName");
                 }
@@ -955,13 +959,13 @@ namespace BlackBerry.Package.ViewModels
         {
             get
             {
-                return _qnxSchema.description;
+                return _qnxSchema.description.Value;
             }
             set
             {
-                if (_qnxSchema.description != value)
+                if (_qnxSchema.description.Value != value)
                 {
-                    _qnxSchema.description = value;
+                    _qnxSchema.description.Value = value;
                     DesignerDirty = true;
                     NotifyPropertyChanged("Description");
                 }
@@ -1071,7 +1075,7 @@ namespace BlackBerry.Package.ViewModels
         /// <summary>
         /// Return the AssetList
         /// </summary>
-        public List<asset> AssetList
+        public List<AssetType> AssetList
         {
             get
             {
@@ -1090,7 +1094,7 @@ namespace BlackBerry.Package.ViewModels
                 }
                 else
                 {
-                    foreach (qnxConfiguration config in _qnxSchema.configuration)
+                    foreach (var config in _qnxSchema.configuration)
                     {
                         if (config.name == _config.Name)
                         {
@@ -1108,7 +1112,7 @@ namespace BlackBerry.Package.ViewModels
 
         public void AddLocalAsset(string assetPath)
         {
-            asset newAsset = new asset();
+            var newAsset = new AssetType();
 
             FileInfo fileInfo = new FileInfo(assetPath);
             newAsset.Value = fileInfo.Name;
@@ -1145,7 +1149,7 @@ namespace BlackBerry.Package.ViewModels
                 _qnxSchema.AddLocalAsset(newAsset);
             else
             {
-                foreach (qnxConfiguration config in _qnxSchema.configuration)
+                foreach (var config in _qnxSchema.configuration)
                 {
                     if (config.name == _config.Name)
                     {
@@ -1166,14 +1170,14 @@ namespace BlackBerry.Package.ViewModels
         public void DeleteLocalAsset(object asset)
         {
             if (_config.Name == "All Configurations")
-                _qnxSchema.DeleteLocalAsset(asset as asset);
+                _qnxSchema.DeleteLocalAsset(asset as AssetType);
             else
             {
-                foreach (qnxConfiguration config in _qnxSchema.configuration)
+                foreach (var config in _qnxSchema.configuration)
                 {
                     if (config.name == _config.Name)
                     {
-                        config.DeleteAsset(asset as asset);
+                        config.DeleteAsset(asset as AssetType);
                     }
                 }
             }
@@ -1191,7 +1195,7 @@ namespace BlackBerry.Package.ViewModels
         {
             if (_config.Name == "All Configurations")
             {
-                foreach (asset assetItem in _qnxSchema.asset)
+                foreach (var assetItem in _qnxSchema.asset)
                 {
                     if (assetItem.Value == identifier)
                     {
@@ -1233,11 +1237,11 @@ namespace BlackBerry.Package.ViewModels
             }
             else
             {
-                foreach (qnxConfiguration config in _qnxSchema.configuration)
+                foreach (var config in _qnxSchema.configuration)
                 {
                     if (config.name == _config.Name)
                     {
-                        foreach (asset assetItem in config.asset)
+                        foreach (var assetItem in config.asset)
                         {
                             if (assetItem.Value == identifier)
                             {
@@ -1291,7 +1295,7 @@ namespace BlackBerry.Package.ViewModels
 
         public void AddIcon(FileInfo icon)
         {
-            _qnxSchema.icon.AddIconImage(icon.Name);
+            _qnxSchema.icon.AddImage(icon.Name);
             DesignerDirty = true;
             IList source = (IList)_iconImageList.SourceCollection;
               ImageItemClass image = new ImageItemClass(icon.Name, icon.ToString(), _activeProjectDirectory);
@@ -1308,7 +1312,7 @@ namespace BlackBerry.Package.ViewModels
         public void DeleteIcon(object iconName)
         {
             ImageItemClass item = (ImageItemClass)iconName;
-            _qnxSchema.icon.DeleteIconImage(item.ImageName);
+            _qnxSchema.icon.DeleteImage(item.ImageName);
             DesignerDirty = true;
             IList source = (IList)_iconImageList.SourceCollection;
             source.Remove(item);
@@ -1323,11 +1327,11 @@ namespace BlackBerry.Package.ViewModels
 
         public void AddSplashScreen(FileInfo splashScreen)
         {
-            qnxSplashScreens qnxSS;
+            ImageType qnxSS;
 
             if (_qnxSchema.splashScreens == null)
             {
-                qnxSS = new qnxSplashScreens();
+                qnxSS = new ImageType();
                 _qnxSchema.splashScreens = qnxSS;
             }
             else
@@ -1335,7 +1339,7 @@ namespace BlackBerry.Package.ViewModels
                 qnxSS = _qnxSchema.splashScreens;
             }
 
-            qnxSS.AddSplashScreenImage(splashScreen.Name);
+            qnxSS.AddImage(splashScreen.Name);
             DesignerDirty = true;
             IList source = (IList)_splashScreenImageList.SourceCollection;
             ImageItemClass image = new ImageItemClass(splashScreen.Name, splashScreen.ToString(), _activeProjectDirectory);
@@ -1352,7 +1356,7 @@ namespace BlackBerry.Package.ViewModels
         public void DeleteSplashScreen(object splashScreenName)
         {
             ImageItemClass item = (ImageItemClass)splashScreenName;
-            _qnxSchema.splashScreens.DeleteSplashScreenImage(item.ImageName);
+            _qnxSchema.splashScreens.DeleteImage(item.ImageName);
             DesignerDirty = true;
             IList source = (IList)_splashScreenImageList.SourceCollection;
             source.Remove(item);
@@ -1371,7 +1375,7 @@ namespace BlackBerry.Package.ViewModels
             if (!isPermissionChecked(identifier))
             {
                 /// add new perm to xml
-                qnxPermission perm = new qnxPermission();
+                var perm = new PermissionType();
                 perm.Value = identifier;
                 _qnxSchema.AddPermission(perm);
             }
@@ -1381,7 +1385,7 @@ namespace BlackBerry.Package.ViewModels
         public void UnCheckPermission(string identifier)
         {
             /// add new perm to xml
-            qnxPermission perm = new qnxPermission();
+            var perm = new PermissionType();
             perm.Value = identifier;
             _qnxSchema.DeletePermission(perm);
             DesignerDirty = true;
@@ -1391,7 +1395,7 @@ namespace BlackBerry.Package.ViewModels
         {
             if (_qnxSchema.permission != null)
             {
-                foreach (qnxPermission permEntry in _qnxSchema.permission)
+                foreach (var permEntry in _qnxSchema.permission)
                 {
                     if (permEntry.Value == identifier)
                     {

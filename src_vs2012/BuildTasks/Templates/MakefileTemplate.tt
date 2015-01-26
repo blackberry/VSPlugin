@@ -2,7 +2,7 @@
 <#@ import namespace="System.Text" #>
 <#@ import namespace="System.Collections.Generic" #>
 #
-# Makefile for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual studio (v<#= Version #>).
+# Makefile for [<#= SolutionName #>] created at [<#= DateTime.Now #>] by BlackBerry NDK plugin for Visual Studio (v<#= Version #>).
 # Any manual changes made by user will be overwritten! Use the project settings instead.
 #
 
@@ -40,14 +40,14 @@ LIBS :=
 
 <#  if (CompileItemsAsC.Length > 0)
     { #>
-C_SRCS += <# Write8dot3Collection(CompileItemsAsC, "    ", ""); #>
+C_SRCS += <# Write8Dot3Collection(CompileItemsAsC, "    ", ""); #>
 
 C_DEPS += <# WriteNameCollection(CompileItemsAsC, "    ./", ".d"); #>
 <#  } /* CompileItemsAsC.Length > 0 */ #>
 
 <#  if (CompileItemsAsCpp.Length > 0)
     { #>
-CPP_SRCS += <# Write8dot3Collection(CompileItemsAsCpp, "    ", ""); #>
+CPP_SRCS += <# Write8Dot3Collection(CompileItemsAsCpp, "    ", ""); #>
 
 CPP_DEPS += <# WriteNameCollection(CompileItemsAsCpp, "    ./", ".d"); #>
 <#  } /* CompileItemsAsCpp.Length > 0 */ #>
@@ -58,6 +58,12 @@ OBJS += <# WriteNameCollection(CompileItems, "    ./", ".o"); #>
 # Targets
 
 all: "<#= TargetFile #>"
+
+Device-Debug: "<#= TargetFile #>"
+
+Device-Release: "<#= TargetFile #>"
+
+Simulator-Debug: "<#= TargetFile #>"
 
 "<#= TargetFile #>": $(OBJS) $(USER_OBJS) $(LIB_DEPS)
 	<# switch (ConfigurationType)
@@ -73,32 +79,7 @@ all: "<#= TargetFile #>"
                 // For added security, remap some sections of ELF as read-only.
                 #>-Wl,-z,relro,-z,now <#
 
-                // Visual Studio doesn't have separate lists for static vs. dynamic dependencies.
-                // To differentiate between the two, include the extension in the list - `.a for static, `.so for dynamic.
-                // If no extension is included in the name it will be treated as the same type
-                // as the last declared type, and the default type is static. This is the way qcc would work
-                // if you were using it from the command line with the "-Bstatic" and "-Bdynamic" flags.
-
-                var libs = LinkItem.GetMetadata("AdditionalDependencies").Split(';');
-                for (int i = 0; i < libs.Length; i++)
-                {
-                    if (libs[i].EndsWith(".so"))
-                    {
-                        #>-Bdynamic -l<#= libs[i].Substring(0, libs[i].Length - 3) #> <#
-                    }
-                    else if (libs[i].EndsWith(".a"))
-                    {
-                        #>-Bstatic -l<#= libs[i].Substring(0, libs[i].Length - 2) #> <#
-                    }
-                    else
-                    {
-                        if (!string.IsNullOrEmpty(libs[i]))
-                        {
-                            #>-l<#= libs[i] #> <#
-                        }
-                    }
-                }
-
+                WriteDependencyLibrariesReferences();
                 WriteCollection(GetRootedDirs(ProjectDir, LinkItem.GetMetadata("AdditionalLibraryDirectories").Split(';')), "-L");
                 WriteCollection(AdditionalLibraryDirectories, "-L");
             }
@@ -122,12 +103,15 @@ all: "<#= TargetFile #>"
 #>
 
 
-clean:
+clean: FORCE
 	-$(RM) $(OBJS)$(C_DEPS)$(CC_DEPS)$(COM_QNX_QCC_OUTPUTTYPE_LINKER_OUTPUTS)$(CPP_DEPS)$(I_DEPS)$(CXX_DEPS)$(C_UPPER_DEPS)$(II_DEPS) "<#= OutDir #><#= TargetFile #>"<#
     if (ConfigurationType == "Application")
     {
 #> "<#= OutDir #><#= TargetBarFile #>"
 <#  } #>
+
+FORCE:
+	
 
 .PHONY: all clean dependents
 
@@ -149,12 +133,11 @@ clean:
     foreach(var compileItem in CompileItems)
     {
         var filename = compileItem.GetMetadata("Filename");
-        var shortPath = GetFullPath8dot3(compileItem);
-        var additionalIncludeDirs = GetRootedDirs(ProjectDir, compileItem.GetMetadata("AdditionalIncludeDirectories").Split(';'));
+        var shortPath = GetFullPath8Dot3(compileItem);
 
         // Now add a compile rule for this item.
         #><#= filename #>.o: <#= shortPath #>
-	qcc -o $@ <#= GetFullPath8dot3(compileItem) #> <#= CompilerFlags #> -c -Wp,-MMD,$(basename $@).d -Wp,-MT,$@ <#
+	qcc -o $@ <#= GetFullPath8Dot3(compileItem) #> <#= CompilerFlags #> -c -Wp,-MMD,$(basename $@).d -Wp,-MT,$@ <#
 
         if (compileItem.GetMetadata("CompileAs") == "CompileAsC")
         {

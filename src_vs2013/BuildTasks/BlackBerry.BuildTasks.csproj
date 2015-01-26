@@ -51,7 +51,7 @@
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
     <Reference Include="Microsoft.Build.CPPTasks.Common, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
-    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Framework, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
     <Reference Include="Microsoft.Build.Tasks.v12.0, Version=12.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Program Files (x86)\MSBuild\12.0\Bin\Microsoft.Build.Tasks.v12.0.dll</HintPath>
@@ -68,78 +68,77 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src_vs2010\BuildTasks\AsyncExec.cs">
-      <Link>AsyncExec.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Parser.cs">
-      <Link>BarDescriptor\Parser.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.cs">
-      <Link>BarDescriptor\Schema\bar-descriptor.cs</Link>
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\BBDeploy.cs">
-      <Link>BBDeploy.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\BBNativePackager.cs">
-      <Link>BBNativePackager.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\BBSigner.cs">
-      <Link>BBSigner.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\BBTask.cs">
-      <Link>BBTask.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\CheckIfInstalled.cs">
-      <Link>CheckIfInstalled.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\DiffManifests.cs">
-      <Link>DiffManifests.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\GenerateMakefile.cs">
-      <Link>GenerateMakefile.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\GetAppInfo.cs">
-      <Link>GetAppInfo.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\MakeAllAndFormatOutputMessages.cs">
-      <Link>MakeAllAndFormatOutputMessages.cs</Link>
-    </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\PackagerCmdBuilder.cs">
-      <Link>PackagerCmdBuilder.cs</Link>
-    </Compile>
     <Compile Include="..\..\src_vs2010\BuildTasks\Properties\AssemblyInfo.cs">
       <Link>Properties\AssemblyInfo.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\Properties\Resources.Designer.cs">
+    <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\TemplateHelper.cs">
+      <Link>Helpers\TemplateHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Properties\Resources.Designer.cs">
       <Link>Properties\Resources.Designer.cs</Link>
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\QccCompiler.cs">
-      <Link>QccCompiler.cs</Link>
+    <Compile Include="..\..\src_vs2012\BuildTasks\AsyncExec.cs">
+      <Link>AsyncExec.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\QccLib.cs">
-      <Link>QccLib.cs</Link>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BarDescriptor\Parser.cs">
+      <Link>BarDescriptor\Parser.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\QccLink.cs">
-      <Link>QccLink.cs</Link>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BBDeploy.cs">
+      <Link>BBDeploy.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\QccTask.cs">
-      <Link>QccTask.cs</Link>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BBNativePackager.cs">
+      <Link>BBNativePackager.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\RemoveFlagFile.cs">
-      <Link>RemoveFlagFile.cs</Link>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BBSigner.cs">
+      <Link>BBSigner.cs</Link>
     </Compile>
-    <Compile Include="..\..\src_vs2010\BuildTasks\SSHDelete.cs">
-      <Link>SSHDelete.cs</Link>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BBTask.cs">
+      <Link>BBTask.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\CheckIfInstalled.cs">
+      <Link>CheckIfInstalled.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\DiffManifests.cs">
+      <Link>DiffManifests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\GenerateMakefile.cs">
+      <Link>GenerateMakefile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\GetAppInfo.cs">
+      <Link>GetAppInfo.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\ProcessSetupHelper.cs">
       <Link>Helpers\ProcessSetupHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\MakeAllAndFormatOutputMessages.cs">
+      <Link>MakeAllAndFormatOutputMessages.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\PackagerCmdBuilder.cs">
+      <Link>PackagerCmdBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccCompiler.cs">
+      <Link>QccCompiler.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\QccExec.cs">
       <Link>QccExec.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccLib.cs">
+      <Link>QccLib.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccLink.cs">
+      <Link>QccLink.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccTask.cs">
+      <Link>QccTask.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\RemoveFlagFile.cs">
+      <Link>RemoveFlagFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\SSHDelete.cs">
+      <Link>SSHDelete.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.cs">
       <Link>Templates\ConfigPriTemplate.cs</Link>
@@ -168,12 +167,14 @@
     <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.Extensions.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.Extensions.cs</Link>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xsd">
-      <Link>BarDescriptor\Schema\bar-descriptor.xsd</Link>
-      <SubType>Designer</SubType>
-    </None>
     <Content Include="..\..\src_vs2012\BuildTasks\BlackBerry\Microsoft.Cpp.BlackBerry.Common.props">
       <Link>BlackBerry\Microsoft.Cpp.BlackBerry.Common.props</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -246,11 +247,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="..\..\src_vs2010\BuildTasks\BarDescriptor\Schema\bar-descriptor.xml">
-      <Link>BarDescriptor\Schema\bar-descriptor.xml</Link>
-    </Content>
-  </ItemGroup>
-  <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
       <Visible>False</Visible>
       <ProductName>Microsoft .NET Framework 4 %28x86 and x64%29</ProductName>
@@ -276,7 +272,7 @@
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\..\src_vs2010\BuildTasks\Properties\Resources.resx">
+    <EmbeddedResource Include="..\..\src_vs2012\BuildTasks\Properties\Resources.resx">
       <Link>Properties\Resources.resx</Link>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

@@ -63,6 +63,7 @@ namespace BlackBerry.NativeCore.QConn
 
         /// <summary>
         /// Gets or sets the sending data timeout.
+        /// Caution: any negative value will disable the timeout.
         /// </summary>
         public int SendTimeout
         {
@@ -71,13 +72,14 @@ namespace BlackBerry.NativeCore.QConn
             {
                 if (_socket != null)
                 {
-                    _socket.SendTimeout = value <= 0 ? Timeout : value;
+                    _socket.SendTimeout = value == 0 ? Timeout : (value < 0 ? System.Threading.Timeout.Infinite: value);
                 }
             }
         }
 
         /// <summary>
         /// Gets or sets the receiving data timeout.
+        /// Caution: any negative value will disable the timeout.
         /// </summary>
         public int ReceiveTimeout 
         {
@@ -86,7 +88,7 @@ namespace BlackBerry.NativeCore.QConn
             {
                 if (_socket != null)
                 {
-                    _socket.ReceiveTimeout = value <= 0 ? Timeout : value;
+                    _socket.ReceiveTimeout = value == 0 ? Timeout : (value < 0 ? System.Threading.Timeout.Infinite : value);
                 }
             }
         }
@@ -249,7 +251,7 @@ namespace BlackBerry.NativeCore.QConn
                     length = _socket.Receive(_buffer, 0, _buffer.Length, SocketFlags.None);
 
                     // reading failed?
-                    if (length < 0)
+                    if (length < 0 || _socket == null)
                     {
                         break;
                     }
@@ -257,7 +259,7 @@ namespace BlackBerry.NativeCore.QConn
                     totalLength += length;
 
                     // read enough or whole data?
-                    if (totalLength >= maxLength || _buffer.Length != length || _socket.Available == 0)
+                    if (totalLength >= maxLength || _buffer.Length != length || (_socket != null && _socket.Available == 0))
                     {
                         break;
                     }

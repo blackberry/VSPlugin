@@ -13,7 +13,6 @@
 //* limitations under the License.
 
 using System;
-using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Debugger.Model;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
@@ -105,8 +104,7 @@ namespace BlackBerry.DebugEngine
 
                 _engine = engine;
                 m_bpLocationType = (uint)enum_BP_LOCATION_TYPE.BPLT_CODE_FILE_LINE;
-                // Need to shorten the path we send to GDB.
-                m_filename = NativeMethods.GetShortPathName(documentName);
+                m_filename = documentName.Replace('\\', '/');
                 m_line = startPosition[0].dwLine + 1;
 
                 _pendingBreakpoint = pendingBreakpoint;
@@ -134,22 +132,21 @@ namespace BlackBerry.DebugEngine
 
             if (_gdbInfo != null)
             {
-                // Set the hit count and condition
-                if (requestInfo.bpPassCount.stylePassCount != enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE)
-                    SetPassCount(requestInfo.bpPassCount);
-                if (requestInfo.bpCondition.styleCondition != enum_BP_COND_STYLE.BP_COND_NONE)
-                    SetCondition(requestInfo.bpCondition);
+                if (!string.IsNullOrEmpty(_gdbInfo.FileName) && _gdbInfo.Address != 0)
+                {
+                    // Set the hit count and condition
+                    if (requestInfo.bpPassCount.stylePassCount != enum_BP_PASSCOUNT_STYLE.BP_PASSCOUNT_NONE)
+                        SetPassCount(requestInfo.bpPassCount);
+                    if (requestInfo.bpCondition.styleCondition != enum_BP_COND_STYLE.BP_COND_NONE)
+                        SetCondition(requestInfo.bpCondition);
 
-                // Get the Line Position sent back from GDB
-                TEXT_POSITION tpos = new TEXT_POSITION();
-                tpos.dwLine = _gdbInfo.Line - 1;
+                    // Get the Line Position sent back from GDB
+                    AD7MemoryAddress codeContext = new AD7MemoryAddress(_engine, _gdbInfo.Address);
+                    AD7DocumentContext documentContext = new AD7DocumentContext(_gdbInfo.FileName, _gdbInfo.Line > 0 ? _gdbInfo.Line - 1 : 0, codeContext);
 
-                AD7MemoryAddress codeContext = new AD7MemoryAddress(_engine, _gdbInfo.Address);
-                AD7DocumentContext documentContext = new AD7DocumentContext(_gdbInfo.FileName, tpos, tpos, codeContext);
-
-                _breakpointResolution = new AD7BreakpointResolution(_engine, _gdbInfo.Address, documentContext);
-
-                _engine.Callback.OnBreakpointBound(this, 0);
+                    _breakpointResolution = new AD7BreakpointResolution(_engine, _gdbInfo.Address, documentContext);
+                    _engine.Callback.OnBreakpointBound(this, 0);
+                }
             }
             else
             {
@@ -250,7 +247,6 @@ namespace BlackBerry.DebugEngine
             return result;
         }
 
-
         /// <summary>
         /// Sets the conditions under which a conditional breakpoint fires. (http://msdn.microsoft.com/en-us/library/bb146215.aspx)
         /// </summary>
@@ -347,7 +343,6 @@ namespace BlackBerry.DebugEngine
 
         #region IDebugBoundBreakpoint2 Members
 
-
         /// <summary>
         /// Called when the breakpoint is being deleted by the user. (http://msdn.microsoft.com/en-us/library/bb146595.aspx)
         /// </summary>
@@ -364,7 +359,6 @@ namespace BlackBerry.DebugEngine
             }
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Called by the debugger UI when the user is enabling or disabling a breakpoint. 
@@ -390,7 +384,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Return the breakpoint resolution which describes how the breakpoint bound in the debuggee. 
         /// (http://msdn.microsoft.com/en-us/library/bb145891.aspx)
@@ -403,7 +396,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Return the pending breakpoint for this bound breakpoint. (http://msdn.microsoft.com/en-us/library/bb145337.aspx)
         /// </summary>
@@ -414,7 +406,6 @@ namespace BlackBerry.DebugEngine
             ppPendingBreakpoint = _pendingBreakpoint;
             return VSConstants.S_OK;
         }
-
 
         /// <summary>
         /// Gets the state of this bound breakpoint. (http://msdn.microsoft.com/en-us/library/bb161276.aspx)
@@ -441,7 +432,6 @@ namespace BlackBerry.DebugEngine
             return VSConstants.S_OK;
         }
 
-
         /// <summary>
         /// Gets the current hit count for this bound breakpoint. (http://msdn.microsoft.com/en-us/library/bb145340.aspx)
         /// </summary>
@@ -461,7 +451,6 @@ namespace BlackBerry.DebugEngine
             }
         }
 
-
         /// <summary>
         /// Sets or changes the condition associated with this bound breakpoint. (http://msdn.microsoft.com/en-us/library/bb146215.aspx)
         /// </summary>
@@ -471,7 +460,6 @@ namespace BlackBerry.DebugEngine
         {
             return SetCondition(bpCondition);
         }
-
 
         /// <summary>
         /// Sets the hit count for the bound breakpoint. (http://msdn.microsoft.com/en-us/library/bb146736.aspx)
@@ -496,7 +484,6 @@ namespace BlackBerry.DebugEngine
                 return VSConstants.S_OK;
             }
         }
-
 
         /// <summary>
         /// Sets or changes the pass count associated with this bound breakpoint. (http://msdn.microsoft.com/en-us/library/bb161364.aspx)

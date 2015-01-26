@@ -63,11 +63,74 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\src_vs2012\BuildTasks\AsyncExec.cs">
+      <Link>AsyncExec.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BarDescriptor\Parser.cs">
+      <Link>BarDescriptor\Parser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BBDeploy.cs">
+      <Link>BBDeploy.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BBNativePackager.cs">
+      <Link>BBNativePackager.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BBSigner.cs">
+      <Link>BBSigner.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\BBTask.cs">
+      <Link>BBTask.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\CheckIfInstalled.cs">
+      <Link>CheckIfInstalled.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\DiffManifests.cs">
+      <Link>DiffManifests.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\GenerateMakefile.cs">
+      <Link>GenerateMakefile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\GetAppInfo.cs">
+      <Link>GetAppInfo.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\ProcessSetupHelper.cs">
       <Link>Helpers\ProcessSetupHelper.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Helpers\TemplateHelper.cs">
+      <Link>Helpers\TemplateHelper.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\MakeAllAndFormatOutputMessages.cs">
+      <Link>MakeAllAndFormatOutputMessages.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\PackagerCmdBuilder.cs">
+      <Link>PackagerCmdBuilder.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\Properties\Resources.Designer.cs">
+      <Link>Properties\Resources.Designer.cs</Link>
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccCompiler.cs">
+      <Link>QccCompiler.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\QccExec.cs">
       <Link>QccExec.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccLib.cs">
+      <Link>QccLib.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccLink.cs">
+      <Link>QccLink.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\QccTask.cs">
+      <Link>QccTask.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\RemoveFlagFile.cs">
+      <Link>RemoveFlagFile.cs</Link>
+    </Compile>
+    <Compile Include="..\..\src_vs2012\BuildTasks\SSHDelete.cs">
+      <Link>SSHDelete.cs</Link>
     </Compile>
     <Compile Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.cs">
       <Link>Templates\ConfigPriTemplate.cs</Link>
@@ -96,36 +159,13 @@
     <Compile Include="..\..\src_vs2012\NativeCore\NativeMethods.cs">
       <Link>NativeMethods.cs</Link>
     </Compile>
-    <Compile Include="BarDescriptor\Parser.cs" />
-    <Compile Include="BarDescriptor\Schema\bar-descriptor.cs">
-      <DependentUpon>bar-descriptor.xsd</DependentUpon>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.cs</Link>
     </Compile>
-    <Compile Include="AsyncExec.cs" />
-    <Compile Include="BBDeploy.cs" />
-    <Compile Include="BBNativePackager.cs" />
-    <Compile Include="BBSigner.cs" />
-    <Compile Include="BBTask.cs" />
-    <Compile Include="RemoveFlagFile.cs" />
-    <Compile Include="MakeAllAndFormatOutputMessages.cs" />
-    <Compile Include="CheckIfInstalled.cs" />
-    <Compile Include="DiffManifests.cs" />
-    <Compile Include="GenerateMakefile.cs" />
-    <Compile Include="GetAppInfo.cs" />
-    <Compile Include="PackagerCmdBuilder.cs" />
-    <Compile Include="SSHDelete.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
+    <Compile Include="..\..\src_vs2012\Package\Model\bar-descriptor.Extensions.cs">
+      <Link>BarDescriptor\Schema\bar-descriptor.Extensions.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\src_vs2012\BuildTasks\Templates\ConfigPriTemplate.tt">
@@ -137,9 +177,6 @@
       <Link>Templates\MakefileTemplate.tt</Link>
       <Generator>TextTemplatingFilePreprocessor</Generator>
       <LastGenOutput>MakefileTemplate.cs</LastGenOutput>
-    </None>
-    <None Include="BarDescriptor\Schema\bar-descriptor.xsd">
-      <SubType>Designer</SubType>
     </None>
     <Content Include="BlackBerry\Microsoft.Cpp.BlackBerry.Packager.targets">
       <SubType>Designer</SubType>
@@ -202,10 +239,6 @@
       <Link>BlackBerry\PlatformToolsets\qcc\1033\ProjectItemsSchema.xml</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="BarDescriptor\Schema\bar-descriptor.xml">
-      <SubType>Designer</SubType>
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.0">
@@ -231,6 +264,13 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\src_vs2012\BuildTasks\Properties\Resources.resx">
+      <Link>Properties\Resources.resx</Link>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <!--  <ItemGroup>
     <WCFMetadata Include="Service References\" />

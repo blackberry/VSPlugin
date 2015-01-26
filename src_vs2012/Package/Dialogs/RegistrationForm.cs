@@ -66,6 +66,9 @@ namespace BlackBerry.Package.Dialogs
 
         private void Log(string text)
         {
+            if (string.IsNullOrEmpty(text))
+                return;
+
             if (InvokeRequired)
             {
                 Invoke(new Action<string>(Log), text);

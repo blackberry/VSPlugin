@@ -78,9 +78,9 @@ namespace BlackBerry.Package.Diagnostics
 
             var timeString = _time != null ? _time.GetCurrent() : null;
             if (!string.IsNullOrEmpty(timeString))
-                ErrorHandler.ThrowOnFailure(_outputPane.OutputString(timeString));
+                ErrorHandler.ThrowOnFailure(_outputPane.OutputStringThreadSafe(timeString));
 
-            ErrorHandler.ThrowOnFailure(_outputPane.OutputString(message));
+            ErrorHandler.ThrowOnFailure(_outputPane.OutputStringThreadSafe(message));
         }
 
         public override void WriteLine(string message, string category)
@@ -93,10 +93,10 @@ namespace BlackBerry.Package.Diagnostics
             {
                 var timeString = _time != null ? _time.GetCurrentAndReset() : null;
                 if (!string.IsNullOrEmpty(timeString))
-                    ErrorHandler.ThrowOnFailure(_outputPane.OutputString(timeString));
+                    ErrorHandler.ThrowOnFailure(_outputPane.OutputStringThreadSafe(timeString));
 
-                ErrorHandler.ThrowOnFailure(_outputPane.OutputString(message));
-                ErrorHandler.ThrowOnFailure(_outputPane.OutputString(Environment.NewLine));
+                ErrorHandler.ThrowOnFailure(_outputPane.OutputStringThreadSafe(message));
+                ErrorHandler.ThrowOnFailure(_outputPane.OutputStringThreadSafe(Environment.NewLine));
             }
             catch
             {

@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Reflection;
 using System.Windows.Forms;
+using BlackBerry.NativeCore;
 using BlackBerry.Package.Helpers;
 
 namespace BlackBerry.Package.Dialogs
@@ -57,12 +58,17 @@ namespace BlackBerry.Package.Dialogs
 
         private void linkSourceCode_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            DialogHelper.StartURL("https://github.com/blackberry/VSPlugin");
+            DialogHelper.StartURL(ConfigDefaults.GithubProjectSourceCode);
         }
 
         private void linkBugTracker_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            DialogHelper.StartURL("https://github.com/blackberry/VSPlugin/issues");
+            DialogHelper.StartURL(ConfigDefaults.GithubProjectIssues);
+        }
+
+        private void linkAuthor_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            DialogHelper.StartURL(ConfigDefaults.GithubProjectAuthor);
         }
     }
 }

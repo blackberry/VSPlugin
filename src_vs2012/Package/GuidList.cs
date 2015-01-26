@@ -21,8 +21,8 @@ namespace BlackBerry.Package
         public const string guidVSNDK_PackageString = "db9f9c5f-fb27-4297-ab44-fa8774e962ca";
         public const string guidVSNDK_PackageCmdSetString = "d531fe01-f48e-443d-8ea1-1530a352525f";
         public const string guidToolWindowPersistanceString = "87346a4d-fbf2-46ff-8f59-31915e39cfb9";
-        public const string guidVSNDK_PackageEditorFactoryString = "9e985c5e-5b53-4cb1-bcd0-40a56f18eb4d";
-        public const string guidVsTemplateDesignerEditorFactoryString = "6bf3ea12-98bb-41e2-ba01-8662f713d293";
+        public const string guidVSNDK_PackageEditorFactoryString = "1daf1ab7-917a-4fdf-9b2f-0cd801301a70";
+        public const string guidVsTemplateDesignerEditorFactoryString = "5f591054-0a88-4a07-8979-44dfb1b28fd8";
 
         public const string guidVSStd97String = "{5efc7975-14bc-11cf-9b2b-00aa00573819}";
         public const string guidVSStd2KString = "{1496A755-94DE-11D0-8C3F-00C04FC2AAE2}";

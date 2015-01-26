@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Threading;
 using BlackBerry.NativeCore.Debugger;
+using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.Diagnostics;
 using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.QConn;
+using BlackBerry.NativeCore.QConn.Model;
+using BlackBerry.NativeCore.QConn.Services;
 
 namespace BlackBerry.NativeCore.Components
 {
@@ -16,12 +19,23 @@ namespace BlackBerry.NativeCore.Components
         #region Internal Classes
 
         /// <summary>
+        /// Method to verify, if specified log entry should be populated to the developer according to current settings.
+        /// </summary>
+        private delegate bool LogPredicate(TargetServiceConsoleLog service, TargetLogEntry log);
+
+        /// <summary>
+        /// Method to format the output of the log message populated to all registered outputs.
+        /// </summary>
+        private delegate string LogFormatter(TargetLogEntry log);
+
+        /// <summary>
         /// Class providing help information about connection parameters with the target device.
         /// </summary>
-        sealed class TargetInfo : IDisposable
+        private sealed class TargetInfo : IDisposable
         {
             private AutoResetEvent _hasStatusEvent;
             private readonly string _sshPublicKeyPath;
+            private volatile bool _startingSLog2;
 
             public event EventHandler<TargetConnectionEventArgs> StatusChanged;
 
@@ -67,6 +81,12 @@ namespace BlackBerry.NativeCore.Components
                 private set;
             }
 
+            public TargetProcessSLog2Info SLog2Info
+            {
+                get;
+                private set;
+            }
+
             public TargetStatus Status
             {
                 get;
@@ -92,6 +112,8 @@ namespace BlackBerry.NativeCore.Components
                         _hasStatusEvent.Dispose();
                         _hasStatusEvent = null;
                     }
+
+                    StopLogServices();
 
                     if (Client != null)
                     {
@@ -138,6 +160,7 @@ namespace BlackBerry.NativeCore.Components
                 try
                 {
                     Client.Load(Device.IP, QConnClient.DefaultPort, 1000);
+                    InitializeLogServices();
 
                     // all is fine, connection established, no need to have own QConnDoor
                     NotifyStatusChange(TargetStatus.Connected, null);
@@ -145,7 +168,7 @@ namespace BlackBerry.NativeCore.Components
                 }
                 catch
                 {
-                    // invalid device or QConnDoor not opened by others...
+                    // invalid device nor QConnDoor not yet opened by others...
                 }
 
                 Door.OpenAsync(Device.IP, Device.Password, _sshPublicKeyPath);
@@ -161,6 +184,7 @@ namespace BlackBerry.NativeCore.Components
                     try
                     {
                         Client.Load(Device.IP);
+                        InitializeLogServices();
                     }
                     catch (Exception ex)
                     {
@@ -179,6 +203,7 @@ namespace BlackBerry.NativeCore.Components
                         TraceLog.WriteException(ex, "Failed to start keeping the connection alive");
                         NotifyStatusChange(TargetStatus.Failed, "Lost connection to the device");
                     }
+
                 }
                 else
                 {
@@ -194,6 +219,119 @@ namespace BlackBerry.NativeCore.Components
 
                 // then notify Targets class, so it updates the internal state:
                 OnChildConnectionStatusChanged(this, Status);
+            }
+
+            public bool StopLogServices()
+            {
+                bool disposed = false;
+
+                var slog2 = SLog2Info;
+                SLog2Info = null;
+
+                if (slog2 != null)
+                {
+                    if (Client != null && Client.ControlService != null)
+                    {
+                        try
+                        {
+                            Client.ControlService.Terminate(slog2);
+                        }
+                        catch (Exception ex)
+                        {
+                            TraceLog.WriteException(ex, "Unable to terminate slog2info");
+                        }
+                    }
+
+                    slog2.Dispose();
+                    disposed = true;
+                }
+
+                if (Client != null)
+                {
+                    if (Client.ConsoleLogService != null)
+                    {
+                        Client.ConsoleLogService.Captured -= OnRemoteLogsCaptured;
+                        disposed = true;
+                    }
+                }
+
+                return disposed;
+            }
+
+            private void InitializeLogServices()
+            {
+                // setup console logging:
+                if (Client != null && Client.ConsoleLogService != null)
+                {
+                    Client.ConsoleLogService.Captured -= OnRemoteLogsCaptured;
+                    Client.ConsoleLogService.Captured += OnRemoteLogsCaptured;
+                }
+
+                // setup slog2info monitor to grab all the logs from the device:
+                if (_startingSLog2)
+                {
+                    return;
+                }
+
+                try
+                {
+                    _startingSLog2 = true;
+                    if (Client != null && Client.LauncherService != null && SLog2Info == null)
+                    {
+                        try
+                        {
+                            SLog2Info = Client.LauncherService.Start<TargetProcessSLog2Info>("/bin/slog2info", new[] { "-n", "-W", "-s" });
+                            TraceLog.WriteLine("Started slog2info with PID: {0}", SLog2Info.PID);
+                        }
+                        catch (Exception ex)
+                        {
+                            SLog2Info = null;
+
+                            // probably PlayBook...
+                            TraceLog.WriteException(ex, "Failed to start slog2info remotely");
+                        }
+
+                        if (SLog2Info != null)
+                        {
+                            SLog2Info.Captured += OnRemoteLogsCaptured;
+                            SLog2Info.Finished += OnSLog2InfoFinished;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to launch slog2info to monitor all activities on the device");
+                }
+                finally
+                {
+                    _startingSLog2 = false;
+                }
+            }
+
+            private void OnSLog2InfoFinished(object sender, EventArgs e)
+            {
+                TraceLog.WriteLine("Terminated slog2info");
+
+                var slog2 = SLog2Info;
+                SLog2Info = null;
+
+                if (slog2 != null)
+                {
+                    slog2.Captured -= OnRemoteLogsCaptured;
+                    slog2.Finished -= OnSLog2InfoFinished;
+                }
+            }
+
+            private void OnRemoteLogsCaptured(object sender, CapturedLogsEventArgs e)
+            {
+                foreach (var log in e.Entries)
+                {
+                    // print each console log and slog2 which matches current settings:
+                    if (log.Type == TargetLogEntry.LogType.Console || _optionSLog2Filter(Client.ConsoleLogService, log))
+                    {
+                        PrintLog(log);
+                    }
+                }
             }
 
             private void NotifyStatusChange(TargetStatus status, string message)
@@ -223,6 +361,14 @@ namespace BlackBerry.NativeCore.Components
             {
                 return new TargetConnectionEventArgs(Device, Client, Status, null);
             }
+
+            /// <summary>
+            /// Method to verify internal state, when another connection is supposed to be opened to this target.
+            /// </summary>
+            public void NewConnectionRequested()
+            {
+                InitializeLogServices();
+            }
         }
 
         #endregion
@@ -230,10 +376,25 @@ namespace BlackBerry.NativeCore.Components
         private static readonly List<TargetInfo> _activeTargets;
         private static readonly object _sync;
 
+        private static bool _optionInjectLogs;
+        private static bool _optionAcceptTracingDebuggedOnly;
+        private static uint _optionLogInterval;
+        private static LogPredicate _optionSLog2Filter;
+        private static LogFormatter _optionSLog2Formatter;
+        private static string[] _optionSLog2BufferSets;
+        private static string _optionCategoryInject;
+
         static Targets()
         {
             _activeTargets = new List<TargetInfo>();
             _sync = new object();
+
+            _optionInjectLogs = true;
+            _optionAcceptTracingDebuggedOnly = false;
+            _optionLogInterval = 0;
+            _optionSLog2Filter = SLog2FilterDefault;
+            _optionSLog2Formatter = SLog2FormatterDefault;
+            _optionCategoryInject = TraceLog.CategoryDevice;
         }
 
         private static TargetInfo NoSyncFind(string ip)
@@ -378,6 +539,8 @@ namespace BlackBerry.NativeCore.Components
                 }
                 else
                 {
+                    existingTarget.NewConnectionRequested();
+
                     if (resultHandler != null)
                     {
                         existingTarget.StatusChanged += resultHandler;
@@ -388,7 +551,7 @@ namespace BlackBerry.NativeCore.Components
             // check if already connected:
             if (existingTarget != null)
             {
-                // and notify the caller:
+                // and notify the caller (it was already mounted to monitor the future status changes):
                 if (resultHandler != null)
                 {
                     resultHandler.BeginInvoke(null, existingTarget.ToEventArgs(), StatusHandlerAsyncCleanup, resultHandler);
@@ -413,7 +576,7 @@ namespace BlackBerry.NativeCore.Components
         private static void OnChildConnectionStatusChanged(TargetInfo target, TargetStatus status)
         {
             if (target == null)
-                throw new ArgumentNullException("sender");
+                throw new ArgumentNullException("target");
 
             bool dispose = false;
 
@@ -586,5 +749,393 @@ namespace BlackBerry.NativeCore.Components
                 }
             }
         }
+
+        /// <summary>
+        /// Starts tracing console output for specified process on a target device.
+        /// It will fail, if not connected to that device before.
+        /// </summary>
+        public static bool Trace(string ip, ProcessInfo process, bool isDebugging)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            var qClient = Get(ip);
+            if (qClient == null || qClient.FileService == null || qClient.ConsoleLogService == null)
+            {
+                TraceLog.WarnLine("Unable to start tracing console outputs for: {0}:\"{1}\"", process.ID, process.ExecutablePath);
+                return false;
+            }
+
+            if (_optionAcceptTracingDebuggedOnly && !isDebugging)
+            {
+                TraceLog.WarnLine("Tracing console outputs for non-debugged applications is disabled, change it in Options or manually start capturing logs in Target Navigator ({0}:\"{1}\")",
+                    process.ID, process.ExecutablePath);
+                return false;
+            }
+
+            // start monitoring for console logs:
+            return qClient.ConsoleLogService.Start(process, _optionLogInterval, isDebugging);
+        }
+
+        /// <summary>
+        /// Starts tracing console output for specified process on a target device.
+        /// It will fail, if not connected to that device before.
+        /// </summary>
+        public static bool Trace(DeviceDefinition device, ProcessInfo process, bool isDebugging)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return Trace(device.IP, process, isDebugging);
+        }
+
+        /// <summary>
+        /// Stops all tracing.
+        /// </summary>
+        public static int TraceStop()
+        {
+            TargetInfo[] activeTargets;
+
+            lock (_sync)
+            {
+                activeTargets = _activeTargets.ToArray();
+            }
+
+            int result = 0;
+
+            if (activeTargets.Length > 0)
+            {
+                foreach (var target in activeTargets)
+                {
+                    if (target.StopLogServices())
+                    {
+                        result++;
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Stops tracing console output from all processes on a given target device.
+        /// </summary>
+        public static bool TraceStop(DeviceDefinition device)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+
+            return TraceStop(device.IP);
+        }
+
+        /// <summary>
+        /// Stops tracing console output from specified process on a given target device.
+        /// </summary>
+        public static bool TraceStop(DeviceDefinition device, ProcessInfo process)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return TraceStop(device.IP, process);
+        }
+
+        /// <summary>
+        /// Stops tracing console output from all processes on a given target device.
+        /// </summary>
+        public static bool TraceStop(string ip)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+
+            var qClient = Get(ip);
+            if (qClient != null && qClient.ConsoleLogService != null)
+            {
+                try
+                {
+                    qClient.ConsoleLogService.StopAll();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to stop console log monitors for: {0}", qClient.Name);
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Stops tracing console outputs from specified process on a given target device.
+        /// </summary>
+        public static bool TraceStop(string ip, ProcessInfo process)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            var qClient = Get(ip);
+            if (qClient != null && qClient.ConsoleLogService != null)
+            {
+                try
+                {
+                    return qClient.ConsoleLogService.Stop(process);
+                }
+                catch (Exception ex)
+                {
+                    TraceLog.WriteException(ex, "Unable to stop console log monitors for: {0}", qClient.Name);
+                    return false;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks, whether specified process' console output is traced.
+        /// </summary>
+        public static bool TraceIs(DeviceDefinition device, ProcessInfo process)
+        {
+            if (device == null)
+                throw new ArgumentNullException("device");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return TraceIs(device.IP, process);
+        }
+
+        /// <summary>
+        /// Checks, whether specified process' console output is traced.
+        /// </summary>
+        public static bool TraceIs(string ip, ProcessInfo process)
+        {
+            if (string.IsNullOrEmpty(ip))
+                throw new ArgumentNullException("ip");
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            var qClient = Get(ip);
+            if (qClient != null && qClient.ConsoleLogService != null)
+            {
+                return qClient.ConsoleLogService.IsMonitoring(process);
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Sets the logging options.
+        /// </summary>
+        public static void TraceOptions(bool debuggedOnly, uint logsInterval, int slog2Level, int slog2FormatterLevel, string[] slog2BufferSets, bool injectLogs, string injectCategory)
+        {
+            _optionInjectLogs = injectLogs;
+            _optionAcceptTracingDebuggedOnly = debuggedOnly;
+            _optionLogInterval = logsInterval;
+            _optionSLog2BufferSets = slog2BufferSets;
+
+            if (!string.IsNullOrEmpty(injectCategory))
+            {
+                _optionCategoryInject = injectCategory;
+            }
+
+            switch (slog2Level)
+            {
+                case 0: // nothing should be monitored
+                    _optionSLog2Filter = SLog2FilterNone;
+                    break;
+                case 1: // only developed applications
+                    if (slog2BufferSets == null || slog2BufferSets.Length == 0)
+                    {
+                        _optionSLog2Filter = SLog2FilterApps;
+                    }
+                    else
+                    {
+                        _optionSLog2Filter = SLog2FilterAppsWithBufferSet;
+                    }
+                    break;
+                case 2: // whole system
+                    _optionSLog2Filter = SLog2FilterSystem;
+                    break;
+                default: // restore default, if out-of-range
+                    _optionSLog2Filter = SLog2FilterDefault;
+                    break;
+            }
+
+            switch (slog2FormatterLevel)
+            {
+                case 0: // default:
+                    _optionSLog2Formatter = SLog2FormatterDefault;
+                    break;
+                case 1: // prefixed with title:
+                    _optionSLog2Formatter = SLog2FormatterTildeMessage;
+                    break;
+                case 2: // prefixed with hash:
+                    _optionSLog2Formatter = SLog2FormatterHashMessage;
+                    break;
+                case 3: // prefixed with PID:
+                    _optionSLog2Formatter = SLog2FormatterPidMessage;
+                    break;
+                case 4: // prefixed with appID:
+                    _optionSLog2Formatter = SLog2FormatterAppIdMessage;
+                    break;
+                case 5: // prefixed with buffer-set:
+                    _optionSLog2Formatter = SLog2FormatterBufferSetMessage;
+                    break;
+                case 6: // prefixed with appID and buffer-set:
+                    _optionSLog2Formatter = SLog2FormatterAppIdBufferSetMessage;
+                    break;
+                case 7: // prefixed with PID and buffer-set:
+                    _optionSLog2Formatter = SLog2FormatterPidBufferSetMessage;
+                    break;
+                case 8: // prefixed with PID and appID:
+                    _optionSLog2Formatter = SLog2FormatterPidAppIdMessage;
+                    break;
+                default: // restore default, if out-of-range
+                    _optionSLog2Formatter = SLog2FormatterDefault;
+                    break;
+            }
+
+            // and update the console log interval for already running loggers:
+            lock (_sync)
+            {
+                foreach (var target in _activeTargets)
+                {
+                    if (target.Client != null && target.Client.ConsoleLogService != null)
+                    {
+                        target.Client.ConsoleLogService.Interval = logsInterval;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Writes the log with current formatting settings into the output.
+        /// </summary>
+        private static void PrintLog(TargetLogEntry log)
+        {
+            if (log.Type == TargetLogEntry.LogType.SLog2)
+            {
+                PrintLogMessage(_optionSLog2Formatter(log));
+            }
+            else
+            {
+                PrintLogMessage(log.Message);
+            }
+        }
+
+        private static void PrintLogMessage(string message)
+        {
+            TraceLog.WriteLine(message);
+
+            // print logs on default 'Debug' output window, if allowed:
+            if (_optionInjectLogs)
+            {
+                System.Diagnostics.Trace.WriteLine(message, _optionCategoryInject);
+            }
+        }
+
+        #region slog2 Formatter
+
+        private static string SLog2FormatterDefault(TargetLogEntry log)
+        {
+            return log.Message;
+        }
+
+        private static string SLog2FormatterTildeMessage(TargetLogEntry log)
+        {
+            return string.Concat("~ ", log.Message);
+        }
+
+        private static string SLog2FormatterHashMessage(TargetLogEntry log)
+        {
+            return string.Concat("# ", log.Message);
+        }
+
+        private static string SLog2FormatterPidMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.PID, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterAppIdMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.AppID, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterBufferSetMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.BufferSet, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterAppIdBufferSetMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.AppID, "::", log.BufferSet, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterPidBufferSetMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.PID, "::", log.BufferSet, ": ", log.Message);
+        }
+
+        private static string SLog2FormatterPidAppIdMessage(TargetLogEntry log)
+        {
+            return string.Concat(log.PID, "::", log.AppID, ": ", log.Message);
+        }
+
+        #endregion
+
+        #region slog2 Filters
+
+        private static bool IsMonitoring(TargetServiceConsoleLog service, uint pid)
+        {
+            return !service.IsMonitoringAnything || service.IsMonitoring(pid);
+        }
+
+        private static bool SLog2FilterDefault(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return log.PID == 0 || string.IsNullOrEmpty(log.BufferSet) || (IsMonitoring(service, log.PID) && log.BufferSet == "default");
+        }
+
+        private static bool SLog2FilterNone(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return false;
+        }
+
+        private static bool SLog2FilterSystem(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return true;
+        }
+
+        private static bool SLog2FilterApps(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return log.PID == 0 || IsMonitoring(service, log.PID);
+        }
+
+        private static bool SLog2FilterAppsWithBufferSet(TargetServiceConsoleLog service, TargetLogEntry log)
+        {
+            return log.PID == 0 || (IsMonitoring(service, log.PID) && InBufferSet(log.BufferSet));
+        }
+
+        private static bool InBufferSet(string name)
+        {
+            if (_optionSLog2BufferSets == null || string.IsNullOrEmpty(name))
+                return true;
+
+            foreach (var bufferName in _optionSLog2BufferSets)
+            {
+                if (string.Compare(bufferName, name, StringComparison.Ordinal) == 0)
+                    return true;
+            }
+
+            return false;
+        }
+
+        #endregion
     }
 }

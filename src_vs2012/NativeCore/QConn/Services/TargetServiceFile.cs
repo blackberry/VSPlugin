@@ -34,7 +34,14 @@ namespace BlackBerry.NativeCore.QConn.Services
                 // disconnect with target service:
                 if (Connection.IsConnected)
                 {
-                    Post("q");
+                    try
+                    {
+                        Post("q");
+                    }
+                    catch (Exception ex)
+                    {
+                        TraceLog.WriteException(ex, "Unable to close {0}", this);
+                    }
                 }
             }
 
@@ -138,13 +145,17 @@ namespace BlackBerry.NativeCore.QConn.Services
             if (descriptor == null)
                 throw new ArgumentNullException("descriptor");
 
-            if (!descriptor.IsClosed && !IsDisposed)
+            if (!descriptor.IsClosed && !IsDisposed && Connection != null && Connection.IsConnected)
             {
                 var response = Send("c:" + descriptor.Handle);
                 descriptor.Closed();
 
                 if (response[0].StringValue == "e")
                     throw new QConnException("Closing-handle failed: " + response[1].StringValue);
+            }
+            else
+            {
+                descriptor.Closed();
             }
         }
 

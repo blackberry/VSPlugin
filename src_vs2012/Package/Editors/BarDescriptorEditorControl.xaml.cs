@@ -18,10 +18,10 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Forms;
 using System.Windows.Input;
+using BlackBerry.BarDescriptor.Model;
 using BlackBerry.NativeCore;
 using BlackBerry.NativeCore.Tools;
 using BlackBerry.Package.Helpers;
-using BlackBerry.Package.Model;
 using BlackBerry.Package.ViewModels;
 using EnvDTE;
 using Microsoft.VisualStudio.Shell;
@@ -316,7 +316,7 @@ namespace BlackBerry.Package.Editors
             if (viewModel != null)
             {
                 bool isPublic = (sender as CheckBox).IsChecked == true;
-                viewModel.EditLocalAsset((grdAssets.SelectedItem as asset).Value, isPublic, "");
+                viewModel.EditLocalAsset((grdAssets.SelectedItem as AssetType).Value, isPublic, "");
             }
         }
 
@@ -332,7 +332,7 @@ namespace BlackBerry.Package.Editors
                     if (viewModel != null)
                     {
                         assetType = (sender as ComboBox).SelectedValue.ToString();
-                        viewModel.EditLocalAsset((grdAssets.SelectedItem as asset).Value, null, assetType);
+                        viewModel.EditLocalAsset((grdAssets.SelectedItem as AssetType).Value, null, assetType);
                     }
                 }
             }

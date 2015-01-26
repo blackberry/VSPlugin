@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using BlackBerry.NativeCore.Debugger.Model;
 using BlackBerry.NativeCore.QConn.Model;
 
@@ -75,6 +76,19 @@ namespace BlackBerry.NativeCore.QConn.Services
             public long vstacksize;
             public char name[128];
         }
+
+        public static class SystemInfoEnv
+        {
+            public int env_str_length;
+            public String env_str;
+        }
+
+        public static class SystemInfoArgs
+        {
+            public int args_str_length;
+            public String args_str;
+        }
+
          */
 
         #endregion
@@ -120,10 +134,92 @@ namespace BlackBerry.NativeCore.QConn.Services
                     reader.Skip(127 - name.Length);
                 }
 
-                result.Add(new SystemInfoProcess(id, parentID, name));
+                if (id != 0 && parentID != 0 && !string.IsNullOrEmpty(name))
+                {
+                    // some fixes around name:
+                    if (name[0] != Path.DirectorySeparatorChar && name[0] != Path.AltDirectorySeparatorChar)
+                    {
+                        name = "/" + name;
+                    }
+
+                    result.Add(new SystemInfoProcess(id, parentID, name));
+                }
+                else
+                {
+#if DEBUG
+                    if (System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
+#endif
+                }
             }
 
             return result.ToArray();
+        }
+
+        /// <summary>
+        /// Loads environment variables for specified process.
+        /// </summary>
+        public string[] LoadEnvironmentVariables(ProcessInfo process)
+        {
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return LoadEnvironmentVariables(process.ID);
+        }
+
+        /// <summary>
+        /// Loads environment variables for specified process.
+        /// </summary>
+        public string[] LoadEnvironmentVariables(uint processID)
+        {
+            var reader = Connection.Request("get env " + processID);
+
+            if (reader != null)
+            {
+                // read header:
+                var header = new Header();
+                header.Read(reader);
+
+                // read environment string:
+                uint length = reader.ReadUInt32();
+                var variables = reader.ReadString(length, '\0');
+
+                return string.IsNullOrEmpty(variables) ? null : variables.Split(new[] { "@@@" }, StringSplitOptions.RemoveEmptyEntries);
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Loads startup arguments for specified process.
+        /// </summary>
+        public string LoadArguments(ProcessInfo process)
+        {
+            if (process == null)
+                throw new ArgumentNullException("process");
+
+            return LoadArguments(process.ID);
+        }
+
+        /// <summary>
+        /// Loads startup arguments for specified process.
+        /// </summary>
+        public string LoadArguments(uint processID)
+        {
+            var reader = Connection.Request("get args " + processID);
+
+            if (reader != null)
+            {
+                // read header:
+                var header = new Header();
+                header.Read(reader);
+
+                // read arguments string:
+                uint length = reader.ReadUInt32();
+                return reader.ReadString(length, '\0');
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -136,6 +232,25 @@ namespace BlackBerry.NativeCore.QConn.Services
                 throw new ArgumentNullException("executable");
 
             return (SystemInfoProcess) ProcessInfo.Find(LoadProcesses(), executable);
+        }
+
+        /// <summary>
+        /// Searches for a running process with specified ID.
+        /// It will return null, if not found.
+        /// </summary>
+        public SystemInfoProcess FindProcess(uint pid)
+        {
+            if (pid == 0)
+                throw new ArgumentOutOfRangeException("pid");
+
+            var processes = LoadProcesses();
+            foreach (var proc in processes)
+            {
+                if (proc.ID == pid)
+                    return proc;
+            }
+
+            return null;
         }
     }
 }

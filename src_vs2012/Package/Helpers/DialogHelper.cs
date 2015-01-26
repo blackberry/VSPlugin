@@ -31,7 +31,7 @@ namespace BlackBerry.Package.Helpers
             openFile.Title = title;
             openFile.InitialDirectory = startupPath;
             openFile.DefaultExt = ".cproject";
-            openFile.Filter = "Native Core Project|*.cproject;*.project|All files|*.*";
+            openFile.Filter = "Project|*.cproject;*.project;*.properties|All files|*.*";
 
             openFile.FilterIndex = 0;
             openFile.CheckFileExists = true;

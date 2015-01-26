@@ -1,0 +1,327 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="5000" xml:space="preserve">
+    <value>Native Core - Empty Project</value>
+  </data>
+  <data name="5001" xml:space="preserve">
+    <value>Creates new C/C++ project with a BAR descriptor file only. No source code is provided.</value>
+  </data>
+  <data name="5002" xml:space="preserve">
+    <value>NativeApp</value>
+  </data>
+  <data name="5010" xml:space="preserve">
+    <value>Native Core - Screen Application</value>
+  </data>
+  <data name="5011" xml:space="preserve">
+    <value>Creates C/C++ application using the minimum Core Native APIs to display a window on a screen.</value>
+  </data>
+  <data name="5012" xml:space="preserve">
+    <value>ScreenApp</value>
+  </data>
+  <data name="5020" xml:space="preserve">
+    <value>Cascades - Empty Application</value>
+  </data>
+  <data name="5021" xml:space="preserve">
+    <value>Creates a basic 'Hello World' Cascades application that only loads a QML file.</value>
+  </data>
+  <data name="5022" xml:space="preserve">
+    <value>CascadesProject</value>
+  </data>
+  <data name="5030" xml:space="preserve">
+    <value>Native Core - OpenGL v1.1</value>
+  </data>
+  <data name="5031" xml:space="preserve">
+    <value>Creates a C/C++ application using OpenGL ES v1.1 and Core Native APIs. Includes code to add a window to the screen and render a trivial scene.</value>
+  </data>
+  <data name="5032" xml:space="preserve">
+    <value>OpenGL11App</value>
+  </data>
+  <data name="5040" xml:space="preserve">
+    <value>Native Core - OpenGL v2.0</value>
+  </data>
+  <data name="5041" xml:space="preserve">
+    <value>Creates a C/C++ application using OpenGL ES 2.0 and Core Native APIs. Includes code to add a window to the screen and render a trivial scene.</value>
+  </data>
+  <data name="5042" xml:space="preserve">
+    <value>OpenGL2App</value>
+  </data>
+  <data name="5050" xml:space="preserve">
+    <value>Native Core - Static Library</value>
+  </data>
+  <data name="5051" xml:space="preserve">
+    <value>Creates a C/C++ static library</value>
+  </data>
+  <data name="5052" xml:space="preserve">
+    <value>StaticLib</value>
+  </data>
+  <data name="5060" xml:space="preserve">
+    <value>NativeCore - Shared Library</value>
+  </data>
+  <data name="5061" xml:space="preserve">
+    <value>Creates a C/C++ shared library</value>
+  </data>
+  <data name="5062" xml:space="preserve">
+    <value>SharedLib</value>
+  </data>
+  <data name="5070" xml:space="preserve">
+    <value>Cascades - List View Application</value>
+  </data>
+  <data name="5071" xml:space="preserve">
+    <value>Creates an application that uses a list-view</value>
+  </data>
+  <data name="5072" xml:space="preserve">
+    <value>CascadesListViewApp</value>
+  </data>
+  <data name="5080" xml:space="preserve">
+    <value>Cascades - Tabbed Pane Application</value>
+  </data>
+  <data name="5081" xml:space="preserve">
+    <value>Creates an application that allows users to switch between tabs</value>
+  </data>
+  <data name="5082" xml:space="preserve">
+    <value>CascadesTabsApp</value>
+  </data>
+  <data name="5090" xml:space="preserve">
+    <value>Cascades - Navigation Pane Application</value>
+  </data>
+  <data name="5091" xml:space="preserve">
+    <value>Creates an application that uses a navigation pane to display a details screen</value>
+  </data>
+  <data name="5092" xml:space="preserve">
+    <value>CascadesNavigationApp</value>
+  </data>
+  <data name="5100" xml:space="preserve">
+    <value>Cascades - Headless App</value>
+  </data>
+  <data name="5101" xml:space="preserve">
+    <value>Creates a headless application consisting of a project for the UI component and a project for the background service</value>
+  </data>
+  <data name="5102" xml:space="preserve">
+    <value>HeadlessApp</value>
+  </data>
+  <data name="5110" xml:space="preserve">
+    <value>Cascades - Card Application</value>
+  </data>
+  <data name="5111" xml:space="preserve">
+    <value>Creates a card application with a user UI component able to send a message to a UI card</value>
+  </data>
+  <data name="5112" xml:space="preserve">
+    <value>CascadesCardApp</value>
+  </data>
+  <data name="5120" xml:space="preserve">
+    <value>PlayBook - Qt4 Application (experimental)</value>
+  </data>
+  <data name="5121" xml:space="preserve">
+    <value>Creates a Qt4 application with initial user UI. It requires PlayBook NDK 2.1+ installed for Qt headers and additional set of libraries downloaded and extracted manually into project's "QtLibs" folder. The ones distributed with the NDK somehow doesn't load properly on the device.</value>
+  </data>
+  <data name="5122" xml:space="preserve">
+    <value>QtAppForPlayBook</value>
+  </data>
+  <data name="6000" xml:space="preserve">
+    <value>BAR Descriptor</value>
+  </data>
+  <data name="6001" xml:space="preserve">
+    <value>Adds a BAR descriptor file into the project</value>
+  </data>
+  <data name="6002" xml:space="preserve">
+    <value>bar-descriptor.xml</value>
+  </data>
+  <data name="6010" xml:space="preserve">
+    <value>QObject Class</value>
+  </data>
+  <data name="6011" xml:space="preserve">
+    <value>Adds new class inheriting from QObject</value>
+  </data>
+  <data name="6012" xml:space="preserve">
+    <value>Class.cpp</value>
+  </data>
+  <data name="6020" xml:space="preserve">
+    <value>QML Control</value>
+  </data>
+  <data name="6021" xml:space="preserve">
+    <value>Adds new QML file defining a custom control</value>
+  </data>
+  <data name="6022" xml:space="preserve">
+    <value>Control.qml</value>
+  </data>
+  <data name="6030" xml:space="preserve">
+    <value>QML Dialog</value>
+  </data>
+  <data name="6031" xml:space="preserve">
+    <value>Adds new QML file defining an empty dialog</value>
+  </data>
+  <data name="6032" xml:space="preserve">
+    <value>Dialog.qml</value>
+  </data>
+  <data name="6040" xml:space="preserve">
+    <value>QML Page</value>
+  </data>
+  <data name="6041" xml:space="preserve">
+    <value>Adds new QML file defining an empty page</value>
+  </data>
+  <data name="6042" xml:space="preserve">
+    <value>Page.qml</value>
+  </data>
+  <data name="6050" xml:space="preserve">
+    <value>QML Navigation Pane</value>
+  </data>
+  <data name="6051" xml:space="preserve">
+    <value>Adds new QML file defining a custom navigation pane usage</value>
+  </data>
+  <data name="6052" xml:space="preserve">
+    <value>NavigationPane.qml</value>
+  </data>
+  <data name="6060" xml:space="preserve">
+    <value>QML Sheet</value>
+  </data>
+  <data name="6061" xml:space="preserve">
+    <value>Adds new QML file defining an empty sheet</value>
+  </data>
+  <data name="6062" xml:space="preserve">
+    <value>Sheet.qml</value>
+  </data>
+  <data name="6070" xml:space="preserve">
+    <value>EGL Utility</value>
+  </data>
+  <data name="6071" xml:space="preserve">
+    <value>Adds a basic code to manage EGL surface - initialize, swap buffers, render text and draw textures</value>
+  </data>
+  <data name="6072" xml:space="preserve">
+    <value>bbutil.c</value>
+  </data>
+  <data name="6080" xml:space="preserve">
+    <value>QML Tabbed Pane</value>
+  </data>
+  <data name="6081" xml:space="preserve">
+    <value>Adds new QML file defining a custom tabbed pane usage</value>
+  </data>
+  <data name="6082" xml:space="preserve">
+    <value>Tab.qml</value>
+  </data>
+  <data name="6090" xml:space="preserve">
+    <value>makefile</value>
+  </data>
+  <data name="6091" xml:space="preserve">
+    <value>Adds new empty makefile for custom build actions</value>
+  </data>
+  <data name="6092" xml:space="preserve">
+    <value>makefile</value>
+  </data>
+</root>

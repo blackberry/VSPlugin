@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 using BlackBerry.NativeCore.Helpers;
@@ -119,26 +121,66 @@ namespace BlackBerry.NativeCore.QConn.Model
 
         public void Skip(int bytes)
         {
+            if (bytes == 0)
+                return;
+
             _at += bytes;
+            if (_at > _data.Length)
+            {
+                int skip = _at - _data.Length;
+
+                VerifyData();
+                Skip(skip);
+            }
         }
 
         public string ReadString(uint maxLength, char terminatorChar)
         {
+            if (maxLength == 0)
+                return string.Empty;
+
             VerifyData();
 
+            List<byte[]> buffers = null;
             var at = _at;
             int i = _at;
-            for (; i < _data.Length && maxLength > 0; i++, maxLength--)
+
+            for (; maxLength > 0; i++, maxLength--)
             {
+                if (i == _data.Length)
+                {
+                    if (buffers == null)
+                        buffers = new List<byte[]>();
+
+                    var chunk = new byte[i - at];
+                    Array.Copy(_data, at, chunk, 0, i - at);
+                    buffers.Add(chunk);
+
+                    LoadNextDataBuffer();
+                    i = 0;
+                    at = 0;
+                }
+
                 if (_data[i] == terminatorChar)
                 {
                     _at = i + 1; // also skip the terminator
-                    return Encoding.UTF8.GetString(_data, at, i - at);
+                    return GetString(buffers, _data, at, i - at);
                 }
             }
 
             _at = i;
-            return Encoding.UTF8.GetString(_data, at, _data.Length - at);
+            return GetString(buffers, _data, at, _data.Length - at);
+        }
+
+        private static string GetString(List<byte[]> buffers, byte[] lastChunk, int lastAt, int lastLength)
+        {
+            if (buffers == null)
+            {
+                return Encoding.UTF8.GetString(lastChunk, lastAt, lastLength);
+            }
+
+            Debug.Assert(lastAt == 0); // enforcing lastAt == 0!
+            return Encoding.UTF8.GetString(BitHelper.Combine(buffers, lastChunk, lastLength));
         }
     }
 }

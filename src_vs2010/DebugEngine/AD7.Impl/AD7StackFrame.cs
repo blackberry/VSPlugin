@@ -634,21 +634,7 @@ namespace BlackBerry.DebugEngine
 
             try
             {
-                // Assume all lines begin and end at the beginning of the line.
-                TEXT_POSITION begTp = new TEXT_POSITION();
-                begTp.dwColumn = 0;
-                if (_lineNum != 0)
-                    begTp.dwLine = _lineNum - 1;
-                else
-                    begTp.dwLine = 0;
-                TEXT_POSITION endTp = new TEXT_POSITION();
-                endTp.dwColumn = 0;
-                if (_lineNum != 0)
-                    endTp.dwLine = _lineNum - 1;
-                else
-                    endTp.dwLine = 0;
-
-                pDocContext = new AD7DocumentContext(_documentName, begTp, endTp, null);
+                pDocContext = new AD7DocumentContext(_documentName, _lineNum > 0 ? _lineNum - 1 : 0, null);
                 return VSConstants.S_OK;
             }
             catch (Exception ex)

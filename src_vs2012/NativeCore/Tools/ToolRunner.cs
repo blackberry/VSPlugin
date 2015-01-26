@@ -260,6 +260,7 @@ namespace BlackBerry.NativeCore.Tools
                 TraceLog.WriteException(ex, "Unable to start {0}", GetType().Name);
 
                 _process.Close();
+                _isProcessing = false;
 
                 ProcessErrorLine(ex.Message);
                 NotifyFinished(-1, null, null);
