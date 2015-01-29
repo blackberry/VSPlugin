@@ -5,6 +5,7 @@ using BlackBerry.NativeCore.Model;
 using BlackBerry.Package.Dialogs;
 using BlackBerry.Package.ViewModels;
 using BlackBerry.NativeCore.Tools;
+using BlackBerry.Package.Helpers;
 
 namespace BlackBerry.Package.Options
 {
@@ -85,6 +86,11 @@ namespace BlackBerry.Package.Options
         {
             var form = new UpdateManagerStatusForm(_vm);
             form.ShowDialog();
+        }
+
+        private void lblMore_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/cascades/dev/tools/api_levels.html");
         }
     }
 }

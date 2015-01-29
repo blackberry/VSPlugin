@@ -172,21 +172,21 @@
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpDocNative" priority="0x0100" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" />
                 <Strings>
-                    <ButtonText>&amp;Native Core Documentation</ButtonText>
+                    <ButtonText>&amp;Native SDK for BlackBerry 10</ButtonText>
                 </Strings>
             </Button>
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpDocCascades" priority="0x0200" type="Button">
+            <!--<Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpDocCascades" priority="0x0200" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" />
                 <Strings>
                     <ButtonText>&amp;Cascades Documentation</ButtonText>
                 </Strings>
-            </Button>
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpDocPlayBook" priority="0x0300" type="Button">
+            </Button>-->
+            <!--<Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpDocPlayBook" priority="0x0300" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Documentation" />
                 <Strings>
                     <ButtonText>&amp;PlayBook Documentation</ButtonText>
                 </Strings>
-            </Button>
+            </Button>-->
 
             <!-- Help Buttons: Samples -->
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesNative" priority="0x0100" type="Button">
@@ -195,22 +195,22 @@
                     <ButtonText>N&amp;ative Core Samples</ButtonText>
                 </Strings>
             </Button>
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesCascades" priority="0x0200" type="Button">
+            <!--<Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesCascades" priority="0x0200" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" />
                 <Strings>
                     <ButtonText>Ca&amp;scades Samples</ButtonText>
                 </Strings>
-            </Button>
-            <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesPlayBook" priority="0x0300" type="Button">
+            </Button>-->
+            <!--<Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesPlayBook" priority="0x0300" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" />
                 <Strings>
                     <ButtonText>Play&amp;Book Samples</ButtonText>
                 </Strings>
-            </Button>
+            </Button>-->
             <Button guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpSamplesOpenSource" priority="0x0400" type="Button">
                 <Parent guid="guidVSNDK_PackageCmdSet" id="cmdidBlackBerryHelpGroup_Samples" />
                 <Strings>
-                    <ButtonText>&amp;Open Source Projects</ButtonText>
+                    <ButtonText>&amp;Open source project</ButtonText>
                 </Strings>
             </Button>
 
@@ -303,11 +303,11 @@
             <IDSymbol name="cmdidBlackBerryHelpWelcomePage" value="0x1001" />
             <IDSymbol name="cmdidBlackBerryHelpSupportForum" value="0x1002" />
             <IDSymbol name="cmdidBlackBerryHelpDocNative" value="0x1101" />
-            <IDSymbol name="cmdidBlackBerryHelpDocCascades" value="0x1102" />
-            <IDSymbol name="cmdidBlackBerryHelpDocPlayBook" value="0x1103" />
+            <!--<IDSymbol name="cmdidBlackBerryHelpDocCascades" value="0x1102" />-->
+            <!--<IDSymbol name="cmdidBlackBerryHelpDocPlayBook" value="0x1103" />-->
             <IDSymbol name="cmdidBlackBerryHelpSamplesNative" value="0x1201" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesCascades" value="0x1202" />
-            <IDSymbol name="cmdidBlackBerryHelpSamplesPlayBook" value="0x1203" />
+            <!--<IDSymbol name="cmdidBlackBerryHelpSamplesCascades" value="0x1202" />-->
+            <!--<IDSymbol name="cmdidBlackBerryHelpSamplesPlayBook" value="0x1203" />-->
             <IDSymbol name="cmdidBlackBerryHelpSamplesOpenSource" value="0x1204" />
             <IDSymbol name="cmdidBlackBerryHelpAbout" value="0x1301" />
         </GuidSymbol>

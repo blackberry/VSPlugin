@@ -42,6 +42,7 @@
             this.bttInstallNew = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.bttStatus = new System.Windows.Forms.Button();
+            this.lblMore = new System.Windows.Forms.LinkLabel();
             this.SuspendLayout();
             // 
             // txtDescription
@@ -110,10 +111,22 @@
             this.bttStatus.UseVisualStyleBackColor = true;
             this.bttStatus.Click += new System.EventHandler(this.bttStatus_Click);
             // 
+            // lblMore
+            // 
+            this.lblMore.AutoSize = true;
+            this.lblMore.Location = new System.Drawing.Point(257, 11);
+            this.lblMore.Name = "lblMore";
+            this.lblMore.Size = new System.Drawing.Size(60, 13);
+            this.lblMore.TabIndex = 6;
+            this.lblMore.TabStop = true;
+            this.lblMore.Text = "More info...";
+            this.lblMore.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lblMore_LinkClicked);
+            // 
             // ApiLevelOptionControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblMore);
             this.Controls.Add(this.bttStatus);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.txtDescription);
@@ -135,5 +148,6 @@
         private System.Windows.Forms.Button bttInstallNew;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button bttStatus;
+        private System.Windows.Forms.LinkLabel lblMore;
     }
 }

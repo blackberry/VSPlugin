@@ -188,7 +188,7 @@ namespace BlackBerry.Package.Dialogs
                                 var info = form.SelectedItem;
                                 _vm.RequestInstall(info, actionTarget);
 
-                                MessageBoxHelper.Show("Scheduled \"" + info + "\" for installation. Please be patient, this might take some time.\r\n\r\nProgress can be monitored in Status window available at BlackBerry -> Options -> API-Level tab.",
+                                MessageBoxHelper.Show("Scheduled \"" + info + "\" for installation. Be patient, this might take some time.\r\n\r\nProgress can be monitored in Status window available at BlackBerry -> Options -> API-Level tab.",
                                                       null, MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                         }
@@ -212,7 +212,7 @@ namespace BlackBerry.Package.Dialogs
                             _vm.RequestRemoval(definition, actionTarget);
                             UpdateUI();
 
-                            MessageBoxHelper.Show("Scheduled \"" + definition + "\" for removal. Please be patient, this might take some time.",
+                            MessageBoxHelper.Show("Scheduled \"" + definition + "\" for removal. Be patient, this might take some time.",
                                 null, MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         break;

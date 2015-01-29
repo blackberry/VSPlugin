@@ -410,31 +410,31 @@ namespace BlackBerry.Package
             switch (cmdID)
             {
                 case PackageCommands.cmdidBlackBerryHelpWelcomePage:
-                    OpenUrl("http://developer.blackberry.com/cascades/momentics/");
+                    OpenUrl("http://developer.blackberry.com/native/");
                     break;
                 case PackageCommands.cmdidBlackBerryHelpSupportForum:
                     OpenUrl("http://supportforums.blackberry.com/t5/Developer-Support-Forums/ct-p/blackberrydev");
                     break;
                 case PackageCommands.cmdidBlackBerryHelpDocNative:
-                    OpenUrl("http://developer.blackberry.com/native/documentation/core/framework.html");
-                    break;
-                case PackageCommands.cmdidBlackBerryHelpDocCascades:
                     OpenUrl("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
                     break;
-                case PackageCommands.cmdidBlackBerryHelpDocPlayBook:
-                    OpenUrl("http://developer.blackberry.com/playbook/native/documentation/");
-                    break;
+                //case PackageCommands.cmdidBlackBerryHelpDocCascades:
+                //    OpenUrl("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
+                //    break;
+                //case PackageCommands.cmdidBlackBerryHelpDocPlayBook:
+                //    OpenUrl("http://developer.blackberry.com/playbook/native/documentation/");
+                //    break;
                 case PackageCommands.cmdidBlackBerryHelpSamplesNative:
                     OpenUrl("http://developer.blackberry.com/native/sampleapps/");
                     break;
-                case PackageCommands.cmdidBlackBerryHelpSamplesCascades:
-                    OpenUrl("http://developer.blackberry.com/native/sampleapps/");
-                    break;
-                case PackageCommands.cmdidBlackBerryHelpSamplesPlayBook:
-                    OpenUrl("http://developer.blackberry.com/playbook/native/sampleapps/");
-                    break;
+                //case PackageCommands.cmdidBlackBerryHelpSamplesCascades:
+                //    OpenUrl("http://developer.blackberry.com/native/sampleapps/");
+                //    break;
+                //case PackageCommands.cmdidBlackBerryHelpSamplesPlayBook:
+                //    OpenUrl("http://developer.blackberry.com/playbook/native/sampleapps/");
+                //    break;
                 case PackageCommands.cmdidBlackBerryHelpSamplesOpenSource:
-                    OpenUrl("https://github.com/blackberry");
+                    OpenUrl("https://github.com/blackberry/VSPlugin");
                     break;
                 case PackageCommands.cmdidBlackBerryHelpAbout:
                     {
