@@ -870,15 +870,15 @@ namespace BlackBerry.NativeCore.Model
              var result = new StringBuilder();
 
             result.AppendLine("Status:");
-            result.Append(" * BlackBerry 10 - ").AppendLine(IsRegistered ? "registered" : (IsTabletRegistered ? "using tablet certificates" : "not registered"));
+            result.Append(" * BlackBerry 10 - ").AppendLine(IsRegistered ? "Registered" : (IsTabletRegistered ? "using tablet certificates" : "Unregistered"));
             if (HasToken)
             {
                 if (Token.IsValid)
-                    result.Append("  > token expires at ").AppendLine(Token.ValidDateString);
+                    result.Append("  > Token expires on ").AppendLine(Token.ValidDateString);
                 else
-                    result.Append("  > token expired ").Append(Token.ExpirationDays).AppendLine(" days ago");
+                    result.Append("  > Token expired ").Append(Token.ExpirationDays).AppendLine(" days ago");
             }
-            result.Append(" * PlayBook - ").AppendLine(IsTabletRegistered ? "registered" : "not registered");
+            result.Append(" * PlayBook - ").AppendLine(IsTabletRegistered ? "Registered" : "Unregistered");
 
             if (IsPasswordSaved)
                 result.AppendLine(" * password is stored");
@@ -893,15 +893,15 @@ namespace BlackBerry.NativeCore.Model
         {
             var result = new StringBuilder();
 
-            result.Append("BB10: ").AppendLine(IsRegistered ? "registered" : (IsTabletRegistered ? "using tablet certificates" : "not registered"));
+            result.Append("BB10: ").AppendLine(IsRegistered ? "Registered" : (IsTabletRegistered ? "using tablet certificates" : "Unregistered"));
             if (HasToken)
             {
                 if (Token.IsValid)
-                    result.Append(" (token expires at ").Append(Token.ValidDateString).AppendLine(")");
+                    result.Append(" (Token expires on ").Append(Token.ValidDateString).AppendLine(")");
                 else
-                    result.Append(" (token expired ").Append(Token.ExpirationDays).AppendLine(" days ago)");
+                    result.Append(" (Token expired ").Append(Token.ExpirationDays).AppendLine(" days ago)");
             }
-            result.Append("PlayBook: ").Append(IsTabletRegistered ? "registered" : "not registered");
+            result.Append("PlayBook: ").Append(IsTabletRegistered ? "Registered" : "Unregistered");
 
             return result.ToString();
         }

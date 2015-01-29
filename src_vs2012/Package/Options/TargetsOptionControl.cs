@@ -58,7 +58,7 @@ namespace BlackBerry.Package.Options
 
         private void lnkMoreInfo_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/cascades/getting_started/setting_up.html");
+            DialogHelper.StartURL("http://developer.blackberry.com/native/documentation/core/vs_get_started.html");
         }
 
         private void listTargets_SelectedIndexChanged(object sender, EventArgs e)
@@ -84,7 +84,7 @@ namespace BlackBerry.Package.Options
 
         private void bttAdd_Click(object sender, EventArgs e)
         {
-            var form = new DeviceForm("Add new Target Device");
+            var form = new DeviceForm("Add New Target Device");
 
             if (form.ShowDialog() == DialogResult.OK)
             {

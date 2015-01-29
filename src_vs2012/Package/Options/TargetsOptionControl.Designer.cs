@@ -110,8 +110,8 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(551, 33);
             this.label1.TabIndex = 1;
-            this.label1.Text = "In order to connect to the device, you must enable the [Development Mode]. It can" +
-    " be found at Settings > Security and Privacy > Development Mode.";
+            this.label1.Text = "In order to connect to the device, you must turn on development mode on the devic" +
+    "e using Settings > Security and Privacy > Development Mode.";
             // 
             // bttAdd
             // 
@@ -179,7 +179,7 @@
             this.bttActivate.Name = "bttActivate";
             this.bttActivate.Size = new System.Drawing.Size(88, 23);
             this.bttActivate.TabIndex = 4;
-            this.bttActivate.Text = "Set &Activate";
+            this.bttActivate.Text = "Set &Active";
             this.bttActivate.UseVisualStyleBackColor = true;
             this.bttActivate.Click += new System.EventHandler(this.bttActivate_Click);
             // 

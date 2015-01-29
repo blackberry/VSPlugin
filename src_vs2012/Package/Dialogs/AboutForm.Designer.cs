@@ -39,9 +39,6 @@
             this.linkBugTracker = new System.Windows.Forms.LinkLabel();
             this.linkSourceCode = new System.Windows.Forms.LinkLabel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.label5 = new System.Windows.Forms.Label();
-            this.linkAuthor = new System.Windows.Forms.LinkLabel();
-            this.label6 = new System.Windows.Forms.Label();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureLogo)).BeginInit();
             this.groupBox1.SuspendLayout();
@@ -158,10 +155,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.linkBugTracker);
-            this.groupBox1.Controls.Add(this.linkAuthor);
             this.groupBox1.Controls.Add(this.linkSourceCode);
-            this.groupBox1.Controls.Add(this.label6);
-            this.groupBox1.Controls.Add(this.label5);
             this.groupBox1.Controls.Add(this.label4);
             this.groupBox1.Controls.Add(this.label2);
             this.groupBox1.Controls.Add(this.label3);
@@ -170,35 +164,6 @@
             this.groupBox1.Size = new System.Drawing.Size(554, 135);
             this.groupBox1.TabIndex = 1;
             this.groupBox1.TabStop = false;
-            // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(16, 107);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(92, 13);
-            this.label5.TabIndex = 3;
-            this.label5.Text = "Special honors to ";
-            // 
-            // linkAuthor
-            // 
-            this.linkAuthor.AutoSize = true;
-            this.linkAuthor.Location = new System.Drawing.Point(101, 107);
-            this.linkAuthor.Name = "linkAuthor";
-            this.linkAuthor.Size = new System.Drawing.Size(152, 13);
-            this.linkAuthor.TabIndex = 4;
-            this.linkAuthor.TabStop = true;
-            this.linkAuthor.Text = "Paweł Hofman (@CodeTitans)";
-            this.linkAuthor.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkAuthor_LinkClicked);
-            // 
-            // label6
-            // 
-            this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(250, 107);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(214, 13);
-            this.label6.TabIndex = 3;
-            this.label6.Text = ", who has implemented most of the features.";
             // 
             // AboutForm
             // 
@@ -241,8 +206,5 @@
         private System.Windows.Forms.LinkLabel linkBugTracker;
         private System.Windows.Forms.LinkLabel linkSourceCode;
         private System.Windows.Forms.GroupBox groupBox1;
-        private System.Windows.Forms.LinkLabel linkAuthor;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
     }
 }

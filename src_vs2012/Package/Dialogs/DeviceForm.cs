@@ -290,23 +290,32 @@ namespace BlackBerry.Package.Dialogs
 
             if (DeviceClass == DialogDeviceClass.Simulator)
             {
-                if (string.IsNullOrEmpty(DeviceName))
-                    DeviceName = "simulator";
-                DeviceIP = "192.168.32.1";
-                DevicePassword = DefaultPasswordForSimulator;
+                if (DeviceName != "Simulator")
+                {
+                    DeviceName = "Simulator";
+                    DeviceIP = "192.168.32.1";
+                    DevicePassword = DefaultPasswordForSimulator;
+                }
             }
-
-            if (DeviceClass == DialogDeviceClass.UsbDevice)
+            else if (DeviceClass == DialogDeviceClass.UsbDevice)
             {
-                if (string.IsNullOrEmpty(DeviceName))
-                    DeviceName = "usb";
-                DeviceIP = "169.254.0.1";
+                if (DeviceName != "USB")
+                {
+                    DeviceName = "USB";
+                    DeviceIP = "169.254.0.1";
+                }
 
                 // got to Password control:
                 ActiveControl = txtPassword;
                 txtPassword.SelectionLength = 0;
                 txtPassword.SelectionStart = txtPassword.Text.Length;
                 return;
+            }
+            else
+            {
+                DeviceName = "";
+                DeviceIP = "";
+                DevicePassword = "";
             }
 
             // and to IP control:

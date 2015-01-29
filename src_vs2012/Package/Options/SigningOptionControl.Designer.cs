@@ -128,8 +128,8 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(384, 32);
             this.label1.TabIndex = 0;
-            this.label1.Text = "You must register with BlackBerry in order to sign applications and create debug " +
-    "tokens for your device.";
+            this.label1.Text = "You must register with BlackBerry to sign applications and create debug tokens fo" +
+    "r your device.";
             // 
             // bttDeletePassword
             // 

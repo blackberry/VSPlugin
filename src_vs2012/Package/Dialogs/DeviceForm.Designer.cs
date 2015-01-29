@@ -154,9 +154,9 @@
             this.cmbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbType.FormattingEnabled = true;
             this.cmbType.Items.AddRange(new object[] {
-            "WiFi device",
+            "Wi-Fi device",
             "USB device",
-            "simulator"});
+            "Simulator"});
             this.cmbType.Location = new System.Drawing.Point(89, 23);
             this.cmbType.Name = "cmbType";
             this.cmbType.Size = new System.Drawing.Size(126, 21);
