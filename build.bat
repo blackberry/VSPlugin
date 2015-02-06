@@ -33,7 +33,7 @@ if /i "%arg%" == "vs2010"         set ActionBuildVS2010=1
 if /i "%arg%" == "vs2012"         set ActionBuildVS2012=1
 if /i "%arg%" == "vs2013"         set ActionBuildVS2013=1
 if /i "%arg:~0,5%" == "/out:"     set CustomOutputDir=%arg:~5%
-if /i "%arg:~0,8%" == "/package"  set ActionClean=1 && set ActionBuildVS2010=1 && set ActionBuildVS2012=1 && set ActionBuildVS2013=1 && set ActionBuildPackage=1
+if /i "%arg:~0,8%" == "/package"  set ActionClean=1 && set ActionBuildPackage=1
 if /i "%arg:~0,9%" == "/package:" set PackageVersion=%arg:~9%
 
 shift /1

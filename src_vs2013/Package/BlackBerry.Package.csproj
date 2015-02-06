@@ -566,322 +566,402 @@
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry.vsdir">
       <Link>Templates\Projects\BlackBerry.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\emptyproj.vsz">
       <Link>Templates\Projects\BlackBerry\emptyproj.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\items.vsdir">
       <Link>Templates\Projects\BlackBerry\items.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\OpenGL\items.vsdir">
       <Link>Templates\Projects\BlackBerry\OpenGL\items.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry.vsdir">
       <Link>Templates\ProjectItems\BlackBerry.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\bar-descriptor.vsz">
       <Link>Templates\ProjectItems\BlackBerry\bar-descriptor.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\items.vsdir">
       <Link>Templates\ProjectItems\BlackBerry\Cascades\items.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qclass.vsz">
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qclass.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\items.vsdir">
       <Link>Templates\ProjectItems\BlackBerry\items.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\applicationui.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\applicationui.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\applicationui.hpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\applicationui.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.hpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationui.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.hpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\applicationuibase.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\bar-descriptor.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\bar-descriptor.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.hpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\cardui.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.hpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\applicationui.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\bar-descriptor.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\bar-descriptor.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main-service.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main-service.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.hpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\service.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\data.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\bar-descriptor.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\bar-descriptor.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\main.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\main.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\README.txt">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\QtPlayBook\README.txt</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor-cascades.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-cascades.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\main-cascades.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-empty.c">
       <Link>Templates\VCWizards\BlackBerry\Shared\main-empty.c</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-opengl1.c">
       <Link>Templates\VCWizards\BlackBerry\Shared\main-opengl1.c</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-opengl2.c">
       <Link>Templates\VCWizards\BlackBerry\Shared\main-opengl2.c</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\main-screen.c">
       <Link>Templates\VCWizards\BlackBerry\Shared\main-screen.c</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\precompiled-cascades.h">
       <Link>Templates\VCWizards\BlackBerry\Shared\precompiled-cascades.h</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\precompiled-empty.h">
       <Link>Templates\VCWizards\BlackBerry\Shared\precompiled-empty.h</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qcontrol.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\qcontrol.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qdialog.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\qdialog.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qpage.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\qpage.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qpane.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\qpane.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qsheet.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\qsheet.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qcontrol.vsz">
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qcontrol.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qdialog.vsz">
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qdialog.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qpage.vsz">
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qpage.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qpane.vsz">
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qpane.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qsheet.vsz">
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qsheet.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\items.vsdir">
       <Link>Templates\Projects\BlackBerry\Cascades\items.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\cascadesproj.vsz">
       <Link>Templates\Projects\BlackBerry\cascadesproj.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\libsharedproj.vsz">
       <Link>Templates\Projects\BlackBerry\libsharedproj.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\libstaticproj.vsz">
       <Link>Templates\Projects\BlackBerry\libstaticproj.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\openglproj1.vsz">
       <Link>Templates\Projects\BlackBerry\openglproj1.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\openglproj2.vsz">
       <Link>Templates\Projects\BlackBerry\openglproj2.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\screenproj.vsz">
       <Link>Templates\Projects\BlackBerry\screenproj.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Translations\makefile-cascades">
       <Link>Templates\VCWizards\BlackBerry\Shared\Translations\makefile-cascades</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Translations\qmake-default.pro">
       <Link>Templates\VCWizards\BlackBerry\Shared\Translations\qmake-default.pro</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\main-helloworld.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\main-helloworld.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\makefile-cascades">
       <Link>Templates\VCWizards\BlackBerry\Shared\makefile-cascades</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qmake-config.pri">
       <Link>Templates\VCWizards\BlackBerry\Shared\qmake-config.pri</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qmake-default.pro">
       <Link>Templates\VCWizards\BlackBerry\Shared\qmake-default.pro</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\main-tabs.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\main-tabs.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\card.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\card.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\main.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Card\qmake.pro">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Card\qmake.pro</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\ItemPage.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\ItemPage.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\main.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\main.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\ListView\qmake.pro">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\ListView\qmake.pro</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\DetailsPage.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\DetailsPage.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\main.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\NavigationPane\main.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_card.vsz">
       <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_card.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_listview.vsz">
       <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_listview.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_navigationpane.vsz">
       <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_navigationpane.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_tabs.vsz">
       <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_tabs.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Cascades\cascadesproj_headless.vsz">
       <Link>Templates\Projects\BlackBerry\Cascades\cascadesproj_headless.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\main.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake-service.pro">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake-service.pro</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro">
       <Link>Templates\VCWizards\BlackBerry\Shared\Assets\Headless\qmake.pro</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\bbutil.vsz">
       <Link>Templates\ProjectItems\BlackBerry\bbutil.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\Cascades\qtab.vsz">
       <Link>Templates\ProjectItems\BlackBerry\Cascades\qtab.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qtab.qml">
       <Link>Templates\VCWizards\BlackBerry\Shared\qtab.qml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Resources\TemplateIcons\EmptyProj.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -908,30 +988,37 @@
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml">
       <Link>Templates\VCWizards\BlackBerry\Shared\bar-descriptor.xml</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qclass.cpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\qclass.cpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\qclass.hpp">
       <Link>Templates\VCWizards\BlackBerry\Shared\qclass.hpp</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\ProjectItems\BlackBerry\makefile.vsz">
       <Link>Templates\ProjectItems\BlackBerry\makefile.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\makefile-empty">
       <Link>Templates\VCWizards\BlackBerry\Shared\makefile-empty</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Qt\items.vsdir">
       <Link>Templates\Projects\BlackBerry\Qt\items.vsdir</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\Projects\BlackBerry\Qt\qtproj_playbook.vsz">
       <Link>Templates\Projects\BlackBerry\Qt\qtproj_playbook.vsz</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <None Include="Resources\TemplateIcons\CascadesProj.ico" />
     <None Include="Resources\TemplateIcons\NewItem.ico" />
@@ -939,25 +1026,32 @@
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.c">
       <Link>Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.c</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="..\..\src_vs2012\Package\Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.h">
       <Link>Templates\VCWizards\BlackBerry\Shared\Utils\bbutil.h</Link>
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\VCWizards\BlackBerry\opengl-default.vcxproj">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\VCWizards\BlackBerry\cascades-default.vcxproj">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\VCWizards\BlackBerry\native-default.vcxproj">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\VCWizards\BlackBerry\native-libshared-default.vcxproj">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Templates\VCWizards\BlackBerry\native-libstatic-default.vcxproj">
       <IncludeInVSIX>true</IncludeInVSIX>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Resource Include="..\..\src_vs2012\Package\Resources\Permissions\BlackBerryMessager.bmp">
       <Link>Resources\Permissions\BlackBerryMessager.bmp</Link>
