@@ -13,6 +13,7 @@
 //* limitations under the License.
 
 using System;
+using BlackBerry.NativeCore.Diagnostics;
 using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Debugger.Interop;
 
@@ -71,10 +72,18 @@ namespace BlackBerry.DebugEngine
         /// </summary>
         public void EvaluatingAsync()
         {
-            VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
-            AD7Property ppResult = new AD7Property(vi);
+            try
+            {
+                VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
+                AD7Property ppResult = new AD7Property(vi);
 
-            _frame._engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, ppResult), AD7ExpressionEvaluationCompleteEvent.IID, _frame._engine, _frame._thread);
+                _frame._engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, ppResult), AD7ExpressionEvaluationCompleteEvent.IID, _frame._engine, _frame._thread);
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to evaluate expression value");
+                _frame._engine.Callback.Send(new AD7ExpressionEvaluationCompleteEvent(this, null), AD7ExpressionEvaluationCompleteEvent.IID, _frame._engine, _frame._thread);
+            }
         }
 
         private void EvaluateAsyncCompleted(IAsyncResult ar)
@@ -111,9 +120,18 @@ namespace BlackBerry.DebugEngine
         /// <returns> VSConstants.S_OK. </returns>
         int IDebugExpression2.EvaluateSync(enum_EVALFLAGS dwFlags, uint dwTimeout, IDebugEventCallback2 pExprCallback, out IDebugProperty2 ppResult)
         {
-            VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
-            ppResult = new AD7Property(vi);
-            return VSConstants.S_OK;
+            try
+            {
+                VariableInfo vi = VariableInfo.Get(_expression, _eventDispatcher, _frame);
+                ppResult = new AD7Property(vi);
+                return VSConstants.S_OK;
+            }
+            catch (Exception ex)
+            {
+                TraceLog.WriteException(ex, "Unable to evaluate expression value");
+                ppResult = null;
+                return VSConstants.E_FAIL;
+            }
         }
 
         #endregion
