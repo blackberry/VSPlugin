@@ -22,7 +22,7 @@ namespace BlackBerry.Package.Helpers
             // verify if at least tried to register:
             if (!developer.HasCertificate)
             {
-                MessageBoxHelper.Show("Sorry, but certificate does not exist. Please try to register first", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Sorry, but certificate does not exist. You must register first", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return false;
             }
 

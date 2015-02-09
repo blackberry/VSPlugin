@@ -153,7 +153,7 @@ namespace BlackBerry.Package.Editors
 
         private void OnLoadingDebugInfoFailed(object sender, EventArgs eventArgs)
         {
-            MessageBoxHelper.Show("Unable to load info about the Author from given debug token. Please try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+            MessageBoxHelper.Show("Unable to load info about the Author from given debug token. ", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
         private void btnAddIC_Click(object sender, RoutedEventArgs e)

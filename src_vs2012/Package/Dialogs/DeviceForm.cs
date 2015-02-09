@@ -228,7 +228,7 @@ namespace BlackBerry.Package.Dialogs
             // verify arguments:
             if (_runner != null)
             {
-                AppendLog("Operation is still in progress. Please be patient.");
+                AppendLog("Operation is still in progress.");
                 return;
             }
 
@@ -326,7 +326,7 @@ namespace BlackBerry.Package.Dialogs
         {
             if (string.IsNullOrEmpty(DeviceIP) || string.IsNullOrEmpty(DevicePassword))
             {
-                MessageBoxHelper.Show("Sorry, some information is still missing. Please fill in all fields", "Target Device", MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Sorry, some information is still missing. Fill in all fields", "Target Device", MessageBoxIcon.Error);
                 ActiveControl = string.IsNullOrEmpty(DeviceIP) ? txtIP : txtPassword;
                 return;
             }

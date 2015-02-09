@@ -188,7 +188,7 @@ namespace BlackBerry.Package.Dialogs
                                 var info = form.SelectedItem;
                                 _vm.RequestInstall(info, actionTarget);
 
-                                MessageBoxHelper.Show("Scheduled \"" + info + "\" for installation. Be patient, this might take some time.\r\n\r\nProgress can be monitored in Status window available at BlackBerry -> Options -> API-Level tab.",
+                                MessageBoxHelper.Show("Scheduled \"" + info + "\" for installation. Be patient, this might take some time.\r\n\r\nProgress can be monitored by clicking Status in the BlackBerry -> Options -> API-Levels window.",
                                                       null, MessageBoxButtons.OK, MessageBoxIcon.Information);
                             }
                         }

@@ -140,7 +140,7 @@ namespace BlackBerry.Package.Dialogs
         {
             if (string.IsNullOrEmpty(author.Text))
             {
-                MessageBoxHelper.Show("Author Name can not be empty. Please enter a meaningful text.", ValidationCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Author Name can not be empty.", ValidationCaption, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 ActiveControl = author;
                 return false;
             }
@@ -234,7 +234,7 @@ namespace BlackBerry.Package.Dialogs
             {
                 if (form.StatusCode != 0)
                 {
-                    MessageBoxHelper.Show("Failed to obtain the BlackBerry ID token.\r\nPlease check your Internet connection", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBoxHelper.Show("Failed to obtain the BlackBerry ID token.\r\nCheck your Internet connection", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
 
@@ -313,7 +313,7 @@ namespace BlackBerry.Package.Dialogs
                 }
                 else
                 {
-                    MessageBoxHelper.Show("Sorry, something unexpected has happened. Please verify logs, unregister and try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBoxHelper.Show("Sorry, something unexpected has happened. Verify logs, unregister and try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
             else
@@ -377,7 +377,7 @@ namespace BlackBerry.Package.Dialogs
                 {
                     _developer.UpdateCertificate(runner.CertificateFileName, txtCskPassword.Text, true);
 
-                    MessageBoxHelper.Show("Keystore certificate has been succesfully created", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBoxHelper.Show("Keystore certificate has been successfully created", null, MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
                 else
                 {

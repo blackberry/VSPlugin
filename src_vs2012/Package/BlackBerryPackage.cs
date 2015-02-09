@@ -409,14 +409,11 @@ namespace BlackBerry.Package
 
             switch (cmdID)
             {
-                case PackageCommands.cmdidBlackBerryHelpWelcomePage:
-                    OpenUrl("http://developer.blackberry.com/native/");
-                    break;
                 case PackageCommands.cmdidBlackBerryHelpSupportForum:
                     OpenUrl("http://supportforums.blackberry.com/t5/Developer-Support-Forums/ct-p/blackberrydev");
                     break;
                 case PackageCommands.cmdidBlackBerryHelpDocNative:
-                    OpenUrl("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
+                    OpenUrl("http://developer.blackberry.com/native/");
                     break;
                 //case PackageCommands.cmdidBlackBerryHelpDocCascades:
                 //    OpenUrl("http://developer.blackberry.com/native/documentation/cascades/dev/index.html");
@@ -482,7 +479,7 @@ namespace BlackBerry.Package
 
             if (projects == null || projects.Length == 0)
             {
-                MessageBoxHelper.Show("Unable to add BlackBerry platform.", "Please open a solution with Visual C++ projects", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Unable to add BlackBerry platform.", "Open a solution with Visual C++ projects", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

@@ -131,7 +131,7 @@ namespace BlackBerry.Package.Dialogs
         {
             if (Add(NewPIN) < 0)
             {
-                MessageBoxHelper.Show("PIN number contains errors. Please correct them and try again", "Invalid PIN value", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("PIN number contains errors. Correct them and try again", "Invalid PIN value", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             NewPIN = string.Empty;
