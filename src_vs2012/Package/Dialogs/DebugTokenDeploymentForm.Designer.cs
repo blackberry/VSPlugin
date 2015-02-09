@@ -66,7 +66,6 @@
             this.bttOK = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.bttAdd = new System.Windows.Forms.Button();
-            this.bttRemove = new System.Windows.Forms.Button();
             this.bttUpload = new System.Windows.Forms.Button();
             this.txtDeviceLog = new System.Windows.Forms.TextBox();
             this.cmbDevices = new System.Windows.Forms.ComboBox();
@@ -164,7 +163,6 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox2.Controls.Add(this.bttAdd);
-            this.groupBox2.Controls.Add(this.bttRemove);
             this.groupBox2.Controls.Add(this.bttUpload);
             this.groupBox2.Controls.Add(this.txtDeviceLog);
             this.groupBox2.Controls.Add(this.cmbDevices);
@@ -186,18 +184,6 @@
             this.bttAdd.Text = "+";
             this.bttAdd.UseVisualStyleBackColor = true;
             this.bttAdd.Click += new System.EventHandler(this.bttAdd_Click);
-            // 
-            // bttRemove
-            // 
-            this.bttRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.bttRemove.Enabled = false;
-            this.bttRemove.Location = new System.Drawing.Point(442, 129);
-            this.bttRemove.Name = "bttRemove";
-            this.bttRemove.Size = new System.Drawing.Size(75, 23);
-            this.bttRemove.TabIndex = 4;
-            this.bttRemove.Text = "Re&move";
-            this.bttRemove.UseVisualStyleBackColor = true;
-            this.bttRemove.Click += new System.EventHandler(this.bttRemove_Click);
             // 
             // bttUpload
             // 
@@ -309,7 +295,6 @@
         private System.Windows.Forms.ComboBox cmbDevices;
         private System.Windows.Forms.TextBox txtDeviceLog;
         private System.Windows.Forms.Button bttUpload;
-        private System.Windows.Forms.Button bttRemove;
         private System.Windows.Forms.Label lblError;
         private System.Windows.Forms.Button bttAdd;
     }

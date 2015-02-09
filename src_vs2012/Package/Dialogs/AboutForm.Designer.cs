@@ -104,19 +104,19 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(16, 35);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(524, 13);
+            this.label2.Size = new System.Drawing.Size(509, 13);
             this.label2.TabIndex = 0;
-            this.label2.Text = "This is an open-source software. We encourage you to take part in its further dev" +
-    "elopment and improvements.";
+            this.label2.Text = "This is open-source software. We encourage you to take part in its further develo" +
+    "pment and improvements.";
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(16, 59);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(207, 13);
+            this.label3.Size = new System.Drawing.Size(165, 13);
             this.label3.TabIndex = 1;
-            this.label3.Text = "Please report bugs and feature requests at";
+            this.label3.Text = "Report bugs and feature requests";
             // 
             // label4
             // 
@@ -130,12 +130,12 @@
             // linkBugTracker
             // 
             this.linkBugTracker.AutoSize = true;
-            this.linkBugTracker.Location = new System.Drawing.Point(219, 59);
+            this.linkBugTracker.Location = new System.Drawing.Point(174, 59);
             this.linkBugTracker.Name = "linkBugTracker";
-            this.linkBugTracker.Size = new System.Drawing.Size(74, 13);
+            this.linkBugTracker.Size = new System.Drawing.Size(31, 13);
             this.linkBugTracker.TabIndex = 2;
             this.linkBugTracker.TabStop = true;
-            this.linkBugTracker.Text = "public tracker.";
+            this.linkBugTracker.Text = "here.";
             this.linkBugTracker.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkBugTracker_LinkClicked);
             // 
             // linkSourceCode

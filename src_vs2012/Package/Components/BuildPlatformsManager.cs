@@ -421,7 +421,7 @@ namespace BlackBerry.Package.Components
             // is Java detected?
             if (string.IsNullOrEmpty(ConfigDefaults.JavaHome) || !Directory.Exists(ConfigDefaults.JavaHome))
             {
-                _errorManager.Add(TaskErrorCategory.Warning, "Java was not detected. Underlying BlackBerry tools might stop working. Please specify one at \"BlackBerry -> Options -> General\" [double-click].", OpenGeneralSettings);
+                _errorManager.Add(TaskErrorCategory.Warning, "Java was not detected. Underlying BlackBerry tools might stop working. Specify one at \"BlackBerry -> Options -> General\" [double-click].", OpenGeneralSettings);
             }
 
             // check, if any project is placed on incorrect location, not supported by underlying makefile system:
@@ -435,14 +435,14 @@ namespace BlackBerry.Package.Components
                         var projectPath = Path.GetDirectoryName(project.FullName);
                         if (!string.IsNullOrEmpty(projectPath) && !IsValidProjectPath(projectPath))
                         {
-                            _errorManager.Add(TaskErrorCategory.Warning, string.Concat("Project path: \"", projectPath, "\" is invalid and might lead to problems in underlying makefile system. Please move the project to the one without spaces and non-ASCII characters."), project, null, OpenGeneralSettings);
+                            _errorManager.Add(TaskErrorCategory.Warning, string.Concat("Project path: \"", projectPath, "\" is invalid and might lead to problems in underlying makefile system. Move the project to the one without spaces and non-ASCII characters."), project, null, OpenGeneralSettings);
                         }
 
                         // is name valid?
                         var projectName = project.Name;
                         if (!string.IsNullOrEmpty(projectPath) && !IsValidProjectName(projectName))
                         {
-                            _errorManager.Add(TaskErrorCategory.Error, string.Concat("Project name: \"", projectName, "\" is invalid. Please remove all spaces and non-ASCII characters."), project, null, OpenGeneralSettings);
+                            _errorManager.Add(TaskErrorCategory.Error, string.Concat("Project name: \"", projectName, "\" is invalid. Remove all spaces and non-ASCII characters."), project, null, OpenGeneralSettings);
                         }
                     }
                 }
@@ -798,7 +798,7 @@ namespace BlackBerry.Package.Components
                 }
                 else
                 {
-                    MessageBoxHelper.Show("Project build is impossible as any BlackBerry NativeCore SDK was detected. Please install or add existing one in \"BlackBerry -> Options -> API-Levels\" and try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBoxHelper.Show("Project build is impossible as any BlackBerry NativeCore SDK was detected. Install or add existing one in \"BlackBerry -> Options -> API-Levels\" and try again.", null, MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
                 return;
             }
@@ -1140,13 +1140,13 @@ namespace BlackBerry.Package.Components
 
             if (ndk == null)
             {
-                MessageBoxHelper.Show("Missing NDK selected. Please install any and mark as active using BlackBerry menu options.", null,
+                MessageBoxHelper.Show("Missing NDK selected. Install any and mark as active using BlackBerry menu options.", null,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
             if (device == null)
             {
-                MessageBoxHelper.Show("Missing target device selected. Please define an IP, password and mark a device as active using BlackBerry menu options.", null,
+                MessageBoxHelper.Show("Missing target device selected. Define an IP, password and mark a device as active using BlackBerry menu options.", null,
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }

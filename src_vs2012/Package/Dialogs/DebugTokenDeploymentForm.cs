@@ -365,8 +365,7 @@ namespace BlackBerry.Package.Dialogs
             bttAdd.Enabled = completed;
             bttDeviceLoad.Enabled = completed && !IsLoadingDeviceInfo;
             bttUpload.Enabled = completed && details != null && _tokenInfo != null /*&& _tokenInfo.ExpiryDate > DateTime.UtcNow && _tokenInfo.Contains(details.PIN) */;
-            bttRemove.Enabled = completed && details != null && details.DebugToken != null && _tokenInfo != null && !string.IsNullOrEmpty(_tokenInfo.ID);
-
+         
             if (!completed)
             {
                 ErrorText = string.Empty;
@@ -586,17 +585,12 @@ namespace BlackBerry.Package.Dialogs
             UploadDebugToken(DebugTokenPath);
         }
 
-        private void bttRemove_Click(object sender, EventArgs e)
-        {
-            RemoveDebugToken();
-        }
-
         private void bttTokenCreate_Click(object sender, EventArgs e)
         {
             var details = _vm.GetDetails(_device);
             if (details == null || details.PIN == 0)
             {
-                MessageBoxHelper.Show("Please connect first the device and load its properties", "Missing device PIN", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBoxHelper.Show("Connect to the device first and load its properties", "Missing device PIN", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 

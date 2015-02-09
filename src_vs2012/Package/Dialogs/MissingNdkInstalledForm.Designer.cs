@@ -84,7 +84,7 @@
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(403, 66);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Toolset for building BlackBerry native application is missing. Please make sure t" +
+            this.label1.Text = "Toolset for building BlackBerry native application is missing. Make sure t" +
     "here is any NDK installed and select it from the list below.";
             // 
             // cmbNDKs

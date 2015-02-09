@@ -48,7 +48,7 @@
             this.groupBox1.Size = new System.Drawing.Size(396, 134);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "BlackBerry Developer Certyficate";
+            this.groupBox1.Text = "BlackBerry Developer Certificate";
             // 
             // bttBackup
             // 

@@ -39,9 +39,9 @@ namespace BlackBerry.Package.Options
             Author = _vm.Developer.Name;
             lblWarning.Visible = string.IsNullOrEmpty(Author);
 
-            //bttRegister.Enabled = !_vm.Developer.IsRegistered;
-            //bttUnregister.Enabled = !bttRegister.Enabled;
-            //bttBackup.Enabled = bttUnregister.Enabled;
+            bttRegister.Enabled = !_vm.Developer.IsRegistered;
+            bttUnregister.Enabled = !bttRegister.Enabled;
+          //  bttBackup.Enabled = bttUnregister.Enabled;
             lblStatus.Text = _vm.Developer.ToShortStatusDescription();
 
             bttNavigate.Enabled = !string.IsNullOrEmpty(CertificatePath);
