@@ -252,7 +252,7 @@ namespace BlackBerry.DebugEngine
         public int GetResult(out IDebugProperty2 ppResult) 
         {
             ppResult = _property;
-            return VSConstants.S_OK;
+            return _property != null ? VSConstants.S_OK : VSConstants.E_FAIL;
         }
     }
 

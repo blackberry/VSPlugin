@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="cc078570-5ed1-40cb-a862-3bae72f78892" Version="3.3.1" Language="en-US" Publisher="CodeTitans" />
+    <Identity Id="cc078570-5ed1-40cb-a862-3bae72f78892" Version="3.0.0" Language="en-US" Publisher="CodeTitans" />
     <DisplayName>BlackBerry Native Plugin for Visual Studio 2012</DisplayName>
-    <Description xml:space="preserve">Package providing Native SDK support inside Visual Studio for PlayBook and BlackBerry 10 devices</Description>
+    <Description xml:space="preserve">Package providing Native SDK support inside Visual Studio for BlackBerry 10 devices</Description>
     <MoreInfo>http://github.com/phofman/vs-plugin/wiki</MoreInfo>
     <License>Resources\License.txt</License>
     <GettingStartedGuide>Resources\StartGuide.txt</GettingStartedGuide>

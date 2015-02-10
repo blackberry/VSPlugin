@@ -49,7 +49,7 @@
             <Menu guid="guidVSNDK_PackageCmdSet" id="BlackBerryTopMenu" priority="0x0100" type="Menu">
                 <Parent guid="guidSHLMainMenu" id="IDG_VS_MM_TOOLSADDINS" />
                 <Strings>
-                    <ButtonText>&amp;BlackBerry</ButtonText>
+                    <ButtonText>B&amp;lackBerry</ButtonText>
                 </Strings>
             </Menu>
         </Menus>
