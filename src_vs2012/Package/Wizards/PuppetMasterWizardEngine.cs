@@ -147,8 +147,15 @@ namespace BlackBerry.Package.Wizards
 
             if (context.IsExclusive)
             {
-                var solutionPath = string.IsNullOrEmpty(context.SolutionName) ? context.LocalDirectory : Path.GetDirectoryName(context.LocalDirectory);
-                dte.Solution.SaveAs(Path.Combine(solutionPath, context.ProjectName));
+                try
+                {
+                    var solutionPath = string.IsNullOrEmpty(context.SolutionName) ? context.LocalDirectory : Path.GetDirectoryName(context.LocalDirectory);
+                    dte.Solution.SaveAs(Path.Combine(solutionPath, context.ProjectName));
+                }
+                catch (Exception)
+                {
+                    // user cancelled save...
+                }
             }
             return wizardResult.wizardResultSuccess;
         }

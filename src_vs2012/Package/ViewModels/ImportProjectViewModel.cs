@@ -100,7 +100,14 @@ namespace BlackBerry.Package.ViewModels
 
             if (saveSolution)
             {
-                solution.SaveAs(Path.Combine(outputPath, projectName + ".sln"));
+                try
+                {
+                    solution.SaveAs(Path.Combine(outputPath, projectName + ".sln"));
+                }
+                catch (Exception)
+                {
+                    // user cancelled save...
+                }
             }
 
             // update state for adding items:
