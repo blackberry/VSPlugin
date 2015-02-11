@@ -225,6 +225,7 @@ namespace BlackBerry.NativeCore.Model
                 if (value == null)
                 {
                     DeleteCachedAuthorInfo();
+                    _cachedAuthor = null;
                 }
                 else
                 {
