@@ -22,6 +22,7 @@ namespace UnitTests
         public const string SampleOpenGlesProjectPath = @"T:\bb_samples\OpenGLES-Samples\OpenGLES2-ProgrammingGuide";
 
         public static readonly string SshPublicKeyPath;
+        public static readonly string SshPrivateKeyPath;
         public static readonly string DebugTokenPath;
 
         static Defaults()
@@ -29,6 +30,7 @@ namespace UnitTests
             NdkDirectory = ConfigDefaults.NdkDirectory;
             CertificatePath = Path.Combine(ConfigDefaults.DataDirectory, DeveloperDefinition.DefaultCertificateName);
             SshPublicKeyPath = ConfigDefaults.SshPublicKeyPath;
+            SshPrivateKeyPath = ConfigDefaults.SshPrivateKeyPath;
             DebugTokenPath = ConfigDefaults.DataFileName("debugtoken.bar");
         }
     }

@@ -10,8 +10,8 @@ samples/FallingBlocks/FallingBlocks/FallingBlocks.vcxproj.user
 samples/HelloWorldDisplay/HelloWorldDisplay.sdf
 samples/HelloWorldDisplay/HelloWorldDisplay.v12.suo
 samples/HelloWorldDisplay/HelloWorldDisplay/HelloWorldDisplay.vcxproj.user
+samples/HelloWorldDisplay/HelloWorldDisplay/Device-Debug/
 samples/HelloWorldDisplay/HelloWorldDisplay/Simulator-Debug/
-
 
 # user configuration files
 src_vs2010/BlackBerry.NativePlugin.opensdf

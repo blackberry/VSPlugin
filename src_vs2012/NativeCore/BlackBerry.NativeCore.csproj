@@ -181,6 +181,7 @@
     <Compile Include="Tools\ApiLevelUpdateRunner.cs" />
     <Compile Include="Tools\ApplicationRemoveRunner.cs" />
     <Compile Include="Tools\BBToolRunner.cs" />
+    <Compile Include="Tools\SshCreateKeyRunner.cs" />
     <Compile Include="Tools\GdbHostRunner.cs" />
     <Compile Include="Tools\DebugTokenCreateRunner.cs" />
     <Compile Include="Tools\DebugTokenInfoRunner.cs" />

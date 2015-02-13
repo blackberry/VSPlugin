@@ -16,7 +16,7 @@ namespace UnitTests
         [TestFixtureSetUp]
         public void Setup()
         {
-            Targets.Connect(Defaults.IP, Defaults.Password, DeviceDefinitionType.Device, Defaults.SshPublicKeyPath, OnDeviceConnectionStatusChanged);
+            Targets.Connect(Defaults.IP, Defaults.Password, DeviceDefinitionType.Device, Defaults.SshPublicKeyPath, Defaults.SshPrivateKeyPath, OnDeviceConnectionStatusChanged);
 
             Targets.Wait(Defaults.IP);
 
