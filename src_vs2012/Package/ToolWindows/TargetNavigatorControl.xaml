@@ -156,10 +156,10 @@
             <ContextMenu x:Key="ContextForTarget">
                 <MenuItem Header="Edit..." Click="EditTarget_OnClick" />
                 <MenuItem Header="Refresh" Click="RefreshItem_OnClick" />
-                <MenuItem Header="Stop Console Captures" Visibility="{Binding CanDisconnect}" Click="StopConsoleCaptures_OnClick" />
+                <MenuItem Header="Stop Console Captures" IsEnabled="{Binding CanDisconnect}" Click="StopConsoleCaptures_OnClick" />
                 <Separator />
-                <MenuItem Header="Connect" Click="ConnectTarget_OnClick" />
-                <MenuItem Header="Disconnect" Click="DisconnectTarget_OnClick" />
+                <MenuItem Header="Connect" IsEnabled="{Binding CanConnect}" Click="ConnectTarget_OnClick" />
+                <MenuItem Header="Disconnect" IsEnabled="{Binding CanDisconnect}" Click="DisconnectTarget_OnClick" />
             </ContextMenu>
             <ContextMenu x:Key="ContextForProcess">
                 <MenuItem Header="Capture Logs" IsEnabled="{Binding CanCapture}" Click="CaptureConsoleForProcess_OnClick" />

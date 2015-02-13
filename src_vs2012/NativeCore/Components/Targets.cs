@@ -453,11 +453,28 @@ namespace BlackBerry.NativeCore.Components
         }
 
         /// <summary>
-        /// Gets an indication, if there is already a valid connection to the device with given IP.
+        /// Gets an indication, if there is already a valid connection to the device.
         /// </summary>
         public static bool IsConnected(DeviceDefinition device)
         {
             return device != null && IsConnected(device.IP);
+        }
+
+        /// <summary>
+        /// Gets an indication, if there is trying to connect to the device with given IP.
+        /// </summary>
+        public static bool IsConnecting(string ip)
+        {
+            var connection = Find(ip);
+            return connection != null && connection.Status == TargetStatus.Connecting;
+        }
+
+        /// <summary>
+        /// Gets an indication, if there is trying to connect to the device.
+        /// </summary>
+        public static bool IsConnecting(DeviceDefinition device)
+        {
+            return device != null && IsConnecting(device.IP);
         }
 
         /// <summary>
