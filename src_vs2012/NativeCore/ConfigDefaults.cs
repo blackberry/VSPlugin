@@ -119,6 +119,11 @@ namespace BlackBerry.NativeCore
 
         public static string GithubProjectAuthor
         {
+            get { return "http://www.codetitans.pl"; }
+        }
+
+        public static string GithubProjectAuthorTwitter
+        {
             get { return "https://twitter.com/CodeTitans"; }
         }
 
