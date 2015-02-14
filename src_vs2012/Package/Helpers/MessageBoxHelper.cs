@@ -61,7 +61,7 @@ namespace BlackBerry.Package.Helpers
                     xButton = OLEMSGBUTTON.OLEMSGBUTTON_ABORTRETRYIGNORE;
                     break;
                 case MessageBoxButtons.YesNo:
-                    xButton = OLEMSGBUTTON.OLEMSGBUTTON_YESNO;
+                    xButton = OLEMSGBUTTON.OLEMSGBUTTON_OKCANCEL;
                     break;
                 case MessageBoxButtons.YesNoCancel:
                     xButton = OLEMSGBUTTON.OLEMSGBUTTON_YESNOCANCEL;
@@ -107,9 +107,9 @@ namespace BlackBerry.Package.Helpers
             switch (result)
             {
                 case IDOK:
-                    return DialogResult.OK;
+                    return buttons == MessageBoxButtons.YesNo ? DialogResult.Yes : DialogResult.OK;
                 case IDCANCEL:
-                    return DialogResult.Cancel;
+                    return buttons == MessageBoxButtons.YesNo ? DialogResult.No : DialogResult.Cancel;
                 case IDABORT:
                     return DialogResult.Abort;
                 case IDIGNORE:
