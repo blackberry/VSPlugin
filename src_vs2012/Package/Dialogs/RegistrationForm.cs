@@ -170,7 +170,7 @@ namespace BlackBerry.Package.Dialogs
             txtCsjPin.Enabled = txtCskPassword.Enabled = txtCskConfirmPassword.Enabled = !tabletRegistered;
 
             // BB10 devices section:
-            bool registered = _developer.IsRegistered;
+            bool registered = _developer.IsBB10Registered;
 
             lblRegistration.Visible = registered;
             lblTokenExpiration.Visible = _developer.HasToken;
