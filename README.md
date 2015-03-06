@@ -13,8 +13,8 @@ If Microsoft Visual Studio 2013 is installed on a machine where Microsoft Visual
 More info [here] (http://connect.microsoft.com/VisualStudio/feedback/details/814147/dia-sdk-installed-into-wrong-directory).
 
 ##Build commands
-# build.bat – A batch file that builds the various components of the BlackBerry Native Plug-in for Microsoft Visual Studio to the "_BuildResults" folder.
-# setup.bat – A batch file that installs the newly built components of the BlackBerry Native Plug-in for Microsoft Visual Studio to the correct locations on your computer. 
+**build.bat** – A batch file that builds the various components of the BlackBerry Native Plug-in for Microsoft Visual Studio to the "_BuildResults" folder.
+**setup.bat** – A batch file that installs the newly built components of the BlackBerry Native Plug-in for Microsoft Visual Studio to the correct locations on your computer. 
 
 Examples:  
 
