@@ -8,41 +8,33 @@ All assets in this repository, unless otherwise stated through sub-directory LIC
 Install
 * [Microsoft Visual Studio Professional 2013 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=40758)
 
-or
-
-* [Microsoft Visual Studio Professional 2012 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=30668)
-
-or
-
-* [Microsoft Visual Studio Professional 2010 SDK] (http://www.microsoft.com/en-us/download/details.aspx?id=21835)
-
-Please note, that currently there is a bug in DIA SDK of Visual Studio 2013.
-If Visual Studio 2013 is installed on a machine, where Visual Studio 2012 did already existed, DIA SDK will be by placed inside it.
+Note: Currently, there is a bug in DIA SDK of Visual Studio 2013.
+If Microsoft Visual Studio 2013 is installed on a machine where Microsoft Visual Studio 2012 was installed, the DIA SDK folder for Microsoft Visual Studio 2013 is installed in the DIA SDK folder for Microsoft Visual Studio 2012.
 More info [here] (http://connect.microsoft.com/VisualStudio/feedback/details/814147/dia-sdk-installed-into-wrong-directory).
 
 ##Build commands
-1. build.bat – A batch file that builds the various components of the BlackBerry Native Plug-in to the "_BuildResults" folder.
-2. setup.bat – A batch file that installs the newly built components of the BlackBerry Native Plug-in to the correct locations on your computer. 
+# build.bat – A batch file that builds the various components of the BlackBerry Native Plug-in for Microsoft Visual Studio to the "_BuildResults" folder.
+# setup.bat – A batch file that installs the newly built components of the BlackBerry Native Plug-in for Microsoft Visual Studio to the correct locations on your computer. 
 
 Examples:  
 
  **build.bat** - default, builds everything  
- **build.bat vs2010** - to build only for Visual Studio 2010  
- **build.bat vs2012 "/out:D:\Shared folder\\_BuildResults"** - to build only for Visual Studio 2012 into specified directory  
+ **build.bat vs2010** - builds only for Microsoft Visual Studio 2010  
+ **build.bat vs2012 "/out:D:\Shared folder\\_BuildResults"** - builds only for Microsoft Visual Studio 2012 into the specified directory  
  
- **setup.bat** - installs plugin for all Visual Studio versions  
- **setup.bat vs2010** - installs only for Visual Studio 2010  
- **setup.bat vs2012 /no-tools** - installs plugin for Visual Studio 2012 without bbndk_vs and qnxtools folders copied  
- **setup.bat vs2012 /msbuild-only** - updates only local MSBuild for Visual Studio 2012 adding 'BlackBerry' and 'BlackBerrySimulator' target platforms
+ **setup.bat** - installs the plug-in for all Microsoft Visual Studio versions  
+ **setup.bat vs2010** - installs the plug-in for only Microsoft Visual Studio 2010  
+ **setup.bat vs2012 /no-tools** - installs the plug-in for Microsoft Visual Studio 2012 without copying the bbndk_vs and qnxtools folders  
+ **setup.bat vs2012 /msbuild-only** - updates only the local MSBuild for Microsoft Visual Studio 2012 and adds the 'BlackBerry' and 'BlackBerrySimulator' target platforms
 
 ##Contributing
 The BlackBerry Native Plug-in for Microsoft Visual Studio project currently contains the following code branches: 
 
-**Master Branch** - The master branch contains the latest production release of the source code. This code is considered stable and is fully tested by the Test team. You can [download the binaries] (http://developer.blackberry.com/native/downloads/) from the Downloads page on the BlackBerry developer website.   
+**Master Branch** - This branch contains the latest production release of the source code. This code is considered stable and is fully tested by the test team. You can [download the binaries] (http://developer.blackberry.com/native/downloads/) from the Downloads page on the BlackBerry developer website.   
 
-**Next Branch** - The next branch contains the latest beta release of the source code. This code may be unstable and is not fully tested because it has passed unit tests only. At some point, a full regression test cycle is performed on the next branch and the code is promoted to the master branch.
+**Next Branch** - This branch contains the latest beta release of the source code. This code may be unstable and is not fully tested because it has passed unit tests only. At some point, a full regression test cycle is performed on the next branch and the code is promoted to the master branch.
 
-**Feature Branch** - Feature branches contain the code changes required to implement specific features or issues being worked on for the next release. This code is considered unstable. These branches are denoted by the following naming scheme in the repository: next-### (where ### is the related issue number). When implementation is completed, the branch is unit and integration tested and then merged into the next branch.
+**Feature Branch** - This branch contains the code changes required to implement specific features or issues being worked on for the next release. This code is considered unstable. These branches are denoted by the following naming scheme in the repository: next-### (where ### is the related issue number). When implementation is completed, the branch is unit and integration tested and then merged into the next branch.
 
 **To contribute code to this repository you must be [signed up as an official contributor](http://blackberry.github.com/howToContribute.html).**
 
