@@ -14,6 +14,7 @@ More info [here] (http://connect.microsoft.com/VisualStudio/feedback/details/814
 
 ##Build commands
 **build.bat** – A batch file that builds the various components of the BlackBerry Native Plug-in for Microsoft Visual Studio to the "_BuildResults" folder.
+
 **setup.bat** – A batch file that installs the newly built components of the BlackBerry Native Plug-in for Microsoft Visual Studio to the correct locations on your computer. 
 
 Examples:  
