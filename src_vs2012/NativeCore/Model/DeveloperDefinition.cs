@@ -38,7 +38,7 @@ namespace BlackBerry.NativeCore.Model
                 throw new ArgumentNullException("dataPath");
 
             DataPath = dataPath;
-            CertificateFileName = certificatePath;
+            CertificateFileName = certificatePath ?? DefaultCertificateName;
             CskPassword = cskPassword;
             _cachedAuthor = authorInfo;
         }
@@ -193,9 +193,17 @@ namespace BlackBerry.NativeCore.Model
         }
 
         /// <summary>
-        /// Checks if developer completed registration.
+        /// Checks if developer completed any kind of registration.
         /// </summary>
         public bool IsRegistered
+        {
+            get { return IsBB10Registered || IsTabletRegistered; }
+        }
+
+        /// <summary>
+        /// Checks if developer completed BB10 registration.
+        /// </summary>
+        public bool IsBB10Registered
         {
             get { return HasCertificate && File.Exists(CskTokenFullPath); }
         }
@@ -225,6 +233,7 @@ namespace BlackBerry.NativeCore.Model
                 if (value == null)
                 {
                     DeleteCachedAuthorInfo();
+                    _cachedAuthor = null;
                 }
                 else
                 {
@@ -844,7 +853,7 @@ namespace BlackBerry.NativeCore.Model
 
             DeleteCertificatePath();
             ClearPassword();
-            CertificateFileName = null;
+            CertificateFileName = DefaultCertificateName;
             Name = null;
             Token = null;
         }
@@ -870,7 +879,7 @@ namespace BlackBerry.NativeCore.Model
              var result = new StringBuilder();
 
             result.AppendLine("Status:");
-            result.Append(" * BlackBerry 10 - ").AppendLine(IsRegistered ? "Registered" : (IsTabletRegistered ? "using tablet certificates" : "Unregistered"));
+            result.Append(" * BlackBerry 10 - ").AppendLine(IsBB10Registered ? "Registered" : (IsTabletRegistered ? "using tablet certificates" : "Unregistered"));
             if (HasToken)
             {
                 if (Token.IsValid)
@@ -893,7 +902,7 @@ namespace BlackBerry.NativeCore.Model
         {
             var result = new StringBuilder();
 
-            result.Append("BB10: ").AppendLine(IsRegistered ? "Registered" : (IsTabletRegistered ? "using tablet certificates" : "Unregistered"));
+            result.Append("BB10: ").AppendLine(IsBB10Registered ? "Registered" : (IsTabletRegistered ? "using tablet certificates" : "Unregistered"));
             if (HasToken)
             {
                 if (Token.IsValid)

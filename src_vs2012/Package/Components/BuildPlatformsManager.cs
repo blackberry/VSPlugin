@@ -1035,7 +1035,7 @@ namespace BlackBerry.Package.Components
                 var target = ActiveTarget;
                 if (target != null)
                 {
-                    Targets.Connect(ActiveTarget, ConfigDefaults.SshPublicKeyPath, null);
+                    Targets.Connect(ActiveTarget, ConfigDefaults.SshPublicKeyPath, ConfigDefaults.SshPrivateKeyPath, null);
                 }
 
                 _isDeploying = true;

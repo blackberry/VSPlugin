@@ -486,6 +486,9 @@
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\KeyToolRemoveRunner.cs">
       <Link>Tools\KeyToolRemoveRunner.cs</Link>
     </Compile>
+    <Compile Include="..\..\src_vs2012\NativeCore\Tools\SshCreateKeyRunner.cs">
+      <Link>Tools\SshCreateKeyRunner.cs</Link>
+    </Compile>
     <Compile Include="..\..\src_vs2012\NativeCore\Tools\ToolRunner.cs">
       <Link>Tools\ToolRunner.cs</Link>
     </Compile>

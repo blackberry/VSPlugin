@@ -70,5 +70,10 @@ namespace BlackBerry.Package.Dialogs
         {
             DialogHelper.StartURL(ConfigDefaults.GithubProjectAuthor);
         }
+
+        private void linkTwitter_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            DialogHelper.StartURL(ConfigDefaults.GithubProjectAuthorTwitter);
+        }
     }
 }

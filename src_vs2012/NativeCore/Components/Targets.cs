@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using BlackBerry.NativeCore.Debugger;
 using BlackBerry.NativeCore.Debugger.Model;
@@ -8,6 +9,7 @@ using BlackBerry.NativeCore.Model;
 using BlackBerry.NativeCore.QConn;
 using BlackBerry.NativeCore.QConn.Model;
 using BlackBerry.NativeCore.QConn.Services;
+using BlackBerry.NativeCore.Tools;
 
 namespace BlackBerry.NativeCore.Components
 {
@@ -35,21 +37,25 @@ namespace BlackBerry.NativeCore.Components
         {
             private AutoResetEvent _hasStatusEvent;
             private readonly string _sshPublicKeyPath;
+            private readonly string _sshPrivateKeyPath;
             private volatile bool _startingSLog2;
 
             public event EventHandler<TargetConnectionEventArgs> StatusChanged;
 
-            public TargetInfo(DeviceDefinition device, string sshPublicKeyPath)
+            public TargetInfo(DeviceDefinition device, string sshPublicKeyPath, string sshPrivateKeyPath)
             {
                 if (device == null)
                     throw new ArgumentNullException("device");
                 if (string.IsNullOrEmpty(sshPublicKeyPath))
                     throw new ArgumentNullException("sshPublicKeyPath");
+                if (string.IsNullOrEmpty(sshPrivateKeyPath))
+                    throw new ArgumentNullException("sshPrivateKeyPath");
 
                 Status = TargetStatus.Initialized;
                 Device = device;
                 _hasStatusEvent = new AutoResetEvent(false);
                 _sshPublicKeyPath = sshPublicKeyPath;
+                _sshPrivateKeyPath = sshPrivateKeyPath;
 
                 Client = new QConnClient();
                 Door = new QConnDoor();
@@ -152,6 +158,26 @@ namespace BlackBerry.NativeCore.Components
             public void Start()
             {
                 NotifyStatusChange(TargetStatus.Connecting, null);
+
+                /////////////////////////////////////
+                // Verify, if we are able to connect at all, where the public key is required:
+                if (!File.Exists(_sshPublicKeyPath))
+                {
+                    var ndk = NdkDefinition.Load();
+                    if (ndk == null || !Directory.Exists(ndk.HostPath))
+                    {
+                        NotifyStatusChange(TargetStatus.Failed, "Unable to create public SSH key to establish connection. Download BlackBerry Native SDK first.");
+                        return;
+                    }
+
+                    // generate SSH public key blocking current thread till completed:
+                    var tool = new SshCreateKeyRunner(Path.Combine(ndk.HostPath, "usr", "bin", "ssh-keygen.exe"), _sshPublicKeyPath, _sshPrivateKeyPath, 4096);
+                    if (!tool.Execute())
+                    {
+                        NotifyStatusChange(TargetStatus.Failed, "Public SSH key creation failed.");
+                        return;
+                    }
+                }
 
                 /////////////////////////////////////
                 // Trick of the day: there can be only one QConnDoor connection setup to the device
@@ -427,11 +453,28 @@ namespace BlackBerry.NativeCore.Components
         }
 
         /// <summary>
-        /// Gets an indication, if there is already a valid connection to the device with given IP.
+        /// Gets an indication, if there is already a valid connection to the device.
         /// </summary>
         public static bool IsConnected(DeviceDefinition device)
         {
             return device != null && IsConnected(device.IP);
+        }
+
+        /// <summary>
+        /// Gets an indication, if there is trying to connect to the device with given IP.
+        /// </summary>
+        public static bool IsConnecting(string ip)
+        {
+            var connection = Find(ip);
+            return connection != null && connection.Status == TargetStatus.Connecting;
+        }
+
+        /// <summary>
+        /// Gets an indication, if there is trying to connect to the device.
+        /// </summary>
+        public static bool IsConnecting(DeviceDefinition device)
+        {
+            return device != null && IsConnecting(device.IP);
         }
 
         /// <summary>
@@ -466,19 +509,21 @@ namespace BlackBerry.NativeCore.Components
         /// Gets the manager of the device for advanced services.
         /// It will try to automatically connect to the device, if needed and might block current thread for that time.
         /// </summary>
-        public static QConnClient Get(DeviceDefinition device, string sshPublicKeyPath)
+        public static QConnClient Get(DeviceDefinition device, string sshPublicKeyPath, string sshPrivateKeyPath)
         {
             if (device == null)
                 throw new ArgumentNullException("device");
             if (string.IsNullOrEmpty(sshPublicKeyPath))
-                throw new ArgumentNullException(sshPublicKeyPath);
+                throw new ArgumentNullException("sshPublicKeyPath");
+            if (string.IsNullOrEmpty(sshPrivateKeyPath))
+                throw new ArgumentNullException("sshPrivateKeyPath");
 
             var qClient = Get(device.IP);
 
             // need to connect first:
             if (qClient == null)
             {
-                Connect(device, sshPublicKeyPath, null);
+                Connect(device, sshPublicKeyPath, sshPrivateKeyPath, null);
 
                 // wait until link established or error:
                 if (Wait(device.IP))
@@ -493,9 +538,9 @@ namespace BlackBerry.NativeCore.Components
         /// <summary>
         /// Requests secure connection setup to given device.
         /// </summary>
-        public static void Connect(string ip, string password, DeviceDefinitionType type, string sshPublicKeyPath, EventHandler<TargetConnectionEventArgs> resultHandler)
+        public static void Connect(string ip, string password, DeviceDefinitionType type, string sshPublicKeyPath, string sshPrivateKeyPath, EventHandler<TargetConnectionEventArgs> resultHandler)
         {
-            Connect(new DeviceDefinition("Ad-hoc device", ip, password, type), sshPublicKeyPath, resultHandler);
+            Connect(new DeviceDefinition("Ad-hoc device", ip, password, type), sshPublicKeyPath, sshPrivateKeyPath, resultHandler);
         }
 
         /// <summary>
@@ -506,18 +551,20 @@ namespace BlackBerry.NativeCore.Components
             if (device == null)
                 throw new ArgumentNullException("device");
 
-            Connect(device, ConfigDefaults.SshPublicKeyPath, resultHandler);
+            Connect(device, ConfigDefaults.SshPublicKeyPath, ConfigDefaults.SshPrivateKeyPath, resultHandler);
         }
 
         /// <summary>
         /// Requests secure connection setup to given device.
         /// </summary>
-        public static void Connect(DeviceDefinition device, string sshPublicKeyPath, EventHandler<TargetConnectionEventArgs> resultHandler)
+        public static void Connect(DeviceDefinition device, string sshPublicKeyPath, string sshPrivateKeyPath, EventHandler<TargetConnectionEventArgs> resultHandler)
         {
             if (device == null)
                 throw new ArgumentNullException("device");
             if (string.IsNullOrEmpty(sshPublicKeyPath))
                 throw new ArgumentNullException("sshPublicKeyPath");
+            if (string.IsNullOrEmpty(sshPrivateKeyPath))
+                throw new ArgumentNullException("sshPrivateKeyPath");
 
             TargetInfo existingTarget;
             lock (_sync)
@@ -527,7 +574,7 @@ namespace BlackBerry.NativeCore.Components
                 // this trick will let only one thread add new connection-info, if both blocked on the sync above:
                 if (existingTarget == null)
                 {
-                    var newTarget = new TargetInfo(device, sshPublicKeyPath);
+                    var newTarget = new TargetInfo(device, sshPublicKeyPath, sshPrivateKeyPath);
                     if (resultHandler != null)
                     {
                         newTarget.StatusChanged += resultHandler;

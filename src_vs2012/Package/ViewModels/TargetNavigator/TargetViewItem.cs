@@ -39,6 +39,16 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
             get { return true; }
         }
 
+        public bool CanConnect
+        {
+            get { return !Targets.IsConnected(Device) && !Targets.IsConnecting(Device); }
+        }
+
+        public bool CanDisconnect
+        {
+            get { return Targets.IsConnected(Device); }
+        }
+
         #endregion
 
         #region Overrides
@@ -99,6 +109,9 @@ namespace BlackBerry.Package.ViewModels.TargetNavigator
 
             AdoptItems(items);
             OnItemsLoaded(items, items, e);
+
+            NotifyPropertyChanged("CanConnect");
+            NotifyPropertyChanged("CanDisconnect");
         }
 
         protected override void ItemsCompleted(object state)

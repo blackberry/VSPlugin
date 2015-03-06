@@ -148,7 +148,7 @@ namespace BlackBerry.DebugEngine
 
             try
             {
-                var qClient = Targets.Get(Device, ConfigDefaults.SshPublicKeyPath);
+                var qClient = Targets.Get(Device, ConfigDefaults.SshPublicKeyPath, ConfigDefaults.SshPrivateKeyPath);
                 if (qClient != null)
                 {
                     processes = qClient.SysInfoService.LoadProcesses();
