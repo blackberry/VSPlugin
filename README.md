@@ -54,5 +54,5 @@ The BlackBerry Native Plug-in for Microsoft Visual Studio project currently cont
 * [Gustavo Arnold](http://github.com/guarnold)
 
 ## Reference material
-* [Using Microsoft Visual Studio] (https://developer.blackberry.com/native/documentation/core/vs_using_microsoft_visual_studio.html)
+* [Microsoft Visual Studio:] (http://developer.blackberry.com/native/documentation/dev/visual_studio/vs_using_microsoft_visual_studio.html) 
 * [GDB Commands] (http://sourceware.org/gdb/onlinedocs/gdb/GDB_002fMI.html)
